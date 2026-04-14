@@ -2,15 +2,8 @@
 | Level 101 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include <QQueue>
-#include <QString>
-
-#include <fmt/format.h>
-
-#include "DC/interp.h"
 
 #include "DC/DC.h"
-#include "DC/terminal.h"
 
 QQueue<QString> imm_history;
 QQueue<QString> imp_history;

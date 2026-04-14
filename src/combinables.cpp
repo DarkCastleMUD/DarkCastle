@@ -1,26 +1,7 @@
 // This file takes care of all the skills that make stuff by combining it
 // in it's container type.  For example, poison making.
 
-#include <iostream>
-#include <fstream>
-#include <utility>
-
-#include "DC/obj.h"
-#include "DC/db.h"
-
 #include "DC/DC.h"
-
-#include "DC/handler.h"
-#include "DC/db.h"
-#include "DC/player.h"
-#include "DC/interp.h"
-#include "DC/magic.h"
-#include "DC/act.h"
-
-#include "DC/spells.h"
-#include "DC/combinables.h"
-#include "DC/const.h"
-#include "DC/utility.h"
 
 using namespace Combinables;
 

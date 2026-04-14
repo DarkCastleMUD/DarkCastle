@@ -5,8 +5,6 @@
 */
 #include "DC/DC.h"
 
-#include <QString>
-
 extern bool MOBtrigger;
 
 constexpr auto TO_ROOM = 0;           // Everyone in ch's room except ch

@@ -6,8 +6,6 @@
 
 #include "DC/DC.h"
 
-#include "DC/interp.h"
-
 class spec_data
 {
 public:

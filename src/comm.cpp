@@ -8,53 +8,14 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-#include <cerrno>
-#include <cstring>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/socket.h>
-#include <sys/resource.h>
-#include <ctime>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/telnet.h>
-#include <arpa/inet.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <cctype>
-#include <sys/time.h>
-
+#include "DC/DC.h"
 #ifdef TRACY
 #include <tracy/Tracy.hpp>
 #endif
 
-#include <sstream>
-#include <iostream>
-#include <algorithm>
-#include <QString>
-#include <QQueue>
-#include <cstdint>
-
-#include <fmt/format.h>
-#include <QTimer>
-#include <QHttpServer>
-#include <QtConcurrent>
-#include <QMap>
-#include <QtNetwork>
-
-#include "DC/terminal.h"
-
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/comm.h"
-#include "DC/quest.h"
-#include "DC/shop.h"
 #ifdef USE_SQL
 #include "Backend/Database.h"
 #endif
-#include "DC/DC.h"
-#include "DC/CommandStack.h"
 
 class multiplayer
 {

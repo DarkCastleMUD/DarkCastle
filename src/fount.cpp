@@ -10,13 +10,7 @@
  ***************************************************************************/
 /* $Id: fount.cpp,v 1.6 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/obj.h"
-
 #include "DC/DC.h"
-
-#include "DC/act.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
 
 /*************************************************************************
  * Figures out if a fountain is present in the room                       *

@@ -13,14 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 #include "DC/DC.h"
-#include <cassert>
-#include <fmt/format.h>
-#include <QFile>
-#include <qtypes.h>
-#include "DC/punish.h"
-#include "DC/terminal.h"
-#include "DC/interp.h"
-#include "DC/db.h"
 
 extern bool MOBtrigger;
 

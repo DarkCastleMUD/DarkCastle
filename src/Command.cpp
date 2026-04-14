@@ -1,9 +1,4 @@
-#include "DC/Command.h"
 #include "DC/DC.h"
-#include "DC/levels.h"
-#include <QMap>
-#include <QString>
-#include <DC/Direction.h>
 QMap<QString, Command> Commands::qstring_command_map_ = {};
 QMap<cmd_t, Command> Commands::cmd_t_command_map_ = {};
 

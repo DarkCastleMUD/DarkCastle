@@ -4,14 +4,7 @@
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
 */
-#include "DC/obj.h"
 #include "DC/DC.h"
-
-#include "DC/handler.h"
-#include "DC/fight.h"
-#include "DC/interp.h"
-#include "DC/inventory.h"
-#include "DC/punish.h"
 
 extern qint32 rev_dir[];
 

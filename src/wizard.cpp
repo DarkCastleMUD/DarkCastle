@@ -4,19 +4,6 @@
 | Description:  Utility functions necessary for wiz commands.
 */
 #include "DC/DC.h"
-#include "DC/wizard.h"
-#include "DC/db.h"
-#include "DC/player.h"
-#include "DC/handler.h"
-#include "DC/spells.h"
-#include "DC/interp.h"
-#include "DC/comm.h"
-#include "DC/const.h"
-#include "DC/inventory.h"
-
-#include <unistd.h>
-#include <fmt/format.h>
-#include <QString>
 
 qint32 getRealSpellDamage(CharacterPtr ch);
 

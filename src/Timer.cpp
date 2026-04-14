@@ -5,9 +5,7 @@
  *      Author: jhhudso
  */
 
-#include <cassert>
-#include "DC/Timer.h"
-#include <sys/time.h>
+#include "DC/DC.h"
 
 QMap<QString, Timer> PerfTimers;
 

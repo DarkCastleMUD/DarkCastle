@@ -14,7 +14,6 @@
  ***************************************************************************/
 /* $Id: weather.cpp,v 1.14 2012/05/06 00:55:44 jhhudso Exp $ */
 
-#include "DC/weather.h"
 #include "DC/DC.h"
 
 // TODO - Either rip out the pressure stuff, or make it easier to understand.

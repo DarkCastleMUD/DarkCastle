@@ -3,13 +3,6 @@
 | Description:  Commands for the mage class.
 */
 #include "DC/DC.h"
-#include "DC/spells.h"
-#include "DC/structs.h"
-
-#include "DC/fight.h"
-
-#include "DC/act.h"
-#include "DC/interp.h"
 
 qint32 spellcraft(CharacterPtr ch, qint32 spell)
 {

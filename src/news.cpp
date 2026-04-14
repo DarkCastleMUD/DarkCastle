@@ -13,16 +13,7 @@
  *   share your changes too.  What goes around, comes around.               *
  ****************************************************************************/
 
-#include <cstring>
-#include <cstdlib>
-#include <qdebug.h>
-#include <qiodevicebase.h>
-
 #include "DC/DC.h"
-
-#include "DC/db.h" // exp_table
-#include "DC/interp.h"
-#include "DC/news.h"
 
 news_data *thenews = {};
 void addnews(news_data *newnews)

@@ -2,29 +2,7 @@
 // Usage: This file contains special procedures pertaining to objects, except
 // for the boards which are in board.C
 
-#include <QString>
-#include <sstream>
-
-#include <cstring> // strstr()
-
-#include <fmt/format.h>
-
-#include "DC/fight.h"
-
 #include "DC/DC.h"
-
-#include "DC/handler.h"
-#include "DC/db.h"
-#include "DC/player.h"
-#include "DC/interp.h"
-#include "DC/magic.h"
-#include "DC/act.h"
-
-#include "DC/spells.h"
-#include "DC/race.h"
-#include "DC/const.h"
-#include "DC/inventory.h"
-#include "DC/utility.h"
 
 const auto EMOTING_FILE = u"emoting-objects.txt"_s;
 

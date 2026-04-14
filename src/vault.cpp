@@ -1,22 +1,9 @@
 
-#include <cstring>
-#include <fstream>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fmt/format.h>
-
 #ifdef TRACY
 #include <tracy/Tracy.hpp>
 #endif
 
 #include "DC/DC.h"
-#include "DC/db.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/clan.h" // clan right
-#include "DC/inventory.h"
 
 /*
   void vault_withdraw(quint32 amount, QString owner);

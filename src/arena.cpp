@@ -10,9 +10,6 @@
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
 #include "DC/DC.h"
-#include "DC/comm.h"
-#include "DC/handler.h"
-#include "DC/punish.h"
 
 auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {

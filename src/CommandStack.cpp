@@ -5,7 +5,6 @@
  *      Author: Jared H. Hudson
  */
 #include "DC/DC.h"
-#include "DC/CommandStack.h"
 
 quint32 CommandStack::depth = {};
 quint32 CommandStack::max_depth = 5;

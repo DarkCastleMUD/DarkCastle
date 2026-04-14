@@ -5,8 +5,6 @@
 */
 
 #include "DC/DC.h"
-#include "DC/interp.h"
-#include "DC/const.h"
 
 ClanPtr get_clan(CharacterPtr);
 
@@ -251,14 +249,14 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       auto is_abbreviation = [&](auto fullname)
       { return is_abbrev(oneword, fullname); };
 
-      auto it = std::std::find_if(std::begin(class_names), std::end(class_names), is_abbreviation);
+      auto it = std::find_if(std::begin(class_names), std::end(class_names), is_abbreviation);
       if (it != std::end(class_names))
       {
         class_found = *it;
       }
       else
       {
-        it = std::std::find_if(std::begin(race_names), std::end(race_names), is_abbreviation);
+        it = std::find_if(std::begin(race_names), std::end(race_names), is_abbreviation);
         if (it != std::end(race_names))
         {
           race_found = *it;

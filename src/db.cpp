@@ -18,35 +18,9 @@
  ***************************************************************************/
 /* $Id: db.cpp,v 1.229 2015/06/14 02:38:12 pirahna Exp $ */
 /* Again, one of those scary files I'd like to stay away from. --Morc XXX */
-#include "DC/comm.h"
+
+#include "DC/DC.h"
 qint32 load_debug = {};
-
-#include <cassert>
-#include <cstdio>
-#include <cstring>
-#include <cctype>
-#include <ctime>
-#include <cstdlib>
-
-#include <sstream>
-
-#include <QDebug>
-
-#include "DC/db.h"
-
-#include "DC/weather.h" // s
-                        // s
-#include "DC/DC.h"
-
-#include "DC/race.h"
-#include "DC/handler.h" // get_obj_num
-#include "DC/interp.h"
-#include "DC/shop.h"
-#include "DC/help.h"
-#include "DC/quest.h"
-#include "DC/DC.h"
-#include "DC/const.h"
-#include "DC/wizard.h"
 
 Room &World::operator[](room_t room_key)
 {
@@ -3114,7 +3088,7 @@ void handle_automatic_mob_settings(CharacterPtr mob)
     alevel -= 0.5;
   if (!c && IS_AFFECTED(mob, AFF_INFRARED))
     alevel -= 0.5;
-  if (!c && IS_AFFECTED(mob, AFF_true_SIGHT))
+  if (!c && IS_AFFECTED(mob, AFF_TRUE_SIGHT))
     alevel -= 1.0;
   if (IS_AFFECTED(mob, AFF_BLIND))
     alevel += 3.0;
@@ -3941,114 +3915,6 @@ ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
   }
 
   return obj;
-}
-
-auto &operator>>(auto &stream, ObjectPtr obj)
-{
-  qint32 loc, mod, nr;
-
-  QChar chk, c;
-  extra_descr_data *new_new_descr;
-
-  if (obj == nullptr)
-  {
-    return stream;
-  }
-
-  clear_object(obj);
-  stream >> c;
-  if (c == '#')
-  {
-    stream >> nr;
-  }
-  stream >> std::ws;
-
-  obj->name(fread_string(stream, true));
-
-  obj->short_description(fread_string(stream, true));
-  obj->long_description(fread_string(stream, 1));
-  obj->ActionDescription(fread_string(stream, 1));
-  obj->table = {};
-  dc_->currentVNUM(nr);
-  dc_->currentName(obj->name());
-  dc_->currentType("Object");
-
-  // numeric data
-
-  obj->obj_flags.type_flag = fread_int(stream, -1000, 2147483467);
-
-  obj->obj_flags.extra_flags = fread_bitvector(stream, 0, 2147483467);
-  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(stream);
-  obj->obj_flags.size = fread_bitvector(stream, 0, 2147483467);
-
-  obj->obj_flags.value[0] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.value[1] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.value[2] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.value[3] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.eq_level = fread_int(stream, -1000, IMPLEMENTER);
-  obj->obj_flags.weight = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.cost = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.more_flags = fread_bitvector(stream, -1000, 2147483467);
-
-  // currently not stored stream object file
-  obj->obj_flags.timer = {};
-
-  obj->ex_description = {};
-  obj->affected = {};
-  obj->num_affects = {};
-  // other flags
-
-  stream >> chk;
-
-  QString log_buf = {};
-  while (chk != 'S')
-  {
-    switch (chk)
-    {
-    // skip whitespace
-    case ' ':
-    case '\n':
-      break;
-    case 'E':
-    {
-      auto new_new_descr = new extra_descr_data;
-      new_new_descr->keyword_ = fread_string(stream, 1);
-      new_new_descr->description_ = fread_string(stream, 1);
-      new_new_descr->next = obj->ex_description;
-      obj->ex_description = new_new_descr;
-    }
-    break;
-
-    case '\\':
-      // ungetc( '\\', stream );
-      // mprog_read_programs( stream, nr,ignore );
-      break;
-
-    case 'A':
-      // these are only two members of obj_affected_type, so nothing else needs initializing
-      loc = fread_int(stream, -1000, 2147483467);
-      mod = fread_int(stream, -1000, 1000);
-      add_obj_affect(obj, loc, mod);
-      break;
-
-    default:
-      logbug(u"Illegal obj addon flag %1 stream obj %2."_s.arg(chk).arg(obj->name()));
-      break;
-    } // switch
-      // read stream next flag
-    stream >> chk;
-  }
-
-  obj->in_room = DC::NOWHERE;
-  obj->next_skill = {};
-  obj->next_content = {};
-  obj->carried_by = {};
-  obj->equipped_by = {};
-  obj->in_obj = {};
-  obj->contains = {};
-  obj->item_number = {};
-
-  return stream;
 }
 
 // write an object to file
@@ -5030,182 +4896,6 @@ bool Zone::isEmpty(void)
   return true;
 }
 
-QString fread_string(QTextStream &stream, bool *ok)
-{
-  assert(stream.status() == QTextStream::Status::Ok);
-  QString buffer;
-
-  qDebugQTextStreamLine(stream, "before fread_string()");
-  do
-  {
-    QString line = stream.readLine();
-    if (line.endsWith('~'))
-    {
-      line.remove(line.length() - 1, 1);
-      if (ok)
-      {
-        *ok = true;
-      }
-      assert(stream.status() == QTextStream::Status::Ok);
-      qDebug() << "fread_string returning" << buffer + line << (buffer + line).length();
-      qDebugQTextStreamLine(stream, "after fread_string()");
-      return buffer + line;
-    }
-    else
-    {
-      buffer += line + '\n';
-    }
-
-  } while (!stream.atEnd());
-
-  if (ok)
-  {
-    *ok = false;
-  }
-  assert(stream.status() == QTextStream::Status::Ok);
-  qDebug() << "fread_string returning" << buffer << buffer.length();
-  qDebugQTextStreamLine(stream, "after fread_string()");
-  return buffer;
-}
-
-QString fread_word(QTextStream &fl)
-{
-  QString buffer;
-  fl >> buffer;
-  return buffer;
-}
-
-/* read and allocate space for a whitespace-terminated QString from a given file */
-QString fread_word(FILE *fl, qint32 hasher)
-{
-  QString buf;
-  QString pAlloc;
-  QString pBufLast;
-  QString temp;
-  QChar tmp;
-  while ((tmp = getc(fl)) == ' ')
-    ;
-  ungetc(tmp, fl);
-
-  for (pBufLast = buf; pBufLast < &buf[sizeof(buf) - 2];)
-  {
-    *pBufLast = getc(fl);
-    switch (*pBufLast)
-    {
-    default:
-      pBufLast++;
-      break;
-
-    case (QChar)EOF:
-      perror("fread_word: EOF");
-      abort();
-      break;
-
-    case '\t':
-    case '\n':
-    case ' ':
-      if (pBufLast == buf)
-      {
-        if (hasher)
-          pAlloc = u""_s;
-        else
-          pAlloc = u""_s;
-      }
-      else if (hasher)
-      {
-        *pBufLast++ = '\0';
-        pAlloc = {};
-        memcpy(pAlloc, buf, pBufLast - buf);
-        temp = pAlloc;
-        pAlloc = temp;
-      }
-      else
-      {
-        *pBufLast++ = '\0';
-        pAlloc = {};
-        memcpy(pAlloc, buf, pBufLast - buf);
-      }
-      return pAlloc;
-      // end of ~ case
-    } // switch
-  } // for
-
-  perror("fread_word: QString too long");
-  abort();
-  return (nullptr);
-}
-
-// This is here to allow us to read a bitvector in as either a number
-// or as a QString of characters.  ie, 4, and c are the same.
-// 5 (1+4) would be the same at 'ac'
-
-qint32 fread_bitvector(FILE *fl, qint32 beg_range, qint32 end_range)
-{
-  QString buf;
-  qint32 ch;
-  qint32 i = {};
-
-  // eat space till we hit the next one
-  while ((ch = getc(fl)))
-  {
-    if (ch == EOF)
-    {
-      qWarning() << u"Reading %1"_s.arg(dc_->current());
-      perror("fread_bitvector: premature EOF");
-      abort();
-    }
-
-    if (ch != ' ' && ch != '\n') /* eat the white space */
-      break;
-  }
-
-  // check if we're dealing with numbers, or letters
-  if (isdigit(ch) || ch == '-')
-  {
-    // It's a digit, so put the chararacter back and let fread_int handle it
-    ungetc(ch, fl);
-    return fread_int(fl, beg_range, end_range);
-  }
-
-  // we're dealing with letters now
-  for (;;)
-  {
-    if (ch == EOF)
-    {
-      logbug(u"Reading %1"_s.arg(dc_->current()));
-      perror("fread_bitvector: premature EOF");
-      abort();
-    }
-    if (ch >= 'a' && ch <= 'z')
-    {
-      i += 1 << (ch - 'a');
-    }
-    else if (ch >= 'A' && ch <= 'G')
-    {
-      i += 1 << (26 + (ch - 'A'));
-    }
-    else if (ch == ' ' || ch == '\n')
-    {
-      // we hit the end.  Return current i.
-      return i;
-    }
-    else
-    {
-      logmisc(u"Reading %1 (%2)"_s.arg(dc_->current()).arg(ch));
-      perror("fread_bitvector: illegal character");
-      abort();
-    }
-
-    // if we hit here, we had a valid character.  read the next one.
-    ch = getc(fl);
-
-  } // for ;;
-
-  perror("fread_bitvector: something went wrong");
-  abort();
-  return {};
-}
-
 qint32 fread_bitvector(std::ifstream &in, qint32 beg_range, qint32 end_range)
 {
   qint32 ch;
@@ -5457,42 +5147,6 @@ qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
   perror("fread_int: something went wrong");
   abort();
   return {};
-}
-
-QChar fread_char(QTextStream &fl)
-{
-
-  if (fl.atEnd())
-  {
-    logbug(u"Reading %1"_s.arg(dc_->current()));
-    perror("fread_char: premature EOF");
-    abort();
-  }
-
-  QChar c;
-  fl >> c;
-
-  return c;
-}
-
-QChar fread_char(FILE *fl)
-{
-  qint32 ch;
-
-  while ((ch = getc(fl)))
-  {
-    if (ch == EOF)
-    {
-      logbug(u"Reading %1"_s.arg(dc_->current()));
-      perror("fread_char: premature EOF");
-      abort();
-    }
-
-    if (ch != ' ' && ch != '\n') /* eat the white space */
-      break;
-  }
-
-  return ch;
 }
 
 /* release memory allocated for a character  */

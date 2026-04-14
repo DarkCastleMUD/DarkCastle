@@ -3,15 +3,6 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include <fmt/format.h>
-
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/DC.h"
 
 #ifdef BANDWIDTH
 #include "DC/bandwidth.h"

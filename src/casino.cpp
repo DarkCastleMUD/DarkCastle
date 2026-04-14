@@ -6,27 +6,6 @@
 
 */
 #include "DC/DC.h"
-#include "DC/comm.h"
-#include "DC/structs.h"
-#include "DC/terminal.h"
-#include "DC/db.h"
-#include "DC/interp.h"
-#include "DC/act.h"
-
-#include <cstring>
-#include <algorithm>
-#include <fmt/format.h>
-
-void pulse_table_bj(table_data *tbl, qint32 recall = 0);
-void reset_table(table_data *tbl);
-void nextturn(table_data *tbl);
-void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3);
-void add_timer_bj_dealer(table_data *tbl);
-void addtimer(timer_data *add);
-qint32 hand_number(player_data *plr);
-qint32 hands(player_data *plr);
-bool charExists(CharacterPtr ch);
-void reel_spin(varg_t, void *, void *);
 
 /*
    BLACKJACK!
@@ -112,7 +91,7 @@ void nextturn(table_data *tbl)
   }
 }
 
-void send_to_table(QString msg, table_data *tbl, player_data *plrSilent = {})
+void DC::send_to_table(QString msg, table_data *tbl, player_data *plrSilent = {})
 {
   //  player_data *plr;
   /*  for (plr = tbl->plr ; plr ; plr = plr->next)
@@ -139,15 +118,13 @@ bool charExists(CharacterPtr ch)
   }
 }
 
-bool verify(player_data *plr)
+bool DC::verify(player_data *plr)
 {
   // make sure player didn't quit, die, or whatever
   // CharacterPtr ch;
 
-  const auto &character_list = dc_->character_list;
-
-  auto result = std::std::find_if(character_list.begin(), character_list.end(), [&plr](CharacterPtr const &ch)
-                                  {
+  auto result = std::find_if(character_list.begin(), character_list.end(), [&plr](CharacterPtr const &ch)
+                             {
 	  if (ch == plr->ch) {
 		  return true;
 	  } else {
@@ -397,7 +374,7 @@ void dealcard(player_data *plr)
   plr->hand_data[i] = pickCard(plr->table->deck);
 }
 
-void check_active(varg_t arg1, void *arg2, void *arg3)
+void DC::check_active(varg_t arg1, void *arg2, void *arg3)
 {
   player_data *plr = arg1.player;
   table_data *tbl = (table_data *)arg3;
@@ -529,7 +506,7 @@ void reset_table(table_data *tbl)
     tbl->hand_data[i] = {};
 }
 
-void check_winner(table_data *tbl)
+void DC::check_winner(table_data *tbl)
 {
   qint32 dealer = hand_strength(tbl);
   player_data *plr, *next;
@@ -669,7 +646,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
   };
 }
 
-void check_blackjacks(table_data *tbl)
+void DC::check_blackjacks(table_data *tbl)
 {
   QString buf;
   player_data *plr, *next;
@@ -773,7 +750,7 @@ const QString hand_thing(player_data *plr)
   return &buf[0];
 }
 
-void pulse_table_bj(table_data *tbl, qint32 recall)
+void DC::pulse_table_bj(table_data *tbl, qint32 recall)
 {
   /*  if (tbl->state)
     {
@@ -977,7 +954,7 @@ QString Character::createBlackjackPrompt(void)
   for (plr = obj->table->plr; plr; plr = pnext)
   {
     pnext = plr->next;
-    if (!verify(plr))
+    if (!dc_->verify(plr))
       continue;
     if (!plr->hand_data[0])
       continue;

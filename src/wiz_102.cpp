@@ -13,17 +13,6 @@
 /*****************************************************************************/
 
 #include "DC/DC.h"
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/race.h"
-#include "DC/const.h"
-#include "DC/newedit.h"
-#include "DC/punish.h"
-#include <cctype>
-#include <QString>
-#include <tuple>
-#include <algorithm>
-#include <fmt/format.h>
 
 command_return_t zedit_list(CharacterPtr ch, QStringList arguments, const Zone &zone, bool stats = false);
 

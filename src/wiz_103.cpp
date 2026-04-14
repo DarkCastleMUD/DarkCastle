@@ -3,12 +3,6 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-#include "DC/interp.h"
-#include "DC/clan.h"
-#include "DC/race.h"
-#include "DC/const.h"
-
-#include <fmt/format.h>
 
 command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {

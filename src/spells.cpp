@@ -22,15 +22,7 @@
  ***************************************************************************/
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
-#include <cstring>
-#include <cassert>
-#include <cstdlib>
-
 #include "DC/DC.h"
-#include "DC/race.h"
-#include "DC/magic.h"
-
-#include "DC/interp.h"
 
 // Global data
 
@@ -243,7 +235,7 @@ const QList<spell_info_type> spell_info =
 
         {/* 88 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 20, TAR_CHAR_WORLD, cast_wizard_eye, SKILL_INCREASE_HARD},
 
-        {/* 89 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_true_sight, SKILL_INCREASE_HARD},
+        {/* 89 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 33, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_TRUE_sight, SKILL_INCREASE_HARD},
 
         {/* 90 */ 3 * DC::PULSE_TIMER, position_t::STANDING, 0, TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT, cast_mana, 0},
 
@@ -2179,13 +2171,13 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_CHAR_WORLD))
           {
-            bool orig = ISSET(ch->affected_by, AFF_true_SIGHT);
+            bool orig = ISSET(ch->affected_by, AFF_TRUE_SIGHT);
             if (spl == SPELL_EAGLE_EYE)
-              SETBIT(ch->affected_by, AFF_true_SIGHT);
+              SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
             if ((tar_char = get_char_vis(ch, name)) != nullptr)
               target_ok = true;
             if (!orig)
-              REMBIT(ch->affected_by, AFF_true_SIGHT);
+              REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
           }
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_INV))
             if ((tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != nullptr)

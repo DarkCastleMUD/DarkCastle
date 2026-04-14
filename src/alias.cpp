@@ -4,9 +4,6 @@
 | Description:  Commands for the alias processor.
 */
 #include "DC/DC.h"
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/const.h"
 
 command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 {

@@ -3,26 +3,8 @@
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
-#include "DC/structs.h"
-#include "DC/player.h"
+
 #include "DC/DC.h"
-#include "DC/spells.h"
-
-#include "DC/fight.h"
-
-#include "DC/magic.h"
-#include "DC/handler.h"
-#include "DC/act.h"
-#include "DC/interp.h"
-#include "DC/returnvals.h"
-
-#include "DC/clan.h"
-
-#include "DC/const.h"
-#include "DC/inventory.h"
-#include "DC/move.h"
-#include "DC/obj.h"
-#include "DC/levels.h"
 
 extern qint32 rev_dir[];
 

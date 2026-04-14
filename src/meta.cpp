@@ -13,22 +13,7 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 
-#include <cassert>
-
 #include "DC/DC.h"
-#include "DC/levels.h"
-#include "DC/structs.h"
-
-#include "DC/handler.h"
-#include "DC/player.h"
-#include "DC/interp.h"
-
-#include "DC/race.h"
-#include "DC/db.h"
-#include "DC/act.h"
-#include "DC/returnvals.h"
-#include "DC/const.h"
-#include "DC/meta.h"
 
 /*
 

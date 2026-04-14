@@ -18,37 +18,7 @@
  ***************************************************************************/
 /* $Id: nanny.cpp,v 1.198 2015/05/26 08:55:40 zen Exp $ */
 
-#include <cstdio>
-#include <cctype>
-#include <unistd.h>
-#include <cstring>
-#include <QString>
-#include <fmt/format.h>
-
 #include "DC/DC.h"
-#include "DC/comm.h"
-#include "DC/connect.h"
-#include "DC/guild.h"
-#include "DC/race.h"
-#include "DC/player.h"
-#include "DC/structs.h" // true
-
-#include "DC/clan.h"
-#include "DC/db.h" // init_char..
-
-#include "DC/interp.h"
-
-#include "DC/act.h"
-#include "DC/clan.h"
-#include "DC/spells.h"
-#include "DC/fight.h"
-#include "DC/handler.h"
-#include "DC/DC.h"
-#include "DC/const.h"
-#include "DC/meta.h"
-#include "DC/levels.h"
-#include "DC/utility.h"
-#define d ->connected((d)->connected)
 
 bool is_bracing(CharacterPtr bracee, RoomDirectionPtr exit);
 void show_question_race(ConnectionPtr d);

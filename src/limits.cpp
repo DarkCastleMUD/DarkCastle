@@ -14,26 +14,11 @@
  ***************************************************************************/
 /* $Id: limits.cpp,v 1.99 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/levels.h"
-#include <cstdio>
-
 #ifdef BANDWIDTH
 #include "DC/bandwidth.h"
 #endif
 
 #include "DC/DC.h"
-
-#include "DC/spells.h" // TYPE
-#include "DC/player.h"
-#include "DC/db.h" // exp_table
-#include "DC/act.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/clan.h" //totem
-#include "DC/DC.h"
-#include "DC/inventory.h"
-#include "DC/const.h"
-#include "DC/corpse.h"
 
 qint32 FOUNTAINisPresent(CharacterPtr ch);
 

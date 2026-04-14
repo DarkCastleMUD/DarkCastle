@@ -1,13 +1,4 @@
-
-#include <cstring>
-
-#include "DC/structs.h"
-
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-#include "DC/returnvals.h"
-#include "DC/const.h"
 
 // Externs
 

@@ -2,30 +2,8 @@
 | Level 110 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
-#include <cstdio>
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
-#include <fmt/format.h>
-
-#include "DC/handler.h"
-
-#include "DC/interp.h"
-#include "DC/interp.h"
-#include "DC/const.h"
-#include "DC/db.h"
-#include "DC/const.h"
 #include "DC/DC.h"
-#include "DC/meta.h"
 
 qint32 get_max_stat_bonus(CharacterPtr ch, qint32 attrs)
 {

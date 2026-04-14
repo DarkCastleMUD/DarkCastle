@@ -4,21 +4,6 @@
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
 #include "DC/DC.h"
-#include "DC/structs.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/terminal.h"
-#include "DC/act.h"
-#include "DC/punish.h"
-
-#include <cstring> //strstr()
-#include <cctype>
-#include <QString>
-#include <QQueue>
-#include <tuple>
-#include <fmt/format.h>
-#include <QQueue>
-#include <QDateTime>
 
 QQueue<ChannelMessage> gossip_history;
 QQueue<QString> auction_history;

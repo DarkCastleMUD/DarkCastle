@@ -4,19 +4,6 @@
 | This contains all the guild commands - practice, gain, etc..
 */
 #include "DC/DC.h"
-#include "DC/levels.h"
-#include "DC/structs.h"
-#include "DC/spells.h"
-
-#include "DC/player.h"
-#include "DC/db.h" // exp_table
-#include "DC/interp.h"
-#include "DC/returnvals.h"
-#include "DC/ki.h"
-
-#include "DC/handler.h"
-#include "DC/const.h"
-#include "DC/guild.h"
 
 extern QList<profession> professions;
 

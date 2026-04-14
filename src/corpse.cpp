@@ -12,18 +12,7 @@
  *  Some functions have been renamed to protect the innocent            *
  *  All Rights Reserved, Copyright (C) 1999                             *
  ***********************************************************************/
-
-/* The standard includes */
-#include <cstring>
-#include <cstdlib>
-#include <cerrno>
-
 #include "DC/DC.h"
-
-#include "DC/db.h"
-#include <cassert>
-#include <cstddef>
-#include <qcontainerfwd.h>
 
 /* Set this define to wherever you want to save your corpses */
 const auto CORPSE_FILE = u"corpse.save"_s;
@@ -42,7 +31,6 @@ qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_t
 qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate);
 void clean_string(QString buffer);
 qint32 get_line_new(FILE *fl, QString buf);
-QString fread_string_new(FILE *fl);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
 
@@ -576,31 +564,6 @@ ObjectPtr create_obj_new(void)
   obj->save_expiration = {};
   obj->no_sell_expiration = {};
   return obj;
-}
-
-QString fread_string_new(FILE *fl)
-{
-  QFile file;
-  if (!file.open(fl, QIODeviceBase::ReadOnly))
-    return {};
-
-  QByteArray return_buffer;
-  while (file.canReadLine())
-  {
-    auto buffer = file.readLine();
-    auto index_of_tilde = buffer.indexOf("~");
-    if (index_of_tilde == -1)
-    {
-      return_buffer += buffer.trimmed().append("\r\n");
-    }
-    else
-    {
-      buffer.resize(index_of_tilde);
-      return_buffer += buffer.trimmed();
-      break;
-    }
-  }
-  return return_buffer;
 }
 
 qint32 count_hash_records(FILE *fl)

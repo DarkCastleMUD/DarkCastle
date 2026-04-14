@@ -14,17 +14,7 @@
  ***************************************************************************/
 /* $Id: shop.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
-#include <fmt/format.h>
-
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-
-#include "DC/db.h"
-#include "DC/shop.h"
-#include "DC/inventory.h"
-#include "DC/const.h"
 
 player_shop *g_playershops;
 

@@ -3,25 +3,7 @@
    Separated all this from the rest(by putting it in save.cpp,
    magic.cpp, etc) to have all the golem code in one place.
 */
-#include <cstring>
-
-#include "DC/obj.h"
 #include "DC/DC.h"
-#include "DC/structs.h"
-#include "DC/spells.h"
-
-#include "DC/player.h"
-#include "DC/db.h"
-#include "DC/interp.h"
-
-#include "DC/race.h"
-#include "DC/act.h"
-#include "DC/magic.h"
-#include "DC/affect.h"
-
-#include "DC/handler.h"
-#include "DC/const.h"
-#include "DC/utility.h"
 // Locals
 void advance_golem_level(CharacterPtr golem);
 

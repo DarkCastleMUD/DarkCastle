@@ -20,35 +20,7 @@
 // - Where is Spellcraft "reduced fireball lag" affect listed?
 //    - Apoc.
 
-#include <cstdio>
-#include <cassert>
-#include <cstdlib>
-#include <math.h> // pow(double,double)
-
-#include <cstring>
-
-#include <fmt/format.h>
-
-#include "DC/spells.h"
-#include "DC/obj.h"
 #include "DC/DC.h"
-#include "DC/race.h"
-#include "DC/magic.h"
-#include "DC/player.h"
-#include "DC/fight.h"
-
-#include "DC/structs.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/weather.h"
-#include "DC/db.h"
-#include "DC/act.h"
-#include "DC/clan.h"
-#include "DC/innate.h"
-#include "DC/returnvals.h"
-#include "DC/const.h"
-#include "DC/inventory.h"
-#include "DC/levels.h"
 
 constexpr auto BEACON_OBJ_NUMBER = 405;
 
@@ -2433,7 +2405,7 @@ qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* true SIGHT */
 
-qint32 spell_true_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+qint32 spell_TRUE_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2446,14 +2418,14 @@ qint32 spell_true_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (victim->affected_by_spell(SPELL_TRUE_SIGHT))
     affect_from_char(victim, SPELL_TRUE_SIGHT);
 
-  if (IS_AFFECTED(victim, AFF_true_SIGHT))
+  if (IS_AFFECTED(victim, AFF_TRUE_SIGHT))
     return ReturnValue::eFAILURE;
 
   af.type = SPELL_TRUE_SIGHT;
   af.duration = 6 + skill / 2;
   af.modifier = {};
   af.location = APPLY_NONE;
-  af.bitvector = AFF_true_SIGHT;
+  af.bitvector = AFF_TRUE_SIGHT;
 
   affect_to_char(victim, &af);
   victim->sendln("You feel your vision enhanced with an incredibly keen perception.");
@@ -8358,32 +8330,32 @@ qint32 cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_true_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+qint32 cast_TRUE_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    return spell_true_sight(level, ch, tar_ch, 0, skill);
+    return spell_TRUE_sight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_POTION:
-    return spell_true_sight(level, ch, ch, 0, skill);
+    return spell_TRUE_sight(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_WAND:
     if (!tar_ch)
       tar_ch = ch;
-    return spell_true_sight(level, ch, tar_ch, 0, skill);
+    return spell_TRUE_sight(level, ch, tar_ch, 0, skill);
   case SPELL_TYPE_SCROLL:
     if (tar_obj)
       return ReturnValue::eFAILURE;
     if (!tar_ch)
       tar_ch = ch;
-    return spell_true_sight(level, ch, tar_ch, 0, skill);
+    return spell_TRUE_sight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
     for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
-      spell_true_sight(level, ch, tar_ch, 0, skill);
+      spell_TRUE_sight(level, ch, tar_ch, 0, skill);
     break;
   default:
     dc_->logentry(u"Serious screw-up in true sight!"_s, ANGEL, DC::LogChannel::LOG_BUG);
@@ -11561,7 +11533,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       act_to_character("You begin moving faster!", victim, 0, 0, 0);
       break;
     case TRUE_VNUM:
-      aff = AFF_true_SIGHT;
+      aff = AFF_TRUE_SIGHT;
       spl = SPELL_TRUE_SIGHT;
       if (victim->affected_by_spell(spl))
       {
@@ -12388,7 +12360,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
     SETBIT(mob->affected_by, AFF_EAS);
 
   if (ch->dc_->number(1, 3) == 1)
-    SETBIT(mob->affected_by, AFF_true_SIGHT);
+    SETBIT(mob->affected_by, AFF_TRUE_SIGHT);
 
   // lag mage
   if (ch->dc_->number(1, 3) == 3 && ch->getLevel() < ARCHANGEL)
@@ -15266,7 +15238,7 @@ SPELL_POINTER get_wild_magic_defensive(quint8 level, CharacterPtr ch, CharacterP
     spell_to_cast = cast_strength;
     break;
   case 30:
-    spell_to_cast = cast_true_sight;
+    spell_to_cast = cast_TRUE_sight;
     break;
   case 31:
     spell_to_cast = cast_mana;

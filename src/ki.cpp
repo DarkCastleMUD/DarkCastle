@@ -5,24 +5,7 @@
  */
 /* $Id: ki.cpp,v 1.94 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <fmt/format.h>
-
-#include "DC/ki.h"
-
 #include "DC/DC.h"
-#include "DC/spells.h" // tar_char..
-
-#include "DC/player.h"
-#include "DC/interp.h"
-
-#include "DC/fight.h"
-#include "DC/handler.h"
-#include "DC/act.h"
-#include "DC/handler.h"
-#include "DC/utility.h"
 
 const QList<ki_info_type> ki_info = {
     {/* 0 */

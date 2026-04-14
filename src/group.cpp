@@ -3,21 +3,7 @@
 | group.C
 | Description:  Group related commands; join, abandon, follow, etc..
 */
-
-#include <cctype>
-
 #include "DC/DC.h"
-
-#include "DC/affect.h"
-
-#include "DC/interp.h"
-#include "DC/handler.h"
-#include "DC/clan.h"
-#include "DC/act.h"
-#include <cstring>
-#include "DC/terminal.h"
-#include "DC/comm.h"
-#include "DC/utility.h"
 
 command_return_t do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
 {

@@ -16,36 +16,6 @@
 
 #include "DC/DC.h"
 
-#include <qlogging.h>
-#include <qnamespace.h>
-#include <sys/time.h>
-
-#include <cstdlib>
-#include <cstring>
-#include <cstdio>
-#include <cctype>
-#include <cassert>
-
-#include <ctime>
-#include <iostream>
-#include <sstream>
-
-#include <QString>
-#include <QStringList>
-
-// LOWER
-#include "DC/db.h"
-
-#include "DC/handler.h" // FIND_CHAR_ROOM
-
-#include "DC/race.h"
-#include "DC/fight.h"
-#include "DC/innate.h"
-#include "DC/set.h"
-#include "DC/const.h"
-#include "DC/corpse.h"
-#include "DC/shop.h"
-
 void huntclear_item(ObjectPtr obj);
 
 /* External procedures */

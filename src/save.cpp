@@ -15,24 +15,7 @@
  ***************************************************************************/
 /* $Id: save.cpp,v 1.76 2015/06/15 01:06:10 pirahna Exp $ */
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-
-#include <fmt/format.h>
-
 #include "DC/DC.h"
-
-#include "DC/db.h"
-#include "DC/DC.h"
-
-#ifdef USE_SQL
-#include <iostream>
-#include <libpq-fe.h>
-#include "Backend/Database.h"
-
-extern Database db;
-#endif
 
 ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
 bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos);

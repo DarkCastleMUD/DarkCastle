@@ -1,22 +1,4 @@
-#include <unistd.h>
-
-#include <iostream>
-#include <QMap>
-#include <filesystem>
-#include <QQueue>
-#include <cassert>
-
-#include <QtSql/QSqlRelationalTableModel>
-#include <QtSql/QSqlRecord>
-#include <QtSql/QSqlField>
-#include <QtSql/QSqlError>
-
-#include "DC/db.h"
 #include "DC/DC.h"
-#include "DC/const.h"
-
-#include "DC/DC.h"
-#include "DC/interp.h"
 
 void load_char_obj_error(FILE *fpsave, QString strsave);
 void store_to_char(char_file_u4 *st, CharacterPtr ch);

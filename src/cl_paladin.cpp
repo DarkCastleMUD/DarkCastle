@@ -6,14 +6,6 @@
 | File create with do_layhands -Pirahna 7/6/1999
 */
 #include "DC/DC.h"
-#include "DC/isr.h"
-#include "DC/structs.h"
-#include "DC/player.h"
-#include "DC/fight.h"
-#include "DC/spells.h"
-#include "DC/act.h"
-#include "DC/interp.h"
-#include "DC/utility.h"
 
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the

@@ -3,9 +3,6 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-
 command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;

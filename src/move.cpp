@@ -10,15 +10,6 @@
  */
 #include "DC/DC.h"
 
-#include "DC/fight.h"
-
-#include "DC/interp.h"
-#include "DC/handler.h"
-#include "DC/race.h" // RACE_FISH
-#include "DC/innate.h"
-#include "DC/const.h"
-#include "DC/move.h"
-
 qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type); // class/cl_mage.cpp
 
 qint32 move_player(CharacterPtr ch, qint32 room)

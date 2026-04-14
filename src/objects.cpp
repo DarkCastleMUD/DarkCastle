@@ -5,29 +5,7 @@
 |   wear them, wield them, grab them, drink them, eat them, etc..
 */
 
-#include <cstring>
-#include <cassert>
-
-#include "DC/class.h"
-#include "DC/isr.h"
-#include "DC/obj.h"
 #include "DC/DC.h"
-
-#include "DC/room.h"
-#include "DC/spells.h"
-#include "DC/player.h"
-#include "DC/handler.h"
-#include "DC/affect.h"
-#include "DC/interp.h"
-#include "DC/act.h"
-#include "DC/structs.h"
-#include "DC/db.h"
-#include "DC/race.h"
-#include "DC/returnvals.h"
-#include "DC/const.h"
-#include "DC/punish.h"
-#include "DC/levels.h"
-#include "DC/utility.h"
 
 extern const QStringList drinks;
 extern const QStringList dirs;

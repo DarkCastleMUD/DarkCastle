@@ -1,15 +1,6 @@
 /* $Id: nlog.cpp,v 1.12 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
-#include <ctime>
-#include <cstring>
-#include <cstdlib>
-#include <cstdio>
-#include <stdarg.h>
-
 #include "DC/DC.h"
-
-#include "DC/terminal.h"
 
 class hash_info
 {
@@ -64,7 +55,7 @@ void DC::logf(level_t level, DC::LogChannel type, QString cformat, ...)
   s = QString::vasprintf(qPrintable(cformat), args);
   va_end(args);
 
-  dc_->logentry(s, level, type);
+  logentry(s, level, type);
 }
 
 QString handle_ansi_(QString s, CharacterPtr ch)

@@ -1,15 +1,4 @@
-
-#include <cctype>
-#include <cstring>
-
 #include "DC/DC.h"
-
-#include "DC/db.h" // exp_table
-#include "DC/interp.h"
-#include "DC/help.h"
-
-#include <QMap>
-#include <algorithm>
 
 // Externs
 extern help_index_element_new *new_help_table;

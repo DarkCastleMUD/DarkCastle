@@ -20,40 +20,7 @@
  ***************************************************************************/
 /* $Id: utility.cpp,v 1.129 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cassert>
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <ctime>
-#include <cctype>
-#include <cstdlib>
-#include <ctime>
-#include <qnamespace.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include <QMap>
-
-#include <fmt/format.h>
-#include <QRandomGenerator>
-#include <QString>
-
-#include "DC/innate.h"
-
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-
-#include "DC/fight.h"
-#include "DC/set.h"
-#include "DC/const.h"
-#include "DC/comm.h"
 
 extern QMap<qint32, QMap<quint8, QString>> professions;
 
@@ -1086,7 +1053,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 
   if (IS_AFFECTED(obj, AFF_HIDE))
   {
-    if (IS_AFFECTED(sub, AFF_true_SIGHT))
+    if (IS_AFFECTED(sub, AFF_TRUE_SIGHT))
       return true;
 
     if (ARE_GROUPED(sub, obj))
@@ -1167,7 +1134,7 @@ bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
     }
   }
 
-  //   if (IS_AFFECTED(sub, AFF_true_SIGHT) )
+  //   if (IS_AFFECTED(sub, AFF_TRUE_SIGHT) )
   //      return true;
 
   if (IS_OBJ_STAT(obj, ITEM_INVISIBLE) && !IS_AFFECTED(sub, AFF_DETECT_INVISIBLE))
@@ -1182,7 +1149,7 @@ bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
 bool check_blind(CharacterPtr ch)
 {
 
-  //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
+  //   if (IS_AFFECTED(ch, AFF_TRUE_SIGHT))
   //    return false;
 
   if (ch->isPlayer() && ch->player->holyLite)

@@ -13,17 +13,8 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
-#include <cassert>
 
 #include "DC/DC.h"
-
-#include "DC/magic.h"
-#include "DC/fight.h"
-
-#include "DC/race.h"
-#include "DC/db.h" // real_room
-#include "DC/const.h"
-#include "DC/utility.h"
 
 /*   external vars  */
 
@@ -3443,7 +3434,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
       return ReturnValue::eSUCCESS;
     }
     qint32 to_room = {};
-    bool ts = IS_AFFECTED(ch, AFF_true_SIGHT);
+    bool ts = IS_AFFECTED(ch, AFF_TRUE_SIGHT);
     if (!str_cmp(arg1, "far") && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir])
       to_room = dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].dir_option[dir]->to_room;
     if (!to_room)
@@ -3458,10 +3449,10 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
     qint32 oldroom = ch->in_room;
     char_from_room(ch);
     char_to_room(ch, to_room);
-    SETBIT(ch->affected_by, AFF_true_SIGHT);
+    SETBIT(ch->affected_by, AFF_TRUE_SIGHT);
     do_look(ch, u""_s, cmd_t::DEFAULT);
     if (!ts)
-      REMBIT(ch->affected_by, AFF_true_SIGHT);
+      REMBIT(ch->affected_by, AFF_TRUE_SIGHT);
     char_from_room(ch);
     char_to_room(ch, oldroom);
     return ReturnValue::eSUCCESS;

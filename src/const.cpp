@@ -13,17 +13,7 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
-
-#include <QMap>
-#include <QString>
-
-#include "DC/affect.h"
-#include "DC/character.h"
-#include "DC/class.h"
-#include "DC/obj.h"
 #include "DC/DC.h"
-#include "DC/player.h" // *app_type
-#include "DC/spells.h"
 
 room_t IMM_PIRAHNA_ROOM = 25;
 
@@ -2020,7 +2010,7 @@ race_data races[] =
 
         {"Goblin", "goblin", "Goblins", false, 63, 0, 0, 0, 1 << 6 | 1 << 11, 0, 100, 100, 60, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED, "jab"},
         {"Reptile", "reptile", "Reptiles", false, 59, 0, 0, 520, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "strike"},
-        {"Dragon", "dragon", "Dragons", false, 91, 0, 268, 0, 1 << 6 | 1 << 9, 0, 500, 2000, 144, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE | AFF_FLYING | AFF_true_SIGHT | AFF_SOLIDITY, "maul"},
+        {"Dragon", "dragon", "Dragons", false, 91, 0, 268, 0, 1 << 6 | 1 << 9, 0, 500, 2000, 144, 240, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE | AFF_FLYING | AFF_TRUE_SIGHT | AFF_SOLIDITY, "maul"},
         {"Snake", "snake", "Snakes", false, 3, 0, 1, 2097160, 32768, 4096, 5, 50, 2, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "bite"},
         {"Horse", "horse", "Horses", false, 19, 0, 0, 0, 2048, 3, 400, 600, 72, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "hoof"},
         {"Bird", "bird", "Birds", false, 63, 0, 2097152, 0, 65536, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_FLYING, "peck"},
@@ -2041,7 +2031,7 @@ race_data races[] =
         {"Demon", "demon", "Demons", false, 127, 16, 8, 1048576, 1023, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE, "maul"},
 
         {"Yrnali", "yrnali", "Yrnali", false, 63, 16, 8, 1048576, 1, 536870912, 150, 300, 72, 96, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE, "maul"},
-        {"Immortal", "immortal", "Immortals", false, 127, 1288, 1048576, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE | AFF_FLYING | AFF_true_SIGHT | AFF_SOLIDITY | AFF_SANCTUARY, "ethereal strike"},
+        {"Immortal", "immortal", "Immortals", false, 127, 1288, 1048576, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE | AFF_FLYING | AFF_TRUE_SIGHT | AFF_SOLIDITY | AFF_SANCTUARY, "ethereal strike"},
         {"Feline", "feline", "Felines", false, 27, 0, 0, 128, 8388608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_SNEAK, "claw"}};
 
 qint32 mob_race_mod[][5] =

@@ -6,9 +6,6 @@
  */
 
 #include "DC/DC.h"
-#include "DC/structs.h"
-#include "DC/interp.h"
-#include <cstring>
 
 void Leaderboard::check(void)
 {

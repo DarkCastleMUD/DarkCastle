@@ -23,24 +23,15 @@
 
 #include "DC/DC.h"
 
-#include "DC/fight.h"
-#include "DC/act.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/spells.h"
-#include "DC/inventory.h"
-#include "DC/utility.h"
-
 void perform_wear(CharacterPtr ch, ObjectPtr obj_object,
                   qint32 keyword);
 bool is_protected(CharacterPtr vict, CharacterPtr ch);
 void scavenge(CharacterPtr ch);
 bool is_r_denied(CharacterPtr ch, qint32 room)
 {
-  deny_data *d;
   if (ch->isPlayer())
     return false;
-  for (d = dc_->world[room].denied; d; d = conn->next)
+  for (auto d = ch->dc_->world[room].denied; d; d = conn->next)
     if (dc_->mob_index[ch->mobdata->nr].vnum() == conn->vnum)
       return true;
   return false;

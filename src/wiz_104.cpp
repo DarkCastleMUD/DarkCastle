@@ -1,17 +1,4 @@
-#include <fmt/format.h>
-#include <fmt/chrono.h>
-#include <QString>
-#include <utility>
-
-#include <QTimeZone>
-
 #include "DC/DC.h"
-#include "DC/db.h"
-
-#include "DC/interp.h"
-#include "DC/race.h"
-#include "DC/const.h"
-#include "DC/corpse.h"
 
 qint32 count_rooms(qint32 start, qint32 end)
 {

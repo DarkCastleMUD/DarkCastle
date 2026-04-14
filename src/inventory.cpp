@@ -5,19 +5,7 @@
 | Authors: DikuMUD, Pirahna, Staylor, Urizen, Rahz, Zaphod, Shane, Jhhudso, Heaven1 and others
 */
 
-#include <fmt/format.h>
-
-#include "DC/obj.h"
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-#include "DC/handler.h"
-#include "DC/clan.h"
-#include "DC/inventory.h"
-#include "DC/corpse.h"
-#include "DC/comm.h"
-#include "DC/character.h"
-#include "DC/mobile.h"
 
 /* extern variables */
 

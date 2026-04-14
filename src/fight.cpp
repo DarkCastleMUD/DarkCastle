@@ -24,34 +24,6 @@
  **************************************************************************/
 
 #include "DC/DC.h"
-// log
-#include <cassert>
-
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <sstream>
-#include "DC/comm.h"
-#include "DC/fight.h"
-#include "DC/race.h"
-#include "DC/player.h" // log
-#include "DC/spells.h" // weapon_spells
-#include "DC/handler.h"
-#include "DC/interp.h" // do_flee()
-#include "DC/db.h"     // fread_string()
-#include "DC/magic.h"  // weapon spells
-#include "DC/act.h"
-#include "DC/clan.h"
-#include "DC/innate.h"
-#include "DC/token.h"
-#include "DC/DC.h"
-#include "DC/const.h"
-#include "DC/corpse.h"
-#include "DC/stat.h"
-#include "DC/obj.h"
-
-#include "DC/punish.h"
-#include "DC/utility.h"
 
 constexpr auto MAX_CHAMP_DEATH_MESSAGE = 14;
 

@@ -1,21 +1,7 @@
 // This file takes care of all innate race abilities
 
-#include "DC/obj.h"
-#include "DC/innate.h"
-#include "DC/race.h"
-#include "DC/fight.h"
-
 #include "DC/DC.h"
 
-#include "DC/handler.h"
-#include "DC/player.h"
-#include "DC/interp.h"
-#include "DC/act.h"
-
-#include "DC/spells.h"
-#include "DC/interp.h"
-#include "DC/affect.h"
-#include "DC/utility.h"
 ////////////////////////////////////////////////////////////////////////////
 // external vars
 

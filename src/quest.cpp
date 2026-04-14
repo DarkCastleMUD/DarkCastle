@@ -2,21 +2,7 @@
 one liner quest shit
 *****************************************************/
 
-#include <math.h>
-
-#include "DC/levels.h"
-#include "DC/obj.h"
-#include "DC/structs.h"
 #include "DC/DC.h"
-#include "DC/returnvals.h"
-#include "DC/interp.h"
-#include "DC/handler.h"
-#include "DC/db.h"
-#include "DC/quest.h"
-#include <vector>
-#include <cstring>
-
-#include "DC/inventory.h"
 
 quest_list_t quest_list;
 

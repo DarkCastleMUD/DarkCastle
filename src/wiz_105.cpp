@@ -3,18 +3,6 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-#include "DC/punish.h"
-#include "DC/handler.h"
-#include "DC/fight.h"
-#include "DC/interp.h"
-#include "DC/innate.h"
-#include "DC/const.h"
-#include "DC/Timer.h"
-
-#include <qdebug.h>
-#include <qiodevicebase.h>
-
-#include <cstdio>
 
 command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {

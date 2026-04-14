@@ -18,34 +18,7 @@
 /***************************************************************************/
 /* $Id: interp.cpp,v 1.200 2015/06/14 02:38:12 pirahna Exp $ */
 
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
-#include <cstdio>
-#include <cassert>
-
-#include <QString>
-#include <qnamespace.h>
-#include <tuple>
-
-#include <fmt/format.h>
-#include <QStringList>
-
-#include "DC/structs.h" // MAX_STRING_LENGTH
 #include "DC/DC.h"
-#include "DC/interp.h"
-
-#include "DC/fight.h"
-#include "DC/spells.h" // ETHERAL consts
-
-#include "DC/act.h"
-#include "DC/returnvals.h"
-#include "DC/terminal.h"
-#include "DC/CommandStack.h"
-#include "DC/Timer.h"
-
-#include "DC/punish.h"
-#include "DC/utility.h"
 
 qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner);
 qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type); // class/cl_mage.cpp
@@ -87,13 +60,13 @@ class LogCommand
 public:
   explicit LogCommand(QString command, CharacterPtr ch) : command_(command), ch_(ch)
   {
-    if (ch_ && ch_->isPlayer() &&
-        (isSet(ch_->player->punish, PUNISH_LOG) ||
-         ch_->getLevel() >= 100 ||
-         (ch_->player->multi && !dc_->cf.allow_multi)))
+    if (ch && ch->isPlayer() &&
+        (isSet(ch->player->punish, PUNISH_LOG) ||
+         ch->getLevel() >= 100 ||
+         (ch->player->multi && !ch->dc_->cf.allow_multi)))
     {
       command_duration_.start();
-      dc_->logentry(u"ch=%1 in=%2 cmd=\"%3\""_s.arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch_);
+      ch->dc_->logentry(u"ch=%1 in=%2 cmd=\"%3\""_s.arg(ch->name()).arg(QString::number(ch->in_room)).arg(command_), 110, DC::LogChannel::LOG_PLAYER, ch);
       logged_ = true;
     }
   }
@@ -105,7 +78,7 @@ public:
       command_duration_.stop();
       auto timediff = ((command_duration_.getDiff().tv_sec * 1000000.0) + command_duration_.getDiff().tv_usec) / 1000000.0;
       auto timediffStr = QString::number(timediff, 'f');
-      dc_->logentry(u"ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6"_s.arg(ch_->name()).arg(QString::number(ch_->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch_);
+      ch->dc_->logentry(u"ch=%1 in=%2 cmd=\"%3\" rc=%4 reason=\"%5\" duration=%6"_s.arg(ch->name()).arg(QString::number(ch->in_room)).arg(command_).arg(QString::number(rc_)).arg(rc_reason_).arg(timediffStr), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, ch);
     }
   }
 
@@ -448,7 +421,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // Check social table
   if ((retval = this->check_social(pcomm)))
   {
-    if (SOCIAL_true_WITH_NOISE == retval)
+    if (SOCIAL_TRUE_WITH_NOISE == retval)
       return check_ethereal_focus(this, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
     else
       return logcmd.setReturn(ReturnValue::eSUCCESS, u"ReturnValue::eSUCCESS"_s);

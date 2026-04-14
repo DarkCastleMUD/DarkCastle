@@ -3,9 +3,6 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-#include "DC/interp.h"
-#include <fmt/format.h>
-
 command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i;

@@ -2,9 +2,6 @@
 #include <QtLogging>
 #include <qhashfunctions.h>
 #include "DC/DC.h"
-#include "DC/comm.h"
-#include "DC/db.h"
-#include "DC/terminal.h"
 
 using namespace Qt::StringLiterals;
 const auto STRING_LITERAL1 = u"$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"_s;

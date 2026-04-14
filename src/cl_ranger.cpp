@@ -8,30 +8,7 @@
  *                      from charmies                                         *
  ******************************************************************************/
 
-#include <cstring>
-#include <cstdio>
-
-#include "DC/obj.h"
 #include "DC/DC.h"
-#include "DC/affect.h"
-
-#include "DC/spells.h"
-
-#include "DC/handler.h"
-
-#include "DC/terminal.h"
-#include "DC/player.h"
-#include "DC/fight.h"
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/act.h"
-#include "DC/returnvals.h"
-#include "DC/inventory.h"
-#include "DC/const.h"
-#include "DC/move.h"
-#include "DC/corpse.h"
-#include "DC/levels.h"
-#include "DC/utility.h"
 
 extern qint32 rev_dir[];
 

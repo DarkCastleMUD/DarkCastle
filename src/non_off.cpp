@@ -8,27 +8,7 @@
 /* 12/08/2003   Onager   Revised do_tap() to prevent sacrifices in donations */
 /*****************************************************************************/
 
-#include <cctype>
-#include <cstring>
-
-#include "DC/levels.h"
-#include "DC/obj.h"
 #include "DC/DC.h"
-
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/player.h"
-#include "DC/act.h"
-#include "DC/spells.h"
-#include "DC/returnvals.h"
-#include "DC/comm.h"
-#include "DC/structs.h"
-
-#include <QString>
-#include <vector>
-#include <QMap>
-
-#include "DC/punish.h"
 
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)

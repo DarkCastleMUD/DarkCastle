@@ -14,22 +14,7 @@
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
 
-#include <fmt/format.h>
-#include <QString>
-#include <QStringLiteral>
-#include <QStringList>
-
 #include "DC/DC.h"
-
-#include "DC/handler.h"
-#include "DC/db.h"
-#include "DC/player.h"
-#include "DC/interp.h"
-#include "DC/act.h"
-#include "DC/returnvals.h"
-#include "DC/const.h"
-#include "DC/inventory.h"
-#include "DC/corpse.h"
 
 extern qint32 class_restricted(CharacterPtr ch, ObjectPtr obj);
 extern qint32 size_restricted(CharacterPtr ch, ObjectPtr obj);

@@ -9,9 +9,6 @@
 // Standard header files
 
 #include "DC/DC.h" // Character
-// GET_LEVEL, &c
-#include "DC/terminal.h" // colors
-#include "DC/handler.h"  // fname()
 
 #undef DEBUG_TOKEN
 

@@ -14,33 +14,6 @@
  * share your changes too.  What goes around, comes around. 		    *
  ****************************************************************************/
 /* $Id: info.cpp,v 1.210 2015/06/14 02:38:12 pirahna Exp $ */
-#include <qtypes.h>
-#include <sys/time.h>
-
-#include <cctype>
-#include <cstring>
-#include <cassert>
-#include <cstdlib>
-#include <QMap>
-#include <sstream>
-#include <fstream>
-#include <fmt/format.h>
-
-#include <algorithm>
-#include <QRegularExpression>
-
-#include "DC/DC.h"
-
-#include "DC/terminal.h"
-
-#include "DC/handler.h"
-#include "DC/db.h" // exp_table
-#include "DC/interp.h"
-#include "DC/race.h"
-#include "DC/set.h"
-
-#include "DC/handler.h"
-#include "DC/const.h"
 #include "DC/DC.h"
 
 /* extern variables */
@@ -555,7 +528,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
 
       if (IS_AFFECTED(i, AFF_INVISIBLE))
         buffer.append(" $1(invisible) ");
-      if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_true_SIGHT) && ch->has_skill(SPELL_TRUE_SIGHT) > 80) || ch->getLevel() > IMMORTAL || ARE_GROUPED(i, ch)))
+      if (IS_AFFECTED(i, AFF_HIDE) && ((IS_AFFECTED(ch, AFF_TRUE_SIGHT) && ch->has_skill(SPELL_TRUE_SIGHT) > 80) || ch->getLevel() > IMMORTAL || ARE_GROUPED(i, ch)))
         buffer.append(" $4(hidden) ");
       if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
         buffer.append(" $B$4(red halo) ");
@@ -582,7 +555,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
         buffer = "";
       }
 
-      if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_true_SIGHT) && ch->has_skill(SPELL_TRUE_SIGHT) > 80)
+      if (IS_AFFECTED(i, AFF_HIDE) && IS_AFFECTED(ch, AFF_TRUE_SIGHT) && ch->has_skill(SPELL_TRUE_SIGHT) > 80)
         buffer.append(" $4(hidden) $3");
       if ((IS_AFFECTED(ch, AFF_DETECT_EVIL) || IS_AFFECTED(ch, AFF_KNOW_ALIGN)) && IS_EVIL(i))
         buffer.append(" $B$4(red halo)$3 ");

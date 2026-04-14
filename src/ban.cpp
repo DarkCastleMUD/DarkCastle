@@ -1,15 +1,4 @@
 #include "DC/DC.h"
-#include "DC/interp.h"
-
-#include <arpa/inet.h>
-#include <fmt/format.h>
-#include <fmt/chrono.h>
-#include <QFile>
-#include <QDebug>
-#include <QHostAddress>
-#include <QIODevice>
-#include <QObject>
-#include <QtTypes>
 
 void Bans::load(void)
 {

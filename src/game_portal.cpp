@@ -1,8 +1,4 @@
 #include "DC/DC.h"
-#include "DC/db.h"
-#include <qdebug.h>
-#include <qiodevicebase.h>
-#include <qtypes.h>
 
 const QStringList portal_bits = {
     "NO_LEAVE",

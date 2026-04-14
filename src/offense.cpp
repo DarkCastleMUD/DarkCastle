@@ -6,19 +6,7 @@
 |   in class/
 */
 
-#include "DC/levels.h"
-#include "DC/structs.h"
 #include "DC/DC.h"
-
-#include "DC/spells.h"
-#include "DC/fight.h"
-
-#include "DC/act.h"
-#include "DC/returnvals.h"
-
-#include "DC/interp.h"
-#include "DC/const.h"
-#include "DC/utility.h"
 
 command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 {

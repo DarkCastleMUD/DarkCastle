@@ -11,18 +11,6 @@ External: (explained more below)
 
 */
 #include "DC/DC.h"
-#include "DC/db.h"
-#include "DC/interp.h"
-#include "DC/inventory.h"
-#include <QString>
-#include <qdebug.h>
-#include <qiodevicebase.h>
-#include <qqueue.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <cassert>
-#include <cerrno>
 
 CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId);
 
@@ -1495,12 +1483,12 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
 
     if (Broker)
     {
-      Broker->do_auction(u"%1 is selling \"_s$R%2$R$6$B\" for %3 gold.").arg(qPrintable(ch->shortdesc_or_name())).arg(obj->short_description()).arg(price).split(' '));
+      Broker->do_auction(u"%1 is selling \"_s$R%2$R$6$B\" for %3 gold."_s.arg(ch->shortdesc_or_name()).arg(obj->short_description()).arg(price).split(' '));
     }
     else
     {
       ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
-      dc_->logentry(u"CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])"_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+      dc_->logentry(u"CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])"_s.arg(ch->name()).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
 
@@ -1534,7 +1522,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr obj;
   quint32 price;
 
-  if (!dc_->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
+  if (!ch->dc_->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)
   {
     ch->sendln("You must be in an auction house to do this!");
     return ReturnValue::eFAILURE;

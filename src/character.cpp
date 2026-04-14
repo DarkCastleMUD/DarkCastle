@@ -1,13 +1,4 @@
 #include "DC/DC.h"
-#include "DC/comm.h"
-#include "DC/db.h"
-#include "DC/terminal.h"
-#include "DC/const.h"
-#include "DC/comm.h"
-
-#include <QStringTokenizer>
-#include <QFile>
-#include <QMetaEnum>
 
 void set_golem(CharacterPtr golem, qint32 golemtype);
 ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);

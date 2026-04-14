@@ -1,18 +1,4 @@
-#include <cstdio>
-#include <cctype>
-#include <cstring>
-#include <cstdlib>
-
-#include "DC/comm.h"
-#include "DC/connect.h" // Connection
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-#include "DC/newedit.h"
-#include "DC/structs.h"
-
-#include <QString>
-#include <fmt/format.h>
 
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort);

@@ -4,19 +4,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <qnamespace.h>
-
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-
-#include "DC/fight.h"
-#include "DC/db.h"
-#include "DC/magic.h"  // dispel_magic
-#include "DC/innate.h" // SKILL_INNATE_EVASION
-#include "DC/const.h"
-#include "DC/inventory.h"
-#include "DC/sing.h"
 
 CharacterPtr origsing = {};
 

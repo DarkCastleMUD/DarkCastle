@@ -1,8 +1,4 @@
-#include "DC/Database.h"
 #include "DC/DC.h"
-#include <QSqlQuery>
-#include <QSqlError>
-#include <QSqlRecord>
 
 Database::Database(void)
 {

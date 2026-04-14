@@ -1,5 +1,4 @@
-#include <QString>
-#include "DC/Version.h"
+#include "DC/DC.h"
 #include "DC/buildinfo.h"
 
 const QString Version::build_version_ = BUILD_VERSION;

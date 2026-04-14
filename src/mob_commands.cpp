@@ -26,22 +26,7 @@
  *  such installation can be found in INSTALL.  Enjoy........    N'Atas-Ha *
  ***************************************************************************/
 
-#include <cctype>
-#include <cstring>
-
-#include <sys/types.h>
-#include <cstdio>
-#include <cstdlib>
-#include <QStringLiteral>
-
 #include "DC/DC.h"
-#include "DC/structs.h"
-#include "DC/spells.h"
-
-#include "DC/interp.h"
-#include "DC/db.h"
-#include "DC/innate.h"
-#include "DC/const.h"
 
 // external vars
 

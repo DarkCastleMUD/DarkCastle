@@ -4,33 +4,8 @@
 /* Revision History                                                    */
 /* 11/10/2003    Onager     Removed clan size limit                    */
 /***********************************************************************/
-#include "DC/comm.h"
-#include <qiodevicebase.h>
-#define __STDC_LIMIT_MACROS
-#include <cstdint>
-quint64 i = UINT64_MAX;
 
-#include <cstring> // dc_strcat
-#include <cstdio>  // FILE *
-#include <cctype>  // isspace..
-#include <netinet/in.h>
-
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <algorithm>
-
-#include <fmt/format.h>
-#include <QFile>
-
-#include "DC/db.h" // real_room
 #include "DC/DC.h"
-
-#include "DC/clan.h"     // duh
-#include "DC/interp.h"   // do_outcast, etc..
-#include "DC/terminal.h" // get_char_room_vis
-                         // CLAN_ROOM flag
-#include "DC/clan.h"
 
 void addtimer(timer_data *timer);
 

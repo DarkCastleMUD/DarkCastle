@@ -3,10 +3,6 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-#include "DC/interp.h"
-#include "DC/handler.h"
-#include <QString>
-#include "DC/const.h"
 
 qint32 get_number(QString *name);
 

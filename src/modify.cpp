@@ -14,22 +14,7 @@
  ***************************************************************************/
 /* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
-#include <cctype>
-#include <cstring>
-#include <ctime>
-#include <cstdlib>
-
-#include "DC/obj.h"
-#include "DC/connect.h" // Connection
-
 #include "DC/DC.h"
-
-#include "DC/interp.h"
-#include "DC/handler.h"
-#include "DC/db.h"
-#include <qdebug.h>
-#include <QString>
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
 constexpr auto REBOOT_AT = 10; /* 0-23, time of optional reboot if -e lib/reboot */

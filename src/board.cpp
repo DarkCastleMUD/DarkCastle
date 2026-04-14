@@ -40,14 +40,6 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 */
 #include "DC/DC.h"
-#include "DC/clan.h"
-#include "DC/interp.h"
-
-#include <cstdio> // FILE *
-#include <QString>
-#include <QMap>
-#include <qdebug.h>
-#include <qiodevicebase.h>
 
 class message
 {

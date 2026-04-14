@@ -1,17 +1,6 @@
 // social.C
 // Description:  Anything to do with socials
-
-#include <cstdlib> // qsort()
-#include <qdebug.h>
-#include <qiodevicebase.h>
-
 #include "DC/DC.h"
-
-#include "DC/social.h"
-#include "DC/interp.h" // len_cmp
-#include "DC/returnvals.h"
-
-#include "DC/punish.h"
 
 // storage of socials
 QMap<QString, social_messg> soc_mess_list; // head of social array
@@ -28,28 +17,28 @@ command_return_t Character::check_social(QString pcomm)
 
   if (!(action = find_social(pcomm)))
   {
-    return SOCIAL_false;
+    return SOCIAL_FALSE;
   }
 
   if (isPlayer() && isSet(player->punish, PUNISH_NOEMOTE))
   {
     this->sendln("You are anti-social!");
-    return SOCIAL_true;
+    return SOCIAL_TRUE;
   }
 
   switch (GET_POS(this))
   {
   case position_t::DEAD:
     this->sendln("Lie still; you are DEAD.");
-    return SOCIAL_true;
+    return SOCIAL_TRUE;
 
   case position_t::STUNNED:
     this->sendln("You are too stunned to do that.");
-    return SOCIAL_true;
+    return SOCIAL_TRUE;
 
   case position_t::SLEEPING:
     this->sendln("In your dreams, or what?");
-    return SOCIAL_true;
+    return SOCIAL_TRUE;
   case position_t::RESTING:
   case position_t::SITTING:
   case position_t::FIGHTING:
@@ -60,7 +49,7 @@ command_return_t Character::check_social(QString pcomm)
   if (isSet(dc_->world[this->in_room].room_flags, QUIET))
   {
     this->sendln("SHHHHHH!! Can't you see people are trying to read?");
-    return SOCIAL_true;
+    return SOCIAL_TRUE;
   }
 
   if (action->char_found)
@@ -83,7 +72,7 @@ command_return_t Character::check_social(QString pcomm)
     {
       act_to_room(action->others_no_arg, this, 0, 0, (action->hide) ? INVIS_NULL : 0);
     }
-    return SOCIAL_true_WITH_NOISE;
+    return SOCIAL_TRUE_WITH_NOISE;
   }
 
   if (!(vict = get_char_room_vis(buf)))
@@ -118,7 +107,7 @@ command_return_t Character::check_social(QString pcomm)
           (action->hide) ? INVIS_NULL : 0);
   }
 
-  return SOCIAL_true_WITH_NOISE;
+  return SOCIAL_TRUE_WITH_NOISE;
 }
 
 QString fread_social_string(FILE *fl)
