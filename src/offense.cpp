@@ -351,7 +351,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     vnum_t victim_vnum = victim_name.toULongLong(&ok);
     if (ok)
     {
-      CharacterPtr possible_victim = dc_->world[in_room].people;
+      CharacterPtr possible_victim = dc_->world[in_room].people_;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
         if (possible_victim->isNonPlayer() && dc_->mob_index[victim->mobdata->nr].vnum() == victim_vnum)

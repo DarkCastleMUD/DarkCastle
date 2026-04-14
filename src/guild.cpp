@@ -733,7 +733,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
   if (known >= get_max(x))
   {
     do_emote(owner, u"eyes you up and down."_s);
-    do_say(owner, u"Taking into account your current attributes, your"_s));
+    do_say(owner, u"Taking into account your current attributes, your"_s);
     do_say(owner, u"maximum proficiency in this ability has been reached."_s);
     return ReturnValue::eSUCCESS;
   }

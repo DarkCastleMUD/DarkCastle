@@ -14,9 +14,6 @@
  ***************************************************************************/
 /* $Id: weather.cpp,v 1.14 2012/05/06 00:55:44 jhhudso Exp $ */
 
-#include <cstdio>
-#include <cstring>
-
 #include "DC/weather.h"
 #include "DC/DC.h"
 

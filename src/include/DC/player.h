@@ -5,8 +5,3 @@
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
-
-/************************************************************************
-| Thirst, FULL, etc..
-*/
-#include <QtTypes>

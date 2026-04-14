@@ -32,21 +32,15 @@ qint32 load_debug = {};
 
 #include <QDebug>
 
-#include "DC/obj.h"
-#include "DC/affect.h"
 #include "DC/db.h"
 
-#include "DC/structs.h" // MAX_STRING_LENGTH
 #include "DC/weather.h" // s
                         // s
-#include "DC/player.h"  // log info
 #include "DC/DC.h"
 
 #include "DC/race.h"
-#include "DC/handler.h"     // get_obj_num
-#include "DC/game_portal.h" // load_game_portals()
+#include "DC/handler.h" // get_obj_num
 #include "DC/interp.h"
-#include "DC/spells.h" // command_range
 #include "DC/shop.h"
 #include "DC/help.h"
 #include "DC/quest.h"
@@ -241,7 +235,7 @@ bool operator==(const Room &r1, const Room &r2)
           r1.light == r2.light &&
           r1.funct == r2.funct &&
           // r1.contents == r2.contents &&
-          // r1.people == r2.people &&
+          // r1.people_ == r2.people_ &&
           // r1.tracks_.size() == r2.tracks_.size() &&
           // r1.tracks == r2.tracks &&
           // r1.iFlags == r2.iFlags &&
@@ -1534,7 +1528,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
 
       dc_->world[room_nr].funct = {};
       dc_->world[room_nr].contents = {};
-      dc_->world[room_nr].people = {};
+      dc_->world[room_nr].people_ = {};
       dc_->world[room_nr].light = {}; /* Zero light sources */
 
       for (size_t tmp = {}; tmp <= 5; tmp++)
@@ -4563,7 +4557,7 @@ void DC::zone_update(void)
 quint64 countMobsInRoom(quint64 vnum, room_t room_id)
 {
   quint64 count = {};
-  for (auto ch = dc_->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
+  for (auto ch = dc_->world[room_id].people_; ch != nullptr; ch = ch->next_in_room)
   {
     if (ch->mobdata && dc_->mob_index[ch->mobdata->nr].vnum() == vnum)
     {

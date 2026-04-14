@@ -43,14 +43,13 @@ bool many_charms(CharacterPtr ch);
 // Marauder proc uses this
 qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
 {
-  CharacterPtr ally = {};
   qint32 friends = {};
 
   if (!ch)
     return false;
 
   // Any friends in the room?  Call for help!   qint32 friends = {};
-  for (ally = dc_->world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (auto &ally : ch->dc_->world[ch->in_room].people_)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -87,7 +86,6 @@ qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
 // Several procs use this
 qint32 protect(CharacterPtr ch, qint32 iFriendId)
 {
-  CharacterPtr ally = {};
   CharacterPtr tmp_ch = {};
   qint32 retval;
 
@@ -95,7 +93,7 @@ qint32 protect(CharacterPtr ch, qint32 iFriendId)
     return ReturnValue::eFAILURE;
 
   // Any one I need to protect in the room?
-  for (ally = dc_->world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (auto &ally : ch->dc_->world[ch->in_room].people_)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -147,7 +145,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
   qint32 count = {};
 
   // Count the number of players in room
-  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
       count++;
 
@@ -158,7 +156,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
   count = dc_->number(1, count);
 
   // Find the "count" player and return them
-  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
     {
       if (count > 1)
@@ -180,7 +178,7 @@ void damage_all_players_in_room(CharacterPtr ch, qint32 damage)
   CharacterPtr next_vict = {};
   void inform_victim(CharacterPtr ch, CharacterPtr vict, qint32 dam);
 
-  for (vict = dc_->world[ch->in_room].people; vict; vict = next_vict)
+  for (vict = dc_->world[ch->in_room].people_; vict; vict = next_vict)
   {
     // we need this here in case fight_kill moves our victim
     next_vict = vict->next_in_room;
@@ -211,7 +209,7 @@ void summon_all_of_mob_to_room(CharacterPtr ch, qint32 iFriendId)
   if (!ch)
     return;
 
-  const auto &character_list = dc_->character_list;
+  const auto &character_list = ch->dc_->character_list;
   for (const auto &victim : character_list)
   {
     if (!victim->isNonPlayer())
@@ -235,7 +233,7 @@ CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId)
     return {};
 
   // Is my friend in the room?
-  for (ally = dc_->world[ch->in_room].people; ally; ally = ally->next_in_room)
+  for (auto &ally : ch->dc_->world[ch->in_room].people_)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -620,7 +618,7 @@ qint32 backstabber(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     return ReturnValue::eSUCCESS;
   }
 
-  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
   {
 
     if (tch->isPlayer())
@@ -1985,7 +1983,7 @@ qint32 mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QSt
     return ReturnValue::eFAILURE;
 
   // TODO - make this Crydragon proc into something better
-  for (tmp_victim = dc_->world[ch->in_room].people; tmp_victim; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((tmp_victim->isNonPlayer() || ch->isNonPlayer()) && (tmp_victim != ch))
@@ -2023,7 +2021,7 @@ qint32 adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
     return ReturnValue::eFAILURE;
 
-  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
     if (tch->isPlayer() && dc_->number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
@@ -2068,7 +2066,7 @@ qint32 mud_school_adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (!AWAKE(ch))
     return ReturnValue::eFAILURE;
 
-  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
     if (tch->isPlayer() && dc_->number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
@@ -2200,7 +2198,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
   if (cmd == cmd_t::LIST)
   { /* List */
     ch->sendln("Available pets are:");
-    for (pet = dc_->world[pet_room].people; pet; pet = pet->next_in_room)
+    for (pet = dc_->world[pet_room].people_; pet; pet = pet->next_in_room)
     {
       dc_sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
       ch->send(buf);
@@ -2371,7 +2369,7 @@ qint32 humaneater(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  for (tch = dc_->world[ch->in_room].people; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
   {
 
     if (tch->isPlayer())
@@ -3147,7 +3145,7 @@ qint32 hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
 
   case 3:
     act_to_room("$n leaps back and readies a wand...", ch, 0, 0, INVIS_NULL);
-    for (victim = dc_->world[ch->in_room].people; victim; victim = victim->next_in_room)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = victim->next_in_room)
     {
       if (victim->isNonPlayer())
         continue;

@@ -4,7 +4,6 @@
 |  the act() function work.
 */
 #include "DC/DC.h"
-#include "DC/comm.h"
 
 #include <QString>
 
@@ -63,7 +62,6 @@ act_return act(
 {
   ConnectionPtr i;
   qint32 retval = {};
-  TokenList *tokens;
 
   send_tokens_return st_return;
   st_return.str = QString();
@@ -73,13 +71,12 @@ act_return act(
   ar.str = QString();
   ar.retval = {};
 
-  tokens = new TokenList(str);
+  TokenList tokens(str);
 
   // This shouldn't happen
   if (ch == 0)
   {
     DC::getInstance()->logentry(u"Error in act(), character equal to 0"_s, OVERSEER, DC::LogChannel::LOG_BUG);
-    tokens = {};
     ar.retval = ReturnValue::eFAILURE;
     return ar;
   }
@@ -141,7 +138,6 @@ act_return act(
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
       ch->dc_->logentry(u"Error in act(), invalid value sent as 'destination'"_s, OVERSEER, DC::LogChannel::LOG_BUG);
-      tokens = {};
       ar.retval = ReturnValue::eFAILURE;
       return ar;
     }
@@ -161,7 +157,6 @@ act_return act(
     }
   }
 
-  tokens = {};
   return ar;
 }
 
@@ -185,10 +180,10 @@ void send_message(QString str, CharacterPtr to)
   write_to_output(str, to->desc);
 }
 
-send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint32 flags, CharacterPtr to)
+send_tokens_return send_tokens(TokenList &tokens, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint32 flags, CharacterPtr to)
 {
   qint32 retval = {};
-  QString buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
+  QString buf = tokens.Interpret(ch, obj, vict_obj, to, flags);
 
   // Uppercase first letter of sentence.
   if (buf.isEmpty() == false && buf[0] != 0)

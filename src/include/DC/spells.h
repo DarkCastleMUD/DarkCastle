@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: spells.h , Implementation of magic spells.       Part of DIKUMUD *
  *  Usage : Spells                                                         *
@@ -13,5 +14,3 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: spells.h,v 1.142 2015/06/14 02:38:12 pirahna Exp $ */
-
-#pragma once

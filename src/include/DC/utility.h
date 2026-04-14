@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: utils.h, Utility module.                         Part of DIKUMUD *
  *  Usage: Utility macros                                                  *
@@ -17,5 +18,3 @@
  *                         crashing                                        *
  ***************************************************************************/
 /* $Id: utility.h,v 1.100 2014/07/27 00:20:02 jhhudso Exp $ */
-
-#pragma once

@@ -1002,7 +1002,7 @@ command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1031,7 +1031,7 @@ command_return_t do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
     af.modifier = {};
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1273,7 +1273,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         CharacterPtr tmp;
-        for (tmp = dc_->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+        for (tmp = dc_->world[ch->in_room].people_; tmp; tmp = tmp->next_in_room)
           if (tmp->fighting == victim)
             stop_fighting(tmp);
         stop_fighting(victim);

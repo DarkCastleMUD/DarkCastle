@@ -23,25 +23,14 @@
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
 #include <cstring>
-#include <cstdio>
 #include <cassert>
 #include <cstdlib>
 
-#include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/race.h"
-#include "DC/spells.h"
 #include "DC/magic.h"
-#include "DC/player.h"
 
-#include "DC/fight.h"
-
-#include "DC/handler.h"
 #include "DC/interp.h"
-#include "DC/act.h"
-#include "DC/ki.h"
-#include "DC/clan.h"
-#include "DC/utility.h"
 
 // Global data
 
@@ -1367,11 +1356,11 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
   CharacterPtr people;
   if (room > 0)
   {
-    people = dc_->world[room].people;
+    people = dc_->world[room].people_;
   }
   else
   {
-    people = dc_->world[ch->in_room].people;
+    people = dc_->world[ch->in_room].people_;
   }
 
   for (temp_char = people;

@@ -18,18 +18,11 @@
 #include <fmt/format.h>
 
 #include "DC/handler.h"
-#include "DC/levels.h"
-
-#include "DC/player.h"
 
 #include "DC/interp.h"
-#include "DC/clan.h"
-#include "DC/returnvals.h"
-#include "DC/spells.h"
 #include "DC/interp.h"
 #include "DC/const.h"
 #include "DC/db.h"
-#include "DC/Leaderboard.h"
 #include "DC/const.h"
 #include "DC/DC.h"
 #include "DC/meta.h"
@@ -425,7 +418,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       GET_PLATINUM(victim) -= 500;
       send(u"You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())).arg(GET_PLATINUM(victim)));
       victim->send(u"You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n"_s.arg(GET_PLATINUM(victim)));
-      dc_->logentry(u"500 platinum removed from %1 for rename."_s.arg(qPrintable(victim->name())), level_, DC::LogChannel::LOG_GOD);
+      dc_->logentry(u"500 platinum removed from %1 for rename."_s.arg(qPrintable(victim->name())), level_t, DC::LogChannel::LOG_GOD);
     }
   }
 
@@ -554,7 +547,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
 
   buffer = u"%1 renamed to %2."_s.arg(qPrintable(victim->name())).arg(newname);
-  dc_->logentry(buffer, level_, DC::LogChannel::LOG_GOD);
+  dc_->logentry(buffer, level_t, DC::LogChannel::LOG_GOD);
 
   // handle the renames
   dc_->TheAuctionHouse.HandleRename(this, qPrintable(victim->name()), newname);

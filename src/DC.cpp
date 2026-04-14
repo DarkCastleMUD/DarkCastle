@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <qcoreapplication.h>
+#include <qtypes.h>
 
 #include "DC/DC.h"
 #include "DC/db.h"
@@ -125,16 +126,12 @@ zone_t DC::getRoomZone(room_t room_nr)
 
 QString DC::getZoneName(zone_t zone_key)
 {
-  DCPtr dc = getInstance();
-  if (dc != nullptr)
+  if (zones_.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      return dc->zones.value(zone_key).name();
-    }
+    return zones_.value(zone_key).name();
   }
 
-  return QString();
+  return {};
 }
 
 void DC::setZoneClanOwner(zone_t zone_key, qint32 clan_key)
@@ -142,9 +139,9 @@ void DC::setZoneClanOwner(zone_t zone_key, qint32 clan_key)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].clanowner = clan_key;
+      dc->zones_[zone_key].clanowner = clan_key;
     }
   }
 }
@@ -154,9 +151,9 @@ void DC::setZoneClanGold(zone_t zone_key, gold_t gold)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].gold = gold;
+      dc->zones_[zone_key].gold = gold;
     }
   }
 }
@@ -166,9 +163,9 @@ void DC::setZoneTopRoom(zone_t zone_key, room_t room_key)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].setRealTop(room_key);
+      dc->zones_[zone_key].setRealTop(room_key);
     }
   }
 }
@@ -178,9 +175,9 @@ void DC::setZoneBottomRoom(zone_t zone_key, room_t room_key)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].setRealBottom(room_key);
+      dc->zones_[zone_key].setRealBottom(room_key);
     }
   }
 }
@@ -190,9 +187,9 @@ void DC::setZoneModified(zone_t zone_key)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].setModified();
+      dc->zones_[zone_key].setModified();
     }
   }
 }
@@ -202,9 +199,9 @@ void DC::setZoneNotModified(zone_t zone_key)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].setModified(false);
+      dc->zones_[zone_key].setModified(false);
     }
   }
 }
@@ -214,9 +211,9 @@ void DC::incrementZoneDiedTick(zone_t zone_key)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].incrementDiedThisTick();
+      dc->zones_[zone_key].incrementDiedThisTick();
     }
   }
 }
@@ -226,9 +223,9 @@ void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
-    if (dc->zones.contains(zone_key))
+    if (dc->zones_.contains(zone_key))
     {
-      dc->zones[zone_key].reset(reset_type);
+      dc->zones_[zone_key].reset(reset_type);
     }
   }
 }
@@ -291,14 +288,14 @@ ObjectPtr DC::getObject(vnum_t vnum)
     return {};
   }
 
-  return dc_->obj_index[rnum].item;
+  return obj_index[rnum].item;
 }
 
 void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   if (cf.verbose_mode)
   {
-    dc_->logentry(str, god_level, type, vict);
+    logentry(str, god_level, type, vict);
   }
 }
 
@@ -541,4 +538,187 @@ QString SANA(ObjectPtr obj)
     return u"an"_s;
   else
     return u"a"_s;
+}
+
+QTextStream &operator>>(QTextStream &in, Room &room)
+{
+  room_t room_nr = {};
+  QString temp = {};
+  QChar ch = {};
+  qint32 dir = {};
+  extra_descr_data *new_new_descr{};
+  zone_t zone_nr = {};
+
+  ch = fread_char(in);
+
+  if (ch != '$')
+  {
+    room_nr = fread_int<room_t>(in, 0, 1000000);
+    temp = fread_string(in, 0);
+
+    if (room_nr)
+    {
+      /*
+      dc_->currentVNUM(room_nr);
+      dc_->currentType("Room");
+      dc_->currentName(temp);
+
+      if (room_nr >= dc_->top_of_world_alloc)
+      {
+        dc_->top_of_world_alloc = room_nr + 200;
+      }
+
+      if (dc_->top_of_world < room_nr)
+        dc_->top_of_world = room_nr;
+      */
+
+      room.paths_ = {};
+      room.number = room_nr;
+      room.name_ = temp;
+    }
+    QString description = fread_string(in, 0);
+    if (room_nr)
+    {
+      room.description_ = description;
+      room.tracks_ = {};
+      room.denied = {};
+      // dc_->total_rooms++;
+    }
+    // Ignore recorded zone number since it may not longer be valid
+    fread_int<quint64>(in, -1, 64000); // zone nr
+
+    if (room_nr)
+    {
+      // Go through the zone table until room.number is
+      // in the current zone.
+
+      bool found = false;
+      zone_t zone_nr = {};
+      for (auto [zone_key, zone] : room.dc_->zones_.asKeyValueRange())
+      {
+        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
+        {
+          found = true;
+          zone_nr = zone_key;
+          break;
+        }
+      }
+      if (!found)
+      {
+        // QString error = u"Room %1 is outside of any zone."_s.arg(room_nr);
+        // dc_->logentry(error);
+        // dc_->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+      }
+      else
+      {
+        auto &zone = room.dc_->zones_[zone_nr];
+        if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
+        {
+          if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
+          {
+            zone.setRealBottom(room_nr);
+          }
+          if (room_nr > zone.getRealTop() || zone.getRealTop() == 0)
+          {
+            zone.setRealTop(room_nr);
+          }
+        }
+        room.zone = zone_nr;
+      }
+    }
+
+    quint32 room_flags = fread_bitvector(in);
+
+    if (room_nr)
+    {
+      room.room_flags = room_flags;
+      if (isSet(room.room_flags, NO_ASTRAL))
+      {
+        REMOVE_BIT(room.room_flags, NO_ASTRAL);
+      }
+
+      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
+      room.temp_room_flags = {};
+    }
+
+    qint32 sector_type = fread_int<qint32>(in, -1, 64000);
+
+    if (room_nr)
+    {
+      room.sector_type = sector_type;
+      room.funct = {};
+      room.contents_ = {};
+      room.people_ = {};
+      room.light = {}; /* Zero light sources */
+
+      for (size_t tmp = {}; tmp <= 5; tmp++)
+        room.dir_option[tmp] = {};
+
+      room.ex_description = {};
+    }
+
+    for (;;)
+    {
+      ch = fread_char(in); /* dir field */
+
+      /* direction field */
+      if (ch == 'D')
+      {
+        dir = fread_int(in, 0, 5);
+        setup_dir(in, room_nr, dir);
+      }
+      /* extra description field */
+      else if (ch == 'E')
+      {
+        // strip off the \n after the E
+        if (fread_char(in) != '\n')
+        {
+          fseek(in, -1, SEEK_CUR);
+        }
+
+        new_new_descr = new extra_descr_data;
+        new_new_descr->keyword_ = fread_string(in, 0);
+        new_new_descr->description_ = fread_string(in, 0);
+
+        if (room_nr)
+        {
+          new_new_descr->next = room.ex_description;
+          room.ex_description = new_new_descr;
+        }
+        else
+        {
+          new_new_descr = {};
+        }
+      }
+      else if (ch == 'B')
+      {
+        deny_data *deni;
+
+        deni = new deny_data;
+        deni->vnum = fread_int(in, -1, 2147483467);
+
+        if (room_nr)
+        {
+          deni->next = room.denied;
+          room.denied = deni;
+        }
+        else
+        {
+          deni = {};
+        }
+      }
+      else if (ch == 'S') /* end of current room */
+        break;
+      else if (ch == 'C')
+      {
+        qint32 c_class = fread_int(in, 0, CLASS_MAX);
+        if (room_nr)
+        {
+          room.allow_class[c_class] = true;
+        }
+      }
+    } // of for (;;) (get directions and extra descs)
+  } // if == $
+
+  return in;
 }

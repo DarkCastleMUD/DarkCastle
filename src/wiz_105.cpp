@@ -4,9 +4,7 @@
 **********************/
 #include "DC/DC.h"
 #include "DC/punish.h"
-#include "DC/spells.h" // Character::PLAYER_CANTQUIT
 #include "DC/handler.h"
-#include "DC/player.h"
 #include "DC/fight.h"
 #include "DC/interp.h"
 #include "DC/innate.h"

@@ -1,19 +1,13 @@
 // social.C
 // Description:  Anything to do with socials
 
-#include <cstring>
 #include <cstdlib> // qsort()
 #include <qdebug.h>
 #include <qiodevicebase.h>
 
-#include "DC/levels.h"
-#include "DC/structs.h" // MAX_INPUT_LENGTH
-
 #include "DC/DC.h"
 
 #include "DC/social.h"
-#include "DC/act.h"
-#include "DC/db.h"
 #include "DC/interp.h" // len_cmp
 #include "DC/returnvals.h"
 

@@ -2236,7 +2236,7 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
         qint32 success = {};
 
         // opened the door that kept them from falling out
-        for (victim = dc_->world[ch->in_room].people; victim; victim = next_vict)
+        for (victim = dc_->world[ch->in_room].people_; victim; victim = next_vict)
         {
           next_vict = victim->next_in_room;
           if (victim->isNonPlayer() || IS_AFFECTED(victim, AFF_FLYING))

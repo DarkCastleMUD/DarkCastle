@@ -2109,19 +2109,19 @@ qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting)
 
   dc_->world[ch->in_room].light -= ch->glow_factor;
 
-  if (ch == dc_->world[ch->in_room].people) /* head of list */
-    dc_->world[ch->in_room].people = ch->next_in_room;
+  if (ch == dc_->world[ch->in_room].people_) /* head of list */
+    dc_->world[ch->in_room].people_ = ch->next_in_room;
 
   /* locate the previous element */
   else
-    for (i = dc_->world[ch->in_room].people; i; i = i->next_in_room)
+    for (i = dc_->world[ch->in_room].people_; i; i = i->next_in_room)
     {
       if (i->next_in_room == ch)
         i->next_in_room = ch->next_in_room;
     }
   //  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
   //	debugpoint();
-  for (i = dc_->world[ch->in_room].people; i; i = i->next_in_room)
+  for (i = dc_->world[ch->in_room].people_; i; i = i->next_in_room)
   {
     if (i->isNonPlayer() && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
       Other = true;
@@ -2184,14 +2184,14 @@ qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
   if (room == DC::NOWHERE)
     return {};
 
-  if (dc_->world[room].people == ch)
+  if (dc_->world[room].people_ == ch)
   {
-    dc_->logentry(u"Error: dc_->world[room].people == ch in char_to_room()."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Error: dc_->world[room].people_ == ch in char_to_room()."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
-  ch->next_in_room = dc_->world[room].people;
-  dc_->world[room].people = ch;
+  ch->next_in_room = dc_->world[room].people_;
+  dc_->world[room].people_ = ch;
   ch->in_room = room;
 
   dc_->world[room].light += ch->glow_factor;
@@ -2687,7 +2687,7 @@ CharacterPtr get_char_room(const QString name, room_t room, bool careful)
   if ((number = get_number(&tmp)) < 0)
     return {};
 
-  for (i = dc_->world[room].people, j = {}; i && (j <= number); i = i->next_in_room)
+  for (i = dc_->world[room].people_, j = {}; i && (j <= number); i = i->next_in_room)
   {
     if (number == 0 && i->isNonPlayer())
       continue;
@@ -3759,7 +3759,7 @@ CharacterPtr Character::get_rand_other_char_room_vis(void)
   qint32 count = {};
 
   // Count the number of players in room
-  for (vict = dc_->world[in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[in_room].people_; vict; vict = vict->next_in_room)
     if (CAN_SEE(this, vict) && this != vict)
       count++;
 
@@ -3770,7 +3770,7 @@ CharacterPtr Character::get_rand_other_char_room_vis(void)
   count = dc_->number(1, count);
 
   // Find the "count" player and return them
-  for (vict = dc_->world[in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[in_room].people_; vict; vict = vict->next_in_room)
   {
     if (CAN_SEE(this, vict) && this != vict)
     {
@@ -3868,7 +3868,7 @@ CharacterPtr Character::get_char_room_vis(QString name)
     name = name.split('.').value(1).trimmed();
   }
 
-  for (i = dc_->world[in_room].people, j = {}; i && (j <= number); i = i->next_in_room)
+  for (i = dc_->world[in_room].people_, j = {}; i && (j <= number); i = i->next_in_room)
   {
     if (number == 0 && i->isNonPlayer())
       continue;
@@ -3927,7 +3927,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
   if ((number = get_number(&tmp)) < 0)
     return {};
 
-  for (i = dc_->world[ch->in_room].people, j = 1; i && (j <= number); i = i->next_in_room)
+  for (i = dc_->world[ch->in_room].people_, j = 1; i && (j <= number); i = i->next_in_room)
   {
     if (!i->isNonPlayer())
       continue;
@@ -3962,7 +3962,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
 
 CharacterPtr get_pc_room_vis_exact(CharacterPtr ch, QString name)
 {
-  for (auto i = dc_->world[ch->in_room].people; i; i = i->next_in_room)
+  for (auto i = dc_->world[ch->in_room].people_; i; i = i->next_in_room)
   {
     if (isexact(name, qPrintable(i->name())) && CAN_SEE(ch, i) && i->isPlayer())
       return (i);

@@ -5,12 +5,7 @@
 | clan.h
 | Description:  Header information for clans.
 */
-
-#include <cstddef>
-#include <QString>
-#include <qqueue.h>
-
-constexpr size_t MAX_CLAN_LEN = 15;
+constexpr auto MAX_CLAN_LEN = 15;
 constexpr auto CLAN_RIGHTS_ACCEPT = 1;
 constexpr auto CLAN_RIGHTS_OUTCAST = 1 << 1;
 constexpr auto CLAN_RIGHTS_B_READ = 1 << 2;

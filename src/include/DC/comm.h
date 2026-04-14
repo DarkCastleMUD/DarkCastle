@@ -7,7 +7,7 @@
 #include "DC/terminal.h"
 
 constexpr auto SMALL_BUFSIZE = 1024;
-#define LARGE_BUFSIZE (24 * 2048)
+constexpr auto LARGE_BUFSIZE = 24 * 2048;
 constexpr auto GARBAGE_SPACE = 32;
 constexpr auto NUM_RESERVED_DESCS = 8;
 constexpr auto HOST_LENGTH = 30;
@@ -46,8 +46,6 @@ const QStringList cond_colorcodes = {
 qint32 write_to_descriptor(qint32 desc, QByteArray txt);
 QString scramble_text(QString txt);
 void send_info(QString messg);
-void send_info(QString messg);
-void send_info(const QString messg);
 void update_bard_singing(void);
 void affect_update(qint32 duration_type); /* In spells.c */
 const QString calc_color(qint32 hit, qint32 max_hit);

@@ -3,15 +3,10 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-#include "DC/act.h"
-#include "DC/affect.h"
-#include "DC/db.h"
 #include "DC/interp.h"
-#include "DC/handler.h"
 #include "DC/clan.h"
 #include "DC/race.h"
 #include "DC/const.h"
-#include "DC/utility.h"
 
 #include <fmt/format.h>
 
@@ -294,7 +289,7 @@ command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr rch;
 
-  for (rch = dc_->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
+  for (rch = dc_->world[ch->in_room].people_; rch != nullptr; rch = rch->next_in_room)
   {
     if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');

@@ -104,7 +104,7 @@ bool someone_fighting(CharacterPtr ch)
   CharacterPtr vict;
   if (ch->fighting && ch->fighting->fighting == ch)
     return true;
-  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
   {
     if (vict->fighting == ch)
       return true;
@@ -124,7 +124,7 @@ qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0)
     return ReturnValue::eFAILURE;
 
   CharacterPtr tmp;
-  for (tmp = dc_->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+  for (tmp = dc_->world[ch->in_room].people_; tmp; tmp = tmp->next_in_room)
   {
     if (tmp == ch || tmp == ch->fighting)
       continue;
@@ -2959,9 +2959,7 @@ void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victi
   if (buf2) // lazy, should've done it earlier, some extra processing wasted, but I don't care!
     dc_strcpy(string2, buf2);
 
-  TokenList *tokens, *tokens2;
-  tokens = new TokenList(string1);
-  tokens2 = new TokenList(string2);
+  TokenList tokens(string1), tokens2(string2);
 
   if ((IS_AFFECTED(ch, AFF_HIDE) || ISSET(ch->affected_by, AFF_FOREST_MELD)) && to != TO_CHAR)
   {
@@ -2971,7 +2969,7 @@ void send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victi
 
   if (to == TO_ROOM)
   {
-    for (tmpch = dc_->world[ch->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+    for (tmpch = dc_->world[ch->in_room].people_; tmpch; tmpch = tmpch->next_in_room)
     {
       if (tmpch == ch || tmpch == victim)
         continue;
@@ -4215,7 +4213,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
   if (isSet(ch->combat, COMBAT_BERSERK))
   {
     bool keepZerk = false;
-    for (tmp = dc_->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+    for (tmp = dc_->world[ch->in_room].people_; tmp; tmp = tmp->next_in_room)
       if (tmp->fighting == ch)
         keepZerk = true;
     if (!keepZerk)

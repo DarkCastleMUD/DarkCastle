@@ -720,7 +720,7 @@ command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (auto curr = dc_->world[ch->in_room].people; curr; curr = curr->next_in_room)
+  for (auto curr = dc_->world[ch->in_room].people_; curr; curr = curr->next_in_room)
   {
     if (curr->fighting == ch)
     {
@@ -745,7 +745,7 @@ command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     for (i = {}; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = {};
     i = {};
-    for (temp = dc_->world[ch->in_room].people; temp; temp = temp->next_in_room)
+    for (temp = dc_->world[ch->in_room].people_; temp; temp = temp->next_in_room)
     {
       if (ch == temp)
         continue;
@@ -1964,7 +1964,7 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1993,7 +1993,7 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;

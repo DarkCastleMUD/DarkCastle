@@ -172,11 +172,11 @@ qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   {
     return ReturnValue::eFAILURE;
   }
-  if (!dc_->world[obj->in_room].people)
+  if (!dc_->world[obj->in_room].people_)
   {
     return ReturnValue::eFAILURE;
   }
-  ch = dc_->world[obj->in_room].people;
+  ch = dc_->world[obj->in_room].people_;
   for (index_cursor = &obj_emote_head; index_cursor; index_cursor = index_cursor->next)
   {
     if (real_room(index_cursor->room_number) == obj->in_room)
@@ -366,7 +366,7 @@ qint32 dawnsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   ch->sendln("You whisper a prayer to Dawn and it responds in a brilliant flash of light!");
   CharacterPtr v;
   affected_type af;
-  for (v = dc_->world[ch->in_room].people; v; v = v->next_in_room)
+  for (v = dc_->world[ch->in_room].people_; v; v = v->next_in_room)
   {
     if (v == ch)
       continue;
@@ -408,7 +408,7 @@ qint32 songstaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   obj->obj_flags.timer = 5;
 
   qint32 heal;
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1505,7 +1505,7 @@ qint32 dancevest(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       };
   CharacterPtr v;
   ch->sendln("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!");
-  for (v = dc_->world[ch->in_room].people; v; v = v->next_in_room)
+  for (v = dc_->world[ch->in_room].people_; v; v = v->next_in_room)
   {
     if (GET_POS(v) != position_t::STANDING)
     {
@@ -1564,7 +1564,7 @@ qint32 durendal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   ch->sendln("Upon hearing your plea, Durendal suddenly bursts into flame with a blinding flash of searing white heat!");
   act_to_room("$n mutters a quiet prayer and with a blinding flash, their weapon bursts into flame!", ch, 0, 0, 0);
   CharacterPtr v, vn;
-  for (v = dc_->world[ch->in_room].people; v; v = vn)
+  for (v = dc_->world[ch->in_room].people_; v; v = vn)
   {
     vn = v->next_in_room;
     if (GET_ALIGNMENT(v) > -350 || ARE_GROUPED(ch, v))
@@ -1863,7 +1863,7 @@ qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   {
     // TODO - should probably check to make sure these are valid rooms before we
     // use them.  Proc isn't used yet though, so no biggy.
-    for (vict = dc_->world[real_room(i)].people; vict; vict = vict->next_in_room)
+    for (vict = dc_->world[real_room(i)].people_; vict; vict = vict->next_in_room)
       if (vict->isNonPlayer())
         found = {};
       else
@@ -1946,7 +1946,7 @@ qint32 generic_push_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   {
   case 26723: // transporter in star-trek
     send_to_room("You hear a chiming electrical noise as the transporter hums to life.\r\n", obj->in_room);
-    for (victim = dc_->world[obj->in_room].people; victim; victim = next_vict)
+    for (victim = dc_->world[obj->in_room].people_; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       victim->sendln("Your body is pulled apart and reassembled elsewhere!");
@@ -2660,7 +2660,7 @@ qint32 no_magic_while_alive(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
   if (obj->in_room == DC::NOWHERE)
     return ReturnValue::eFAILURE;
 
-  CharacterPtr vict = dc_->world[obj->in_room].people;
+  CharacterPtr vict = dc_->world[obj->in_room].people_;
 
   for (; vict; vict = vict->next_in_room)
   {
@@ -2862,7 +2862,7 @@ qint32 mob_summoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     return ReturnValue::eFAILURE; // someone loaded me
 
   // see if we have any players in room
-  for (vict = dc_->world[obj->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[obj->in_room].people_; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
       break;
 
@@ -3935,7 +3935,7 @@ qint32 exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QStrin
     if (dc_->world[obj->in_room].dir_option[i] && dc_->world[obj->in_room].dir_option[i]->to_room)
       send_to_room("You hear a loud boom.\r\n", dc_->world[obj->in_room].dir_option[i]->to_room);
 
-  for (victim = dc_->world[obj->in_room].people; victim; victim = next_v)
+  for (victim = dc_->world[obj->in_room].people_; victim; victim = next_v)
   {
     next_v = victim->next_in_room;
     if (victim->isNonPlayer()) // only hurts players
@@ -4342,7 +4342,7 @@ qint32 angie_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
   act_to_character("You turn the doorknob, there is a loud click, and a blinding explosion knocks you on your ass.", ch, nullptr, nullptr, 0);
   CharacterPtr a, b, c;
   b = ch->dc_->initiate_oproc(nullptr, obj);
-  for (a = dc_->world[ch->in_room].people; a; a = c)
+  for (a = dc_->world[ch->in_room].people_; a; a = c)
   {
     c = a->next_in_room; // 'cause mobs get freed
     if (a == b)

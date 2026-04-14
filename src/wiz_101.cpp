@@ -11,12 +11,6 @@
 
 #include "DC/DC.h"
 #include "DC/terminal.h"
-#include "DC/handler.h"
-#include "DC/connect.h"
-#include "DC/returnvals.h"
-#include "DC/spells.h"
-#include "DC/db.h"
-#include "DC/levels.h"
 
 QQueue<QString> imm_history;
 QQueue<QString> imp_history;
@@ -282,7 +276,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   if ((isSet(dc_->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
   {
 
-    for (i = 0, pers = dc_->world[location].people; pers;
+    for (i = 0, pers = dc_->world[location].people_; pers;
          pers = pers->next_in_room, i++)
       ;
     if (i > 1)
@@ -295,7 +289,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   send("\r\n");
 
   if (!this->isNonPlayer())
-    for (tmp_ch = dc_->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
@@ -317,7 +311,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   move_char(this, location);
 
   if (!this->isNonPlayer())
-    for (tmp_ch = dc_->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
@@ -518,8 +512,8 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 retval = ch->command_interpreter(command);
 
   /* check if the guy's still there */
-  for (target_mob = dc_->world[location].people; target_mob; target_mob =
-                                                                 target_mob->next_in_room)
+  for (target_mob = dc_->world[location].people_; target_mob; target_mob =
+                                                                  target_mob->next_in_room)
     if (ch == target_mob)
     {
       move_char(ch, original_loc);

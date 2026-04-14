@@ -156,7 +156,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   auto arg2_level = arg2.toUInt(&arg2_level_ok);
 
   extern qint32 top_of_mobt;
-  QMultiMap<level_, QString> results;
+  QMultiMap<level_t, QString> results;
 
   for (vnum_t vnum = {}; (vnum <= dc_->mob_index[top_of_mobt].vnum()); ++vnum)
   {
@@ -275,7 +275,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   sendln("$B$7LVL,ATK,HIT,DAM,   HP, -AC, dice, class, description$R");
   for (const auto &line : results)
     sendln(line);
-  sendln(u"$B$5*$R = in world now"_s));
+  sendln(u"$B$5*$R = in world now"_s);
   // loop though all npcs
 
   // search npcs affect of charmable

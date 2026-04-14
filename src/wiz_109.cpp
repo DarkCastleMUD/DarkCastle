@@ -60,7 +60,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   char_to_room(new_new, in_room);
   act_to_room("$n gestures sharply and $N comes into existence!", this, 0, new_new, 0);
   act_to_character("You linkload $N.", this, 0, new_new, 0);
-  dc_->logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", qPrintable(this->name()), qPrintable(new_new->name()));
+  dc_->logf(level_t, DC::LogChannel::LOG_GOD, "%s linkloads %s.", qPrintable(this->name()), qPrintable(new_new->name()));
   return ReturnValue::eSUCCESS;
 }
 

@@ -1,6 +1,4 @@
 #include "DC/DC.h"
-#include "DC/handler.h"
-#include "DC/returnvals.h"
 #include "DC/interp.h"
 
 /******************* Area start **************************************/

@@ -1,6 +1,5 @@
 #pragma once
 #include "DC/mobile.h"
-#include "DC/structs.h"
 
 extern const QStringList dirs;
 extern race_data races[];

@@ -260,7 +260,7 @@ void DC::mobile_activity(void)
       //      CharacterPtr temp = get_char(get_random_hate(ch));
       done = {};
 
-      for (tmp_ch = dc_->world[ch->in_room].people; tmp_ch; tmp_ch = next_blah)
+      for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = next_blah)
       {
         next_blah = tmp_ch->next_in_room;
 
@@ -335,7 +335,7 @@ void DC::mobile_activity(void)
         while (!done && targets)
         {
           targets = {};
-          for (tmp_ch = dc_->world[ch->in_room].people; tmp_ch; tmp_ch = next_aggro)
+          for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = next_aggro)
           {
             if (!tmp_ch || !ch)
             {
@@ -399,7 +399,7 @@ void DC::mobile_activity(void)
           ISSET(ch->mobdata->actflags, ACT_AGGR_EVIL) ||
           ISSET(ch->mobdata->actflags, ACT_AGGR_NEUT) ||
           ISSET(ch->mobdata->actflags, ACT_AGGR_GOOD))
-        for (tmp_ch = dc_->world[ch->in_room].people; tmp_ch; tmp_ch = pch)
+        for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = pch)
         {
           pch = tmp_ch->next_in_room;
 

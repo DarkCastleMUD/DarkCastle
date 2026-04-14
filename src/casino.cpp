@@ -1200,7 +1200,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     {
       CharacterPtr tmpch;
       qint32 i = {};
-      for (tmpch = dc_->world[ch->in_room].people; tmpch;
+      for (tmpch = dc_->world[ch->in_room].people_; tmpch;
            tmpch = tmpch->next_in_room)
         if (tmpch->isPlayer())
           i++;
@@ -1214,7 +1214,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     {
       CharacterPtr tmpch;
       qint32 i = {};
-      for (tmpch = dc_->world[ch->in_room].people; tmpch;
+      for (tmpch = dc_->world[ch->in_room].people_; tmpch;
            tmpch = tmpch->next_in_room)
         if (tmpch->isPlayer())
           i++;

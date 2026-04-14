@@ -264,7 +264,7 @@ bool Character::isTank(void)
 {
   if (!in_room)
     return false;
-  for (auto victim = dc_->world[in_room].people; victim; victim = victim->next_in_room)
+  for (auto victim = dc_->world[in_room].people_; victim; victim = victim->next_in_room)
     if (victim->fighting == this && victim != this)
       return true;
   return false;
@@ -358,7 +358,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   {
     left += 6;
     CharacterPtr tmp;
-    for (tmp = dc_->world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
+    for (tmp = dc_->world[mob->in_room].people_; tmp; tmp = tmp->next_in_room)
     {
       if (isexact(left, qPrintable(tmp->name())))
       {
@@ -1623,7 +1623,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     CharacterPtr te;
     qint32 vnum = atoi(arg);
-    for (te = dc_->world[mob->in_room].people; te; te = te->next)
+    for (te = dc_->world[mob->in_room].people_; te; te = te->next)
     {
       if (te->isPlayer())
         continue;
@@ -1727,7 +1727,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     CharacterPtr p;
     qint32 count = {};
-    for (p = dc_->world[mob->in_room].people; p; p = p->next_in_room)
+    for (p = dc_->world[mob->in_room].people_; p; p = p->next_in_room)
       if (p->isPlayer())
         count++;
     return mprog_veval(count, opr, atoi(val));
@@ -1779,7 +1779,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     qint32 target = atoi(arg);
     CharacterPtr p;
     qint32 count = {};
-    for (p = dc_->world[mob->in_room].people; p; p = p->next_in_room)
+    for (p = dc_->world[mob->in_room].people_; p; p = p->next_in_room)
       if (p->isNonPlayer() && dc_->mob_index[p->mobdata->nr].vnum() == target)
         count++;
 
@@ -2825,7 +2825,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     qint32 target = atoi(arg);
 
-    for (CharacterPtr vch = dc_->world[mob->in_room].people;
+    for (CharacterPtr vch = dc_->world[mob->in_room].people_;
          vch;
          vch = vch->next_in_room)
     {
@@ -3883,7 +3883,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
   // count valid random victs in room
   if (mob->in_room > 0)
   {
-    for (vch = dc_->world[mob->in_room].people; vch; vch = vch->next_in_room)
+    for (vch = dc_->world[mob->in_room].people_; vch; vch = vch->next_in_room)
       if (CAN_SEE(mob, vch, true) && vch->isPlayer())
         count++;
 
@@ -3892,7 +3892,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
 
     if (!rndm && count)
     {
-      for (vch = dc_->world[mob->in_room].people; vch && count;)
+      for (vch = dc_->world[mob->in_room].people_; vch && count;)
       {
         if (CAN_SEE(mob, vch, true) && vch->isPlayer())
           count--;
@@ -4311,7 +4311,7 @@ qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 qint32 Character::mprog_greet_trigger(void)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
-  for (auto vmob = dc_->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+  for (auto vmob = dc_->world[in_room].people_; vmob != nullptr; vmob = vmob->next_in_room)
     if (vmob->isNonPlayer() && (vmob->fighting == nullptr) && AWAKE(vmob))
     {
       if (this != vmob && CAN_SEE(vmob, this) && (dc_->mob_index[vmob->mobdata->nr].progtypes & GREET_PROG) && isPaused(vmob) == false)
@@ -4430,7 +4430,7 @@ qint32 Character::mprog_speech_trigger(const QString txt)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
-  for (vmob = dc_->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
+  for (vmob = dc_->world[in_room].people_; vmob != nullptr; vmob = vmob->next_in_room)
     if (vmob->isNonPlayer() && (dc_->mob_index[vmob->mobdata->nr].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
     {
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))

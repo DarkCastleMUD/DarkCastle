@@ -844,8 +844,8 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (tmp_ch = dc_->world[in_room].people; tmp_ch &&
-                                            (tmp_ch->fighting != victim);
+  for (tmp_ch = dc_->world[in_room].people_; tmp_ch &&
+                                             (tmp_ch->fighting != victim);
        tmp_ch = tmp_ch->next_in_room)
     ;
 
@@ -959,7 +959,7 @@ qint32 handle_any_guard(CharacterPtr ch)
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
   {
-    for (auto vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (auto vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
         curr = {};
@@ -1128,7 +1128,7 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1157,7 +1157,7 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1205,7 +1205,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (i = dc_->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1228,7 +1228,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (i = dc_->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1268,7 +1268,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 
     affect_to_char(ch, &af);
 
-    for (i = dc_->world[ch->in_room].people; i; i = next_i)
+    for (i = dc_->world[ch->in_room].people_; i; i = next_i)
     {
       next_i = i->next_in_room;
 

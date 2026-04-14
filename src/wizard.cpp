@@ -1511,7 +1511,7 @@ command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     dc_sprintf(buf, "\r\n%s\r\n", argument + i);
-    for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
       vict->send(buf);
   }
   return ReturnValue::eSUCCESS;

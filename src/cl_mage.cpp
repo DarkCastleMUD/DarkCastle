@@ -294,7 +294,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
 
   // loop through the room to find the caster. It should only be possible for a single
   // caster in a room to have this running (as long as no imms are being stupid)
-  for (i = dc_->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -346,7 +346,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
     // Loop through allies and attack
-    for (ally = dc_->world[ch->in_room].people; ally; ally = next_ally)
+    for (ally = dc_->world[ch->in_room].people_; ally; ally = next_ally)
     {
       next_ally = ally->next_in_room;
 

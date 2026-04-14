@@ -432,27 +432,27 @@ private slots:
     QCOMPARE(conn->output, "a small mushroom has been removed from the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 2.mushroom"_s)); // put bad#.keyword
+    rc = do_vault(&ch, u"put 2.mushroom"_s); // put bad#.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 1.mushroom"_s)); // put #.keyword
+    rc = do_vault(&ch, u"put 1.mushroom"_s); // put #.keyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a small mushroom has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 2.sword"_s));
+    rc = do_vault(&ch, u"put 2.sword"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 2.sword"_s));
+    rc = do_vault(&ch, u"put 2.sword"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 1.sword"_s));
+    rc = do_vault(&ch, u"put 1.sword"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\n");
     conn->output = {};
@@ -487,12 +487,12 @@ private slots:
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 1.missing"_s)); // put #.missingkeyword
+    rc = do_vault(&ch, u"put 1.missing"_s); // put #.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
 
-    rc = do_vault(&ch, u"put 2.missing"_s)); // put bad#.missingkeyword
+    rc = do_vault(&ch, u"put 2.missing"_s); // put bad#.missingkeyword
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't have anything like that.\r\n");
     conn->output = {};
@@ -528,7 +528,7 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, u"get 1.sword"_s)); // get #.keyword
+    rc = do_vault(&ch, u"get 1.sword"_s); // get #.keyword
     QCOMPARE(conn->output, "a short sword has been removed from the vault.\r\n");
     conn->output = {};
 
@@ -536,7 +536,7 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "a short sword has been placed in the vault.\r\n");
     conn->output = {};
-    rc = do_vault(&ch, u"get 1.missing"_s)); // get #.missingkeyword
+    rc = do_vault(&ch, u"get 1.missing"_s); // get #.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
@@ -544,7 +544,7 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, u"get 3.sword"_s)); // get bad#.keyword
+    rc = do_vault(&ch, u"get 3.sword"_s); // get bad#.keyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
@@ -552,7 +552,7 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, u"get 3.missing"_s)); // get bad#.missingkeyword
+    rc = do_vault(&ch, u"get 3.missing"_s); // get bad#.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
@@ -560,7 +560,7 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, u"get 3.sword"_s)); // get invalid#.keyword
+    rc = do_vault(&ch, u"get 3.sword"_s); // get invalid#.keyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 
@@ -568,7 +568,7 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "");
     conn->output = {};
-    rc = do_vault(&ch, u"get 3.missing"_s)); // get invalid#.missingkeyword
+    rc = do_vault(&ch, u"get 3.missing"_s); // get invalid#.missingkeyword
     QCOMPARE(conn->output, "There is nothing like that in the vault.\r\n");
     conn->output = {};
 

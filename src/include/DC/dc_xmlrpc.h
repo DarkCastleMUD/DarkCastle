@@ -1,3 +1,4 @@
+#pragma once
 #include <XmlRpc.h>
 #include <QtTypes>
 using namespace XmlRpc;

@@ -16,6 +16,11 @@
 #pragma once
 #include <QString>
 #include <QObject>
+#include <QDebug>
+#include <QTextStream>
+
+using namespace Qt::StringLiterals;
+
 class error_eof
 {
 };
@@ -82,6 +87,8 @@ quint64 fread_uint(auto &in, quint64 minval = std::numeric_limits<quint64>::min(
   in >> val;
   return val;
 }
+
+
 
 QChar fread_char(QTextStream &fl);
 

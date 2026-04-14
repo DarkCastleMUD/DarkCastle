@@ -38,8 +38,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <iostream>
-#include <sstream>
 #include <QMap>
 
 #include <fmt/format.h>
@@ -47,20 +45,12 @@
 #include <QString>
 
 #include "DC/innate.h"
-#include "DC/levels.h"
-#include "DC/structs.h"
-#include "DC/player.h"
 
 #include "DC/DC.h"
 
 #include "DC/interp.h"
 
-#include "DC/handler.h"
-#include "DC/act.h"
-#include "DC/spells.h"
-#include "DC/clan.h"
 #include "DC/fight.h"
-#include "DC/returnvals.h"
 #include "DC/set.h"
 #include "DC/const.h"
 #include "DC/comm.h"
@@ -1587,7 +1577,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (loop_ch = dc_->world[victim->in_room].people; loop_ch; loop_ch = loop_ch->next_in_room)
+  for (loop_ch = dc_->world[victim->in_room].people_; loop_ch; loop_ch = loop_ch->next_in_room)
     if (loop_ch == victim || loop_ch->fighting == victim)
       stop_fighting(loop_ch);
 
@@ -2471,7 +2461,7 @@ bool check_make_camp(qint32 room)
   CharacterPtr i, next_i;
   bool campok = false;
 
-  for (i = dc_->world[room].people; i; i = next_i)
+  for (i = dc_->world[room].people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 

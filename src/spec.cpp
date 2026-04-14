@@ -4,11 +4,9 @@
 
 */
 
-#include "DC/structs.h"
 #include "DC/DC.h"
 
 #include "DC/interp.h"
-#include "DC/returnvals.h"
 
 class spec_data
 {

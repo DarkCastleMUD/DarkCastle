@@ -5161,10 +5161,10 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
     if (room == DC::NOWHERE)
       continue;
 
-    if (dc_->world[room].people)
+    if (dc_->world[room].people_)
     {
 
-      for (mob = dc_->world[room].people; mob; mob = mob->next_in_room)
+      for (mob = dc_->world[room].people_; mob; mob = mob->next_in_room)
       {
         if (mob->isPlayer())
           continue;

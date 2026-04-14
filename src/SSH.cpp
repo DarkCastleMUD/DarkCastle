@@ -1,9 +1,6 @@
-#include <iostream>
 
 #include <libssh/callbacks.h>
 #include <QDebug>
-
-#include "DC/SSH.h"
 
 namespace SSH
 {

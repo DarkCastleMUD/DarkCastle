@@ -7,7 +7,5 @@
 
 #pragma once
 
-#include "DC/class.h"
-#include <sstream>
 #include <QString>
 #include <QString>

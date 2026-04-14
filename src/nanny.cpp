@@ -2265,7 +2265,7 @@ void DC::checkConsecrate(qint32 pulseType)
               }
             }
           }
-          for (tmp_ch = dc_->world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
+          for (tmp_ch = dc_->world[obj->in_room].people_; tmp_ch; tmp_ch = next_ch)
           {
             next_ch = tmp_ch->next_in_room;
             if (tmp_ch == ch)
@@ -2310,7 +2310,7 @@ void DC::checkConsecrate(qint32 pulseType)
         {
           ch = obj->obj_flags.origin;
         }
-        for (tmp_ch = dc_->world[obj->in_room].people; tmp_ch; tmp_ch = next_ch)
+        for (tmp_ch = dc_->world[obj->in_room].people_; tmp_ch; tmp_ch = next_ch)
         {
           next_ch = tmp_ch->next_in_room;
           if (tmp_ch->isImmortalPlayer())

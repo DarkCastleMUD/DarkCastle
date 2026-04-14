@@ -908,7 +908,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       }
 
   /* special in mobile present? */
-  for (k = dc_->world[this->in_room].people; k; k = k->next_in_room)
+  for (k = dc_->world[this->in_room].people_; k; k = k->next_in_room)
   {
     if (k->isNonPlayer())
     {

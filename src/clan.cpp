@@ -2895,10 +2895,9 @@ void claimArea(qint32 clan, bool defend, bool challenge, qint32 clan2, qint32 zo
   send_info(buf);
 }
 
-qint32 count_controlled_areas(qint32 clan)
+qint32 DC::count_controlled_areas(qint32 clan)
 {
-  quint64 zones = {};
-  for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
+  for (auto [zone_key, zone] : zones.asKeyValueRange())
   {
     if (zone.clanowner == clan && can_collect(zone_key))
     {

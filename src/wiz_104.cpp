@@ -1,4 +1,3 @@
-#include <vector>
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 #include <QString>
@@ -6,18 +5,10 @@
 
 #include <QTimeZone>
 
-#include "DC/levels.h"
-#include "DC/wizard.h"
-
-#include "DC/connect.h"
-
 #include "DC/DC.h"
-#include "DC/handler.h"
 #include "DC/db.h"
 
 #include "DC/interp.h"
-#include "DC/returnvals.h"
-#include "DC/spells.h"
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
@@ -389,7 +380,7 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
                  "flames!\r\n",
                  ch);
 
-    for (vict = dc_->world[ch->in_room].people; vict; vict = next_v)
+    for (vict = dc_->world[ch->in_room].people_; vict; vict = next_v)
     {
       next_v = vict->next_in_room;
       if (vict->isNonPlayer())
@@ -1904,7 +1895,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[target].room_flags, PRIVATE))
   {
-    for (loop = 0, pers = dc_->world[target].people; pers;
+    for (loop = 0, pers = dc_->world[target].people_; pers;
          pers = pers->next_in_room, loop++)
       ;
     if (loop > 1)

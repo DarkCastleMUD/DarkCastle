@@ -15,25 +15,16 @@
 /* $Id: shop.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
 #include <cstdio>
-#include <cstring>
 #include <fmt/format.h>
 
-#include "DC/levels.h"
-#include "DC/obj.h"
-#include "DC/affect.h"
 #include "DC/DC.h"
 
 #include "DC/interp.h"
-#include "DC/player.h"
-#include "DC/handler.h"
 
 #include "DC/db.h"
-#include "DC/act.h"
-#include "DC/returnvals.h"
 #include "DC/shop.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
-#include "DC/wizard.h"
 
 player_shop *g_playershops;
 
@@ -677,7 +668,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   /*
    * Find a shop keeper in the room.
    */
-  //    for ( keeper = dc_->world[ch->in_room].people;
+  //    for ( keeper = dc_->world[ch->in_room].people_;
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
@@ -846,7 +837,7 @@ void DC::fix_shopkeepers_inventory(void)
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
   for (shop_nr = {}; shop_nr < max_shop; shop_nr++)
-    for (keeper = dc_->world[dc_->shop_index[shop_nr].in_room].people; keeper != nullptr;
+    for (keeper = dc_->world[dc_->shop_index[shop_nr].in_room].people_; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
       if (keeper->isNonPlayer() && dc_->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)

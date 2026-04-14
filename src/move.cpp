@@ -220,7 +220,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   {
     qint32 ppl = {};
     CharacterPtr k;
-    for (k = dc_->world[target].people; k; k = k->next_in_room)
+    for (k = dc_->world[target].people_; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
     if (ppl > 2)
@@ -234,7 +234,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   {
     qint32 ppl = {};
     CharacterPtr k;
-    for (k = dc_->world[target].people; k; k = k->next_in_room)
+    for (k = dc_->world[target].people_; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
     if (ppl > 4)
@@ -808,7 +808,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
    }
    */
   if ((GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
-    for (CharacterPtr tmp_ch = dc_->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (CharacterPtr tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if (tmp_ch->isPlayer())
         continue;
@@ -1308,7 +1308,7 @@ qint32 ambush(CharacterPtr ch)
   CharacterPtr i, next_i;
   qint32 retval;
 
-  for (i = dc_->world[ch->in_room].people; i; i = next_i)
+  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 

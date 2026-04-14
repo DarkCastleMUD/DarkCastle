@@ -552,7 +552,7 @@ command_return_t do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
     CharacterPtr vnext;
     ObjectPtr obj_next;
 
-    for (victim = dc_->world[ch->in_room].people; victim != nullptr; victim = vnext)
+    for (victim = dc_->world[ch->in_room].people_; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
       if (victim->isNonPlayer() && victim != ch)
@@ -1167,7 +1167,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   if (!victim && type == 0)
     return ReturnValue::eFAILURE;
   if (!victim)
-    victim = dc_->world[this->in_room].people;
+    victim = dc_->world[this->in_room].people_;
 
   for (; victim; victim = victim->next_in_room)
   {
@@ -1421,7 +1421,7 @@ command_return_t do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     CharacterPtr next_vict;
-    for (victim = dc_->world[ch->in_room].people; victim; victim = next_vict)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       if ((victim->isPlayer() && victim->getLevel() > MORTAL) || victim == ch)
@@ -1597,7 +1597,7 @@ command_return_t do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
     owner = (CharacterPtr)ch->beacon;
 
   if (!victim)
-    victim = dc_->world[ch->in_room].people;
+    victim = dc_->world[ch->in_room].people_;
   qint32 z = {};
   for (; victim;)
   {
@@ -1849,7 +1849,7 @@ command_return_t do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
       stop_fighting(vict);
     return ReturnValue::eSUCCESS;
   }
-  for (rch = dc_->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
+  for (rch = dc_->world[ch->in_room].people_; rch != nullptr; rch = rch->next_in_room)
   {
     if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');

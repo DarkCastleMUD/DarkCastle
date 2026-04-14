@@ -778,7 +778,7 @@ void DC::point_update(void)
       for (o = {}; o < MAX_HIDE; o++)
         i->player->hiding_from[o] = {};
       o = {};
-      for (temp = dc_->world[i->in_room].people; temp; temp = temp->next_in_room)
+      for (temp = dc_->world[i->in_room].people_; temp; temp = temp->next_in_room)
       {
         if (i == temp)
           continue;
@@ -882,10 +882,10 @@ void DC::update_corpses_and_portals(void)
       {
         if (j->carried_by)
           act_to_character("$p decays in your hands.", j->carried_by, j, 0, 0);
-        else if ((j->in_room != DC::NOWHERE) && (dc_->world[j->in_room].people))
+        else if ((j->in_room != DC::NOWHERE) && (dc_->world[j->in_room].people_))
         {
-          act_to_room("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people, j, 0, INVIS_NULL);
-          act_to_character("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people, j, 0, 0);
+          act_to_room("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people_, j, 0, INVIS_NULL);
+          act_to_character("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people_, j, 0, 0);
         }
         bool corpse_contained = j->contains != nullptr;
         for (jj = j->contains; jj; jj = next_thing2)

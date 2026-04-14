@@ -6,7 +6,6 @@
 |   control.
 */
 #include <QString>
-#include <QString>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 

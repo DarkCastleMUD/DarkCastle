@@ -1277,7 +1277,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   else if (IS_DARK(ch->in_room) && (!ch->isNonPlayer() && !ch->player->holyLite))
   {
     ch->sendln("It is pitch black...");
-    ch->list_char_to_char(dc_->world[ch->in_room].people, 0);
+    ch->list_char_to_char(dc_->world[ch->in_room].people_, 0);
     ch->send("$R");
     // TODO - if have blindfighting, list some of the room exits sometimes
   }
@@ -1696,7 +1696,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       ansi_color(BLUE, ch);
       ansi_color(BOLD, ch);
       ch->list_obj_to_char(dc_->world[ch->in_room].contents, 0, false);
-      ch->list_char_to_char(dc_->world[ch->in_room].people, 0);
+      ch->list_char_to_char(dc_->world[ch->in_room].people_, 0);
 
       dc_strcpy(buffer, "");
       *buffer = '\0';
@@ -3095,7 +3095,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
   ch->sendln("You carefully search the surroundings...\r\n");
 
-  for (vict = dc_->world[ch->in_room].people; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
   {
     if (CAN_SEE(ch, vict) && ch != vict)
     {

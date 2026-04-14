@@ -129,7 +129,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
   {
-    ch->sendln(u"You feel at peace, calm, relaxed, one with yourself and the universe."_s));
+    ch->sendln(u"You feel at peace, calm, relaxed, one with yourself and the universe."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -422,7 +422,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
         remove_memory(vict, 'f');
       }
       CharacterPtr tmp;
-      for (tmp = dc_->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+      for (tmp = dc_->world[ch->in_room].people_; tmp; tmp = tmp->next_in_room)
         if (tmp->fighting == vict)
           stop_fighting(tmp);
       stop_fighting(vict);
@@ -525,7 +525,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
   //  act("$n's eyes flash as $e pools the energy within $m!\r\nA burst of energy slams into you!\r\n",
   qint32 room = ch->in_room;
-  for (tmp_victim = dc_->world[ch->in_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
@@ -549,7 +549,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       room = EXIT_TO(room, dir);
       if (room == DC::NOWHERE)
         break;
-      for (tmp_victim = dc_->world[room].people; tmp_victim; tmp_victim = tmp_victim->next_in_room)
+      for (tmp_victim = dc_->world[room].people_; tmp_victim; tmp_victim = tmp_victim->next_in_room)
         tmp_victim->sendln("A crackle of energy echoes past you.");
     }
   if (ch->dc_->number(1, 4) == 4 && !ch->fighting)
@@ -1126,7 +1126,7 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
     ch->sendln("You instruct your party on more graceful movement.");
     act_to_room("$n holds a quick tai chi class.", ch, 0, 0, 0);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;

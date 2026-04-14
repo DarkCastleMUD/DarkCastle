@@ -1,14 +1,11 @@
+#pragma once
 /*
  * CommandStack.h
  *
  *  Created on: May 26, 2020
  *      Author: Jared H. Hudson
  */
-
-#pragma once
-
-#include <cstdint>
-
+#include <QtTypes>
 class CommandStack
 {
 public:

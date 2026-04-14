@@ -225,7 +225,7 @@ qint32 DC::load_hotboot_descs(void)
   if (hotboot_file.open(QFile::ReadOnly))
   {
     unlink("hotboot");
-    logmisc(u"Hotboot, reloading characters."_s));
+    logmisc(u"Hotboot, reloading characters."_s);
 
     QTextStream out(&hotboot_file);
     std::for_each(cf.ports.begin(), cf.ports.end(), [this, &out](in_port_t &port)
@@ -934,7 +934,7 @@ void DC::game_loop_init(void)
   auto tcpserver = new QTcpServer();
   if (!tcpserver->listen(QHostAddress::LocalHost, 6980))
   {
-    logmisc(u"Unable to listen to port 6980."_s));
+    logmisc(u"Unable to listen to port 6980."_s);
   }
 
   if (!server.bind(tcpserver))
@@ -2716,12 +2716,12 @@ void send_to_room(QString messg, qint32 room, bool awakeonly, CharacterPtr nta)
   if (room == DC::NOWHERE)
     return;
 
-  if (!rooms.contains(room) || !world[room].people)
+  if (!rooms.contains(room) || !world[room].people_)
   {
     return;
   }
   if (!messg.isEmpty())
-    for (i = world[room].people; i; i = i->next_in_room)
+    for (i = world[room].people_; i; i = i->next_in_room)
       if (i->desc && !is_busy(i) && nta != i)
         if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
           write_to_output(messg, i->desc);

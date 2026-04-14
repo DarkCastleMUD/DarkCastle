@@ -5,9 +5,6 @@
 */
 #pragma once
 
-#include <QHostAddress>
-#include <QMap>
-
 // if you change, make sure you update QStringList connected_states in const.C
 // also update connected_types[]
 

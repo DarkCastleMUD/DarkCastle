@@ -8,16 +8,10 @@
 */
 // Standard header files
 
-#include <cstring>
-
-#include "DC/obj.h"
-
 #include "DC/DC.h" // Character
 // GET_LEVEL, &c
 #include "DC/terminal.h" // colors
-#include "DC/act.h"      // act flags
 #include "DC/handler.h"  // fname()
-#include "DC/token.h"    // fname()
 
 #undef DEBUG_TOKEN
 

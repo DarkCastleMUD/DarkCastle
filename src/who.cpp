@@ -3,14 +3,9 @@
 | who.C
 | Commands for who, maybe? :P
 */
-#include <cstring>
-#include "DC/levels.h"
 
 #include "DC/DC.h"
-#include "DC/clan.h"
 #include "DC/interp.h"
-#include "DC/handler.h"
-#include "DC/returnvals.h"
 #include "DC/const.h"
 
 ClanPtr get_clan(CharacterPtr);

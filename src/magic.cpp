@@ -594,7 +594,7 @@ qint32 spell_howl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
   if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
-  for (tmp_char = dc_->world[ch->in_room].people; tmp_char;
+  for (tmp_char = dc_->world[ch->in_room].people_; tmp_char;
        tmp_char = tmp_char->next_in_room)
   {
 
@@ -1018,7 +1018,7 @@ qint32 spell_life_leech(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
     return ReturnValue::eFAILURE;
   /*  double o = 0.0, m = 0.0, avglevel = 0.0;
-   for (tmp_victim = dc_->world[ch->in_room].people;tmp_victim;tmp_victim = tmp_victim->next_in_room)
+   for (tmp_victim = dc_->world[ch->in_room].people_;tmp_victim;tmp_victim = tmp_victim->next_in_room)
    if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
    { o++; m++; avglevel *= o-1; avglevel += tmp_victim->getLevel(); avglevel /= o;}
    else m++;
@@ -1030,7 +1030,7 @@ qint32 spell_life_leech(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
    qint32 max = (qint32)(o * 50 * ( m / pow(m, powmod*m)));
    max += dc_->number(-10,10);
    */
-  for (tmp_victim = dc_->world[ch->in_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) && (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
@@ -1128,9 +1128,9 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   orig_room = ch->in_room;
 
-  // we also now use .people instead of the character_list -pir 12/26
+  // we also now use .people_ instead of the character_list -pir 12/26
 
-  for (tmp_victim = dc_->world[orig_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
+  for (tmp_victim = dc_->world[orig_room].people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((orig_room == tmp_victim->in_room) && (tmp_victim != ch) &&
@@ -1154,7 +1154,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   {
     if (CAN_GO(ch, i))
     {
-      for (tmp_victim = dc_->world[dc_->world[orig_room].dir_option[i]->to_room].people;
+      for (tmp_victim = dc_->world[dc_->world[orig_room].dir_option[i]->to_room].people_;
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
@@ -1401,7 +1401,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   ch->sendln("$B$4Fire$R falls from the heavens!");
   act_to_room("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, 0);
 
-  for (auto victim = dc_->world[ch->in_room].people; victim; victim = next_victim)
+  for (auto victim = dc_->world[ch->in_room].people_; victim; victim = next_victim)
   {
     next_victim = victim->next_in_room;
 
@@ -3573,7 +3573,7 @@ qint32 cast_camouflague(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_camouflague(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_camouflague(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3611,7 +3611,7 @@ qint32 cast_farsight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_farsight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_farsight(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3649,7 +3649,7 @@ qint32 cast_freefloat(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_freefloat(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       ;
     spell_freefloat(level, ch, tar_ch, 0, skill);
@@ -3687,7 +3687,7 @@ qint32 cast_insomnia(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_insomnia(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_insomnia(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3725,7 +3725,7 @@ qint32 cast_shadowslip(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_shadowslip(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_shadowslip(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3811,7 +3811,7 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_sanctuary(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_sanctuary(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -6482,7 +6482,7 @@ qint32 spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     return ReturnValue::eFAILURE;
   }
 
-  for (tmp_victim = dc_->world[ch->in_room].people; tmp_victim;
+  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim;
        tmp_victim = tmp_victim->next_in_room)
   {
     if (ch->in_room == tmp_victim->in_room)
@@ -6695,7 +6695,7 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   CharacterPtr tmpch;
 
   bool found_hunt_or_quest_item = false;
-  for (tmpch = dc_->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
+  for (tmpch = dc_->world[victim->in_room].people_; tmpch; tmpch = tmpch->next_in_room)
   {
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
     {
@@ -6788,7 +6788,7 @@ qint32 cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   case SPELL_TYPE_STAFF:
     if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
     {
-      for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+      for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
       {
         next_v = victim->next_in_room;
 
@@ -7119,7 +7119,7 @@ qint32 cast_energy_drain(quint8 level, CharacterPtr ch, QString arg, qint32 type
       return spell_energy_drain(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7166,7 +7166,7 @@ qint32 cast_souldrain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_souldrain(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7344,7 +7344,7 @@ qint32 cast_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_harm(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7392,7 +7392,7 @@ qint32 cast_power_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_power_harm(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7429,7 +7429,7 @@ qint32 cast_divine_fury(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_divine_fury(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7660,7 +7660,7 @@ qint32 cast_teleport(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
 
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       // must do it this way to insure staff continues in THIS room
       next_v = tar_ch->next_in_room;
@@ -7854,7 +7854,7 @@ qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_paralyze(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       if (tar_ch->isNonPlayer())
         if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
@@ -7920,7 +7920,7 @@ qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_blindness(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8074,7 +8074,7 @@ qint32 cast_remove_paralysis(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_remove_paralysis(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
     {
       retval = spell_remove_paralysis(level, ch, tar_ch, 0, skill);
       if (isSet(retval, ReturnValue::eCH_DIED))
@@ -8109,7 +8109,7 @@ qint32 cast_remove_blind(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_remove_blind(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_blind(level, ch, tar_ch, 0, skill);
@@ -8182,7 +8182,7 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
@@ -8256,7 +8256,7 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
@@ -8311,7 +8311,7 @@ qint32 cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_curse(level, ch, tar_ch, 0, skill);
     }
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       if (tar_ch->isNonPlayer())
       {
@@ -8346,7 +8346,7 @@ qint32 cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_detect_evil(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_detect_evil(level, ch, tar_ch, 0, skill);
@@ -8381,7 +8381,7 @@ qint32 cast_true_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_true_sight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_true_sight(level, ch, tar_ch, 0, skill);
     break;
@@ -8411,7 +8411,7 @@ qint32 cast_detect_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_detect_good(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_detect_good(level, ch, tar_ch, 0, skill);
@@ -8485,7 +8485,7 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
     return spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
@@ -8555,7 +8555,7 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
@@ -8592,7 +8592,7 @@ qint32 cast_haste(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_haste(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       if (!(IS_AFFECTED(tar_ch, SPELL_HASTE)))
@@ -8699,7 +8699,7 @@ qint32 cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_dispel_evil(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8756,7 +8756,7 @@ qint32 cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_dispel_good(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8845,7 +8845,7 @@ qint32 cast_mana(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_mana(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_mana(level, ch, tar_ch, 0, skill);
     break;
@@ -8880,7 +8880,7 @@ qint32 cast_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_heal(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8915,7 +8915,7 @@ qint32 cast_power_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8943,7 +8943,7 @@ qint32 cast_full_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_full_heal(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_full_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -9001,7 +9001,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
     }
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_invisibility(level, ch, tar_ch, 0, skill);
     break;
@@ -9056,7 +9056,7 @@ qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_poison(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9156,7 +9156,7 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
     return spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   default:
@@ -9244,7 +9244,7 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
     return spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   default:
@@ -9283,7 +9283,7 @@ qint32 cast_remove_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_remove_curse(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_curse(level, ch, tar_ch, 0, skill);
@@ -9304,7 +9304,7 @@ qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
       qint32 retval = ReturnValue::eFAILURE;
-      for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char;
+      for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char;
            tmp_char = tmp_char->next_in_room)
       {
         if (!ARE_GROUPED(ch, tmp_char))
@@ -9342,7 +9342,7 @@ qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     break;
 
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_poison(level, ch, tar_ch, 0, skill);
@@ -9375,7 +9375,7 @@ qint32 cast_fireshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_fireshield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_fireshield(level, ch, tar_ch, 0, skill);
@@ -9419,7 +9419,7 @@ qint32 cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_sleep(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9459,7 +9459,7 @@ qint32 cast_strength(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_strength(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_strength(level, ch, tar_ch, 0, skill);
@@ -9500,7 +9500,7 @@ qint32 cast_ventriloquate(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   dc_sprintf(buf3, "Someone says, '%s'\r\n", arg);
 
-  for (tmp_ch = dc_->world[ch->in_room].people; tmp_ch;
+  for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch;
        tmp_ch = tmp_ch->next_in_room)
   {
 
@@ -9556,7 +9556,7 @@ qint32 cast_word_of_recall(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return targetted_word_of_recall(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch_next)
     {
       tar_ch_next = tar_ch->next_in_room;
@@ -9634,7 +9634,7 @@ qint32 cast_charm_person(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_charm_person(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9673,7 +9673,7 @@ qint32 cast_sense_life(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_sense_life(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_sense_life(level, ch, tar_ch, 0, skill);
@@ -9810,7 +9810,7 @@ qint32 cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_fear(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9895,7 +9895,7 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_refresh(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_refresh(level, ch, tar_ch, 0, skill);
@@ -9972,7 +9972,7 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_fly(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_fly(level, ch, tar_ch, 0, skill);
@@ -10028,7 +10028,7 @@ qint32 cast_know_alignment(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
@@ -10088,7 +10088,7 @@ qint32 cast_dispel_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
@@ -10147,7 +10147,7 @@ qint32 cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_dispel_minor(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dispel_minor(level, ch, tar_ch, 0, skill);
     break;
@@ -10429,7 +10429,7 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
@@ -10469,7 +10469,7 @@ qint32 cast_cause_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cause_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10520,7 +10520,7 @@ qint32 cast_cause_critical(quint8 level, CharacterPtr ch, QString arg,
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10570,7 +10570,7 @@ qint32 cast_cause_serious(quint8 level, CharacterPtr ch, QString arg,
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10620,7 +10620,7 @@ qint32 cast_flamestrike(quint8 level, CharacterPtr ch, QString arg,
     return spell_flamestrike(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10867,7 +10867,7 @@ qint32 cast_shield(quint8 level, CharacterPtr ch, QString arg,
     return spell_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_shield(level, ch, tar_ch, 0, skill);
     break;
@@ -10918,7 +10918,7 @@ qint32 cast_weaken(quint8 level, CharacterPtr ch, QString arg,
     return spell_weaken(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10997,7 +10997,7 @@ qint32 cast_acid_blast(quint8 level, CharacterPtr ch, QString arg,
     return spell_acid_blast(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -11046,7 +11046,7 @@ qint32 cast_hellstream(quint8 level, CharacterPtr ch, QString arg,
     return spell_hellstream(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -11123,7 +11123,7 @@ qint32 cast_infravision(quint8 level, CharacterPtr ch, QString arg,
     return spell_infravision(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people;
+    for (tar_ch = dc_->world[ch->in_room].people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_infravision(level, ch, tar_ch, 0, skill);
@@ -12989,7 +12989,7 @@ qint32 cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_STAFF:
     if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
     {
-      for (victim = dc_->world[ch->in_room].people; victim; victim = next_v)
+      for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
       {
         next_v = victim->next_in_room;
 
@@ -13205,7 +13205,7 @@ qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13259,7 +13259,7 @@ qint32 cast_water_breathing(quint8 level, CharacterPtr ch, QString arg, qint32 t
     return spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13352,7 +13352,7 @@ qint32 cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32
     return spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13483,7 +13483,7 @@ qint32 cast_icestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return spell_icestorm(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13548,7 +13548,7 @@ qint32 cast_lightning_shield(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13635,7 +13635,7 @@ qint32 cast_blue_bird(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return spell_blue_bird(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13758,7 +13758,7 @@ qint32 cast_debility(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return spell_debility(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13880,7 +13880,7 @@ qint32 cast_attrition(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return spell_attrition(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -14098,7 +14098,7 @@ qint32 cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14155,7 +14155,7 @@ qint32 cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14230,7 +14230,7 @@ qint32 cast_release_elemental(quint8 level, CharacterPtr ch, QString arg, qint32
     return spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14252,7 +14252,7 @@ qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     return ReturnValue::eFAILURE;
   }
 
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -14303,7 +14303,7 @@ qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     return ReturnValue::eFAILURE;
   }
 
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -14640,7 +14640,7 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     return ReturnValue::eFAILURE;
   }
 
-  for (victim = dc_->world[ch->in_room].people; victim; victim = victim->next_in_room)
+  for (victim = dc_->world[ch->in_room].people_; victim; victim = victim->next_in_room)
     castcost += 75;
 
   castcost -= 75; // the initial 75 to cast the spell
@@ -14656,7 +14656,7 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   ch->sendln("You call forth the fury of the gods to consume the area in a holy tempest!");
   act_to_room("$n calls forth the fury of the gods to consume the area in a holy tempest!", ch, 0, 0, 0);
 
-  for (victim = dc_->world[ch->in_room].people; victim; victim = next_vict)
+  for (victim = dc_->world[ch->in_room].people_; victim; victim = next_vict)
   {
     next_vict = victim->next_in_room;
 
@@ -15040,7 +15040,7 @@ qint32 cast_solidity(quint8 level, CharacterPtr ch, QString arg,
     return spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -15889,7 +15889,7 @@ qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   ch->sendln("You focus the minds of your allies to react to the slightest movement...");
   act_to_room("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, INVIS_NULL);
   // loop through group members in room
-  for (ally = dc_->world[ch->in_room].people; ally; ally = next_ally)
+  for (ally = dc_->world[ch->in_room].people_; ally; ally = next_ally)
   {
     next_ally = ally->next_in_room;
 

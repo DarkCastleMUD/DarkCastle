@@ -5,7 +5,3 @@
 | Description:  This file contains all of the room header file/constant
 |   information.  It also contains information about the 'world' structs.
 */
-
-#include <QSharedPointer>
-
-/* Bitvector For 'room_flags' */

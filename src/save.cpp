@@ -20,15 +20,10 @@
 #include <cstring>
 
 #include <fmt/format.h>
-#include <memory>
 
 #include "DC/DC.h"
 
-#include "DC/spells.h"
-#include "DC/player.h"
 #include "DC/db.h"
-#include "DC/connect.h"
-#include "DC/handler.h"
 #include "DC/DC.h"
 
 #ifdef USE_SQL
