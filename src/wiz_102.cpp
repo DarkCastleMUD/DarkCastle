@@ -2549,7 +2549,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
 void update_mobprog_bits(qint32 mob_num)
 {
-  mob_prog_data *prog = dc_->mob_index[mob_num].mobprogs;
+  mob_prog_data *prog = dc_->mob_index[mob_num].mobprogs_;
   dc_->mob_index[mob_num].progtypes = {};
 
   while (prog)
@@ -2680,7 +2680,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     prog->next = {};
 
     qint32 prog_num = 1;
-    if ((currprog = dc_->mob_index[mob_num].mobprogs))
+    if ((currprog = dc_->mob_index[mob_num].mobprogs_))
     {
       while (currprog->next)
       {
@@ -2692,7 +2692,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      dc_->mob_index[mob_num].mobprogs = prog;
+      dc_->mob_index[mob_num].mobprogs_ = prog;
     }
 
     update_mobprog_bits(mob_num);
@@ -2716,7 +2716,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     // find program number "intval"
     prog = {};
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -2728,7 +2728,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (prog)
       prog->next = currprog->next;
     else
-      dc_->mob_index[mob_num].mobprogs = currprog->next;
+      dc_->mob_index[mob_num].mobprogs_ = currprog->next;
 
     currprog->type = {};
     currprog->arglist = {};
@@ -2778,7 +2778,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs; currprog && i != intval; i++, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -2869,7 +2869,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs; currprog && i != intval; i++, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -2902,7 +2902,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs; currprog && i != intval; i++, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, currprog = currprog->next)
       ;
 
     if (!currprog)

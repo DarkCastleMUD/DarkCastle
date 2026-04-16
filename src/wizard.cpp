@@ -695,7 +695,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
     ch->send(buf);
     dc_strcpy(buf, "$3Mob Progs$R: ");
-    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].mobprogs_ ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 

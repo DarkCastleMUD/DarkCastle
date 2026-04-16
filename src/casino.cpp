@@ -38,10 +38,10 @@ void switch_cards(cDeck *tDeck, qint32 pos1, qint32 pos2)
   tDeck->cards[pos2] = b;
 }
 
-void free_player(player_data *plr)
+void free_player(CasinoPlayerPtr plr)
 {
-  player_data *tmp, *prev = {};
-  table_data *tbl = plr->table;
+  CasinoPlayerPtr tmp, prev = {};
+  CasinoTablePtr tbl = plr->table;
   for (tmp = tbl->plr; tmp; tmp = tmp->next)
   {
     if (tmp == plr)
@@ -71,7 +71,7 @@ void free_player(player_data *plr)
   plr = {};
 }
 
-void nextturn(table_data *tbl)
+void nextturn(CasinoTablePtr tbl)
 {
   if (!tbl->plr)
   {
@@ -91,9 +91,9 @@ void nextturn(table_data *tbl)
   }
 }
 
-void DC::send_to_table(QString msg, table_data *tbl, player_data *plrSilent = {})
+void DC::send_to_table(QString msg, CasinoTablePtr tbl, CasinoPlayerPtr plrSilent = {})
 {
-  //  player_data *plr;
+  //  CasinoPlayerPtr plr;
   /*  for (plr = tbl->plr ; plr ; plr = plr->next)
      if (verify(plr) && plrSilent != plr)
        plr->ch->send(msg);
@@ -118,7 +118,7 @@ bool charExists(CharacterPtr ch)
   }
 }
 
-bool DC::verify(player_data *plr)
+bool DC::verify(CasinoPlayerPtr plr)
 {
   // make sure player didn't quit, die, or whatever
   // CharacterPtr ch;
@@ -149,7 +149,7 @@ bool DC::verify(player_data *plr)
 void shuffle_deck(cDeck *tDeck)
 { // this would not hold up to a test of true randomization, but then
   // neither would a real dealer shuffling a deck
-  player_data *plr;
+  CasinoPlayerPtr plr;
   qint32 pos = 0, i, v;
   if (tDeck->pos) // new deck otherwise
     for (plr = tDeck->table->plr; plr; plr = plr->next)
@@ -235,7 +235,7 @@ const QString valstri(qint32 card)
   }
 }
 
-bool canInsurance(player_data *plr)
+bool canInsurance(CasinoPlayerPtr plr)
 {
   if (val(plr->table->hand_data[0]) == 1 &&
       plr->table->hand_data[2] == 0 &&
@@ -246,7 +246,7 @@ bool canInsurance(player_data *plr)
   return false;
 }
 
-bool canSplit(player_data *plr)
+bool canSplit(CasinoPlayerPtr plr)
 {
   if (plr->hand_data[0] && val(plr->hand_data[0]) == val(plr->hand_data[1]) && !plr->hand_data[2] && plr->table->cr == plr)
     return true;
@@ -254,9 +254,9 @@ bool canSplit(player_data *plr)
   return false;
 }
 
-player_data *createPlayer(CharacterPtr ch, table_data *tbl, qint32 noadd = 0)
+CasinoPlayerPtr createPlayer(CharacterPtr ch, CasinoTablePtr tbl, qint32 noadd = 0)
 {
-  player_data *plr = new player_data;
+  CasinoPlayerPtr plr = new CasinoPlayer;
   plr->table = tbl;
   plr->ch = ch;
   for (qint32 i = {}; i < 21; i++)
@@ -269,7 +269,7 @@ player_data *createPlayer(CharacterPtr ch, table_data *tbl, qint32 noadd = 0)
   plr->state = {};
   if (!noadd)
   {
-    player_data *tmp;
+    CasinoPlayerPtr tmp;
     for (tmp = tbl->plr; tmp; tmp = tmp->next)
       if (tmp->next == nullptr)
         break;
@@ -291,14 +291,14 @@ qint32 pickCard(cDeck *deck)
   return deck->cards[deck->pos++];
 }
 
-void freeHand(player_data *plr)
+void freeHand(CasinoPlayerPtr plr)
 {
   qint32 i;
   for (i = {}; i < 21; i++)
     plr->hand_data[i] = {};
 }
 
-qint32 hand_strength(player_data *plr)
+qint32 hand_strength(CasinoPlayerPtr plr)
 {
   qint32 i, z = {};
   for (i = {}; plr->hand_data[i] != 0; i++)
@@ -336,7 +336,7 @@ qint32 hand_strength(player_data *plr)
   return z;
 }
 
-qint32 hand_strength(table_data *tbl)
+qint32 hand_strength(CasinoTablePtr tbl)
 {
   qint32 i, z = {};
   for (i = {}; tbl->hand_data[i] != 0; i++)
@@ -364,7 +364,7 @@ qint32 hand_strength(table_data *tbl)
   return z;
 }
 
-void dealcard(player_data *plr)
+void dealcard(CasinoPlayerPtr plr)
 {
   // functions calling this should verify that the player can be dealt a card
   qint32 i = {};
@@ -376,9 +376,9 @@ void dealcard(player_data *plr)
 
 void DC::check_active(varg_t arg1, void *arg2, void *arg3)
 {
-  player_data *plr = arg1.player;
-  table_data *tbl = (table_data *)arg3;
-  player_data *ptmp = {};
+  CasinoPlayerPtr plr = arg1.player;
+  CasinoTablePtr tbl = (CasinoTablePtr)arg3;
+  CasinoPlayerPtr ptmp = {};
   for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
     if (ptmp == plr)
       break;
@@ -403,13 +403,13 @@ void DC::check_active(varg_t arg1, void *arg2, void *arg3)
   }
   if ((quint64)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
   { // inactive
-    table_data *tbl = plr->table;
+    CasinoTablePtr tbl = plr->table;
     CharacterPtr ch = plr->ch;
 
     QString buf;
     dc_sprintf(buf, "Security removes a sleepy %s from the table.\r\n", qPrintable(plr->ch->name()));
     send_to_table(buf, tbl, plr);
-    player_data *tmp, *tnext;
+    CasinoPlayerPtr tmp, tnext;
     for (tmp = tbl->plr; tmp; tmp = tnext)
     {
       tnext = tmp->next;
@@ -436,7 +436,7 @@ void addtimer(TimerPtr add)
   timer_list = add;
 }
 
-void add_timer(player_data *plr)
+void add_timer(CasinoPlayerPtr plr)
 {
   TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.player = plr;
@@ -451,12 +451,12 @@ void add_timer(player_data *plr)
 
 void bj_dealer_aiz(varg_t arg1, void *arg2, void *arg3)
 { // hack so I don't have to bother
-  table_data *tbl = arg1.table;
+  CasinoTablePtr tbl = arg1.table;
   tbl->state = 2;
   bj_dealer_ai(arg1, arg2, arg3);
 }
 
-void add_timer_bj_dealer(table_data *tbl)
+void add_timer_bj_dealer(CasinoTablePtr tbl)
 {
   TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.table = tbl;
@@ -469,7 +469,7 @@ void add_timer_bj_dealer(table_data *tbl)
   addtimer(timer);
 }
 
-void add_timer_bj_dealer2(table_data *tbl, qint32 time = 10)
+void add_timer_bj_dealer2(CasinoTablePtr tbl, qint32 time = 10)
 {
   TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.table = tbl;
@@ -482,12 +482,12 @@ void add_timer_bj_dealer2(table_data *tbl, qint32 time = 10)
 }
 void bj_finish(varg_t arg1, void *arg2, void *arg3)
 {
-  table_data *tbl = arg1.table;
+  CasinoTablePtr tbl = arg1.table;
   send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n", tbl->obj->in_room, true);
   tbl->state = {};
 }
 
-void add_new_bets(table_data *tbl)
+void add_new_bets(CasinoTablePtr tbl)
 {
   TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.table = tbl;
@@ -496,7 +496,7 @@ void add_new_bets(table_data *tbl)
   addtimer(timer);
 }
 
-void reset_table(table_data *tbl)
+void reset_table(CasinoTablePtr tbl)
 { // called both on error and regular reset
   while (tbl->plr)
     free_player(tbl->plr);
@@ -506,10 +506,10 @@ void reset_table(table_data *tbl)
     tbl->hand_data[i] = {};
 }
 
-void DC::check_winner(table_data *tbl)
+void DC::check_winner(CasinoTablePtr tbl)
 {
   qint32 dealer = hand_strength(tbl);
-  player_data *plr, *next;
+  CasinoPlayerPtr plr, next;
   if (tbl->hand_data[2] == 0)
   {
     QString buf;
@@ -582,7 +582,7 @@ void DC::check_winner(table_data *tbl)
 
 void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
 {
-  table_data *tbl = arg1.table;
+  CasinoTablePtr tbl = arg1.table;
   qint32 a = (qint64)arg2;
   QString buf;
   if (a && tbl->handnr != a)
@@ -596,7 +596,7 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
     tbl->state++;
     dc_sprintf(buf, "The dealer flips over his card revealing a %s%s%c%s.\r\n", suitcol(tbl->hand_data[1]), valstri(tbl->hand_data[1]), suit(tbl->hand_data[1]), NTEXT);
     send_to_table(buf, tbl);
-    player_data *plr, *pnext;
+    CasinoPlayerPtr plr, pnext;
     for (plr = tbl->plr; plr; plr = pnext)
     { // check if all players have busted
       pnext = plr->next;
@@ -646,10 +646,10 @@ void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
   };
 }
 
-void DC::check_blackjacks(table_data *tbl)
+void DC::check_blackjacks(CasinoTablePtr tbl)
 {
   QString buf;
-  player_data *plr, *next;
+  CasinoPlayerPtr plr, next;
   if (hand_strength(tbl) == 21)
   {
     send_to_table("The dealer blackjacked!\r\n", tbl);
@@ -705,7 +705,7 @@ void DC::check_blackjacks(table_data *tbl)
 
 void check_insurance2(varg_t arg1, void *arg2, void *arg3)
 {
-  table_data *tbl = arg1.table;
+  CasinoTablePtr tbl = arg1.table;
 
   if (hand_strength(tbl) == 21)
   { // dealer blackjacked
@@ -721,7 +721,7 @@ void check_insurance2(varg_t arg1, void *arg2, void *arg3)
   }
 }
 
-void check_insurance(table_data *tbl)
+void check_insurance(CasinoTablePtr tbl)
 {
   if (val(tbl->hand_data[0]) == 1)
   { // ace showing
@@ -741,7 +741,7 @@ void check_insurance(table_data *tbl)
     pulse_table_bj(tbl);
   }
 }
-const QString hand_thing(player_data *plr)
+const QString hand_thing(CasinoPlayerPtr plr)
 {
   if (hands(plr) <= 1)
     return "";
@@ -750,7 +750,7 @@ const QString hand_thing(player_data *plr)
   return &buf[0];
 }
 
-void DC::pulse_table_bj(table_data *tbl, qint32 recall)
+void DC::pulse_table_bj(CasinoTablePtr tbl, qint32 recall)
 {
   /*  if (tbl->state)
     {
@@ -773,7 +773,7 @@ void DC::pulse_table_bj(table_data *tbl, qint32 recall)
     // new hand
     tbl->handnr++;
     send_to_table("The dealer passes out cards to everyone at the table.\r\n", tbl);
-    player_data *plr, *pnext;
+    CasinoPlayerPtr plr, pnext;
     for (plr = tbl->plr; plr; plr = pnext)
     {
       pnext = plr->next;
@@ -792,8 +792,8 @@ void DC::pulse_table_bj(table_data *tbl, qint32 recall)
 
 void create_table(ObjectPtr obj)
 {
-  table_data *table;
-  table = new table_data;
+  CasinoTablePtr table;
+  table = new CasinoTable;
   table->obj = obj;
   if (obj->obj_flags.value[2])
     table->gold = false;
@@ -811,16 +811,16 @@ void create_table(ObjectPtr obj)
   shuffle_deck(table->deck);
 }
 
-void destroy_table(table_data *tbl)
+void destroy_table(CasinoTablePtr tbl)
 {
   tbl->obj->table = {};
   reset_table(tbl);
   tbl = {};
 }
 
-bool playing(CharacterPtr ch, table_data *tbl)
+bool playing(CharacterPtr ch, CasinoTablePtr tbl)
 {
-  player_data *plr;
+  CasinoPlayerPtr plr;
   for (plr = tbl->plr; plr; plr = plr->next)
     if (plr->ch == ch)
       return true;
@@ -828,9 +828,9 @@ bool playing(CharacterPtr ch, table_data *tbl)
   return false;
 }
 
-player_data *getPlayer(CharacterPtr ch, table_data *tbl)
+CasinoPlayerPtr getPlayer(CharacterPtr ch, CasinoTablePtr tbl)
 {
-  player_data *plr;
+  CasinoPlayerPtr plr;
   if (tbl->cr && tbl->cr->ch == ch)
     return tbl->cr; // priority on current hand
   for (plr = tbl->plr; plr; plr = plr->next)
@@ -839,9 +839,9 @@ player_data *getPlayer(CharacterPtr ch, table_data *tbl)
   return {};
 }
 
-qint32 players(table_data *tbl)
+qint32 players(CasinoTablePtr tbl)
 {
-  player_data *plr;
+  CasinoPlayerPtr plr;
   qint32 i = {};
   for (plr = tbl->plr; plr; plr = plr->next)
     i++;
@@ -894,11 +894,11 @@ QString show_hand(qint32 hand_data[21], qint32 hide, bool ascii, bool showColor)
   return &buf[0];
 }
 
-// qint32 hand_number(player_data *plr)
-qint32 hands(player_data *plr)
+// qint32 hand_number(CasinoPlayerPtr plr)
+qint32 hands(CasinoPlayerPtr plr)
 {
   qint32 i = {};
-  for (player_data *ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
+  for (CasinoPlayerPtr ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
   {
     if (plr->ch == ptmp->ch)
       i++;
@@ -906,10 +906,10 @@ qint32 hands(player_data *plr)
   return i;
 }
 
-qint32 hand_number(player_data *plr)
+qint32 hand_number(CasinoPlayerPtr plr)
 {
   qint32 i = {};
-  for (player_data *ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
+  for (CasinoPlayerPtr ptmp = plr->table->plr; ptmp; ptmp = ptmp->next)
   {
     if (plr->ch == ptmp->ch)
       i++;
@@ -950,7 +950,7 @@ QString Character::createBlackjackPrompt(void)
   buf[0] = '\0';
   lineTwo[0] = '\0';
   lineTop[0] = '\0';
-  player_data *plr, *pnext;
+  CasinoPlayerPtr plr, pnext;
   for (plr = obj->table->plr; plr; plr = pnext)
   {
     pnext = plr->next;
@@ -1110,7 +1110,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  player_data *plr = getPlayer(ch, obj->table);
+  CasinoPlayerPtr plr = getPlayer(ch, obj->table);
 
   if (cmd == cmd_t::BET) // bet
   {
@@ -1199,7 +1199,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       {
         TimerPtr tmr;
         for (tmr = timer_list; tmr; tmr = tmr->next)
-          if ((table_data *)tmr->arg1.table == obj->table)
+          if ((CasinoTablePtr)tmr->arg1.table == obj->table)
             tmr->timeleft = 1;
       }
     }
@@ -1340,7 +1340,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       ch->removeGold(plr->bet);
     else
       GET_PLATINUM(ch) -= plr->bet;
-    player_data *nw = createPlayer(ch, plr->table, 1);
+    CasinoPlayerPtr nw = createPlayer(ch, plr->table, 1);
     nw->next = plr->next;
     plr->next = nw;
     nw->bet = plr->bet;

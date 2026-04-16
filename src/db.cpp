@@ -80,9 +80,6 @@ void clear_char(CharacterPtr ch);
 
 // MOBprogram locals
 qint32 mprog_name_to_type(QString name);
-// void		load_mobprogs           ( FILE* stream );
-void mprog_read_programs(auto &stream, qint32 i, bool ignore);
-void mprog_read_programs(QTextStream &stream, qint32 i, bool ignore);
 
 extern bool MOBtrigger;
 
@@ -971,7 +968,7 @@ mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
           index[i].qty = {};
           index[i].non_combat_func = {};
           index[i].combat_func = {};
-          index[i].mobprogs = {};
+          index[i].mobprogs_ = {};
           index[i].mobspec = {};
           index[i].progtypes = {};
           dc_->currentVNUM(index[i].vnum());
@@ -1150,13 +1147,13 @@ void add_mobspec(qint32 i)
     break;
   case CLASS_PSIONIC:
     if (a->getLevel() < 21)
-      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(149)].mobprogs;
+      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(149)].mobprogs_;
     else if (a->getLevel() < 35)
-      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(150)].mobprogs;
+      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(150)].mobprogs_;
     else if (a->getLevel() < 51)
-      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(151)].mobprogs;
+      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(151)].mobprogs_;
     else
-      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(152)].mobprogs;
+      dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(152)].mobprogs_;
     break;
   default:
     break;
@@ -1164,7 +1161,7 @@ void add_mobspec(qint32 i)
 
   if (mob)
   {
-    dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(mob)].mobprogs;
+    dc_->mob_index[i].mobspec = dc_->mob_index[real_mobile(mob)].mobprogs_;
 
     for (qint32 j = {}; j < ACT_MAX / ASIZE + 1; j++)
     {
@@ -2775,9 +2772,9 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
     dc_fprintf(stream, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
   }
 
-  if (dc_->mob_index[mob->mobdata->nr].mobprogs)
+  if (dc_->mob_index[mob->mobdata->nr].mobprogs_)
   {
-    write_mprog_recur(stream, dc_->mob_index[mob->mobdata->nr].mobprogs, true);
+    write_mprog_recur(stream, dc_->mob_index[mob->mobdata->nr].mobprogs_, true);
     dc_fprintf(stream, "|\n");
   }
 
@@ -3392,7 +3389,7 @@ qint32 DC::create_blank_mobile(qint32 nr)
 
   dc_->mob_index[cur_index].item = mob;
 
-  dc_->mob_index[cur_index].mobprogs = {};
+  dc_->mob_index[cur_index].mobprogs_ = {};
   dc_->mob_index[cur_index].mobspec = {};
   dc_->mob_index[cur_index].progtypes = {};
 
@@ -3634,9 +3631,9 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
                        "%d %d\n",
                obj->affected[i].location, obj->affected[i].modifier);
 
-  if (dc_->obj_index[obj->item_number].mobprogs)
+  if (dc_->obj_index[obj->item_number].mobprogs_)
   {
-    write_mprog_recur(stream, dc_->obj_index[obj->item_number].mobprogs, false);
+    write_mprog_recur(stream, dc_->obj_index[obj->item_number].mobprogs_, false);
     dc_fprintf(stream, "|\n");
   }
 
@@ -3685,9 +3682,9 @@ auto &operator<<(auto &stream, ObjectPtr obj)
            << obj->affected[i].modifier << "\n";
   }
 
-  if (obj->dc_->obj_index[obj->item_number].mobprogs)
+  if (obj->dc_->obj_index[obj->item_number].mobprogs_)
   {
-    write_mprog_recur(stream, obj->dc_->obj_index[obj->item_number].mobprogs, false);
+    write_mprog_recur(stream, obj->dc_->obj_index[obj->item_number].mobprogs_, false);
     stream << "|\n";
   }
 
@@ -5203,130 +5200,6 @@ void load_mobprogs(auto &stream)
       mprog_file_read(fread_word(stream, 1), value);
       break;
     }
-}
-
-void mprog_read_programs(auto &stream, qint32 i, bool ignore)
-{
-  mob_prog_data *mprog = {};
-  QChar letter;
-  qint32 type;
-  mob_prog_data lmprog;
-  for (;;)
-  {
-    if ((letter = fread_char(stream)) == '|')
-      break;
-    else if (letter != '>' && letter != '\\')
-    {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG character", i);
-      ungetc(letter, stream);
-      return;
-    }
-    type = mprog_name_to_type(fread_word(stream, 1));
-    switch (type)
-    {
-    case ERROR_PROG:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG type.", i);
-      return;
-    case IN_FILE_PROG:
-      mprog_file_read(fread_string(stream, 1), i);
-      break;
-    default:
-      if (!ignore)
-      {
-        if (letter == '>')
-          SET_BIT(dc_->mob_index[i].progtypes, type);
-        else
-          SET_BIT(dc_->obj_index[i].progtypes, type);
-      }
-      if (!ignore)
-      {
-        mprog = new mob_prog_data;
-      }
-      else
-        mprog = &lmprog;
-      mprog->type = type;
-      mprog->arglist = fread_string(stream, 0);
-      mprog->comlist = fread_string(stream, 0);
-      if (!ignore)
-      {
-        if (letter == '>')
-        {
-          mprog->next = dc_->mob_index[i].mobprogs; // when we write them, we write last first
-          dc_->mob_index[i].mobprogs = mprog;       // so reading them this way keeps them in order
-        }
-        else
-        {
-          mprog->next = dc_->obj_index[i].mobprogs;
-          dc_->obj_index[i].mobprogs = mprog;
-        }
-      }
-      break;
-    }
-  }
-}
-
-void mprog_read_programs(QTextStream &stream, qint32 i, bool ignore)
-{
-  mob_prog_data *mprog = {};
-  QChar letter = {};
-  qint32 type = {};
-  mob_prog_data lmprog = {};
-  for (;;)
-  {
-    stream >> letter;
-
-    if (letter == '|')
-    {
-      break;
-    }
-    else if (letter != '>' && letter != '\\')
-    {
-      dc_->logentry(u"Load_mobiles: vnum %1 MOBPROG character"_s.arg(i));
-      return;
-    }
-    QString word = fread_word(stream);
-    type = mprog_name_to_type(word);
-    switch (type)
-    {
-    case ERROR_PROG:
-      dc_->logentry(u"Load_mobiles: vnum %1 MOBPROG type."_s.arg(i));
-      return;
-    case IN_FILE_PROG:
-      mprog_file_read(fread_string(stream, 1), i);
-      break;
-    default:
-      if (!ignore)
-      {
-        if (letter == '>')
-          SET_BIT(dc_->mob_index[i].progtypes, type);
-        else
-          SET_BIT(dc_->obj_index[i].progtypes, type);
-      }
-      if (!ignore)
-      {
-        mprog = new mob_prog_data;
-      }
-      else
-        mprog = &lmprog;
-      mprog->type = type;
-      mprog->arglist = fread_string(stream, false);
-      mprog->comlist = fread_string(stream, false);
-      if (!ignore)
-      {
-        if (letter == '>')
-        {
-          mprog->next = dc_->mob_index[i].mobprogs; // when we write them, we write last first
-          dc_->mob_index[i].mobprogs = mprog;       // so reading them this way keeps them in order
-        }
-        else
-        {
-          mprog->next = dc_->obj_index[i].mobprogs;
-          dc_->obj_index[i].mobprogs = mprog;
-        }
-      }
-      break;
-    }
-  }
 }
 
 // * --- End MOBProgs stuff --- *

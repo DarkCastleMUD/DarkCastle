@@ -3374,7 +3374,7 @@ void extract_obj(ObjectPtr obj)
   }
   if (obj->table)
   {
-    extern void destroy_table(table_data * tbl);
+    extern void destroy_table(CasinoTablePtr tbl);
     destroy_table(obj->table);
   }
   if (obj->equipped_by)

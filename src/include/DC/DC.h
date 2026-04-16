@@ -311,6 +311,7 @@ using DCPtr = QPointer<class DC>;
 using CharacterPtr = QPointer<class Character>;
 using ObjectPtr = QPointer<class Object>;
 using TimerPtr = QPointer<class Timer>;
+using ProgramPtr = QPointer<class Program>;
 qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat = 0);
 qint32 ambush(CharacterPtr ch);
 typedef qint32 (*SPELL_POINTER)(quint8, CharacterPtr, QString, qint32, CharacterPtr, ObjectPtr, qint32);
@@ -2830,8 +2831,8 @@ union varg_t
 {
   CharacterPtr ch;
   clan_id_t clan;
-  class player_data *player;
-  class table_data *table;
+  class CasinoPlayerPtr player;
+  class CasinoTablePtr table;
   class machine_data *machine;
   class wheel_data *wheel;
 };
@@ -3069,11 +3070,11 @@ public:
 class mob_prog_data
 {
 public:
-  mob_prog_data *next = {};
   qint32 type = {};
   QString arglist = {};
   QString comlist = {};
 };
+
 void write_mprog_recur(auto &stream, mob_prog_data *mprg, bool mob)
 {
   if (mprg->next)
@@ -3912,7 +3913,7 @@ public:
   ObjectPtr next_content = {}; /* For 'contains' lists             */
   ObjectPtr next = {};         /* For the object list              */
   ObjectPtr next_skill = {};
-  table_data *table = {};
+  CasinoTablePtr table = {};
   class machine_data *slot = {};
   class wheel_data *wheel = {};
   time_t save_expiration = {};
@@ -4181,11 +4182,11 @@ private:
 // All non-specific data is held in this structure
 // PC/MOB specific data are held in the appropriate pointed-to structs
 
-class player_data
+class CasinoPlayer
 {
 public:
-  player_data *next;
-  class table_data *table;
+  CasinoPlayerPtr next;
+  class CasinoTablePtr table;
   CharacterPtr ch;
   qint32 hand_data[21];
   // theoretical cardmax is lower than 21, but whatever
@@ -4195,13 +4196,13 @@ public:
   qint32 state;
 };
 
-class table_data
+class CasinoTable
 {
 public:
   ObjectPtr obj; // linked to obj
   class cDeck *deck;
-  player_data *plr;
-  player_data *cr; // current
+  CasinoPlayerPtr plr;
+  CasinoPlayerPtr cr; // current
   bool gold;
   qint32 options;
   CharacterPtr dealer;
@@ -4215,7 +4216,7 @@ public:
 class cDeck
 {
 public:
-  table_data *table;
+  CasinoTablePtr table;
   qint32 *cards;
   qint32 pos;
   qint32 decks;
@@ -5731,8 +5732,6 @@ void remove_active_potato(CharacterPtr vict);
 
 void prepare_character_for_sixty(CharacterPtr ch);
 bool isPaused(CharacterPtr mob);
-
-typedef QSharedPointer<Program> ProgramPtr;
 
 class Programs
 {
@@ -8061,467 +8060,527 @@ public:
   void remove_clan_member(ClanPtr theClan, CharacterPtr ch);
   QString get_clan_name(ClanPtr clan);
 
-  qint32 write_corpse_to_disk(auto &stream, ObjectPtr obj, qint32 locate)
+  void mprog_read_programs(auto &stream, qint32 i, bool ignore)
   {
-    /* This is basically Patrick's my_obj_save_to_disk function with    */
-    /* a few minor tweaks to make it work for corpses. Basically it     */
-    /* writes one object out to the corpse file every time it is called.*/
-    /* It can handle regular obj's and XAP objects.                     */
-
-    qint32 counter;
-    extra_descr_data *ex_desc;
-    // QString buf2;
-
-    auto action_description = obj->ActionDescription().remove('\r');
-    dc_fprintf(stream,
-               "#%lu\n"
-               "%d %d %d %d %d %u %d %d\n",
-               GET_OBJ_VNUM(obj),
-               locate,
-               GET_OBJ_VAL(obj, 0),
-               GET_OBJ_VAL(obj, 1),
-               GET_OBJ_VAL(obj, 2),
-               GET_OBJ_VAL(obj, 3),
-               GET_OBJ_EXTRA(obj),
-               GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
-               GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
-
-    if (!(IS_OBJ_STAT(obj, ITEM_UNIQUE_SAVE)))
+    QChar letter = {};
+    qint32 type = {};
+    mob_prog_data lmprog = {};
+    for (;;)
     {
-      return 1;
-    }
-    dc_fprintf(stream,
-               "XAP\n"
-               "%s~\n"
-               "%s~\n"
-               "%s~\n"
-               "%s~\n"
-               "%d %d %d %d %d\n",
-               !obj->name().isEmpty() ? qPrintable(obj->name()) : "undefined",
-               qPrintable(obj->short_description()) ? qPrintable(obj->short_description()) : "undefined",
-               !obj->long_description().isEmpty() ? qPrintable(obj->long_description()) : "undefined",
-               obj->ActionDescription().remove('\r'),
-               GET_OBJ_TYPE(obj),
-               GET_OBJ_WEAR(obj).toInt(),
-               (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
-               GET_OBJ_COST(obj), obj->num_affects);
-    /* Do we have affects? */
-    for (counter = {}; counter < obj->num_affects; counter++)
-      if (obj->affected[counter].modifier)
-        dc_fprintf(stream, "A\n"
-                           "%d %d\n",
-                   obj->affected[counter].location,
-                   obj->affected[counter].modifier);
+      stream >> letter;
 
-    /* Do we have extra descriptions? */
-    if (obj->ex_description)
-    { /*. Yep, save them too . */
-      for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next)
+      if (letter == '|')
       {
-        /*. Sanity check to prevent nasty protection faults . */
-        if (ex_desc->keyword_.isEmpty() || ex_desc->description_.isEmpty())
-        {
-          continue;
-        }
-        dc_fprintf(stream, "E\n"
-                           "%s~\n"
-                           "%s~\n",
-                   qPrintable(ex_desc->keyword_),
-                   ex_desc->description_.remove('\r'));
+        break;
       }
+      else if (letter != '>' && letter != '\\')
+      {
+        logentry(u"Load_mobiles: vnum %1 MOBPROG character"_s.arg(i));
+        return;
+      }
+      QString word = fread_word(stream);
+      type = mprog_name_to_type(word);
+      switch (type)
+      {
+      case ERROR_PROG:
+        logentry(u"Load_mobiles: vnum %1 MOBPROG type."_s.arg(i));
+        return;
+      case IN_FILE_PROG:
+        mprog_file_read(fread_string(stream, 1), i);
+        break;
+      default:
+        if (!ignore)
+        {
+          if (letter == '>')
+            SET_BIT(mob_index[i].progtypes, type);
+          else
+            SET_BIT(obj_index[i].progtypes, type);
+        }
+        if (!ignore)
+        {
+          mprog = new mob_prog_data;
+        }
+        else
+          mprog = &lmprog;
+        mprog->type = type;
+        mprog->arglist = fread_string(stream, false);
+        mprog->comlist = fread_string(stream, false);
+        if (!ignore)
+        {
+          if (letter == '>')
+            mob_index[i].mobprogs_.push_back(mprog); // when we write them, we write last first
+          else
+            obj_index[i].mobprogs_.push_back(mprog);
+        }
+      }
+      break;
     }
+  }
+}
+
+qint32
+write_corpse_to_disk(auto &stream, ObjectPtr obj, qint32 locate)
+{
+  /* This is basically Patrick's my_obj_save_to_disk function with    */
+  /* a few minor tweaks to make it work for corpses. Basically it     */
+  /* writes one object out to the corpse file every time it is called.*/
+  /* It can handle regular obj's and XAP objects.                     */
+
+  qint32 counter;
+  extra_descr_data *ex_desc;
+  // QString buf2;
+
+  auto action_description = obj->ActionDescription().remove('\r');
+  dc_fprintf(stream,
+             "#%lu\n"
+             "%d %d %d %d %d %u %d %d\n",
+             GET_OBJ_VNUM(obj),
+             locate,
+             GET_OBJ_VAL(obj, 0),
+             GET_OBJ_VAL(obj, 1),
+             GET_OBJ_VAL(obj, 2),
+             GET_OBJ_VAL(obj, 3),
+             GET_OBJ_EXTRA(obj),
+             GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
+             GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
+
+  if (!(IS_OBJ_STAT(obj, ITEM_UNIQUE_SAVE)))
+  {
     return 1;
   }
-  /* read an object from OBJ_FILE */
-  ObjectPtr read_object(qint32 nr, auto &stream, bool ignore)
-  {
-    qint32 loc{}, mod = {};
+  dc_fprintf(stream,
+             "XAP\n"
+             "%s~\n"
+             "%s~\n"
+             "%s~\n"
+             "%s~\n"
+             "%d %d %d %d %d\n",
+             !obj->name().isEmpty() ? qPrintable(obj->name()) : "undefined",
+             qPrintable(obj->short_description()) ? qPrintable(obj->short_description()) : "undefined",
+             !obj->long_description().isEmpty() ? qPrintable(obj->long_description()) : "undefined",
+             obj->ActionDescription().remove('\r'),
+             GET_OBJ_TYPE(obj),
+             GET_OBJ_WEAR(obj).toInt(),
+             (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
+             GET_OBJ_COST(obj), obj->num_affects);
+  /* Do we have affects? */
+  for (counter = {}; counter < obj->num_affects; counter++)
+    if (obj->affected[counter].modifier)
+      dc_fprintf(stream, "A\n"
+                         "%d %d\n",
+                 obj->affected[counter].location,
+                 obj->affected[counter].modifier);
 
-    QString chk;
-
-    if (nr < 0)
+  /* Do we have extra descriptions? */
+  if (obj->ex_description)
+  { /*. Yep, save them too . */
+    for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next)
     {
-      return 0;
-    }
-
-    ObjectPtr obj = new Object(this);
-    clear_object(obj);
-
-    /* *** QString data *** */
-    // read it, add it to the hsh table, free it
-    // that way, we only have one copy of it in memory at any time
-
-    obj->name(fread_string(stream));
-
-    qDebug("%s", qPrintable(u"Object name: %1"_s.arg(obj->name())));
-    obj->short_description(fread_string(stream));
-    if (obj->short_description().length() >= MAX_OBJ_SDESC_LENGTH)
-    {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", obj_index[nr].vnum());
-    }
-
-    obj->long_description(fread_string(stream));
-
-    obj->ActionDescription(fread_string(stream));
-    stream.skipWhiteSpace();
-    if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
-    {
-      logentry(u"read_object: vnum %1 action description [%2] removed."_s.arg(obj_index[nr].vnum()).arg(obj->ActionDescription()));
-      obj->ActionDescription(QString());
-    }
-    obj->table = {};
-    currentVNUM(nr);
-    currentName(obj->name());
-    currentType("Object");
-    obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(stream);
-    obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(stream);
-    obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(stream);
-    obj->obj_flags.size = fread_int<decltype(obj->obj_flags.size)>(stream);
-
-    obj->obj_flags.value[0] = fread_int<object_value_t>(stream);
-    obj->obj_flags.value[1] = fread_int<object_value_t>(stream);
-    obj->obj_flags.value[2] = fread_int<object_value_t>(stream);
-    obj->obj_flags.value[3] = fread_int<object_value_t>(stream);
-    obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(stream, 0, IMPLEMENTER);
-
-    obj->obj_flags.weight = fread_int<decltype(obj->obj_flags.weight)>(stream);
-    obj->obj_flags.cost = fread_int<decltype(obj->obj_flags.cost)>(stream);
-    obj->obj_flags.more_flags = fread_int<decltype(obj->obj_flags.more_flags)>(stream);
-    /* currently not stored in object file */
-    obj->obj_flags.timer = {};
-
-    obj->ex_description = {};
-    obj->affected = {};
-    obj->num_affects = {};
-    /* *** other flags *** */
-
-    if (nr == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
-    {
-      qDebug("Debug point");
-    }
-
-    qDebugQTextStreamLine(stream, "read_object(), before stream >> chk >> Qt::ws");
-    stream >> chk >> Qt::ws;
-    qDebugQTextStreamLine(stream, "read_object(), after stream >> chk >> Qt::ws");
-    qDebug() << "First chk " << chk;
-    extra_descr_data *new_new_descr = {};
-    qint64 current_pos = {};
-    QString current_line = {};
-    while (!chk.isEmpty() && chk != "S")
-    {
-      bool ok = false;
-      switch (chk[0].toLatin1())
+      /*. Sanity check to prevent nasty protection faults . */
+      if (ex_desc->keyword_.isEmpty() || ex_desc->description_.isEmpty())
       {
-      case 'E':
-        qDebugQTextStreamLine(stream, "Type E before first fread_string");
-        new_new_descr = new extra_descr_data;
-
-        new_new_descr->keyword_ = fread_string(stream);
-
-        qDebugQTextStreamLine(stream, "Type E before second fread_string");
-
-        new_new_descr->description_ = fread_string(stream);
-
-        qDebugQTextStreamLine(stream, "Type E after second fread_string");
-
-        new_new_descr->next = obj->ex_description;
-        obj->ex_description = new_new_descr;
-        break;
-
-      case '\\':
-        qDebugQTextStreamLine(stream, "before seek: ");
-        ok = stream.seek(stream.pos() - 1);
-        if (!ok)
-        {
-          qFatal("Failed to seek -1 in read_object");
-        }
-
-        qDebugQTextStreamLine(stream, "after seek: ");
-
-        mprog_read_programs(stream, nr, ignore);
-
-        qDebugQTextStreamLine(stream, "after mprog_read_programs seek: ");
-        break;
-
-      case 'A':
-        // these are only two members of obj_affected_type, so nothing else needs initializing
-        loc = fread_int<decltype(loc)>(stream);
-        mod = fread_int<decltype(mod)>(stream, -1000, 1000);
-        add_obj_affect(obj, loc, mod);
-        break;
-
-      default:
-        logentry(u"Illegal obj addon flag [%1] in obj [%2]."_s.arg(chk).arg(obj->name()), IMPLEMENTER, DC::LogChannel::LOG_BUG);
-        break;
-      } // switch
-        // read in next flag
-      assert(stream.status() == QTextStream::Status::Ok);
-      stream >> chk >> Qt::ws;
-      assert(stream.status() == QTextStream::Status::Ok);
-      qDebug() << "subsequent chk [" << chk << "]";
+        continue;
+      }
+      dc_fprintf(stream, "E\n"
+                         "%s~\n"
+                         "%s~\n",
+                 qPrintable(ex_desc->keyword_),
+                 ex_desc->description_.remove('\r'));
     }
+  }
+  return 1;
+}
+/* read an object from OBJ_FILE */
+ObjectPtr read_object(qint32 nr, auto &stream, bool ignore)
+{
+  qint32 loc{}, mod = {};
 
-    obj->in_room = DC::NOWHERE;
-    obj->next_skill = {};
-    obj->next_content = {};
-    obj->carried_by = {};
-    obj->equipped_by = {};
-    obj->in_obj = {};
-    obj->contains = {};
-    obj->item_number = nr;
+  QString chk;
 
-    // Keys will now save for up to 24 hours. If there are any with
-    // ITEM_NOSAVE that flag will be removed.
-    if (IS_KEY(obj))
+  if (nr < 0)
+  {
+    return 0;
+  }
+
+  ObjectPtr obj = new Object(this);
+  clear_object(obj);
+
+  /* *** QString data *** */
+  // read it, add it to the hsh table, free it
+  // that way, we only have one copy of it in memory at any time
+
+  obj->name(fread_string(stream));
+
+  qDebug("%s", qPrintable(u"Object name: %1"_s.arg(obj->name())));
+  obj->short_description(fread_string(stream));
+  if (obj->short_description().length() >= MAX_OBJ_SDESC_LENGTH)
+  {
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", obj_index[nr].vnum());
+  }
+
+  obj->long_description(fread_string(stream));
+
+  obj->ActionDescription(fread_string(stream));
+  stream.skipWhiteSpace();
+  if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
+  {
+    logentry(u"read_object: vnum %1 action description [%2] removed."_s.arg(obj_index[nr].vnum()).arg(obj->ActionDescription()));
+    obj->ActionDescription(QString());
+  }
+  obj->table = {};
+  currentVNUM(nr);
+  currentName(obj->name());
+  currentType("Object");
+  obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(stream);
+  obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(stream);
+  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(stream);
+  obj->obj_flags.size = fread_int<decltype(obj->obj_flags.size)>(stream);
+
+  obj->obj_flags.value[0] = fread_int<object_value_t>(stream);
+  obj->obj_flags.value[1] = fread_int<object_value_t>(stream);
+  obj->obj_flags.value[2] = fread_int<object_value_t>(stream);
+  obj->obj_flags.value[3] = fread_int<object_value_t>(stream);
+  obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(stream, 0, IMPLEMENTER);
+
+  obj->obj_flags.weight = fread_int<decltype(obj->obj_flags.weight)>(stream);
+  obj->obj_flags.cost = fread_int<decltype(obj->obj_flags.cost)>(stream);
+  obj->obj_flags.more_flags = fread_int<decltype(obj->obj_flags.more_flags)>(stream);
+  /* currently not stored in object file */
+  obj->obj_flags.timer = {};
+
+  obj->ex_description = {};
+  obj->affected = {};
+  obj->num_affects = {};
+  /* *** other flags *** */
+
+  if (nr == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
+  {
+    qDebug("Debug point");
+  }
+
+  qDebugQTextStreamLine(stream, "read_object(), before stream >> chk >> Qt::ws");
+  stream >> chk >> Qt::ws;
+  qDebugQTextStreamLine(stream, "read_object(), after stream >> chk >> Qt::ws");
+  qDebug() << "First chk " << chk;
+  extra_descr_data *new_new_descr = {};
+  qint64 current_pos = {};
+  QString current_line = {};
+  while (!chk.isEmpty() && chk != "S")
+  {
+    bool ok = false;
+    switch (chk[0].toLatin1())
     {
-      SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
-    }
+    case 'E':
+      qDebugQTextStreamLine(stream, "Type E before first fread_string");
+      new_new_descr = new extra_descr_data;
 
-    return obj;
+      new_new_descr->keyword_ = fread_string(stream);
+
+      qDebugQTextStreamLine(stream, "Type E before second fread_string");
+
+      new_new_descr->description_ = fread_string(stream);
+
+      qDebugQTextStreamLine(stream, "Type E after second fread_string");
+
+      new_new_descr->next = obj->ex_description;
+      obj->ex_description = new_new_descr;
+      break;
+
+    case '\\':
+      qDebugQTextStreamLine(stream, "before seek: ");
+      ok = stream.seek(stream.pos() - 1);
+      if (!ok)
+      {
+        qFatal("Failed to seek -1 in read_object");
+      }
+
+      qDebugQTextStreamLine(stream, "after seek: ");
+
+      mprog_read_programs(stream, nr, ignore);
+
+      qDebugQTextStreamLine(stream, "after mprog_read_programs seek: ");
+      break;
+
+    case 'A':
+      // these are only two members of obj_affected_type, so nothing else needs initializing
+      loc = fread_int<decltype(loc)>(stream);
+      mod = fread_int<decltype(mod)>(stream, -1000, 1000);
+      add_obj_affect(obj, loc, mod);
+      break;
+
+    default:
+      logentry(u"Illegal obj addon flag [%1] in obj [%2]."_s.arg(chk).arg(obj->name()), IMPLEMENTER, DC::LogChannel::LOG_BUG);
+      break;
+    } // switch
+      // read in next flag
+    assert(stream.status() == QTextStream::Status::Ok);
+    stream >> chk >> Qt::ws;
+    assert(stream.status() == QTextStream::Status::Ok);
+    qDebug() << "subsequent chk [" << chk << "]";
   }
 
-  void signal_setup(void);
-  qint32 new_descriptor(qint32 s);
-  void check_idle_passwords(void);
-  void init_heartbeat(void);
-  void report_debug_logging();
-  void pulse_takeover(void);
-  void zone_update(void);
-  void point_update(void); /* In limits.c */
-  void food_update(void);  /* In limits.c */
-  void mobile_activity(void);
-  void update_corpses_and_portals(void);
-  void perform_violence(void);
-  void time_update(void);
-  void weather_update(void);
-  void pulse_command_lag(void);
-  void checkConsecrate(qint32);
-  void another_hour(qint32 mode);
-  void weather_change(void);
+  obj->in_room = DC::NOWHERE;
+  obj->next_skill = {};
+  obj->next_content = {};
+  obj->carried_by = {};
+  obj->equipped_by = {};
+  obj->in_obj = {};
+  obj->contains = {};
+  obj->item_number = nr;
 
-  void load_messages(const QString file, qint32 base = 0);
-  void boot_social_messages(void);
-  void assign_clan_rooms(void);
-  void find_unordered_objects(void);
-  void boot_clans(void);
-  void update_make_camp_and_leadership(void);
-  qint32 _parse_name(const QString arg, QString name);
-
-  void pulse_table_bj(table_data *tbl, qint32 recall = 0);
-  void reset_table(table_data *tbl);
-  void nextturn(table_data *tbl);
-  void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3);
-  void add_timer_bj_dealer(table_data *tbl);
-  void addtimer(TimerPtr add);
-  qint32 hand_number(player_data *plr);
-  qint32 hands(player_data *plr);
-  bool charExists(CharacterPtr ch);
-  void reel_spin(varg_t, void *, void *);
-
-  command_return_t save_boards(void);
-  bool is_forbidden(QString name);
-  ObjectPtr getObject(vnum_t vnum);
-  void findLibrary(void);
-  qint32 create_one_room(CharacterPtr ch, qint32 vnum);
-  void update_wizlist(CharacterPtr ch);
-  void do_godlist(void);
-  void write_wizlist(QString filename);
-  explicit DC(QString argv);
-  explicit DC(config c);
-  void setup(void);
-  DC(const DC &) = delete; // non-copyable
-  DC(DC &&) = delete;      // and non-movable
-  DC &operator=(const DC &) = delete;
-  DC &operator=(DC &&) = delete;
-  void main_loop2(void);
-  void removeDead(void);
-  void handleShooting(void);
-  void init_game(void);
-  void boot_db(void);
-  void boot_zones(void);
-  void boot_world(void);
-  void write_one_zone(auto &streamstream, zone_t zone_key);
-  zone_t read_one_zone(auto &streamstream);
-  qint32 read_one_room(auto &streamstream, qint32 &room_nr);
-  void load_hints(void);
-  void save_hints(void);
-  void send_hint(void);
-  void assign_mobiles(void);
-  bool authenticate(QString username, QString password, quint64 level = 0);
-  bool authenticate(const QHttpServerRequest &request, quint64 level = 0);
-  void crash_hotboot(void);
-  void loadnews(void);
-  void sendAll(QString message);
-  bool isAllowedHost(QHostAddress host);
-  Database getDatabase(void) { return database_; }
-  Database db(void) { return database_; }
-  command_lag *getCommandLag(void) const { return command_lag_list_; }
-  void setCommandLag(command_lag *cl) { command_lag_list_ = cl; }
-
-  [[nodiscard]] inline QString currentType(void) { return current_type_; }
-  void currentType(QString current_type) { current_type_ = current_type; }
-
-  [[nodiscard]] inline QString currentName(void) { return current_name_; }
-  void currentName(QString current_name) { current_name_ = current_name; }
-
-  [[nodiscard]] inline vnum_t currentVNUM(void) { return current_VNUM_; }
-  void currentVNUM(vnum_t current_VNUM) { current_VNUM_ = current_VNUM; }
-
-  [[nodiscard]] inline QString currentFilename(void) { return current_filename_; }
-  void currentFilename(QString current_filename) { current_filename_ = current_filename; }
-
-  void current(QString current_type, QString current_name, vnum_t current_VNUM, QString current_filename)
+  // Keys will now save for up to 24 hours. If there are any with
+  // ITEM_NOSAVE that flag will be removed.
+  if (IS_KEY(obj))
   {
-    currentType(current_type);
-    currentName(current_name);
-    currentVNUM(current_VNUM);
-    currentFilename(current_filename);
+    SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
+    REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
   }
 
-  [[nodiscard]] inline QString current(void)
+  return obj;
+}
+
+void signal_setup(void);
+qint32 new_descriptor(qint32 s);
+void check_idle_passwords(void);
+void init_heartbeat(void);
+void report_debug_logging();
+void pulse_takeover(void);
+void zone_update(void);
+void point_update(void); /* In limits.c */
+void food_update(void);  /* In limits.c */
+void mobile_activity(void);
+void update_corpses_and_portals(void);
+void perform_violence(void);
+void time_update(void);
+void weather_update(void);
+void pulse_command_lag(void);
+void checkConsecrate(qint32);
+void another_hour(qint32 mode);
+void weather_change(void);
+
+void load_messages(const QString file, qint32 base = 0);
+void boot_social_messages(void);
+void assign_clan_rooms(void);
+void find_unordered_objects(void);
+void boot_clans(void);
+void update_make_camp_and_leadership(void);
+qint32 _parse_name(const QString arg, QString name);
+
+void pulse_table_bj(CasinoTablePtr tbl, qint32 recall = 0);
+void reset_table(CasinoTablePtr tbl);
+void nextturn(CasinoTablePtr tbl);
+void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3);
+void add_timer_bj_dealer(CasinoTablePtr tbl);
+void addtimer(TimerPtr add);
+qint32 hand_number(CasinoPlayerPtr plr);
+qint32 hands(CasinoPlayerPtr plr);
+bool charExists(CharacterPtr ch);
+void reel_spin(varg_t, void *, void *);
+
+command_return_t save_boards(void);
+bool is_forbidden(QString name);
+ObjectPtr getObject(vnum_t vnum);
+void findLibrary(void);
+qint32 create_one_room(CharacterPtr ch, qint32 vnum);
+void update_wizlist(CharacterPtr ch);
+void do_godlist(void);
+void write_wizlist(QString filename);
+explicit DC(QString argv);
+explicit DC(config c);
+void setup(void);
+DC(const DC &) = delete; // non-copyable
+DC(DC &&) = delete;      // and non-movable
+DC &operator=(const DC &) = delete;
+DC &operator=(DC &&) = delete;
+void main_loop2(void);
+void removeDead(void);
+void handleShooting(void);
+void init_game(void);
+void boot_db(void);
+void boot_zones(void);
+void boot_world(void);
+void write_one_zone(auto &streamstream, zone_t zone_key);
+zone_t read_one_zone(auto &streamstream);
+qint32 read_one_room(auto &streamstream, qint32 &room_nr);
+void load_hints(void);
+void save_hints(void);
+void send_hint(void);
+void assign_mobiles(void);
+bool authenticate(QString username, QString password, quint64 level = 0);
+bool authenticate(const QHttpServerRequest &request, quint64 level = 0);
+void crash_hotboot(void);
+void loadnews(void);
+void sendAll(QString message);
+bool isAllowedHost(QHostAddress host);
+Database getDatabase(void) { return database_; }
+Database db(void) { return database_; }
+command_lag *getCommandLag(void) const { return command_lag_list_; }
+void setCommandLag(command_lag *cl) { command_lag_list_ = cl; }
+
+[[nodiscard]] inline QString currentType(void) { return current_type_; }
+void currentType(QString current_type) { current_type_ = current_type; }
+
+[[nodiscard]] inline QString currentName(void) { return current_name_; }
+void currentName(QString current_name) { current_name_ = current_name; }
+
+[[nodiscard]] inline vnum_t currentVNUM(void) { return current_VNUM_; }
+void currentVNUM(vnum_t current_VNUM) { current_VNUM_ = current_VNUM; }
+
+[[nodiscard]] inline QString currentFilename(void) { return current_filename_; }
+void currentFilename(QString current_filename) { current_filename_ = current_filename; }
+
+void current(QString current_type, QString current_name, vnum_t current_VNUM, QString current_filename)
+{
+  currentType(current_type);
+  currentName(current_name);
+  currentVNUM(current_VNUM);
+  currentFilename(current_filename);
+}
+
+[[nodiscard]] inline QString current(void)
+{
+  return u"%1:%2:%3:%4"_s.arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
+}
+
+void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
+[[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
+
+template <typename T>
+T number(T from, T to)
+{
+  if (from == to)
+    return to;
+
+  if (from > to)
   {
-    return u"%1:%2:%3:%4"_s.arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
+    logentry(u"BACKWARDS usage: dc_->number(%1, %2)!"_s.arg(from).arg(to));
+    produce_coredump();
+    return to;
   }
 
-  void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
-  [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
+  if (std::is_unsigned<T>::value)
+    return random_.bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
+  else if (std::is_signed<T>::value)
+    return random_.bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
+}
 
-  template <typename T>
-  T number(T from, T to)
-  {
-    if (from == to)
-      return to;
+void clean_socials_from_memory(void);
+void remove_all_mobs_from_world(void);
+void remove_all_objs_from_world(void);
+void free_zones_from_memory(void);
+void free_clans_from_memory(void);
+void set_zone_saved_zone(qint32 room);
+void set_zone_modified_zone(qint32 room);
+[[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>;
+void set_zone_modified(qint32 modnum, world_file_list_item *list);
+void set_zone_modified_world(qint32 room);
+void set_zone_modified_mob(qint32 mob);
+void set_zone_modified_obj(qint32 obj);
+void set_zone_saved(qint32 modnum, world_file_list_item *list);
+void set_zone_saved_world(qint32 room);
+void set_zone_saved_mob(qint32 mob);
+void set_zone_saved_obj(qint32 obj);
+void free_world_from_memory(void);
+void free_mobs_from_memory(void);
+void free_objs_from_memory(void);
+void free_messages_from_memory(void);
+void free_hsh_tree_from_memory(void);
+void free_help_from_memory(void);
+void free_emoting_objects_from_memory(void);
+void free_game_portals_from_memory(void);
+void free_ban_list_from_memory(void);
+void free_buff_pool_from_memory(void);
+void load_vaults(void);
+void testing_load_vaults(void);
+void reload_vaults(void);
+void load_corpses(void);
+ObjectPtr ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket);
+qint32 write_hotboot_file(void);
+qint32 load_hotboot_descs(void);
+vnum_t getObjectVNUM(ObjectPtr obj, bool *ok = {});
+vnum_t getObjectVNUM(qint32 nr, bool *ok = {});
+vnum_t getObjectVNUM(rnum_t nr, bool *ok = {});
+mob_index_data *generate_mob_indices(qint32 *top, mob_index_data *index);
+obj_index_data *generate_obj_indices(qint32 *top, obj_index_data *index);
+CharacterPtr read_mobile(qint32 nr, FILE *stream);
+CharacterPtr clone_mobile(qint32 nr);
+auto create_blank_item(qint32 nr) -> std::expected<qint32, create_error>;
+qint32 create_blank_mobile(qint32 nr);
+void game_test_init(void);
+void heartbeat(void);
+void finish_hotboot(void);
+std::expected<ConnectionPtr, load_status_t> load_char_obj(QString name);
+bool has_vault_access(QString owner, VaultPtr vault);
+bool has_vault_access(CharacterPtr ch, VaultPtr vault);
+void update_mprog_throws(void);
+CharacterPtr initiate_oproc(CharacterPtr ch, ObjectPtr obj);
+qint32 oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
+qint32 oprog_rand_trigger(ObjectPtr item);
+qint32 oprog_arand_trigger(ObjectPtr item);
+void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
+void logf(qint32 level, DC::LogChannel type, QString cformat, ...);
+qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
+qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer);
+void load_game_portals(void);
+void process_portals(void);
 
-    if (from > to)
-    {
-      logentry(u"BACKWARDS usage: dc_->number(%1, %2)!"_s.arg(from).arg(to));
-      produce_coredump();
-      return to;
-    }
+~DC(void)
+{
+  /* TODO enable and fix all memory leaks
+  remove_all_mobs_from_world();
+  remove_all_objs_from_world();
+  clean_socials_from_memory();
+  free_zones_from_memory();
+  free_clans_from_memory();
+  free_world_from_memory();
+  free_mobs_from_memory();
+  free_objs_from_memory();
+  free_messages_from_memory();
+  free_hsh_tree_from_memory();
+  wizlist.clear();
+  free_help_from_memory();
+  shop_index.clear();
+  free_emoting_objects_from_memory();
+  free_game_portals_from_memory();
+  free_ban_list_from_memory();
+  free_buff_pool_from_memory();
+  removeDead();
+  */
+}
 
-    if (std::is_unsigned<T>::value)
-      return random_.bounded(static_cast<quint64>(from), static_cast<quint64>(to + 1));
-    else if (std::is_signed<T>::value)
-      return random_.bounded(static_cast<qint64>(from), static_cast<qint64>(to + 1));
-  }
+QRandomGenerator random_;
+QMap<quint64, Shop> shop_index;
+CVoteData DCVote;
 
-  void clean_socials_from_memory(void);
-  void remove_all_mobs_from_world(void);
-  void remove_all_objs_from_world(void);
-  void free_zones_from_memory(void);
-  void free_clans_from_memory(void);
-  void set_zone_saved_zone(qint32 room);
-  void set_zone_modified_zone(qint32 room);
-  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>;
-  void set_zone_modified(qint32 modnum, world_file_list_item *list);
-  void set_zone_modified_world(qint32 room);
-  void set_zone_modified_mob(qint32 mob);
-  void set_zone_modified_obj(qint32 obj);
-  void set_zone_saved(qint32 modnum, world_file_list_item *list);
-  void set_zone_saved_world(qint32 room);
-  void set_zone_saved_mob(qint32 mob);
-  void set_zone_saved_obj(qint32 obj);
-  void free_world_from_memory(void);
-  void free_mobs_from_memory(void);
-  void free_objs_from_memory(void);
-  void free_messages_from_memory(void);
-  void free_hsh_tree_from_memory(void);
-  void free_help_from_memory(void);
-  void free_emoting_objects_from_memory(void);
-  void free_game_portals_from_memory(void);
-  void free_ban_list_from_memory(void);
-  void free_buff_pool_from_memory(void);
-  void load_vaults(void);
-  void testing_load_vaults(void);
-  void reload_vaults(void);
-  void load_corpses(void);
-  ObjectPtr ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it, qint32 ticket);
-  qint32 write_hotboot_file(void);
-  qint32 load_hotboot_descs(void);
-  vnum_t getObjectVNUM(ObjectPtr obj, bool *ok = {});
-  vnum_t getObjectVNUM(qint32 nr, bool *ok = {});
-  vnum_t getObjectVNUM(rnum_t nr, bool *ok = {});
-  mob_index_data *generate_mob_indices(qint32 *top, mob_index_data *index);
-  obj_index_data *generate_obj_indices(qint32 *top, obj_index_data *index);
-  CharacterPtr read_mobile(qint32 nr, FILE *stream);
-  CharacterPtr clone_mobile(qint32 nr);
-  auto create_blank_item(qint32 nr) -> std::expected<qint32, create_error>;
-  qint32 create_blank_mobile(qint32 nr);
-  void game_test_init(void);
-  void heartbeat(void);
-  void finish_hotboot(void);
-  std::expected<ConnectionPtr, load_status_t> load_char_obj(QString name);
-  bool has_vault_access(QString owner, VaultPtr vault);
-  bool has_vault_access(CharacterPtr ch, VaultPtr vault);
-  void update_mprog_throws(void);
-  CharacterPtr initiate_oproc(CharacterPtr ch, ObjectPtr obj);
-  qint32 oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
-  qint32 oprog_rand_trigger(ObjectPtr item);
-  qint32 oprog_arand_trigger(ObjectPtr item);
-  void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
-  void logf(qint32 level, DC::LogChannel type, QString cformat, ...);
-  qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
-  qint32 make_arbitrary_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer);
-  void load_game_portals(void);
-  void process_portals(void);
-
-  ~DC(void)
-  {
-    /* TODO enable and fix all memory leaks
-    remove_all_mobs_from_world();
-    remove_all_objs_from_world();
-    clean_socials_from_memory();
-    free_zones_from_memory();
-    free_clans_from_memory();
-    free_world_from_memory();
-    free_mobs_from_memory();
-    free_objs_from_memory();
-    free_messages_from_memory();
-    free_hsh_tree_from_memory();
-    wizlist.clear();
-    free_help_from_memory();
-    shop_index.clear();
-    free_emoting_objects_from_memory();
-    free_game_portals_from_memory();
-    free_ban_list_from_memory();
-    free_buff_pool_from_memory();
-    removeDead();
-    */
-  }
-
-  QRandomGenerator random_;
-  QMap<quint64, Shop> shop_index;
-  CVoteData DCVote;
-
-  QString last_processed_cmd = {};
-  QString last_char_name = {};
-  room_t last_char_room = {};
-  Commands CMD_;
-  Arena arena_;
-  mob_index_data mob_index_array[MAX_INDEX] = {};
-  class mob_index_data *mob_index = mob_index_array;
-  Bans bans_;
-  Vaults vaults_;
+QString last_processed_cmd = {};
+QString last_char_name = {};
+room_t last_char_room = {};
+Commands CMD_;
+Arena arena_;
+mob_index_data mob_index_array[MAX_INDEX] = {};
+class mob_index_data *mob_index = mob_index_array;
+Bans bans_;
+Vaults vaults_;
 
 private:
-  timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
-  hints_t hints_;
-  Shops shops_;
-  QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
-  Database database_;
-  command_lag *command_lag_list_ = {};
-  QString current_type_;
-  QString current_name_;
-  vnum_t current_VNUM_ = {};
-  QString current_filename_;
-  void game_loop_init(void);
-  void game_loop(void);
-  qint32 init_socket(in_port_t port);
-  qint32 exceeded_connection_limit(ConnectionPtr new_conn);
-  void nanny(ConnectionPtr conn, QString arg = "");
-  void object_activity(quint64 pulse_type);
-};
+timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
+hints_t hints_;
+Shops shops_;
+QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
+Database database_;
+command_lag *command_lag_list_ = {};
+QString current_type_;
+QString current_name_;
+vnum_t current_VNUM_ = {};
+QString current_filename_;
+void game_loop_init(void);
+void game_loop(void);
+qint32 init_socket(in_port_t port);
+qint32 exceeded_connection_limit(ConnectionPtr new_conn);
+void nanny(ConnectionPtr conn, QString arg = "");
+void object_activity(quint64 pulse_type);
+}
+;
 bool CAN_GO(auto ch, auto door)
 {
   return EXIT(ch, door) && (EXIT(ch, door)->to_room != DC::NOWHERE) && (EXIT(ch, door)->to_room != DC::NOWHERE) && !isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
@@ -10056,7 +10115,7 @@ auto &operator>>(QTextStream &stream, Room &room)
       }
     }
 
-    quint32 room_flags = fread_uint(stream);
+    quint32 room_flags = fread_uint<quint32>(stream);
 
     if (room_nr)
     {
@@ -10093,22 +10152,22 @@ auto &operator>>(QTextStream &stream, Room &room)
       /* direction field */
       if (c == 'D')
       {
-        dir = fread_int(in, 0, 5);
-        setup_dir(in, room_nr, dir);
+        dir = fread_int(stream, 0, 5);
+        setup_dir(stream, room_nr, dir);
       }
       /* extra description field */
       else if (c == 'E')
       {
         // strip off the \n after the E
-        if (fread_char(in) != '\n')
+        if (fread_char(stream) != '\n')
         {
-          // fseek(in, -1, SEEK_CUR);
-          in.seek(-1);
+          // fseek(stream, -1, SEEK_CUR);
+          stream.seek(-1);
         }
 
         new_new_descr = new extra_descr_data;
-        new_new_descr->keyword_ = fread_string(in, 0);
-        new_new_descr->description_ = fread_string(in, 0);
+        new_new_descr->keyword_ = fread_string(stream, 0);
+        new_new_descr->description_ = fread_string(stream, 0);
 
         if (room_nr)
         {
@@ -10125,7 +10184,7 @@ auto &operator>>(QTextStream &stream, Room &room)
         deny_data *deni;
 
         deni = new deny_data;
-        deni->vnum = fread_int(in, -1, 2147483467);
+        deni->vnum = fread_int(stream, -1, 2147483467);
 
         if (room_nr)
         {
@@ -10141,7 +10200,7 @@ auto &operator>>(QTextStream &stream, Room &room)
         break;
       else if (c == 'C')
       {
-        qint32 c_class = fread_int(in, 0, CLASS_MAX);
+        qint32 c_class = fread_int(stream, 0, CLASS_MAX);
         if (room_nr)
         {
           room.allow_class[c_class] = true;

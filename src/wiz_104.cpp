@@ -2023,7 +2023,7 @@ void opstat(CharacterPtr ch, qint32 vnum)
   mob_prog_data *mprg = {};
   qint32 i = {};
   QString buf2 = {};
-  for (mprg = dc_->obj_index[num].mobprogs, i = 1; mprg != nullptr;
+  for (mprg = dc_->obj_index[num].mobprogs_, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     dc_sprintf(buf, "$3%d$R>$3$B", i);
@@ -2071,7 +2071,7 @@ command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void update_objprog_bits(qint32 num)
 {
-  mob_prog_data *prog = dc_->obj_index[num].mobprogs;
+  mob_prog_data *prog = dc_->obj_index[num].mobprogs_;
   dc_->obj_index[num].progtypes = {};
 
   while (prog)
@@ -2131,14 +2131,14 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     prog->comlist = u"say This is my new obj prog!\r\n"_s;
     prog->next = {};
 
-    if ((currprog = dc_->obj_index[num].mobprogs))
+    if ((currprog = dc_->obj_index[num].mobprogs_))
     {
       while (currprog->next)
         currprog = currprog->next;
       currprog->next = prog;
     }
     else
-      dc_->obj_index[num].mobprogs = prog;
+      dc_->obj_index[num].mobprogs_ = prog;
     update_objprog_bits(num);
     ch->sendln("New obj proc created.");
     return ReturnValue::eSUCCESS;
@@ -2156,7 +2156,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     a = dc_atoi(arg);
     prog = {};
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs;
+    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
          currprog && i != a;
          i++, prog = currprog, currprog = currprog->next)
       ;
@@ -2168,7 +2168,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (prog)
       prog->next = currprog->next;
     else
-      dc_->obj_index[num].mobprogs = currprog->next;
+      dc_->obj_index[num].mobprogs_ = currprog->next;
 
     currprog->type = {};
     currprog->arglist = {};
@@ -2197,7 +2197,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     qint32 a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs;
+    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
@@ -2262,7 +2262,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs;
+    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
@@ -2287,7 +2287,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs;
+    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
@@ -2401,7 +2401,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->obj_index[r2].non_combat_func = {};
   dc_->obj_index[r2].qty = {};
   dc_->obj_index[r2].vnum(v2);
-  dc_->obj_index[r2].mobprogs = {};
+  dc_->obj_index[r2].mobprogs_ = {};
   dc_->obj_index[r2].combat_func = {};
   dc_->obj_index[r2].mobspec = {};
   // extract_obj(otmp);
@@ -2488,7 +2488,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->mob_index[dst].qty = {};
   dc_->mob_index[dst].non_combat_func = {};
   dc_->mob_index[dst].combat_func = {};
-  dc_->mob_index[dst].mobprogs = {};
+  dc_->mob_index[dst].mobprogs_ = {};
   dc_->mob_index[dst].mobspec = {};
   dc_->mob_index[dst].progtypes = {};
   dc_->mob_index[dst].vnum(vdst);
@@ -2503,7 +2503,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     ch->sendln("Warning: hardcoded combat function found. Notify coder.");
   }
-  if (dc_->mob_index[src].mobprogs)
+  if (dc_->mob_index[src].mobprogs_)
   {
     ch->sendln("Warning: mob program found. This will need to be copied manually.");
   }

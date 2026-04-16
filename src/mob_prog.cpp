@@ -3920,9 +3920,9 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
   qint32 i = {};
   qint32 retval = {};
   bool done = {};
-  //  for ( mprg = dc_->mob_index[mob->mobdata->nr].mobprogs; mprg != nullptr; mprg
+  //  for ( mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_; mprg != nullptr; mprg
   //= next )
-  mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+  mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
   if (!mprg)
   {
     done = true;
@@ -4009,7 +4009,7 @@ void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
   mob_prog_data *mprg = {};
   mob_prog_data *next = {};
   bool done = false;
-  mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+  mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
   if (!mprg)
   {
     done = true;
@@ -4080,7 +4080,7 @@ qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
   {
     mob->removeGold(amount);
 
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
     if (!mprg)
     {
       done = true;
@@ -4121,7 +4121,7 @@ qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
   bool done = false;
   if (mob->isNonPlayer() && (dc_->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
 
     if (!mprg)
     {
@@ -4201,7 +4201,7 @@ qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
   bool done = false, okay = false;
   if (mob->isNonPlayer() && (dc_->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
     if (!mprg)
     {
       done = true;
@@ -4271,7 +4271,7 @@ qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (dc_->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
     if (!mprg)
     {
       done = true;
@@ -4393,7 +4393,7 @@ qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint
 
   if (mob->isNonPlayer() && (dc_->mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs;
+    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
     if (!mprg || (opt & 1))
     {
       done = true;
@@ -4560,7 +4560,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
 { // Sneakiness.
   CharacterPtr temp;
   temp = clone_mobile(real_mobile(12));
-  mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
+  mob_index[real_mobile(12)].mobprogs_ = obj_index[obj->item_number].mobprogs_;
   mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
 
   if (ch)
@@ -4607,7 +4607,7 @@ void end_oproc(CharacterPtr ch)
     trace.addTrack("end_oproc");
     extract_char(ch, true, trace);
     dc_->mob_index[real_mobile(12)].progtypes = {};
-    dc_->mob_index[real_mobile(12)].mobprogs = {};
+    dc_->mob_index[real_mobile(12)].mobprogs_ = {};
   }
 }
 
@@ -4689,7 +4689,7 @@ qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qin
 
   if (obj_index[obj->item_number].progtypes & CATCH_PROG)
   {
-    mprg = obj_index[obj->item_number].mobprogs;
+    mprg = obj_index[obj->item_number].mobprogs_;
     mprog_command_num = {};
     for (; mprg != nullptr; mprg = mprg->next)
     {
