@@ -4,70 +4,29 @@
 | Description:  Utility functions necessary for wiz commands.
 */
 #include "DC/DC.h"
+#include <qtypes.h>
 
 qint32 getRealSpellDamage(CharacterPtr ch);
 
-qint32 number_or_name(QString *name, qint32 *num)
+qint32 number_or_name(QString &name, qint32 &num)
 {
-  qint32 i;
-  QString ppos;
-  QString number;
-
-  if ((ppos = index(*name, '.')) != nullptr)
+  auto targets = name.trimmed().split('.');
+  if (targets.size() < 2)
   {
-    *ppos++ = '\0';
-    dc_strcpy(number, *name);
-    dc_strcpy(*name, ppos);
-
-    for (i = {}; *(number + i); i++)
-      if (!isdigit(*(number + i)))
-        return {};
-
-    return (atoi(number));
+    return {}
   }
+  auto prefix = targets.value(0);
+  auto target = targets.value(1);
 
-  /* no dot */
-  if ((*num = atoi(*name)) > 0)
-    return -1;
-  else
-    return 1;
+  bool ok = false;
+  num = prefix.toULongLong(&ok);
+  if (ok)
+  {
+    name = target;
+    return num;
+  }
+  return {};
 }
-
-#if (0)
-qint32 number_or_name(QString *name, qint32 *num)
-{
-  quint32 i;
-  QString ppos = {};
-  QString number;
-
-  for (i = {}; i < dc_strlen(*name); i++)
-  {
-    if (*name[i] == '.')
-    {
-      ppos = *name + i;
-      break;
-    }
-  }
-  if (ppos)
-  {
-    *ppos++ = '\0';
-    dc_strcpy(number, *name);
-    dc_strcpy(*name, ppos);
-
-    for (i = {}; *(number + i); i++)
-      if (!isdigit(*(number + i)))
-        return {};
-
-    return (atoi(number));
-  }
-
-  /* no dot */
-  if ((*num = atoi(*name)) > 0)
-    return -1;
-  else
-    return 1;
-}
-#endif
 
 void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
 {
@@ -533,9 +492,9 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   if (!k->isNonPlayer())
     display_punishes(ch, k);
 
-  if (k->desc)
+  if (k->conn_)
   {
-    sprinttype(k->desc->connected, connected_types, buf2);
+    sprinttype(k->conn_->connected, connected_types, buf2);
     dc_strcat(buf, "  $3Connected$R: ");
     dc_strcat(buf, buf2);
   }
@@ -696,9 +655,9 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   dc_sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", qPrintable(k->getPositionQString()),
              ((k->fighting) ? qPrintable(k->fighting->name())
                             : "Nobody"));
-  if (k->desc)
+  if (k->conn_)
   {
-    sprinttype(k->desc->connected, connected_types, buf2);
+    sprinttype(k->conn_->connected, connected_types, buf2);
     dc_strcat(buf, "  $3Connected$R: ");
     dc_strcat(buf, buf2);
   }
@@ -1462,7 +1421,7 @@ command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
   for (const auto &i : character_list)
   {
 
-    if (i->isNonPlayer() || i->desc || !CAN_SEE(ch, i))
+    if (i->isNonPlayer() || i->conn_ || !CAN_SEE(ch, i))
       continue;
     x++;
 
@@ -1798,7 +1757,6 @@ void init_random_hunt_items(hunt_data *h)
     }
     h->itemsAvail[a] = -1;
   }
-  fclose(f);
 }
 
 QString last_hunt_time(QString last_hunt)
@@ -1839,14 +1797,6 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
 
   if (nullptr != pTime)
   {
-#ifdef __CYGWIN__
-    dc_snprintf(tmp, dc_strlen(tmp) + 1, "%d/%d/%d (%d:%02d)\r\n",
-                pTime->tm_mon + 1,
-                pTime->tm_mday,
-                pTime->tm_year + 1900,
-                pTime->tm_hour,
-                pTime->tm_min);
-#else
     dc_snprintf(tmp, dc_strlen(tmp) + 1, "%d/%d/%d (%d:%02d) %s\r\n",
                 pTime->tm_mon + 1,
                 pTime->tm_mday,
@@ -1854,7 +1804,6 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
                 pTime->tm_hour,
                 pTime->tm_min,
                 pTime->tm_zone);
-#endif
   }
 
   if (item == 76)
@@ -2090,40 +2039,6 @@ command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg2, arg3, buf;
-#ifdef TWITTER
-  twitCurl twitterObj;
-  QString authUrl, replyMsg;
-  QString myOAuthAccessTokenKey("");
-  QString myOAuthAccessTokenSecret("");
-  QString userName("");
-  QString passWord("");
-  QString message("");
-
-  userName = "username";
-  passWord = "password";
-
-  twitterObj.setTwitterUsername(userName);
-  twitterObj.setTwitterPassword(passWord);
-
-  twitterObj.getOAuth().setConsumerKey(QString("xyz"));
-  twitterObj.getOAuth().setConsumerSecret(QString("xyz"));
-
-  twitterObj.getOAuth().setOAuthTokenKey(QString("xyz-xyz"));
-  twitterObj.getOAuth().setOAuthTokenSecret(QString("xyz"));
-
-  if (twitterObj.accountVerifyCredGet())
-  {
-    //    twitterObj.getLastWebResponse( replyMsg );
-    dc_sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet web response:\n%s\n", replyMsg.c_str());
-    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
-  }
-  else
-  {
-    twitterObj.getLastCurlError(replyMsg);
-    dc_sprintf(buf, "twitterClient:: twitCurl::accountVerifyCredGet error:\n%s\n", replyMsg.c_str());
-    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
-  }
-#endif
 
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg2);
@@ -2134,7 +2049,7 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]");
     return ReturnValue::eSUCCESS;
   }
-  qint32 vnum = atoi(arg), num = atoi(arg2), time = atoi(arg3);
+  qint32 vnum = dc_atoi(arg), num = dc_atoi(arg2), time = dc_atoi(arg3);
   if (vnum <= 0 || real_object(vnum) < 0)
   {
     ch->sendln("Non-existent item.");
@@ -2171,30 +2086,6 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 
   dc_sprintf(buf, "\r\n## %s has been started! There are a total of %d items and %d minutes to find them all!\r\n## Type 'huntitems' to get the locations!\r\n", huntname, num, time);
   send_info(buf);
-
-#ifdef TWITTER
-  QString holding[3] = {
-      "Get your ass to MAHS... err, DC.  There's a hunt!",
-      "You may be wondering why I've gathered you here today.  There's a hunt!",
-      "Aussie Aussie Aussie! Oi Oi Hunt!!"};
-
-  qint32 pos = rand() % 3;
-
-  message = holding[pos];
-
-  if (twitterObj.statusUpdate(message))
-  {
-    //    twitterObj.getLastWebResponse( replyMsg );
-    dc_sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate web response:\n%s\n", replyMsg.c_str());
-    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
-  }
-  else
-  {
-    twitterObj.getLastCurlError(replyMsg);
-    dc_sprintf(buf, "\ntwitterClient:: twitCurl::statusUpdate error:\n%s\n", replyMsg.c_str());
-    dc_->logentry(buf, 100, DC::LogChannel::LOG_GOD);
-  }
-#endif
 
   return ReturnValue::eSUCCESS;
 }

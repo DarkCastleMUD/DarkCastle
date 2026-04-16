@@ -104,7 +104,7 @@ qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0)
       continue;
     if (tmp->fighting)
       continue;
-    if (!tmp->desc)
+    if (!tmp->conn_)
       continue;
     if (GET_POS(tmp) != position_t::STANDING)
       continue;
@@ -135,7 +135,7 @@ qint32 check_joincharmie(CharacterPtr ch, qint32 skill = 0)
     return ReturnValue::eFAILURE;
   if (tmp == ch || tmp == ch->fighting)
     return ReturnValue::eFAILURE;
-  if (!tmp->desc)
+  if (!tmp->conn_)
     return ReturnValue::eFAILURE;
   if (tmp->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -532,7 +532,7 @@ qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
   // when cast by mobs, I need to make sure mobs aren't killing each other
   if (ch->isNonPlayer() && vict->isNonPlayer() &&
       !IS_AFFECTED(ch, AFF_CHARM) && !IS_AFFECTED(ch, AFF_FAMILIAR) &&
-      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED(vict, AFF_FAMILIAR) && !ch->desc && !vict->desc)
+      !IS_AFFECTED(vict, AFF_CHARM) && !IS_AFFECTED(vict, AFF_FAMILIAR) && !ch->conn_ && !vict->conn_)
   {
     if (ch->fighting == vict)
     {
@@ -3978,13 +3978,13 @@ bool check_dodge(CharacterPtr ch, CharacterPtr victim, qint32 attacktype, bool d
  */
 void DC::load_messages(const QString file, qint32 base)
 {
-  FILE *fl;
+  FILE *stream;
   qint32 i, type;
   extern message_list fight_messages[MAX_MESSAGES];
   message_type *messages;
   QString chk;
 
-  if (!(fl = fopen(file, "r")))
+  if (!(stream = fopen(file, "r")))
   {
     perror("read messages");
     exit(0);
@@ -3998,11 +3998,11 @@ void DC::load_messages(const QString file, qint32 base)
       fight_messages[i].msg2 = {};
     }
 
-  fscanf(fl, "%s\n", chk);
+  fscanf(stream, "%s\n", chk);
 
   while (*chk == 'M')
   {
-    fscanf(fl, " %d\n", &type);
+    fscanf(stream, " %d\n", &type);
     //     type += base;
     for (i = {}; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
                  (fight_messages[i].a_type);
@@ -4030,22 +4030,20 @@ void DC::load_messages(const QString file, qint32 base)
       messages->next = fight_messages[i].msg2;
       fight_messages[i].msg2 = messages;
     }
-    messages->die_msg.attacker_msg = fread_string(fl, 0);
-    messages->die_msg.victim_msg = fread_string(fl, 0);
-    messages->die_msg.room_msg = fread_string(fl, 0);
-    messages->miss_msg.attacker_msg = fread_string(fl, 0);
-    messages->miss_msg.victim_msg = fread_string(fl, 0);
-    messages->miss_msg.room_msg = fread_string(fl, 0);
-    messages->hit_msg.attacker_msg = fread_string(fl, 0);
-    messages->hit_msg.victim_msg = fread_string(fl, 0);
-    messages->hit_msg.room_msg = fread_string(fl, 0);
-    messages->god_msg.attacker_msg = fread_string(fl, 0);
-    messages->god_msg.victim_msg = fread_string(fl, 0);
-    messages->god_msg.room_msg = fread_string(fl, 0);
-    fscanf(fl, " %s \n", chk);
+    messages->die_msg.attacker_msg = fread_string(stream);
+    messages->die_msg.victim_msg = fread_string(stream);
+    messages->die_msg.room_msg = fread_string(stream);
+    messages->miss_msg.attacker_msg = fread_string(stream);
+    messages->miss_msg.victim_msg = fread_string(stream);
+    messages->miss_msg.room_msg = fread_string(stream);
+    messages->hit_msg.attacker_msg = fread_string(stream);
+    messages->hit_msg.victim_msg = fread_string(stream);
+    messages->hit_msg.room_msg = fread_string(stream);
+    messages->god_msg.attacker_msg = fread_string(stream);
+    messages->god_msg.victim_msg = fread_string(stream);
+    messages->god_msg.room_msg = fread_string(stream);
+    fscanf(stream, " %s \n", chk);
   }
-
-  fclose(fl);
 }
 
 void DC::free_messages_from_memory(void)
@@ -4110,7 +4108,7 @@ void set_fighting(CharacterPtr ch, CharacterPtr vict)
       if (level_difference > 0 || ch->getLevel() == 60)
       {
         vict->add_memory(qPrintable(ch->name()), 't');
-        timer_data *timer = new timer_data;
+        TimerPtr timer = TimerPtr(new Timer);
         timer->var_arg1 = vict->hunting;
         timer->arg2 = (void *)vict;
         timer->function = clear_hunt;
@@ -4125,7 +4123,7 @@ void set_fighting(CharacterPtr ch, CharacterPtr vict)
           if (level_difference > 0 || vict->getLevel() == 60)
           {
             ch->add_memory(vict->name(), 't');
-            timer_data *timer = new timer_data;
+            TimerPtr timer = TimerPtr(new Timer);
             timer->var_arg1 = ch->hunting;
             timer->arg2 = (void *)ch;
             timer->function = clear_hunt;
@@ -4264,8 +4262,8 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
   update_pos(ch);
 
   // Remove ch's lag if he wasn't using wimpy.
-  if (ch->isPlayer() && ch->desc && !isSet(ch->player->toggles, Player::PLR_WIMPY) && clearlag)
-    ch->desc->wait = {};
+  if (ch->isPlayer() && ch->conn_ && !isSet(ch->player->toggles, Player::PLR_WIMPY) && clearlag)
+    ch->conn_->wait = {};
 
   if (ch == combat_next_dude)
     combat_next_dude = ch->next_fighting;
@@ -6501,7 +6499,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     // now with tav/meta pkilling not adding to your score
     if (!ch->isNonPlayer()
         // && victim->getLevel() > PKILL_COUNT_LIMIT
-        && victim->desc && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+        && victim->conn_ && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
       level_spread = ch->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
@@ -6537,7 +6535,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master
         //  && victim->getLevel() > PKILL_COUNT_LIMIT
-        && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+        && victim->conn_ && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
       level_spread = ch->master->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
@@ -6575,7 +6573,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     }
     if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master
         // && victim->getLevel() > PKILL_COUNT_LIMIT
-        && victim->desc && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+        && victim->conn_ && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
     {
       level_spread = ch->master->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
@@ -7462,10 +7460,10 @@ command_return_t do_flee(CharacterPtr ch, const QString argument, cmd_t cmd)
 command_return_t Character::check_pursuit(CharacterPtr victim, QString dircommand)
 {
   // Handle pursuit skill
-  if (victim == 0 || this->isNonPlayer() || !affected_by_spell(SKILL_PURSUIT))
+  if (victim == 0 || isNonPlayer() || !affected_by_spell(SKILL_PURSUIT))
     return ReturnValue::eFAILURE;
 
-  qint32 pursuit = this->has_skill(SKILL_PURSUIT);
+  qint32 pursuit = has_skill(SKILL_PURSUIT);
   if (ch->dc_->number(1, 100) > pursuit)
   {
     // failure
@@ -7482,7 +7480,7 @@ command_return_t Character::check_pursuit(CharacterPtr victim, QString dircomman
     act_to_character("Upon seeing $N flee, you bellow in rage and charge blindly after $m!", this, 0, victim, 0);
     act_to_room("Upon seeing $N flee, $n bellows in rage and charges blindly after $m!", this, 0, victim, NOTVICT);
 
-    qint32 retval = this->command_interpreter(dircommand);
+    qint32 retval = command_interpreter(dircommand);
     if (isSet(retval, ReturnValue::eCH_DIED))
       return ReturnValue::eSUCCESS;
 
@@ -7659,7 +7657,7 @@ qint32 debug_retval(CharacterPtr ch, CharacterPtr victim, qint32 retval)
   return retval;
 }
 
-void Character::send(const QString buffer)
+void Character::send(QString buffer)
 {
   send_to_char(buffer, this);
 }
@@ -7676,16 +7674,16 @@ void Character::send(QString buffer)
 
 void Character::sendRaw(QString buffer)
 {
-  if (this->desc != nullptr)
+  if (conn_ != nullptr)
   {
-    this->desc->allowColor = {};
+    conn_->allowColor = {};
   }
 
-  this->send(buffer);
+  send(buffer);
 
-  if (this->desc != nullptr)
+  if (conn_ != nullptr)
   {
-    this->desc->allowColor = 1;
+    conn_->allowColor = 1;
   }
 }
 

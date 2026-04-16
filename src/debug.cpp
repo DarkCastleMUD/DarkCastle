@@ -1,10 +1,10 @@
 #include "DC/DC.h"
 
-void load_char_obj_error(FILE *fpsave, QString strsave);
+void load_char_obj_error(auto &streamfpsave, QString strsave);
 void store_to_char(char_file_u4 *st, CharacterPtr ch);
 qint32 store_to_char_variable_data(CharacterPtr ch, FILE *fpsave);
 ObjectPtr my_obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
-qsizetype fread_to_tilde(FILE *fpsave, QString filename);
+qsizetype fread_to_tilde(auto &streamfpsave, QString filename);
 bool read_pc_or_mob_data(CharacterPtr ch, FILE *fpsave, QString filename);
 void load_vaults();
 
@@ -231,7 +231,7 @@ qint32 main(qint32 argc, QString *argv)
   dc_->logentry(u"renumbering zone table"_s, 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
 
-  ConnectionPtr d = new Connection;
+  ConnectionPtr conn = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
   debug.create_blank_item(1);
@@ -245,7 +245,7 @@ qint32 main(qint32 argc, QString *argv)
   qint32 vnum = {};
   if (argc >= 3)
   {
-    vnum = atoi(argv[2]);
+    vnum = dc_atoi(argv[2]);
   }
 
   d = new Connection;
@@ -254,7 +254,7 @@ qint32 main(qint32 argc, QString *argv)
   ch->player = new Player;
   ch->setType(Character::Type::Player);
 
-  ch->desc = d;
+  ch->conn_ = d;
   ch->setLevel(110);
   conn->descriptor = 1;
   conn->character = ch;
@@ -428,7 +428,7 @@ qint32 main(qint32 argc, QString *argv)
 
     for (const auto &c : dc_->character_list)
     {
-      c->desc = d;
+      c->conn_ = d;
       do_score(c, "");
       conn->process_output();
       do_vault(c, "list");

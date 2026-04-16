@@ -6,14 +6,14 @@
 command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i;
-  ConnectionPtr d;
+  ConnectionPtr conn;
   QString arg;
   QString buf;
   qint32 minamt;
 
   one_argument(argument, arg);
   if (!arg.isEmpty())
-    minamt = atoi(arg);
+    minamt = dc_atoi(arg);
   else
     minamt = 1;
 
@@ -136,10 +136,10 @@ command_return_t run_all_events(CharacterPtr ch = {})
     if (ch)
     {
       ch->send("Running check_timer()\r\n");
-      ch->desc->process_output();
+      ch->conn_->process_output();
     }
     check_timer();
-    ch->desc->process_output();
+    ch->conn_->process_output();
   }
   if (counter >= 1000)
   {
@@ -201,9 +201,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, auto *function, QString ar
       new_rc = function(ch, arguments, cmd);
     }
     ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
-    if (ch->desc)
+    if (ch->conn_)
     {
-      ch->desc->process_output();
+      ch->conn_->process_output();
     }
   }
 
@@ -223,9 +223,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_gen2_t function, Q
       new_rc = function(ch, arguments, cmd);
     }
     ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
-    if (ch->desc)
+    if (ch->conn_)
     {
-      ch->desc->process_output();
+      ch->conn_->process_output();
     }
   }
 
@@ -245,9 +245,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_gen3_t function, Q
       new_rc = (*ch.*(function))(arguments, cmd);
     }
     ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
-    if (ch->desc)
+    if (ch->conn_)
     {
-      ch->desc->process_output();
+      ch->conn_->process_output();
     }
   }
 
@@ -267,9 +267,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_special_t function
       new_rc = (*ch.*(function))(arguments, cmd);
     }
     ch->send(u"Return code is %1 (%2)\r\n"_s.arg(new_rc).arg(rc_to_qstring(new_rc)));
-    if (ch->desc)
+    if (ch->conn_)
     {
-      ch->desc->process_output();
+      ch->conn_->process_output();
     }
   }
 
@@ -335,37 +335,37 @@ command_return_t test_casino(CharacterPtr ch)
 
   check_timer();
   check_timer();
-  ch->desc->process_output();
+  ch->conn_->process_output();
 
   run_check(ch, &max_rc, &Character::special, "", cmd_t::HIT);
 
   check_timer();
   check_timer();
-  ch->desc->process_output();
+  ch->conn_->process_output();
 
   run_check(ch, &max_rc, &Character::special, "", cmd_t::STAY);
 
   check_timer();
   check_timer();
-  ch->desc->process_output();
+  ch->conn_->process_output();
 
   run_check(ch, &max_rc, &Character::special, "", cmd_t::DOUBLE);
 
   check_timer();
   check_timer();
-  ch->desc->process_output();
+  ch->conn_->process_output();
 
   run_check(ch, &max_rc, &Character::special, "", cmd_t::DOUBLE);
 
   check_timer();
   check_timer();
-  ch->desc->process_output();
+  ch->conn_->process_output();
 
   run_check(ch, &max_rc, &Character::special, "", cmd_t::DOUBLE);
 
   check_timer();
   check_timer();
-  ch->desc->process_output();
+  ch->conn_->process_output();
 
   if (ch->getGold() > 2000000)
   {

@@ -25,51 +25,49 @@ const QStringList valid_fields = {
 
 qint32 load_quests(void)
 {
-  FILE *fl;
+  FILE *stream;
   quest_info *quest;
 
-  if (!(fl = fopen(QUEST_FILE, "r")))
+  if (!(stream = fopen(QUEST_FILE, "r")))
   {
     dc_->logentry(u"Failed to open quest file for reading!"_s, 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
-  while (fgetc(fl) != '$')
+  while (fgetc(stream) != '$')
   {
 
     auto quest = new quest_info;
 
-    quest->number = fread_int(fl, 0, 32768);
-    quest->name = fread_string(fl, 1);
-    quest->hint1 = fread_string(fl, 1);
-    quest->hint2 = fread_string(fl, 1);
-    quest->hint3 = fread_string(fl, 1);
-    quest->objshort = fread_string(fl, 1);
-    quest->objlong = fread_string(fl, 1);
-    quest->objkey = fread_string(fl, 1);
-    quest->level = fread_int(fl, 0, 32768);
-    quest->objnum = fread_int(fl, 0, 32768);
-    quest->mobnum = fread_int(fl, 0, 32768);
-    quest->timer = fread_int(fl, 0, 32768);
-    quest->reward = fread_int(fl, 0, 32768);
-    quest->cost = fread_int(fl, 0, 32768);
-    quest->brownie = fread_int(fl, 0, 32768);
+    quest->number = fread_int(stream, 0, 32768);
+    quest->name = fread_string(stream);
+    quest->hint1 = fread_string(stream);
+    quest->hint2 = fread_string(stream);
+    quest->hint3 = fread_string(stream);
+    quest->objshort = fread_string(stream);
+    quest->objlong = fread_string(stream);
+    quest->objkey = fread_string(stream);
+    quest->level = fread_int(stream, 0, 32768);
+    quest->objnum = fread_int(stream, 0, 32768);
+    quest->mobnum = fread_int(stream, 0, 32768);
+    quest->timer = fread_int(stream, 0, 32768);
+    quest->reward = fread_int(stream, 0, 32768);
+    quest->cost = fread_int(stream, 0, 32768);
+    quest->brownie = fread_int(stream, 0, 32768);
     quest->active = false;
 
     quest_list.push_back(quest);
   }
-
-  fclose(fl);
 
   return ReturnValue::eSUCCESS;
 }
 
 qint32 save_quests(void)
 {
-  FILE *fl;
+  FILE *stream;
   quest_info *quest;
 
-  if (!(fl = fopen(QUEST_FILE, "w")))
+  if (!(stream = fopen(QUEST_FILE, "w")))
   {
     dc_->logentry(u"Failed to open quest file for writing!"_s, 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
@@ -78,20 +76,18 @@ qint32 save_quests(void)
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
     quest = *node;
-    dc_fprintf(fl, "#%d\n", quest->number);
-    string_to_file(fl, quest->name);
-    string_to_file(fl, quest->hint1);
-    string_to_file(fl, quest->hint2);
-    string_to_file(fl, quest->hint3);
-    string_to_file(fl, quest->objshort);
-    string_to_file(fl, quest->objlong);
-    string_to_file(fl, quest->objkey);
-    dc_fprintf(fl, "%d %d %d %d %d %d %d\n", quest->level, quest->objnum, quest->mobnum, quest->timer, quest->reward, quest->cost, quest->brownie);
+    dc_fprintf(stream, "#%d\n", quest->number);
+    string_to_file(stream, quest->name);
+    string_to_file(stream, quest->hint1);
+    string_to_file(stream, quest->hint2);
+    string_to_file(stream, quest->hint3);
+    string_to_file(stream, quest->objshort);
+    string_to_file(stream, quest->objlong);
+    string_to_file(stream, quest->objkey);
+    dc_fprintf(stream, "%d %d %d %d %d %d %d\n", quest->level, quest->objnum, quest->mobnum, quest->timer, quest->reward, quest->cost, quest->brownie);
   }
 
-  dc_fprintf(fl, "$");
-
-  fclose(fl);
+  dc_fprintf(stream, "$");
 
   return ReturnValue::eSUCCESS;
 }
@@ -125,12 +121,12 @@ quest_info *get_quest_(QString name)
     if (str_nosp_equal(name, quest->name))
       return quest;
 
-    if (atoi(name) == 0 && name[0] != '0')
+    if (dc_atoi(name) == 0 && name[0] != '0')
     {
       continue;
     }
 
-    if (quest->number == atoi(name))
+    if (quest->number == dc_atoi(name))
     {
       return quest;
     }
@@ -691,7 +687,7 @@ void quest_update()
   const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
-    if (!i->desc || i->isNonPlayer())
+    if (!i->conn_ || i->isNonPlayer())
       continue;
 
     for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
@@ -871,13 +867,13 @@ qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (cmd == cmd_t::BUY)
   {
-    if ((choice = atoi(arg)) == 0 || choice < 0)
+    if ((choice = dc_atoi(arg)) == 0 || choice < 0)
     {
       dc_sprintf(buf, "%s Try a number from the list.", qPrintable(ch->name()));
       owner->do_tell(QString(buf).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    switch (atoi(arg))
+    switch (dc_atoi(arg))
     {
     case 1:
       do_say(owner, "Sure, bum.");
@@ -1110,7 +1106,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (*arg && is_number(arg) && field.isEmpty())
   {
-    show_quest_info(ch, atoi(arg));
+    show_quest_info(ch, dc_atoi(arg));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1178,10 +1174,10 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
 
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", qPrintable(ch->name()), qPrintable(vict->name()),
-                vict->player->quest_points, atoi(value));
-      ch->send(u"Setting %s's quest points from %d to %d.\r\n"_s.arg(qPrintable(vict->name())).arg(vict->player->quest_points).arg(atoi(value)));
+                vict->player->quest_points, dc_atoi(value));
+      ch->send(u"Setting %s's quest points from %d to %d.\r\n"_s.arg(qPrintable(vict->name())).arg(vict->player->quest_points).arg(dc_atoi(value)));
 
-      vict->player->quest_points = atoi(value);
+      vict->player->quest_points = dc_atoi(value);
     }
     return ReturnValue::eSUCCESS;
   }
@@ -1191,7 +1187,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (field.isEmpty() || !is_number(field))
       ch->sendln("Usage: qedit show <number>");
     else
-      show_quest_info(ch, atoi(field));
+      show_quest_info(ch, dc_atoi(field));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1206,10 +1202,10 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (is_abbrev(arg, "list") && *field && is_number(field))
   {
-    lownum = MAX(0, atoi(field));
+    lownum = MAX(0, dc_atoi(field));
     if (*value && is_number(value))
     {
-      highnum = MIN(QUEST_TOTAL, atoi(value));
+      highnum = MIN(QUEST_TOTAL, dc_atoi(value));
       if (lownum > highnum)
       {
         holdernum = lownum;
@@ -1229,7 +1225,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  holdernum = atoi(arg);
+  holdernum = dc_atoi(arg);
 
   if (holdernum <= 0 || holdernum > QUEST_TOTAL)
   {
@@ -1291,12 +1287,12 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 1: // level
     ch->send(u"Level changed from %1 "_s.arg(quest->level));
-    quest->level = atoi(value);
+    quest->level = dc_atoi(value);
     ch->send(u"to %1.\r\n"_s.arg(quest->level));
     break;
   case 2: // objnum
     ch->send(u"Objnum changed from %1 "_s.arg(quest->objnum));
-    quest->objnum = atoi(value);
+    quest->objnum = dc_atoi(value);
     ch->send(u"to %1.\r\n"_s.arg(quest->objnum));
     break;
   case 3: // objshort
@@ -1319,17 +1315,17 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 6: // mobnum
     ch->send(u"Mobnum changed from %1 "_s.arg(quest->mobnum));
-    quest->mobnum = atoi(value);
+    quest->mobnum = dc_atoi(value);
     ch->send(u"to %1.\r\n"_s.arg(quest->mobnum));
     break;
   case 7: // timer
     ch->send(u"Timer changed from %1 "_s.arg(quest->timer));
-    quest->timer = atoi(value);
+    quest->timer = dc_atoi(value);
     ch->send(u"to %1.\r\n"_s.arg(quest->timer));
     break;
   case 8: // reward
     ch->send(u"Reward changed from %1 "_s.arg(quest->reward));
-    quest->reward = atoi(value);
+    quest->reward = dc_atoi(value);
     ch->send(u"to %1.\r\n"_s.arg(quest->reward));
     break;
   case 9: // hint1
@@ -1352,7 +1348,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 12: // cost
     ch->send(u"Cost changed from %1 "_s.arg(quest->cost));
-    quest->cost = atoi(value);
+    quest->cost = dc_atoi(value);
     ch->send(u"to %1.\r\n"_s.arg(quest->cost));
     break;
   case 13: // brownie
@@ -1456,7 +1452,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     }
 
     bool FOUND = false;
-    qint32 want_num = atoi(arg2) - 1;
+    qint32 want_num = dc_atoi(arg2) - 1;
     qint32 n = {};
     for (qint32 qvnum = 27975; qvnum <= 27996; qvnum++)
     {

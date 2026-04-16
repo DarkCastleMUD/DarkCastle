@@ -24,7 +24,7 @@ constexpr auto TP_OBJ = 1;
 constexpr auto TP_ERROR = 2;
 
 void check_for_awaymsgs(CharacterPtr ch);
-void page_string_dep(ConnectionPtr d, const QString str, qint32 keep_internal);
+void page_string_dep(ConnectionPtr conn, const QString str, qint32 keep_internal);
 
 const QStringList string_fields = {"name", "short", "long", "description", "title", "delete-description", "\n"};
 
@@ -38,60 +38,23 @@ const QStringList skill_fields = {"learned", "recognize", "\n"};
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
 
-void string_hash_add(ConnectionPtr d, QString str)
+void string_hash_add(ConnectionPtr conn, QString str)
 {
-  QString scan;
-  qint32 terminator = {};
-  CharacterPtr ch = conn->character;
+  if (!conn->hashstr)
+    return;
 
-  scan = str;
-  while (*scan)
+  if (auto i = str.indexOf('~'); i)
   {
-    if ((terminator = (*scan == '~') != 0))
-    {
-      *scan = '\0';
-      break;
-    }
-    scan++;
-  }
-
-  if (!(*conn->hashstr))
-  {
-#ifdef LEAK_CHECK
-    (*conn->hashstr) = calloc(dc_strlen(str) + 3, sizeof(QChar));
-#else
-    (*conn->hashstr) = dc_alloc(dc_strlen(str) + 3, sizeof(QChar));
-#endif
-    dc_strcpy(*conn->hashstr, str);
-  }
-
-  else
-  {
-    if (!(*conn->hashstr = realloc(*conn->hashstr, dc_strlen(*conn->hashstr) + dc_strlen(str) + 3)))
-    {
-      perror("string_hash_add: ");
-      abort();
-    }
-
-    dc_strcat(*conn->hashstr, str);
-  }
-
-  if (terminator)
-  {
-    scan = *conn->hashstr;
-    *conn->hashstr = {};
-    *conn->hashstr = scan;
-    conn->hashstr = {};
+    *conn->hashstr = str.remove(i, str.length() - i);
     conn->connected = Connection::states::PLAYING;
-    ch->sendln("Ok.");
+    conn->character->sendln("Ok.");
     check_for_awaymsgs(ch);
   }
   else
-    dc_strcat(*conn->hashstr, "\r\n");
+  {
+    *conn->hashstr += str;
+  }
 }
-
-// TODO - figure out what this is for...kill it if nothing
-#undef MAX_STR
 
 /* interpret an argument for do_string */
 void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString string)
@@ -117,12 +80,6 @@ void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString st
   arg = one_argument(arg, buf);
   if (!(*field = old_search_block(buf, 0, dc_strlen(buf), string_fields, 0)))
     return;
-
-  /* string */
-  for (; isspace(*arg); arg++)
-    ;
-  for (; (*string = *arg) != '\0'; arg++, string++)
-    ;
 }
 
 command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
@@ -183,9 +140,9 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       /*
       TODO
       if (mob->isNonPlayer())
-              ch->desc->hashstr = mob->getNameCPtr();
+              ch->conn_->hashstr = mob->getNameCPtr();
       else
-              ch->desc->strnew = mob->getNameCPtr();
+              ch->conn_->strnew = mob->getNameCPtr();
       */
 
       if (mob->isPlayer())
@@ -200,9 +157,9 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       dc_sprintf(message, "%s just restrung short on %s", qPrintable(ch->name()), qPrintable(mob->name()));
       dc_->logentry(message, IMPLEMENTER, DC::LogChannel::LOG_GOD);
       if (mob->isNonPlayer())
-        ch->desc->hashstr = &mob->short_desc;
+        ch->conn_->hashstr = &mob->short_desc;
       else
-        ch->desc->strnew = &mob->short_desc;
+        ch->conn_->strnew = &mob->short_desc;
       break;
     case 3:
       if (mob->isPlayer())
@@ -210,13 +167,13 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
         ch->sendln("That field is for monsters only.");
         return 1;
       }
-      ch->desc->hashstr = &mob->long_desc;
+      ch->conn_->hashstr = &mob->long_desc;
       break;
     case 4:
       if (mob->isNonPlayer())
-        ch->desc->hashstr = &mob->description;
+        ch->conn_->hashstr = &mob->description;
       else
-        ch->desc->strnew = &mob->description;
+        ch->conn_->strnew = &mob->description;
       break;
     case 5:
       if (mob->isNonPlayer())
@@ -224,7 +181,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
         ch->sendln("Monsters have no titles.");
         return 1;
       }
-      ch->desc->strnew = &mob->title;
+      ch->conn_->strnew = &mob->title;
       break;
     default:
       ch->sendln("That field is undefined for monsters.");
@@ -262,13 +219,13 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
         return 1;
       }
       // TODO hashstr for qstring
-      // ch->desc->hashstr = &qPrintable(obj->name());
+      // ch->conn_->hashstr = &qPrintable(obj->name());
       break;
     case 2:
-      ch->desc->hashstr = &obj->short_description;
+      ch->conn_->hashstr = &obj->short_description;
       break;
     case 3:
-      ch->desc->hashstr = &obj->long_description;
+      ch->conn_->hashstr = &obj->long_description;
       break;
     case 4:
       // TODO - remove this when the obj pfile saving keeps track of extra descs
@@ -284,17 +241,12 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       for (ed = obj->ex_description;; ed = ed->next)
         if (!ed)
         { /* the field was not found. create a new_new one. */
-#ifdef LEAK_CHECK
-          ed = (extra_descr_data *)
-              calloc(1, sizeof(extra_descr_data));
-#else
           ed = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
-#endif
           ed->next = obj->ex_description;
           obj->ex_description = ed;
           ed->keyword = string;
           ed->description = {};
-          ch->desc->hashstr = &ed->description;
+          ch->conn_->hashstr = &ed->description;
           ch->sendln("New field.");
           break;
         }
@@ -302,7 +254,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
         {
           /* the field exists */
           ed->description = {};
-          ch->desc->hashstr = &ed->description;
+          ch->conn_->hashstr = &ed->description;
           ch->sendln("Modifying description.");
           break;
         }
@@ -362,13 +314,13 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     if (type == TP_MOB && mob->isPlayer())
     {
-      *ch->desc->strnew = (string);
-      ch->desc->strnew = {};
+      *ch->conn_->strnew = (string);
+      ch->conn_->strnew = {};
     }
     else
     {
-      *ch->desc->hashstr = string;
-      ch->desc->hashstr = {};
+      *ch->conn_->hashstr = string;
+      ch->conn_->hashstr = {};
     }
     ch->sendln("Ok.");
   }
@@ -380,18 +332,9 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
                  "of a line.\r\n",
                  ch);
     if (type == TP_MOB && mob->isPlayer())
-#ifdef LEAK_CHECK
-      (*ch->desc->strnew) = calloc(length[field - 1], sizeof(QChar));
-#else
-      (*ch->desc->strnew) = dc_alloc(length[field - 1], sizeof(QChar));
-#endif
-    else
-#ifdef LEAK_CHECK
-      (*ch->desc->hashstr) = calloc(length[field - 1], sizeof(QChar));
-#else
-      (*ch->desc->hashstr) = dc_alloc(length[field - 1], sizeof(QChar));
-#endif
-    ch->desc->connected = Connection::states::EDITING;
+      (*ch->conn_->strnew) = dc_alloc(length[field - 1], sizeof(QChar));
+    (*ch->conn_->hashstr) = calloc(length[field - 1], sizeof(QChar));
+    ch->conn_->connected = Connection::states::EDITING;
   }
   return 1;
 }
@@ -454,7 +397,7 @@ void DC::free_help_from_memory(void)
   help_index = {};
 }
 
-help_index_t build_help_index(QTextStream &fl)
+help_index_t build_help_index(QTextStream &stream)
 {
   qsizetype nr{};
   bool issorted{};
@@ -465,8 +408,8 @@ help_index_t build_help_index(QTextStream &fl)
 
   for (;;)
   {
-    pos = fl.pos();
-    buf = fl.readLine();
+    pos = stream.pos();
+    buf = stream.readLine();
     scan = buf;
     for (;;)
     {
@@ -482,7 +425,7 @@ help_index_t build_help_index(QTextStream &fl)
 
     /* skip the text */
     do
-      buf = fl.readLine();
+      buf = stream.readLine();
     while (buf.startsWith('#'));
 
     if (buf.length() >= 2 && buf[1] == '~')
@@ -590,7 +533,7 @@ qint32 count_pages(const QString str)
  * page_string function, after showstr_vector has been allocated and
  * showstr_count set.
  */
-void paginate_string(const QString str, ConnectionPtr d)
+void paginate_string(const QString str, ConnectionPtr conn)
 {
   qint32 i;
 
@@ -603,7 +546,7 @@ void paginate_string(const QString str, ConnectionPtr d)
   conn->showstr_page = {};
 }
 
-void page_string(ConnectionPtr d, const QString str, qint32 keep_internal)
+void page_string(ConnectionPtr conn, const QString str, qint32 keep_internal)
 {
   if (!d || !(conn->character))
     return;
@@ -642,7 +585,7 @@ void page_string(ConnectionPtr d, const QString str, qint32 keep_internal)
 }
 
 /* The depreciated call that gets the paging ball rolling... */
-void page_string_dep(ConnectionPtr d, const QString str, qint32 keep_internal)
+void page_string_dep(ConnectionPtr conn, const QString str, qint32 keep_internal)
 {
   if (!d)
     return;
@@ -666,7 +609,7 @@ void page_string_dep(ConnectionPtr d, const QString str, qint32 keep_internal)
 }
 
 /* The call that displays the next page. */
-void show_string(ConnectionPtr d, const QString input)
+void show_string(ConnectionPtr conn, const QString input)
 {
   QString buffer;
   QString buf;
@@ -687,7 +630,7 @@ void show_string(ConnectionPtr d, const QString input)
    * are there!
    */
   else if (isdigit(*buf))
-    conn->showstr_page = MAX(0, MIN(atoi(buf) - 1, conn->showstr_count - 1));
+    conn->showstr_page = MAX(0, MIN(dc_atoi(buf) - 1, conn->showstr_count - 1));
 
   else if (!buf.isEmpty())
   {

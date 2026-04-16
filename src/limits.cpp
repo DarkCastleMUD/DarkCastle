@@ -14,10 +14,6 @@
  ***************************************************************************/
 /* $Id: limits.cpp,v 1.99 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#ifdef BANDWIDTH
-#include "DC/bandwidth.h"
-#endif
-
 #include "DC/DC.h"
 
 qint32 FOUNTAINisPresent(CharacterPtr ch);
@@ -90,13 +86,13 @@ qint32 Character::mana_gain_lookup(void)
   qint32 divisor = 1;
   qint32 modifier;
 
-  if (this->isNonPlayer())
-    gain = this->getLevel();
+  if (isNonPlayer())
+    gain = getLevel();
   else
   {
     //    gain = graf(age().year, 2,3,4,6,7,8,9);
 
-    gain = (qint32)(this->max_mana * (qreal)mana_regens[GET_CLASS(this)] / 100);
+    gain = (qint32)(max_mana * (qreal)mana_regens[GET_CLASS(this)] / 100);
     switch (GET_POS(this))
     {
     case position_t::SLEEPING:
@@ -131,23 +127,23 @@ qint32 Character::mana_gain_lookup(void)
     gain += modifier;
   }
 
-  if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
+  if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && getLevel() < 60)
     gain >>= 2;
   gain /= 4;
   gain /= divisor;
   gain += MIN(age().year, 100) / 5;
-  if (this->getLevel() < 50)
+  if (getLevel() < 50)
 
-    gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
+    gain = (qint32)((qreal)gain * (2.0 - (qreal)getLevel() / 50.0));
 
-  if (this->mana_regen > 0)
-    gain += this->mana_regen;
-  if (this->in_room >= 0)
-    if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+  if (mana_regen > 0)
+    gain += mana_regen;
+  if (in_room >= 0)
+    if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
       gain = (qint32)(gain * 1.25);
 
-  if (this->mana_regen < 0)
-    gain += this->mana_regen;
+  if (mana_regen < 0)
+    gain += mana_regen;
   return MAX(1, gain);
 }
 
@@ -160,9 +156,9 @@ qint32 Character::hit_gain(position_t position, bool improve)
   qint32 divisor = 1;
   qint32 learned = has_skill(SKILL_ENHANCED_REGEN);
   /* Neat and fast */
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
-    if (this->fighting)
+    if (fighting)
       gain = (GET_MAX_HIT(this) / 24);
     else
       gain = (GET_MAX_HIT(this) / 6);
@@ -170,7 +166,7 @@ qint32 Character::hit_gain(position_t position, bool improve)
   /* PC's */
   else
   {
-    gain = (qint32)(this->max_hit * (qreal)hit_regens[GET_CLASS(this)] / 100);
+    gain = (qint32)(max_hit * (qreal)hit_regens[GET_CLASS(this)] / 100);
 
     /* Position calculations    */
 
@@ -210,29 +206,29 @@ qint32 Character::hit_gain(position_t position, bool improve)
 
     gain += GET_CON(this);
   }
-  if (ISSET(this->affected_by, AFF_REGENERATION))
+  if (ISSET(affected_by, AFF_REGENERATION))
     gain += (gain / 2);
 
   if (learned && (!improve || skill_success(nullptr, SKILL_ENHANCED_REGEN)))
     gain += 3 + learned / 5;
 
-  if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
+  if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && getLevel() < 60)
     gain >>= 2;
 
   gain /= 4;
   //  gain -= MIN(age().year,100) / 10;
 
   gain /= divisor;
-  if (this->hit_regen > 0)
-    gain += this->hit_regen;
-  if (this->getLevel() < 50)
-    gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
+  if (hit_regen > 0)
+    gain += hit_regen;
+  if (getLevel() < 50)
+    gain = (qint32)((qreal)gain * (2.0 - (qreal)getLevel() / 50.0));
 
-  if (this->in_room >= 0)
-    if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+  if (in_room >= 0)
+    if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
       gain = (qint32)(gain * 1.5);
-  if (this->hit_regen < 0)
-    gain += this->hit_regen;
+  if (hit_regen < 0)
+    gain += hit_regen;
   return MAX(1, gain);
 }
 
@@ -279,25 +275,25 @@ qint32 Character::move_gain_lookup(qint32 extra)
       gain += (qint32)(af->modifier * 1.5);
   }
 
-  if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && this->getLevel() < 60)
+  if (((GET_COND(this, FULL) == 0) || (GET_COND(this, THIRST) == 0)) && getLevel() < 60)
     gain >>= 2;
   gain /= divisor;
-  gain -= MIN(100, this->age().year) / 10;
+  gain -= MIN(100, age().year) / 10;
 
-  if (this->move_regen > 0)
-    gain += this->move_regen;
+  if (move_regen > 0)
+    gain += move_regen;
 
   if (learned && (!improve || skill_success(nullptr, SKILL_ENHANCED_REGEN)))
     gain += 3 + learned / 10;
 
-  if (this->getLevel() < 50)
-    gain = (qint32)((qreal)gain * (2.0 - (qreal)this->getLevel() / 50.0));
+  if (getLevel() < 50)
+    gain = (qint32)((qreal)gain * (2.0 - (qreal)getLevel() / 50.0));
 
-  if (this->in_room >= 0)
-    if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+  if (in_room >= 0)
+    if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
       gain = (qint32)(gain * 1.5);
-  if (this->move_regen < 0)
-    gain += this->move_regen;
+  if (move_regen < 0)
+    gain += move_regen;
 
   return MAX(1, gain);
 }
@@ -783,7 +779,7 @@ void DC::point_update(void)
     }
 
     // only heal linkalive's and mobs
-    if (GET_POS(i) > position_t::DEAD && (i->isNonPlayer() || i->desc))
+    if (GET_POS(i) > position_t::DEAD && (i->isNonPlayer() || i->conn_))
     {
       i->setHP(MIN(i->getHP() + i->hit_gain(), hit_limit(i)));
 
@@ -792,7 +788,7 @@ void DC::point_update(void)
       i->setMove(MIN(GET_MOVE(i) + i->move_gain_lookup(), i->move_limit()));
       GET_KI(i) = MIN(GET_KI(i) + i->ki_gain_lookup(), ki_limit(i));
     }
-    else if (!i->isNonPlayer() && i->getLevel() < 1 && !i->desc)
+    else if (!i->isNonPlayer() && i->getLevel() < 1 && !i->conn_)
     {
       act_to_room("$n fades away into obscurity; $s life leaving history with nothing of note.", i, 0, 0, 0);
       do_quit(i, "", cmd_t::SAVE_SILENTLY);

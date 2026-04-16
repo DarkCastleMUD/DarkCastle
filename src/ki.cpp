@@ -307,8 +307,8 @@ qint32 Character::ki_gain_lookup(void)
   qint32 gain;
 
   /* gain 1 - 7 depedant on level */
-  gain = GET_CLASS(this) == CLASS_MONK ? (qint32)(this->max_ki * 0.04) : (qint32)(this->max_ki * 0.05); /*(this->getLevel() / 8) + 1;*/
-  gain += this->ki_regen;
+  gain = GET_CLASS(this) == CLASS_MONK ? (qint32)(max_ki * 0.04) : (qint32)(max_ki * 0.05); /*(getLevel() / 8) + 1;*/
+  gain += ki_regen;
 
   // Normalize these so we dont underun the array below
   qint32 norm_wis = MAX(0, GET_WIS(this));
@@ -325,7 +325,7 @@ qint32 Character::ki_gain_lookup(void)
 
   gain += age().year / 25;
 
-  if (isSet(dc_->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
+  if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
     gain = (qint32)(gain * 1.25);
 
   qint32 multiplyer = 1;
@@ -1162,7 +1162,7 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
   // arg = one_argument(arg, amt);
   // arg = one_argument(arg, type);
 
-  amount = atoi(amt);
+  amount = dc_atoi(amt);
 
   if (amount < 0)
   {

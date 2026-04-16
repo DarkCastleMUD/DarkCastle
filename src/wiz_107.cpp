@@ -60,7 +60,7 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!victim->desc)
+  if (!victim->conn_)
   {
     sendln("This can only be used on linkalive players.");
     return ReturnValue::eFAILURE;
@@ -74,18 +74,18 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim;
 
-  if (!this->desc)
+  if (!conn_)
     return ReturnValue::eFAILURE;
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
-    this->send("Did you ever try this before?");
+    send("Did you ever try this before?");
     return ReturnValue::eFAILURE;
   }
 
   if (!has_skill(COMMAND_SNOOP))
   {
-    this->sendln("Huh?");
+    sendln("Huh?");
     return ReturnValue::eFAILURE;
   }
 
@@ -93,7 +93,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    this->sendln("Snoop whom?");
+    sendln("Snoop whom?");
     return ReturnValue::eFAILURE;
   }
 
@@ -102,25 +102,25 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
     send_to_char("Your victim is either not available or "
                  "linkdead.\r\n",
                  this);
-    this->sendln("(You can only snoop a link-active pc.)");
+    sendln("(You can only snoop a link-active pc.)");
     return ReturnValue::eFAILURE;
   }
-  if ((victim->getLevel() > this->getLevel()) && (qPrintable(this->name()) != qPrintable(victim->name())))
+  if ((victim->getLevel() > getLevel()) && (qPrintable(name()) != qPrintable(victim->name())))
   {
-    this->sendln("Can't do that. That mob is higher than you!");
-    dc_->logentry(u"%1 tried to snoop a higher mob\r\n"_s.arg(qPrintable(this->name())), OVERSEER, DC::LogChannel::LOG_GOD);
+    sendln("Can't do that. That mob is higher than you!");
+    dc_->logentry(u"%1 tried to snoop a higher mob\r\n"_s.arg(qPrintable(name())), OVERSEER, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    this->sendln("Ok, you just snoop yourself.");
-    if (this->desc->snooping)
+    sendln("Ok, you just snoop yourself.");
+    if (conn_->snooping)
     {
-      this->desc->snooping->snoop_by = {};
-      this->desc->snooping = {};
+      conn_->snooping->snoop_by = {};
+      conn_->snooping = {};
     }
-    dc_->logentry(u"%1 snoops themself."_s.arg(name()), this->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(u"%1 snoops themself."_s.arg(name()), getLevel(), DC::LogChannel::LOG_GOD);
     return ReturnValue::eSUCCESS;
   }
 
@@ -131,15 +131,15 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (victim->desc->snoop_by)
+  if (victim->conn_->snoop_by)
   {
-    if (victim->desc->snoop_by->character)
+    if (victim->conn_->snoop_by->character)
     {
-      sendln(u"%1 is snooping them already."_s.arg(victim->desc->snoop_by->character->name()));
+      sendln(u"%1 is snooping them already."_s.arg(victim->conn_->snoop_by->character->name()));
     }
     else
     {
-      sendln(u"Descriptor #%1 is snooping them already."_s.arg(victim->desc->snoop_by->descriptor));
+      sendln(u"Descriptor #%1 is snooping them already."_s.arg(victim->conn_->snoop_by->descriptor));
     }
 
     return ReturnValue::eFAILURE;
@@ -149,11 +149,11 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   sendln("Ok.");
 
-  if (this->desc->snooping)
-    this->desc->snooping->snoop_by = {};
+  if (conn_->snooping)
+    conn_->snooping->snoop_by = {};
 
-  this->desc->snooping = victim->desc;
-  victim->desc->snoop_by = this->desc;
+  conn_->snooping = victim->conn_;
+  victim->conn_->snoop_by = conn_;
   dc_->logentry(u"%1 snoops %2."_s.arg(name()).arg(victim->name()), getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }

@@ -312,19 +312,19 @@ qint32 Character::meta_get_stat_exp_cost(attribute_t stat)
   switch (stat)
   {
   case attribute_t::CONSTITUTION:
-    curr_stat = this->raw_con;
+    curr_stat = raw_con;
     break;
   case attribute_t::STRENGTH:
-    curr_stat = this->raw_str;
+    curr_stat = raw_str;
     break;
   case attribute_t::DEXTERITY:
-    curr_stat = this->raw_dex;
+    curr_stat = raw_dex;
     break;
   case attribute_t::INTELLIGENCE:
-    curr_stat = this->raw_intel;
+    curr_stat = raw_intel;
     break;
   case attribute_t::WISDOM:
-    curr_stat = this->raw_wis;
+    curr_stat = raw_wis;
     break;
   default:
     xp_price = 9999999;
@@ -382,8 +382,8 @@ qint32 Character::meta_get_stat_exp_cost(attribute_t stat)
     break;
   }
 
-  //    if(this->player->statmetas > 0)
-  //     xp_price += this->player->statmetas * 20000;
+  //    if(player->statmetas > 0)
+  //     xp_price += player->statmetas * 20000;
 
   return xp_price;
 }
@@ -396,19 +396,19 @@ qint32 Character::meta_get_stat_plat_cost(attribute_t targetstat)
   switch (targetstat)
   {
   case attribute_t::CONSTITUTION:
-    stat = this->raw_con;
+    stat = raw_con;
     break;
   case attribute_t::STRENGTH:
-    stat = this->raw_str;
+    stat = raw_str;
     break;
   case attribute_t::DEXTERITY:
-    stat = this->raw_dex;
+    stat = raw_dex;
     break;
   case attribute_t::WISDOM:
-    stat = this->raw_wis;
+    stat = raw_wis;
     break;
   case attribute_t::INTELLIGENCE:
-    stat = this->raw_intel;
+    stat = raw_intel;
     break;
   default:
     stat = 99;
@@ -436,42 +436,42 @@ void Character::meta_list_stats(void)
   xp_price = meta_get_stat_exp_cost(attribute_t::STRENGTH);
   plat_cost = meta_get_stat_plat_cost(attribute_t::STRENGTH);
   max_stat = get_max_stat(this, attribute_t::STRENGTH);
-  if (this->raw_str >= max_stat)
-    this->send(u"$B$31)$R Str:       Your strength is already %1.\r\n"_s.arg(max_stat));
+  if (raw_str >= max_stat)
+    send(u"$B$31)$R Str:       Your strength is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(u"$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n"_s.arg((this->raw_str + 1)).arg(xp_price).arg(plat_cost));
+    send(u"$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n"_s.arg((raw_str + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::DEXTERITY);
   plat_cost = meta_get_stat_plat_cost(attribute_t::DEXTERITY);
   max_stat = get_max_stat(this, attribute_t::DEXTERITY);
-  if (this->raw_dex >= max_stat)
-    this->send(u"$B$32)$R Dex:       Your dexterity is already %1.\r\n"_s.arg(max_stat));
+  if (raw_dex >= max_stat)
+    send(u"$B$32)$R Dex:       Your dexterity is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(u"$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_dex + 1)).arg(xp_price).arg(plat_cost));
+    send(u"$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((raw_dex + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::CONSTITUTION);
   plat_cost = meta_get_stat_plat_cost(attribute_t::CONSTITUTION);
   max_stat = get_max_stat(this, attribute_t::CONSTITUTION);
-  if (this->raw_con >= max_stat)
-    this->send(u"$B$33)$R Con:       Your constitution is already %1.\r\n"_s.arg(max_stat));
+  if (raw_con >= max_stat)
+    send(u"$B$33)$R Con:       Your constitution is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(u"$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_con + 1)).arg(xp_price).arg(plat_cost));
+    send(u"$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((raw_con + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::INTELLIGENCE);
   plat_cost = meta_get_stat_plat_cost(attribute_t::INTELLIGENCE);
   max_stat = get_max_stat(this, attribute_t::INTELLIGENCE);
-  if (this->raw_intel >= max_stat)
-    this->send(u"$B$34)$R Int:       Your intelligence is already %1.\r\n"_s.arg(max_stat));
+  if (raw_intel >= max_stat)
+    send(u"$B$34)$R Int:       Your intelligence is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(u"$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_intel + 1)).arg(xp_price).arg(plat_cost));
+    send(u"$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((raw_intel + 1)).arg(xp_price).arg(plat_cost));
 
   xp_price = meta_get_stat_exp_cost(attribute_t::WISDOM);
   plat_cost = meta_get_stat_plat_cost(attribute_t::WISDOM);
   max_stat = get_max_stat(this, attribute_t::WISDOM);
-  if (this->raw_wis >= max_stat)
-    this->send(u"$B$35)$R Wis:       Your wisdom is already %1.\r\n"_s.arg(max_stat));
+  if (raw_wis >= max_stat)
+    send(u"$B$35)$R Wis:       Your wisdom is already %1.\r\n"_s.arg(max_stat));
   else
-    this->send(u"$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((this->raw_wis + 1)).arg(xp_price).arg(plat_cost));
+    send(u"$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n"_s.arg((raw_wis + 1)).arg(xp_price).arg(plat_cost));
 }
 
 quint64 Character::meta_get_moves_exp_cost(void)
@@ -676,13 +676,13 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       return ReturnValue::eSUCCESS;
     }
 
-    qint32 choice = atoi(argument);
+    qint32 choice = dc_atoi(argument);
     if (choice < 1 || choice > 3)
     {
       ch->sendln("$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R ");
       return ReturnValue::eSUCCESS;
     }
-    qint32 amount = atoi(arg2);
+    qint32 amount = dc_atoi(arg2);
     if (amount < 5 || amount > 10000)
     {
       ch->sendln("$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R ");
@@ -777,7 +777,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   else if (cmd == cmd_t::BUY)
   { /* buy  */
     one_argument(arg, argument);
-    if ((choice = atoi(argument)) == 0 || choice < 0)
+    if ((choice = dc_atoi(argument)) == 0 || choice < 0)
     {
       ch->sendln("The Meta-physician tells you, 'Pick a number.'");
       return ReturnValue::eSUCCESS;
@@ -1272,87 +1272,87 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
 void Character::undo_race_saves(void)
 {
-  switch (this->race)
+  switch (race)
   {
   case RACE_HUMAN:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_HUMAN_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_HUMAN_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_HUMAN_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_HUMAN_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_HUMAN_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_HUMAN_POISON_MOD;
+    saves[SAVE_TYPE_FIRE] -= RACE_HUMAN_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_HUMAN_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_HUMAN_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_HUMAN_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_HUMAN_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_HUMAN_POISON_MOD;
     break;
   case RACE_ELVEN:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_ELVEN_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_ELVEN_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_ELVEN_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_ELVEN_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_ELVEN_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_ELVEN_POISON_MOD;
-    this->spell_mitigation -= 1;
+    saves[SAVE_TYPE_FIRE] -= RACE_ELVEN_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_ELVEN_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_ELVEN_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_ELVEN_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_ELVEN_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_ELVEN_POISON_MOD;
+    spell_mitigation -= 1;
     break;
   case RACE_DWARVEN:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_DWARVEN_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_DWARVEN_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_DWARVEN_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_DWARVEN_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_DWARVEN_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_DWARVEN_POISON_MOD;
-    this->melee_mitigation -= 1;
+    saves[SAVE_TYPE_FIRE] -= RACE_DWARVEN_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_DWARVEN_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_DWARVEN_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_DWARVEN_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_DWARVEN_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_DWARVEN_POISON_MOD;
+    melee_mitigation -= 1;
     break;
   case RACE_TROLL:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_TROLL_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_TROLL_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_TROLL_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_TROLL_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_TROLL_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_TROLL_POISON_MOD;
-    this->spell_mitigation -= 2;
+    saves[SAVE_TYPE_FIRE] -= RACE_TROLL_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_TROLL_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_TROLL_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_TROLL_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_TROLL_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_TROLL_POISON_MOD;
+    spell_mitigation -= 2;
     break;
   case RACE_GIANT:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_GIANT_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_GIANT_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_GIANT_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_GIANT_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_GIANT_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_GIANT_POISON_MOD;
-    this->melee_mitigation -= 2;
+    saves[SAVE_TYPE_FIRE] -= RACE_GIANT_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_GIANT_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_GIANT_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_GIANT_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_GIANT_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_GIANT_POISON_MOD;
+    melee_mitigation -= 2;
     break;
   case RACE_PIXIE:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_PIXIE_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_PIXIE_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_PIXIE_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_PIXIE_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_PIXIE_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_PIXIE_POISON_MOD;
-    this->spell_mitigation -= 2;
+    saves[SAVE_TYPE_FIRE] -= RACE_PIXIE_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_PIXIE_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_PIXIE_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_PIXIE_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_PIXIE_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_PIXIE_POISON_MOD;
+    spell_mitigation -= 2;
     break;
   case RACE_HOBBIT:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_HOBBIT_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_HOBBIT_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_HOBBIT_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_HOBBIT_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_HOBBIT_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_HOBBIT_POISON_MOD;
-    this->melee_mitigation -= 2;
+    saves[SAVE_TYPE_FIRE] -= RACE_HOBBIT_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_HOBBIT_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_HOBBIT_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_HOBBIT_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_HOBBIT_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_HOBBIT_POISON_MOD;
+    melee_mitigation -= 2;
     break;
   case RACE_GNOME:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_GNOME_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_GNOME_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_GNOME_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_GNOME_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_GNOME_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_GNOME_POISON_MOD;
-    this->spell_mitigation -= 1;
+    saves[SAVE_TYPE_FIRE] -= RACE_GNOME_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_GNOME_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_GNOME_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_GNOME_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_GNOME_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_GNOME_POISON_MOD;
+    spell_mitigation -= 1;
     break;
   case RACE_ORC:
-    this->saves[SAVE_TYPE_FIRE] -= RACE_ORC_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] -= RACE_ORC_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] -= RACE_ORC_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] -= RACE_ORC_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] -= RACE_ORC_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] -= RACE_ORC_POISON_MOD;
-    this->melee_mitigation -= 1;
+    saves[SAVE_TYPE_FIRE] -= RACE_ORC_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] -= RACE_ORC_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] -= RACE_ORC_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] -= RACE_ORC_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] -= RACE_ORC_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] -= RACE_ORC_POISON_MOD;
+    melee_mitigation -= 1;
     break;
   default:
     break;
@@ -1419,47 +1419,47 @@ bool Character::would_die(void)
 
 void Character::set_heightweight(void)
 {
-  switch (this->race)
+  switch (race)
   {
   case RACE_HUMAN:
-    this->height = dc_->number(66, 77);
-    this->weight = dc_->number(160, 200);
+    height = dc_->number(66, 77);
+    weight = dc_->number(160, 200);
     break;
   case RACE_ELVEN:
-    this->height = dc_->number(78, 101);
-    this->weight = dc_->number(120, 160);
+    height = dc_->number(78, 101);
+    weight = dc_->number(120, 160);
     break;
   case RACE_DWARVEN:
-    this->height = dc_->number(42, 65);
-    this->weight = dc_->number(140, 180);
+    height = dc_->number(42, 65);
+    weight = dc_->number(140, 180);
     break;
   case RACE_HOBBIT:
-    this->height = dc_->number(20, 41);
-    this->weight = dc_->number(40, 80);
+    height = dc_->number(20, 41);
+    weight = dc_->number(40, 80);
     break;
   case RACE_PIXIE:
-    this->height = dc_->number(12, 33);
-    this->weight = dc_->number(10, 40);
+    height = dc_->number(12, 33);
+    weight = dc_->number(10, 40);
     break;
   case RACE_GIANT:
-    this->height = dc_->number(106, 131);
-    this->weight = dc_->number(260, 300);
+    height = dc_->number(106, 131);
+    weight = dc_->number(260, 300);
     break;
   case RACE_GNOME:
-    this->height = dc_->number(42, 65);
-    this->weight = dc_->number(80, 120);
+    height = dc_->number(42, 65);
+    weight = dc_->number(80, 120);
     break;
   case RACE_ORC:
-    this->height = dc_->number(78, 101);
-    this->weight = dc_->number(200, 240);
+    height = dc_->number(78, 101);
+    weight = dc_->number(200, 240);
     break;
   case RACE_TROLL:
-    this->height = dc_->number(102, 123);
-    this->weight = dc_->number(240, 280);
+    height = dc_->number(102, 123);
+    weight = dc_->number(240, 280);
     break;
   }
-  dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
-  dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
+  dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's height set to %d", qPrintable(name()), GET_HEIGHT(this));
+  dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "set_heightweight: %s's weight set to %d", qPrintable(name()), GET_WEIGHT(this));
 }
 
 qint32 changecost(qint32 oldrace, qint32 newrace)
@@ -1539,12 +1539,12 @@ qint32 changecost(qint32 oldrace, qint32 newrace)
 QString Character::race_message(qint32 race)
 {
   static QString buf;
-  if (this->race == race)
+  if (race == race)
     return "You are already of this race.";
   else if (!is_race_applicable(race))
     return "You do not qualify for becoming this race.";
 
-  dc_sprintf(buf, "%d platinum coins.", changecost(this->race, race));
+  dc_sprintf(buf, "%d platinum coins.", changecost(race, race));
   return &buf[0];
 }
 
@@ -1595,7 +1595,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
     QString arg, arg2;
     argument = one_argument(argument, arg);
     argument = one_argument(argument, arg2);
-    qint32 choice = atoi(arg);
+    qint32 choice = dc_atoi(arg);
     if (choice > 0 && choice <= MAX_PC_RACE)
     {
       if (ch->would_die())

@@ -23,7 +23,7 @@ extern time_info_data time_info;
 qint32 max_shop;
 
 // extern function
-qint32 fwrite_string(const QString buf, FILE *fl);
+qint32 fwrite_string(const QString buf, FILE *stream);
 
 QMap<QString, reroll_t> reroll_sessions = {};
 
@@ -713,9 +713,9 @@ void DC::boot_the_shops(void)
   QString buf;
   qint32 temp;
   qint32 count;
-  FILE *fp;
+  QTextStream stream;
 
-  if ((fp = fopen(SHOP_FILE, "r")) == nullptr)
+  if ((stream = fopen(SHOP_FILE, "r")) == nullptr)
   {
     perror(SHOP_FILE);
     exit(1);
@@ -725,7 +725,7 @@ void DC::boot_the_shops(void)
 
   for (;;)
   {
-    buf = fread_string(fp, 0);
+    buf = fread_string(stream, 0);
     if (*buf == '$')
     {
       buf = {};
@@ -751,33 +751,33 @@ void DC::boot_the_shops(void)
      * Ignore "producing" list.
      */
     for (count = {}; count < 6; count++)
-      fscanf(fp, "%d \n", &temp);
+      fscanf(stream, "%d \n", &temp);
 
-    fscanf(fp, "%f \n", &dc_->shop_index[max_shop].profit_buy_base);
-    fscanf(fp, "%f \n", &dc_->shop_index[max_shop].profit_sell);
+    fscanf(stream, "%f \n", &dc_->shop_index[max_shop].profit_buy_base);
+    fscanf(stream, "%f \n", &dc_->shop_index[max_shop].profit_sell);
     for (count = {}; count < MAX_TRADE; count++)
     {
-      fscanf(fp, "%d \n", &dc_->shop_index[max_shop].type[count]);
+      fscanf(stream, "%d \n", &dc_->shop_index[max_shop].type[count]);
     }
 
     dc_->shop_index[max_shop].profit_buy = dc_->shop_index[max_shop].profit_buy_base;
-    dc_->shop_index[max_shop].no_such_item1 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    dc_->shop_index[max_shop].no_such_item2 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    dc_->shop_index[max_shop].do_not_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    dc_->shop_index[max_shop].missing_cash1 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    dc_->shop_index[max_shop].missing_cash2 = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    dc_->shop_index[max_shop].message_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
-    dc_->shop_index[max_shop].message_sell = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].no_such_item1 = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].no_such_item2 = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].do_not_buy = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].missing_cash1 = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].missing_cash2 = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].message_buy = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
+    dc_->shop_index[max_shop].message_sell = QString(fread_string(stream, 0)).replace("%s", "%1").replace("%d", "%2");
 
-    fscanf(fp, "%d \n", &temp); /* Temper       */
-    fscanf(fp, "%d \n", &temp); /* Temper       */
+    fscanf(stream, "%d \n", &temp); /* Temper       */
+    fscanf(stream, "%d \n", &temp); /* Temper       */
 
-    fscanf(fp, "%d \n", &temp);
+    fscanf(stream, "%d \n", &temp);
     dc_->shop_index[max_shop].keeper = real_mobile(temp);
 
-    fscanf(fp, "%d \n", &temp); /* With_whom    */
+    fscanf(stream, "%d \n", &temp); /* With_whom    */
 
-    fscanf(fp, "%d \n", &temp);
+    fscanf(stream, "%d \n", &temp);
 
     qint32 room_nr = real_room(temp);
     if (room_nr < 0 || room_nr > dc_->top_of_world)
@@ -788,10 +788,10 @@ void DC::boot_the_shops(void)
 
     dc_->shop_index[max_shop].in_room = room_nr;
 
-    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].open1);
-    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].close1);
-    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].open2);
-    fscanf(fp, "%d \n", &dc_->shop_index[max_shop].close2);
+    fscanf(stream, "%d \n", &dc_->shop_index[max_shop].open1);
+    fscanf(stream, "%d \n", &dc_->shop_index[max_shop].close1);
+    fscanf(stream, "%d \n", &dc_->shop_index[max_shop].open2);
+    fscanf(stream, "%d \n", &dc_->shop_index[max_shop].close2);
 
     dc_->shop_index[max_shop].inventory = {};
 
@@ -805,8 +805,6 @@ void DC::boot_the_shops(void)
     }
     max_shop++;
   }
-
-  fclose(fp);
 }
 
 void DC::assign_the_shopkeepers(void)
@@ -852,7 +850,7 @@ void DC::fix_shopkeepers_inventory(void)
 
 // return {} for failure
 // return pointer to new shop on success
-player_shop *read_one_player_shop(FILE *fp)
+player_shop *read_one_player_shop(auto &stream)
 {
   qint32 count;
   QString code;
@@ -860,13 +858,13 @@ player_shop *read_one_player_shop(FILE *fp)
   player_shop_item *item = {};
   auto shop = new player_shop;
 
-  fread(&shop->owner, sizeof(QChar), PC_SHOP_OWNER_SIZE, fp);
-  fread(&shop->room_num, sizeof(qint32), 1, fp);
-  fread(&shop->sell_message, sizeof(QChar), PC_SHOP_SELL_MESS_SIZE, fp);
-  fread(&shop->money_on_hand, sizeof(qint32), 1, fp);
+  fread(&shop->owner, sizeof(QChar), PC_SHOP_OWNER_SIZE, stream);
+  fread(&shop->room_num, sizeof(qint32), 1, stream);
+  fread(&shop->sell_message, sizeof(QChar), PC_SHOP_SELL_MESS_SIZE, stream);
+  fread(&shop->money_on_hand, sizeof(qint32), 1, stream);
 
   code[3] = '\0';
-  fread(&code, sizeof(QChar), 3, fp);
+  fread(&code, sizeof(QChar), 3, stream);
 
   while (dc_strcmp(code, "END"))
   {
@@ -877,16 +875,16 @@ player_shop *read_one_player_shop(FILE *fp)
     exit(1);
   }
 
-  fread(&count, sizeof(qint32), 1, fp);
+  fread(&count, sizeof(qint32), 1, stream);
 
   shop->sale_list = {};
   for (qint32 i = {}; i < count; i++)
   {
     item = new player_shop_item;
 
-    fread(&item->item_vnum, sizeof(qint32), 1, fp);
-    fread(&item->price, sizeof(qint32), 1, fp);
-    fread(&code, sizeof(QChar), 3, fp);
+    fread(&item->item_vnum, sizeof(qint32), 1, stream);
+    fread(&item->price, sizeof(qint32), 1, stream);
+    fread(&code, sizeof(QChar), 3, stream);
     // code junk right now.  Add future stuff before it if needed
     item->next = shop->sale_list;
     shop->sale_list = item;
@@ -899,60 +897,57 @@ player_shop *read_one_player_shop(FILE *fp)
 // assumes valid shop
 void write_one_player_shop(player_shop *shop)
 {
-  FILE *fp;
+  QTextStream stream;
   player_shop_item *item;
   QString buf;
   qint32 count = {};
 
   dc_sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
 
-  if ((fp = fopen(buf, "w")) == nullptr)
+  if ((stream = fopen(buf, "w")) == nullptr)
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
-  fwrite(&(shop->owner), sizeof(QChar), PC_SHOP_OWNER_SIZE, fp);
-  fwrite(&(shop->room_num), sizeof(qint32), 1, fp);
-  fwrite(&(shop->sell_message), sizeof(QChar), PC_SHOP_SELL_MESS_SIZE, fp);
-  fwrite(&(shop->money_on_hand), sizeof(qint32), 1, fp);
+  fwrite(&(shop->owner), sizeof(QChar), PC_SHOP_OWNER_SIZE, stream);
+  fwrite(&(shop->room_num), sizeof(qint32), 1, stream);
+  fwrite(&(shop->sell_message), sizeof(QChar), PC_SHOP_SELL_MESS_SIZE, stream);
+  fwrite(&(shop->money_on_hand), sizeof(qint32), 1, stream);
 
   // add stuff later here with 3 digit code
   // end of variable data
-  fwrite("END", sizeof(QChar), 3, fp);
+  fwrite("END", sizeof(QChar), 3, stream);
 
   for (item = shop->sale_list; item; item = item->next)
     count++;
 
-  fwrite(&(count), sizeof(qint32), 1, fp);
+  fwrite(&(count), sizeof(qint32), 1, stream);
 
   for (item = shop->sale_list; item; item = item->next)
   {
-    fwrite(&(item->item_vnum), sizeof(qint32), 1, fp);
-    fwrite(&(item->price), sizeof(qint32), 1, fp);
-    fwrite("END", sizeof(QChar), 3, fp);
+    fwrite(&(item->item_vnum), sizeof(qint32), 1, stream);
+    fwrite(&(item->price), sizeof(qint32), 1, stream);
+    fwrite("END", sizeof(QChar), 3, stream);
   }
-
-  fclose(fp);
 }
 
 // save the list of shopfiles (not an individual shop)
 // this only needs to be done when a shop is created or deleted
 void save_shop_list()
 {
-  FILE *fp;
+  QTextStream stream;
 
-  if ((fp = fopen(PLAYER_SHOP_INDEX, "w")) == nullptr)
+  if ((stream = fopen(PLAYER_SHOP_INDEX, "w")) == nullptr)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
   }
 
   for (player_shop *shop = g_playershops; shop; shop = shop->next)
-    fwrite_string(shop->owner, fp);
+    fwrite_string(shop->owner, stream);
 
-  fwrite_string("$", fp);
-  fclose(fp);
+  fwrite_string("$", stream);
 }
 
 void save_player_shop_world_range()
@@ -984,7 +979,7 @@ void save_player_shop_world_range()
 
 void DC::boot_player_shops(void)
 {
-  FILE *fp;
+  QTextStream stream;
   FILE *shopfp;
   player_shop *shop;
   QString filename;
@@ -992,7 +987,7 @@ void DC::boot_player_shops(void)
 
   g_playershops = {};
 
-  if ((fp = fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
+  if ((stream = fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -1000,7 +995,7 @@ void DC::boot_player_shops(void)
 
   // read list of player owned shops
 
-  filename = fread_string(fp, 0);
+  filename = fread_string(stream, 0);
   while (dc_strcmp(filename, "$"))
   {
     dc_sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
@@ -1018,10 +1013,8 @@ void DC::boot_player_shops(void)
     shop->next = g_playershops;
     g_playershops = shop;
 
-    fclose(shopfp);
-    filename = fread_string(fp, 0);
+    filename = fread_string(stream, 0);
   }
-  fclose(fp);
 }
 
 player_shop *find_player_shop(CharacterPtr keeper)
@@ -1124,7 +1117,7 @@ void player_shopping_buy(const QString arg, CharacterPtr ch, CharacterPtr keeper
     return;
   }
 
-  qint32 item_pos = atoi(buf);
+  qint32 item_pos = dc_atoi(buf);
   player_shop_item *item = shop->sale_list;
   for (qint32 j = 1; (item && j < item_pos); item = item->next, j++)
     ;
@@ -1466,7 +1459,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
                       "  they won't be able to use it.\r\n", ch);
          return ReturnValue::eFAILURE;
       }
-      i = atoi(text);
+      i = dc_atoi(text);
       if(i < 1 || i > dc_->top_of_world || !dc_->rooms[i]) {
          ch->sendln("You must choose a valid room number.");
          return ReturnValue::eFAILURE;
@@ -1688,7 +1681,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       return ReturnValue::eSUCCESS;
     }
 
-    qint32 choice = atoi(arg1);
+    qint32 choice = dc_atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
       ch->send(u"Invalid number. Choose between 1 and %1.\r\n"_s.arg(QString::number(MAX_EDDIE_ITEMS)));

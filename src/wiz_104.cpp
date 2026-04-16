@@ -134,7 +134,6 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   if (cmd == cmd_t::PRIZE && type.isEmpty())
   {
 
-    *buf = '\0';
     ch->sendln("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n");
 
     for (x = {}; (x < dc_->obj_index[top_of_objt].vnum()); x++)
@@ -166,7 +165,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (arg3[0])
     {
-      cnt = atoi(arg3);
+      cnt = dc_atoi(arg3);
       half_chop(arg3, qty, random);
     }
 
@@ -332,10 +331,10 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
       act_to_room("$n disintegrates $N.", ch, 0, vict, NOTVICT);
       act_to_character("You disintegrate $N.", ch, 0, vict, 0);
 
-      if (vict->desc)
+      if (vict->conn_)
       {
-        close_socket(vict->desc);
-        vict->desc = {};
+        close_socket(vict->conn_);
+        vict->conn_ = {};
       }
 
       extract_char(vict, true);
@@ -846,7 +845,6 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         begin = i;
       }
 
-      *buf = '\0';
       ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
       if (end == -1)
@@ -883,7 +881,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      *buf = '\0';
+
       ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
       for (i = {}; (i <= dc_->mob_index[top_of_mobt].vnum()); i++)
@@ -949,7 +947,6 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         begin = i;
       }
 
-      *buf = '\0';
       ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
       if (end == -1)
@@ -986,7 +983,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      *buf = '\0';
+
       ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
       for (i = {}; (i <= dc_->obj_index[top_of_objt].vnum()); i++)
@@ -1044,7 +1041,6 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         begin = i;
       }
 
-      *buf = '\0';
       ch->sendln("[#  ] [ROOM#] ROOM'S NAME\n");
 
       if (end == -1)
@@ -1123,7 +1119,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Syntax: show rsearch <zone#> <sectorname/roomflag>");
       return ReturnValue::eSUCCESS;
     }
-    zon = atoi(arg1);
+    zon = dc_atoi(arg1);
     //     Room
     //   zone
     //   sector_type
@@ -1236,10 +1232,10 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         argument = one_argument(argument, arg1);
         if (is_number(arg1))
-          levlow = atoi(arg1);
+          levlow = dc_atoi(arg1);
         argument = one_argument(argument, arg1);
         if (is_number(arg1))
-          levhigh = atoi(arg1);
+          levhigh = dc_atoi(arg1);
         if (levhigh == -555 || levlow == -555)
         {
           ch->sendln("Incorrect level requirement.");
@@ -1487,11 +1483,11 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         argument = one_argument(argument, arg1);
         if (is_number(arg1))
-          levlow = atoi(arg1);
+          levlow = dc_atoi(arg1);
 
         argument = one_argument(argument, arg1);
         if (is_number(arg1))
-          levhigh = atoi(arg1);
+          levhigh = dc_atoi(arg1);
 
         if (levhigh == -555 || levlow == -555)
         {
@@ -1503,11 +1499,11 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         argument = one_argument(argument, arg1);
         if (is_number(arg1))
-          lweight = atoi(arg1);
+          lweight = dc_atoi(arg1);
 
         argument = one_argument(argument, arg1);
         if (is_number(arg1))
-          hweight = atoi(arg1);
+          hweight = dc_atoi(arg1);
 
         if (lweight == -555 || hweight == -555)
         {
@@ -1726,7 +1722,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    count = atoi(name);
+    count = dc_atoi(name);
     if ((!count && *name != '0') || count < 0)
     {
       ch->sendln("Which key was that?");
@@ -1854,7 +1850,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isdigit(*room))
   {
-    target = atoi(&room[0]);
+    target = dc_atoi(&room[0]);
     if ((*room != '0' && target == 0) || !dc_->rooms.contains(target))
     {
       ch->sendln("No room exists with that number.");
@@ -2062,7 +2058,7 @@ command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (isdigit(*buf))
   {
-    vnum = atoi(argument);
+    vnum = dc_atoi(argument);
   }
   else
   {
@@ -2094,7 +2090,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   if (isdigit(*arg))
   {
-    vnum = atoi(arg);
+    vnum = dc_atoi(arg);
     argument = one_argument(argument, arg);
   }
   else
@@ -2158,7 +2154,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
                    ch);
       return ReturnValue::eFAILURE;
     }
-    a = atoi(arg);
+    a = dc_atoi(arg);
     prog = {};
     for (i = 1, currprog = dc_->obj_index[num].mobprogs;
          currprog && i != a;
@@ -2200,7 +2196,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       return ReturnValue::eFAILURE;
     }
-    qint32 a = atoi(arg);
+    qint32 a = dc_atoi(arg);
     for (i = 1, currprog = dc_->obj_index[num].mobprogs;
          currprog && i != a;
          i++, currprog = currprog->next)
@@ -2211,7 +2207,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Invalid prog number.");
       return ReturnValue::eFAILURE;
     }
-    switch (atoi(argument + 1))
+    switch (dc_atoi(argument + 1))
     {
     case 1:
       a = ACT_PROG;
@@ -2265,7 +2261,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>");
       return ReturnValue::eFAILURE;
     }
-    a = atoi(arg);
+    a = dc_atoi(arg);
     for (i = 1, currprog = dc_->obj_index[num].mobprogs;
          currprog && i != a;
          i++, currprog = currprog->next)
@@ -2290,7 +2286,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("$3Syntax$R: opedit [obj_num] command <prog>");
       return ReturnValue::eFAILURE;
     }
-    a = atoi(arg);
+    a = dc_atoi(arg);
     for (i = 1, currprog = dc_->obj_index[num].mobprogs;
          currprog && i != a;
          i++, currprog = currprog->next)
@@ -2302,16 +2298,16 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->desc->backstr = {};
-    ch->desc->strnew = &(currprog->comlist);
+    ch->conn_->backstr = {};
+    ch->conn_->strnew = &(currprog->comlist);
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
-      ch->desc->web_connected = Connection::states::EDIT_MPROG;
+      ch->conn_->web_connected = Connection::states::EDIT_MPROG;
     }
     else
     {
-      ch->desc->connected = Connection::states::EDIT_MPROG;
+      ch->conn_->connected = Connection::states::EDIT_MPROG;
 
       send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
                    "|--------------------------------------------------------------------------------|\r\n",
@@ -2319,8 +2315,8 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (currprog->comlist)
       {
-        ch->desc->backstr = (currprog->comlist);
-        ch->send(ch->desc->backstr);
+        ch->conn_->backstr = (currprog->comlist);
+        ch->send(ch->conn_->backstr);
       }
     }
 
@@ -2353,7 +2349,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   ObjectPtr obj, otmp;
-  qint32 v1 = atoi(arg1), v2 = atoi(arg2);
+  qint32 v1 = dc_atoi(arg1), v2 = dc_atoi(arg2);
   qint32 r1 = real_object(v1), r2 = real_object(v2);
   if (r1 < 0)
   {
@@ -2427,7 +2423,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   CharacterPtr mob;
-  qint32 vdst = atoi(arg2), vsrc = atoi(arg1);
+  qint32 vdst = dc_atoi(arg2), vsrc = dc_atoi(arg1);
   qint32 dst = real_mobile(vdst), src = real_mobile(vsrc);
   if (src < 0)
   {

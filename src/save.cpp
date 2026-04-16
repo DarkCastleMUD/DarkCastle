@@ -21,14 +21,14 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
 bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos);
 void restore_weight(ObjectPtr obj);
 void store_to_char(char_file_u4 *st, CharacterPtr ch);
-QString fread_alias_string(FILE *fpsave);
+QString fread_alias_string(auto &streamfpsave);
 
 // return 1 on success
 // return 0 on failure
 // donno where it would fail off hand though unless we ran out of HD space
 // or had a failure.  I'm just not willing to code that much fault protection in
 // -pir
-void Player::save_char_aliases(FILE *fpsave)
+void Player::save_char_aliases(auto &streamfpsave)
 {
   quint32 tmp_size = aliases_.size();
   fwrite(&tmp_size, sizeof(tmp_size), 1, fpsave);
@@ -49,7 +49,7 @@ void Player::save_char_aliases(FILE *fpsave)
 }
 
 // return pointer to aliases or nullptr
-aliases_t read_char_aliases(FILE *fpsave)
+aliases_t read_char_aliases(auto &streamfpsave)
 {
   quint32 total = {};
   fread(&total, sizeof(total), 1, fpsave);
@@ -71,7 +71,7 @@ aliases_t read_char_aliases(FILE *fpsave)
   return aliases;
 }
 
-QString fread_alias_string(FILE *fpsave)
+QString fread_alias_string(auto &streamfpsave)
 {
   quint32 tmp_size = {};
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
@@ -118,7 +118,7 @@ void fwrite_var_string(QString str, FILE *fpsave)
   fwrite_var_string(qPrintable(str), fpsave);
 }
 
-QString fread_var_string(FILE *fpsave)
+QString fread_var_string(auto &streamfpsave)
 {
   quint16 tmp_size = {};
   QString tmp_str = {};
@@ -144,7 +144,7 @@ QString fread_var_string(FILE *fpsave)
   return {};
 }
 
-void Mobile::save(FILE *fpsave)
+void Mobile::save(auto &streamfpsave)
 {
   fwrite(&(nr), sizeof(nr), 1, fpsave);
   fwrite(&(default_pos), sizeof(default_pos), 1, fpsave);
@@ -159,7 +159,7 @@ void Mobile::save(FILE *fpsave)
   fwrite("STP", sizeof(QChar), 3, fpsave);
 }
 
-void Mobile::read(FILE *fpsave)
+void Mobile::read(auto &streamfpsave)
 {
   fread(&(nr), sizeof(nr), 1, fpsave);
   fread(&(default_pos), sizeof(default_pos), 1, fpsave);
@@ -183,13 +183,13 @@ void Mobile::read(FILE *fpsave)
 // TODO - make sure I go back and update the time_data s everywhere when
 // we lose link, or logout, etc so that the 'played' variable is correct
 
-void fwrite_string_tilde(FILE *fpsave)
+void fwrite_string_tilde(auto &streamfpsave)
 {
   QString buf;
   dc_strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
-void Player::save(FILE *fpsave, time_data tmpage)
+void Player::save(auto &streamfpsave, time_data tmpage)
 {
   fwrite(qPrintable(password_), sizeof(QChar), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(fpsave);
@@ -332,7 +332,7 @@ void Player::save(FILE *fpsave, time_data tmpage)
   fwrite("STP", sizeof(QChar), 3, fpsave);
 }
 
-qsizetype fread_to_tilde(FILE *fpsave, QString filename)
+qsizetype fread_to_tilde(auto &streamfpsave, QString filename)
 {
   qsizetype characters_read = {};
   QString buffer;
@@ -375,7 +375,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
   return characters_read;
 }
 
-bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
+bool Player::read(auto &streamfpsave, CharacterPtr ch, QString filename)
 {
   if (!ch)
   {
@@ -555,7 +555,7 @@ bool Player::read(FILE *fpsave, CharacterPtr ch, QString filename)
   return true;
 }
 
-bool Character::save_pc_or_mob_data(FILE *fpsave, time_data tmpage)
+bool Character::save_pc_or_mob_data(auto &streamfpsave, time_data tmpage)
 {
   if (isNonPlayer())
   {
@@ -612,18 +612,18 @@ qint32 store_worn_eq(CharacterPtr ch, FILE *fpsave)
   return 1;
 }
 
-qint32 Character::char_to_store_variable_data(FILE *fpsave)
+qint32 Character::char_to_store_variable_data(auto &streamfpsave)
 {
-  fwrite_var_string(this->name(), fpsave);
-  fwrite_var_string(this->short_desc, fpsave);
-  fwrite_var_string(this->long_desc, fpsave);
-  fwrite_var_string(this->description, fpsave);
-  fwrite_var_string(this->title, fpsave);
+  fwrite_var_string(name(), fpsave);
+  fwrite_var_string(short_desc, fpsave);
+  fwrite_var_string(long_desc, fpsave);
+  fwrite_var_string(description, fpsave);
+  fwrite_var_string(title, fpsave);
 
   if (!has_skill(NEW_SAVE)) // New save.
     learn_skill(NEW_SAVE, 1, 100);
 
-  for (const auto &skill : this->skills)
+  for (const auto &skill : skills)
   {
     fwrite("SKL", sizeof(QChar), 3, fpsave);
     fwrite(&(skill.first), sizeof(skill.first), 1, fpsave);
@@ -635,14 +635,14 @@ qint32 Character::char_to_store_variable_data(FILE *fpsave)
   affected_type *af;
   qint16 aff_count = {}; // do not change from qint16
 
-  for (af = this->affected; af; af = af->next)
+  for (af = affected; af; af = af->next)
     aff_count++;
 
   if (aff_count)
   {
     fwrite("AFS", sizeof(QChar), 3, fpsave);
     fwrite(&aff_count, sizeof(aff_count), 1, fpsave);
-    for (af = this->affected; af; af = af->next)
+    for (af = affected; af; af = af->next)
     {
       fwrite(&(af->type), sizeof(af->type), 1, fpsave);
       fwrite(&(af->duration), sizeof(af->duration), 1, fpsave);
@@ -653,7 +653,7 @@ qint32 Character::char_to_store_variable_data(FILE *fpsave)
   }
 
   tempvariable *mpv;
-  for (mpv = this->tempVariable; mpv; mpv = mpv->next)
+  for (mpv = tempVariable; mpv; mpv = mpv->next)
   {
     if (!mpv->save)
       continue;
@@ -663,7 +663,7 @@ qint32 Character::char_to_store_variable_data(FILE *fpsave)
   }
 
   fwrite("GLD", sizeof(QChar), 3, fpsave);
-  fwrite(&this->gold_, sizeof(this->gold_), 1, fpsave);
+  fwrite(&gold_, sizeof(gold_), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate dc_strcmp statement in the read_mob_data object
@@ -703,7 +703,7 @@ void read_skill(CharacterPtr ch, FILE *fpsave)
   ch->skills[curr.skillnum] = curr;
 }
 
-qint32 Character::store_to_char_variable_data(FILE *fpsave)
+qint32 Character::store_to_char_variable_data(auto &streamfpsave)
 {
   QString typeflag;
 
@@ -728,13 +728,13 @@ qint32 Character::store_to_char_variable_data(FILE *fpsave)
   {
     qint16 aff_count; // do not change form qint16
     fread(&aff_count, sizeof(aff_count), 1, fpsave);
-    this->affected = {};
+    affected = {};
     for (qint16 i = {}; i < aff_count; i++)
     {
       affected_type *af = new (std::nothrow) affected_type;
       af->duration_type = {};
-      af->next = this->affected;
-      this->affected = af;
+      af->next = affected;
+      affected = af;
 
       fread(&(af->type), sizeof(af->type), 1, fpsave);
       fread(&(af->duration), sizeof(af->duration), 1, fpsave);
@@ -754,13 +754,13 @@ qint32 Character::store_to_char_variable_data(FILE *fpsave)
     mpv->name = fread_var_string(fpsave);
     mpv->data = fread_var_string(fpsave);
     mpv->save = 1;
-    mpv->next = this->tempVariable;
-    this->tempVariable = mpv;
+    mpv->next = tempVariable;
+    tempVariable = mpv;
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
   if (typeflag == u"GLD"_s)
   {
-    fread(&(this->gold_), sizeof(this->gold_), 1, fpsave);
+    fread(&(gold_), sizeof(gold_), 1, fpsave);
     fread(&typeflag, sizeof(QChar), 3, fpsave);
   }
   // Add new items in this format
@@ -774,7 +774,6 @@ qint32 Character::store_to_char_variable_data(FILE *fpsave)
   return 1;
 }
 
-#ifdef USE_SQL
 void save_char_obj_db(CharacterPtr ch)
 {
   if (ch == 0)
@@ -784,7 +783,7 @@ void save_char_obj_db(CharacterPtr ch)
     return;
 
   // so weapons stop falling off
-  SETBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  SETBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
   char_file_u4 uchar;
   time_data tmpage;
@@ -796,8 +795,8 @@ void save_char_obj_db(CharacterPtr ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (isSet(dc_->world[this->in_room].room_flags, SAFE))
-    uchar.load_room = dc_->world[this->in_room].number;
+  if (isSet(dc_->world[in_room].room_flags, SAFE))
+    uchar.load_room = dc_->world[in_room].number;
   else
     uchar.load_room = real_room(ch->hometown);
 
@@ -815,32 +814,31 @@ void save_char_obj_db(CharacterPtr ch)
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
      (ch->save_pc_or_mob_data(fpsave, tmpage))                &&
-     (obj_to_store (this->carrying, ch, fpsave, -1))            &&
+     (obj_to_store (carrying, ch, fpsave, -1))            &&
      (store_worn_eq(ch, fpsave))
     )
   {
     if(fpsave != nullptr)
-      fclose(fpsave);
+
     dc_sprintf(log_buf, "mv -f %s %s", strsave, name);
     system(log_buf);
   }
   else
   {
     if(fpsave != nullptr)
-      fclose(fpsave);
+
     dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
     dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
-  REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
   VaultPtr vault;
   if ((vault = dc_->vaults_->has_vault(qPrintable(ch->name()))))
     save_vault(vault->owner);
   */
 }
-#endif
 
 // save a character and inventory.
 // maybe modify it to save mobs for quest purposes too
@@ -854,7 +852,7 @@ void Character::save_char_obj(void)
 
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if (this->isNonPlayer() || getLevel() < 1)
+  if (isNonPlayer() || getLevel() < 1)
   {
     return;
   }
@@ -913,17 +911,16 @@ void Character::save_char_obj(void)
       (store_worn_eq(this, fpsave)))
   {
     if (fpsave != nullptr)
-      fclose(fpsave);
 
-    QString log_buf = {};
+      QString log_buf = {};
     dc_sprintf(log_buf, "mv -f %s %s", strsave, name);
     system(log_buf);
   }
   else
   {
     if (fpsave != nullptr)
-      fclose(fpsave);
-    QString log_buf = {};
+
+      QString log_buf = {};
     dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
     send("WARNING: file problem. You did not save!");
     perror(log_buf);
@@ -937,13 +934,12 @@ void Character::save_char_obj(void)
 }
 
 // just error crap to avoid using "goto" like we were
-void load_char_obj_error(FILE *fpsave, QString strsave)
+void load_char_obj_error(auto &streamfpsave, QString strsave)
 {
   QString log_buf = u"Load_char_obj: %1"_s.arg(strsave);
   perror(qPrintable(log_buf));
   dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
-    fclose(fpsave);
 }
 
 // Load a character and inventory into a new_new ch ure.
@@ -970,7 +966,7 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
 
   conn->character = ch;
   clear_char(ch);
-  ch->desc = d;
+  ch->conn_ = d;
 
   if (dc_->cf.bport)
   {
@@ -1023,8 +1019,8 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
   }
 
   if (fpsave != nullptr)
-    fclose(fpsave);
-  return load_status_t::success;
+
+    return load_status_t::success;
 }
 
 // read data from file for an item.
@@ -1636,7 +1632,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 
   st->sex = GET_SEX(this);
   st->c_class = GET_CLASS(this);
-  st->race = this->race;
+  st->race = race;
   st->level = getLevel();
 
   st->raw_str = GET_RAW_STR(this);
@@ -1667,7 +1663,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   //  st->gold      = getGold();
   st->gold = {}; // Moved
   st->plat = GET_PLATINUM(this);
-  st->exp = this->exp;
+  st->exp = exp;
   st->immune = immune;
   st->resist = resist;
   st->suscept = suscept;
@@ -1683,7 +1679,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   for (x = {}; x < 3; x++)
     st->extra_ints[x] = {};
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
     st->armor = armor;
     st->hitroll = hitroll;

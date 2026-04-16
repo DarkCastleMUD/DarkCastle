@@ -25,7 +25,6 @@
 constexpr auto BEACON_OBJ_NUMBER = 405;
 
 qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type);
-ClanPtr get_clan(CharacterPtr);
 
 void update_pos(CharacterPtr victim);
 bool many_charms(CharacterPtr ch);
@@ -1150,8 +1149,8 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
             return retval;
 
           if (isSet(retval, ReturnValue::eVICT_DIED))
-            if (ch->desc && ch->player && !isSet(ch->player->toggles, Player::PLR_WIMPY))
-              ch->desc->wait = {};
+            if (ch->conn_ && ch->player && !isSet(ch->player->toggles, Player::PLR_WIMPY))
+              ch->conn_->wait = {};
           if (!isSet(retval, ReturnValue::eVICT_DIED))
           {
             // don't blind surrounding rooms
@@ -1167,7 +1166,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
                     if (level_difference > 0)
                     {
                       tmp_victim->add_memory(qPrintable(ch->name()), 't');
-                      timer_data *timer = new timer_data;
+                      TimerPtr timer = TimerPtr(new Timer);
                       timer->var_arg1 = tmp_victim->hunting;
                       timer->arg2 = (void *)tmp_victim;
                       timer->function = clear_hunt;
@@ -14326,17 +14325,17 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     ch->sendln("You're a bit too distracted by the battle.");
     return ReturnValue::eFAILURE;
   }
-  if (!ch->desc || ch->desc->snooping || ch->isNonPlayer() || !ch->in_room)
+  if (!ch->conn_ || ch->conn_->snooping || ch->isNonPlayer() || !ch->in_room)
   {
     ch->sendln("You can't do that at the moment.");
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->desc->snoop_by)
+  if (ch->conn_->snoop_by)
   {
-    ch->desc->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
-    ch->desc->snoop_by->character->sendln("Your victim is casting spiritwalk spell.");
-    ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->name().split(' '));
+    ch->conn_->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
+    ch->conn_->snoop_by->character->sendln("Your victim is casting spiritwalk spell.");
+    ch->conn_->snoop_by->character->do_snoop(ch->conn_->snoop_by->character->name().split(' '));
   }
   qint32 vnum;
   switch (dc_->world[ch->in_room].sector_type)
@@ -14394,10 +14393,10 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   ch->sendln("You call upon the spirits of this area, shifting into a trance-state.");
   ch->sendln("(Use the 'return' command to return to your body).");
   ch->player->possesing = 1;
-  ch->desc->character = mob;
-  ch->desc->original = ch;
-  mob->desc = ch->desc;
-  ch->desc = {};
+  ch->conn_->character = mob;
+  ch->conn_->original = ch;
+  mob->conn_ = ch->conn_;
+  ch->conn_ = {};
   return ReturnValue::eSUCCESS;
 }
 
@@ -14889,7 +14888,7 @@ qint32 cast_channel(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   case SPELL_TYPE_WAND:
   case SPELL_TYPE_SCROLL:
   case SPELL_TYPE_STAFF:
-    return spell_channel(level, ch, tar_ch, 0, skill, atoi(arg));
+    return spell_channel(level, ch, tar_ch, 0, skill, dc_atoi(arg));
     break;
   default:
     dc_->logentry(u"Serious screw-up in channel!"_s, ANGEL, DC::LogChannel::LOG_BUG);

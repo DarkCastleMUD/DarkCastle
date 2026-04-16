@@ -2,7 +2,7 @@
 
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort);
-void format_text(QString *ptr_string, qint32 mode, ConnectionPtr d, qint32 maxlen);
+void format_text(QString *ptr_string, qint32 mode, ConnectionPtr conn, qint32 maxlen);
 qint32 replace_str(QString *string, QString pattern, QString replacement, qint32 rep_all, qint32 max_size);
 void check_for_awaymsgs(CharacterPtr);
 
@@ -185,7 +185,7 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
   case parse_t::LIST_NORM:
     /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
      * are prolly ok fer what i want to do here. */
-    *buf = '\0';
+
     if (*str != '\0')
       switch (sscanf(str, " %d - %d ", &line_low, &line_high))
       {
@@ -213,7 +213,7 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
       write_to_output("That range is invalid.\r\n", d);
       return;
     }
-    *buf = '\0';
+
     if ((line_high < 999999) || (line_low > 1))
     {
       dc_sprintf(buf, "Current buffer range [%d - %d]:\r\n", line_low, line_high);
@@ -260,7 +260,7 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
   case parse_t::LIST_NUM:
     /* note: my buf,buf1,buf2 vars are defined at 32k sizes so they
      * are prolly ok fer what i want to do here. */
-    *buf = '\0';
+
     if (*str != '\0')
       switch (sscanf(str, " %d - %d ", &line_low, &line_high))
       {
@@ -288,7 +288,7 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
       write_to_output("That range is invalid.\r\n", d);
       return;
     }
-    *buf = '\0';
+
     i = 1;
     total_len = {};
     s = *conn->strnew;
@@ -344,11 +344,11 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
       write_to_output("You must specify a line number before which to insert text.\r\n", d);
       return;
     }
-    line_low = atoi(buf);
+    line_low = dc_atoi(buf);
     dc_strncat(buf2, "\r\n", 32768 - dc_strlen(buf2) - 1);
 
     i = 1;
-    *buf = '\0';
+
     if ((s = *conn->strnew) == nullptr)
     {
       write_to_output("Buffer is empty, nowhere to insert.\r\n", d);
@@ -394,11 +394,11 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
       write_to_output("You must specify a line number at which to change text.\r\n", d);
       return;
     }
-    line_low = atoi(buf);
+    line_low = dc_atoi(buf);
     dc_strncat(buf2, "\r\n", 32768 - dc_strlen(buf2) - 1);
 
     i = 1;
-    *buf = '\0';
+
     if ((s = *conn->strnew) == nullptr)
     {
       write_to_output("Buffer is empty, nothing to change.\r\n", d);
@@ -527,7 +527,7 @@ qint32 replace_str(QString *string, QString pattern, QString replacement, qint32
 
 /* re-formats message type formatted chararacters * */
 /* (for strings edited with conn->strnew) (mostly olc and mail)     */
-void format_text(QString *ptr_string, qint32 mode, ConnectionPtr d, qint32 maxlen)
+void format_text(QString *ptr_string, qint32 mode, ConnectionPtr conn, qint32 maxlen)
 {
   qint32 total_chars, cap_next = true, cap_next_next = false;
   QString flow, *start = {}, temp;
@@ -639,7 +639,7 @@ void format_text(QString *ptr_string, qint32 mode, ConnectionPtr d, qint32 maxle
   dc_strcpy(*ptr_string, formated);
 }
 
-void new_string_add(ConnectionPtr d, QString str)
+void new_string_add(ConnectionPtr conn, QString str)
 {
   // QString scan;
   qint32 terminator = 0, action = {};

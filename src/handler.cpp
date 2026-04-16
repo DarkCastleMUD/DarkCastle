@@ -2275,7 +2275,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
   }
   if (equipment[pos])
   {
-    dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", qPrintable(this->name()), pos);
+    dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "%s already equipped at position %d in equip_char!", qPrintable(name()), pos);
     produce_coredump();
     return 0;
   }
@@ -2298,26 +2298,26 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     return 0;
   }
 
-  if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && this->isPlayer())
+  if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && isPlayer())
   {
-    if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || this->isPlayerObjectThief() || contains_no_trade_item(obj))
+    if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isPlayerObjectThief() || contains_no_trade_item(obj))
     {
       act_to_character("You are zapped by $p but it stays with you.", this, obj, 0, 0);
-      this->recheck_height_wears();
+      recheck_height_wears();
       obj_to_char(obj, this);
-      if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
+      if (pos == WEAR_WIELD && equipment[WEAR_SECOND_WIELD])
       {
         equip_char(unequip_char(WEAR_SECOND_WIELD), WEAR_WIELD);
       }
       return 1;
     }
-    if (this->in_room != DC::NOWHERE)
+    if (in_room != DC::NOWHERE)
     {
       act_to_character("You are zapped by $p and instantly drop it.", this, obj, 0, 0);
       act_to_room("$n is zapped by $p and instantly drops it.", this, obj, 0, 0);
-      this->recheck_height_wears();
-      obj_to_room(obj, this->in_room);
-      if (pos == WEAR_WIELD && this->equipment[WEAR_SECOND_WIELD])
+      recheck_height_wears();
+      obj_to_room(obj, in_room);
+      if (pos == WEAR_WIELD && equipment[WEAR_SECOND_WIELD])
       {
         equip_char(unequip_char(WEAR_SECOND_WIELD), WEAR_WIELD);
       }
@@ -2325,51 +2325,51 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
     else
     {
-      dc_->logentry(u"this->in_room = DC::NOWHERE when equipping character."_s, 0, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"in_room = DC::NOWHERE when equipping character."_s, 0, DC::LogChannel::LOG_BUG);
     }
   }
 
-  if (dc_->obj_index[obj->item_number].vnum() == 30010 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index[obj->item_number].vnum() == 30010 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("$p binds to your skin and won't let go. It hurts!", this, obj, 0, 0);
     act_to_room("$p binds to $n's skin!", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
-  if (dc_->obj_index[obj->item_number].vnum() == 30036 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
-  if (dc_->obj_index[obj->item_number].vnum() == 30033 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, 0);
     obj->obj_flags.timer = {};
   }
 
-  if (dc_->obj_index[obj->item_number].vnum() == 30008 && !ISSET(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, 0);
     obj->obj_flags.timer = 5;
   }
 
-  this->equipment[pos] = obj;
+  equipment[pos] = obj;
   obj->equipped_by = this;
-  if (this->isPlayer())
+  if (isPlayer())
     for (qint32 a = {}; a < obj->num_affects; a++)
     {
       if (obj->affected[a].location >= 1000)
       {
-        obj->next_skill = this->player->skillchange;
-        this->player->skillchange = obj;
+        obj->next_skill = player->skillchange;
+        player->skillchange = obj;
         break;
       }
     }
 
   if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
   {
-    this->glow_factor++;
-    if (this->in_room > DC::NOWHERE)
-      dc_->world[this->in_room].light++;
+    glow_factor++;
+    if (in_room > DC::NOWHERE)
+      dc_->world[in_room].light++;
     //  this crashes in a reconnect cause player isn't around yet
     //  rather than fixing it, i'm leaving it out because it's annoying anyway cause
     //  it tells you every time you save
@@ -2379,15 +2379,15 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
   }
   if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
   {
-    this->glow_factor++;
-    if (this->in_room > DC::NOWHERE)
-      dc_->world[this->in_room].light++;
+    glow_factor++;
+    if (in_room > DC::NOWHERE)
+      dc_->world[in_room].light++;
   }
 
   if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
     GET_AC(this) -= apply_ac(this, pos);
 
-  for (j = {}; this->equipment[pos] && j < this->equipment[pos]->num_affects; j++)
+  for (j = {}; equipment[pos] && j < equipment[pos]->num_affects; j++)
     affect_modify(this, obj->affected[j].location, obj->affected[j].modifier, -1, true, flag);
 
   add_set_stats(this, obj, flag, pos);
@@ -2431,7 +2431,7 @@ ObjectPtr Character::unequip_char(qint32 pos, bool flag)
   remove_set_stats(this, obj, flag);
   ObjectPtr a, b = {};
 b: // ew
-  if (this->isPlayer())
+  if (isPlayer())
     for (a = player->skillchange; a; a = a->next_skill)
     {
       if (a == 0x95959595)
@@ -2562,7 +2562,7 @@ qint32 get_number(QString *name)
       if (!isdigit(*(number + i)))
         return (-1);
 
-    return (atoi(number));
+    return (dc_atoi(number));
   }
 
   return (1);
@@ -3518,7 +3518,7 @@ void extract_char(CharacterPtr ch, bool pull)
   ObjectPtr i;
   CharacterPtr omast = {};
   qint32 ret = ReturnValue::eSUCCESS;
-  if (ch->isPlayer() && !ch->desc)
+  if (ch->isPlayer() && !ch->conn_)
     for (t_desc = dc_->connections_; t_desc; t_desc = t_desc->next)
       if (t_desc->original == ch)
         ret = do_return(t_desc->character, "");
@@ -3699,7 +3699,7 @@ void extract_char(CharacterPtr ch, bool pull)
 
   GET_AC(ch) -= GET_AC_METAS(ch);
 
-  if (ch->desc && ch->desc->original)
+  if (ch->conn_ && ch->conn_->original)
     do_return(ch, u""_s, cmd_t::LOOK);
 
   if (ch->isNonPlayer() && ch->mobdata->nr > -1)
@@ -4169,7 +4169,7 @@ CharacterPtr get_active_pc(QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
-  ConnectionPtr d;
+  ConnectionPtr conn;
 
   partial_match = {};
 
@@ -4200,7 +4200,7 @@ get_active_pc(const QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
-  ConnectionPtr d;
+  ConnectionPtr conn;
 
   partial_match = {};
 
@@ -4229,7 +4229,7 @@ get_active_pc(const QString name)
 CharacterPtr get_all_pc(QString name)
 {
   CharacterPtr i;
-  ConnectionPtr d;
+  ConnectionPtr conn;
 
   for (auto &d : dc_->connections_)
   {
@@ -4328,7 +4328,7 @@ CharacterPtr Character::get_active_pc_vis(QString name)
 {
   CharacterPtr i;
   CharacterPtr partial_match;
-  ConnectionPtr d;
+  ConnectionPtr conn;
 
   partial_match = {};
 
@@ -4817,13 +4817,13 @@ void Character::add_memory(QString victim_name, QChar type)
     else
     {
       // Don't put same name twice
-      if (isexact(victim_name, this->mobdata->hated))
+      if (isexact(victim_name, mobdata->hated))
       {
         return;
       }
 
       // name 1 + name 2 + a space + terminator
-      this->mobdata->hated = u"%1 %2"_s.arg(mobdata->hated).arg(victim_name);
+      mobdata->hated = u"%1 %2"_s.arg(mobdata->hated).arg(victim_name);
     }
   }
   else if (type == 'f')

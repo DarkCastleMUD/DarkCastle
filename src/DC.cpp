@@ -10,7 +10,7 @@
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
 
-DC::DC(qint32 &argc, QString *argv)
+DC::DC(qint32 &argc, char **argv)
     : QCoreApplication(argc, argv), cf(argc, argv), ssh(this), shops_(this), random_(*QRandomGenerator::global())
 {
   setup();
@@ -30,7 +30,7 @@ void DC::setup(void)
   QCoreApplication::setApplicationName("DarkCastle");
   if (cf.sql)
   {
-    database_ = Database("dcastle");
+    database_ = Database(this, "dcastle");
   }
   findLibrary();
   QLocale::setDefault(QLocale::English);
@@ -292,11 +292,11 @@ void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, Charact
   }
 }
 
-void close_file(std::FILE *fp)
+void close_file(std::FILE *stream)
 {
-  if (fp)
+  if (stream)
   {
-    std::fclose(fp);
+    std::
   }
 }
 
@@ -351,7 +351,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
   {
     if (*arg5)
     {
-          arena.hplimit = atoi(arg5);
+          arena.hplimit = dc_atoi(arg5);
           if (arena.hplimit <= 0)
             arena.hplimit = 1000;
     }
@@ -470,7 +470,7 @@ const QString Combinables::Scribe::RECIPES_FILENAME = "scribe.dat";
 QMap<Combinables::Scribe::recipe, qint32> Combinables::Scribe::recipes;
 bool Combinables::Scribe::initialized = false;
 
-qint32 dc_fprintf(FILE *stream, const QString format, ...)
+qint32 dc_fprintf(auto &streamstream, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);

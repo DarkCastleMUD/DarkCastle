@@ -2,17 +2,16 @@
 
 // Externs
 extern help_index_element_new *new_help_table;
-qint32 get_line(FILE *fl, QString buf);
+qint32 get_line(auto &streamstream, QString buf);
 bool is_abbrev(const QString arg1, const QString arg2);
-void help_string_to_file(FILE *f, QString string);
+void help_string_to_file(auto &streamf, QString string);
 
 // locals
 help_index_element_new *find_help(QString keyword);
 qint32 strn_cmp(QString arg1, QString arg2, qint32 n);
-qint32 count_hash_records(FILE *fl);
 void show_hedit_usage(CharacterPtr ch);
 void save_help(CharacterPtr ch);
-qint32 get_line_with_space(FILE *fl, QString buf);
+qint32 get_line_with_space(auto &streamstream, QString buf);
 qint32 show_one_help_entry(qint32 entry, CharacterPtr ch, qint32 count);
 void show_help_header(CharacterPtr ch);
 void show_help_bar(CharacterPtr ch);
@@ -77,7 +76,7 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
   QString entry;
   QString key1, key2, key3, key4, key5, rec_level;
 
-  if (!ch->desc)
+  if (!ch->conn_)
     return ReturnValue::eFAILURE;
 
   argument = argument.trimmed();
@@ -227,7 +226,7 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
              this_help->entry, this_help->related);
 
   if (cmd != cmd_t::UNDEFINED)
-    page_string(ch->desc, entry, 1);
+    page_string(ch->conn_, entry, 1);
   else
     ch->send(entry);
 
@@ -253,13 +252,13 @@ help_index_element_new &find_help(QString keyword)
 
 constexpr auto ENTRY_MAX = 32384;
 
-qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
+qint32 load_new_help(auto &streamstream, qint32 reload, CharacterPtr ch)
 {
   QString entry, line, tmpentry, buf, tmpbuffer;
   help_index_element_new new_help;
   qint32 version = 0, level = -1, linenum = {};
 
-  linenum += get_line(fl, line);
+  linenum += get_line(stream, line);
   if (sscanf(line, "@Version: %d", &version) != 1)
   {
     if (reload == 1)
@@ -274,28 +273,28 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
     }
   }
 
-  linenum += get_line(fl, line);
+  linenum += get_line(stream, line);
 
   while (*line != '$')
   {
     new_help.keyword1 = line;
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     new_help.keyword2 = line;
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     new_help.keyword3 = line;
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     new_help.keyword4 = line;
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     new_help.keyword5 = line;
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     new_help.related = line;
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     if (sscanf(line, "L: %d", &level) == 1)
     {
       new_help.min_level = level;
@@ -305,9 +304,9 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
       new_help.min_level = {};
     }
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     // E: Here.
-    linenum += get_line_with_space(fl, line);
+    linenum += get_line_with_space(stream, line);
     *tmpentry = '\0';
     while (*line != '#')
     {
@@ -321,7 +320,7 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
         dc_snprintf(tmpbuffer, ENTRY_MAX, "%s%s\r\n", tmpentry, line);
         dc_strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
-      linenum += get_line_with_space(fl, line);
+      linenum += get_line_with_space(stream, line);
     }
 
     if (dc_strlen(tmpentry) > MAX_HELP_LENGTH)
@@ -336,9 +335,9 @@ qint32 load_new_help(FILE *fl, qint32 reload, CharacterPtr ch)
     level = -1;
     *entry = '\0';
 
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
     // ~ is here.
-    linenum += get_line(fl, line);
+    linenum += get_line(stream, line);
   }
 
   if (reload == 1)
@@ -383,12 +382,12 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
       argument = one_argument(argument, arg3);
       one_argument(argument, arg);
       if (arg[0] && is_number(arg))
-        start = atoi(arg);
+        start = dc_atoi(arg);
       argument = &arg2[0];
       dc_strcpy(arg, arg3);
-      if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0))
+      if ((((dc_atoi(argument)) > 0) || *argument == '0') && ((dc_atoi(arg)) > 0))
       { // not valid numbers
-        if (atoi(argument) > atoi(arg))
+        if (dc_atoi(argument) > dc_atoi(arg))
         {
           ch->sendln("Usage: hindex -l <low level> <high level>");
           return ReturnValue::eFAILURE;
@@ -398,7 +397,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
         show_help_header(ch);
         for (i = {}; i < dc_->new_top_of_helpt; i++)
         {
-          if (new_help_table[i].min_level >= atoi(argument) && new_help_table[i].min_level <= atoi(arg) && start-- <= 0) // too many level 1s, so we must exclude them or get an OVERFLOW
+          if (new_help_table[i].min_level >= dc_atoi(argument) && new_help_table[i].min_level <= dc_atoi(arg) && start-- <= 0) // too many level 1s, so we must exclude them or get an OVERFLOW
             count = show_one_help_entry(i, ch, count);
         }
         show_help_bar(ch);
@@ -435,41 +434,41 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
       show_help_bar(ch);
     }
   }
-  else if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0))
+  else if ((((dc_atoi(argument)) > 0) || *argument == '0') && ((dc_atoi(arg)) > 0))
   { // index #s out of range
-    if (atoi(argument) > atoi(arg))
+    if (dc_atoi(argument) > dc_atoi(arg))
     {
       ch->sendln("Usage: hindex <low ID#> <high ID#>"); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
-    else if ((atoi(arg) - atoi(argument)) >= 30)
+    else if ((dc_atoi(arg) - dc_atoi(argument)) >= 30)
     { // too many listed, only 30 at a time or we get too much spam
       ch->sendln("You can only list 30 help entries at a time.");
       return ReturnValue::eFAILURE;
     }
-    else if (atoi(argument) >= dc_->new_top_of_helpt || atoi(arg) >= dc_->new_top_of_helpt)
+    else if (dc_atoi(argument) >= dc_->new_top_of_helpt || dc_atoi(arg) >= dc_->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
 
     show_help_header(ch);
-    for (i = atoi(argument); i <= atoi(arg); i++)
+    for (i = dc_atoi(argument); i <= dc_atoi(arg); i++)
     {
       count = show_one_help_entry(i, ch, count);
     }
     show_help_bar(ch);
   }
-  else if (((atoi(argument)) > 0) || *argument == '0')
+  else if (((dc_atoi(argument)) > 0) || *argument == '0')
   { // show a specific ID #
-    if (atoi(argument) >= dc_->new_top_of_helpt)
+    if (dc_atoi(argument) >= dc_->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
 
     show_help_header(ch);
-    count = show_one_help_entry(atoi(argument), ch, count);
+    count = show_one_help_entry(dc_atoi(argument), ch, count);
     show_help_bar(ch);
   }
   else
@@ -508,20 +507,20 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((((atoi(argument)) > 0) || *argument == '0') && ((atoi(arg)) > 0))
+  if ((((dc_atoi(argument)) > 0) || *argument == '0') && ((dc_atoi(arg)) > 0))
   { // index #s out of range
-    if (atoi(argument) > atoi(arg))
+    if (dc_atoi(argument) > dc_atoi(arg))
     {
       ch->sendln("Usage: index <low ID#> <high ID#>"); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
-    if (atoi(argument) >= dc_->new_top_of_helpt || atoi(arg) >= dc_->new_top_of_helpt)
+    if (dc_atoi(argument) >= dc_->new_top_of_helpt || dc_atoi(arg) >= dc_->new_top_of_helpt)
     {
       ch->sendln("Out of range."); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
     show_help_header(ch);
-    for (i = atoi(argument); i <= atoi(arg); i++)
+    for (i = dc_atoi(argument); i <= dc_atoi(arg); i++)
     {
       if (new_help_table[i].min_level > 1)
         continue;
@@ -531,20 +530,20 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     show_help_bar(ch);
   }
-  else if (((atoi(argument)) > 0) || *argument == '0')
+  else if (((dc_atoi(argument)) > 0) || *argument == '0')
   { // show a specific ID #
-    if (atoi(argument) >= dc_->new_top_of_helpt)
+    if (dc_atoi(argument) >= dc_->new_top_of_helpt)
     {
       ch->sendln("Out of range.");
       return ReturnValue::eFAILURE;
     }
 
-    if (new_help_table[atoi(argument)].min_level > 1)
+    if (new_help_table[dc_atoi(argument)].min_level > 1)
       ch->sendln("You are not high enough level to view this helpfile.");
     else
     {
       show_help_header(ch);
-      count = show_one_help_entry(atoi(argument), ch, count);
+      count = show_one_help_entry(dc_atoi(argument), ch, count);
       show_help_bar(ch);
     }
   }
@@ -641,7 +640,6 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   help_rec_count = count_hash_records(new_help_fl);
-  fclose(new_help_fl);
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
@@ -652,7 +650,6 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->new_top_of_helpt = {};
   new_help_table = new help_index_element_new[help_rec_count];
   ret = load_new_help(new_help_fl, 1, ch);
-  fclose(new_help_fl);
 
   if (ret == ReturnValue::eFAILURE)
   {
@@ -722,7 +719,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_sprintf(buf, "%s just created a help file for '%s'.", qPrintable(ch->name()), buf2);
     dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
   }
-  else if ((help_id = atoi(buf)) || *buf == '0')
+  else if ((help_id = dc_atoi(buf)) || *buf == '0')
   { // Edit a specific help entry
     if (*buf == 0)
       help_id = {};
@@ -740,7 +737,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Not a valid key # or no value specified.");
         return ReturnValue::eFAILURE;
       }
-      if ((key_id = atoi(buf3)))
+      if ((key_id = dc_atoi(buf3)))
       {
         if (dc_strlen(value) > MAX_HELP_KEYWORD_LENGTH)
         {
@@ -781,7 +778,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else if (is_abbrev(field, "level"))
     { // changing the level
-      if (*buf2 && ((level = atoi(buf2)) || *buf2 == '0') && level >= 0 && level <= 110)
+      if (*buf2 && ((level = dc_atoi(buf2)) || *buf2 == '0') && level >= 0 && level <= 110)
       {
         if (*buf2 == '0')
           level = {};
@@ -816,18 +813,18 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else if (is_abbrev(field, "entry"))
     { // changing the actual help entry
-      ch->desc->backstr = {};
+      ch->conn_->backstr = {};
       send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
                    "   |--------------------------------------------------------------------------------|\r\n",
                    ch);
       if (new_help_table[help_id].entry)
       {
-        ch->desc->backstr = (new_help_table[help_id].entry);
-        ch->send(ch->desc->backstr);
+        ch->conn_->backstr = (new_help_table[help_id].entry);
+        ch->send(ch->conn_->backstr);
       }
 
-      ch->desc->connected = Connection::states::EDITING;
-      ch->desc->strnew = &(new_help_table[help_id].entry);
+      ch->conn_->connected = Connection::states::EDITING;
+      ch->conn_->strnew = &(new_help_table[help_id].entry);
     }
     else
     { // no idea wtf they are doing
@@ -928,7 +925,7 @@ void save_help(CharacterPtr ch)
   }
 }
 
-void help_string_to_file(FILE *f, QString str)
+void help_string_to_file(auto &streamf, QString str)
 {
   QString newbuf;
   dc_strcpy(newbuf, str);
@@ -950,7 +947,7 @@ void help_string_to_file(FILE *f, QString str)
   dc_fprintf(f, "%s\n", newbuf);
 }
 
-qint32 get_line_with_space(FILE *fl, QString buf)
+qint32 get_line_with_space(auto &streamstream, QString buf)
 {
   QString temp;
   qint32 lines = {};
@@ -958,13 +955,13 @@ qint32 get_line_with_space(FILE *fl, QString buf)
   do
   {
     lines++;
-    fgets(temp, 256, fl);
+    fgets(temp, 256, stream);
     if (!temp.isEmpty())
       temp[dc_strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && *temp == '*');
-  // } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
+  } while (!feof(stream) && *temp == '*');
+  // } while (!feof(stream) && (*temp == '*' || temp.isEmpty()));
 
-  if (feof(fl))
+  if (feof(stream))
     return 0;
   else
   {

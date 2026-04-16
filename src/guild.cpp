@@ -480,7 +480,7 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
     if (!known && getLevel() < skilllist[i].levelavailable)
       continue;
 
-    if (this->isPlayer() && skilllist[i].group > 0 && skilllist[i].group != player->profession)
+    if (isPlayer() && skilllist[i].group > 0 && skilllist[i].group != player->profession)
     {
       continue;
     }
@@ -489,7 +489,7 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        this->send(u"\r\n$B%s Profession Skills:$R\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[i].group))));
+        send(u"\r\n$B%s Profession Skills:$R\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[i].group))));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -607,7 +607,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
   qint32 skillnumber;
   qint32 percent;
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   CharacterClassSkill *skilllist = get_skill_list();
@@ -705,9 +705,9 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
     }
 
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
-    if (skilllist[skillnumber].group && this->isPlayer() && skilllist[skillnumber].group != player->profession)
+    if (skilllist[skillnumber].group && isPlayer() && skilllist[skillnumber].group != player->profession)
     {
-      this->send(u"You must join the %s profession in order to learn that.\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[skillnumber].group))));
+      send(u"You must join the %s profession in order to learn that.\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[skillnumber].group))));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -1242,7 +1242,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
 {
   qint32 chance, maximum;
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
     return;
   }
@@ -1396,7 +1396,7 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
   if (skillname.isEmpty())
   {
     send(u"Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n"_s.arg(skill));
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(this->name()), skill, learned, difficulty);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", qPrintable(name()), skill, learned, difficulty);
     return;
   }
 

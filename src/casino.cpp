@@ -389,7 +389,7 @@ void DC::check_active(varg_t arg1, void *arg2, void *arg3)
 
   if ((qint64)arg2 == plr->table->handnr || (qint64)arg2 == (plr->table->handnr + 100) * 2)
   {
-    timer_data *timer = new timer_data;
+    TimerPtr timer = TimerPtr(new Timer);
     timer->arg1.player = plr;
     timer->arg2 = (void *)(((qint64)arg2 + 100) * 2);
     timer->arg3 = (void *)plr->table;
@@ -422,9 +422,9 @@ void DC::check_active(varg_t arg1, void *arg2, void *arg3)
   }
 }
 
-void addtimer(timer_data *add)
+void addtimer(TimerPtr add)
 {
-  timer_data *timer;
+  TimerPtr timer;
   for (timer = timer_list; timer; timer = timer->next)
   {
     if (timer->next == nullptr)
@@ -438,7 +438,7 @@ void addtimer(timer_data *add)
 
 void add_timer(player_data *plr)
 {
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.player = plr;
   timer->arg2 = (void *)(qint64)plr->table->handnr;
   timer->arg3 = (void *)plr->table;
@@ -458,7 +458,7 @@ void bj_dealer_aiz(varg_t arg1, void *arg2, void *arg3)
 
 void add_timer_bj_dealer(table_data *tbl)
 {
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.table = tbl;
   timer->arg2 = {};
   if (tbl->state != 3)
@@ -471,7 +471,7 @@ void add_timer_bj_dealer(table_data *tbl)
 
 void add_timer_bj_dealer2(table_data *tbl, qint32 time = 10)
 {
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.table = tbl;
   timer->arg2 = (void *)(qint64)(++tbl->handnr);
   if (tbl->handnr == 0) // not plausible, but possible
@@ -489,7 +489,7 @@ void bj_finish(varg_t arg1, void *arg2, void *arg3)
 
 void add_new_bets(table_data *tbl)
 {
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.table = tbl;
   timer->function = bj_finish;
   timer->timeleft = 2;
@@ -727,7 +727,7 @@ void check_insurance(table_data *tbl)
   { // ace showing
     tbl->state = 1;
     send_to_table("$B$7The dealer says 'Blackjack insurance is available. Type INSURANCE to buy some.'$R\r\n", tbl);
-    timer_data *timer = new timer_data;
+    TimerPtr timer = TimerPtr(new Timer);
     timer->arg1.table = tbl;
     timer->arg2 = {};
     timer->function = check_insurance2;
@@ -1129,7 +1129,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       ch->sendln("Bet how much?\r\nSyntax: bet <amount>");
       return ReturnValue::eSUCCESS;
     }
-    qint32 amt = atoi(arg1);
+    qint32 amt = dc_atoi(arg1);
     if (obj->table->gold)
     {
       if (amt < 0 || amt > obj->obj_flags.value[1] || amt < obj->obj_flags.value[0])
@@ -1197,7 +1197,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
           i++;
       if (i <= players(obj->table))
       {
-        timer_data *tmr;
+        TimerPtr tmr;
         for (tmr = timer_list; tmr; tmr = tmr->next)
           if ((table_data *)tmr->arg1.table == obj->table)
             tmr->timeleft = 1;
@@ -1756,7 +1756,7 @@ command_return_t do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   one_argument(argument, arg);
-  //  qint32 i = atoi(arg);
+  //  qint32 i = dc_atoi(arg);
   //  qint32 z = get_hand(i);
   // QString buf;
   // dc_sprintf(buf, "One: %d Two: %d Three: %d Four: %d Five: %d\r\n",
@@ -2047,7 +2047,7 @@ void update_linked_slots(machine_data *machine)
 
 void slot_timer(machine_data *machine, qint32 stop1, qint32 stop2, qint32 delay)
 {
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.machine = machine;
   timer->arg2 = (void *)(qint64)stop1;
   timer->arg3 = (void *)(qint64)stop2;
@@ -2210,9 +2210,9 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (cmd == cmd_t::BET)
   {
-    if (atoi(buf) >= 1 && atoi(buf) <= 5)
+    if (dc_atoi(buf) >= 1 && dc_atoi(buf) <= 5)
     {
-      obj->slot->bet = atoi(buf);
+      obj->slot->bet = dc_atoi(buf);
       obj->slot->prch = ch;
       if (obj->slot->button)
       {
@@ -2550,7 +2550,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3);
 
 void roulette_timer(wheel_data *wheel, qint32 spin)
 {
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.wheel = wheel;
   timer->arg2 = (void *)(qint64)spin;
   timer->function = pulse_countdown;
@@ -2660,13 +2660,13 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
       ch->sendln("Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>");
       return ReturnValue::eSUCCESS;
     }
-    if (!is_number(arg2) || atoi(arg2) < 100)
+    if (!is_number(arg2) || dc_atoi(arg2) < 100)
     {
       ch->sendln("You must bet an amount greater than 100 coins.");
       return ReturnValue::eSUCCESS;
     }
     else
-      bet = atoi(arg2);
+      bet = dc_atoi(arg2);
     if (bet > 20000000)
     {
       ch->sendln("The maximum bet is 20 million coins.");
@@ -2954,9 +2954,9 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
       }
       obj->wheel->plr[i]->bet_array[10] += bet;
     }
-    else if (is_number(arg1) && atoi(arg1) >= 0 && atoi(arg1) <= 36)
+    else if (is_number(arg1) && dc_atoi(arg1) >= 0 && dc_atoi(arg1) <= 36)
     {
-      qint32 number = atoi(arg1);
+      qint32 number = dc_atoi(arg1);
       if (obj->wheel->plr[i]->bet_array[number + 11])
       {
         if (obj->wheel->plr[i]->bet_array[number + 11] + bet > 20000000)

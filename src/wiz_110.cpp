@@ -118,7 +118,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
   CharacterPtr victim = get_pc_vis(this, victim_name);
   if (!victim)
   {
-    this->sendln(u"You don't see anyone named '%1'."_s.arg(victim_name));
+    sendln(u"You don't see anyone named '%1'."_s.arg(victim_name));
     return ReturnValue::eSUCCESS;
   }
 
@@ -131,11 +131,11 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (!bgc.testcmd)
       {
-        this->sendln(u"%1 %2"_s.arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
+        sendln(u"%1 %2"_s.arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
-    this->sendln("");
+    sendln("");
     send_to_char("Test Command           Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
                  this);
@@ -143,7 +143,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (bgc.testcmd)
       {
-        this->sendln(u"%1 %2"_s.arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
+        sendln(u"%1 %2"_s.arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
@@ -154,22 +154,22 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 
   if (!bc.has_value())
   {
-    this->sendln(u"There is no god command named '%1'."_s.arg(command));
+    sendln(u"There is no god command named '%1'."_s.arg(command));
     return ReturnValue::eSUCCESS;
   }
 
   // if has
   if (victim->has_skill(bc->num))
   {
-    this->sendln(u"%1 already has that command."_s.arg(victim->name()));
+    sendln(u"%1 already has that command."_s.arg(victim->name()));
     return ReturnValue::eSUCCESS;
   }
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  dc_->logentry(u"%1 has been bestowed %2 by %3."_s.arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(this->name())), this->getLevel(), DC::LogChannel::LOG_GOD);
-  this->sendln(u"%1 has been bestowed %2."_s.arg(qPrintable(victim->name())).arg(bc->name));
-  this->sendln(u"%1 has bestowed %2 upon you."_s.arg(name()).arg(bc->name));
+  dc_->logentry(u"%1 has been bestowed %2 by %3."_s.arg(qPrintable(victim->name())).arg(bc->name).arg(qPrintable(name())), getLevel(), DC::LogChannel::LOG_GOD);
+  sendln(u"%1 has been bestowed %2."_s.arg(qPrintable(victim->name())).arg(bc->name));
+  sendln(u"%1 has bestowed %2 upon you."_s.arg(name()).arg(bc->name));
   return ReturnValue::eSUCCESS;
 }
 
@@ -330,7 +330,7 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isdigit(*lev_str))
   {
-    lev_nr = atoi(lev_str);
+    lev_nr = dc_atoi(lev_str);
     if (lev_nr < IMMORTAL || lev_nr > IMPLEMENTER)
     {
       ch->sendln("You must use a valid level from 100-110.");
@@ -372,7 +372,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
-    send(u"%1 just tried to rename you.\r\n"_s.arg(qPrintable(this->name())));
+    send(u"%1 just tried to rename you.\r\n"_s.arg(qPrintable(name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -538,7 +538,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   if (!(victim = get_pc(newname)))
   {
-    this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
+    sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
     return ReturnValue::eFAILURE;
   }
   do_name(victim, " %");
@@ -550,7 +550,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     ClanPtr tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(victim->name(), this->clan)))
+    if ((pmember = get_member(victim->name(), clan)))
       pmember->rights(rights);
     add_totem_stats(victim);
   }
@@ -581,7 +581,7 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(range = atoi(arg1)))
+  if (!(range = dc_atoi(arg1)))
   {
     dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                     "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
@@ -595,7 +595,7 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(numrooms = atoi(arg2)))
+  if (!(numrooms = dc_atoi(arg2)))
   {
     dc_sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                     "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
@@ -852,7 +852,7 @@ command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Syntax: <tohit> <level> <target level>");
     return ReturnValue::eFAILURE;
   }
-  qint32 toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
+  qint32 toHit = dc_atoi(arg1), tlevel = dc_atoi(arg3), level = dc_atoi(arg2);
   qreal lvldiff = level - tlevel;
   if (lvldiff > 15 && lvldiff < 25)
     toHit += 25;

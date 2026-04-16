@@ -642,7 +642,6 @@ LOAD
 */
 void AuctionHouse::Load()
 {
-  qint32 room;
   QString nl;
   QString buf;
   AuctionTicket InTicket;
@@ -663,10 +662,11 @@ void AuctionHouse::Load()
   quint32 num_items;
   in >> num_items;
 
+  room_t room_id;
   for (room_t i = {}; i < num_rooms; i++)
   {
-    in >> room;
-    auction_rooms[room] = 1;
+    in >> room_id;
+    auction_rooms[room_id] = 1;
   }
 
   in >> num_items;
@@ -1054,7 +1054,7 @@ ObjectPtr DC::ticket_object_load(QMap<quint32, AuctionTicket>::iterator Item_it,
     obj = clone_object(rnum);
     copySaveData(obj, reference_obj);
 
-    if (verify_item(&obj))
+    if (verify_item(obj))
     {
       copySaveData(obj, reference_obj);
     }
@@ -1291,7 +1291,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     if (options == LIST_BY_SLOT)
       ch->send(u"\r\nThere are no %s items currently posted.\r\n"_s.arg(qPrintable(name)));
     else if (options == LIST_BY_SELLER)
-      ch->sendln(u"\r\n\"%s\" doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n"_s).arg(name);
+      ch->sendln(u"\r\n\"%s\" doesn't seem to be selling any public items.\r\n\r\nTo view private items, use \"vend list private\".\r\n"_s.arg(name));
     else if (options == LIST_BY_CLASS)
       ch->send(u"\r\nThere are no \"%s\" wearable public items for sale.\r\n"_s.arg(qPrintable(name)));
     else if (options == LIST_MINE)
@@ -1323,7 +1323,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
   }
 
-  page_string(ch->desc, qPrintable(output_buf), 1);
+  page_string(ch->conn_, qPrintable(output_buf), 1);
 }
 
 /*
@@ -1554,14 +1554,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Modify what ticket?\r\nSyntax: vend modify <ticket> <new_price>");
       return ReturnValue::eSUCCESS;
     }
-    ticket = atoi(buf);
+    ticket = dc_atoi(buf);
     argument = one_argument(argument, buf);
     if (buf.isEmpty())
     {
       ch->sendln("What price do you want it?\r\nSyntax: vend modify <ticket> <new_price>");
       return ReturnValue::eSUCCESS;
     }
-    dc_->TheAuctionHouse.DoModify(ch, ticket, atoi(buf));
+    ch->dc_->TheAuctionHouse.DoModify(ch, ticket, dc_atoi(buf));
 
     return ReturnValue::eSUCCESS;
   }
@@ -1583,7 +1583,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("What name do you want to search for?\r\nSyntax: vend search name <keyword>");
         return ReturnValue::eSUCCESS;
       }
-      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1601,7 +1601,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_SLOT, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1618,7 +1618,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_RACE, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1639,7 +1639,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Class name needs to be at least 4 letters to search!");
         return ReturnValue::eSUCCESS;
       }
-      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_CLASS, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1655,7 +1655,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
                      ch);
         return ReturnValue::eSUCCESS;
       }
-      dc_->TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_SELLER, buf, 0, 0);
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1670,12 +1670,12 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("What level?\r\nSyntax: vend search level <min_level> [max_level]");
         return ReturnValue::eSUCCESS;
       }
-      level = atoi(buf);
+      level = dc_atoi(buf);
       argument = one_argument(argument, buf);
       if (buf.isEmpty())
-        dc_->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
+        ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, 0);
       else
-        dc_->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, atoi(buf));
+        ch->dc_->TheAuctionHouse.ListItems(ch, LIST_BY_LEVEL, "", level, dc_atoi(buf));
       ch->add_command_lag(cmd, DC::PULSE_VIOLENCE);
 
       return ReturnValue::eSUCCESS;
@@ -1696,12 +1696,12 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (buf == u"all"_s)
     {
-      dc_->TheAuctionHouse.CollectTickets(ch);
+      ch->dc_->TheAuctionHouse.CollectTickets(ch);
       return ReturnValue::eSUCCESS;
     }
-    if (atoi(buf) > 0)
+    if (dc_atoi(buf) > 0)
     {
-      dc_->TheAuctionHouse.CollectTickets(ch, atoi(buf));
+      ch->dc_->TheAuctionHouse.CollectTickets(ch, dc_atoi(buf));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1718,7 +1718,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Buy what?\r\nSyntax: vend buy <ticket #>");
       return ReturnValue::eSUCCESS;
     }
-    dc_->TheAuctionHouse.BuyItem(ch, atoi(buf));
+    ch->dc_->TheAuctionHouse.BuyItem(ch, dc_atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1733,10 +1733,10 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (buf == u"all"_s) // stupid cancel all didn't fit my design, but the boss wanted it
     {
-      dc_->TheAuctionHouse.CancelAll(ch);
+      ch->dc_->TheAuctionHouse.CancelAll(ch);
       return ReturnValue::eSUCCESS;
     }
-    dc_->TheAuctionHouse.RemoveTicket(ch, atoi(buf));
+    ch->dc_->TheAuctionHouse.RemoveTicket(ch, dc_atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1752,19 +1752,19 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (buf == u"all"_s)
     {
-      dc_->TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_ALL, "", 0, 0);
     }
     else if (buf == u"mine"_s)
     {
-      dc_->TheAuctionHouse.ListItems(ch, LIST_MINE, "", 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_MINE, "", 0, 0);
     }
     else if (buf == u"private"_s)
     {
-      dc_->TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_PRIVATE, "", 0, 0);
     }
     else if (buf == u"recent"_s)
     {
-      dc_->TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
+      ch->dc_->TheAuctionHouse.ListItems(ch, LIST_RECENT, "", 0, 0);
     }
     else
     {
@@ -1794,7 +1794,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("How much do you want to sell it for?\r\nSyntax: vend sell <item> <price> [person]");
       return ReturnValue::eSUCCESS;
     }
-    price = atoi(buf);
+    price = dc_atoi(buf);
     if (price < 1000)
     {
       ch->sendln("Minimum sell price is 1000 coins!");
@@ -1802,7 +1802,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     argument = one_argument(argument, buf); // private name
-    dc_->TheAuctionHouse.AddItem(ch, obj, price, buf);
+    ch->dc_->TheAuctionHouse.AddItem(ch, obj, price, buf);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1815,14 +1815,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Identify what?\r\nSyntax: vend identify <ticket>");
       return ReturnValue::eSUCCESS;
     }
-    dc_->TheAuctionHouse.Identify(ch, atoi(buf));
+    ch->dc_->TheAuctionHouse.Identify(ch, dc_atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
   /*SHOW STATS*/
   if (ch->getLevel() >= 104 && buf == u"stats"_s)
   {
-    dc_->TheAuctionHouse.ShowStats(ch);
+    ch->dc_->TheAuctionHouse.ShowStats(ch);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1835,7 +1835,7 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Add what room?\r\nSyntax: vend addroom <vnum>");
       return ReturnValue::eSUCCESS;
     }
-    dc_->TheAuctionHouse.AddRoom(ch, atoi(buf));
+    ch->dc_->TheAuctionHouse.AddRoom(ch, dc_atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -1848,14 +1848,14 @@ command_return_t do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Remove what room?\r\nSyntax: vend removeroom <vnum>");
       return ReturnValue::eSUCCESS;
     }
-    dc_->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
+    ch->dc_->TheAuctionHouse.RemoveRoom(ch, dc_atoi(buf));
     return ReturnValue::eSUCCESS;
   }
 
   /*LIST ROOMS*/
   if (ch->getLevel() >= 104 && buf == u"listrooms"_s)
   {
-    dc_->TheAuctionHouse.ListRooms(ch);
+    ch->dc_->TheAuctionHouse.ListRooms(ch);
     return ReturnValue::eSUCCESS;
   }
 

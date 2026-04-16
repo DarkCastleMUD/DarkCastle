@@ -366,7 +366,7 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
     send("You can't toggle anything, you're a mob!\r\n");
     return ReturnValue::eFAILURE;
@@ -419,7 +419,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 
   if (found_toggle.function_)
   {
-    return (this->*(found_toggle.function_))({}, cmd_t::DEFAULT);
+    return (*(found_toggle.function_))({}, cmd_t::DEFAULT);
   }
 
   return ReturnValue::eSUCCESS;
@@ -662,7 +662,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_BRIEF))
@@ -680,17 +680,17 @@ command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_ANSI))
   {
-    this->sendln("ANSI COLOR $B$4off$R.");
+    sendln("ANSI COLOR $B$4off$R.");
     REMOVE_BIT(player->toggles, Player::PLR_ANSI);
   }
   else
   {
-    this->sendln("ANSI COLOR $B$2on$R.");
+    sendln("ANSI COLOR $B$2on$R.");
     SET_BIT(player->toggles, Player::PLR_ANSI);
   }
   return ReturnValue::eSUCCESS;
@@ -698,17 +698,17 @@ command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_VT100))
   {
-    this->sendln("VT100 $B$4off$R.");
+    sendln("VT100 $B$4off$R.");
     REMOVE_BIT(player->toggles, Player::PLR_VT100);
   }
   else
   {
-    this->sendln("VT100 $B$2on$R.");
+    sendln("VT100 $B$2on$R.");
     SET_BIT(player->toggles, Player::PLR_VT100);
   }
   return ReturnValue::eSUCCESS;
@@ -716,17 +716,17 @@ command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_COMPACT))
   {
-    this->sendln("Compact mode $B$4off$R.");
+    sendln("Compact mode $B$4off$R.");
     REMOVE_BIT(player->toggles, Player::PLR_COMPACT);
   }
   else
   {
-    this->sendln("Compact mode $B$2on$R.");
+    sendln("Compact mode $B$2on$R.");
     SET_BIT(player->toggles, Player::PLR_COMPACT);
   }
   return ReturnValue::eSUCCESS;
@@ -734,12 +734,12 @@ command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_SUMMONABLE))
   {
-    this->sendln("You may no longer be summoned by other players.");
+    sendln("You may no longer be summoned by other players.");
     REMOVE_BIT(player->toggles, Player::PLR_SUMMONABLE);
   }
   else
@@ -754,17 +754,17 @@ command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_LFG))
   {
-    this->sendln("You are no longer Looking For Group.");
+    sendln("You are no longer Looking For Group.");
     REMOVE_BIT(player->toggles, Player::PLR_LFG);
   }
   else
   {
-    this->sendln("You are now Looking For Group.");
+    sendln("You are now Looking For Group.");
     SET_BIT(player->toggles, Player::PLR_LFG);
   }
   return ReturnValue::eSUCCESS;
@@ -772,23 +772,23 @@ command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!isSet(player->toggles, Player::PLR_GUIDE))
   {
-    this->sendln("You must be assigned as a $BGuide$R by the gods before you can toggle it.");
+    sendln("You must be assigned as a $BGuide$R by the gods before you can toggle it.");
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(player->toggles, Player::PLR_GUIDE_TOG))
   {
-    this->sendln("You have hidden your $B(Guide)$R tag.");
+    sendln("You have hidden your $B(Guide)$R tag.");
     REMOVE_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    this->sendln("You will now show your $B(Guide)$R tag.");
+    sendln("You will now show your $B(Guide)$R tag.");
     SET_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
 
@@ -796,17 +796,17 @@ command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 }
 command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_NEWS))
   {
-    this->sendln("You now view news in an up-down fashion.");
+    sendln("You now view news in an up-down fashion.");
     REMOVE_BIT(player->toggles, Player::PLR_NEWS);
   }
   else
   {
-    this->sendln("You now view news in a down-up fashion..");
+    sendln("You now view news in a down-up fashion..");
     SET_BIT(player->toggles, Player::PLR_NEWS);
   }
 
@@ -815,17 +815,17 @@ command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_ASCII))
   {
     REMOVE_BIT(player->toggles, Player::PLR_ASCII);
-    this->sendln("Cards are now displayed through ASCII.");
+    sendln("Cards are now displayed through ASCII.");
   }
   else
   {
-    this->sendln("Cards are no longer dislayed through ASCII.");
+    sendln("Cards are no longer dislayed through ASCII.");
     SET_BIT(player->toggles, Player::PLR_ASCII);
   }
 
@@ -834,17 +834,17 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_DAMAGE))
   {
     REMOVE_BIT(player->toggles, Player::PLR_DAMAGE);
-    this->sendln("Damage numbers will no longer be displayed in combat.");
+    sendln("Damage numbers will no longer be displayed in combat.");
   }
   else
   {
-    this->sendln("Damage numbers will now be displayed in combat.");
+    sendln("Damage numbers will now be displayed in combat.");
     SET_BIT(player->toggles, Player::PLR_DAMAGE);
   }
 
@@ -853,17 +853,17 @@ command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_NOTAX))
   {
-    this->sendln("You will now be taxed on all your loot.");
+    sendln("You will now be taxed on all your loot.");
     REMOVE_BIT(player->toggles, Player::PLR_NOTAX);
   }
   else
   {
-    this->sendln("You will no longer be taxed.");
+    sendln("You will no longer be taxed.");
     SET_BIT(player->toggles, Player::PLR_NOTAX);
   }
 
@@ -872,17 +872,17 @@ command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_CHARMIEJOIN))
   {
-    this->sendln("Your followers will no longer automatically join you.");
+    sendln("Your followers will no longer automatically join you.");
     REMOVE_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
   else
   {
-    this->sendln("Your followers will automatically aid you in battle.");
+    sendln("Your followers will automatically aid you in battle.");
     SET_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
 
@@ -891,17 +891,17 @@ command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t c
 
 command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_AUTOEAT))
   {
-    this->sendln("You no longer automatically eat and drink.");
+    sendln("You no longer automatically eat and drink.");
     REMOVE_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
   else
   {
-    this->sendln("You now automatically eat and drink when hungry and thirsty.");
+    sendln("You now automatically eat and drink when hungry and thirsty.");
     SET_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
   return ReturnValue::eSUCCESS;
@@ -911,16 +911,16 @@ command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
 {
   if (level_ < 40)
   {
-    this->sendln("You are too inexperienced to disguise your profession.");
+    sendln("You are too inexperienced to disguise your profession.");
     return ReturnValue::eSUCCESS;
   }
   if (isSet(player->toggles, Player::PLR_ANONYMOUS))
   {
-    this->sendln("Your class and level information is now public.");
+    sendln("Your class and level information is now public.");
   }
   else
   {
-    this->sendln("Your class and level information is now private.");
+    sendln("Your class and level information is now private.");
   }
 
   TOGGLE_BIT(player->toggles, Player::PLR_ANONYMOUS);
@@ -931,12 +931,12 @@ command_return_t Character::do_wimpy(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_WIMPY))
   {
-    this->sendln("You are no longer a wimp....maybe.");
+    sendln("You are no longer a wimp....maybe.");
     REMOVE_BIT(player->toggles, Player::PLR_WIMPY);
     return ReturnValue::eFAILURE;
   }
 
-  this->sendln("You are now an official wimp.");
+  sendln("You are now an official wimp.");
   SET_BIT(player->toggles, Player::PLR_WIMPY);
   return ReturnValue::eSUCCESS;
 }
@@ -947,12 +947,12 @@ command_return_t Character::do_pager(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_PAGER))
   {
-    this->sendln("You now page your strings in 24 line chunks.");
+    sendln("You now page your strings in 24 line chunks.");
     REMOVE_BIT(player->toggles, Player::PLR_PAGER);
     return ReturnValue::eFAILURE;
   }
 
-  this->sendln("You no longer page strings in 24 line chunks.");
+  sendln("You no longer page strings in 24 line chunks.");
   SET_BIT(player->toggles, Player::PLR_PAGER);
   return ReturnValue::eSUCCESS;
 }
@@ -961,12 +961,12 @@ command_return_t Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd
 {
   if (isSet(player->toggles, Player::PLR_BARD_SONG))
   {
-    this->sendln("Bard singing now in verbose mode.");
+    sendln("Bard singing now in verbose mode.");
     REMOVE_BIT(player->toggles, Player::PLR_BARD_SONG);
     return ReturnValue::eFAILURE;
   }
 
-  this->sendln("Bard singing now in brief mode.");
+  sendln("Bard singing now in brief mode.");
   SET_BIT(player->toggles, Player::PLR_BARD_SONG);
   return ReturnValue::eSUCCESS;
 }
@@ -975,30 +975,30 @@ command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cm
 {
   if (isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
-    this->sendln("You will attach duplicate keys to keyrings.");
+    sendln("You will attach duplicate keys to keyrings.");
     REMOVE_BIT(player->toggles, Player::PLR_NODUPEKEYS);
     return ReturnValue::eFAILURE;
   }
 
-  this->sendln("You will not attach duplicate keys to keyrings.");
+  sendln("You will not attach duplicate keys to keyrings.");
   SET_BIT(player->toggles, Player::PLR_NODUPEKEYS);
   return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
 {
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_BEEP))
   {
     REMOVE_BIT(player->toggles, Player::PLR_BEEP);
-    this->sendln("\r\nTell is now silent.");
+    sendln("\r\nTell is now silent.");
     return ReturnValue::eFAILURE;
   }
 
   SET_BIT(player->toggles, Player::PLR_BEEP);
-  this->sendln("\r\nTell now beeps.\a");
+  sendln("\r\nTell now beeps.\a");
   return ReturnValue::eSUCCESS;
 }
 
@@ -1264,7 +1264,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 
   if (!tmp_char)
   {
-    this->sendln("You do not see that person here.");
+    sendln("You do not see that person here.");
     return ReturnValue::eFAILURE;
   }
 
@@ -1421,7 +1421,7 @@ void CVoteData::StartVote(CharacterPtr ch)
   send_info("\r\n##Attention! There is now a vote in progress!\r\n##Type Vote for more information!\r\n");
 
   active = true;
-  this->OutToFile();
+  OutToFile();
 }
 
 void CVoteData::EndVote(CharacterPtr ch)
@@ -1433,7 +1433,7 @@ void CVoteData::EndVote(CharacterPtr ch)
   }
 
   active = false;
-  this->OutToFile();
+  OutToFile();
   send_info("\r\n##The vote has ended! Type \"Vote Results\" to see the results!\r\n");
 }
 
@@ -1453,18 +1453,18 @@ void CVoteData::AddAnswer(CharacterPtr ch, QString answer)
 
 bool CVoteData::HasVoted(CharacterPtr ch)
 {
-  return (ip_voted[ch->desc->getPeerOriginalAddress().toString(qPrintable())] || char_voted[qPrintable(ch->name())]);
+  return (ip_voted[ch->conn_->getPeerOriginalAddress().toString(qPrintable())] || char_voted[qPrintable(ch->name())]);
 }
 
 bool CVoteData::Vote(CharacterPtr ch, quint32 vote)
 {
-  if (!ch->desc)
+  if (!ch->conn_)
   {
     ch->sendln("Monsters don't get to vote!");
     return false;
   }
 
-  if (this->HasVoted(ch))
+  if (HasVoted(ch))
   {
     ch->sendln("You have already voted!");
     return false;
@@ -1476,7 +1476,7 @@ bool CVoteData::Vote(CharacterPtr ch, quint32 vote)
     return false;
   }
 
-  ip_voted[ch->desc->getPeerOriginalAddress().toString(qPrintable())] = true;
+  ip_voted[ch->conn_->getPeerOriginalAddress().toString(qPrintable())] = true;
   char_voted[qPrintable(ch->name())] = true;
   total_votes++;
   answers.at(vote - 1).votes++;
@@ -1488,7 +1488,7 @@ bool CVoteData::Vote(CharacterPtr ch, quint32 vote)
 
 void CVoteData::DisplayResults(CharacterPtr ch)
 {
-  if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString(qPrintable())] && ch->isMortalPlayer())
+  if (active && ch->getLevel() > 39 && !ip_voted[ch->conn_->getPeerOriginalAddress().toString(qPrintable())] && ch->isMortalPlayer())
   {
     ch->sendln("Sorry, but you have to cast a vote before you can see the results.");
     return;
@@ -1575,8 +1575,6 @@ void CVoteData::OutToFile()
   {
     dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
-
-  fclose(the_file);
 }
 
 void CVoteData::SetQuestion(CharacterPtr ch, QString question)
@@ -1605,7 +1603,7 @@ CVoteData::CVoteData()
   the_file = fopen("../lib/vote_data", "r");
   if (!the_file)
   {
-    this->Reset(nullptr);
+    Reset(nullptr);
     return;
   }
 
@@ -1614,8 +1612,8 @@ CVoteData::CVoteData()
 
   if (feof(the_file))
   {
-    fclose(the_file);
-    this->Reset(nullptr);
+
+    Reset(nullptr);
     return;
   }
 
@@ -1624,8 +1622,8 @@ CVoteData::CVoteData()
 
   if (!fgets(buf, MAX_STRING_LENGTH, the_file))
   {
-    fclose(the_file);
-    this->Reset(nullptr);
+
+    Reset(nullptr);
     dc_->logentry(u"Error reading question from vote file."_s, 0, DC::LogChannel::LOG_MISC);
     return;
   }
@@ -1639,9 +1637,9 @@ CVoteData::CVoteData()
     fscanf(the_file, "%d\n", &num);
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      fclose(the_file);
+
       dc_->logentry(u"Error reading answers from vote file."_s, 0, DC::LogChannel::LOG_MISC);
-      this->Reset(nullptr);
+      Reset(nullptr);
       return;
     }
 
@@ -1657,9 +1655,9 @@ CVoteData::CVoteData()
   {
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      fclose(the_file);
+
       dc_->logentry(u"Error reading ip addresses from vote file."_s, 0, DC::LogChannel::LOG_MISC);
-      this->Reset(nullptr);
+      Reset(nullptr);
       return;
     }
     buf[dc_strlen(buf) - 1] = {};
@@ -1672,9 +1670,9 @@ CVoteData::CVoteData()
   {
     if (!fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      fclose(the_file);
+
       dc_->logentry(u"Error reading character names from vote file."_s, 0, DC::LogChannel::LOG_MISC);
-      this->Reset(nullptr);
+      Reset(nullptr);
       return;
     }
     buf[dc_strlen(buf) - 1] = {};
@@ -1683,8 +1681,6 @@ CVoteData::CVoteData()
 
   // everything must have been correct, activate it here
   active = (bool)is_active;
-
-  fclose(the_file);
 }
 
 CVoteData::~CVoteData()
@@ -1720,7 +1716,7 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  vote = atoi(buf);
+  vote = dc_atoi(buf);
   if (true == dc_->DCVote.Vote(ch, vote))
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", qPrintable(ch->name()), vote);
 

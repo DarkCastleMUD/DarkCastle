@@ -225,7 +225,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
   FILE *fpfile = {};
 
-  if (this->isNonPlayer() || level_ < IMMORTAL)
+  if (isNonPlayer() || level_ < IMMORTAL)
   {
     return false;
   }
@@ -260,7 +260,6 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
   {
     last_cont = obj_store_to_char(charmie, fpfile, last_cont);
   }
-  fclose(fpfile);
 
   char_to_room(charmie, in_room);
 
@@ -509,37 +508,14 @@ Sockets::Sockets(CharacterPtr ch, QString searchkey)
 
 void Character::display_string_list(QStringList list)
 {
-  QString buf;
-  quint64 count = {};
-  for (const auto &item : list)
+  quint64 count{};
+  for (const auto &entry : list)
   {
-    send(u"%1"_s.arg(item, 18));
+    send(u"%1"_s.arg(entry, 18));
     if (++count % 4 == 0)
-    {
-      send("\r\n");
-    }
+      sendln();
   }
-  send("\r\n");
-}
-
-void Character::display_string_list(const QStringList list)
-{
-  QString buf = {};
-  *buf = '\0';
-
-  for (qint32 i = 1; *list[i - 1] != '\n'; i++)
-  {
-    dc_sprintf(buf + dc_strlen(buf), "%18s", list[i - 1]);
-    if (!(i % 4))
-    {
-      strlcat(buf, "\r\n", MAX_STRING_LENGTH);
-      this->send(buf);
-      *buf = '\0';
-    }
-  }
-  if (!buf.isEmpty())
-    this->send(buf);
-  this->sendln("");
+  sendln();
 }
 
 const QStringList Player::toggle_txt = {
@@ -911,7 +887,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
   else if (variable == "xp")
     value = QString::number(target->exp);
   else if (variable == "xptnl")
-    value = QString::number(exp_table[getLevel() + 1] - this->exp);
+    value = QString::number(exp_table[getLevel() + 1] - exp);
   else if (variable == "align" || variable == "alignment")
   {
     value = QString::number(GET_ALIGNMENT(this));
@@ -1021,7 +997,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
 QString Character::createPrompt(void)
 {
   QString source = {};
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
     source = u"HP: %i/%H %f >"_s;
   }

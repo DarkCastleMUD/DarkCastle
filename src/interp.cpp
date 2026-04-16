@@ -36,7 +36,7 @@ command_return_t do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   extern QString motd;
 
-  page_string(ch->desc, motd, 1);
+  page_string(ch->conn_, motd, 1);
   return ReturnValue::eSUCCESS;
 }
 
@@ -44,7 +44,7 @@ command_return_t do_imotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   extern QString imotd;
 
-  page_string(ch->desc, imotd, 1);
+  page_string(ch->conn_, imotd, 1);
   return ReturnValue::eSUCCESS;
 }
 
@@ -200,7 +200,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
           logbug(str);
           return logcmd.setReturn(ReturnValue::eFAILURE, str);
         }
-        else if (this->isNonPlayer())
+        else if (isNonPlayer())
         {
           sendln("Huh?");
           return logcmd.setReturn(ReturnValue::eFAILURE, "NPC attempting bestowed cmd");
@@ -222,7 +222,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         return logcmd.setReturn(ReturnValue::eFAILURE, "paralyzed");
       }
       // Character not in position for command?
-      if (GET_POS(this) == position_t::FIGHTING && !this->fighting)
+      if (GET_POS(this) == position_t::FIGHTING && !fighting)
       {
         setStanding();
       }
@@ -233,27 +233,27 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         switch (GET_POS(this))
         {
         case position_t::DEAD:
-          this->sendln("Lie still; you are DEAD.");
+          sendln("Lie still; you are DEAD.");
           return logcmd.setReturn(ReturnValue::eFAILURE, u"dead < %1"_s.arg(minimum_position_str));
           break;
         case position_t::STUNNED:
-          this->sendln("You are too stunned to do that.");
+          sendln("You are too stunned to do that.");
           return logcmd.setReturn(ReturnValue::eFAILURE, u"stunned < %1"_s.arg(minimum_position_str));
           break;
         case position_t::SLEEPING:
-          this->sendln("In your dreams, or what?");
+          sendln("In your dreams, or what?");
           return logcmd.setReturn(ReturnValue::eFAILURE, u"sleeping < %1"_s.arg(minimum_position_str));
           break;
         case position_t::RESTING:
-          this->sendln("Nah... You feel too relaxed...");
+          sendln("Nah... You feel too relaxed...");
           return logcmd.setReturn(ReturnValue::eFAILURE, u"resting < %1"_s.arg(minimum_position_str));
           break;
         case position_t::SITTING:
-          this->sendln("Maybe you should stand up first?");
+          sendln("Maybe you should stand up first?");
           return logcmd.setReturn(ReturnValue::eFAILURE, u"sitting < %1"_s.arg(minimum_position_str));
           break;
         case position_t::FIGHTING:
-          this->sendln("No way!  You are still fighting!");
+          sendln("No way!  You are still fighting!");
           return logcmd.setReturn(ReturnValue::eFAILURE, u"fighting < %1"_s.arg(minimum_position_str));
           break;
         case position_t::STANDING:
@@ -272,20 +272,20 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         }
       }
 
-      if (this->isNonPlayer() && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
+      if (isNonPlayer() && conn_ && conn_->original && conn_->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
       {
-        this->sendln("The spirit cannot perform that action.");
+        sendln("The spirit cannot perform that action.");
         return logcmd.setReturn(ReturnValue::eFAILURE, u"spirit not allowed"_s);
       }
       /*
       if (IS_AFFECTED(this, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
-          REMBIT(this->affected_by, AFF_HIDE);
+          REMBIT(affected_by, AFF_HIDE);
           dc_sprintf(buf, "You emerge from your hidden position...\r\n");
           act_to_character(buf, this, 0, 0,  0);
           }
-        if ((found->toggle_hide > 1) && (ch->dc_->number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
-          REMBIT(this->affected_by, AFF_HIDE);
+        if ((found->toggle_hide > 1) && (ch->dc_->number(1, has_skill( SKILL_HIDE)) < found->toggle_hide)) {
+          REMBIT(affected_by, AFF_HIDE);
           dc_sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
           act_to_character(buf, this, 0, 0,  0);
           }
@@ -294,7 +294,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
 
       if (!can_use_command(found->getNumber()))
       {
-        this->sendln("You are still recovering from your last attempt.");
+        sendln("You are still recovering from your last attempt.");
         return logcmd.setReturn(ReturnValue::eFAILURE, u"still recovering"_s);
       }
 
@@ -415,11 +415,11 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   // If we're at this point, Paralyze stops everything so get out.
   if (IS_AFFECTED(this, AFF_PARALYSIS))
   {
-    this->sendln("You've been paralyzed and are unable to move.");
+    sendln("You've been paralyzed and are unable to move.");
     return logcmd.setReturn(ReturnValue::eFAILURE, u"paralyzed"_s);
   }
   // Check social table
-  if ((retval = this->check_social(pcomm)))
+  if ((retval = check_social(pcomm)))
   {
     if (SOCIAL_TRUE_WITH_NOISE == retval)
       return check_ethereal_focus(this, ETHEREAL_FOCUS_TRIGGER_SOCIAL);
@@ -428,7 +428,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
   }
 
   // Unknown command (or character too low level)
-  this->sendln("Huh?");
+  sendln("Huh?");
   return logcmd.setReturn(ReturnValue::eSUCCESS, u"ReturnValue::eSUCCESS"_s);
 }
 
@@ -640,7 +640,7 @@ void automail(QString name)
 
   blah = fopen("../lib/whassup.txt", "w");
   dc_fprintf(blah, "%s", name);
-  fclose(blah);
+
   dc_sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
 }
@@ -862,10 +862,10 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
 
   /* special in equipment list? */
   for (j = {}; j <= (MAX_WEAR - 1); j++)
-    if (equipment[j] && this->equipment[j]->item_number >= 0)
-      if (dc_->obj_index[this->equipment[j]->item_number].non_combat_func)
+    if (equipment[j] && equipment[j]->item_number >= 0)
+      if (dc_->obj_index[equipment[j]->item_number].non_combat_func)
       {
-        retval = ((*dc_->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, qPrintable(arguments), this));
+        retval = ((*dc_->obj_index[equipment[j]->item_number].non_combat_func)(this, equipment[j], cmd, qPrintable(arguments), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -881,7 +881,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       }
 
   /* special in mobile present? */
-  for (k = dc_->world[this->in_room].people_; k; k = k->next_in_room)
+  for (k = dc_->world[in_room].people_; k; k = k->next_in_room)
   {
     if (k->isNonPlayer())
     {
@@ -902,7 +902,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   }
 
   /* special in object present? */
-  for (i = dc_->world[this->in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[in_room].contents; i; i = i->next_content)
     if (i->item_number >= 0)
       if (dc_->obj_index[i->item_number].non_combat_func)
       {

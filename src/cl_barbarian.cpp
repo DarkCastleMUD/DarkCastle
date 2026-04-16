@@ -346,13 +346,13 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
 
   if (in_room != victim->in_room)
   {
-    this->sendln("That person seems to have left.");
+    sendln("That person seems to have left.");
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    this->sendln("Aren't we funny today...");
+    sendln("Aren't we funny today...");
     return ReturnValue::eFAILURE;
   }
 
@@ -376,8 +376,8 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
       return retval;
     }
 
-    this->setSitting();
-    SET_BIT(this->combat, COMBAT_BASH1);
+    setSitting();
+    SET_BIT(combat, COMBAT_BASH1);
   }
   else
   {
@@ -392,12 +392,12 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
       return retval;
     }
 
-    SET_BIT(this->combat, COMBAT_RAGE1);
+    SET_BIT(combat, COMBAT_RAGE1);
   }
 
   WAIT_STATE(this, DC::PULSE_VIOLENCE * 3);
 
-  if (!this->fighting)
+  if (!fighting)
     return attack(this, victim, TYPE_UNDEFINED);
 
   // chance of bonus round at high level of skill
@@ -921,10 +921,10 @@ command_return_t do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   SETBIT(ch->affected_by, AFF_RUSH_CD);
-  extern void addtimer(timer_data * add);
+  extern void addtimer(TimerPtr add);
 
   // Reset bullrush AFF in 5 seconds
-  timer_data *timer = new timer_data;
+  TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.ch = ch;
   timer->function = rush_reset;
   timer->timeleft = 5;

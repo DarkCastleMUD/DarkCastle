@@ -1053,7 +1053,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    amount = atoi(arg);
+    amount = dc_atoi(arg);
     argument = one_argument(argument, arg);
     if (str_cmp("coins", arg) && str_cmp("coin", arg) && str_cmp("gold", arg))
     {
@@ -1538,7 +1538,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   if (is_number(obj_name))
   {
-    if (!this->isNonPlayer() && isPlayerGoldThief())
+    if (!isNonPlayer() && isPlayerGoldThief())
     {
       sendln("Your criminal acts prohibit it.");
       return ReturnValue::eFAILURE;
@@ -1589,13 +1589,13 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
           }
     */
     sendln(u"You give %1 coin%2 to %3."_s.arg(amount).arg(amount == 1 ? "" : "s").arg(qPrintable(vict->shortdesc_or_name())));
-    logobjects(u"%1 gives %2 coin%3 to %4"_s.arg(qPrintable(this->name())).arg(amount).arg(pluralize(amount)).arg(qPrintable(vict->name())));
+    logobjects(u"%1 gives %2 coin%3 to %4"_s.arg(qPrintable(name())).arg(amount).arg(pluralize(amount)).arg(qPrintable(vict->name())));
     act_to_victim(u"%1 gives you %2 $B$5gold$R coin%3."_s.arg(PERS(this, vict)).arg(amount).arg(amount == 1 ? "" : "s"), this, 0, vict, INVIS_NULL);
     act_to_room("$n gives some gold to $N.", this, 0, vict, INVIS_NULL | NOTVICT);
 
     removeGold(amount);
 
-    if (this->isNonPlayer() && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
+    if (isNonPlayer() && (!IS_AFFECTED(this, AFF_CHARM) || getLevel() > 50))
     {
       special_log(QString(u"%1 (mob) giving %2 gold to %3 in room %4."_s.arg(name()).arg(amount).arg(vict->name()).arg(in_room));
     }
@@ -1694,7 +1694,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!this->isNonPlayer() && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!isNonPlayer() && affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     sendln("Your criminal acts prohibit it.");
     return ReturnValue::eFAILURE;
@@ -1722,7 +1722,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     else
     {
       // You can give no_trade items to mobs for quest purposes.  It's taken care of later
-      if (vict->isPlayer() && (this->isPlayer() || IS_AFFECTED(this, AFF_CHARM)))
+      if (vict->isPlayer() && (isPlayer() || IS_AFFECTED(this, AFF_CHARM)))
       {
         if (getLevel() > IMMORTAL)
           sendln("That was a NO_TRADE item btw....");
@@ -1756,7 +1756,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!this->isNonPlayer() && isPlayerObjectThief() && !vict->desc)
+  if (!isNonPlayer() && isPlayerObjectThief() && !vict->conn_)
   {
     sendln("Now WHY would a thief give something to a linkdead character..?");
     return ReturnValue::eFAILURE;
@@ -1813,14 +1813,14 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     if (search_char_for_item(vict, obj->item_number, false))
     {
       sendln("The item's uniqueness prevents it.");
-      vict->send(u"%s tried to give you an item but was unable.\r\n"_s.arg(qPrintable(this->shortdesc_or_name())));
+      vict->send(u"%s tried to give you an item but was unable.\r\n"_s.arg(qPrintable(shortdesc_or_name())));
       return ReturnValue::eFAILURE;
     }
   }
   if (contents_cause_unique_problem(obj, vict))
   {
     sendln("The uniqueness of something inside it prevents it.");
-    vict->send(u"%s tried to give you an item but was unable.\r\n"_s.arg(qPrintable(this->shortdesc_or_name())));
+    vict->send(u"%s tried to give you an item but was unable.\r\n"_s.arg(qPrintable(shortdesc_or_name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -1829,7 +1829,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   act_to_victim("$n gives you $p.", this, obj, vict, 0);
   act_to_character("You give $p to $N.", this, obj, vict, 0);
 
-  logobjects(u"%1 gives %2 to %3"_s.arg(qPrintable(this->name())).arg(obj->name()).arg(qPrintable(vict->name())));
+  logobjects(u"%1 gives %2 to %3"_s.arg(qPrintable(name())).arg(obj->name()).arg(qPrintable(vict->name())));
   for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
               qPrintable(obj->short_description()),

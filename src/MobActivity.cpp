@@ -169,7 +169,7 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
       if (isPathConnected(pa->p))
       {
         path_data *t;
-        for (t = this->p; t; t = t->next)
+        for (t = p; t; t = t->next)
           if (t->p == pa->p)
             t->num++;
       }
@@ -332,7 +332,7 @@ command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
     do_findPath(ch, "");
     return ReturnValue::eFAILURE;
   }
-  start = atoi(arg1);
+  start = dc_atoi(arg1);
   argument = one_argument(argument, arg1);
 
   if (!arg1[0] || !is_number(arg1))
@@ -340,7 +340,7 @@ command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
     do_findPath(ch, "");
     return ReturnValue::eFAILURE;
   }
-  end = atoi(arg1);
+  end = dc_atoi(arg1);
   QString path = p->determineRoute(ch, start, end);
 
   if (!path)
@@ -481,7 +481,7 @@ qint32 Path::connectRoom(class Path *z)
 {
   path_data *pa;
 
-  for (QMap<qint32, qint32>::iterator iter = this->begin(); iter != this->end(); iter++)
+  for (QMap<qint32, qint32>::iterator iter = begin(); iter != end(); iter++)
     for (pa = dc_->world[(*iter).first].paths; pa; pa = pa->next)
       if (pa->p == z)
         return (*iter).first;
@@ -572,7 +572,7 @@ command_return_t do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
-    qint32 i = atoi(arg1), z = atoi(arg2);
+    qint32 i = dc_atoi(arg1), z = dc_atoi(arg2);
     if (!i || !z) { ch->sendln("BLeh!"); return ReturnValue::eFAILURE; }
     QString t =  findPath(i, z, ch);
     ch->send(u"Final Path: %1\r\n"_s.arg(t));

@@ -66,14 +66,14 @@ void load_emoting_objects()
 {
   obj_emote_index *index_cursor = {};
   obj_emote_data *data_cursor = {};
-  FILE *fl;
+  FILE *stream;
   // short i;
   QChar fromfile;
   bool done = false,
        done2 = false;
   short offset;
 
-  fl = fopen(EMOTING_FILE, "r");
+  stream = fopen(EMOTING_FILE, "r");
   obj_emote_head.next = new obj_emote_index;
   index_cursor = obj_emote_head.next;
   index_cursor->next = {};
@@ -86,8 +86,8 @@ void load_emoting_objects()
   data_cursor->next = {};
   while (!done2)
   {
-    index_cursor->room_number = fread_int(fl, 0, 1000000);
-    index_cursor->frequency = fread_int(fl, 0, 1000000);
+    index_cursor->room_number = fread_int(stream, 0, 1000000);
+    index_cursor->frequency = fread_int(stream, 0, 1000000);
     done = false;
     while (!done)
     {
@@ -95,9 +95,9 @@ void load_emoting_objects()
       // a pointer to the space IT allocs?  Azrack you silly goose.  I fixed it.
       // -pir 05/03/00
       // data_cursor->emote_text = dc_alloc(100, sizeof(QChar));
-      data_cursor->emote_text = fread_string(fl, 0);
+      data_cursor->emote_text = fread_string(stream);
       index_cursor->emote_index_length++;
-      if ((offset = 1) && ((fromfile = fgetc(fl)) == 'S') && ((offset = 2) && (fromfile = fgetc(fl)) == '\n'))
+      if ((offset = 1) && ((fromfile = fgetc(stream)) == 'S') && ((offset = 2) && (fromfile = fgetc(stream)) == '\n'))
       {
         done = true;
       }
@@ -108,16 +108,16 @@ void load_emoting_objects()
         data_cursor->next = {};
         // Azrack -- fseek had a -1 * offset * sizeof(QChar) which is going to send us to EOF immmediately
         // because fseek takes an quint32.
-        fseek(fl, (-1 * offset * sizeof(QChar)), SEEK_CUR);
+        fseek(stream, (-1 * offset * sizeof(QChar)), SEEK_CUR);
       }
     }
-    if ((fromfile = fgetc(fl)) == '$')
+    if ((fromfile = fgetc(stream)) == '$')
     {
       done2 = true;
     }
     else
     {
-      fseek(fl, (1 * sizeof(QChar)), SEEK_CUR);
+      fseek(stream, (1 * sizeof(QChar)), SEEK_CUR);
       index_cursor->next = new obj_emote_index;
       index_cursor = index_cursor->next;
       index_cursor->next = {};
@@ -129,7 +129,6 @@ void load_emoting_objects()
       data_cursor->next = {};
     }
   }
-  fclose(fl);
 }
 
 qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
@@ -749,7 +748,7 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     }
 
     one_argument(arg, buf);
-    if (buf.isEmpty() || !(x = atoi(buf)) || x < 0)
+    if (buf.isEmpty() || !(x = dc_atoi(buf)) || x < 0)
     {
       ch->sendln("Deposit what?");
       return ReturnValue::eSUCCESS;
@@ -773,7 +772,7 @@ qint32 bank(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   /* withdraw */
   one_argument(arg, buf);
-  if (buf.isEmpty() || !(x = atoi(buf)) || x < 0)
+  if (buf.isEmpty() || !(x = dc_atoi(buf)) || x < 0)
   {
     ch->sendln("Withdraw what?");
     return ReturnValue::eSUCCESS;
@@ -815,7 +814,7 @@ qint32 casino_atm(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   /* withdraw */
   one_argument(arg, buf);
-  if (buf.isEmpty() || !(x = atoi(buf)) || x < 0)
+  if (buf.isEmpty() || !(x = dc_atoi(buf)) || x < 0)
   {
     ch->sendln("Withdraw what?");
     return ReturnValue::eSUCCESS;
@@ -3545,7 +3544,7 @@ qint32 talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   if (!vict)
     return ReturnValue::eFAILURE;
 
-  if (vict->player && vict->desc == nullptr)
+  if (vict->player && vict->conn_ == nullptr)
   {
     return ReturnValue::eFAILURE;
   }

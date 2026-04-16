@@ -102,39 +102,39 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   QString name = arguments.value(0);
 
-  if (!has_skill(SKILL_BACKSTAB) && !this->isNonPlayer())
+  if (!has_skill(SKILL_BACKSTAB) && !isNonPlayer())
   {
-    this->sendln("You don't know how to backstab people!");
+    sendln("You don't know how to backstab people!");
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_room_vis(name)))
   {
-    this->sendln("Backstab whom?");
+    sendln("Backstab whom?");
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    this->sendln("How can you sneak up on yourself?");
+    sendln("How can you sneak up on yourself?");
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    this->sendln("You cannot backstab someone that HUGE!");
+    sendln("You cannot backstab someone that HUGE!");
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    this->sendln("You cannot target just one to backstab!");
+    sendln("You cannot target just one to backstab!");
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    this->sendln("You cannot target someone that tiny to backstab!");
+    sendln("You cannot target someone that tiny to backstab!");
     return ReturnValue::eFAILURE;
   }
 
@@ -150,41 +150,41 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   qint32 min_hp = (qint32)(GET_MAX_HIT(this) / 5);
   min_hp = MIN(min_hp, 25);
 
-  if (this->getHP() < min_hp)
+  if (getHP() < min_hp)
   {
-    this->sendln("You are feeling too weak right now to attempt such a bold maneuver.");
+    sendln("You are feeling too weak right now to attempt such a bold maneuver.");
     return ReturnValue::eFAILURE;
   }
 
-  if (!this->equipment[WEAR_WIELD])
+  if (!equipment[WEAR_WIELD])
   {
-    this->sendln("You need to wield a weapon to make it a success.");
+    sendln("You need to wield a weapon to make it a success.");
     return ReturnValue::eFAILURE;
   }
 
-  if (this->equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && this->equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
+  if (equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
   {
-    this->sendln("You can't stab without a stabbing weapon...");
+    sendln("You can't stab without a stabbing weapon...");
     return ReturnValue::eFAILURE;
   }
 
   if (victim->fighting)
   {
-    this->sendln("You can't backstab a fighting person, they are too alert!");
+    sendln("You can't backstab a fighting person, they are too alert!");
     return ReturnValue::eFAILURE;
   }
 
   // Check the killer/victim
-  if ((this->getLevel() < G_POWER) || this->isNonPlayer())
+  if ((getLevel() < G_POWER) || isNonPlayer())
   {
     if (!can_attack(this) || !can_be_attacked(this, victim))
       return ReturnValue::eFAILURE;
   }
 
   qint32 itemp = dc_->number(1, 100);
-  if (this->isPlayer() && victim->isPlayer())
+  if (isPlayer() && victim->isPlayer())
   {
-    if (victim->getLevel() > this->getLevel())
+    if (victim->getLevel() > getLevel())
       itemp = {}; // not gonna happen
     else if (GET_MAX_HIT(victim) > GET_MAX_HIT(this))
     {
@@ -200,13 +200,13 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   }
 
   // record the room I'm in.  Used to make sure a dual can go off.
-  was_in = this->in_room;
+  was_in = in_room;
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((this->isPlayer() && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || this->getLevel() >= ARCHANGEL) || (this->isNonPlayer() && this->getLevel() > 70)) && (this->equipment[WEAR_SECOND_WIELD]) && ((this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (this->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
+  if ((((isPlayer() && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || getLevel() >= ARCHANGEL) || (isNonPlayer() && getLevel() > 70)) && (equipment[WEAR_SECOND_WIELD]) && ((equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
-    if (skill_success(victim, SKILL_DUAL_BACKSTAB) || this->isNonPlayer())
+    if (skill_success(victim, SKILL_DUAL_BACKSTAB) || isNonPlayer())
     {
       perform_dual_backstab = true;
     }
@@ -218,11 +218,11 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   if (AWAKE(victim) && !skill_success(victim, SKILL_BACKSTAB))
   {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
-    if (perform_dual_backstab && this->isPlayer())
+    if (perform_dual_backstab && isPlayer())
     {
-      this->player->unjoinable = true;
+      player->unjoinable = true;
       retval = damage(this, victim, 0, TYPE_UNDEFINED, SKILL_BACKSTAB);
-      this->player->unjoinable = false;
+      player->unjoinable = false;
     }
     else
     {
@@ -248,11 +248,11 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   else
   {
     // If this is stab 1 of 2 for a dual backstab, we dont want people autojoining on the first stab
-    if (perform_dual_backstab && this->isPlayer())
+    if (perform_dual_backstab && isPlayer())
     {
-      this->player->unjoinable = true;
+      player->unjoinable = true;
       retval = attack(this, victim, SKILL_BACKSTAB, WEAR_WIELD);
-      this->player->unjoinable = false;
+      player->unjoinable = false;
     }
     else
     {
@@ -281,7 +281,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   // If we're intended to have a dual backstab AND we still can
   if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && GET_POS(victim) != position_t::DEAD && victim->in_room != DC::NOWHERE)
   {
-    if (was_in == this->in_room)
+    if (was_in == in_room)
     {
       if (AWAKE(victim) && !skill_success(victim, SKILL_BACKSTAB))
       {
@@ -305,7 +305,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
     // if (IS_AFFECTED(this, AFF_CHARM)) SET_BIT(retval, check_joincharmie(this,1));
     // if (SOMEONE_DIED(retval)) return retval;
-    if (this->c_class == CLASS_THIEF && victim->isPlayer())
+    if (c_class == CLASS_THIEF && victim->isPlayer())
     {
       WAIT_STATE(this, DC::PULSE_VIOLENCE * 2);
     }
@@ -860,7 +860,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   /*  if(victim->isPlayer() &&
-      !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
+      !(victim->conn_) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
       ch->sendln("That person is not really there.");
       return ReturnValue::eFAILURE;
     }*/
@@ -1312,7 +1312,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   /*if(victim->isPlayer() &&
-    !(victim->desc) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
+    !(victim->conn_) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
     ch->sendln("That person is not really there.");
     return ReturnValue::eFAILURE;
   }
@@ -1600,7 +1600,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    amount = atoi(obj_name);
+    amount = dc_atoi(obj_name);
     argument = one_argument(argument, arg);
 
     if (str_cmp("coins", arg) && str_cmp("coin", arg))
@@ -1800,7 +1800,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isPlayerObjectThief() && !vict->desc)
+  if (ch->isPlayerObjectThief() && !vict->conn_)
   {
     send_to_char("Now WHY would a thief slip something to a "
                  "linkdead character?\r\n",

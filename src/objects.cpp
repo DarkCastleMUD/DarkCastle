@@ -819,7 +819,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   affected_type af = {};
   qint32 amount = {};
 
-  if (isSet(dc_->world[this->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
     sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eFAILURE;
@@ -839,7 +839,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   }
 
   auto arg1 = arguments.value(0);
-  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[this->in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
+  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
   {
     act_to_character("You drink from $p.", this, temp, 0, 0);
     act_to_room("$n drinks from $p.", this, temp, 0, INVIS_NULL);
@@ -863,7 +863,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(temp = get_obj_in_list_vis(this, arg1, this->carrying)))
+  if (!(temp = get_obj_in_list_vis(this, arg1, carrying)))
   {
     act_to_character("You cannot find it!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -918,14 +918,14 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
         addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (!this->isImmortalPlayer()))
+      if (temp->obj_flags.value[3] && (!isImmortalPlayer()))
       {
         /* The shit was poisoned ! */
         act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
         act_to_room("$n chokes and utters some strange sounds.", this, 0, 0, 0);
         if (ch->dc_->number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
         {
-          this->sendln("Luckily, your body rejects the poison almost immediately.");
+          sendln("Luckily, your body rejects the poison almost immediately.");
         }
         else
         {
@@ -2348,39 +2348,39 @@ qint32 Character::hands_are_free(qint32 number)
   ObjectPtr wielded;
   qint32 hands = {};
 
-  wielded = this->equipment[WEAR_WIELD];
+  wielded = equipment[WEAR_WIELD];
 
   if (wielded)
-    if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(this->affected_by, AFF_POWERWIELD))
+    if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(affected_by, AFF_POWERWIELD))
       hands = 2;
 
-  if (this->equipment[WEAR_WIELD])
+  if (equipment[WEAR_WIELD])
     hands++;
-  if (this->equipment[WEAR_SECOND_WIELD])
+  if (equipment[WEAR_SECOND_WIELD])
     hands++;
 
-  if (this->equipment[WEAR_SHIELD])
+  if (equipment[WEAR_SHIELD])
   {
-    if (isSet(this->equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-        !ISSET(this->affected_by, AFF_POWERWIELD))
+    if (isSet(equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+        !ISSET(affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
-  if (this->equipment[WEAR_HOLD])
+  if (equipment[WEAR_HOLD])
   {
-    if (isSet(this->equipment[WEAR_HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-        !ISSET(this->affected_by, AFF_POWERWIELD))
+    if (isSet(equipment[WEAR_HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+        !ISSET(affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
-  if (this->equipment[WEAR_LIGHT])
+  if (equipment[WEAR_LIGHT])
   {
-    if (isSet(this->equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
-        !ISSET(this->affected_by, AFF_POWERWIELD))
+    if (isSet(equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+        !ISSET(affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
-  if (this->equipment[WEAR_HOLD2])
+  if (equipment[WEAR_HOLD2])
     hands++;
 
   if (number == 1 && hands < 2)
@@ -2528,10 +2528,10 @@ qint32 Character::recheck_height_wears(void)
 
   for (j = {}; j < MAX_WEAR; j++)
   {
-    if (!this->equipment[j])
+    if (!equipment[j])
       continue;
 
-    if (size_restricted(this, this->equipment[j]))
+    if (size_restricted(this, equipment[j]))
     {
       obj = unequip_char(j);
       obj_to_char(obj, this);
@@ -2603,13 +2603,13 @@ void Character::heightweight(bool add)
   qint32 i, j;
   for (i = {}; i < MAX_WEAR; i++)
   {
-    if (this->equipment[i])
-      for (j = {}; j < this->equipment[i]->num_affects; j++)
+    if (equipment[i])
+      for (j = {}; j < equipment[i]->num_affects; j++)
       {
-        if (this->equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
-          affect_modify(this, this->equipment[i]->affected[j].location, this->equipment[i]->affected[j].modifier, -1, add);
-        else if (this->equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
-          affect_modify(this, this->equipment[i]->affected[j].location, this->equipment[i]->affected[j].modifier, -1, add);
+        if (equipment[i]->affected[j].location == APPLY_CHAR_HEIGHT)
+          affect_modify(this, equipment[i]->affected[j].location, equipment[i]->affected[j].modifier, -1, add);
+        else if (equipment[i]->affected[j].location == APPLY_CHAR_WEIGHT)
+          affect_modify(this, equipment[i]->affected[j].location, equipment[i]->affected[j].modifier, -1, add);
       }
   }
 }

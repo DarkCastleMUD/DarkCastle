@@ -130,8 +130,6 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr wand;
   affected_type af;
 
-  *buf = '\0';
-
   argument = one_argument(argument, buf);
 
   if (!lvl)
@@ -304,7 +302,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     REMOVE_BIT(dc_->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
     affect_from_char(i, SPELL_ETHEREAL_FOCUS);
 
-    if (i->isPlayer() && !i->desc) // don't work if I'm linkdead
+    if (i->isPlayer() && !i->conn_) // don't work if I'm linkdead
       break;
 
     // If for some reason the caster is busy, the spell fails.
@@ -346,7 +344,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
       // Skip anyone unable to fight
       // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
       if (ally == ch || ally == i || ally->fighting || GET_POS(ally) != position_t::STANDING ||
-          (ally->isPlayer() && !ally->desc) // linkdead groupies won't help
+          (ally->isPlayer() && !ally->conn_) // linkdead groupies won't help
       )
         continue;
       // TODO - skip anyone with this toggle turned off

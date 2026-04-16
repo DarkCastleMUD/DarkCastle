@@ -154,7 +154,7 @@ command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("You need to specify a zone number.");
       return ReturnValue::eSUCCESS;
     }
-    areaData.DisplaySingleArea(ch, atoi(buf));
+    areaData.DisplaySingleArea(ch, dc_atoi(buf));
     return ReturnValue::eSUCCESS;
   }
   if (buf == u"all"_s)

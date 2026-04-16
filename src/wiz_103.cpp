@@ -146,14 +146,14 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString buf;
-  ConnectionPtr d;
+  ConnectionPtr conn;
   quint32 sdesc;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   one_argument(argument, arg);
-  sdesc = atoi(arg);
+  sdesc = dc_atoi(arg);
   if (arg == 0)
   {
     ch->sendln("Illegal descriptor number.");
@@ -169,7 +169,7 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
         dc_sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", qPrintable(ch->name()));
         conn->character->send(buf);
         ch->sendln("You dummy, can't do that to your elders!");
-        close_socket(ch->desc);
+        close_socket(ch->conn_);
         return ReturnValue::eFAILURE;
       }
       else
@@ -354,7 +354,7 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
   if (str == 0)
     return -1;
 
-  qint32 room = atoi(str);
+  qint32 room = dc_atoi(str);
 
   if (room == DC::NOWHERE || room > dc_->top_of_world || !dc_->rooms.contains(room))
   {

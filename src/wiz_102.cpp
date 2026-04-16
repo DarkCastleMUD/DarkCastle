@@ -92,7 +92,7 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       auto conn = *result;
       vict = conn->character;
-      vict->desc = {};
+      vict->conn_ = {};
 
       redo_hitpoints(vict);
       redo_mana(vict);
@@ -139,11 +139,11 @@ command_return_t do_check(CharacterPtr ch, QString arg, cmd_t cmd)
   display_punishes(ch, vict);
 
   if (connected)
-    if (vict->desc)
+    if (vict->conn_)
     {
       if (ch->getLevel() >= OVERSEER && ch->getLevel() >= vict->getLevel())
       {
-        ch->sendln(u"$3Connected from$R: %1"_s.arg(vict->desc->getPeerOriginalAddress().toString()));
+        ch->sendln(u"$3Connected from$R: %1"_s.arg(vict->conn_->getPeerOriginalAddress().toString()));
       }
       else
       {
@@ -298,7 +298,7 @@ command_return_t do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       auto conn = *result;
       auto vict = conn->character;
-      vict->desc = {};
+      vict->conn_ = {};
       redo_hitpoints(vict);
       redo_mana(vict);
       if (vict->title_.isEmpty())
@@ -353,7 +353,7 @@ command_return_t do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (isdigit(*name))
   {
-    if (!(x = atoi(name)))
+    if (!(x = dc_atoi(name)))
     {
       ch->sendln("That is not a valid number.");
       return ReturnValue::eFAILURE;
@@ -1660,8 +1660,8 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
     //                   " Terminate with '~' on a new line.\r\n\r\n", ch);
     //        curr->description = {};
 
-    ch->desc->connected = Connection::states::EDITING;
-    ch->desc->strnew = &(curr->description);
+    ch->conn_->connected = Connection::states::EDITING;
+    ch->conn_->strnew = &(curr->description);
 
     break;
   }
@@ -1905,7 +1905,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
-    modifier = atoi(value);
+    modifier = dc_atoi(value);
     num -= 1;
     obj->affected[num].location = modifier * 1000;
     ch->send(u"Affect %1 changed to %2 by %3.\r\n"_s.arg(num + 1).arg(get_skill_name(obj->affected[num].location / 1000)).arg(obj->affected[num].modifier));
@@ -1957,7 +1957,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
           "description",
           "\n"};
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   half_chop(qPrintable(arguments.join(' ')), buf, buf2);
@@ -2605,7 +2605,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 mobvnum = -1;
   if (isdigit(*buf))
   {
-    mobvnum = atoi(buf);
+    mobvnum = dc_atoi(buf);
     if (((mob_num = real_mobile(mobvnum)) < 0) || (mobvnum == 0 && *buf != '0'))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
@@ -2911,16 +2911,16 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->desc->backstr = {};
-    ch->desc->strnew = &(currprog->comlist);
+    ch->conn_->backstr = {};
+    ch->conn_->strnew = &(currprog->comlist);
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
-      ch->desc->web_connected = Connection::states::EDIT_MPROG;
+      ch->conn_->web_connected = Connection::states::EDIT_MPROG;
     }
     else
     {
-      ch->desc->connected = Connection::states::EDIT_MPROG;
+      ch->conn_->connected = Connection::states::EDIT_MPROG;
 
       send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
                    "   |--------------------------------------------------------------------------------|\r\n",
@@ -2928,10 +2928,10 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (currprog->comlist)
       {
-        ch->desc->backstr = (currprog->comlist);
-        if (ch->desc->backstr != nullptr)
+        ch->conn_->backstr = (currprog->comlist);
+        if (ch->conn_->backstr != nullptr)
         {
-          ch->send(double_dollars(QString(ch->desc->backstr)));
+          ch->send(double_dollars(QString(ch->conn_->backstr)));
         }
       }
     }
@@ -2965,7 +2965,7 @@ command_return_t do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  qint64 mob_vnum = atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
+  qint64 mob_vnum = dc_atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
   if (((mob_num = real_mobile(mob_vnum)) < 0))
   {
     ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mob_vnum));
@@ -3149,9 +3149,9 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
                  ch);
     // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
     //        mob->description = {};
-    ch->desc->connected = Connection::states::EDITING;
+    ch->conn_->connected = Connection::states::EDITING;
     mob->description = u""_s;
-    ch->desc->strnew = &(mob->description);
+    ch->conn_->strnew = &(mob->description);
   }
   break;
 
@@ -4128,8 +4128,8 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ch->sendln("        Write your room's description.  (/s saves /h for help)");
-    ch->desc->connected = Connection::states::EDITING;
-    ch->desc->strnew = &(dc_->world[ch->in_room].description);
+    ch->conn_->connected = Connection::states::EDITING;
+    ch->conn_->strnew = &(dc_->world[ch->in_room].description);
   }
   break;
 
@@ -4448,12 +4448,12 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     FREE(extra->keyword);
     extra->keyword = (arg2.c_str());
     ch->sendln("Write your extra description. (/s saves /h for help)");
-    ch->desc->strnew = &extra->description;
-    ch->desc->connected = Connection::states::EDITING;
-    if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
+    ch->conn_->strnew = &extra->description;
+    ch->conn_->connected = Connection::states::EDITING;
+    if (ch->conn_->strnew != nullptr && *ch->conn_->strnew != nullptr && **ch->conn_->strnew != '\0')
     {
       // There's already an existing extra description so let's show it
-      parse_action(parse_t::LIST_NUM, "", ch->desc);
+      parse_action(parse_t::LIST_NUM, "", ch->conn_);
     }
   }
   break;
@@ -4494,8 +4494,8 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
           dc_->world[ch->in_room].dir_option[x]->general_description = {};
         }
    */
-    ch->desc->strnew = &dc_->world[ch->in_room].dir_option[x]->general_description;
-    ch->desc->connected = Connection::states::EDITING;
+    ch->conn_->strnew = &dc_->world[ch->in_room].dir_option[x]->general_description;
+    ch->conn_->connected = Connection::states::EDITING;
   }
   break;
 
@@ -4823,7 +4823,6 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 
   zone.write(f);
 
-  fclose(f);
   sendln(u"Saved zone %1."_s.arg(zone_key));
   zone.setModified(false);
   return ReturnValue::eSUCCESS;
@@ -4981,7 +4980,7 @@ command_return_t do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  FILE *fl;
+  FILE *stream;
   QString buf, bufl[200] /*,buf2[200],buf3[200]*/;
   qint32 room = 1, x, door /*,direction*/;
   qint32 pos;
@@ -5005,8 +5004,8 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
    }
 
    half_chop(GET_RANGE(ch), buf, bufl);*/
-  low = atoi(buf);
-  high = atoi(bufl);
+  low = dc_atoi(buf);
+  high = dc_atoi(bufl);
 
   for (x = low; x <= high; x++)
   {
@@ -5025,10 +5024,10 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
   dc_sprintf(buf, "../lib/builder/%s.zon", qPrintable(ch->name()));
 
-  if ((fl = fopen(buf, "w")) == nullptr)
+  if ((stream = fopen(buf, "w")) == nullptr)
   {
     ch->send("Couldn't open up zone file. Tell Godflesh!");
-    fclose(fl);
+
     return ReturnValue::eFAILURE;
   }
 
@@ -5040,11 +5039,11 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
     break;
   }
 
-  dc_fprintf(fl, "#%d\n", dc_->world[room].zone);
+  dc_fprintf(stream, "#%d\n", dc_->world[room].zone);
   dc_sprintf(buf, "%s's Area.", qPrintable(ch->name()));
-  string_to_file(fl, buf);
-  dc_fprintf(fl, "~\n");
-  dc_fprintf(fl, "%d 30 2\n", high);
+  string_to_file(stream, buf);
+  dc_fprintf(stream, "~\n");
+  dc_fprintf(stream, "%d 30 2\n", high);
 
   /* Set allthe door states..  */
 
@@ -5074,7 +5073,7 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
           value = {};
         }
 
-        dc_fprintf(fl, "D 0 %d %d %d\n", dc_->world[room].number, dc_->world[dc_->world[room].dir_option[door]->to_room].number, value);
+        dc_fprintf(stream, "D 0 %d %d %d\n", dc_->world[room].number, dc_->world[dc_->world[room].dir_option[door]->to_room].number, value);
       }
     }
   } /*  Ok.. all door state info written...  */
@@ -5104,11 +5103,11 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
         if (!obj->in_obj)
         {
-          dc_fprintf(fl, "O 0 %d %d %d",
+          dc_fprintf(stream, "O 0 %d %d %d",
                      dc_->obj_index[obj->item_number].vnum(), count,
                      dc_->world[room].number);
           dc_sprintf(buf, "           %s\n", qPrintable(obj->short_description()));
-          string_to_file(fl, buf);
+          string_to_file(stream, buf);
 
           if (obj->contains)
           {
@@ -5124,13 +5123,13 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                   count++;
               }
 
-              dc_fprintf(fl, "P 1 %d %d %d",
+              dc_fprintf(stream, "P 1 %d %d %d",
                          dc_->obj_index[tmp_obj->item_number].vnum(), count,
                          dc_->obj_index[obj->item_number].vnum());
               dc_sprintf(buf, "     %s placed inside %s\n",
                          tmp_obj->short_description,
                          qPrintable(obj->short_description()));
-              string_to_file(fl, buf);
+              string_to_file(stream, buf);
             } /*  for loop */
           } /* end of the object's contents... */
         } /* end of if !obj->in_obj */
@@ -5167,10 +5166,10 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
             count++;
         }
 
-        dc_fprintf(fl, "M 0 %d %d %d", dc_->mob_index[mob->mobdata->nr].vnum(),
+        dc_fprintf(stream, "M 0 %d %d %d", dc_->mob_index[mob->mobdata->nr].vnum(),
                    count, dc_->world[room].number);
         dc_sprintf(buf, "           %s\n", mob->short_desc);
-        string_to_file(fl, buf);
+        string_to_file(stream, buf);
 
         for (pos = {}; pos < MAX_WEAR; pos++)
         {
@@ -5189,12 +5188,12 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              dc_fprintf(fl, "E 1 %d %d %d",
+              dc_fprintf(stream, "E 1 %d %d %d",
                          dc_->obj_index[obj->item_number].vnum(), count,
                          pos);
               dc_sprintf(buf, "      Equip %s with %s\n",
                          mob->short_desc, qPrintable(obj->short_description()));
-              string_to_file(fl, buf);
+              string_to_file(stream, buf);
 
               if (obj->contains)
               {
@@ -5210,14 +5209,14 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                       count++;
                   }
 
-                  dc_fprintf(fl, "P 1 %d %d %d",
+                  dc_fprintf(stream, "P 1 %d %d %d",
                              dc_->obj_index[tmp_obj->item_number].vnum(),
                              count,
                              dc_->obj_index[obj->item_number].vnum());
                   dc_sprintf(buf, "     %s placed inside %s\n",
                              tmp_obj->short_description,
                              qPrintable(obj->short_description()));
-                  string_to_file(fl, buf);
+                  string_to_file(stream, buf);
                 } /*  for loop */
               }
             } /* end of the object's contents... */
@@ -5240,11 +5239,11 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              dc_fprintf(fl, "G 1 %d %d",
+              dc_fprintf(stream, "G 1 %d %d",
                          dc_->obj_index[obj->item_number].vnum(), count);
               dc_sprintf(buf, "      Give %s %s\n", mob->short_desc,
                          qPrintable(obj->short_description()));
-              string_to_file(fl, buf);
+              string_to_file(stream, buf);
 
               if (obj->contains)
               {
@@ -5260,14 +5259,14 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                       count++;
                   }
 
-                  dc_fprintf(fl, "P 1 %d %d %d",
+                  dc_fprintf(stream, "P 1 %d %d %d",
                              dc_->obj_index[tmp_obj->item_number].vnum(),
                              count,
                              dc_->obj_index[obj->item_number].vnum());
                   dc_sprintf(buf, "     %s placed inside %s\n",
                              tmp_obj->short_description,
                              qPrintable(obj->short_description()));
-                  string_to_file(fl, buf);
+                  string_to_file(stream, buf);
                 } /*  for loop */
               }
             } /* end of the object's contents... */
@@ -5277,8 +5276,8 @@ command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
     } /* end of if some body is in the fucking room.  */
   } /* end of for loop going through the zone looking for mobs...  */
 
-  dc_fprintf(fl, "S\n");
-  fclose(fl);
+  dc_fprintf(stream, "S\n");
+
   ch->sendln("Zone File Created! Tell someone who can put it in!");
   return ReturnValue::eSUCCESS;
 }
@@ -5307,7 +5306,7 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   else
   {
-    x = atoi(arg1);
+    x = dc_atoi(arg1);
     if (x < 0 || (loc = real_room(x)) == DC::NOWHERE)
     {
       ch->sendln("No such room exists.");
@@ -5453,14 +5452,14 @@ command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("That mob is a bit too tough for you to handle.");
         return ReturnValue::eFAILURE;
       }
-      else if (!ch->desc || ch->desc->snoop_by || ch->desc->snooping)
+      else if (!ch->conn_ || ch->conn_->snoop_by || ch->conn_->snooping)
       {
-        if (ch->desc->snoop_by)
+        if (ch->conn_->snoop_by)
         {
-          ch->desc->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
+          ch->conn_->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
           dc_sprintf(buf, "Your victim is now trying to possess: %s\n", qPrintable(victim->name()));
-          ch->desc->snoop_by->character->send(buf);
-          ch->desc->snoop_by->character->do_snoop(ch->desc->snoop_by->character->name().split(' '));
+          ch->conn_->snoop_by->character->send(buf);
+          ch->conn_->snoop_by->character->do_snoop(ch->conn_->snoop_by->character->name().split(' '));
         }
         else
         {
@@ -5469,7 +5468,7 @@ command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
 
-      else if (victim->desc || (victim->isPlayer()))
+      else if (victim->conn_ || (victim->isPlayer()))
       {
         ch->sendln("You can't do that, the body is already in use!");
         return ReturnValue::eFAILURE;
@@ -5480,11 +5479,11 @@ command_return_t do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
         dc_sprintf(buf, "%s possessed %s", qPrintable(ch->name()), qPrintable(victim->name()));
         dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
         ch->player->possesing = 1;
-        ch->desc->character = victim;
-        ch->desc->original = ch;
+        ch->conn_->character = victim;
+        ch->conn_->original = ch;
 
-        victim->desc = ch->desc;
-        ch->desc = {};
+        victim->conn_ = ch->conn_;
+        ch->conn_ = {};
       }
     }
   }
@@ -5497,10 +5496,10 @@ command_return_t do_return(CharacterPtr ch, QString argument, cmd_t cmd)
   //    if(ch->isNonPlayer())
   //        return ReturnValue::eFAILURE;
 
-  if (!ch->desc)
+  if (!ch->conn_)
     return ReturnValue::eFAILURE;
 
-  if (!ch->desc->original)
+  if (!ch->conn_->original)
   {
     ch->sendln("Huh!?!");
     return ReturnValue::eFAILURE;
@@ -5509,12 +5508,12 @@ command_return_t do_return(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     ch->sendln("You return to your original body.");
 
-    ch->desc->original->player->possesing = {};
-    ch->desc->character = ch->desc->original;
-    ch->desc->original = {};
+    ch->conn_->original->player->possesing = {};
+    ch->conn_->character = ch->conn_->original;
+    ch->conn_->original = {};
 
-    ch->desc->character->desc = ch->desc;
-    ch->desc = {};
+    ch->conn_->character->conn_ = ch->conn_;
+    ch->conn_ = {};
     if (ch->isNonPlayer() && dc_->mob_index[ch->mobdata->nr].vnum() > 90 &&
         dc_->mob_index[ch->mobdata->nr].vnum() < 100 &&
         cmd != cmd_t::LOOK)
@@ -5611,7 +5610,7 @@ command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   if (buf == u"remove"_s)
   {
-    dc->DCVote.RemoveAnswer(ch, (quint32)atoi(buf2));
+    dc->DCVote.RemoveAnswer(ch, (quint32)dc_atoi(buf2));
     return ReturnValue::eSUCCESS;
   }
 

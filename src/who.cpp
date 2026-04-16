@@ -6,12 +6,10 @@
 
 #include "DC/DC.h"
 
-ClanPtr get_clan(CharacterPtr);
-
 command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto arguments = QString(argument).split(' ');
-  ConnectionPtr d{};
+  ConnectionPtr conn{};
   CharacterPtr k{}, i{};
   follow_type *f{};
   qint32 foundtarget{};
@@ -40,7 +38,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 
     //  What the hell is this line supposed to be checking? -pir
     //  If this occurs, we got alot bigger problems than 'who_group'
-    //      if (ch->desc->character != ch)
+    //      if (ch->conn_->character != ch)
     //         continue;
 
     i = conn->character;
@@ -118,7 +116,7 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("\r\nNo groups found.");
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
-  page_string(ch->desc, qPrintable(tempbuffer), 1);
+  page_string(ch->conn_, qPrintable(tempbuffer), 1);
   return ReturnValue::eSUCCESS;
 }
 
@@ -171,7 +169,7 @@ command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
   } // End For Loop.
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
-  page_string(ch->desc, qPrintable(tempbuffer), 1);
+  page_string(ch->conn_, qPrintable(tempbuffer), 1);
   return ReturnValue::eSUCCESS;
 }
 
@@ -277,7 +275,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 
   QString buf;
   QString immbuf;
-  bool hasholylight = this->isNonPlayer() ? false : player->holyLite;
+  bool hasholylight = isNonPlayer() ? false : player->holyLite;
   for (auto d = dc_->connections_; d; d = conn->next)
   {
     QString infoBuf;
@@ -326,7 +324,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       continue;
     }
 
-    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != this->clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
+    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
     {
       continue;
     }
@@ -546,7 +544,7 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  ConnectionPtr d;
+  ConnectionPtr conn;
   qint32 zonenumber;
   QString buf;
 

@@ -347,7 +347,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Can't set a mob's age.");
       return ReturnValue::eFAILURE;
     }
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set age of victim */
     vict->player->time.birth =
@@ -435,7 +435,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 3: /* level */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if (value > DC::MAX_MORTAL_LEVEL && value < MIN_GOD)
     {
       ch->sendln("That level doesn't exist!");
@@ -460,7 +460,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 4: /* height */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set height of victim */
     vict->height = value;
@@ -468,7 +468,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 5: /* weight */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set weight of victim */
     vict->weight = value;
@@ -476,7 +476,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 6: /* str */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
       ch->sendln("Strength must be more than 0");
@@ -495,7 +495,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 8: /* qint32 */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
       ch->sendln("Intelligence must be more than 0");
@@ -511,7 +511,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 9: /* wis */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
       ch->sendln("Wisdom must be more than 0");
@@ -525,7 +525,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 10: /* dex */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
       ch->sendln("Dexterity must be more than 0");
@@ -539,7 +539,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 11: /* con */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
       ch->sendln("Constitution must be more than 0");
@@ -554,7 +554,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 12: /* gold */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original gold of victim */
     vict->setGold(value);
@@ -572,7 +572,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 14: /* mana */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original mana of victim */
     vict->raw_mana = value;
@@ -581,7 +581,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 15: /* hit */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original hit of victim */
     vict->raw_hit = value;
@@ -590,7 +590,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 16: /* move */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original move of victim */
     vict->raw_move = value;
@@ -603,7 +603,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("Can't set a mob's pracs...");
       return ReturnValue::eFAILURE;
     }
-    value = atoi(buf);
+    value = dc_atoi(buf);
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original sessions of victim */
     vict->player->practices = value;
@@ -611,7 +611,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 18: /* alignment */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value < -1000) || (value > 1000))
     {
       ch->sendln("Alignment must be more than -1000");
@@ -625,7 +625,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 19: /* thirst */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value < -1) || (value > 100))
     {
       ch->sendln("Thirst must be more than -2");
@@ -639,7 +639,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 20: /* drunk */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value < -1) || (value > 100))
     {
       ch->sendln("Drunk must be more than -2");
@@ -653,7 +653,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 21: /* full */
   {
-    value = atoi(buf);
+    value = dc_atoi(buf);
     if ((value < -1) || (value > 100))
     {
       ch->sendln("Full must be more than -2");
@@ -688,7 +688,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 23: /* bank */
   {
-    GET_BANK(vict) = atoi(buf);
+    GET_BANK(vict) = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
@@ -697,7 +697,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     if (ch->getLevel() == IMPLEMENTER)
     {
       quint32 before_plat = GET_PLATINUM(vict);
-      GET_PLATINUM(vict) = atoi(buf);
+      GET_PLATINUM(vict) = dc_atoi(buf);
       dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
                 qPrintable(ch->name()), qPrintable(vict->name()), before_plat, GET_PLATINUM(vict));
     }
@@ -705,13 +705,13 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 25: /* ki */
   {
-    vict->raw_ki = atoi(buf);
+    vict->raw_ki = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 26: /* clan number */
   {
-    vict->clan = atoi(buf);
+    vict->clan = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
   }
   break;
@@ -746,25 +746,25 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 28:
   {
-    GET_HP_METAS(vict) = atoi(buf);
+    GET_HP_METAS(vict) = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 29:
   {
-    GET_MANA_METAS(vict) = atoi(buf);
+    GET_MANA_METAS(vict) = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 30:
   {
-    GET_MOVE_METAS(vict) = atoi(buf);
+    GET_MOVE_METAS(vict) = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 31:
   {
-    vict->armor = atoi(buf);
+    vict->armor = dc_atoi(buf);
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;

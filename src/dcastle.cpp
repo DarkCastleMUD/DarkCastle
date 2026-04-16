@@ -76,7 +76,7 @@ DC::config parse_arguments(qint32 argc, QString *argv)
       cf.verbose_mode = true;
       break;
     case 'p':
-      port = atoi(optarg);
+      port = dc_atoi(optarg);
       cf.ports.push_back(port);
       if (port == 6666)
       {

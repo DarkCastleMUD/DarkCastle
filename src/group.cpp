@@ -193,7 +193,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 
   if (k != this && k->in_room == in_room)
   {
-    k->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
+    k->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(shortdesc_or_name())).arg(amount).arg(share));
     qint32 lost = {};
     if (k->clan && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
         (k->clan != clan || (k->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
@@ -212,7 +212,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
         f->follower != this &&
         !f->follower->isNonPlayer())
     {
-      f->follower->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(this->shortdesc_or_name())).arg(amount).arg(share));
+      f->follower->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(shortdesc_or_name())).arg(amount).arg(share));
       qint32 lost = {};
       if (f->follower->clan && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
           (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
@@ -755,9 +755,9 @@ QList<CharacterPtr> Character::getFollowers(void)
     return followers;
   }
 
-  if (this->master != nullptr)
+  if (master != nullptr)
   {
-    leader = this->master;
+    leader = master;
   }
   else
   {

@@ -13,6 +13,7 @@
  *  All Rights Reserved, Copyright (C) 1999                             *
  ***********************************************************************/
 #include "DC/DC.h"
+#include <qiodevicebase.h>
 
 /* Set this define to wherever you want to save your corpses */
 const auto CORPSE_FILE = u"corpse.save"_s;
@@ -24,33 +25,10 @@ ObjectPtr obj_proto;
 qint16 frozen_start_room = 1;
 
 /* Local Function Declerations */
-qint32 count_hash_records(FILE *fl);
-ObjectPtr create_obj_new(void);
-void save_corpses(void);
-qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_tree);
-qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate);
-void clean_string(QString buffer);
-qint32 get_line_new(FILE *fl, QString buf);
 
-/* Tada! THE FUNCTIONS ! Yaaa! */
+qint32 get_line_new(auto &streamstream, QString buf);
 
-void clean_string(QString buffer)
-{
-  QString ptr, *str;
-
-  ptr = buffer;
-  str = ptr;
-
-  while ((*str = *ptr))
-  {
-    str++;
-    ptr++;
-    if (*ptr == '\r')
-      ptr++;
-  }
-}
-
-qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_tree)
+qint32 corpse_save(ObjectPtr obj, FILE *stream, qint32 location, bool recurse_this_tree)
 {
   /* This function basically is responsible for taking the    */
   /* supplied obj and figuring out if it has any contents. If */
@@ -73,12 +51,12 @@ qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_t
 
     if (recurse_this_tree != false)
     {
-      corpse_save(obj->next_content, fp, location, recurse_this_tree);
+      corpse_save(obj->next_content, stream, location, recurse_this_tree);
     }
 
     recurse_this_tree = true;
-    corpse_save(obj->contains, fp, MIN(0, location) - 1, recurse_this_tree);
-    result = write_corpse_to_disk(fp, obj, location);
+    corpse_save(obj->contains, stream, MIN(0, location) - 1, recurse_this_tree);
+    result = write_corpse_to_disk(stream, obj, location);
 
     /* readjust the wieght while we do this */
     //    for (tmp = obj->in_obj; tmp; tmp = tmp->in_obj)
@@ -89,95 +67,14 @@ qint32 corpse_save(ObjectPtr obj, FILE *fp, qint32 location, bool recurse_this_t
   return (true);
 }
 
-qint32 write_corpse_to_disk(FILE *fp, ObjectPtr obj, qint32 locate)
-{
-  /* This is basically Patrick's my_obj_save_to_disk function with    */
-  /* a few minor tweaks to make it work for corpses. Basically it     */
-  /* writes one object out to the corpse file every time it is called.*/
-  /* It can handle regular obj's and XAP objects.                     */
-
-  qint32 counter;
-  extra_descr_data *ex_desc;
-  QString buf1 = {};
-  // QString buf2;
-
-  if (!obj->ActionDescription().isEmpty())
-  {
-    dc_strncpy(buf1, qPrintable(obj->ActionDescription()), sizeof(buf1) - 1);
-    clean_string(buf1);
-  }
-  else
-    *buf1 = {};
-  dc_fprintf(fp,
-             "#%lu\n"
-             "%d %d %d %d %d %u %d %d\n",
-             GET_OBJ_VNUM(obj),
-             locate,
-             GET_OBJ_VAL(obj, 0),
-             GET_OBJ_VAL(obj, 1),
-             GET_OBJ_VAL(obj, 2),
-             GET_OBJ_VAL(obj, 3),
-             GET_OBJ_EXTRA(obj),
-             GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
-             GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
-
-  if (!(IS_OBJ_STAT(obj, ITEM_UNIQUE_SAVE)))
-  {
-    return 1;
-  }
-  dc_fprintf(fp,
-             "XAP\n"
-             "%s~\n"
-             "%s~\n"
-             "%s~\n"
-             "%s~\n"
-             "%d %d %d %d %d\n",
-             !obj->name().isEmpty() ? qPrintable(obj->name()) : "undefined",
-             qPrintable(obj->short_description()) ? qPrintable(obj->short_description()) : "undefined",
-             !obj->long_description().isEmpty() ? qPrintable(obj->long_description()) : "undefined",
-             qPrintable(buf1),
-             GET_OBJ_TYPE(obj),
-             GET_OBJ_WEAR(obj).toInt(),
-             (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
-             GET_OBJ_COST(obj), obj->num_affects);
-  /* Do we have affects? */
-  for (counter = {}; counter < obj->num_affects; counter++)
-    if (obj->affected[counter].modifier)
-      dc_fprintf(fp, "A\n"
-                     "%d %d\n",
-                 obj->affected[counter].location,
-                 obj->affected[counter].modifier);
-
-  /* Do we have extra descriptions? */
-  if (obj->ex_description)
-  { /*. Yep, save them too . */
-    for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next)
-    {
-      /*. Sanity check to prevent nasty protection faults . */
-      if (ex_desc->keyword_.isEmpty() || ex_desc->description_.isEmpty())
-      {
-        continue;
-      }
-      dc_strcpy(buf1, ex_desc->description_);
-      clean_string(buf1);
-      dc_fprintf(fp, "E\n"
-                     "%s~\n"
-                     "%s~\n",
-                 qPrintable(ex_desc->keyword_),
-                 qPrintable(buf1));
-    }
-  }
-  return 1;
-}
-
-void save_corpses(void)
+void DC::save_corpses(void)
 {
   /* This is basically the mother of all the save corpse functions */
   /* You can call it from anywhere in the game with no arguments */
   /* Basically any time a corpse is manipulated in any way..either */
   /* directly or indirectly you need to call this function */
 
-  FILE *fp;
+  QTextStream stream;
   ObjectPtr i, next;
   qint32 location = {};
   QString buf1;
@@ -187,11 +84,12 @@ void save_corpses(void)
     return;
 
   /* Open corpse file */
-  if (!(fp = fopen(CORPSE_FILE, "w")))
+  QFile file(CORPSE_FILE);
+  if (!file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    if (errno != ENOENT) /* if it fails, NOT because of no file */
-      dc_sprintf(buf1, "SYSERR: checking for corpse file %s : %s", CORPSE_FILE, strerror(errno));
-    perror(buf1);
+    QString buf1;
+    dc_sprintf(buf1, "SYSERR: checking for corpse file %s : %s", CORPSE_FILE, strerror(errno));
+    perror(qPrintable(buf1));
     return;
   }
 
@@ -204,16 +102,15 @@ void save_corpses(void)
     if (IS_OBJ_STAT(i, ITEM_PC_CORPSE) && i->contains)
     {
       /* It is, so save it to a file */
-      if (!corpse_save(i, fp, location, false))
+      if (!corpse_save(i, stream, location, false))
       {
         perror("SYSERR: A corpse didnt save for some reason");
-        fclose(fp);
+
         return;
       }
     }
   }
   /* Close the corpse file */
-  fclose(fp);
 }
 
 void DC::load_corpses(void)
@@ -227,7 +124,7 @@ void DC::load_corpses(void)
   /* If they dont like it, screwum. They are lucky I coded this:)    */
   /* Oh, and a bunch of this code is from Patricks XAP obj's code    */
 
-  FILE *fp;
+  QTextStream stream;
   QString line;
   qint32 t[15], zwei = {};
   qint32 nr, num_objs = {};
@@ -239,20 +136,20 @@ void DC::load_corpses(void)
   ObjectPtr money;
   qint32 debug = {};
 
-  if (!(fp = fopen(CORPSE_FILE, "r")))
+  if (!(stream = fopen(CORPSE_FILE, "r")))
   {
     logverbose(u"Unable to open '%1"_s.arg(CORPSE_FILE));
     return;
   }
 
-  if (!feof(fp))
+  if (!feof(stream))
   {
-    get_line_new(fp, line);
+    get_line_new(stream, line);
   }
   else
     dc_->logentry(u"No corpses in file to load"_s, 0, DC::LogChannel::LOG_MISC);
 
-  while (!feof(fp) && !end)
+  while (!feof(stream) && !end)
   {
     temp = {};
     /* first, we get the number. Not too hard. */
@@ -293,7 +190,7 @@ void DC::load_corpses(void)
         }
       }
 
-      get_line_new(fp, line);
+      get_line_new(stream, line);
       if (debug == 1)
       {
         dc_sprintf(buf3, " -LINE: %s", line);
@@ -308,7 +205,7 @@ void DC::load_corpses(void)
       GET_OBJ_VROOM(temp) = t[6];
       GET_OBJ_TIMER(temp) = t[7];
 
-      get_line_new(fp, line);
+      get_line_new(stream, line);
       if (debug == 1)
       {
         dc_sprintf(buf3, " -LINE: %s", line);
@@ -320,7 +217,7 @@ void DC::load_corpses(void)
         if (debug == 1)
           dc_->logentry(u"XAP Found"_s, 0, DC::LogChannel::LOG_MISC);
 
-        temp->name(fread_string_new(fp));
+        temp->name(fread_string_new(stream));
         if (temp->name().isEmpty())
         {
           temp->name(u"undefined"_s);
@@ -333,8 +230,8 @@ void DC::load_corpses(void)
           }
         }
 
-        auto buffer = fread_string_new(fp);
-        if (temp->short_description(fread_string_new(fp)).isEmpty())
+        auto buffer = fread_string_new(stream);
+        if (temp->short_description(fread_string_new(stream)).isEmpty())
         {
           temp->short_description("undefined");
         }
@@ -347,7 +244,7 @@ void DC::load_corpses(void)
           }
         }
 
-        if (temp->long_description(fread_string_new(fp)).isEmpty())
+        if (temp->long_description(fread_string_new(stream)).isEmpty())
         {
           temp->long_description("undefined");
         }
@@ -360,7 +257,7 @@ void DC::load_corpses(void)
           }
         }
 
-        temp->ActionDescription(fread_string_new(fp));
+        temp->ActionDescription(fread_string_new(stream));
         if (temp->ActionDescription().isEmpty())
         {
           temp->ActionDescription("undefined");
@@ -373,7 +270,7 @@ void DC::load_corpses(void)
             dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
-        if (!get_line_new(fp, line) ||
+        if (!get_line_new(stream, line) ||
             (sscanf(line, "%d %d %d %d %d", t, t + 1, t + 2, t + 3, t + 4) != 5))
         {
           dc_->logentry(u"load_corpses: Format error in first numeric line (expecting 5 args)"_s, 0, DC::LogChannel::LOG_MISC);
@@ -408,27 +305,27 @@ void DC::load_corpses(void)
           temp->ex_description = {};
         }
 
-        get_line_new(fp, line);
-        for (zwei = {}; !zwei && !feof(fp);)
+        get_line_new(stream, line);
+        for (zwei = {}; !zwei && !feof(stream);)
         {
           switch (*line)
           {
           case 'E':
             new_descr = new extra_descr_data;
-            new_descr->keyword_ = fread_string_new(fp);
-            new_descr->description_ = fread_string_new(fp);
+            new_descr->keyword_ = fread_string_new(stream);
+            new_descr->description_ = fread_string_new(stream);
             new_descr->next = temp->ex_description;
             temp->ex_description = new_descr;
-            get_line_new(fp, line);
+            get_line_new(stream, line);
             break;
           case 'A':
-            get_line_new(fp, line);
+            get_line_new(stream, line);
             sscanf(line, "%d %d", t, t + 1);
 
             temp->affected[temp->num_affects].location = t[0];
             temp->affected[temp->num_affects].modifier = t[1];
             temp->num_affects++;
-            get_line_new(fp, line);
+            get_line_new(stream, line);
             break;
 
           case '|':
@@ -505,17 +402,16 @@ void DC::load_corpses(void)
       }
     }
   }
-  fclose(fp);
 }
 
-qint32 get_line_new(FILE *fl, QString buf)
+qint32 get_line_new(auto &streamstream, QString buf)
 {
   QString temp;
   qint32 lines = 0, a = {};
 
-  while (!feof(fl))
+  while (!feof(stream))
   {
-    switch ((temp[a++] = fgetc(fl)))
+    switch ((temp[a++] = fgetc(stream)))
     {
     case (QChar)EOF:
       return 0;
@@ -538,12 +434,12 @@ qint32 get_line_new(FILE *fl, QString buf)
   do
   {
     lines++;
-    fgets(temp, 256, fl);
+    fgets(temp, 256, stream);
     if (!temp.isEmpty())
       temp[dc_strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
+  } while (!feof(stream) && (*temp == '*' || temp.isEmpty()));
 
-  if (feof(fl))
+  if (feof(stream))
     return 0;
   else
   {
@@ -552,28 +448,15 @@ qint32 get_line_new(FILE *fl, QString buf)
   }
 }
 
-ObjectPtr create_obj_new(void)
+ObjectPtr DC::create_obj_new(void)
 {
-  ObjectPtr obj = new Object;
+  auto obj = ObjectPtr(new Object(this));
   clear_object(obj);
-  obj->next = dc_->object_list;
-  dc_->object_list = obj;
+  object_list_.push_back(obj);
   /* Corpse saving stuff */
   GET_OBJ_VROOM(obj) = DC::NOWHERE;
   GET_OBJ_TIMER(obj) = {};
   obj->save_expiration = {};
   obj->no_sell_expiration = {};
   return obj;
-}
-
-qint32 count_hash_records(FILE *fl)
-{
-  QString buf;
-  qint32 count = {};
-
-  while (fgets(buf, 128, fl))
-    if (*buf == '#')
-      count++;
-
-  return count;
 }

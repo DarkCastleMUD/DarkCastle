@@ -451,7 +451,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument_interpreter(argument, papername, penname);
 
-  if (!ch->desc)
+  if (!ch->conn_)
     return ReturnValue::eSUCCESS;
   if (ch->getLevel() < 5)
   {
@@ -537,7 +537,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Ok.. go ahead and write.. end the note with a \\@.");
     act_to_room("$n begins to jot down a note.", ch, 0, 0, INVIS_NULL);
     // TODO BROKEN
-    // ch->desc->strnew = &paper->ActionDescription();
+    // ch->conn_->strnew = &paper->ActionDescription();
   }
   return ReturnValue::eSUCCESS;
 }
@@ -666,11 +666,11 @@ void DC::load_hints(void)
   }
 
   /*
-    while (fgetc(fl) != '$')
+    while (fgetc(stream) != '$')
     {
-      fread_uint(fl, 0, 32768); // ignored
+      fread_uint(stream, 0, 32768); // ignored
 
-      QString buffer = fread_string(fl, 0);
+      QString buffer = fread_string(stream);
       if (buffer != nullptr)
       {
         hints_.push_back(buffer);
@@ -678,7 +678,7 @@ void DC::load_hints(void)
       }
     }
 
-    fclose(fl);
+
     */
 }
 
@@ -722,7 +722,7 @@ void DC::send_hint(void)
 
   for (auto &conn : connections_)
   {
-    if (!conn->isPlaying() || !conn->character || !conn->character->desc || is_busy(conn->character) || conn->character->isNonPlayer())
+    if (!conn->isPlaying() || !conn->character || !conn->character->conn_ || is_busy(conn->character) || conn->character->isNonPlayer())
     {
       continue;
     }

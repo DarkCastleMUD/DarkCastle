@@ -104,7 +104,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   follow_type *k = {}, *next_dude = {};
   ObjectPtr target_obj = {};
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
@@ -281,7 +281,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   send("\r\n");
 
-  if (!this->isNonPlayer())
+  if (!isNonPlayer())
     for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -303,7 +303,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   move_char(this, location);
 
-  if (!this->isNonPlayer())
+  if (!isNonPlayer())
     for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -333,7 +333,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if (start_room == k->follower->in_room && CAN_SEE(k->follower, this) &&
           k->follower->getLevel() >= IMMORTAL)
       {
-        k->follower->send(u"You follow %s.\r\n\r\n"_s.arg(qPrintable(this->shortdesc_or_name())));
+        k->follower->send(u"You follow %s.\r\n\r\n"_s.arg(qPrintable(shortdesc_or_name())));
         k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
@@ -461,7 +461,7 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isdigit(*loc_str) && !strchr(loc_str, '.'))
   {
-    loc_nr = atoi(loc_str);
+    loc_nr = dc_atoi(loc_str);
     if ((loc_nr == 0 && *loc_str != '0') ||
         ((location = real_room(loc_nr)) < 0))
     {
@@ -582,7 +582,7 @@ command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  arg1 = atoi(argument);
+  arg1 = dc_atoi(argument);
 
   if (arg1 < 0)
     arg1 = {};

@@ -16,30 +16,6 @@
 /* $Id: info.cpp,v 1.210 2015/06/14 02:38:12 pirahna Exp $ */
 #include "DC/DC.h"
 
-/* extern variables */
-
-extern QString credits;
-extern QString info;
-extern QString story;
-extern QStringList where;
-extern QStringList color_liquid;
-extern QStringList fullness;
-extern QStringList sky_look;
-extern const QStringList temp_room_bits;
-
-/* Used for "who" */
-extern qint32 max_who;
-
-/* extern functions */
-
-void page_string(ConnectionPtr d, const QString str, qint32 keep_internal);
-ClanPtr get_clan(CharacterPtr);
-extern qint32 getRealSpellDamage(CharacterPtr ch);
-
-/* intern functions */
-
-void showStatDiff(CharacterPtr ch, qint32 base, qint32 random, bool swapcolors = false);
-
 qint32 get_saves(CharacterPtr ch, qint32 savetype)
 {
   qint32 save = ch->saves[savetype];
@@ -140,7 +116,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
 
   // Don't show NO_NOTICE items in a room with "look" unless they have holylite
   if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE) &&
-      (this->player && !this->player->holyLite))
+      (player && !player->holyLite))
     return;
 
   buffer[0] = '\0';
@@ -157,7 +133,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       {
         dc_strncpy(buffer, "There is something written upon it:\r\n\r\n", sizeof(buffer) - 1);
         dc_strncat(buffer, qPrintable(object->ActionDescription()), sizeof(buffer) - 1);
-        page_string(this->desc, buffer, 1);
+        page_string(conn_, buffer, 1);
       }
       else
         act_to_character("It's blank.", this, 0, 0, 0);
@@ -307,7 +283,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
   }
 
   dc_strcat(buffer, "\r\n");
-  page_string(this->desc, buffer, 1);
+  page_string(conn_, buffer, 1);
 }
 
 void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
@@ -331,7 +307,7 @@ void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
       if (number > 1)
       {
         dc_sprintf(buf, "[%d] ", number);
-        this->send(buf);
+        send(buf);
       }
       show_obj_to_char(i, mode);
       found = true;
@@ -340,7 +316,7 @@ void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
   }
 
   if ((!found) && (show))
-    this->sendln("Nothing");
+    sendln("Nothing");
 }
 
 void show_spells(CharacterPtr i, CharacterPtr ch)
@@ -437,7 +413,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
       /* A character without long descr, or not in default pos. */
       if (i->isPlayer())
       {
-        if (!i->desc)
+        if (!i->conn_)
           buffer = "*linkdead*  ";
         if (isSet(i->player->toggles, Player::PLR_GUIDE_TOG))
           buffer.append("$B$7(Guide)$B$3 ");
@@ -689,7 +665,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
   QString name = arguments.value(0);
   if (name.isEmpty())
   {
-    this->sendln("botcheck <player> or all\r\n");
+    sendln("botcheck <player> or all\r\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -698,7 +674,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (!victim && name == "all")
   {
-    ConnectionPtr d;
+    ConnectionPtr conn;
     CharacterPtr i;
 
     for (auto &d : dc_->connections_)
@@ -722,17 +698,17 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (victim->getLevel() > this->getLevel())
+  if (victim->getLevel() > getLevel())
   {
-    this->sendln("Unable to show information.");
-    this->send(u"%s is a higher level than you.\r\n"_s.arg(qPrintable(victim->name())));
+    sendln("Unable to show information.");
+    send(u"%s is a higher level than you.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer())
   {
-    this->sendln("Unable to show information.");
-    this->send(u"%s is a mob.\r\n"_s.arg(qPrintable(victim->name())));
+    sendln("Unable to show information.");
+    send(u"%s is a mob.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -741,7 +717,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (victim->player->lastseen->size() == 0)
   {
-    this->send(u"%s has not seen any mobs recently.\r\n"_s.arg(qPrintable(victim->name())));
+    send(u"%s has not seen any mobs recently.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
@@ -768,7 +744,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
     if (nr >= 0)
     {
-      this->send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description())));
+      send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description())));
     }
   }
 
@@ -779,41 +755,41 @@ void Character::list_char_to_char(CharacterPtr list, qint32 mode)
 {
   bool clear_lastseen = false;
   CharacterPtr i;
-  qint32 known = this->has_skill(SKILL_BLINDFIGHTING);
+  qint32 known = has_skill(SKILL_BLINDFIGHTING);
   timeval tv, tv_zero = {0, 0};
 
   for (i = list; i; i = i->next_in_room)
   {
     if (this == i)
       continue;
-    if (!i->isNonPlayer() && (i->player->wizinvis > this->getLevel()))
-      if (!i->player->incognito || !(this->in_room == i->in_room))
+    if (!i->isNonPlayer() && (i->player->wizinvis > getLevel()))
+      if (!i->player->incognito || !(in_room == i->in_room))
         continue;
     if (IS_AFFECTED(this, AFF_SENSE_LIFE) || CAN_SEE(this, i))
     {
       show_char_to_char(i, this, 0);
 
-      if (this->isPlayer() && i->isNonPlayer())
+      if (isPlayer() && i->isNonPlayer())
       {
-        if (this->player->lastseen == 0)
-          this->player->lastseen = new std::multimap<qint32, std::pair<timeval, timeval>>;
+        if (player->lastseen == 0)
+          player->lastseen = new std::multimap<qint32, std::pair<timeval, timeval>>;
 
         if (clear_lastseen == false)
         {
-          this->player->lastseen->clear();
+          player->lastseen->clear();
           clear_lastseen = true;
         }
 
         gettimeofday(&tv, nullptr);
-        this->player->lastseen->insert(std::pair<qint32, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
+        player->lastseen->insert(std::pair<qint32, std::pair<timeval, timeval>>(i->mobdata->nr, std::pair<timeval, timeval>(tv, tv_zero)));
       }
     }
-    else if (IS_DARK(this->in_room))
+    else if (IS_DARK(in_room))
     {
       if (known && skill_success(nullptr, SKILL_BLINDFIGHTING))
-        this->sendln("Your blindfighting awareness alerts you to a presense in the area.");
+        sendln("Your blindfighting awareness alerts you to a presense in the area.");
       else if (ch->dc_->number(1, 10) == 1)
-        this->sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
+        sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
     }
   }
 }
@@ -871,10 +847,10 @@ QString Character::getStatDiff(qint32 base, qint32 random, bool swapcolors)
   QString color_good = "$2";
   QString color_bad = "$4";
 
-  if (this->player)
+  if (player)
   {
-    color_good = this->getSettingAsColor("color.good");
-    color_bad = this->getSettingAsColor("color.bad");
+    color_good = getSettingAsColor("color.good");
+    color_bad = getSettingAsColor("color.bad");
   }
   else
   {
@@ -1236,7 +1212,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   };
 
   qint32 weight_in(ObjectPtr obj);
-  if (!ch->desc)
+  if (!ch->conn_)
     return 1;
   if (GET_POS(ch) < position_t::SLEEPING)
     ch->sendln("You can't see anything but stars!");
@@ -1284,7 +1260,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       auto tmp_desc = find_ex_description(arg1, dc_->world[ch->in_room].ex_description);
       if (!tmp_desc.isEmpty())
       {
-        page_string(ch->desc, qPrintable(tmp_desc), 0);
+        page_string(ch->conn_, qPrintable(tmp_desc), 0);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1483,7 +1459,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
           auto tmp_desc = find_ex_description(arg2, dc_->world[ch->in_room].ex_description);
           if (!tmp_desc.isEmpty())
           {
-            page_string(ch->desc, qPrintable(tmp_desc), 0);
+            page_string(ch->conn_, qPrintable(tmp_desc), 0);
             return ReturnValue::eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
                                           /* Old system was: found = true; */
           }
@@ -1504,7 +1480,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 auto tmp_desc = find_ex_description(arg2, ch->equipment[j]->ex_description);
                 if (!tmp_desc.isEmpty())
                 {
-                  page_string(ch->desc, qPrintable(tmp_desc), 1);
+                  page_string(ch->conn_, qPrintable(tmp_desc), 1);
                   return ReturnValue::eSUCCESS;
                   //                              found = true;
                 }
@@ -1525,7 +1501,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               auto tmp_desc = find_ex_description(arg2, tmp_object->ex_description);
               if (!tmp_desc.isEmpty())
               {
-                page_string(ch->desc, qPrintable(tmp_desc), 1);
+                page_string(ch->conn_, qPrintable(tmp_desc), 1);
                 return ReturnValue::eSUCCESS;
                 //                           found = true;
               }
@@ -1546,7 +1522,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               auto tmp_desc = find_ex_description(arg2, tmp_object->ex_description);
               if (!tmp_desc.isEmpty())
               {
-                page_string(ch->desc, qPrintable(tmp_desc), 1);
+                page_string(ch->conn_, qPrintable(tmp_desc), 1);
                 return ReturnValue::eSUCCESS;
                 //                           found = true;
               }
@@ -1786,8 +1762,6 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
       "West ",
       "Up   ",
       "Down "};
-
-  *buf = '\0';
 
   if (check_blind(ch))
     return ReturnValue::eFAILURE;
@@ -2323,7 +2297,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 chk, bot, top, mid;
   QString buf, buffer;
 
-  if (!ch->desc)
+  if (!ch->conn_)
     return ReturnValue::eFAILURE;
 
   for (; isspace(*argument); argument++)
@@ -2358,7 +2332,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
           dc_strcat(buffer, buf);
           dc_strcat(buffer, "\r");
         }
-        page_string(ch->desc, buffer, 1);
+        page_string(ch->conn_, buffer, 1);
         return ReturnValue::eSUCCESS;
       }
       else if (bot >= top)
@@ -2379,7 +2353,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  ConnectionPtr d;
+  ConnectionPtr conn;
   CharacterPtr i;
   qint32 clss[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   qint32 race[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -2459,26 +2433,26 @@ command_return_t do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  page_string(ch->desc, credits, 0);
+  page_string(ch->conn_, credits, 0);
   return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_story(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  page_string(ch->desc, story, 0);
+  page_string(ch->conn_, story, 0);
   return ReturnValue::eSUCCESS;
 }
 /*
 command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-   page_string(ch->desc, news, 0);
+   page_string(ch->conn_, news, 0);
    return ReturnValue::eSUCCESS;
 }
 
 */
 command_return_t do_info(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  page_string(ch->desc, info, 0);
+  page_string(ch->conn_, info, 0);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2494,7 +2468,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
   buf2[0] = '\0';
   if (isdigit(*name))
   {
-    vnum = atoi(name);
+    vnum = dc_atoi(name);
     searchnum = real_object(vnum);
   }
 
@@ -2595,7 +2569,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
   if (buf.isEmpty() 2)
     ch->sendln("Couldn't find any such OBJECT.");
   else
-    page_string(ch->desc, buf2, 1);
+    page_string(ch->conn_, buf2, 1);
   return ReturnValue::eSUCCESS;
 }
 /*********--------- end of locate objects -----------------************/
@@ -2611,7 +2585,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 
   if (isdigit(*name))
   {
-    vnum = atoi(name);
+    vnum = dc_atoi(name);
     searchnum = real_mobile(vnum);
   }
 
@@ -2641,7 +2615,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
     }
 
     count++;
-    *buf = '\0';
+
     dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), dc_->world[i->in_room].number);
     if (dc_strlen(buf) + dc_strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
@@ -2654,7 +2628,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
   if (buf.isEmpty() 2)
     ch->sendln("Couldn't find any MOBS by that NAME.");
   else
-    page_string(ch->desc, buf2, 1);
+    page_string(ch->conn_, buf2, 1);
   return ReturnValue::eSUCCESS;
 }
 /* --------------------- End of Mob locate function -------------------- */
@@ -3189,7 +3163,7 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->desc == nullptr)
+  if (ch->conn_ == nullptr)
     return ReturnValue::eFAILURE;
 
   while (*argument == ' ')
@@ -3198,7 +3172,7 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
   if (*argument == '\0')
     ntick = 1;
   else
-    ntick = atoi(argument);
+    ntick = dc_atoi(argument);
 
   if (ntick == 1)
     dc_sprintf(buf, "$n is waiting for one tick.");
@@ -3209,7 +3183,7 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_room(buf, ch, 0, 0, INVIS_NULL);
 
   // TODO - figure out if this ever had any purpose.  It's still fun though:)
-  ch->desc->tick_wait = ntick;
+  ch->conn_->tick_wait = ntick;
   return ReturnValue::eSUCCESS;
 }
 
@@ -3255,12 +3229,12 @@ void check_champion_and_website_who_list()
   for (const auto &ch : character_list)
   {
 
-    if (ch->isPlayer() && ch->desc && ch->player && ch->player->wizinvis <= 0)
+    if (ch->isPlayer() && ch->conn_ && ch->player && ch->player->wizinvis <= 0)
     {
       buf << qPrintable(ch->shortdesc_or_name()) << std::endl;
     }
 
-    if ((ch->isNonPlayer() || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
+    if ((ch->isNonPlayer() || !ch->conn_) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
     {
       obj_from_char(obj);
       obj_to_room(obj, CFLAG_HOME);
@@ -3287,9 +3261,9 @@ void check_champion_and_website_who_list()
     }
   }
 
-  std::ifstream fl(LOCAL_WHO_FILE);
+  std::ifstream stream(LOCAL_WHO_FILE);
 
-  while (getline(fl, name))
+  while (getline(stream, name))
   {
     if (addminute <= 9)
       buf << name << std::endl;
@@ -3299,7 +3273,7 @@ void check_champion_and_website_who_list()
       addminute++;
   }
 
-  fl.close();
+  stream.close();
 
   std::ofstream flo(LOCAL_WHO_FILE);
   flo << buf.str();
@@ -3314,7 +3288,7 @@ command_return_t do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString art = "a";
 
-  if (ch->desc && ch->in_room)
+  if (ch->conn_ && ch->in_room)
   {
     qint32 sector = dc_->world[ch->in_room].sector_type;
     switch (sector)
@@ -4123,7 +4097,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     extern VaultPtr vault_table;
     for (auto vault = vault_table; vault; vault = vault->next)
     {
-      if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(qPrintable(this->name()), vault))
+      if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(qPrintable(name()), vault))
       {
         vaults_searched++;
         vault_items_data *items;

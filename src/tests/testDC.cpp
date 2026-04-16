@@ -641,7 +641,6 @@ private slots:
     QString str3 = fread_string(stream);
     QCOMPARE(str3, u""_s);
 
-    fclose(stream);
     testfile.remove();
   }
 
@@ -723,8 +722,8 @@ private slots:
     QCOMPARE(fstream_checksum.toHex(), original_checksum.toHex());
 
     {
-      FILE *fl = fopen(qPrintable(legacyfile_filename), "r");
-      QVERIFY(fl);
+      FILE *stream = fopen(qPrintable(legacyfile_filename), "r");
+      QVERIFY(stream);
 
       QFile qf(qfile_filename);
       QVERIFY(qf.open(QIODeviceBase::ReadOnly));
@@ -737,7 +736,7 @@ private slots:
       qint32 room_nr = {};
 
       Room original_room1 = dc_->world[1];
-      qint32 new_room_nr = dc_->read_one_room(fl, room_nr);
+      qint32 new_room_nr = dc_->read_one_room(stream, room_nr);
       QCOMPARE(room_nr, 1);
       QCOMPARE(new_room_nr, 1);
       Room new_room1 = dc_->world[1];
@@ -1367,18 +1366,18 @@ private slots:
       ch->player->last_obj_vnum = 2222;
       ch->player->last_mob_edit = 4444;
 
-      ch->desc = new Connection;
-      ch->desc->descriptor = 1;
-      ch->desc->character = ch;
-      ch->desc->output = {};
+      ch->conn_ = new Connection;
+      ch->conn_->descriptor = 1;
+      ch->conn_->character = ch;
+      ch->conn_->output = {};
 
       if (dc.connections_)
-        ch->desc->next = dc.connections_;
-      dc.connections_ = ch->desc;
+        ch->conn_->next = dc.connections_;
+      dc.connections_ = ch->conn_;
       dc.character_list.insert(ch);
 
       QCOMPARE(move_char(ch, 3014), ReturnValue::eSUCCESS);
-      QCOMPARE(ch->desc->output, "");
+      QCOMPARE(ch->conn_->output, "");
     }
 
     QCOMPARE(do_found(&p1, "."), ReturnValue::eSUCCESS);
@@ -1390,12 +1389,12 @@ private slots:
 
     for (CharacterPtr ch : {&g1, &g2, &g3, &g4})
     {
-      ch->desc->output = {};
+      ch->conn_->output = {};
       p1.desc->output = {};
       QCOMPARE(do_follow(ch, QStringLiteral(qUtf8Printable(names[0]))), ReturnValue::eSUCCESS);
-      QCOMPARE(ch->desc->output, "You now follow agis.\r\n");
+      QCOMPARE(ch->conn_->output, "You now follow agis.\r\n");
       QCOMPARE(p1.desc->output, u"%1 starts following you.\r\n"_s.arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));
-      ch->desc->output = {};
+      ch->conn_->output = {};
       p1.desc->output = {};
       QCOMPARE(do_group(&p1, QStringLiteral(qUtf8Printable(ch->name()))), ReturnValue::eSUCCESS);
       QCOMPARE(p1.desc->output, u"%1 is now a group member.\r\n"_s.arg(ch->name().replace(0, 1, ch->name()[0].toUpper())));

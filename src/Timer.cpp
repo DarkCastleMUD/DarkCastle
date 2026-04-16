@@ -1,5 +1,5 @@
 /*
- * Timer.cpp
+ * SystemTimer.cpp
  *
  *  Created on: Nov 13, 2011
  *      Author: jhhudso
@@ -7,7 +7,7 @@
 
 #include "DC/DC.h"
 
-QMap<QString, Timer> PerfTimers;
+QMap<QString, SystemTimer> PerfSystemTimers;
 
 TimeVal::TimeVal(time_t sec, suseconds_t usec)
 {
@@ -101,28 +101,28 @@ void TimeVal::gettime()
   tv_usec = tv.tv_usec;
 }
 
-Timer::Timer()
+SystemTimer::SystemTimer()
     : stopCount(0), totalTime(0)
 {
 }
 
-Timer::~Timer()
+SystemTimer::~SystemTimer()
 {
 }
 
-void Timer::start()
+void SystemTimer::start()
 {
   starttv.gettime();
 }
 
-void Timer::stop()
+void SystemTimer::stop()
 {
   TimeVal stoptv;
   stoptv.gettime();
 
   if (stoptv < starttv)
   {
-    // std::cerr << "Timer::stop() time went backwards." << std::endl;
+    // std::cerr << "SystemTimer::stop() time went backwards." << std::endl;
     stoptv = starttv;
   }
   diff_cur = stoptv - starttv;
@@ -148,31 +148,31 @@ void Timer::stop()
   totalTime += (diff_cur.tv_usec / 1000);
 }
 
-TimeVal Timer::getDiff()
+TimeVal SystemTimer::getDiff()
 {
   return diff_cur;
 }
 
-TimeVal Timer::getDiffMin()
+TimeVal SystemTimer::getDiffMin()
 {
   return diff_min;
 }
 
-TimeVal Timer::getDiffMax()
+TimeVal SystemTimer::getDiffMax()
 {
   return diff_max;
 }
 
-TimeVal Timer::getDiffAvg()
+TimeVal SystemTimer::getDiffAvg()
 {
   return diff_avg;
 }
 
-std::ostream &operator<<(std::ostream &out, Timer t)
+std::ostream &operator<<(std::ostream &out, SystemTimer t)
 {
-  out << "last=" << t.diff_cur << " min=" << t.diff_min
-      << " max=" << t.diff_max << " avg=" << t.diff_avg
-      << " count=" << t.stopCount << " total=" << t.totalTime << "ms";
+  out << "last=" << t.getDiff() << " min=" << t.getDiffMin()
+      << " max=" << t.getDiffMax() << " avg=" << t.getDiffAvg()
+      << " count=" << t.Count() << " total=" << t.Total() << "ms";
   return out;
 }
 std::ostream &operator<<(std::ostream &out, TimeVal tv)

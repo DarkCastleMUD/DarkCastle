@@ -356,7 +356,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   {
     left += 5;
     if (is_number(left))
-      rtarget = real_room(atoi(left));
+      rtarget = real_room(dc_atoi(left));
     else
       rtarget = mob->in_room;
   }
@@ -809,7 +809,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       else
       {
         qint32 skl = {};
-        if (*half == '\0' || (skl = atoi(half)) < 0)
+        if (*half == '\0' || (skl = dc_atoi(half)) < 0)
         {
           dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                     "translate_value: Mob: %d invalid skillnumber in hasskill",
@@ -1607,7 +1607,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   if (!(arg[0] == '$') && is_number(arg) && traditional)
   {
     CharacterPtr te;
-    qint32 vnum = atoi(arg);
+    qint32 vnum = dc_atoi(arg);
     for (te = dc_->world[mob->in_room].people_; te; te = te->next)
     {
       if (te->isPlayer())
@@ -1640,15 +1640,15 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   if (val2[0] == '\0')
   {
     if (lvali)
-      return mprog_veval(*lvali, opr, atoi(val));
+      return mprog_veval(*lvali, opr, dc_atoi(val));
     if (lvalui)
-      return mprog_veval(*lvalui, opr, (uint)atoi(val));
+      return mprog_veval(*lvalui, opr, (uint)dc_atoi(val));
     if (lvali64)
-      return mprog_veval((qint32)*lvali64, opr, atoi(val));
+      return mprog_veval((qint32)*lvali64, opr, dc_atoi(val));
     if (lvalui64)
-      return mprog_veval((qint32)*lvalui64, opr, atoi(val));
+      return mprog_veval((qint32)*lvalui64, opr, dc_atoi(val));
     if (lvalb)
-      return mprog_veval((qint32)*lvalb, opr, atoi(val));
+      return mprog_veval((qint32)*lvalb, opr, dc_atoi(val));
     if (lvalstr)
       return mob->mprog_seval(*lvalstr, opr, val);
     if (!lvalqstr.isEmpty())
@@ -1671,7 +1671,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         return mob->mprog_seval(*lvalstr, opr, *rvalstr);
       // The rest fit in an qint64, so let's just use that.
       if (rvalstr)
-        rval = atoi(*rvalstr);
+        rval = dc_atoi(*rvalstr);
       if (rvali)
         rval = *rvali;
       if (rvalui)
@@ -1697,15 +1697,15 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   switch (ifcheck[buf])
   {
   case eRAND:
-    return (ch->dc_->number(1, 100) <= atoi(arg));
+    return (ch->dc_->number(1, 100) <= dc_atoi(arg));
     break;
 
   case eRAND1K:
-    return (ch->dc_->number(1, 1000) <= atoi(arg));
+    return (ch->dc_->number(1, 1000) <= dc_atoi(arg));
     break;
 
   case eAMTITEMS:
-    return mprog_veval(dc_->obj_index[real_object(atoi(arg))].qty, opr, atoi(val));
+    return mprog_veval(dc_->obj_index[real_object(dc_atoi(arg))].qty, opr, dc_atoi(val));
     break;
 
   case eNUMPCS:
@@ -1715,13 +1715,13 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     for (p = dc_->world[mob->in_room].people_; p; p = p->next_in_room)
       if (p->isPlayer())
         count++;
-    return mprog_veval(count, opr, atoi(val));
+    return mprog_veval(count, opr, dc_atoi(val));
   }
   break;
 
   case eNUMOFMOBSINWORLD:
   {
-    qint32 target = atoi(arg);
+    qint32 target = dc_atoi(arg);
     qint32 count = {};
 
     const auto &character_list = dc_->character_list;
@@ -1738,12 +1738,12 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
                             }
                           });
 
-    return mprog_veval(count, opr, atoi(val));
+    return mprog_veval(count, opr, dc_atoi(val));
   }
   break;
   case eNUMOFOBJSINWORLD:
   {
-    qint32 target = atoi(arg);
+    qint32 target = dc_atoi(arg);
     qint32 count = {};
 
     ObjectPtr p;
@@ -1755,20 +1755,20 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       }
     }
 
-    return mprog_veval(count, opr, atoi(val));
+    return mprog_veval(count, opr, dc_atoi(val));
   }
   break;
 
   case eNUMOFMOBSINROOM:
   {
-    qint32 target = atoi(arg);
+    qint32 target = dc_atoi(arg);
     CharacterPtr p;
     qint32 count = {};
     for (p = dc_->world[mob->in_room].people_; p; p = p->next_in_room)
       if (p->isNonPlayer() && dc_->mob_index[p->mobdata->nr].vnum() == target)
         count++;
 
-    return mprog_veval(count, opr, atoi(val));
+    return mprog_veval(count, opr, dc_atoi(val));
   }
   break;
 
@@ -1865,34 +1865,34 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eISWEAPPRI:
     if (fvict && fvict->equipment[WEAR_WIELD])
-      return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+      return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
     if (ye)
       return false;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
       if (mob->equipment[WEAR_WIELD])
-        return mprog_veval(mob->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(mob->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'z':
       if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD])
-        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return -1;
     case 'n':
       if (actor && actor->equipment[WEAR_WIELD])
-        return mprog_veval(actor->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(actor->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 't':
       if (vict && vict->equipment[WEAR_WIELD])
-        return mprog_veval(vict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(vict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'r':
       if (rndm && rndm->equipment[WEAR_WIELD])
-        return mprog_veval(rndm->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(rndm->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     default:
@@ -1903,34 +1903,34 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eISWEAPSEC:
     if (fvict && fvict->equipment[WEAR_SECOND_WIELD])
-      return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+      return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
     if (ye)
       return false;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
       if (mob->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'z':
       if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return -1;
     case 'n':
       if (actor && actor->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 't':
       if (vict && vict->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'r':
       if (rndm && rndm->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+        return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
       else
         return 0;
     default:
@@ -2408,33 +2408,33 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eISAFFECTED:
     if (fvict)
-      return (ISSET(fvict->affected_by, atoi(val)));
+      return (ISSET(fvict->affected_by, dc_atoi(val)));
     if (ye)
       return false;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return (ISSET(mob->affected_by, atoi(val)));
+      return (ISSET(mob->affected_by, dc_atoi(val)));
     case 'z':
       if (mob->beacon)
-        return (ISSET(((CharacterPtr)mob->beacon)->affected_by, atoi(val)));
+        return (ISSET(((CharacterPtr)mob->beacon)->affected_by, dc_atoi(val)));
       else
         return -1;
 
     case 'n':
       if (actor)
-        return (ISSET(actor->affected_by, atoi(val)));
+        return (ISSET(actor->affected_by, dc_atoi(val)));
       else
         return -1;
     case 't':
       if (vict)
-        return (ISSET(vict->affected_by, atoi(val)));
+        return (ISSET(vict->affected_by, dc_atoi(val)));
       else
         return -1;
     case 'r':
       if (rndm)
-        return (ISSET(rndm->affected_by, atoi(val)));
+        return (ISSET(rndm->affected_by, dc_atoi(val)));
       else
         return -1;
     default:
@@ -2450,7 +2450,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     if (fvict)
     {
       lhsvl = (fvict->hit * 100) / fvict->max_hit;
-      rhsvl = atoi(val);
+      rhsvl = dc_atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     }
     if (ye)
@@ -2459,13 +2459,13 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     {
     case 'i':
       lhsvl = (mob->hit * 100) / mob->max_hit;
-      rhsvl = atoi(val);
+      rhsvl = dc_atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     case 'z':
       if (mob->beacon)
       {
         lhsvl = (((CharacterPtr)mob->beacon)->hit * 100) / ((CharacterPtr)mob->beacon)->max_hit;
-        rhsvl = atoi(val);
+        rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
@@ -2475,7 +2475,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (actor)
       {
         lhsvl = (actor->hit * 100) / actor->max_hit;
-        rhsvl = atoi(val);
+        rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
@@ -2484,7 +2484,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (vict)
       {
         lhsvl = (vict->hit * 100) / vict->max_hit;
-        rhsvl = atoi(val);
+        rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
@@ -2493,7 +2493,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (rndm)
       {
         lhsvl = (rndm->hit * 100) / rndm->max_hit;
-        rhsvl = atoi(val);
+        rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
@@ -2514,7 +2514,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
     if (fvict)
     {
-      obj = search_char_for_item(fvict, real_object(atoi(valu)), true);
+      obj = search_char_for_item(fvict, real_object(dc_atoi(valu)), true);
       take = fvict;
     }
     else
@@ -2526,28 +2526,28 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       case 'z':
         if (!mob->beacon)
           return -1;
-        obj = search_char_for_item(((CharacterPtr)mob->beacon), real_object(atoi(valu)), true);
+        obj = search_char_for_item(((CharacterPtr)mob->beacon), real_object(dc_atoi(valu)), true);
         take = ((CharacterPtr)mob->beacon);
       case 'i': // mob
-        obj = search_char_for_item(mob, real_object(atoi(valu)), true);
+        obj = search_char_for_item(mob, real_object(dc_atoi(valu)), true);
         take = mob;
         break;
       case 'n': // actor
         if (!actor)
           return -1;
-        obj = search_char_for_item(actor, real_object(atoi(valu)), true);
+        obj = search_char_for_item(actor, real_object(dc_atoi(valu)), true);
         take = actor;
         break;
       case 't': // vict
         if (!vict)
           return -1;
-        obj = search_char_for_item(vict, real_object(atoi(valu)), true);
+        obj = search_char_for_item(vict, real_object(dc_atoi(valu)), true);
         take = vict;
         break;
       case 'r': // rndm
         if (!rndm)
           return -1;
-        obj = search_char_for_item(rndm, real_object(atoi(valu)), true);
+        obj = search_char_for_item(rndm, real_object(dc_atoi(valu)), true);
         take = rndm;
         break;
       default:
@@ -2584,7 +2584,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     QString valu = one_argument(val, bufeh);
     if (fvict)
     {
-      obj = search_char_for_item(fvict, real_object(atoi(valu)), false);
+      obj = search_char_for_item(fvict, real_object(dc_atoi(valu)), false);
       take = fvict;
     }
     else
@@ -2596,28 +2596,28 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       case 'z':
         if (!mob->beacon)
           return -1;
-        obj = search_char_for_item(((CharacterPtr)mob->beacon), real_object(atoi(valu)), false);
+        obj = search_char_for_item(((CharacterPtr)mob->beacon), real_object(dc_atoi(valu)), false);
         take = ((CharacterPtr)mob->beacon);
       case 'i': // mob
-        obj = search_char_for_item(mob, real_object(atoi(valu)), false);
+        obj = search_char_for_item(mob, real_object(dc_atoi(valu)), false);
         take = mob;
         break;
       case 'n': // actor
         if (!actor)
           return -1;
-        obj = search_char_for_item(actor, real_object(atoi(valu)), false);
+        obj = search_char_for_item(actor, real_object(dc_atoi(valu)), false);
         take = actor;
         break;
       case 't': // vict
         if (!vict)
           return -1;
-        obj = search_char_for_item(vict, real_object(atoi(valu)), false);
+        obj = search_char_for_item(vict, real_object(dc_atoi(valu)), false);
         take = vict;
         break;
       case 'r': // rndm
         if (!rndm)
           return -1;
-        obj = search_char_for_item(rndm, real_object(atoi(valu)), false);
+        obj = search_char_for_item(rndm, real_object(dc_atoi(valu)), false);
         take = rndm;
         break;
       default:
@@ -2654,7 +2654,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (fvict->isPlayer())
         return 0;
       lhsvl = dc_->mob_index[fvict->mobdata->nr].vnum();
-      rhsvl = atoi(val);
+      rhsvl = dc_atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     }
     if (ye)
@@ -2664,7 +2664,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     {
     case 'i':
       lhsvl = dc_->mob_index[mob->mobdata->nr].vnum();
-      rhsvl = atoi(val);
+      rhsvl = dc_atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     case 'z':
       if (mob->beacon)
@@ -2672,7 +2672,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         if (((CharacterPtr)mob->beacon)->isNonPlayer())
         {
           lhsvl = dc_->mob_index[((CharacterPtr)mob->beacon)->mobdata->nr].vnum();
-          rhsvl = atoi(val);
+          rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
         else
@@ -2687,7 +2687,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         if (actor->isNonPlayer())
         {
           lhsvl = dc_->mob_index[actor->mobdata->nr].vnum();
-          rhsvl = atoi(val);
+          rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
       }
@@ -2699,7 +2699,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         if (actor->isNonPlayer())
         {
           lhsvl = dc_->mob_index[vict->mobdata->nr].vnum();
-          rhsvl = atoi(val);
+          rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
       }
@@ -2711,7 +2711,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         if (actor->isNonPlayer())
         {
           lhsvl = dc_->mob_index[rndm->mobdata->nr].vnum();
-          rhsvl = atoi(val);
+          rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
       }
@@ -2721,7 +2721,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (obj)
       {
         lhsvl = dc_->obj_index[obj->item_number].vnum();
-        rhsvl = atoi(val);
+        rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
@@ -2730,7 +2730,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       if (v_obj)
       {
         lhsvl = dc_->obj_index[v_obj->item_number].vnum();
-        rhsvl = atoi(val);
+        rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
@@ -2808,7 +2808,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   // search a room for a mob with vnum arg
   case eISMOBVNUMINROOM:
   {
-    qint32 target = atoi(arg);
+    qint32 target = dc_atoi(arg);
 
     for (CharacterPtr vch = dc_->world[mob->in_room].people_;
          vch;
@@ -2826,7 +2826,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   // search a room for a obj with vnum arg
   case eISOBJVNUMINROOM:
   {
-    qint32 target = atoi(arg);
+    qint32 target = dc_atoi(arg);
 
     for (ObjectPtr obj = dc_->world[mob->in_room].contents;
          obj;
@@ -3098,56 +3098,9 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
 
       if (!thrw || DIFF(cmnd, activeProgTmpBuf) >= thrw->startPos)
       {
-
-#ifdef DEBUG_MPROG
-        if (mob && mob->mobdata != (Mobile *)0x95959595 && dc_->mob_index[mob->mobdata->nr].vnum() == 4821)
-        {
-          qDebug("debug: ");
-          if (cmnd)
-                                                qDebug(qUtf8Printable(u"cmd: %1 "_s.arg(cmnd));
-					else
-						qDebug("cmd: (null) ");
-
-					if (mob && mob->name)
-						qDebug(qUtf8Printable(u"mob: %1 "_s.arg(mob->name)));
-					else
-						qDebug("mob: (null) ");
-
-					if (actor && actor->name)
-						qDebug(qUtf8Printable(u"actor: %1 = "_s.arg(actor->name)));
-					else
-						qDebug("actor: (null) = ");
-        }
-#endif
         SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
-
-#ifdef DEBUG_MPROG
-        if (mob && mob->mobdata != (Mobile *)0x95959595 && dc_->mob_index[mob->mobdata->nr].vnum() == 4821)
-        {
-          if (isSet(mprog_cur_result, ReturnValue::eFAILURE))
-            qDebug("ReturnValue::eFAILURE ");
-          if (isSet(mprog_cur_result, ReturnValue::eSUCCESS))
-            qDebug("ReturnValue::eSUCCESS ");
-          if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
-            qDebug("ReturnValue::eCH_DIED ");
-          if (isSet(mprog_cur_result, ReturnValue::eVICT_DIED))
-            qDebug("ReturnValue::eVICT_DIED ");
-          if (isSet(mprog_cur_result, ReturnValue::eINTERNAL_ERROR))
-            qDebug("ReturnValue::eINTERNAL_ERROR ");
-          if (isSet(mprog_cur_result, ReturnValue::eEXTRA_VALUE))
-            qDebug("ReturnValue::eEXTRA_VALUE ");
-          if (isSet(mprog_cur_result, ReturnValue::eEXTRA_VAL2))
-            qDebug("ReturnValue::eEXTRA_VAL2 ");
-          if (isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
-            qDebug("ReturnValue::eDELAYED_EXEC ");
-
-          qDebug("\n");
-        }
-#endif
-        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) ||
-            isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC) ||
-            isSet(mprog_cur_result, ReturnValue::eVICT_DIED))
-          return null;
+        if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC) || isSet(mprog_cur_result, ReturnValue::eVICT_DIED))
+          return {};
       }
       cmnd = com_list;
       activePos = com_list = mprog_next_command(com_list);
@@ -4073,7 +4026,7 @@ void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
   {
     mprog_command_num++;
     next = mprg->next;
-    if ((mprg->type & type) && (ch->dc_->number(0, 99) < atoi(mprg->arglist)))
+    if ((mprg->type & type) && (ch->dc_->number(0, 99) < dc_atoi(mprg->arglist)))
     {
       mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
       if (selfpurge)
@@ -4140,7 +4093,7 @@ qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
       mprog_command_num++;
       next = mprg->next;
 
-      if ((mprg->type & BRIBE_PROG) && (amount >= atoi(mprg->arglist)))
+      if ((mprg->type & BRIBE_PROG) && (amount >= dc_atoi(mprg->arglist)))
       {
         mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
         if (selfpurge)
@@ -4182,7 +4135,7 @@ qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
       mprog_command_num++;
       next = mprg->next;
 
-      if ((mprg->type & DAMAGE_PROG) && (amount >= atoi(mprg->arglist)))
+      if ((mprg->type & DAMAGE_PROG) && (amount >= dc_atoi(mprg->arglist)))
       {
         mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
         if (selfpurge)
@@ -4331,7 +4284,7 @@ qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
       mprog_command_num++;
       next = mprg->next;
 
-      if ((mprg->type & HITPRCNT_PROG) && ((100 * mob->hit / mob->max_hit) < atoi(mprg->arglist)))
+      if ((mprg->type & HITPRCNT_PROG) && ((100 * mob->hit / mob->max_hit) < dc_atoi(mprg->arglist)))
       {
         mprog_driver(mprg->comlist, mob, ch, nullptr, nullptr, nullptr, nullptr);
         if (selfpurge)

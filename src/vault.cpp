@@ -38,7 +38,7 @@ vault_search_parameter::~vault_search_parameter()
 }
 
 qint32 total_vaults = {};
-qint32 get_line(FILE *fl, QString buf);
+qint32 get_line(auto &streamstream, QString buf);
 
 CharacterPtr find_owner(QString name);
 void vault_log(CharacterPtr ch, QString owner);
@@ -171,12 +171,12 @@ void Character::vault_myaccess(QString arg)
       sendln("No such player.");
       return;
     }
-    if (!dc_->has_vault_access(qPrintable(this->name()), vault))
+    if (!dc_->has_vault_access(qPrintable(name()), vault))
     {
       sendln("You do not have access to that vault anyway.");
       return;
     }
-    access_remove(qPrintable(this->name()), vault);
+    access_remove(qPrintable(name()), vault);
     sendln("You remove your access to that vault.");
     return;
   }
@@ -943,7 +943,7 @@ void DC::load_vaults(void)
   vault_items_data *items;
   ObjectPtr obj = {};
   struct stat statbuf = {};
-  FILE *fl = {}, *index = {};
+  FILE *stream = {}, *index = {};
   qint32 vnum = 0, full = 0, count = {};
   quint64 gold = {};
   QString value = {}, line[128] = {}, buf = {}, filename = {}, type[128] = {}, tmp[10] = {};
@@ -961,7 +961,6 @@ void DC::load_vaults(void)
     logverbose(u"%1 - %2"_s.arg(total_vaults).arg(line));
     fscanf(index, "%s\n", line);
   }
-  fclose(index);
 
   logverbose(u"boot_vaults: found [%1] player vaults to read."_s.arg(total_vaults));
 
@@ -981,7 +980,7 @@ void DC::load_vaults(void)
 
     *line = UPPER(*line);
     dc_sprintf(filename, "../vaults/%c/%s.vault", UPPER(*line), line);
-    if (!(fl = fopen(filename, "r")))
+    if (!(stream = fopen(filename, "r")))
     {
       dc_sprintf(buf, "boot_vaults: unable to open file [%s].", filename);
       dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -1004,7 +1003,7 @@ void DC::load_vaults(void)
     vault->items = {};
     vault->next = {};
 
-    get_line(fl, type);
+    get_line(stream, type);
     while (*type != '$')
     {
       switch (*type)
@@ -1035,7 +1034,7 @@ void DC::load_vaults(void)
               saveChanges = true;
           }
 
-          fclose(oldfl);
+
             }
         }
         */
@@ -1067,8 +1066,8 @@ void DC::load_vaults(void)
         else
         {
           QString tmp;
-          get_line(fl, tmp);
-          obj = read_object(real_object(vnum), fl, true);
+          get_line(stream, tmp);
+          obj = read_object(real_object(vnum), stream, true);
           items->obj = obj;
         }
 
@@ -1079,7 +1078,7 @@ void DC::load_vaults(void)
             // Skip the rest of the full item
             while (dc_strcmp(type, "S") != 0)
             {
-              get_line(fl, type);
+              get_line(stream, type);
             }
           }
 
@@ -1130,13 +1129,11 @@ void DC::load_vaults(void)
         dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         break;
       }
-      get_line(fl, type);
+      get_line(stream, type);
     }
 
     vault->next = vault_table;
     vault_table = vault;
-
-    fclose(fl);
 
     if (saveChanges)
     {
@@ -1146,7 +1143,6 @@ void DC::load_vaults(void)
 
     fscanf(index, "%s\n", line);
   }
-  fclose(index);
 }
 
 void Character::remove_vault_access(QString victim_name, VaultPtr vault)
@@ -1562,7 +1558,7 @@ void Vaults::vault_get(CharacterPtr ch, QString object, QString owner)
       tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
       copySaveData(tmp_obj, obj);
 
-      if (verify_item(&tmp_obj))
+      if (verify_item(tmp_obj))
       {
         copySaveData(tmp_obj, obj);
       }
@@ -2063,7 +2059,7 @@ void Character::vault_list(QString owner)
     owner[0] = owner[0].toUpper();
   }
 
-  if (owner == qPrintable(this->name()))
+  if (owner == qPrintable(name()))
     self = 1;
 
   if (!(vault = dc_->vaults_->has_vault(owner)))
@@ -2075,7 +2071,7 @@ void Character::vault_list(QString owner)
     return;
   }
 
-  if (!dc_->has_vault_access(qPrintable(this->name()), vault))
+  if (!dc_->has_vault_access(qPrintable(name()), vault))
   {
     send(u"You don't have access to %1's vault.\r\n"_s.arg(owner));
     return;
@@ -2179,10 +2175,9 @@ void add_new_vault(const QString name, qint32 indexonly)
   // we found $, now add in the new name, then the $
   dc_fprintf(tvfl, "%s\n", name);
   dc_fprintf(tvfl, "$\n");
-  fclose(tvfl);
+
   if (vfl)
   {
-    fclose(vfl);
   }
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
 
@@ -2205,7 +2200,6 @@ void add_new_vault(const QString name, qint32 indexonly)
   else
     dc_fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
   dc_fprintf(pvfl, "$\n");
-  fclose(pvfl);
 
   dc_sprintf(buf, "%s bought a vault.", name);
   logvault(buf, name);
@@ -2271,7 +2265,7 @@ void vault_log(CharacterPtr ch, QString owner)
   buffer << buf;
   buffer << fin.rdbuf();
 
-  page_string(ch->desc, const_cast<QString>(buffer.str().c_str()), 1);
+  page_string(ch->conn_, const_cast<QString>(buffer.str().c_str()), 1);
 }
 
 void logvault(QString message, QString name)
@@ -2313,7 +2307,7 @@ void logvault(QString message, QString name)
       return;
     }
     dc_fprintf(ofile, "$\n");
-    fclose(ofile);
+
     if (!(ofile = fopen(fname, "r")))
     {
       dc_sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
@@ -2353,8 +2347,6 @@ void logvault(QString message, QString name)
   }
   dc_fprintf(nfile, "$\n");
 
-  fclose(nfile);
-  fclose(ofile);
   unlink(fname);
   rename(nfname, fname);
   // dc_sprintf(cmd, "mv -f %s %s", nfname, fname);
@@ -2405,7 +2397,7 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   }
   else
   {
-    qint32 i = atoi(arg1);
+    qint32 i = dc_atoi(arg1);
     switch (i)
     {
     case 1:

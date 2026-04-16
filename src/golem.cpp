@@ -148,7 +148,6 @@ void save_golem_data(CharacterPtr ch)
   // Use previously defined functions after this.
   obj_to_store(golem->carrying, golem, fpfile, -1);
   store_worn_eq(golem, fpfile);
-  fclose(fpfile);
 }
 
 void save_charmie_data(CharacterPtr ch)
@@ -179,7 +178,6 @@ void save_charmie_data(CharacterPtr ch)
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
     store_worn_eq(follower, fpfile);
-    fclose(fpfile);
   }
 }
 
@@ -240,22 +238,22 @@ void Character::load_golem_data(qint32 golemtype)
   QString file;
   FILE *fpfile = {};
   CharacterPtr golem;
-  if (this->isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
+  if (isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && getLevel() < OVERSEER) || player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(this->name())[0], qPrintable(this->name()), golemtype);
+  dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(name())[0], qPrintable(name()), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
     golem = dc_->clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
-    golem->alignment = this->alignment;
-    this->player->golem = golem;
+    golem->alignment = alignment;
+    player->golem = golem;
     return;
   }
   golem = dc_->clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
-  this->player->golem = golem;
+  player->golem = golem;
   quint8 golem_level = {};
   fread(&(golem_level), sizeof(golem_level), 1, fpfile);
   golem->setLevel(golem_level);
@@ -271,7 +269,6 @@ void Character::load_golem_data(qint32 golemtype)
   {
     last_cont = obj_store_to_char(golem, fpfile, last_cont);
   }
-  fclose(fpfile);
 }
 
 qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)

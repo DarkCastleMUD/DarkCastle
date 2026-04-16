@@ -94,7 +94,7 @@ QString handle_ansi_(QString s, CharacterPtr ch)
     }
     else
     {
-      if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->conn_ && ch->conn_->color))
       {
         switch (*++sp)
         {

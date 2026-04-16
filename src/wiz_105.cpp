@@ -251,11 +251,11 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
       }
       else if (arg3 != "")
       {
-        QMap<QString, Timer>::iterator i = PerfTimers.find(arg3);
+        QMap<QString, SystemTimer>::iterator i = PerfTimers.find(arg3);
         if (i != PerfTimers.end())
         {
           QString key = conn->key();
-          Timer t = conn->value();
+          SystemTimer t = conn->value();
           ch->sendln(QStringLiteral(
                          "%15s: cur:%lus %luμs\tmin:%lus %luμs\tmax:%lus %luμs\tavg:%lus %luμs")
                          .arg(key)
@@ -607,13 +607,13 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     break;
   case 2:
     ch->sendln("Enter new message. End with \\s.");
-    ch->desc->connected = Connection::states::EDITING;
-    ch->desc->strnew = &(skill->message);
+    ch->conn_->connected = Connection::states::EDITING;
+    ch->conn_->strnew = &(skill->message);
     break;
   case 3:
     if (is_number(arg2))
     {
-      skill->level = atoi(arg2);
+      skill->level = dc_atoi(arg2);
       ch->sendln("Level modified.");
     }
     else
@@ -639,7 +639,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      i = atoi(arg2);
+      i = dc_atoi(arg2);
     }
     if (i < 1 || i > 11)
     {

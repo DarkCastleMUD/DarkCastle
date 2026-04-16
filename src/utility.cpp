@@ -25,9 +25,8 @@
 extern QMap<qint32, QMap<quint8, QString>> professions;
 
 // extern funcs
-ClanPtr get_clan(CharacterPtr);
 void release_message(CharacterPtr ch);
-timer_data *timer_list = {};
+TimerPtr timer_list = {};
 
 // tested in TestUtility::test_nocolor_strlen_qstring
 std::size_t nocolor_strlen(const QStringView str)
@@ -360,7 +359,6 @@ void dc_->logentry(QString str, quint64 god_level, DC::LogChannel type, Characte
   if (stream != STDIN_FILENO)
   {
     dc_fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
-    fclose(*f);
   }
 
   if (god_level >= IMMORTAL)
@@ -750,14 +748,13 @@ time_info_data Character::age(void)
 
 bool file_exists(const QString filename)
 {
-  FILE *fp;
+  QTextStream stream;
 
-  if ((fp = fopen(filename, "r")) == nullptr)
+  if ((stream = fopen(filename, "r")) == nullptr)
   {
     return false;
   }
 
-  fclose(fp);
   return true;
 }
 
@@ -1244,7 +1241,7 @@ command_return_t do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  FILE *fl;
+  FILE *stream;
   QString str;
 
   if (ch->isNonPlayer())
@@ -1263,7 +1260,7 @@ command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(fl = fopen(IDEA_LOG, "a")))
+  if (!(stream = fopen(IDEA_LOG, "a")))
   {
     perror("do_idea");
     ch->sendln("Could not open the idea log.");
@@ -1271,15 +1268,15 @@ command_return_t do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
-  fputs(str, fl);
-  fclose(fl);
+  fputs(str, stream);
+
   ch->sendln("Ok.  Thanks.");
   return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  FILE *fl;
+  FILE *stream;
   QString str;
 
   if (ch->isNonPlayer())
@@ -1298,7 +1295,7 @@ command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(fl = fopen(TYPO_LOG, "a")))
+  if (!(stream = fopen(TYPO_LOG, "a")))
   {
     perror("do_typo");
     ch->sendln("Could not open the typo log.");
@@ -1307,15 +1304,15 @@ command_return_t do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
 
   dc_sprintf(str, "**%s[%d]: %s\n",
              qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
-  fputs(str, fl);
-  fclose(fl);
+  fputs(str, stream);
+
   ch->sendln("Ok.  Thanks.");
   return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  FILE *fl;
+  FILE *stream;
   QString str;
 
   if (ch->isNonPlayer())
@@ -1334,7 +1331,7 @@ command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(fl = fopen(BUG_LOG, "a")))
+  if (!(stream = fopen(BUG_LOG, "a")))
   {
     perror("do_bug");
     ch->sendln("Could not open the bug log.");
@@ -1342,8 +1339,8 @@ command_return_t do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
-  fputs(str, fl);
-  fclose(fl);
+  fputs(str, stream);
+
   ch->sendln("Ok.");
   return ReturnValue::eSUCCESS;
 }
@@ -1365,22 +1362,22 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (IS_AFFECTED(this, AFF_CHARM))
     return ReturnValue::eFAILURE;
 
-  if (this->room().isArena())
+  if (room().isArena())
   {
-    this->sendln("TYou can't recall while in the arena.");
+    sendln("TYou can't recall while in the arena.");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[this->in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[in_room].room_flags, NO_MAGIC))
   {
-    this->sendln("You can't use magic here.");
+    sendln("You can't use magic here.");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(this->combat, COMBAT_BASH1) ||
-      isSet(this->combat, COMBAT_BASH2))
+  if (isSet(combat, COMBAT_BASH1) ||
+      isSet(combat, COMBAT_BASH2))
   {
-    this->sendln("You can't, you're bashed!");
+    sendln("You can't, you're bashed!");
     return ReturnValue::eFAILURE;
   }
 
@@ -1394,7 +1391,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     victim = get_char_room_vis(name);
     if (victim == nullptr)
     {
-      this->sendln("Whom do you want to recall?");
+      sendln("Whom do you want to recall?");
       return ReturnValue::eFAILURE;
     }
 
@@ -1405,7 +1402,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (this->isPlayer())
+  if (isPlayer())
   {
     x = GET_WIS(this);
     quint64 percent = dc_->number(1, 100);
@@ -1423,7 +1420,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (percent > 50)
     {
-      this->sendln("You failed in your recall!");
+      sendln("You failed in your recall!");
       return ReturnValue::eFAILURE;
     }
   }
@@ -1440,7 +1437,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (this->isNonPlayer())
+  if (isNonPlayer())
   {
     location = real_room(hometown);
   }
@@ -1457,7 +1454,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (location < 0)
     {
-      this->sendln("Failed.");
+      sendln("Failed.");
       return ReturnValue::eFAILURE;
     }
 
@@ -1474,7 +1471,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
-        this->sendln("The gods frown on you, and reset your home.");
+        sendln("The gods frown on you, and reset your home.");
         location = real_room(START_ROOM);
         victim->hometown = START_ROOM;
       }
@@ -1486,7 +1483,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
         if (!found)
         {
-          this->sendln("The gods frown on you, and reset your home.");
+          sendln("The gods frown on you, and reset your home.");
           location = real_room(START_ROOM);
           victim->hometown = START_ROOM;
         }
@@ -1524,23 +1521,23 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
       cost *= 2;
     }
 
-    if (this->getGold() < (quint32)cost)
+    if (getGold() < (quint32)cost)
     {
-      this->send(u"You don't have %1 gold!\r\n"_s.arg(cost));
+      send(u"You don't have %1 gold!\r\n"_s.arg(cost));
       return ReturnValue::eFAILURE;
     }
 
-    this->removeGold(cost);
+    removeGold(cost);
   }
 
   if (IS_AFFECTED(victim, AFF_CURSE))
   {
-    this->sendln("A curse affect prevents it.");
+    sendln("A curse affect prevents it.");
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    this->sendln("A solidity affect prevents it.");
+    sendln("A solidity affect prevents it.");
     return ReturnValue::eFAILURE;
   }
 
@@ -1734,16 +1731,16 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   dc_->update_wizlist(ch);
 
-  if (ch->isPlayer() && ch->desc && !ch->desc->getPeerOriginalAddress().isNull())
+  if (ch->isPlayer() && ch->conn_ && !ch->conn_->getPeerOriginalAddress().isNull())
   {
-    ch->player->last_site = ch->desc->getPeerOriginalAddress().toString();
+    ch->player->last_site = ch->conn_->getPeerOriginalAddress().toString();
     ch->player->time.logon = time(0);
   }
 
-  if (ch->desc)
+  if (ch->conn_)
   {
     ch->save_char_obj();
-    if (!close_socket(ch->desc)) // if returns 0, then it already quit us out
+    if (!close_socket(ch->conn_)) // if returns 0, then it already quit us out
       return ReturnValue::eFAILURE | ReturnValue::eCH_DIED;
   }
   else
@@ -1772,20 +1769,18 @@ command_return_t Character::save(cmd_t cmd)
   // 9 = save with a round of lag
   // -pir 3/15/1999
 
-  if (this->isNonPlayer() || level_ > IMPLEMENTER)
+  if (isNonPlayer() || level_ > IMPLEMENTER)
     return ReturnValue::eFAILURE;
 
   if (cmd != cmd_t::SAVE_SILENTLY)
   {
-    send(u"Saving %1.\r\n"_s.arg(qPrintable(this->name())));
+    send(u"Saving %1.\r\n"_s.arg(qPrintable(name())));
   }
 
-  if (this->isPlayer())
+  if (isPlayer())
   {
     save_char_obj();
-#ifdef USE_SQL
     save_char_obj_db(this);
-#endif
 
     if (followers)
     {
@@ -1928,7 +1923,7 @@ QString get_skill_name(qint32 skillnum)
 // return true if successful, false if error
 bool check_valid_and_convert(qint32 &value, QString buf)
 {
-  value = atoi(buf);
+  value = dc_atoi(buf);
   if (value == 0 && dc_strcmp(buf, "0"))
     return false;
 
@@ -2143,30 +2138,21 @@ void parse_bitstrings_into_int(const QStringList bits, const QString remainder_a
 
 void check_timer()
 { // Called once/sec
-  timer_data *curr, *nex, *las;
-  las = {};
-  for (curr = timer_list; curr; curr = nex)
+  for (auto curr = timer_list.begin(); curr != timer_list.end();)
   {
-    nex = curr->next;
     curr->timeleft--;
     if (curr->timeleft <= 0)
     {
       (*(curr->function))(curr->arg1, curr->arg2, curr->arg3);
-      if (!nex && curr->next)
-        nex = curr->next;
-      if (las)
-        las->next = curr->next;
-      else
-        timer_list = curr->next;
-      curr = {};
-      continue;
+      curr = timer_list.erase(curr);
     }
-    las = curr;
+    else
+      curr++;
   }
   dc_->removeDead();
 }
 
-qint32 get_line(FILE *fl, QString buf)
+qint32 get_line(auto &streamstream, QString buf)
 {
   QString temp = {};
   qint32 lines = {};
@@ -2174,12 +2160,12 @@ qint32 get_line(FILE *fl, QString buf)
   do
   {
     lines++;
-    fgets(temp, 256, fl);
+    fgets(temp, 256, stream);
     if (!temp.isEmpty())
       temp[dc_strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && (*temp == '*' || temp.isEmpty()));
+  } while (!feof(stream) && (*temp == '*' || temp.isEmpty()));
 
-  if (feof(fl))
+  if (feof(stream))
     return 0;
   else
   {
@@ -2241,12 +2227,12 @@ bool is_in_game(CharacterPtr ch)
   }
 
   // Linkdead
-  if (ch->desc == 0)
+  if (ch->conn_ == 0)
   {
     return true;
   }
 
-  if (ch->desc->isEditing() || ch->desc->isPlaying())
+  if (ch->conn_->isEditing() || ch->conn_->isPlaying())
   {
     return true;
   }
@@ -2974,15 +2960,15 @@ void Character::setPOSFighting(void)
 void Character::setPlayerLastMob(vnum_t mob_vnum)
 {
   QString buffer;
-  if (this->player == nullptr)
+  if (player == nullptr)
   {
     return;
   }
 
-  if (mob_vnum != this->player->last_mob_edit)
+  if (mob_vnum != player->last_mob_edit)
   {
-    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", this->player->last_mob_edit, mob_vnum));
-    this->player->last_mob_edit = mob_vnum;
+    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", player->last_mob_edit, mob_vnum));
+    player->last_mob_edit = mob_vnum;
   }
 }
 
@@ -3143,10 +3129,10 @@ bool operator!(load_status_t ls)
 
 void WAIT_STATE(CharacterPtr ch, qint32 cycle)
 {
-  if (ch->desc && !ch->isImmortalPlayer())
+  if (ch->conn_ && !ch->isImmortalPlayer())
   {
-    if (ch->desc->wait < cycle)
-      ch->desc->wait = cycle;
+    if (ch->conn_->wait < cycle)
+      ch->conn_->wait = cycle;
   }
   else if (ch->isNonPlayer())
     ch->deaths = cycle;
@@ -3157,8 +3143,8 @@ qint32 GET_WAIT(CharacterPtr ch)
   if (ch->isNonPlayer())
     return ch->deaths;
 
-  if (ch->desc)
-    return ch->desc->wait;
+  if (ch->conn_)
+    return ch->conn_->wait;
 
   return 0;
 }

@@ -241,7 +241,7 @@ command_return_t do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->prog_error(u"MpAddlag - Invalid duration."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
-  WAIT_STATE(victim, atoi(arg1));
+  WAIT_STATE(victim, dc_atoi(arg1));
   return ReturnValue::eSUCCESS;
 }
 
@@ -446,7 +446,7 @@ command_return_t do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((realnum = real_mobile(atoi(arg))) < 0)
+  if ((realnum = real_mobile(dc_atoi(arg))) < 0)
   {
     ch->prog_error(u"Mpmload - Bad mob vnum."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -483,7 +483,7 @@ command_return_t do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((realnum = real_object(atoi(arg1))) < 0)
+  if ((realnum = real_object(dc_atoi(arg1))) < 0)
   {
     ch->prog_error(u"Mpoload - Bad vnum arg."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -631,7 +631,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->prog_error(u"Mpgoto - Missing vnum after 'mob' argument."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
-    vict = get_mob_vnum(atoi(arg));
+    vict = get_mob_vnum(dc_atoi(arg));
     if (!vict)
       location = -1;
     else
@@ -663,7 +663,7 @@ command_return_t do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      location = atoi(arg);
+      location = dc_atoi(arg);
     }
   }
   if (location < 0)
@@ -712,7 +712,7 @@ command_return_t do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr vict;
   if (!(vict = get_char_vis(ch, arg)))
   {
-    location = atoi(arg);
+    location = dc_atoi(arg);
   }
   else
   {
@@ -801,7 +801,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
   QString arg1;
   QString arg2;
   qint32 location;
-  ConnectionPtr d;
+  ConnectionPtr conn;
   CharacterPtr victim;
 
   if (ch->isPlayer())
@@ -842,7 +842,7 @@ command_return_t do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     // TODO - make location take args
-    location = atoi(arg2);
+    location = dc_atoi(arg2);
 
     if (location < 0)
     {
@@ -1129,15 +1129,15 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   QString arg3 = arguments.value(3);
   if (arg.isEmpty() || temp.isEmpty() || arg2.isEmpty())
   {
-    if (this->isNonPlayer())
+    if (isNonPlayer())
     {
-      qint32 num = dc_->mob_index[this->mobdata->nr].vnum();
+      qint32 num = dc_->mob_index[mobdata->nr].vnum();
 
       dc_->logentry(u"Mob %1 lacking argument for mpsettemp."_s.arg(num));
     }
     return ReturnValue::eFAILURE;
   }
-  victim = get_char_room(arg, this->in_room);
+  victim = get_char_room(arg, in_room);
   qint32 type = {};
   if (!victim)
   {
@@ -1152,7 +1152,7 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   if (!victim && type == 0)
     return ReturnValue::eFAILURE;
   if (!victim)
-    victim = dc_->world[this->in_room].people_;
+    victim = dc_->world[in_room].people_;
 
   for (; victim; victim = victim->next_in_room)
   {
@@ -1205,9 +1205,9 @@ command_return_t do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
   victim = get_char_room(arg, ch->in_room);
   if (!victim || (!is_number(align) && (!is_number(align + 1) || *align != '-')))
     return ReturnValue::eFAILURE;
-  if (atoi(align) > 1000 || atoi(align) < -1000)
+  if (dc_atoi(align) > 1000 || dc_atoi(align) < -1000)
     return ReturnValue::eFAILURE;
-  victim->alignment = atoi(align);
+  victim->alignment = dc_atoi(align);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2159,7 +2159,7 @@ void Character::prog_error(QString error_message)
   {
     logworld(u"Obj %1, com %2, line %3: %4"_s.arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
-  else if (this->isNonPlayer())
+  else if (isNonPlayer())
   {
     logworld(u"Mob %1, com %2, line %3: %4"_s.arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }

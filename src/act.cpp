@@ -172,10 +172,10 @@ void send_message(QString str, CharacterPtr to)
   if (!to)
     return;
 
-  if (!to->desc)
+  if (!to->conn_)
     return;
 
-  write_to_output(str, to->desc);
+  write_to_output(str, to->conn_);
 }
 
 send_tokens_return send_tokens(TokenList &tokens, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint32 flags, CharacterPtr to)

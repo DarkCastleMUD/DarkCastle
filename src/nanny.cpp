@@ -21,7 +21,7 @@
 #include "DC/DC.h"
 
 bool is_bracing(CharacterPtr bracee, RoomDirectionPtr exit);
-void show_question_race(ConnectionPtr d);
+void show_question_race(ConnectionPtr conn);
 
 bool wizlock = false;
 
@@ -36,20 +36,20 @@ extern QString imotd;
 extern ObjectPtr object_list;
 
 qint32 _parse_email(QString arg);
-bool check_deny(ConnectionPtr d, QString name);
+bool check_deny(ConnectionPtr conn, QString name);
 void isr_set(CharacterPtr ch);
-bool check_reconnect(ConnectionPtr d, QString name, bool fReconnect);
-bool check_playing(ConnectionPtr d, QString name);
+bool check_reconnect(ConnectionPtr conn, QString name, bool fReconnect);
+bool check_playing(ConnectionPtr conn, QString name);
 QString str_str(QString first, QString second);
 bool apply_race_attributes(CharacterPtr ch, qint32 race = 0);
 bool check_race_attributes(CharacterPtr ch, qint32 race = 0);
-bool handle_get_race(ConnectionPtr d, QString arg);
-void show_question_race(ConnectionPtr d);
-void show_question_class(ConnectionPtr d);
-bool handle_get_class(ConnectionPtr d, QString arg);
+bool handle_get_race(ConnectionPtr conn, QString arg);
+void show_question_race(ConnectionPtr conn);
+void show_question_class(ConnectionPtr conn);
+bool handle_get_class(ConnectionPtr conn, QString arg);
 bool is_clss_race_compat(CharacterPtr ch, qint32 clss);
-void show_question_stats(ConnectionPtr d);
-bool handle_get_stats(ConnectionPtr d, QString arg);
+void show_question_stats(ConnectionPtr conn);
+bool handle_get_stats(ConnectionPtr conn, QString arg);
 
 bool is_race_eligible(CharacterPtr ch, qint32 race)
 {
@@ -189,87 +189,87 @@ void Character::do_inate_race_abilities(void)
   // Add race base saving throw mods
   // Yes, I could combine this 'switch' with the next one, but this is
   // alot more readable
-  switch (this->race)
+  switch (race)
   {
   case RACE_HUMAN:
-    this->saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
+    saves[SAVE_TYPE_FIRE] += RACE_HUMAN_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_HUMAN_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_HUMAN_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_HUMAN_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_HUMAN_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_HUMAN_POISON_MOD;
     break;
   case RACE_ELVEN:
-    this->saves[SAVE_TYPE_FIRE] += RACE_ELVEN_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_ELVEN_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_ELVEN_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_ELVEN_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_ELVEN_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_ELVEN_POISON_MOD;
-    this->spell_mitigation += 1;
+    saves[SAVE_TYPE_FIRE] += RACE_ELVEN_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_ELVEN_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_ELVEN_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_ELVEN_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_ELVEN_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_ELVEN_POISON_MOD;
+    spell_mitigation += 1;
     break;
   case RACE_DWARVEN:
-    this->saves[SAVE_TYPE_FIRE] += RACE_DWARVEN_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_DWARVEN_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_DWARVEN_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_DWARVEN_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_DWARVEN_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_DWARVEN_POISON_MOD;
-    this->melee_mitigation += 1;
+    saves[SAVE_TYPE_FIRE] += RACE_DWARVEN_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_DWARVEN_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_DWARVEN_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_DWARVEN_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_DWARVEN_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_DWARVEN_POISON_MOD;
+    melee_mitigation += 1;
     break;
   case RACE_TROLL:
-    this->saves[SAVE_TYPE_FIRE] += RACE_TROLL_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_TROLL_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_TROLL_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_TROLL_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_TROLL_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_TROLL_POISON_MOD;
-    this->spell_mitigation += 2;
+    saves[SAVE_TYPE_FIRE] += RACE_TROLL_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_TROLL_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_TROLL_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_TROLL_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_TROLL_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_TROLL_POISON_MOD;
+    spell_mitigation += 2;
     break;
   case RACE_GIANT:
-    this->saves[SAVE_TYPE_FIRE] += RACE_GIANT_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_GIANT_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_GIANT_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_GIANT_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_GIANT_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_GIANT_POISON_MOD;
-    this->melee_mitigation += 2;
+    saves[SAVE_TYPE_FIRE] += RACE_GIANT_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_GIANT_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_GIANT_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_GIANT_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_GIANT_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_GIANT_POISON_MOD;
+    melee_mitigation += 2;
     break;
   case RACE_PIXIE:
-    this->saves[SAVE_TYPE_FIRE] += RACE_PIXIE_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_PIXIE_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_PIXIE_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_PIXIE_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_PIXIE_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_PIXIE_POISON_MOD;
-    this->spell_mitigation += 2;
+    saves[SAVE_TYPE_FIRE] += RACE_PIXIE_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_PIXIE_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_PIXIE_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_PIXIE_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_PIXIE_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_PIXIE_POISON_MOD;
+    spell_mitigation += 2;
     break;
   case RACE_HOBBIT:
-    this->saves[SAVE_TYPE_FIRE] += RACE_HOBBIT_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_HOBBIT_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_HOBBIT_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_HOBBIT_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_HOBBIT_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_HOBBIT_POISON_MOD;
-    this->melee_mitigation += 2;
+    saves[SAVE_TYPE_FIRE] += RACE_HOBBIT_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_HOBBIT_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_HOBBIT_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_HOBBIT_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_HOBBIT_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_HOBBIT_POISON_MOD;
+    melee_mitigation += 2;
     break;
   case RACE_GNOME:
-    this->saves[SAVE_TYPE_FIRE] += RACE_GNOME_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_GNOME_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_GNOME_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_GNOME_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_GNOME_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_GNOME_POISON_MOD;
-    this->spell_mitigation += 1;
+    saves[SAVE_TYPE_FIRE] += RACE_GNOME_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_GNOME_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_GNOME_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_GNOME_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_GNOME_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_GNOME_POISON_MOD;
+    spell_mitigation += 1;
     break;
   case RACE_ORC:
-    this->saves[SAVE_TYPE_FIRE] += RACE_ORC_FIRE_MOD;
-    this->saves[SAVE_TYPE_COLD] += RACE_ORC_COLD_MOD;
-    this->saves[SAVE_TYPE_ENERGY] += RACE_ORC_ENERGY_MOD;
-    this->saves[SAVE_TYPE_ACID] += RACE_ORC_ACID_MOD;
-    this->saves[SAVE_TYPE_MAGIC] += RACE_ORC_MAGIC_MOD;
-    this->saves[SAVE_TYPE_POISON] += RACE_ORC_POISON_MOD;
-    this->melee_mitigation += 1;
+    saves[SAVE_TYPE_FIRE] += RACE_ORC_FIRE_MOD;
+    saves[SAVE_TYPE_COLD] += RACE_ORC_COLD_MOD;
+    saves[SAVE_TYPE_ENERGY] += RACE_ORC_ENERGY_MOD;
+    saves[SAVE_TYPE_ACID] += RACE_ORC_ACID_MOD;
+    saves[SAVE_TYPE_MAGIC] += RACE_ORC_MAGIC_MOD;
+    saves[SAVE_TYPE_POISON] += RACE_ORC_POISON_MOD;
+    melee_mitigation += 1;
     break;
   default:
     break;
@@ -319,46 +319,46 @@ void update_max_who(void)
 void Character::do_on_login_stuff(void)
 {
   add_to_bard_list();
-  this->player->bad_pw_tries = {};
+  player->bad_pw_tries = {};
   redo_hitpoints(this);
   redo_mana(this);
   redo_ki(this);
   do_inate_race_abilities();
   check_hw();
   /* Add a character's skill item's to the list. */
-  this->player->skillchange = {};
-  this->spellcraftglyph = {};
+  player->skillchange = {};
+  spellcraftglyph = {};
   for (qint32 i = {}; i < MAX_WEAR; i++)
   {
-    if (!this->equipment[i])
+    if (!equipment[i])
       continue;
-    for (qint32 a = {}; a < this->equipment[i]->num_affects; a++)
+    for (qint32 a = {}; a < equipment[i]->num_affects; a++)
     {
-      if (this->equipment[i]->affected[a].location >= 1000)
+      if (equipment[i]->affected[a].location >= 1000)
       {
-        this->equipment[i]->next_skill = this->player->skillchange;
-        this->player->skillchange = this->equipment[i];
-        this->equipment[i]->next_skill = {};
+        equipment[i]->next_skill = player->skillchange;
+        player->skillchange = equipment[i];
+        equipment[i]->next_skill = {};
       }
     }
   }
   // add character base saves to saving throws
   for (qint32 i = {}; i <= SAVE_TYPE_MAX; i++)
   {
-    this->saves[i] += this->getLevel() / 4;
-    this->saves[i] += this->player->saves_mods[i];
+    saves[i] += getLevel() / 4;
+    saves[i] += player->saves_mods[i];
   }
 
-  if (this->title == nullptr)
+  if (title == nullptr)
   {
-    this->title = u"is a virgin."_s;
+    title = u"is a virgin."_s;
   }
 
   if (GET_CLASS(this) == CLASS_MONK)
   {
-    GET_AC(this) -= (this->getLevel() * 2);
+    GET_AC(this) -= (getLevel() * 2);
   }
-  GET_AC(this) -= this->has_skill(SKILL_COMBAT_MASTERY) / 2;
+  GET_AC(this) -= has_skill(SKILL_COMBAT_MASTERY) / 2;
 
   GET_AC(this) -= GET_AC_METAS(this);
 
@@ -368,39 +368,39 @@ void Character::do_on_login_stuff(void)
   }
   /* Set ISR's cause they're not saved...   */
   isr_set(this);
-  this->altar = clan_altar();
+  altar = clan_altar();
 
-  if (!this->isNonPlayer() && this->getLevel() >= IMMORTAL)
+  if (!isNonPlayer() && getLevel() >= IMMORTAL)
   {
-    this->player->holyLite = true;
+    player->holyLite = true;
     GET_COND(this, THIRST) = -1;
     GET_COND(this, FULL) = -1;
   }
   add_totem_stats(this);
-  if (this->getLevel() < 5 && GET_AGE(this) < 21)
+  if (getLevel() < 5 && GET_AGE(this) < 21)
     char_to_room(this, real_room(200));
-  else if (this->in_room >= 2)
-    char_to_room(this, this->in_room);
-  else if (this->getLevel() >= IMMORTAL)
+  else if (in_room >= 2)
+    char_to_room(this, in_room);
+  else if (getLevel() >= IMMORTAL)
     char_to_room(this, real_room(17));
   else
     char_to_room(this, real_room(START_ROOM));
 
-  this->curLeadBonus = {};
-  this->changeLeadBonus = false;
-  this->cRooms = {};
-  REMBIT(this->affected_by, AFF_BLACKJACK_ALERT);
+  curLeadBonus = {};
+  changeLeadBonus = false;
+  cRooms = {};
+  REMBIT(affected_by, AFF_BLACKJACK_ALERT);
   for (qint32 i = {}; i < QUEST_MAX; i++)
   {
-    this->player->quest_current[i] = -1;
-    this->player->quest_current_ticksleft[i] = {};
+    player->quest_current[i] = -1;
+    player->quest_current_ticksleft[i] = {};
   }
   auto &vault = dc_->vaults_.has_vault(name());
   if (player->time.logon < 1172204700)
   {
     if (vault)
     {
-      qint32 adder = this->getLevel() - 50;
+      qint32 adder = getLevel() - 50;
       if (adder < 0)
         adder = {}; // Heh :P
       vault.size_ += adder * 10;
@@ -414,25 +414,25 @@ void Character::do_on_login_stuff(void)
   {
     if (vault.size_ < getLevel() * 10)
     {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", qPrintable(this->name()), vault.size_, this->getLevel() * 10);
-      vault.size_ = this->getLevel() * 10;
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s's vault reset from %d to %d during login.", qPrintable(name()), vault.size_, getLevel() * 10);
+      vault.size_ = getLevel() * 10;
     }
 
     dc_->vaults_.save(vault.owner_);
   }
 
-  if (this->player->time.logon < 1151506181)
+  if (player->time.logon < 1151506181)
   {
-    this->player->quest_points = {};
+    player->quest_points = {};
     for (qint32 i = {}; i < QUEST_MAX_CANCEL; i++)
-      this->player->quest_cancel[i] = {};
+      player->quest_cancel[i] = {};
     for (qint32 i = {}; i < QUEST_TOTAL / ASIZE; i++)
-      this->player->quest_complete[i] = {};
+      player->quest_complete[i] = {};
   }
-  if (this->player->time.logon < 1151504181)
-    SET_BIT(this->misc, DC::LogChannel::CHANNEL_TELL);
+  if (player->time.logon < 1151504181)
+    SET_BIT(misc, DC::LogChannel::CHANNEL_TELL);
 
-  if (this->player->time.logon < 1171757100)
+  if (player->time.logon < 1171757100)
   {
     switch (GET_CLASS(this))
     {
@@ -474,106 +474,106 @@ void Character::do_on_login_stuff(void)
     }
   }
 
-  if (GET_CLASS(this) == CLASS_MONK && this->getLevel() > 10)
+  if (GET_CLASS(this) == CLASS_MONK && getLevel() > 10)
   {
-    this->swapSkill(SKILL_SHIELDBLOCK, SKILL_DEFENSE);
+    swapSkill(SKILL_SHIELDBLOCK, SKILL_DEFENSE);
   }
-  if (GET_CLASS(this) == CLASS_PALADIN && this->getLevel() >= 41)
+  if (GET_CLASS(this) == CLASS_PALADIN && getLevel() >= 41)
   {
-    this->swapSkill(SPELL_ARMOR, SPELL_AEGIS);
-    this->swapSkill(SPELL_POWER_HARM, SPELL_DIVINE_FURY);
+    swapSkill(SPELL_ARMOR, SPELL_AEGIS);
+    swapSkill(SPELL_POWER_HARM, SPELL_DIVINE_FURY);
   }
-  if (GET_CLASS(this) == CLASS_RANGER && this->getLevel() > 9)
+  if (GET_CLASS(this) == CLASS_RANGER && getLevel() > 9)
   {
-    if (this->skills.contains(SKILL_SHIELDBLOCK))
+    if (skills.contains(SKILL_SHIELDBLOCK))
     {
-      this->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
-      this->setSkillMin(SKILL_DODGE, 50);
+      swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
+      setSkillMin(SKILL_DODGE, 50);
     }
   }
-  if (GET_CLASS(this) == CLASS_ANTI_PAL && this->getLevel() >= 44)
+  if (GET_CLASS(this) == CLASS_ANTI_PAL && getLevel() >= 44)
   {
-    this->swapSkill(SPELL_STONE_SKIN, SPELL_U_AEGIS);
+    swapSkill(SPELL_STONE_SKIN, SPELL_U_AEGIS);
   }
-  if (GET_CLASS(this) == CLASS_BARD && this->getLevel() >= 30)
+  if (GET_CLASS(this) == CLASS_BARD && getLevel() >= 30)
   {
-    this->swapSkill(SKILL_BLUDGEON_WEAPONS, SKILL_STINGING_WEAPONS);
+    swapSkill(SKILL_BLUDGEON_WEAPONS, SKILL_STINGING_WEAPONS);
   }
-  if (GET_CLASS(this) == CLASS_CLERIC && this->getLevel() >= 42)
+  if (GET_CLASS(this) == CLASS_CLERIC && getLevel() >= 42)
   {
-    this->swapSkill(SPELL_RESIST_FIRE, SPELL_RESIST_MAGIC);
-    this->skills.erase(SPELL_RESIST_COLD);
+    swapSkill(SPELL_RESIST_FIRE, SPELL_RESIST_MAGIC);
+    skills.erase(SPELL_RESIST_COLD);
   }
   if (GET_CLASS(this) == CLASS_MAGIC_USER)
   {
-    this->skills.erase(SPELL_SLEEP);
-    this->skills.erase(SPELL_RESIST_COLD);
-    this->skills.erase(SPELL_KNOW_ALIGNMENT);
+    skills.erase(SPELL_SLEEP);
+    skills.erase(SPELL_RESIST_COLD);
+    skills.erase(SPELL_KNOW_ALIGNMENT);
   }
   // Remove pick if they're no longer allowed to have it.
-  if (GET_CLASS(this) == CLASS_THIEF && this->getLevel() < 22 && this->has_skill(SKILL_PICK_LOCK))
+  if (GET_CLASS(this) == CLASS_THIEF && getLevel() < 22 && has_skill(SKILL_PICK_LOCK))
   {
-    this->skills.erase(SKILL_PICK_LOCK);
+    skills.erase(SKILL_PICK_LOCK);
   }
-  if (GET_CLASS(this) == CLASS_BARD && this->has_skill(SKILL_HIDE))
+  if (GET_CLASS(this) == CLASS_BARD && has_skill(SKILL_HIDE))
   {
-    this->skills.erase(SKILL_HIDE);
+    skills.erase(SKILL_HIDE);
   }
   // Remove listsongs
-  if (GET_CLASS(this) == CLASS_BARD && this->has_skill(SKILL_SONG_LIST_SONGS))
+  if (GET_CLASS(this) == CLASS_BARD && has_skill(SKILL_SONG_LIST_SONGS))
   {
-    this->skills.erase(SKILL_SONG_LIST_SONGS);
+    skills.erase(SKILL_SONG_LIST_SONGS);
   }
   // Replace shieldblock on barbs
-  if (GET_CLASS(this) == CLASS_BARBARIAN && this->has_skill(SKILL_SHIELDBLOCK))
+  if (GET_CLASS(this) == CLASS_BARBARIAN && has_skill(SKILL_SHIELDBLOCK))
   {
-    this->swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
+    swapSkill(SKILL_SHIELDBLOCK, SKILL_DODGE);
   }
   // Replace eagle-eye on druids
-  if (GET_CLASS(this) == CLASS_DRUID && this->has_skill(SPELL_EAGLE_EYE))
+  if (GET_CLASS(this) == CLASS_DRUID && has_skill(SPELL_EAGLE_EYE))
   {
-    this->swapSkill(SPELL_EAGLE_EYE, SPELL_GHOSTWALK);
+    swapSkill(SPELL_EAGLE_EYE, SPELL_GHOSTWALK);
   }
   // Replace crushing on bards
-  if (GET_CLASS(this) == CLASS_BARD && this->has_skill(SKILL_CRUSHING_WEAPONS))
+  if (GET_CLASS(this) == CLASS_BARD && has_skill(SKILL_CRUSHING_WEAPONS))
   {
-    this->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_WHIPPING_WEAPONS);
+    swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_WHIPPING_WEAPONS);
   }
   // Replace crushing on thieves
-  if (GET_CLASS(this) == CLASS_THIEF && this->has_skill(SKILL_CRUSHING_WEAPONS))
+  if (GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_CRUSHING_WEAPONS))
   {
-    this->swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_STINGING_WEAPONS);
+    swapSkill(SKILL_CRUSHING_WEAPONS, SKILL_STINGING_WEAPONS);
   }
   // Replace firestorm on antis
-  if (GET_CLASS(this) == CLASS_ANTI_PAL && this->has_skill(SPELL_FIRESTORM))
+  if (GET_CLASS(this) == CLASS_ANTI_PAL && has_skill(SPELL_FIRESTORM))
   {
-    this->swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
+    swapSkill(SPELL_FIRESTORM, SPELL_LIFE_LEECH);
   }
 
-  CharacterClassSkill *c_skills = this->get_skill_list();
+  CharacterClassSkill *c_skills = get_skill_list();
 
   if (IS_MORTAL(this))
   {
     QQueue<skill_t> skills_to_delete = {};
-    for (const auto &curr : this->skills)
+    for (const auto &curr : skills)
     {
       if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
       {
-        dc_->logentry(u"Removing skill %1 from %2"_s.arg(curr.first).arg(qPrintable(this->name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
-        // this->send(fmt::format("Removing skill {}\r\n", curr.first));
+        dc_->logentry(u"Removing skill %1 from %2"_s.arg(curr.first).arg(qPrintable(name())), IMMORTAL, DC::LogChannel::LOG_PLAYER);
+        // send(fmt::format("Removing skill {}\r\n", curr.first));
         skills_to_delete.push(curr.first);
       }
     }
     while (skills_to_delete.isEmpty() == false)
     {
-      this->skills.erase(skills_to_delete.front());
+      skills.erase(skills_to_delete.front());
       skills_to_delete.pop();
     }
   }
 
-  barb_magic_resist(this, 0, this->has_skill(SKILL_MAGIC_RESIST));
+  barb_magic_resist(this, 0, has_skill(SKILL_MAGIC_RESIST));
   /* meta reimbursement */
-  if (!this->has_skill(META_REIMB))
+  if (!has_skill(META_REIMB))
   {
     learn_skill(META_REIMB, 1, 100);
     qint32 new_ = MIN(r_new_meta_platinum_cost(0, hps_plats_spent()), r_new_meta_exp_cost(0, hps_exp_spent()));
@@ -595,7 +595,7 @@ void Character::do_on_login_stuff(void)
 
   // Check for deleted characters listed in access list
   QQueue<QString> todelete;
-  vault = dc_->vaults_.has_vault(qPrintable(this->name()));
+  vault = dc_->vaults_.has_vault(qPrintable(name()));
   if (vault)
   {
     for (const auto &access : vault.access)
@@ -612,15 +612,15 @@ void Character::do_on_login_stuff(void)
 
   while (!todelete.isEmpty())
   {
-    dc_->logentry(u"Deleting %1 from %2's vault access list.\n"_s.arg(todelete.front()).arg(qPrintable(this->name())), 0, DC::LogChannel::LOG_MORTAL);
+    dc_->logentry(u"Deleting %1 from %2's vault access list.\n"_s.arg(todelete.front()).arg(qPrintable(name())), 0, DC::LogChannel::LOG_MORTAL);
     remove_vault_access(todelete.front(), vault);
     todelete.pop();
   }
 
-  if (this->getSetting("mode").startsWith("character"))
+  if (getSetting("mode").startsWith("character"))
   {
-    telnet_echo_off(this->desc);
-    telnet_sga(this->desc);
+    telnet_echo_off(conn_);
+    telnet_sga(conn_);
   }
 }
 
@@ -647,15 +647,15 @@ void Character::roll_and_display_stats(void)
 
   /*
   For testing purposes
-  this->desc->stats->str[0] = 13;
-  this->desc->stats->dex[0] = 14;
-  this->desc->stats->con[0] = 13;
-  this->desc->stats->tel[0] = 12;
-  this->desc->stats->wis[0] = 14;
+  conn_->stats->str[0] = 13;
+  conn_->stats->dex[0] = 14;
+  conn_->stats->con[0] = 13;
+  conn_->stats->tel[0] = 12;
+  conn_->stats->wis[0] = 14;
   */
 
   write_to_output("\r\n  Choose from any of the following groups of abilities...     \r\n", desc);
-  write_to_output("Group: 1     2     3     4     5\r\n", this->desc);
+  write_to_output("Group: 1     2     3     4     5\r\n", conn_);
   write_to_output(u"Str:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->str[0], -2).arg(desc->stats->str[1], -2).arg(desc->stats->str[2], -2).arg(desc->stats->str[3], -2).arg(desc->stats->str[4], -2), desc);
   write_to_output(u"Dex:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->dex[0], -2).arg(desc->stats->dex[1], -2).arg(desc->stats->dex[2], -2).arg(desc->stats->dex[3], -2).arg(desc->stats->dex[4], -2), desc);
   write_to_output(u"Con:   %1    %2    %3    %4    %5\r\n"_s.arg(desc->stats->con[0], -2).arg(desc->stats->con[1], -2).arg(desc->stats->con[2], -2).arg(desc->stats->con[3], -2).arg(desc->stats->con[4], -2), desc);
@@ -709,40 +709,40 @@ qint32 DC::exceeded_connection_limit(ConnectionPtr new_conn)
 void Character::check_hw(void)
 {
   heightweight(false);
-  if (this->height > races[this->race].max_height)
+  if (height > races[race].max_height)
   {
-    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].max_height);
-    this->height = races[this->race].max_height;
+    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d > max %d. height set to max.", qPrintable(name()), GET_HEIGHT(this), races[race].max_height);
+    height = races[race].max_height;
   }
-  if (this->height < races[this->race].min_height)
+  if (height < races[race].min_height)
   {
-    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", qPrintable(this->name()), GET_HEIGHT(this), races[this->race].min_height);
-    this->height = races[this->race].min_height;
+    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's height %d < min %d. height set to min.", qPrintable(name()), GET_HEIGHT(this), races[race].min_height);
+    height = races[race].min_height;
   }
 
-  if (this->weight > races[this->race].max_weight)
+  if (weight > races[race].max_weight)
   {
-    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].max_weight);
-    this->weight = races[this->race].max_weight;
+    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d > max %d. weight set to max.", qPrintable(name()), GET_WEIGHT(this), races[race].max_weight);
+    weight = races[race].max_weight;
   }
-  if (this->weight < races[this->race].min_weight)
+  if (weight < races[race].min_weight)
   {
-    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", qPrintable(this->name()), GET_WEIGHT(this), races[this->race].min_weight);
-    this->weight = races[this->race].min_weight;
+    dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_BUG, "check_hw: %s's weight %d < min %d. weight set to min.", qPrintable(name()), GET_WEIGHT(this), races[race].min_weight);
+    weight = races[race].min_weight;
   }
   heightweight(true);
 }
 
 void Character::set_hw(void)
 {
-  this->height = dc_->number(races[this->race].min_height, races[this->race].max_height);
-  // dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", qPrintable(this->name()), GET_HEIGHT(this));
-  this->weight = dc_->number(races[this->race].min_weight, races[this->race].max_weight);
-  // dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", qPrintable(this->name()), GET_WEIGHT(this));
+  height = dc_->number(races[race].min_height, races[race].max_height);
+  // dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's height set to %d", qPrintable(name()), GET_HEIGHT(this));
+  weight = dc_->number(races[race].min_weight, races[race].max_weight);
+  // dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "%s's weight set to %d", qPrintable(name()), GET_WEIGHT(this));
 }
 
 // Deal with sockets that haven't logged in yet.
-void DC::nanny(ConnectionPtr d, QString arg)
+void DC::nanny(ConnectionPtr conn, QString arg)
 {
   auto badclssmsg = u"You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> "_s;
   auto ch = conn->character;
@@ -1276,11 +1276,11 @@ void DC::nanny(ConnectionPtr d, QString arg)
     break;
 
   case Connection::states::OLD_STAT_METHOD:
-    if (ch->desc->stats != nullptr)
+    if (ch->conn_->stats != nullptr)
     {
-      ch->desc->stats = {};
+      ch->conn_->stats = {};
     }
-    ch->desc->stats = new stat_data;
+    ch->conn_->stats = new stat_data;
 
     conn->connected = Connection::states::OLD_CHOOSE_STATS;
     arg.clear();
@@ -1306,13 +1306,13 @@ void DC::nanny(ConnectionPtr d, QString arg)
 
     if (selection >= 1 && selection <= 5)
     {
-      GET_RAW_STR(ch) = ch->desc->stats->str[selection - 1];
-      GET_RAW_INT(ch) = ch->desc->stats->tel[selection - 1];
-      GET_RAW_WIS(ch) = ch->desc->stats->wis[selection - 1];
-      GET_RAW_DEX(ch) = ch->desc->stats->dex[selection - 1];
-      GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
-      ch->desc->stats = {};
-      ch->desc->stats = {};
+      GET_RAW_STR(ch) = ch->conn_->stats->str[selection - 1];
+      GET_RAW_INT(ch) = ch->conn_->stats->tel[selection - 1];
+      GET_RAW_WIS(ch) = ch->conn_->stats->wis[selection - 1];
+      GET_RAW_DEX(ch) = ch->conn_->stats->dex[selection - 1];
+      GET_RAW_CON(ch) = ch->conn_->stats->con[selection - 1];
+      ch->conn_->stats = {};
+      ch->conn_->stats = {};
       write_to_output("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
       dc_sprintf(buf, "  %c1: Human\r\n  %c2: Elf\r\n  %c3: Dwarf\r\n"
                       "  %c4: Hobbit\r\n  %c5: Pixie\r\n  %c6: Ogre\r\n"
@@ -1923,7 +1923,7 @@ bool DC::_parse_name(QString arg, QString name)
 }
 
 // Check for denial of service.
-bool check_deny(ConnectionPtr d, QString name)
+bool check_deny(ConnectionPtr conn, QString name)
 {
   FILE *fpdeny = {};
   QString strdeny;
@@ -1932,7 +1932,6 @@ bool check_deny(ConnectionPtr d, QString name)
   dc_sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
   if ((fpdeny = fopen(strdeny, "rb")) == nullptr)
     return false;
-  fclose(fpdeny);
 
   QString log_buf = {};
   dc_sprintf(log_buf, "Denying access to player %s@%s.", name, conn->getPeerOriginalAddress().toString(qPrintable()));
@@ -1944,12 +1943,12 @@ bool check_deny(ConnectionPtr d, QString name)
 }
 
 // Look for link-dead player to reconnect.
-bool check_reconnect(ConnectionPtr d, QString name, bool fReconnect)
+bool check_reconnect(ConnectionPtr conn, QString name, bool fReconnect)
 {
   const auto &character_list = d->dc_->character_list;
   for (const auto &tmp_ch : character_list)
   {
-    if (tmp_ch->isNonPlayer() || tmp_ch->desc != nullptr)
+    if (tmp_ch->isNonPlayer() || tmp_ch->conn_ != nullptr)
       continue;
 
     if (str_cmp(qPrintable(conn->character->name()), qPrintable(tmp_ch->name())))
@@ -1970,7 +1969,7 @@ bool check_reconnect(ConnectionPtr d, QString name, bool fReconnect)
     {
       free_char(conn->character);
       conn->character = tmp_ch;
-      tmp_ch->desc = d;
+      tmp_ch->conn_ = d;
       tmp_ch->timer = {};
       tmp_ch->sendln("Reconnecting.");
 
@@ -2002,9 +2001,9 @@ bool check_reconnect(ConnectionPtr d, QString name, bool fReconnect)
 /*
  * Check if already playing (on an open descriptor.)
  */
-bool check_playing(ConnectionPtr d, QString name)
+bool check_playing(ConnectionPtr conn, QString name)
 {
-  ConnectionPtr dold, next_d;
+  ConnectionPtr connold, next_d;
   CharacterPtr compare = {};
 
   for (dold = dc_->connections_; dold; dold = next_d)
@@ -2217,7 +2216,7 @@ void DC::checkConsecrate(qint32 pulseType)
           if ((ch = obj->obj_flags.origin) && charExists(ch))
           {
             ch->cRooms--;
-            if (ch->desc)
+            if (ch->conn_)
             {
               if (spl == SPELL_CONSECRATE)
               {
@@ -2431,12 +2430,11 @@ bool DC::on_forbidden_name_list(QString name)
       if (!str_cmp(name, buf))
         found = true;
     }
-    fclose(nameList);
   }
   return found;
 }
 
-void show_question_race(ConnectionPtr d)
+void show_question_race(ConnectionPtr conn)
 {
   if (d == nullptr || conn->character == nullptr)
   {
@@ -2467,7 +2465,7 @@ void show_question_race(ConnectionPtr d)
   telnet_ga(d);
 }
 
-bool handle_get_race(ConnectionPtr d, QString arg)
+bool handle_get_race(ConnectionPtr conn, QString arg)
 {
   if (d == nullptr || conn->character == nullptr || arg == "")
   {
@@ -2504,7 +2502,7 @@ bool handle_get_race(ConnectionPtr d, QString arg)
   return true;
 }
 
-void show_question_class(ConnectionPtr d)
+void show_question_class(ConnectionPtr conn)
 {
   if (d == nullptr || conn->character == nullptr)
   {
@@ -2541,7 +2539,7 @@ void show_question_class(ConnectionPtr d)
   telnet_ga(d);
 }
 
-bool handle_get_class(ConnectionPtr d, QString arg)
+bool handle_get_class(ConnectionPtr conn, QString arg)
 {
   if (d == nullptr || conn->character == nullptr || arg == "")
   {
@@ -2616,7 +2614,7 @@ void stat_data::setMin(void)
   wis[0] = getMin(wis[0], races[race].mod_wis, MAX(races[race].min_wis, classes[clss].min_wis));
 }
 
-void show_question_stats(ConnectionPtr d)
+void show_question_stats(ConnectionPtr conn)
 {
   if (d == nullptr || conn->character == nullptr)
   {
@@ -2721,7 +2719,7 @@ void show_question_stats(ConnectionPtr d)
   telnet_ga(d);
 }
 
-bool handle_get_stats(ConnectionPtr d, QString arg)
+bool handle_get_stats(ConnectionPtr conn, QString arg)
 {
   if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
   {

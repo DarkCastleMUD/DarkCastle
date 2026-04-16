@@ -49,8 +49,8 @@ void addnews(news_data *newnews)
 
 void savenews()
 {
-  FILE *fl;
-  if (!(fl = fopen("news.data", "w")))
+  FILE *stream;
+  if (!(stream = fopen("news.data", "w")))
   {
     dc_->logentry(u"Cannot open news file 'news.data'"_s, 0, DC::LogChannel::LOG_MISC);
     abort();
@@ -59,11 +59,11 @@ void savenews()
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
-    dc_fprintf(fl, "%d %s~\n", (qint32)tmpnews->time, qPrintable(tmpnews->addedby));
-    string_to_file(fl, tmpnews->news);
+    dc_fprintf(stream, "%d %s~\n", (qint32)tmpnews->time, qPrintable(tmpnews->addedby));
+    string_to_file(stream, tmpnews->news);
   }
-  dc_fprintf(fl, "0\n");
-  fclose(fl);
+  dc_fprintf(stream, "0\n");
+
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
@@ -79,15 +79,15 @@ void DC::loadnews(void)
     logmisc(u"Cannot open news file 'news.data'"_s);
     return;
   }
-  QTextStream fl(&news_file);
+  QTextStream stream(&news_file);
   qint32 i;
-  while ((i = fread_int(fl, 0, 2147483467)) != 0)
+  while ((i = fread_int(stream, 0, 2147483467)) != 0)
   {
     news_data *nnews;
     nnews = new news_data;
     nnews->time = i;
-    nnews->addedby = fread_string(fl, 0);
-    nnews->news = fread_string(fl, 0);
+    nnews->addedby = fread_string(stream);
+    nnews->news = fread_string(stream);
     qint32 i, v = {};
     QString buf;
     for (i = {}; i < (qint32)dc_strlen(nnews->news); i++)
@@ -98,7 +98,6 @@ void DC::loadnews(void)
     nnews->news = (buf);
     addnews(nnews);
   }
-  fclose(fl);
 }
 
 const QString newsify(QString string)
@@ -160,7 +159,7 @@ command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
     if (dc_strlen(buf) > MAX_STRING_LENGTH - 1000)
       break;
   }
-  page_string(ch->desc, buf, 1);
+  page_string(ch->conn_, buf, 1);
   if (QString(buf).isEmpty())
   {
     if (QString(argument) == u"all"_s)
@@ -182,7 +181,7 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!argument || argument.isEmpty() || !ch->desc)
+  if (!argument || argument.isEmpty() || !ch->conn_)
   {
     send_to_char("Syntax: addnews <date>\r\n"
                  "Date is either TODAY or in the following format: day/month/year\r\n"
@@ -243,8 +242,8 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
   if (nnews->news)
     ch->send(nnews->news);
   //  nnews->news = u"Temporary data.\r\n"_s;
-  ch->desc->connected = Connection::states::EDITING;
-  ch->desc->strnew = &(nnews->news);
+  ch->conn_->connected = Connection::states::EDITING;
+  ch->conn_->strnew = &(nnews->news);
 
   return ReturnValue::eSUCCESS;
 }

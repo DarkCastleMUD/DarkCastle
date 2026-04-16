@@ -47,10 +47,6 @@ TokenList::TokenList(const QString str) : head(0), current(0)
 
     cur_token = new Token(temp_str);
     AddToken(cur_token);
-
-#ifdef DEBUG_TOKEN
-    // std::cerr << "Added token: " << cur_token->GetBuf() << std::endl;
-#endif
   }
 
   Reset();
@@ -131,10 +127,10 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, Ch
   // Can't write to a mob!
   //--
   // However, we want to go ahead and format what they would get sent so that the
-  // MOBProgs will trigger.  Added check to send_to->desc on next line as well since
+  // MOBProgs will trigger.  Added check to send_to->conn_ on next line as well since
   // we no longer check it here.
   // - pir 11/18/01
-  // if(send_to->desc == 0) return(0);
+  // if(send_to->conn_ == 0) return(0);
 
   //--
   // A few checks before we bother
@@ -144,7 +140,7 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, Ch
   {
     return "";
   }
-  if (send_to->desc && send_to->desc->connected != Connection::states::PLAYING && !(flags & FLAG_FORCE))
+  if (send_to->conn_ && send_to->conn_->connected != Connection::states::PLAYING && !(flags & FLAG_FORCE))
     return "";
   if (isSet(dc_->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
     return "";
@@ -159,351 +155,323 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, Ch
   for (Reset(); current != 0; Next())
   {
 
-#ifdef DEBUG_TOKEN
-    if (current->IsAnsi())
-      // std::cerr << "ANSI token" << std::endl;
-      if (current->IsVt100())
-        // std::cerr << "VT100 token" << std::endl;
-        if (current->IsCode())
-          // std::cerr << "Code token" << std::endl;
-          if (current->IsText())
-    // std::cerr << "Text token" << std::endl;
-#endif
+    if (current->IsText())
+    {
+      interp += current->GetBuf();
+    }
+    else if (current->IsAnsi() || current->IsVt100())
+    {
+      if (send_to->isNonPlayer() ||
+          (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
+          (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
+      {
+        switch (current->GetBuf()[1])
+        {
+        case '1':
+          interp += BLUE;
+          break;
+        case '2':
+          interp += GREEN;
+          break;
+        case '3':
+          interp += CYAN;
+          break;
+        case '4':
+          interp += RED;
+          break;
+        case '5':
+          interp += YELLOW;
+          break;
+        case '6':
+          interp += PURPLE;
+          break;
+        case '7':
+          interp += GREY;
+          break;
+        case '0':
+          interp += BLACK;
+          break;
+        case 'B':
+          interp += BOLD;
+          break;
+        case 'L':
+          interp += FLASH;
+          break;
+        case 'I':
+          interp += INVERSE;
+          break;
+        case 'R':
+          interp += NTEXT;
+          break;
+        case '*':
+          interp += EEEE;
+          break;
+        case '$':
+          interp += "$";
+          break;
+        default:
+          break;
+        } // switch
+      } // if they are appropriate
+    } // if it's ansi or vt100
+    else if (current->IsCode())
+    {
+      switch ((current->GetBuf())[1])
+      {
+      case 'n':
+        if (send_to == nullptr || from == nullptr || from->shortdesc_or_name().isEmpty())
+        {
+          break;
+        }
 
-            if (current->IsText())
-            {
-#ifdef DEBUG_TOKEN
-      // std::cerr << "It's a text token" << std::endl;
-#endif
-              interp += current->GetBuf();
-            }
-            else if (current->IsAnsi() || current->IsVt100())
-            {
-#ifdef DEBUG_TOKEN
-      // std::cerr << "It's ansi or vt100 code" << std::endl;
-#endif
-              if (send_to->isNonPlayer() ||
-                  (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
-                  (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
-              {
-                switch (current->GetBuf()[1])
-                {
-                case '1':
-                  interp += BLUE;
-                  break;
-                case '2':
-                  interp += GREEN;
-                  break;
-                case '3':
-                  interp += CYAN;
-                  break;
-                case '4':
-                  interp += RED;
-                  break;
-                case '5':
-                  interp += YELLOW;
-                  break;
-                case '6':
-                  interp += PURPLE;
-                  break;
-                case '7':
-                  interp += GREY;
-                  break;
-                case '0':
-                  interp += BLACK;
-                  break;
-                case 'B':
-                  interp += BOLD;
-                  break;
-                case 'L':
-                  interp += FLASH;
-                  break;
-                case 'I':
-                  interp += INVERSE;
-                  break;
-                case 'R':
-                  interp += NTEXT;
-                  break;
-                case '*':
-                  interp += EEEE;
-                  break;
-                case '$':
-                  interp += "$";
-                  break;
-                default:
-                  break;
-                } // switch
-              } // if they are appropriate
-            } // if it's ansi or vt100
-            else if (current->IsCode())
-            {
-#ifdef DEBUG_TOKEN
-      // std::cerr << "It's a special code" << std::endl;
-#endif
-              switch ((current->GetBuf())[1])
-              {
-              case 'n':
-                if (send_to == nullptr || from == nullptr || from->shortdesc_or_name().isEmpty())
-                {
-                  break;
-                }
+        if (!CAN_SEE(send_to, from, true))
+        {
+          if (flags & INVIS_NULL)
+            return {};
+          else if (flags & INVIS_VISIBLE)
+            interp += from->shortdesc_or_name();
+          else
+            interp += "someone";
+        }
+        else
+        {
+          if (qPrintable(from->shortdesc_or_name()))
+          {
+            interp += from->shortdesc_or_name();
+          }
+        }
+        break;
+      case 'N':
+        if (vict_obj == nullptr || ((CharacterPtr)vict_obj)->shortdesc_or_name().isEmpty())
+        {
+          break;
+        }
+        if (!CAN_SEE(send_to, (CharacterPtr)vict_obj, true))
+        {
+          if (flags & INVIS_NULL)
+            return {};
+          else if (flags & INVIS_VISIBLE)
+            interp += ((CharacterPtr)vict_obj)->shortdesc_or_name();
+          else
+            interp += "someone";
+        }
+        else
+        {
+          if (vict_obj == nullptr || ((CharacterPtr)vict_obj)->shortdesc_or_name().isEmpty())
+          {
+            break;
+          }
+          interp += ((CharacterPtr)vict_obj)->shortdesc_or_name();
+        }
+        break;
+      case 'm':
+        if (from == nullptr)
+        {
+          break;
+        }
+        interp += HMHR(from);
+        break;
+      case 'M':
+        if (vict_obj == nullptr)
+        {
+          break;
+        }
+        interp += HMHR((CharacterPtr)vict_obj);
+        break;
+      case 's':
+        if (from == nullptr)
+        {
+          break;
+        }
+        interp += HSHR(from);
+        break;
+      case 'S':
+        if (vict_obj == nullptr)
+        {
+          break;
+        }
+        interp += HSHR((CharacterPtr)vict_obj);
+        break;
+      case 'e':
+        if (from == nullptr)
+        {
+          break;
+        }
+        interp += HSSH(from);
+        break;
+      case 'E':
+        if (vict_obj == nullptr)
+        {
+          break;
+        }
+        interp += HSSH((CharacterPtr)vict_obj);
+        break;
+      case 'o':
+        if (send_to == nullptr || obj == nullptr || obj->name().isEmpty())
+        {
+          break;
+        }
 
-                if (!CAN_SEE(send_to, from, true))
-                {
-                  if (flags & INVIS_NULL)
-                    return {};
-                  else if (flags & INVIS_VISIBLE)
-                    interp += from->shortdesc_or_name();
-                  else
-                    interp += "someone";
-                }
-                else
-                {
-                  if (qPrintable(from->shortdesc_or_name()))
-                  {
-                    interp += from->shortdesc_or_name();
-                  }
-                }
-                break;
-              case 'N':
-                if (vict_obj == nullptr || ((CharacterPtr)vict_obj)->shortdesc_or_name().isEmpty())
-                {
-                  break;
-                }
-                if (!CAN_SEE(send_to, (CharacterPtr)vict_obj, true))
-                {
-                  if (flags & INVIS_NULL)
-                    return {};
-                  else if (flags & INVIS_VISIBLE)
-                    interp += ((CharacterPtr)vict_obj)->shortdesc_or_name();
-                  else
-                    interp += "someone";
-                }
-                else
-                {
-                  if (vict_obj == nullptr || ((CharacterPtr)vict_obj)->shortdesc_or_name().isEmpty())
-                  {
-                    break;
-                  }
-                  interp += ((CharacterPtr)vict_obj)->shortdesc_or_name();
-                }
-                break;
-              case 'm':
-                if (from == nullptr)
-                {
-                  break;
-                }
-                interp += HMHR(from);
-                break;
-              case 'M':
-                if (vict_obj == nullptr)
-                {
-                  break;
-                }
-                interp += HMHR((CharacterPtr)vict_obj);
-                break;
-              case 's':
-                if (from == nullptr)
-                {
-                  break;
-                }
-                interp += HSHR(from);
-                break;
-              case 'S':
-                if (vict_obj == nullptr)
-                {
-                  break;
-                }
-                interp += HSHR((CharacterPtr)vict_obj);
-                break;
-              case 'e':
-                if (from == nullptr)
-                {
-                  break;
-                }
-                interp += HSSH(from);
-                break;
-              case 'E':
-                if (vict_obj == nullptr)
-                {
-                  break;
-                }
-                interp += HSSH((CharacterPtr)vict_obj);
-                break;
-              case 'o':
-                if (send_to == nullptr || obj == nullptr || obj->name().isEmpty())
-                {
-                  break;
-                }
+        if (!CAN_SEE_OBJ(send_to, obj))
+        {
+          if (flags & INVIS_NULL)
+            return {};
+          else if (flags & INVIS_VISIBLE)
+          {
+            interp += fname(obj->name()).toStdString();
+          }
+          else
+            interp += "something";
+        }
+        else
+        {
+          interp += fname(obj->name()).toStdString();
+        }
+        break;
+      case 'O':
+        if (send_to == nullptr || vict_obj == nullptr || vict_obj->name().isEmpty())
+        {
+          break;
+        }
+        if (!CAN_SEE_OBJ(send_to, vict_obj))
+        {
+          if (flags & INVIS_NULL)
+            return {};
+          else if (flags & INVIS_VISIBLE)
+          {
+            auto o = vict_obj;
+            auto n = o->name();
+            auto fs = fname(n).toStdString();
+            interp += fs;
+          }
+          else
+            interp += "something";
+        }
+        else
+        {
+          auto o = vict_obj;
+          auto n = o->name();
+          auto fs = fname(n).toStdString();
+          interp += fs;
+        }
+        break;
+      case 'p':
+        if (send_to == nullptr || obj == nullptr || obj->short_description().isEmpty())
+        {
+          break;
+        }
 
-                if (!CAN_SEE_OBJ(send_to, obj))
-                {
-                  if (flags & INVIS_NULL)
-                    return {};
-                  else if (flags & INVIS_VISIBLE)
-                  {
-                    interp += fname(obj->name()).toStdString();
-                  }
-                  else
-                    interp += "something";
-                }
-                else
-                {
-                  interp += fname(obj->name()).toStdString();
-                }
-                break;
-              case 'O':
-                if (send_to == nullptr || vict_obj == nullptr || vict_obj->name().isEmpty())
-                {
-                  break;
-                }
-                if (!CAN_SEE_OBJ(send_to, vict_obj))
-                {
-                  if (flags & INVIS_NULL)
-                    return {};
-                  else if (flags & INVIS_VISIBLE)
-                  {
-                    auto o = vict_obj;
-                    auto n = o->name();
-                    auto fs = fname(n).toStdString();
-                    interp += fs;
-                  }
-                  else
-                    interp += "something";
-                }
-                else
-                {
-                  auto o = vict_obj;
-                  auto n = o->name();
-                  auto fs = fname(n).toStdString();
-                  interp += fs;
-                }
-                break;
-              case 'p':
-                if (send_to == nullptr || obj == nullptr || obj->short_description().isEmpty())
-                {
-                  break;
-                }
+        if (!CAN_SEE_OBJ(send_to, obj))
+        {
+          if (flags & INVIS_NULL)
+            return {};
+          else if (flags & INVIS_VISIBLE)
+            interp += obj->short_description();
+          else
+            interp += "something";
+        }
+        else
+        {
+          interp += obj->short_description();
+        }
+        break;
+      case 'P':
+        if (send_to == nullptr || vict_obj == nullptr || vict_obj->short_description().isEmpty())
+        {
+          break;
+        }
 
-                if (!CAN_SEE_OBJ(send_to, obj))
-                {
-                  if (flags & INVIS_NULL)
-                    return {};
-                  else if (flags & INVIS_VISIBLE)
-                    interp += obj->short_description();
-                  else
-                    interp += "something";
-                }
-                else
-                {
-                  interp += obj->short_description();
-                }
-                break;
-              case 'P':
-                if (send_to == nullptr || vict_obj == nullptr || vict_obj->short_description().isEmpty())
-                {
-                  break;
-                }
+        if (!CAN_SEE_OBJ(send_to, vict_obj))
+        {
+          if (flags & INVIS_NULL)
+            return {};
+          else if (flags & INVIS_VISIBLE)
+            interp += ((ObjectPtr)vict_obj)->short_description().toStdString();
+          else
+            interp += "something";
+        }
+        else
+        {
+          interp += ((ObjectPtr)vict_obj)->short_description().toStdString();
+        }
+        break;
+      case 'a':
+        if (obj == nullptr || obj->name().isEmpty())
+        {
+          break;
+        }
 
-                if (!CAN_SEE_OBJ(send_to, vict_obj))
-                {
-                  if (flags & INVIS_NULL)
-                    return {};
-                  else if (flags & INVIS_VISIBLE)
-                    interp += ((ObjectPtr)vict_obj)->short_description().toStdString();
-                  else
-                    interp += "something";
-                }
-                else
-                {
-                  interp += ((ObjectPtr)vict_obj)->short_description().toStdString();
-                }
-                break;
-              case 'a':
-                if (obj == nullptr || obj->name().isEmpty())
-                {
-                  break;
-                }
+        switch (*qPrintable((obj)->name()))
+        {
+        case 'a':
+        case 'A':
+        case 'e':
+        case 'E':
+        case 'i':
+        case 'I':
+        case 'o':
+        case 'O':
+        case 'u':
+        case 'U':
+        case 'y':
+        case 'Y':
+          interp += "an";
+          break;
+        default:
+          interp += "a";
+          break;
+        }
+        break;
+      case 'A':
+        if (vict_obj != nullptr && !((ObjectPtr)vict_obj)->name().isEmpty())
+        {
+          switch (*qPrintable(((ObjectPtr)vict_obj)->name()))
+          {
+          case 'a':
+          case 'A':
+          case 'e':
+          case 'E':
+          case 'i':
+          case 'I':
+          case 'o':
+          case 'O':
+          case 'u':
+          case 'U':
+          case 'y':
+          case 'Y':
+            interp += "an";
+            /* no break */
+          default:
+            interp += "a";
+          }
+        }
+        break;
+      case 'T':
+        if (vict_obj != nullptr)
+        {
+          interp += vict_obj->name();
+        }
+        break;
 
-                switch (*qPrintable((obj)->name()))
-                {
-                case 'a':
-                case 'A':
-                case 'e':
-                case 'E':
-                case 'i':
-                case 'I':
-                case 'o':
-                case 'O':
-                case 'u':
-                case 'U':
-                case 'y':
-                case 'Y':
-                  interp += "an";
-                  break;
-                default:
-                  interp += "a";
-                  break;
-                }
-                break;
-              case 'A':
-                if (vict_obj != nullptr && !((ObjectPtr)vict_obj)->name().isEmpty())
-                {
-                  switch (*qPrintable(((ObjectPtr)vict_obj)->name()))
-                  {
-                  case 'a':
-                  case 'A':
-                  case 'e':
-                  case 'E':
-                  case 'i':
-                  case 'I':
-                  case 'o':
-                  case 'O':
-                  case 'u':
-                  case 'U':
-                  case 'y':
-                  case 'Y':
-                    interp += "an";
-                    /* no break */
-                  default:
-                    interp += "a";
-                  }
-                }
-                break;
-              case 'T':
-                if (vict_obj != nullptr)
-                {
-                  interp += vict_obj->name();
-                }
-                break;
+      case 'F':
+        if (vict_obj != nullptr)
+        {
+          interp += fname(vict_obj->name());
+        }
+        break;
 
-              case 'F':
-                if (vict_obj != nullptr)
-                {
-                  interp += fname(vict_obj->name());
-                }
-                break;
-
-              default: // Illegal code - just output it
-                interp += current->GetBuf();
-                break;
-              } /* switch */
-            } /* if it's a code */
-            else // It's unrecognized.  Shouldn't happen.
-            {
-              dc_->logentry(u"TokenList::Interpret() sent bad Token!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
-            }
-#ifdef DEBUG_TOKEN
-    // std::cerr << "Output after this loop: " << interp << std::endl;
-#endif
+      default: // Illegal code - just output it
+        interp += current->GetBuf();
+        break;
+      } /* switch */
+    } /* if it's a code */
+    else // It's unrecognized.  Shouldn't happen.
+    {
+      dc_->logentry(u"TokenList::Interpret() sent bad Token!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
+    }
   } /* for loop */
 
   interp += "\r\n";
-
-#ifdef DEBUG_TOKEN
-  // std::cerr << "Finished building interp; it is:" << std::endl;
-  // std::cerr << interp << std::endl;
-#endif
 
   return interp;
 }
@@ -540,9 +508,6 @@ void Token::SetBuf(QString rhs)
   if (buf[0] != '$')
   {
     type = TEXT;
-#ifdef DEBUG_TOKEN
-    // std::cerr << buf << ": TEXT" << std::endl;
-#endif
   }
   else
   {
@@ -565,31 +530,19 @@ void Token::SetBuf(QString rhs)
     case '0':
     case '*':
       type = ANSI;
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": ANSI" << std::endl;
-#endif
       break;
     case 'B':
     case 'I':
     case 'L':
     case 'R':
       type = (VT100 | ANSI);
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": ANSI|VT100" << std::endl;
-#endif
       break;
       // we allow $$ to go through now, since it's handled in handle_ansi -pir 2/14/01
     case '$':
       type = TEXT; // buf[1] = {};
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": TEXT" << std::endl;
-#endif
       break;
     default:
       type = CODE;
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": CODE" << std::endl;
-#endif
       break;
     } /* switch */
   } /* else */

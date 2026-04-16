@@ -948,7 +948,7 @@ void affect_update(qint32 duration_type)
         continue;
       }
 
-      if ((af->type == Character::PLAYER_OBJECT_THIEF || af->type == Character::PLAYER_CANTQUIT || af->type == Character::PLAYER_GOLD_THIEF) && !i->desc)
+      if ((af->type == Character::PLAYER_OBJECT_THIEF || af->type == Character::PLAYER_CANTQUIT || af->type == Character::PLAYER_GOLD_THIEF) && !i->conn_)
         continue;
       if (af->duration > 1)
       {
@@ -1724,7 +1724,7 @@ bool Character::skill_success(CharacterPtr victim, qint32 skillnum, qint32 mod)
   else
   {
     /* Check for skill improvement anyway */
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a);
     return false; // Failure
   }
@@ -1776,7 +1776,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
   //    return ReturnValue::eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (ch->isNonPlayer() && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
+  if (ch->isNonPlayer() && ch->conn_ && ch->conn_->original && ch->conn_->original != ch->conn_->character && ch->conn_->original->isMortalPlayer())
   {
     ch->sendln("You cannot cast in this form.");
     return ReturnValue::eFAILURE;
@@ -2449,10 +2449,10 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           tar_char->sendln("Your sleep is restless.");
         ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
 
-        if (tar_char && tar_char != ch && ch->isPlayer() && tar_char->isPlayer() && tar_char->desc && ch->desc)
+        if (tar_char && tar_char != ch && ch->isPlayer() && tar_char->isPlayer() && tar_char->conn_ && ch->conn_)
         {
           /*
-          if (!dc_strcmp(tar_char->desc->getPeerOriginalAddress().toString(qPrintable()), ch->desc->getPeerOriginalAddress().toString(qPrintable())))
+          if (!dc_strcmp(tar_char->conn_->getPeerOriginalAddress().toString(qPrintable()), ch->conn_->getPeerOriginalAddress().toString(qPrintable())))
           {
             dc_sprintf(log_buf, "Multi: %s casted '%s' on %s", qPrintable(ch->name()),
                     get_skill_name(spl), qPrintable(tar_char->name()));
@@ -2882,7 +2882,7 @@ command_return_t do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   dc_strcat(buf, "\r\n");
-  page_string(ch->desc, buf, 1);
+  page_string(ch->conn_, buf, 1);
 
   return ReturnValue::eSUCCESS;
 }
@@ -2909,7 +2909,7 @@ command_return_t do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   dc_strcat(buf, "\r\n");
-  page_string(ch->desc, buf, 1);
+  page_string(ch->conn_, buf, 1);
 
   return ReturnValue::eSUCCESS;
 }
@@ -3041,7 +3041,7 @@ command_return_t do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   dc_strcat(buf, "\r\n");
-  page_string(ch->desc, buf, 1);
+  page_string(ch->conn_, buf, 1);
 
   return ReturnValue::eSUCCESS;
 }
@@ -3080,11 +3080,11 @@ qint32 Character::has_skill(skill_t skill)
   else if (affected_by_spell(SPELL_HEROISM))
     bonus += affected_by_spell(SPELL_HEROISM)->modifier / 5;
 
-  if (this->skills.contains(skill))
+  if (skills.contains(skill))
   {
-    const auto &curr = this->skills[skill];
+    const auto &curr = skills[skill];
 
-    for (o = this->player->skillchange; o; o = o->next_skill)
+    for (o = player->skillchange; o; o = o->next_skill)
     {
       qint32 a;
       for (a = {}; a < o->num_affects; a++)

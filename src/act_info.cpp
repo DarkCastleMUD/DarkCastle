@@ -19,7 +19,7 @@ qint32 max_who = {};
 
 /* extern functions */
 
-void page_string(ConnectionPtr d, const QString str, qint32 keep_internal);
+void page_string(ConnectionPtr conn, const QString str, qint32 keep_internal);
 
 command_return_t do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
 {
@@ -35,6 +35,6 @@ command_return_t do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
   for (i = 1; i <= DC::MAX_MORTAL_LEVEL; i++)
     buf += u"[%2d] %9d\r\n"_s.arg(i).arg(exp_table[i]);
 
-  page_string(ch->desc, buf, 1);
+  page_string(ch->conn_, buf, 1);
   return ReturnValue::eSUCCESS;
 }

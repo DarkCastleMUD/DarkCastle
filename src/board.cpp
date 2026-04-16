@@ -72,7 +72,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
 void board_save_board(QMap<QString, BOARD_INFO>::iterator board);
 void board_load_board();
 qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 fwrite_string(const QString buf, FILE *fl);
+qint32 fwrite_string(const QString buf, FILE *stream);
 void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort);
 
 constexpr auto ANY_BOARD = 0;
@@ -575,7 +575,7 @@ qint32 board(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
   if (arg.isEmpty())
     return ReturnValue::eFAILURE;
 
-  if (!ch->desc)
+  if (!ch->conn_)
     return ReturnValue::eFAILURE; /* By MS or all NPC's will be trapped at the board */
 
   if (!has_loaded)
@@ -733,8 +733,8 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
   reserve->buf = {};
   reserve->board = board;
   wait_for_write[ch] = reserve;
-  ch->desc->connected = Connection::states::WRITE_BOARD;
-  ch->desc->strnew = &reserve->buf;
+  ch->conn_->connected = Connection::states::WRITE_BOARD;
+  ch->conn_->strnew = &reserve->buf;
 }
 
 qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
@@ -747,7 +747,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   if (number.isEmpty() || !isdigit(*number))
     return ReturnValue::eFAILURE;
 
-  if (!(tmessage = atoi(number)))
+  if (!(tmessage = dc_atoi(number)))
     return ReturnValue::eFAILURE;
 
   if (board->second.msgs.isEmpty())
@@ -852,7 +852,6 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
     write_me = remove_slashr(board->second.msgs[ind].text);
     fwrite_string(write_me.c_str(), the_file);
   }
-  fclose(the_file);
 }
 
 void board_load_board()
@@ -877,7 +876,7 @@ void board_load_board()
     fscanf(the_file, " %d ", &number);
     if (number < 0 || feof(the_file))
     {
-      fclose(the_file);
+
       continue;
     }
 
@@ -898,8 +897,6 @@ void board_load_board()
 
       map_it->second.msgs.push_back(curr_msg);
     }
-
-    fclose(the_file);
   }
 }
 
@@ -932,7 +929,7 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
     ch->sendln("Read what?");
     return ReturnValue::eFAILURE;
   }
-  if (!(tmessage = atoi(number)))
+  if (!(tmessage = dc_atoi(number)))
     return ReturnValue::eFAILURE;
 
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
@@ -999,7 +996,7 @@ qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>
   dc_snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
   board_msg += buf;
 
-  page_string(ch->desc, board_msg.c_str(), 1);
+  page_string(ch->conn_, board_msg.c_str(), 1);
   return ReturnValue::eSUCCESS;
 }
 
@@ -1066,11 +1063,11 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
       }
   }
   board_save_board(board);
-  page_string(ch->desc, board_msg.c_str(), 1);
+  page_string(ch->conn_, board_msg.c_str(), 1);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 fwrite_string(const QString buf, FILE *fl)
+qint32 fwrite_string(const QString buf, FILE *stream)
 {
-  return (dc_fprintf(fl, "%s~\n", buf));
+  return (dc_fprintf(stream, "%s~\n", buf));
 }

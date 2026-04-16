@@ -783,7 +783,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
   }
 
   herb_vnum = atoll(arg1);
-  liquid_type = atoi(arg2);
+  liquid_type = dc_atoi(arg2);
   container_vnum = atoll(arg3);
 
   if (herb_vnum < 6301 || herb_vnum > 6312)
@@ -838,7 +838,7 @@ qint32 Brew::remove(CharacterPtr ch, QString argument)
   }
 
   qint32 i = {};
-  qint32 target = atoi(argument);
+  qint32 target = dc_atoi(argument);
 
   for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
@@ -1233,10 +1233,10 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
     return ReturnValue::eFAILURE;
   }
 
-  ink_vnum = atoi(arg1);
-  dust_vnum = atoi(arg2);
-  pen_vnum = atoi(arg3);
-  paper_vnum = atoi(arg4);
+  ink_vnum = dc_atoi(arg1);
+  dust_vnum = dc_atoi(arg2);
+  pen_vnum = dc_atoi(arg3);
+  paper_vnum = dc_atoi(arg4);
 
   if (ink_vnum < 6326 || ink_vnum > 6328)
   {
@@ -1290,7 +1290,7 @@ qint32 Scribe::remove(CharacterPtr ch, QString argument)
   }
 
   qint32 i = {};
-  qint32 target = atoi(argument);
+  qint32 target = dc_atoi(argument);
 
   for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {

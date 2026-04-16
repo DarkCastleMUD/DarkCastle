@@ -575,7 +575,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
       // if they already have 2 rounds of wait, only tack on 1 instead of 2
 
       if (!SOMEONE_DIED(retval))
-        if (victim->desc)
+        if (victim->conn_)
           WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
     }
   }
@@ -810,7 +810,7 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (this->isPlayer() && (victim->isNonPlayer() && !IS_AFFECTED(victim, AFF_CHARM)))
+  if (isPlayer() && (victim->isNonPlayer() && !IS_AFFECTED(victim, AFF_CHARM)))
   {
     sendln("Doesn't need your help!");
     return ReturnValue::eFAILURE;

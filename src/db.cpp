@@ -63,7 +63,7 @@ weather_data weather_info; /* the infomation about the weather */
 VaultPtr vault_table = {};
 
 /* local procedures */
-void setup_dir(FILE *fl, qint32 room, qint32 dir);
+void setup_dir(auto &streamstream, qint32 room, qint32 dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
@@ -71,7 +71,7 @@ void half_chop(const QString str, QString arg1, QString arg2);
 world_file_list_item *new_mob_file_item(QString filename, qint32 room_nr);
 world_file_list_item *new_obj_file_item(QString filename, qint32 room_nr);
 
-QString read_next_worldfile_name(FILE *flWorldIndex);
+QString read_next_worldfile_name(auto &streamflWorldIndex);
 
 void fix_shopkeepers_inventory();
 qint32 file_to_string(const QString name, QString buf);
@@ -80,15 +80,15 @@ void clear_char(CharacterPtr ch);
 
 // MOBprogram locals
 qint32 mprog_name_to_type(QString name);
-// void		load_mobprogs           ( FILE* fp );
-void mprog_read_programs(FILE *fp, qint32 i, bool ignore);
-void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore);
+// void		load_mobprogs           ( FILE* stream );
+void mprog_read_programs(auto &stream, qint32 i, bool ignore);
+void mprog_read_programs(QTextStream &stream, qint32 i, bool ignore);
 
 extern bool MOBtrigger;
 
 /* external refs */
 
-help_index_t build_help_index(QTextStream &fl);
+help_index_t build_help_index(QTextStream &stream);
 // The Room implementation
 // -Sadus 9/1/96
 
@@ -359,7 +359,7 @@ const QStringList funnybootmessages =
 
 void funny_boot_message()
 {
-  ConnectionPtr d;
+  ConnectionPtr conn;
 
   extern qint32 was_hotboot;
 
@@ -381,9 +381,9 @@ void funny_boot_message()
 command_return_t do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   skill_quest *curr;
-  FILE *fl;
+  FILE *stream;
 
-  if (!(fl = fopen(SKILL_QUEST_FILE, "w")))
+  if (!(stream = fopen(SKILL_QUEST_FILE, "w")))
   {
     if (ch)
       ch->sendln("Can't open the skill quest file.");
@@ -391,11 +391,11 @@ command_return_t do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cm
   }
   for (curr = skill_list; curr; curr = curr->next)
   {
-    dc_fprintf(fl, "%d %s~\n", curr->num, curr->message);
-    dc_fprintf(fl, "%d %d\n", curr->clas, curr->level);
+    dc_fprintf(stream, "%d %s~\n", curr->num, curr->message);
+    dc_fprintf(stream, "%d %d\n", curr->clas, curr->level);
   }
-  dc_fprintf(fl, "0\n");
-  fclose(fl);
+  dc_fprintf(stream, "0\n");
+
   ch->sendln("Skill quests saved.");
   return ReturnValue::eSUCCESS;
 }
@@ -405,15 +405,15 @@ void load_skillquests()
   skill_quest *newsq, *last = {};
   skill_list = {};
   qint32 i;
-  FILE *fl;
+  FILE *stream;
 
-  if (!(fl = fopen(SKILL_QUEST_FILE, "r")))
+  if (!(stream = fopen(SKILL_QUEST_FILE, "r")))
   {
     dc_->logentry(u"Cannot open skill quest file."_s, 0, DC::LogChannel::LOG_MISC);
     abort();
   }
 
-  while ((i = fread_int(fl, 0, 1000)) != 0)
+  while ((i = fread_int(stream, 0, 1000)) != 0)
   {
     auto newsq = new skill_quest;
 
@@ -424,9 +424,9 @@ void load_skillquests()
       dc_sprintf(buf, "%d duplicate.", i);
       dc_->logentry(buf, 0, DC::LogChannel::LOG_BUG);
     }
-    newsq->message = fread_string(fl, 0);
-    newsq->clas = fread_int(fl, 0, 32768);
-    newsq->level = fread_int(fl, 0, 200);
+    newsq->message = fread_string(stream);
+    newsq->clas = fread_int(stream, 0, 32768);
+    newsq->level = fread_int(stream, 0, 200);
     newsq->next = {};
 
     if (last)
@@ -436,7 +436,6 @@ void load_skillquests()
 
     last = newsq;
   }
-  fclose(fl);
 }
 
 /*************************************************************************
@@ -488,7 +487,6 @@ void DC::boot_db(void)
     abort();
   }
   help_rec_count = count_hash_records(new_help_fl);
-  fclose(new_help_fl);
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
   {
@@ -496,7 +494,7 @@ void DC::boot_db(void)
     abort();
   }
   load_new_help(new_help_fl);
-  fclose(new_help_fl);
+
   // end new help files
 
   logverbose(u"Opening help file."_s);
@@ -817,7 +815,7 @@ command_return_t do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  page_string(ch->desc, buf, 1);
+  page_string(ch->conn_, buf, 1);
   return 1;
 }
 
@@ -905,7 +903,7 @@ mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
   QString buf;
   QString log_buf;
   FILE *flMobIndex;
-  FILE *fl;
+  FILE *stream;
   QString temp;
   QString endfile;
   world_file_list_item *pItem = {};
@@ -946,7 +944,7 @@ mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
       dc_->logentry(temp, 0, DC::LogChannel::LOG_MISC);
     }
 
-    if (!(fl = fopen(endfile, "r")))
+    if (!(stream = fopen(endfile, "r")))
     {
       perror(endfile);
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
@@ -957,7 +955,7 @@ mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
 
     for (;;)
     {
-      if (fgets(buf, 81, fl))
+      if (fgets(buf, 81, stream))
       {
 
         if (*buf == '#')
@@ -977,7 +975,7 @@ mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
           index[i].mobspec = {};
           index[i].progtypes = {};
           dc_->currentVNUM(index[i].vnum());
-          if (!(index[i].item = (CharacterPtr)read_mobile(i, fl)))
+          if (!(index[i].item = (CharacterPtr)read_mobile(i, stream)))
           {
 
             dc_sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[i].vnum());
@@ -997,11 +995,9 @@ mob_index_data *DC::generate_mob_indices(qint32 *top, mob_index_data *index)
     }
 
     pItem->lastnum = (i - 1);
-
-    fclose(fl);
   }
   *top = i - 1;
-  fclose(flMobIndex);
+
   /*
    Here the index gets processed, and mob classes gets
    assigned. (Not done in read_mobile 'cause of
@@ -1217,7 +1213,7 @@ obj_index_data *DC::generate_obj_indices(qint32 *top, obj_index_data *index)
   qint32 i = {};
   QString buf;
   QString log_buf;
-  FILE *fl;
+  FILE *stream;
   FILE *flObjIndex;
   QString temp;
   QString endfile;
@@ -1249,7 +1245,7 @@ obj_index_data *DC::generate_obj_indices(qint32 *top, obj_index_data *index)
     dc_strcat(endfile, qPrintable(temp));
     logverbose(temp);
 
-    if (!(fl = fopen(endfile, "r")))
+    if (!(stream = fopen(endfile, "r")))
     {
       dc_->logentry(u"generate_obj_indices: could not open obj file."_s, 0, LogChannel::LOG_BUG);
       dc_->logentry(temp, 0, LogChannel::LOG_BUG);
@@ -1260,7 +1256,7 @@ obj_index_data *DC::generate_obj_indices(qint32 *top, obj_index_data *index)
 
     for (;;)
     {
-      if (fgets(buf, 81, fl))
+      if (fgets(buf, 81, stream))
       {
         if (*buf == '#') /* allocate new_new cell */
         {
@@ -1276,7 +1272,7 @@ obj_index_data *DC::generate_obj_indices(qint32 *top, obj_index_data *index)
           index[i].non_combat_func = {};
           index[i].combat_func = {};
           index[i].progtypes = {};
-          if (!(index[i].item = read_object(i, fl, false)))
+          if (!(index[i].item = read_object(i, stream, false)))
           {
             dc_sprintf(log_buf, "Unable to load object %lu!\r\n", index[i].vnum());
             dc_->logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
@@ -1294,11 +1290,10 @@ obj_index_data *DC::generate_obj_indices(qint32 *top, obj_index_data *index)
 
     pItem->lastnum = (i - 1);
 
-    fclose(fl);
   } // for next_in_file
 
   *top = i - 1;
-  fclose(flObjIndex);
+
   return (index);
 }
 
@@ -1379,7 +1374,7 @@ void write_one_room(LegacyFile &lf, qint32 a)
   dc_fprintf(f, "S\n");
 }
 
-qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
+qint32 DC::read_one_room(auto &streamstream, qint32 &room_nr)
 {
   QString temp = {};
   QChar ch = {};
@@ -1387,11 +1382,11 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
   extra_descr_data *new_new_descr = {};
   zone_t zone_nr = {};
 
-  ch = fread_char(fl);
+  ch = fread_char(stream);
 
   if (ch != '$')
   {
-    room_nr = fread_int(fl, 0, 1000000);
+    room_nr = fread_int(stream, 0, 1000000);
 
     if (load_debug)
     {
@@ -1399,7 +1394,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       fflush(stdout);
     }
 
-    temp = fread_string(fl, 0);
+    temp = fread_string(stream);
 
     if (room_nr)
     {
@@ -1423,7 +1418,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       dc_->world[room_nr].number = room_nr;
       dc_->world[room_nr].name = temp;
     }
-    QString description = fread_string(fl, 0);
+    QString description = fread_string(stream);
     if (room_nr)
     {
       dc_->world[room_nr].description = description;
@@ -1434,7 +1429,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       dc_->total_rooms++;
     }
     // Ignore recorded zone number since it may not longer be valid
-    fread_int(fl, -1, 64000); // zone nr
+    fread_int(stream, -1, 64000); // zone nr
 
     if (room_nr)
     {
@@ -1476,7 +1471,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       }
     }
 
-    quint32 room_flags = fread_bitvector(fl, -1, 2147483467);
+    quint32 room_flags = fread_int(stream);
 
     if (room_nr)
     {
@@ -1488,7 +1483,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       dc_->world[room_nr].temp_room_flags = {};
     }
 
-    qint32 sector_type = fread_int(fl, -1, 64000);
+    qint32 sector_type = fread_int(stream, -1, 64000);
 
     if (room_nr)
     {
@@ -1513,23 +1508,23 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
 
     for (;;)
     {
-      ch = fread_char(fl); /* dir field */
+      ch = fread_char(stream); /* dir field */
 
       /* direction field */
       if (ch == 'D')
       {
-        dir = fread_int(fl, 0, 5);
-        setup_dir(fl, room_nr, dir);
+        dir = fread_int(stream, 0, 5);
+        setup_dir(stream, room_nr, dir);
       }
       /* extra description field */
       else if (ch == 'E')
       {
         // strip off the \n after the E
-        if (fread_char(fl) != '\n')
-          fseek(fl, -1, SEEK_CUR);
+        if (fread_char(stream) != '\n')
+          fseek(stream, -1, SEEK_CUR);
         auto new_new_descr = new extra_descr_data;
-        new_new_descr->keyword_ = fread_string(fl, 0);
-        new_new_descr->description_ = fread_string(fl, 0);
+        new_new_descr->keyword_ = fread_string(stream);
+        new_new_descr->description_ = fread_string(stream);
 
         if (room_nr)
         {
@@ -1544,7 +1539,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
       else if (ch == 'B')
       {
         auto deni = new deny_data;
-        deni->vnum = fread_int(fl, -1, 2147483467);
+        deni->vnum = fread_int(stream, -1, 2147483467);
 
         if (room_nr)
         {
@@ -1560,7 +1555,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
         break;
       else if (ch == 'C')
       {
-        qint32 c_class = fread_int(fl, 0, CLASS_MAX);
+        qint32 c_class = fread_int(stream, 0, CLASS_MAX);
         if (room_nr)
         {
           dc_->world[room_nr].allow_class[c_class] = true;
@@ -1573,7 +1568,7 @@ qint32 DC::read_one_room(FILE *fl, qint32 &room_nr)
   return false;
 }
 
-QString read_next_worldfile_name(FILE *flWorldIndex)
+QString read_next_worldfile_name(auto &streamflWorldIndex)
 {
   QString filename = fread_string(flWorldIndex, 0);
 
@@ -1878,7 +1873,7 @@ world_file_list_item *new_obj_file_item(QString filename, qint32 room_nr)
 /* load the rooms */
 void DC::boot_world(void)
 {
-  FILE *fl;
+  FILE *stream;
   FILE *flWorldIndex;
   qint32 room_nr = {};
   QString temp;
@@ -1924,7 +1919,7 @@ void DC::boot_world(void)
       dc_->logentry(temp, 0, DC::LogChannel::LOG_MISC);
     }
 
-    if (!(fl = fopen(endfile, "r")))
+    if (!(stream = fopen(endfile, "r")))
     {
       perror("fopen");
       dc_->logentry(u"boot_world: could not open world file."_s, 0, DC::LogChannel::LOG_BUG);
@@ -1934,7 +1929,7 @@ void DC::boot_world(void)
 
     pItem = new_world_file_item(temp, room_nr);
 
-    while (read_one_room(fl, room_nr))
+    while (read_one_room(stream, room_nr))
       ;
 
     // push the first num forward until it hits a room, that way it's
@@ -1946,17 +1941,14 @@ void DC::boot_world(void)
     pItem->lastnum = room_nr / 100 * 100 + 99;
 
     room_nr++;
-
-    fclose(fl);
   }
   // dc_->logentry(u"World Boot done."_s, 0, DC::LogChannel::LOG_MISC);
-  fclose(flWorldIndex);
 
   top_of_world = --room_nr;
 }
 
 /* read direction data */
-void setup_dir(FILE *fl, qint32 room, qint32 dir)
+void setup_dir(auto &streamstream, qint32 room, qint32 dir)
 {
   qint32 tmp;
 
@@ -1977,16 +1969,16 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
   {
     dc_->world[room].dir_option[dir] = new RoomDirection;
   }
-  QString general_description = fread_string(fl, 0);
+  QString general_description = fread_string(stream);
 
   if (room)
     dc_->world[room].dir_option[dir]->general_description = general_description;
 
-  QString keyword = fread_string(fl, 0);
+  QString keyword = fread_string(stream);
   if (room)
     dc_->world[room].dir_option[dir]->keyword = keyword;
 
-  tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
+  tmp = fread_int(stream); /* tjs hack - not the right range */
 
   if (room)
   {
@@ -1994,7 +1986,7 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
     dc_->world[room].dir_option[dir]->bracee = {};
   }
 
-  qint16 key = fread_int(fl, -62000, 62000);
+  qint16 key = fread_int(stream, -62000, 62000);
   if (room)
   {
     dc_->world[room].dir_option[dir]->key = key;
@@ -2003,7 +1995,7 @@ void setup_dir(FILE *fl, qint32 room, qint32 dir)
   qint16 to_room = DC::NOWHERE;
   try
   {
-    to_room = fread_int(fl, 0, 62000);
+    to_room = fread_int(stream, 0, 62000);
   }
   catch (...)
   {
@@ -2186,27 +2178,27 @@ void DC::free_zones_from_memory()
   }
 }
 
-void Zone::write(FILE *fl)
+void Zone::write(auto &streamstream)
 {
-  dc_fprintf(fl, "V2\n");
-  dc_fprintf(fl, "#%lu\n", (id_ ? (bottom / 100) : 0));
-  dc_fprintf(fl, "%s~\n", qPrintable(name()));
-  dc_fprintf(fl, "%lu %lu %d %ld %d\n", top, lifespan, reset_mode, zone_flags, continent);
+  dc_fprintf(stream, "V2\n");
+  dc_fprintf(stream, "#%lu\n", (id_ ? (bottom / 100) : 0));
+  dc_fprintf(stream, "%s~\n", qPrintable(name()));
+  dc_fprintf(stream, "%lu %lu %d %ld %d\n", top, lifespan, reset_mode, zone_flags, continent);
 
   for (qint32 i = {}; i < cmd.size(); i++)
   {
     if (cmd[i]->command == '*')
-      dc_fprintf(fl, "* %s\n", qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(stream, "* %s\n", qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == '%')
-      dc_fprintf(fl, "%% %2d %3d %3d %s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(stream, "%% %2d %3d %3d %s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'X')
-      dc_fprintf(fl, "X %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(stream, "X %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'K')
-      dc_fprintf(fl, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
+      dc_fprintf(stream, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'M')
     {
       qint32 virt = cmd[i]->active ? dc_->mob_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      dc_fprintf(fl, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+      dc_fprintf(stream, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
                  cmd[i]->arg3,
@@ -2216,7 +2208,7 @@ void Zone::write(FILE *fl)
     {
       qint32 virt = cmd[i]->active ? dc_->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
       qint32 virt2 = cmd[i]->active ? dc_->obj_index[cmd[i]->arg3].vnum() : cmd[i]->arg3;
-      dc_fprintf(fl, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+      dc_fprintf(stream, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
                  virt2,
@@ -2226,7 +2218,7 @@ void Zone::write(FILE *fl)
     {
       qint32 virt = cmd[i]->active ? dc_->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
 
-      dc_fprintf(fl, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+      dc_fprintf(stream, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
                  cmd[i]->arg3,
@@ -2235,7 +2227,7 @@ void Zone::write(FILE *fl)
     else if (cmd[i]->command == 'O')
     {
       qint32 virt = cmd[i]->active ? dc_->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      dc_fprintf(fl, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+      dc_fprintf(stream, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
                  cmd[i]->arg3,
@@ -2244,14 +2236,14 @@ void Zone::write(FILE *fl)
     else if (cmd[i]->command == 'E')
     {
       qint32 virt = cmd[i]->active ? dc_->obj_index[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      dc_fprintf(fl, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
+      dc_fprintf(stream, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
                  cmd[i]->arg3,
                  qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     }
     else
-      dc_fprintf(fl, "%c %2d %5d %3d %5d %s\n", cmd[i]->command,
+      dc_fprintf(stream, "%c %2d %5d %3d %5d %s\n", cmd[i]->command,
                  cmd[i]->if_flag,
                  cmd[i]->arg1,
                  cmd[i]->arg2,
@@ -2259,10 +2251,10 @@ void Zone::write(FILE *fl)
                  qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
   }
 
-  dc_fprintf(fl, "S\n$~\n");
+  dc_fprintf(stream, "S\n$~\n");
 }
 
-zone_t DC::read_one_zone(FILE *fl)
+zone_t DC::read_one_zone(auto &streamstream)
 {
   static room_t last_top_vnum = {};
   zone_commands_t reset_tab;
@@ -2272,17 +2264,17 @@ zone_t DC::read_one_zone(FILE *fl)
   qint32 version = 1;
   bool modified = false;
 
-  ch = fread_char(fl);
+  ch = fread_char(stream);
   if (ch == 'V')
   {
-    version = fread_int(fl, 0, 64000);
-    ch = fread_char(fl);
+    version = fread_int(stream, 0, 64000);
+    ch = fread_char(stream);
     modified = true;
   }
 
-  tmp = fread_int(fl, 0, 64000);
-  check = fread_string(fl, 0);
-  // a = fread_int(fl, 0, 64000);
+  tmp = fread_int(stream, 0, 64000);
+  check = fread_string(stream);
+  // a = fread_int(stream, 0, 64000);
   /* alloc a new_new zone */
   //*num = zon = a / 100;
 
@@ -2303,7 +2295,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
   zone.name(check);
   zone.setBottom(last_top_vnum + 1);
-  zone.setTop(fread_int(fl, 0, WORLD_MAX_ROOM));
+  zone.setTop(fread_int(stream, 0, WORLD_MAX_ROOM));
   last_top_vnum = zone.getTop();
   zone.setRealBottom(0);
   zone.setRealTop(0);
@@ -2312,9 +2304,9 @@ zone_t DC::read_one_zone(FILE *fl)
   zone.repops_without_deaths = -1;
   zone.repops_with_bonus = {};
 
-  zone.lifespan = fread_int(fl, 0, 64000);
-  zone.reset_mode = fread_int(fl, 0, 64000);
-  zone.setZoneFlags(fread_bitvector(fl, 0, 2147483467));
+  zone.lifespan = fread_int(stream, 0, 64000);
+  zone.reset_mode = fread_int(stream, 0, 64000);
+  zone.setZoneFlags(fread_int(stream));
 
   // if its old version set the altered flag so that
   // this zone will be saved with new format soon
@@ -2325,7 +2317,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
   if (version > 1)
   {
-    zone.continent = fread_int(fl, 0, 64000);
+    zone.continent = fread_int(stream, 0, 64000);
   }
 
   /* read the command table */
@@ -2334,7 +2326,7 @@ zone_t DC::read_one_zone(FILE *fl)
   {
     QSharedPointer<ResetCommand> reset = QSharedPointer<ResetCommand>::create();
     reset->comment = {}; // needs to be initialized
-    reset->command = fread_char(fl);
+    reset->command = fread_char(stream);
     reset->if_flag = {};
     reset->last = {};
     reset->arg1 = {};
@@ -2347,7 +2339,7 @@ zone_t DC::read_one_zone(FILE *fl)
 
     if (reset->command == '*')
     {
-      fgets(buf, 160, fl); /* skip command */
+      fgets(buf, 160, stream); /* skip command */
       // skip any space
       skipper = buf;
       while (*skipper == ' ' || *skipper == '\t')
@@ -2364,12 +2356,12 @@ zone_t DC::read_one_zone(FILE *fl)
       continue;
     }
 
-    tmp = fread_int(fl, 0, 9);
+    tmp = fread_int(stream, 0, 9);
     reset->if_flag = tmp;
     reset->last = time(nullptr) - dc_->number(0, 12 * 3600);
     // randomize last repop on boot
-    reset->arg1 = fread_int(fl, -64000, 2147483467);
-    reset->arg2 = fread_int(fl, -64000, 2147483467);
+    reset->arg1 = fread_int(stream, -64000, 2147483467);
+    reset->arg2 = fread_int(stream, -64000, 2147483467);
     if (reset->arg1 > 64000)
       reset->arg1 = 2;
 
@@ -2387,7 +2379,7 @@ zone_t DC::read_one_zone(FILE *fl)
         reset->command == 'J'
         // % only has 2 args
     )
-      reset->arg3 = fread_int(fl, -64000, 32768);
+      reset->arg3 = fread_int(stream, -64000, 32768);
     else
       reset->arg3 = {};
 
@@ -2398,8 +2390,8 @@ zone_t DC::read_one_zone(FILE *fl)
 
     /* tjs hack - ugly tmp bug fix */
     // this just moves our cursor back 1 position
-    fseek(fl, -1, SEEK_CUR);
-    fgets(buf, 160, fl); /* read comment */
+    fseek(stream, -1, SEEK_CUR);
+    fgets(buf, 160, stream); /* read comment */
 
     skipper = buf;
 
@@ -2428,7 +2420,7 @@ zone_t DC::read_one_zone(FILE *fl)
 /* load the zone table and command tables */
 void DC::boot_zones(void)
 {
-  FILE *fl;
+  FILE *stream;
   FILE *flZoneIndex;
   QString temp;
   QString endfile;
@@ -2464,26 +2456,22 @@ void DC::boot_zones(void)
       dc_->logentry(temp, 0, DC::LogChannel::LOG_MISC);
     }
 
-    if (!(fl = fopen(endfile, "r")))
+    if (!(stream = fopen(endfile, "r")))
     {
       perror(endfile);
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
       abort();
     }
 
-    auto zone_key = read_one_zone(fl);
+    auto zone_key = read_one_zone(stream);
     auto &zone = zones[zone_key];
     zone.setFilename(temp);
     // // std::cerr << u"%1 %2"_s.arg(zone).arg(temp).toStdString() << std::endl;
-
-    fclose(fl);
   }
 
   // dc_->logentry(u"Zone Boot done."_s, 0, DC::LogChannel::LOG_MISC);
 
-  fclose(flZoneIndex);
-
-  //  fclose(fl);
+  //
 }
 
 /*************************************************************************
@@ -2491,7 +2479,7 @@ void DC::boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
+CharacterPtr DC::read_mobile(qint32 nr, FILE *stream)
 {
   QString buf;
   qint32 i, j;
@@ -2507,20 +2495,20 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
 
   /***** String data *** */
 
-  mob->name(fread_string(fl, 1));
+  mob->name(fread_string(stream));
   /* set up the fread debug stuff */
   dc_->currentType("Mob");
   dc_->currentName(mob->name());
-  mob->short_description(fread_string(fl, 1));
-  mob->long_description(fread_string(fl, 1));
-  mob->description(fread_string(fl, 1));
+  mob->short_description(fread_string(stream));
+  mob->long_description(fread_string(stream));
+  mob->description(fread_string(stream));
   mob->title_ = {};
 
   mob->mobdata = new Mobile;
   mob->mobdata->reset = {};
   /* *** Numeric data *** */
   j = {};
-  while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1)
+  while ((tmp = fread_int(stream, -2147483467, 2147483467)) != -1)
   {
     mob->mobdata->actflags[j] = tmp;
     j++;
@@ -2532,7 +2520,7 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
   mob->setType(Character::Type::NPC);
 
   j = {};
-  while ((tmp = fread_int(fl, -2147483467, 2147483467)) != -1)
+  while ((tmp = fread_int(stream, -2147483467, 2147483467)) != -1)
   {
     mob->affected_by[j] = tmp;
     j++;
@@ -2540,9 +2528,9 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
   for (; j < AFF_MAX / ASIZE + 1; j++)
     mob->affected_by[j] = {};
 
-  mob->alignment = fread_int(fl, -2147483467, 2147483467);
+  mob->alignment = fread_int(stream, -2147483467, 2147483467);
 
-  tmp = fread_int(fl, 0, MAX_RACE);
+  tmp = fread_int(stream, 0, MAX_RACE);
   mob->race = (QChar)tmp;
 
   mob->raw_str = mob->str = BASE_STAT + mob_race_mod[mob->race][0];
@@ -2551,22 +2539,22 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
   mob->raw_intel = mob->intel = BASE_STAT + mob_race_mod[mob->race][3];
   mob->raw_wis = mob->wis = BASE_STAT + mob_race_mod[mob->race][4];
 
-  mob->setLevel(fread_int(fl, 0, IMPLEMENTER));
+  mob->setLevel(fread_int(stream, 0, IMPLEMENTER));
 
-  mob->hitroll = 20 - fread_int(fl, -64000, 64000);
-  mob->armor = 10 * fread_int(fl, -64000, 64000);
+  mob->hitroll = 20 - fread_int(stream, -64000, 64000);
+  mob->armor = 10 * fread_int(stream, -64000, 64000);
 
-  tmp = fread_int(fl, 0, 64000);
-  tmp2 = fread_int(fl, 0, 64000);
-  tmp3 = fread_int(fl, 0, 64000);
+  tmp = fread_int(stream, 0, 64000);
+  tmp2 = fread_int(stream, 0, 64000);
+  tmp3 = fread_int(stream, 0, 64000);
 
   mob->raw_hit = dice(tmp, tmp2) + tmp3;
   mob->max_hit = mob->raw_hit;
   mob->hit = mob->max_hit;
 
-  mob->mobdata->damnodice = fread_int(fl, 0, 64000);
-  mob->mobdata->damsizedice = fread_int(fl, 0, 64000);
-  mob->damroll = fread_int(fl, 0, 64000);
+  mob->mobdata->damnodice = fread_int(stream, 0, 64000);
+  mob->mobdata->damsizedice = fread_int(stream, 0, 64000);
+  mob->damroll = fread_int(stream, 0, 64000);
   mob->mobdata->last_room = {};
   mob->mana = 100 + (mob->getLevel() * 10);
   mob->max_mana = 100 + (mob->getLevel() * 10);
@@ -2578,14 +2566,14 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
   mob->ki = mob->max_ki;
   mob->raw_ki = mob->max_ki;
 
-  mob->setGold(fread_int(fl, 0, 2147483467));
+  mob->setGold(fread_int(stream, 0, 2147483467));
   mob->plat = {};
-  mob->exp = (qint64)fread_int(fl, -2147483467, 2147483467);
+  mob->exp = (qint64)fread_int(stream, -2147483467, 2147483467);
 
-  mob->setPosition(static_cast<position_t>(fread_int(fl, 0, 10)));
-  mob->mobdata->default_pos = static_cast<position_t>(fread_int(fl, 0, 10));
+  mob->setPosition(static_cast<position_t>(fread_int(stream, 0, 10)));
+  mob->mobdata->default_pos = static_cast<position_t>(fread_int(stream, 0, 10));
 
-  tmp = fread_int(fl, 0, 12);
+  tmp = fread_int(stream, 0, 12);
 
   /* Read in ISR vlues...  (sex +3) */
   // Eventually I can remove this "if" but not until I fix them all.
@@ -2594,9 +2582,9 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
 
   mob->sex = (Character::sex_t)tmp;
 
-  mob->immune = fread_bitvector(fl, 0, 2147483467);
-  mob->suscept = fread_bitvector(fl, 0, 2147483467);
-  mob->resist = fread_bitvector(fl, 0, 2147483467);
+  mob->immune = fread_int(stream);
+  mob->suscept = fread_int(stream);
+  mob->resist = fread_int(stream);
 
   // if all three are 0, then chances are someone just didn't set them, so go with
   // the race defaults.
@@ -2615,34 +2603,34 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
 
   do
   {
-    letter = fread_char(fl);
+    letter = fread_char(stream);
     switch (letter)
     {
     case 'C':
-      mob->c_class = fread_int(fl, 0, 2147483467);
-      // fread_new_newline(fl);
+      mob->c_class = fread_int(stream, 0, 2147483467);
+      // fread_new_newline(stream);
       break;
     case 'T': // sTats
-      mob->raw_str = mob->str = fread_int(fl, 0, 100);
-      mob->raw_intel = mob->intel = fread_int(fl, 0, 100);
-      mob->raw_wis = mob->wis = fread_int(fl, 0, 100);
-      mob->raw_dex = mob->dex = fread_int(fl, 0, 100);
-      mob->raw_con = mob->con = fread_int(fl, 0, 100);
-      fread_int(fl, 0, 100); // junk var in case we add another stat
-      // fread_new_newline(fl);
+      mob->raw_str = mob->str = fread_int(stream, 0, 100);
+      mob->raw_intel = mob->intel = fread_int(stream, 0, 100);
+      mob->raw_wis = mob->wis = fread_int(stream, 0, 100);
+      mob->raw_dex = mob->dex = fread_int(stream, 0, 100);
+      mob->raw_con = mob->con = fread_int(stream, 0, 100);
+      fread_int(stream, 0, 100); // junk var in case we add another stat
+      // fread_new_newline(stream);
       break;
     case '>':
-      ungetc(letter, fl);
-      mprog_read_programs(fl, nr, false);
+      ungetc(letter, stream);
+      mprog_read_programs(stream, nr, false);
       break;
     case 'Y': // type
-      mob->mobdata->mob_flags.type = (mob_type_t)fread_int(fl, mob_type_t::MOB_TYPE_FIRST, mob_type_t::MOB_TYPE_LAST);
-      // fread_new_newline(fl);
+      mob->mobdata->mob_flags.type = (mob_type_t)fread_int(stream, mob_type_t::MOB_TYPE_FIRST, mob_type_t::MOB_TYPE_LAST);
+      // fread_new_newline(stream);
       break;
     case 'V': // value
-      i = fread_int(fl, 0, MAX_MOB_VALUES - 1);
-      mob->mobdata->mob_flags.value[i] = fread_int(fl, -1000, 2147483467);
-      // fread_new_newline(fl);
+      i = fread_int(stream, 0, MAX_MOB_VALUES - 1);
+      mob->mobdata->mob_flags.value[i] = fread_int(stream, -1000, 2147483467);
+      // fread_new_newline(stream);
       break;
     case 'S':
       break;
@@ -2653,7 +2641,7 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
     }
   } while (letter != 'S');
 
-  // fread_new_newline(fl);
+  // fread_new_newline(stream);
 
   mob->weight = 200;
   mob->height = 198;
@@ -2693,28 +2681,28 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *fl)
     mob->saves[SAVE_TYPE_MAGIC] -= 50;
 
   mob->mobdata->nr = nr;
-  mob->desc = {};
+  mob->conn_ = {};
 
   return (mob);
 }
 
 // we write them recursively so they read in properly
-void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob)
+void write_mprog_recur(auto &streamstream, mob_prog_data *mprg, bool mob)
 {
   if (mprg->next)
-    write_mprog_recur(fl, mprg->next, mob);
+    write_mprog_recur(stream, mprg->next, mob);
   if (mob)
-    dc_fprintf(fl, ">%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
+    dc_fprintf(stream, ">%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
   else
-    dc_fprintf(fl, "\\%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
+    dc_fprintf(stream, "\\%s ", qPrintable(Program::mprog_type_to_name(mprg->type)));
   if (mprg->arglist)
-    string_to_file(fl, mprg->arglist);
+    string_to_file(stream, mprg->arglist);
   else
-    string_to_file(fl, "Saved During Edit");
+    string_to_file(stream, "Saved During Edit");
   if (mprg->comlist)
-    string_to_file(fl, mprg->comlist);
+    string_to_file(stream, mprg->comlist);
   else
-    string_to_file(fl, "Saved During Edit");
+    string_to_file(stream, "Saved During Edit");
 }
 
 // Write a mob to file
@@ -2722,34 +2710,34 @@ void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob)
 //
 void write_mobile(LegacyFile &lf, CharacterPtr mob)
 {
-  FILE *fl = lf.file_handle_;
+  FILE *stream = lf.file_handle_;
   qint32 i = {};
 
-  dc_fprintf(fl, "#%lu\n", dc_->mob_index[mob->mobdata->nr].vnum());
-  string_to_file(fl, mob->name());
-  string_to_file(fl, qPrintable(mob->short_description()));
-  string_to_file(fl, qPrintable(mob->long_description()));
-  string_to_file(fl, qPrintable(mob->description()));
+  dc_fprintf(stream, "#%lu\n", dc_->mob_index[mob->mobdata->nr].vnum());
+  string_to_file(stream, mob->name());
+  string_to_file(stream, qPrintable(mob->short_description()));
+  string_to_file(stream, qPrintable(mob->long_description()));
+  string_to_file(stream, qPrintable(mob->description()));
 
   while (i < ACT_MAX / ASIZE + 1)
   {
-    dc_fprintf(fl, "%d ", mob->mobdata->actflags[i]);
+    dc_fprintf(stream, "%d ", mob->mobdata->actflags[i]);
     i++;
   }
-  dc_fprintf(fl, "-1\n");
+  dc_fprintf(stream, "-1\n");
   i = {};
 
   while (i < AFF_MAX / ASIZE + 1)
   {
-    dc_fprintf(fl, "%d ", mob->affected_by[i]);
+    dc_fprintf(stream, "%d ", mob->affected_by[i]);
     i++;
   }
-  dc_fprintf(fl, "-1\n");
+  dc_fprintf(stream, "-1\n");
 
-  dc_fprintf(fl, "%d %d %llu\n"
-                 "%d %d %dd%d+%d %dd%d+%d\n"
-                 "%ld %ld\n"
-                 "%d %d %d %d %d %d\n",
+  dc_fprintf(stream, "%d %d %llu\n"
+                     "%d %d %dd%d+%d %dd%d+%d\n"
+                     "%ld %ld\n"
+                     "%d %d %d %d %d %d\n",
              mob->alignment,
              mob->race,
              mob->getLevel(),
@@ -2774,7 +2762,7 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
              mob->resist);
 
   if (mob->c_class)
-    dc_fprintf(fl, "C %d\n", mob->c_class);
+    dc_fprintf(stream, "C %d\n", mob->c_class);
 
   if ((mob->raw_str != 11 || mob->raw_dex != 11 || mob->raw_con != 11 ||
        mob->raw_intel != 11 || mob->raw_wis != 11) &&
@@ -2784,25 +2772,25 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
        mob->raw_intel != BASE_STAT + mob_race_mod[mob->race][3] ||
        mob->raw_wis != BASE_STAT + mob_race_mod[mob->race][4]))
   {
-    dc_fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
+    dc_fprintf(stream, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
   }
 
   if (dc_->mob_index[mob->mobdata->nr].mobprogs)
   {
-    write_mprog_recur(fl, dc_->mob_index[mob->mobdata->nr].mobprogs, true);
-    dc_fprintf(fl, "|\n");
+    write_mprog_recur(stream, dc_->mob_index[mob->mobdata->nr].mobprogs, true);
+    dc_fprintf(stream, "|\n");
   }
 
   if (mob->mobdata->mob_flags.type > 0)
   {
-    dc_fprintf(fl, "Y %d\n", mob->mobdata->mob_flags.type);
+    dc_fprintf(stream, "Y %d\n", mob->mobdata->mob_flags.type);
     for (quint32 i = {}; i < MAX_MOB_VALUES; ++i)
     {
-      dc_fprintf(fl, "V %d %d\n", i, mob->mobdata->mob_flags.value[i]);
+      dc_fprintf(stream, "V %d %d\n", i, mob->mobdata->mob_flags.value[i]);
     }
   }
 
-  dc_fprintf(fl, "S\n");
+  dc_fprintf(stream, "S\n");
 }
 
 // If a mob is set to 0d0 we need to give it hps depending upon it's level
@@ -3183,7 +3171,7 @@ CharacterPtr DC::clone_mobile(qint32 nr)
     mob->equipment[i] = {};
 
   mob->mobdata->nr = nr;
-  mob->desc = {};
+  mob->conn_ = {};
   mob->mobdata->reset = {};
 
   auto &character_list = dc_->character_list;
@@ -3234,7 +3222,6 @@ CharacterPtr DC::clone_mobile(qint32 nr)
 //
 auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
 {
-  ObjectPtr obj;
   ObjectPtr curr;
   qint32 cur_index = {};
 
@@ -3257,7 +3244,7 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
 
   // create
 
-  obj = new Object;
+  auto obj = ObjectPtr(new Object(this));
   clear_object(obj);
   obj->name(u"empty obj"_s);
   obj->short_description("An empty obj");
@@ -3355,7 +3342,7 @@ qint32 DC::create_blank_mobile(qint32 nr)
   mob->fighting = {};
   mob->player = {};
   mob->altar = {};
-  mob->desc = {};
+  mob->conn_ = {};
   GET_RAW_DEX(mob) = 11;
   GET_RAW_STR(mob) = 11;
   GET_RAW_INT(mob) = 11;
@@ -3601,339 +3588,23 @@ void delete_item_from_index(qint32 nr)
   }
 }
 
-QString qDebugQTextStreamLine(QTextStream &stream, QString message)
-{
-  assert(stream.status() == QTextStream::Status::Ok);
-  auto current_pos = stream.pos();
-  auto current_line = stream.readLine();
-  assert(stream.status() == QTextStream::Status::Ok);
-
-  if (!message.isEmpty())
-  {
-    qDebug("%s", qPrintable(u"%1: [%2]"_s.arg(message).arg(current_line)));
-  }
-  auto ok = stream.seek(current_pos);
-  assert(stream.pos() == current_pos);
-  assert(stream.status() == QTextStream::Status::Ok);
-  if (!ok)
-  {
-    qFatal("Failed to seek in qDebugQTextStreamLine");
-  }
-  return current_line;
-}
-
-/* read an object from OBJ_FILE */
-ObjectPtr read_object(qint32 nr, QTextStream &fl, bool ignore)
-{
-  qint32 loc{}, mod = {};
-
-  QString chk;
-
-  if (nr < 0)
-  {
-    return 0;
-  }
-
-  ObjectPtr obj = new Object;
-  clear_object(obj);
-
-  /* *** QString data *** */
-  // read it, add it to the hsh table, free it
-  // that way, we only have one copy of it in memory at any time
-
-  obj->name(fread_string(fl, 1));
-
-  qDebug("%s", qPrintable(u"Object name: %1"_s.arg(obj->name())));
-  obj->short_description(fread_string(fl, 1));
-  if (obj->short_description().length() >= MAX_OBJ_SDESC_LENGTH)
-  {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", dc_->obj_index[nr].vnum());
-  }
-
-  obj->long_description(fread_string(fl, 1));
-
-  obj->ActionDescription(fread_string(fl, 1));
-  fl.skipWhiteSpace();
-  if (!obj->ActionDescription().isEmpty() && !obj->ActionDescription()[0].isNull() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~'))
-  {
-    dc_->logentry(u"read_object: vnum %1 action description [%2] removed."_s.arg(dc_->obj_index[nr].vnum()).arg(obj->ActionDescription()));
-    obj->ActionDescription(QString());
-  }
-  obj->table = {};
-  dc_->currentVNUM(nr);
-  dc_->currentName(obj->name());
-  dc_->currentType("Object");
-  obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(fl);
-  obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(fl);
-  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(fl);
-  obj->obj_flags.size = fread_int<decltype(obj->obj_flags.size)>(fl);
-
-  obj->obj_flags.value[0] = fread_int<object_value_t>(fl);
-  obj->obj_flags.value[1] = fread_int<object_value_t>(fl);
-  obj->obj_flags.value[2] = fread_int<object_value_t>(fl);
-  obj->obj_flags.value[3] = fread_int<object_value_t>(fl);
-  obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(fl, 0, IMPLEMENTER);
-
-  obj->obj_flags.weight = fread_int<decltype(obj->obj_flags.weight)>(fl);
-  obj->obj_flags.cost = fread_int<decltype(obj->obj_flags.cost)>(fl);
-  obj->obj_flags.more_flags = fread_int<decltype(obj->obj_flags.more_flags)>(fl);
-  /* currently not stored in object file */
-  obj->obj_flags.timer = {};
-
-  obj->ex_description = {};
-  obj->affected = {};
-  obj->num_affects = {};
-  /* *** other flags *** */
-
-  if (nr == 2866 && !obj->ActionDescription().isEmpty() && obj->ActionDescription()[0] == 'P')
-  {
-    qDebug("Debug point");
-  }
-
-  qDebugQTextStreamLine(fl, "read_object(), before fl >> chk >> Qt::ws");
-  fl >> chk >> Qt::ws;
-  qDebugQTextStreamLine(fl, "read_object(), after fl >> chk >> Qt::ws");
-  qDebug() << "First chk " << chk;
-  extra_descr_data *new_new_descr = {};
-  qint64 current_pos = {};
-  QString current_line = {};
-  while (!chk.isEmpty() && chk != "S")
-  {
-    bool ok = false;
-    switch (chk[0].toLatin1())
-    {
-    case 'E':
-      qDebugQTextStreamLine(fl, "Type E before first fread_string");
-      new_new_descr = new extra_descr_data;
-
-      new_new_descr->keyword_ = fread_string(fl, 1);
-
-      qDebugQTextStreamLine(fl, "Type E before second fread_string");
-
-      new_new_descr->description_ = fread_string(fl, 1);
-
-      qDebugQTextStreamLine(fl, "Type E after second fread_string");
-
-      new_new_descr->next = obj->ex_description;
-      obj->ex_description = new_new_descr;
-      break;
-
-    case '\\':
-      qDebugQTextStreamLine(fl, "before seek: ");
-      ok = fl.seek(fl.pos() - 1);
-      if (!ok)
-      {
-        qFatal("Failed to seek -1 in read_object");
-      }
-
-      qDebugQTextStreamLine(fl, "after seek: ");
-
-      mprog_read_programs(fl, nr, ignore);
-
-      qDebugQTextStreamLine(fl, "after mprog_read_programs seek: ");
-      break;
-
-    case 'A':
-      // these are only two members of obj_affected_type, so nothing else needs initializing
-      loc = fread_int<decltype(loc)>(fl);
-      mod = fread_int<decltype(mod)>(fl, -1000, 1000);
-      add_obj_affect(obj, loc, mod);
-      break;
-
-    default:
-      dc_->logentry(u"Illegal obj addon flag [%1] in obj [%2]."_s.arg(chk).arg(obj->name()), IMPLEMENTER, DC::LogChannel::LOG_BUG);
-      break;
-    } // switch
-      // read in next flag
-    assert(fl.status() == QTextStream::Status::Ok);
-    fl >> chk >> Qt::ws;
-    assert(fl.status() == QTextStream::Status::Ok);
-    qDebug() << "subsequent chk [" << chk << "]";
-  }
-
-  obj->in_room = DC::NOWHERE;
-  obj->next_skill = {};
-  obj->next_content = {};
-  obj->carried_by = {};
-  obj->equipped_by = {};
-  obj->in_obj = {};
-  obj->contains = {};
-  obj->item_number = nr;
-
-  // Keys will now save for up to 24 hours. If there are any with
-  // ITEM_NOSAVE that flag will be removed.
-  if (IS_KEY(obj))
-  {
-    SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
-    REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
-  }
-
-  return obj;
-}
-
-/* read an object from OBJ_FILE */
-ObjectPtr read_object(qint32 nr, FILE *fl, bool ignore)
-{
-  qint32 loc, mod;
-
-  QChar chk;
-  extra_descr_data *new_new_descr;
-
-  if (nr < 0)
-  {
-    return 0;
-  }
-
-  ObjectPtr obj = new Object;
-  assert(obj);
-
-  clear_object(obj);
-
-  /* *** QString data *** */
-  // read it, add it to the hsh table, free it
-  // that way, we only have one copy of it in memory at any time
-  obj->name(fread_string(fl, 1));
-  QString tmpptr;
-
-  tmpptr = fread_string(fl, 1);
-
-  if (dc_strlen(tmpptr) >= MAX_OBJ_SDESC_LENGTH)
-  {
-    tmpptr[MAX_OBJ_SDESC_LENGTH - 1] = {};
-
-    obj->short_description(tmpptr);
-
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", dc_->obj_index[nr].vnum());
-  }
-  else
-  {
-    obj->short_description(tmpptr);
-  }
-
-  obj->long_description(fread_string(fl, 1));
-  obj->ActionDescription(fread_string(fl, 1));
-  if ((!obj->ActionDescription().isEmpty() && (obj->ActionDescription()[0] < ' ' || obj->ActionDescription()[0] > '~')) && !obj->ActionDescription()[0].isNull())
-  {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d action description [%s] removed.", dc_->obj_index[nr].vnum(), qPrintable(obj->ActionDescription()));
-    obj->ActionDescription(QString());
-  }
-  obj->table = {};
-  dc_->currentVNUM(nr);
-  dc_->currentName(obj->name());
-  dc_->currentType("Object");
-
-  /* *** numeric data *** */
-
-  obj->obj_flags.type_flag = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.extra_flags = fread_bitvector(fl, 0, 2147483467);
-  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(fl);
-  obj->obj_flags.size = fread_bitvector(fl, 0, 2147483467);
-
-  obj->obj_flags.value[0] = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.value[1] = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.value[2] = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.value[3] = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.eq_level = fread_int(fl, -1000, IMPLEMENTER);
-  obj->obj_flags.weight = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.cost = fread_int(fl, -1000, 2147483467);
-  obj->obj_flags.more_flags = fread_bitvector(fl, -1000, 2147483467);
-
-  /* currently not stored in object file */
-  obj->obj_flags.timer = {};
-
-  obj->ex_description = {};
-  obj->affected = {};
-  obj->num_affects = {};
-  /* *** other flags *** */
-
-  fscanf(fl, "%c\n", &chk);
-  QString log_buf = {};
-  while (chk != 'S')
-  {
-    switch (chk)
-    {
-    // skip whitespace
-    case ' ':
-    case '\n':
-      break;
-    case 'E':
-    {
-      auto new_new_descr = new extra_descr_data;
-      new_new_descr->keyword_ = fread_string(fl, 1);
-      new_new_descr->description_ = fread_string(fl, 1);
-      new_new_descr->next = obj->ex_description;
-      obj->ex_description = new_new_descr;
-    }
-    break;
-
-    case '\\':
-      ungetc('\\', fl);
-      mprog_read_programs(fl, nr, ignore);
-      break;
-
-    case 'A':
-      // these are only two members of obj_affected_type, so nothing else needs initializing
-      loc = fread_int(fl, -1000, 2147483467);
-      try
-      {
-        mod = fread_int(fl, -1000, 1000);
-      }
-      catch (error_range_over)
-      {
-        mod = 1000;
-      }
-      catch (error_range_under)
-      {
-        mod = -1000;
-      }
-      add_obj_affect(obj, loc, mod);
-      break;
-
-    default:
-      logbug(u"Illegal obj addon flag %1 in obj %2."_s.arg(chk).arg(obj->name()));
-      break;
-    } // switch
-      // read in next flag
-    fscanf(fl, "%c\n", &chk);
-  }
-
-  obj->in_room = DC::NOWHERE;
-  obj->next_skill = {};
-  obj->next_content = {};
-  obj->carried_by = {};
-  obj->equipped_by = {};
-  obj->in_obj = {};
-  obj->contains = {};
-  obj->item_number = nr;
-
-  // Keys will now save for up to 24 hours. If there are any with
-  // ITEM_NOSAVE that flag will be removed.
-  if (IS_KEY(obj))
-  {
-    SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
-    REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
-  }
-
-  return obj;
-}
-
 // write an object to file
 // This assumes that the object is valid, and the file is open for writing
 //
 void write_object(LegacyFile &lf, ObjectPtr obj)
 {
-  FILE *fl = lf.file_handle_;
+  FILE *stream = lf.file_handle_;
   extra_descr_data *currdesc;
 
-  dc_fprintf(fl, "#%lu\n", dc_->obj_index[obj->item_number].vnum());
-  string_to_file(fl, obj->name());
-  string_to_file(fl, obj->short_description());
-  string_to_file(fl, obj->long_description());
-  string_to_file(fl, obj->ActionDescription());
+  dc_fprintf(stream, "#%lu\n", dc_->obj_index[obj->item_number].vnum());
+  string_to_file(stream, obj->name());
+  string_to_file(stream, obj->short_description());
+  string_to_file(stream, obj->long_description());
+  string_to_file(stream, obj->ActionDescription());
 
-  dc_fprintf(fl, "%d %d %d %d\n"
-                 "%d %d %d %d %llu\n"
-                 "%d %d %d\n",
+  dc_fprintf(stream, "%d %d %d %d\n"
+                     "%d %d %d %d %llu\n"
+                     "%d %d %d\n",
              obj->obj_flags.type_flag,
              obj->obj_flags.extra_flags,
              obj->obj_flags.wear_flags.toInt(),
@@ -3952,24 +3623,24 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
   currdesc = obj->ex_description;
   while (currdesc)
   {
-    dc_fprintf(fl, "E\n");
-    string_to_file(fl, currdesc->keyword_);
-    string_to_file(fl, currdesc->description_);
+    dc_fprintf(stream, "E\n");
+    string_to_file(stream, currdesc->keyword_);
+    string_to_file(stream, currdesc->description_);
     currdesc = currdesc->next;
   }
 
   for (qint32 i = {}; i < obj->num_affects; i++)
-    dc_fprintf(fl, "A\n"
-                   "%d %d\n",
+    dc_fprintf(stream, "A\n"
+                       "%d %d\n",
                obj->affected[i].location, obj->affected[i].modifier);
 
   if (dc_->obj_index[obj->item_number].mobprogs)
   {
-    write_mprog_recur(fl, dc_->obj_index[obj->item_number].mobprogs, false);
-    dc_fprintf(fl, "|\n");
+    write_mprog_recur(stream, dc_->obj_index[obj->item_number].mobprogs, false);
+    dc_fprintf(stream, "|\n");
   }
 
-  dc_fprintf(fl, "S\n");
+  dc_fprintf(stream, "S\n");
 }
 
 auto &operator<<(auto &stream, ObjectPtr obj)
@@ -4896,259 +4567,6 @@ bool Zone::isEmpty(void)
   return true;
 }
 
-qint32 fread_bitvector(std::ifstream &in, qint32 beg_range, qint32 end_range)
-{
-  qint32 ch;
-  qint32 i = {};
-
-  // Save original exception mask so we can restore it later
-  std::ios_base::iostate orig_exceptions = in.exceptions();
-  in.exceptions(std::ifstream::failbit | std::ifstream::badbit | std::ifstream::eofbit);
-  try
-  {
-    // eat space till we hit the next one
-    while ((ch = in.get()))
-    {
-      if (ch != ' ' && ch != '\n') /* eat the white space */
-        break;
-    }
-
-    // check if we're dealing with numbers, or letters
-    if (isdigit(ch) || ch == '-')
-    {
-      // It's a digit, so put the character back and let fread_int handle it
-      in.unget();
-      qint32 n = fread_int(in, beg_range, end_range);
-      in.exceptions(orig_exceptions);
-      return n;
-    }
-
-    // we're dealing with letters now
-    for (;;)
-    {
-      if (ch >= 'a' && ch <= 'z')
-      {
-        i += 1 << (ch - 'a');
-      }
-      else if (ch >= 'A' && ch <= 'G')
-      {
-        i += 1 << (26 + (ch - 'A'));
-      }
-      else if (ch == ' ' || ch == '\n')
-      {
-        // we hit the end.  Return current i.
-        in.exceptions(orig_exceptions);
-        return i;
-      }
-      else
-      {
-        logbug("fread_bitvector: illegal character");
-        logbug(u"Reading %1"_s.arg(dc_->current()));
-        throw;
-      }
-
-      // if we hit here, we had a valid character.  read the next one.
-      ch = in.get();
-
-    } // for ;;
-  }
-  catch (...)
-  {
-    logbug("fread_bitvector: unknown error");
-    logbug(u"Reading %1"_s.arg(dc_->current()));
-    throw;
-  }
-  in.exceptions(orig_exceptions);
-
-  return 0;
-}
-
-quint64 fread_uint(FILE *fl, quint64 beg_range, quint64 end_range)
-{
-  QString buf;
-  QString pBufLast;
-  qint32 ch;
-  quint64 i;
-
-  while ((ch = getc(fl)))
-  {
-    if (ch == EOF)
-    {
-      logbug(u"Reading %1"_s.arg(dc_->current()));
-      perror("fread_int: premature EOF");
-      abort();
-    }
-
-    if (ch != ' ' && ch != '\n') /* eat the white space */
-      break;
-  }
-
-  pBufLast = buf;
-
-  if (ch == '-' && beg_range >= 0)
-  {
-    while (isdigit(getc(fl)))
-    {
-    }
-    throw error_negative_int();
-  }
-  else if (ch == '-')
-  {
-    *pBufLast = ch;
-    pBufLast++;
-    ch = getc(fl);
-  }
-
-  *pBufLast = ch;
-  pBufLast++;
-
-  for (; pBufLast < &buf[sizeof(buf) - 4];)
-  {
-    switch (ch = getc(fl))
-    {
-    default:
-      if (isdigit(ch))
-      {
-        *pBufLast = ch;
-        pBufLast++;
-      }
-      else
-      {
-        *pBufLast = {};
-        i = atoll(buf);
-        if (i >= beg_range && i <= end_range)
-        {
-          return i;
-        }
-        else
-        {
-          dc_->logentry(u"fread_int: Bad value for range %1 - %2: %3"_s.arg(beg_range).arg(end_range).arg(i));
-          throw error_range_int();
-        }
-      }
-      break;
-
-    case (QChar)EOF:
-      perror("fread_int: EOF");
-      abort();
-      break;
-    }
-  }
-
-  perror("fread_int: something went wrong");
-  abort();
-  return {};
-}
-
-qint64 fread_int(std::ifstream &in, qint64 beg_range, qint64 end_range)
-{
-  qint64 number;
-  in >> number;
-
-  if (number < beg_range)
-  {
-    // std::cerr << "fread_int: error " << number << " less than " << beg_range << ". " << "Setting to " << beg_range << std::endl;
-    number = beg_range;
-  }
-  else if (number > end_range)
-  {
-    // std::cerr << "fread_int: error " << number << " greater than " << beg_range << ". " << "Setting to " << beg_range << std::endl;
-    number = end_range;
-  }
-
-  return number;
-}
-
-/*
- fread_int has the nasty habit of reading on white
- space character after the qint32 it reads.  This can goof
- up stuff like comments in the zone file.
- */
-qint64 fread_int(FILE *fl, qint64 beg_range, qint64 end_range)
-{
-  QString buf;
-  QString pBufLast;
-  qint32 ch;
-  qint64 i;
-
-  while ((ch = getc(fl)))
-  {
-    if (ch == EOF)
-    {
-      qWarning() << "Reading" << dc_->current();
-      perror("fread_int: premature EOF");
-      abort();
-    }
-
-    if (ch != ' ' && ch != '\n') /* eat the white space */
-      break;
-  }
-
-  pBufLast = buf;
-
-  if (ch == '-' && beg_range >= 0)
-  {
-    while (isdigit(getc(fl)))
-    {
-    }
-    throw error_negative_int();
-  }
-  else if (ch == '-')
-  {
-    *pBufLast = ch;
-    pBufLast++;
-    ch = getc(fl);
-  }
-
-  *pBufLast = ch;
-  pBufLast++;
-
-  for (; pBufLast < &buf[sizeof(buf) - 4];)
-  {
-    switch (ch = getc(fl))
-    {
-    default:
-      if (isdigit(ch))
-      {
-        *pBufLast = ch;
-        pBufLast++;
-      }
-      else
-      {
-        *pBufLast = {};
-        i = atoll(buf);
-        if (i >= beg_range && i <= end_range)
-        {
-          return i;
-        }
-        else
-        {
-          dc_->logentry(u"fread_int: Bad value for range %1 - %2: %3"_s.arg(beg_range).arg(end_range).arg(i));
-
-          if (i < beg_range)
-          {
-            throw error_range_under();
-          }
-          else if (i > end_range)
-          {
-            throw error_range_over();
-          }
-        }
-      }
-      break;
-
-    case (QChar)EOF:
-      perror("fread_int: EOF");
-      abort();
-      break;
-    }
-  }
-
-  perror("fread_int: something went wrong");
-  abort();
-  return {};
-}
-
 /* release memory allocated for a character  */
 void free_char(CharacterPtr ch)
 {
@@ -5254,29 +4672,27 @@ void free_obj(ObjectPtr obj)
 /* read contents of a text file, and place in buf */
 qint32 file_to_string(const QString name, QString buf)
 {
-  FILE *fl;
+  FILE *stream;
   QString tmp;
 
-  *buf = '\0';
-
-  if (!(fl = fopen(name, "r")))
+  if (!(stream = fopen(name, "r")))
   {
     dc_->logverbose(u"Unable to open '%1':%2"_s.arg(name).arg(strerror(errno)));
-    *buf = '\0';
+
     return (-1);
   }
 
   do
   {
-    fgets(tmp, 99, fl);
+    fgets(tmp, 99, stream);
 
-    if (!feof(fl))
+    if (!feof(stream))
     {
       if (dc_strlen(buf) + dc_strlen(tmp) + 2 > MAX_STRING_LENGTH)
       {
-        dc_->logentry(u"fl->strng: QString too big (db.c, file_to_string)"_s,
+        dc_->logentry(u"stream->strng: QString too big (db.c, file_to_string)"_s,
                       0, DC::LogChannel::LOG_BUG);
-        *buf = '\0';
+
         return (-1);
       }
 
@@ -5284,9 +4700,7 @@ qint32 file_to_string(const QString name, QString buf)
       *(buf + dc_strlen(buf) + 1) = '\0';
       *(buf + dc_strlen(buf)) = '\r';
     }
-  } while (!feof(fl));
-
-  fclose(fl);
+  } while (!feof(stream));
 
   return {};
 }
@@ -5725,27 +5139,27 @@ qint32 mprog_name_to_type(QString name)
 void mprog_file_read(QString f, qint32 i)
 {
   mob_prog_data *mprog = {};
-  FILE *fp = {};
+  FILE *stream = {};
   QChar letter = {};
   QString name = {};
   qint32 type = {};
 
   dc_sprintf(name, "%s%s", MOB_DIR, f);
-  if (!(fp = fopen(name, "r")))
+  if (!(stream = fopen(name, "r")))
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d couldn't opne mobprog file.", i);
     return;
   }
   for (;;)
   {
-    if ((letter = fread_char(fp)) == '|')
+    if ((letter = fread_char(stream)) == '|')
       break;
     else if (letter != '>')
     {
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mprog_file_read: Invalid letter mob %d.", i);
       return;
     }
-    switch ((type = fread_int(fp, 0, MPROG_MAX_TYPE_VALUE)))
+    switch ((type = fread_int(stream, 0, MPROG_MAX_TYPE_VALUE)))
     {
     case ERROR_PROG:
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d: in file prog error.", i);
@@ -5757,21 +5171,20 @@ void mprog_file_read(QString f, qint32 i)
       SET_BIT(dc_->mob_index[i].progtypes, type);
       mprog = new mob_prog_data;
       mprog->type = type;
-      mprog->arglist = fread_string(fp, 0);
-      mprog->comlist = fread_string(fp, 0);
+      mprog->arglist = fread_string(stream, 0);
+      mprog->comlist = fread_string(stream, 0);
       break;
     }
   }
-  fclose(fp);
 }
 
-void load_mobprogs(FILE *fp)
+void load_mobprogs(auto &stream)
 {
   QChar letter;
   qint32 value;
 
   for (;;)
-    switch (LOWER(letter = fread_char(fp)))
+    switch (LOWER(letter = fread_char(stream)))
     {
     default:
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: bad command '%c'.", letter);
@@ -5781,18 +5194,18 @@ void load_mobprogs(FILE *fp)
     case '*':
       break;
     case 'm':
-      value = fread_int(fp, 0, 2147483467);
+      value = fread_int(stream, 0, 2147483467);
       if (real_mobile(value) < 0)
       {
         dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);
         break;
       }
-      mprog_file_read(fread_word(fp, 1), value);
+      mprog_file_read(fread_word(stream, 1), value);
       break;
     }
 }
 
-void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
+void mprog_read_programs(auto &stream, qint32 i, bool ignore)
 {
   mob_prog_data *mprog = {};
   QChar letter;
@@ -5800,22 +5213,22 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
   mob_prog_data lmprog;
   for (;;)
   {
-    if ((letter = fread_char(fp)) == '|')
+    if ((letter = fread_char(stream)) == '|')
       break;
     else if (letter != '>' && letter != '\\')
     {
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG character", i);
-      ungetc(letter, fp);
+      ungetc(letter, stream);
       return;
     }
-    type = mprog_name_to_type(fread_word(fp, 1));
+    type = mprog_name_to_type(fread_word(stream, 1));
     switch (type)
     {
     case ERROR_PROG:
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobiles: vnum %d MOBPROG type.", i);
       return;
     case IN_FILE_PROG:
-      mprog_file_read(fread_string(fp, 1), i);
+      mprog_file_read(fread_string(stream, 1), i);
       break;
     default:
       if (!ignore)
@@ -5832,8 +5245,8 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
       else
         mprog = &lmprog;
       mprog->type = type;
-      mprog->arglist = fread_string(fp, 0);
-      mprog->comlist = fread_string(fp, 0);
+      mprog->arglist = fread_string(stream, 0);
+      mprog->comlist = fread_string(stream, 0);
       if (!ignore)
       {
         if (letter == '>')
@@ -5852,7 +5265,7 @@ void mprog_read_programs(FILE *fp, qint32 i, bool ignore)
   }
 }
 
-void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
+void mprog_read_programs(QTextStream &stream, qint32 i, bool ignore)
 {
   mob_prog_data *mprog = {};
   QChar letter = {};
@@ -5860,7 +5273,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
   mob_prog_data lmprog = {};
   for (;;)
   {
-    fp >> letter;
+    stream >> letter;
 
     if (letter == '|')
     {
@@ -5871,7 +5284,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
       dc_->logentry(u"Load_mobiles: vnum %1 MOBPROG character"_s.arg(i));
       return;
     }
-    QString word = fread_word(fp);
+    QString word = fread_word(stream);
     type = mprog_name_to_type(word);
     switch (type)
     {
@@ -5879,7 +5292,7 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
       dc_->logentry(u"Load_mobiles: vnum %1 MOBPROG type."_s.arg(i));
       return;
     case IN_FILE_PROG:
-      mprog_file_read(fread_string(fp, 1), i);
+      mprog_file_read(fread_string(stream, 1), i);
       break;
     default:
       if (!ignore)
@@ -5896,8 +5309,8 @@ void mprog_read_programs(QTextStream &fp, qint32 i, bool ignore)
       else
         mprog = &lmprog;
       mprog->type = type;
-      mprog->arglist = fread_string(fp, false);
-      mprog->comlist = fread_string(fp, false);
+      mprog->arglist = fread_string(stream, false);
+      mprog->comlist = fread_string(stream, false);
       if (!ignore)
       {
         if (letter == '>')
@@ -5948,14 +5361,14 @@ void find_unordered_mobiles(void)
   }
 }
 
-void string_to_file(FILE *f, QString str)
+void string_to_file(auto &streamf, QString str)
 {
   dc_fprintf(f, "%s~\n", str.remove('\r').toStdString().c_str());
 }
 
-void string_to_file(QTextStream &fl, QString str)
+void string_to_file(QTextStream &stream, QString str)
 {
-  fl << str.remove('\r') + "~\n";
+  stream << str.remove('\r') + "~\n";
 }
 
 void copySaveData(ObjectPtr target, ObjectPtr source)
@@ -6195,7 +5608,6 @@ LegacyFile::~LegacyFile()
 {
   if (file_handle_)
   {
-    fclose(file_handle_);
   }
 }
 
@@ -6203,7 +5615,6 @@ FILE *LegacyFile::openFile(void)
 {
   if (file_handle_)
   {
-    fclose(file_handle_);
   }
 
   if ((file_handle_ = fopen(qPrintable(filepath_), "w")) == nullptr)

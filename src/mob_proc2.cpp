@@ -401,7 +401,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   {
     dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
     ch->send("Available corpses (freshest first):\r\n$B");
-    for (obj = dc_->object_list; obj; obj = obj->next)
+    for (obj = ch->dc_->object_list; obj; obj = obj->next)
     {
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
         continue;
@@ -439,7 +439,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   }
 
   /* buy */
-  if ((which = atoi(arg)) == 0)
+  if ((which = dc_atoi(arg)) == 0)
   {
     send_to_char("Try \"buy <number>\", or \"list\" for a list of "
                  "available corpses.\r\n",
@@ -447,7 +447,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     return ReturnValue::eSUCCESS;
   }
 
-  for (obj = dc_->object_list; obj; obj = obj->next)
+  for (obj = ch->dc_->object_list; obj; obj = obj->next)
   {
     dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
 
@@ -641,7 +641,7 @@ const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 
 qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
 
-  qint32 mobvnum = dc_->mob_index[owner->mobdata->nr].vnum();
+  qint32 mobvnum = ch->dc_->mob_index[owner->mobdata->nr].vnum();
   qint32 o;
   QString buf;
   //  return ReturnValue::eFAILURE; //disabled for now
@@ -693,7 +693,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       owner->do_tell(u"%1 Sorry, mate. You type buy <number> to specify what you want.."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    qint32 k = atoi(arg2) - 1;
+    qint32 k = dc_atoi(arg2) - 1;
     if (k >= 13 || k < 0 || platsmith_list[o].sales[k] == 0)
     {
       owner->do_tell(u"%1 Don't have that I'm afraid. Type \"list\" to see my wares."_s.arg(qPrintable(ch->name())).split(' '));

@@ -526,7 +526,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
   Room *rm = &(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room]);
 
-  if (rm->sector_type != dc_->world[ch->in_room].sector_type && ch->desc && ch->desc->original && ch->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL)
+  if (rm->sector_type != dc_->world[ch->in_room].sector_type && ch->conn_ && ch->conn_->original && ch->conn_->original->getLevel() <= DC::MAX_MORTAL_LEVEL)
   {
     qint32 s2 = rm->sector_type, s1 = dc_->world[ch->in_room].sector_type;
     if ((s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_PAVED_ROAD && (s2 != SECT_INSIDE && s2 != SECT_CITY)) || (s1 == SECT_FIELD && (s2 != SECT_HILLS && s2 != SECT_MOUNTAIN)) || (s1 == SECT_HILLS && (s2 != SECT_MOUNTAIN && s2 != SECT_FIELD)) || (s1 == SECT_MOUNTAIN && (s2 != SECT_HILLS && s2 != SECT_FIELD)) || (s1 == SECT_WATER_NOSWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_SWIM)) || (s1 == SECT_WATER_SWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_NOSWIM)) || (s1 == SECT_UNDERWATER && (s2 != SECT_WATER_NOSWIM && s2 != SECT_WATER_SWIM)) || (s1 == SECT_BEACH && (s2 != SECT_DESERT)) || (s1 == SECT_DESERT && (s2 != SECT_BEACH)) || (s1 == SECT_FROZEN_TUNDRA && (s2 != SECT_ARCTIC)) || (s1 == SECT_ARCTIC && (s2 != SECT_FROZEN_TUNDRA)) || (s1 == SECT_AIR) || (s1 == SECT_SWAMP))
@@ -715,7 +715,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       if (level_difference >= 0 || ch->getLevel() >= 50)
       {
         chaser->add_memory(qPrintable(ch->name()), 't');
-        timer_data *timer = new timer_data;
+        TimerPtr timer = TimerPtr(new Timer);
         timer->var_arg1 = chaser->hunting;
         timer->arg2 = (void *)chaser;
         timer->function = clear_hunt;
@@ -1312,7 +1312,7 @@ qint32 ambush(CharacterPtr ch)
         (isSet(dc_->world[i->in_room].room_flags, SAFE) &&
          !IS_AFFECTED(ch, AFF_CANTQUIT)))
       continue;
-    if (!i->isNonPlayer() && !i->desc) // don't work if I'm linkdead
+    if (!i->isNonPlayer() && !i->conn_) // don't work if I'm linkdead
       continue;
     if (isexact(i->ambush, qPrintable(ch->name())))
     {

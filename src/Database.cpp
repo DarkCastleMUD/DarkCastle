@@ -1,11 +1,7 @@
 #include "DC/DC.h"
 
-Database::Database(void)
-{
-}
-
-Database::Database(const QString &name, const QString &hostname, const QString &type)
-    : name_(name), hostname_(hostname), type_(type)
+Database::Database(DCPtr dc, const QString &name, const QString &hostname, const QString &type)
+    : dc_(dc), name_(name), hostname_(hostname), type_(type)
 {
   if (QSqlDatabase::contains("qt_sql_default_connection"))
   {

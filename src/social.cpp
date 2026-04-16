@@ -22,22 +22,22 @@ command_return_t Character::check_social(QString pcomm)
 
   if (isPlayer() && isSet(player->punish, PUNISH_NOEMOTE))
   {
-    this->sendln("You are anti-social!");
+    sendln("You are anti-social!");
     return SOCIAL_TRUE;
   }
 
   switch (GET_POS(this))
   {
   case position_t::DEAD:
-    this->sendln("Lie still; you are DEAD.");
+    sendln("Lie still; you are DEAD.");
     return SOCIAL_TRUE;
 
   case position_t::STUNNED:
-    this->sendln("You are too stunned to do that.");
+    sendln("You are too stunned to do that.");
     return SOCIAL_TRUE;
 
   case position_t::SLEEPING:
-    this->sendln("In your dreams, or what?");
+    sendln("In your dreams, or what?");
     return SOCIAL_TRUE;
   case position_t::RESTING:
   case position_t::SITTING:
@@ -46,9 +46,9 @@ command_return_t Character::check_social(QString pcomm)
     break;
   }
 
-  if (isSet(dc_->world[this->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
-    this->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln("SHHHHHH!! Can't you see people are trying to read?");
     return SOCIAL_TRUE;
   }
 
@@ -110,12 +110,12 @@ command_return_t Character::check_social(QString pcomm)
   return SOCIAL_TRUE_WITH_NOISE;
 }
 
-QString fread_social_string(FILE *fl)
+QString fread_social_string(auto &streamstream)
 {
   QString buf, *rslt;
 
-  fgets(buf, MAX_STRING_LENGTH, fl);
-  if (feof(fl))
+  fgets(buf, MAX_STRING_LENGTH, stream);
+  if (feof(stream))
   {
     dc_->logentry(u"Fread_social_string - unexpected EOF."_s, IMMORTAL, DC::LogChannel::LOG_BUG);
     exit(0);
@@ -134,58 +134,58 @@ QString fread_social_string(FILE *fl)
 // read one social
 // return true on success
 // return false on 'EOF'
-bool read_social_from_file(QTextStream &fl)
+bool read_social_from_file(QTextStream &stream)
 {
   social_messg sm;
-  fl >> sm.name;
-  if (fl.atEnd())
+  stream >> sm.name;
+  if (stream.atEnd())
     return false;
 
   quint32 min_victim_position;
-  fl >> sm.hide;
-  if (fl.atEnd())
+  stream >> sm.hide;
+  if (stream.atEnd())
     return false;
 
-  fl >> min_victim_position;
-  if (fl.atEnd())
+  stream >> min_victim_position;
+  if (stream.atEnd())
     return false;
 
   sm.min_victim_position = position_t(min_victim_position);
 
-  sm.char_no_arg = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.char_no_arg = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
-  sm.others_no_arg = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.others_no_arg = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
-  sm.char_found = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.char_found = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
   // if no char_found, then the social is done, and the ones below won't be there
   if (!sm.char_found)
     return true;
 
-  sm.others_found = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.others_found = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
-  sm.vict_found = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.vict_found = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
-  sm.not_found = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.not_found = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
-  sm.char_auto = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.char_auto = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
-  sm.others_auto = fread_social_string(fl);
-  if (fl.atEnd())
+  sm.others_auto = fread_social_string(stream);
+  if (stream.atEnd())
     return false;
 
   soc_mess_list[name] = sm;
@@ -195,7 +195,7 @@ bool read_social_from_file(QTextStream &fl)
 void DC::boot_social_messages(void)
 {
   QFile social_messages_file(SOCIAL_FILE);
-  QTextStream fl(&social_messages_file);
+  QTextStream stream(&social_messages_file);
 
   if (!social_messages_file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
@@ -203,7 +203,7 @@ void DC::boot_social_messages(void)
     abort();
   }
 
-  while (read_social_from_file(fl))
+  while (read_social_from_file(stream))
   {
   }
 }
