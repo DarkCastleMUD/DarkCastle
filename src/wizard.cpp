@@ -284,13 +284,13 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
   switch (k->sex)
   {
-  case SEX_NEUTRAL:
+  case Character::sex_t::NEUTRAL:
     dc_sprintf(buf2, "Neutral");
     break;
-  case SEX_MALE:
+  case Character::sex_t::MALE:
     dc_sprintf(buf2, "Male");
     break;
-  case SEX_FEMALE:
+  case Character::sex_t::FEMALE:
     dc_sprintf(buf2, "Female");
     break;
   default:
@@ -603,13 +603,13 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   switch (k->sex)
   {
-  case SEX_NEUTRAL:
+  case Character::sex_t::NEUTRAL:
     ch->send("NEUTRAL]  ");
     break;
-  case SEX_MALE:
+  case Character::sex_t::MALE:
     ch->send("MALE]  ");
     break;
-  case SEX_FEMALE:
+  case Character::sex_t::FEMALE:
     ch->send("FEMALE]  ");
     break;
   default:
@@ -695,7 +695,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
     ch->send(buf);
     dc_strcpy(buf, "$3Mob Progs$R: ");
-    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].mobprogs_ ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].programs_ ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 
@@ -1565,31 +1565,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-// Scavenger hunts..
-
-class hunt_data
-{
-public:
-  hunt_data *next;
-  QString huntname;
-  qint32 itemnum;
-  qint32 time;
-  qint32 itemsAvail[50];
-};
-
-class hunt_items
-{ // Bleh, don't wanna make it go through every item in the game everytime someone checks the list
-public:
-  hunt_items *next;
-  hunt_data *hunt;
-  ObjectPtr obj;
-  QString mobname;
-};
-
-hunt_data *hunt_list = {};
-hunt_items *hunt_items_list = {};
-
-void check_end_of_hunt(hunt_data *h, bool forced = false)
+void check_end_of_hunt(hunt_dataPtr h, bool forced = false)
 {
   hunt_items *i, *p = {}, *in;
   qint32 items = {};
@@ -1650,7 +1626,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
     }
     send_info(buf);
 
-    hunt_data *hl, *p = {};
+    hunt_dataPtr hl, *p = {};
     for (hl = hunt_list; hl; hl = hl->next)
     {
       if (hl == h)
@@ -1680,7 +1656,7 @@ command_return_t do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   else
   {
-    hunt_data *h, *hn;
+    hunt_dataPtr h, *hn;
     for (h = hunt_list; h; h = hn)
     {
       hn = h->next;
@@ -1712,7 +1688,7 @@ void huntclear_item(ObjectPtr obj)
   }
 }
 
-qint32 get_rand_obj(hunt_data *h)
+qint32 get_rand_obj(hunt_dataPtr h)
 {
   qint32 i, v;
 
@@ -1731,7 +1707,7 @@ qint32 get_rand_obj(hunt_data *h)
   return c;
 }
 
-void init_random_hunt_items(hunt_data *h)
+void init_random_hunt_items(hunt_dataPtr h)
 {
   FILE *f;
   if ((f = fopen("huntitems.txt", "r")) == nullptr)
@@ -1778,7 +1754,7 @@ QString last_hunt_time(QString last_hunt)
 
 void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
 { // time, itme, item
-  hunt_data *n;
+  hunt_dataPtr n;
   QString tmp;
   tm *pTime = {};
   time_t ct;
@@ -1880,7 +1856,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
       dc_sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
                  qPrintable(obj->short_description()), i->mobname, qPrintable(ch->name()));
       send_info(buf);
-      hunt_data *h = i->hunt;
+      hunt_dataPtr h = i->hunt;
       ObjectPtr oitem = {}, citem;
       qint32 r1 = {};
       switch (vnum)
@@ -1958,7 +1934,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
 
 void pulse_hunts()
 {
-  hunt_data *h, *hn;
+  hunt_dataPtr h, *hn;
 
   for (h = hunt_list; h; h = hn)
   {
@@ -1991,7 +1967,7 @@ void pulse_hunts()
 command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
-  hunt_data *h;
+  hunt_dataPtr h;
   hunt_items *hi;
 
   if (!hunt_list)
@@ -2065,7 +2041,7 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Invalid duration.");
     return ReturnValue::eSUCCESS;
   }
-  hunt_data *h;
+  hunt_dataPtr h;
   for (h = hunt_list; h; h = h->next)
     if (h->itemnum == vnum)
     {

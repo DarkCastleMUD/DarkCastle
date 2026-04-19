@@ -26,7 +26,7 @@ const QStringList valid_fields = {
 qint32 load_quests(void)
 {
   FILE *stream;
-  quest_info *quest;
+  quest_infoPtr quest;
 
   if (!(stream = fopen(QUEST_FILE, "r")))
   {
@@ -65,7 +65,7 @@ qint32 load_quests(void)
 qint32 save_quests(void)
 {
   FILE *stream;
-  quest_info *quest;
+  quest_infoPtr quest;
 
   if (!(stream = fopen(QUEST_FILE, "w")))
   {
@@ -92,9 +92,9 @@ qint32 save_quests(void)
   return ReturnValue::eSUCCESS;
 }
 
-quest_info *get_quest_(qint32 num)
+quest_infoPtr get_quest_(qint32 num)
 {
-  quest_info *quest;
+  quest_infoPtr quest;
   if (!num)
     return 0;
 
@@ -109,14 +109,14 @@ quest_info *get_quest_(qint32 num)
   return 0;
 }
 
-quest_info *get_quest_(QString name)
+quest_infoPtr get_quest_(QString name)
 {
   if (name == nullptr || name.isEmpty())
     return 0;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
-    quest_info *quest = *node;
+    quest_infoPtr quest = *node;
 
     if (str_nosp_equal(name, quest->name))
       return quest;
@@ -170,7 +170,7 @@ command_return_t do_add_quest(CharacterPtr ch, QString name)
 void list_quests(CharacterPtr ch, qint32 lownum, qint32 highnum)
 {
   QString buffer;
-  quest_info *quest;
+  quest_infoPtr quest;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
@@ -187,7 +187,7 @@ void list_quests(CharacterPtr ch, qint32 lownum, qint32 highnum)
 
 void show_quest_info(CharacterPtr ch, qint32 num)
 {
-  quest_info *quest;
+  quest_infoPtr quest;
 
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
@@ -218,7 +218,7 @@ void show_quest_info(CharacterPtr ch, qint32 num)
   ch->sendln("That quest doesn't exist.");
 }
 
-bool check_available_quest(CharacterPtr ch, quest_info *quest)
+bool check_available_quest(CharacterPtr ch, quest_infoPtr quest)
 {
   if (!quest)
     return false;
@@ -252,7 +252,7 @@ bool check_quest_complete(CharacterPtr ch, qint32 number)
   return false;
 }
 
-qint32 get_quest_price(quest_info *quest)
+qint32 get_quest_price(quest_infoPtr quest)
 {
   return MIN(500, (qint32)(3.76 * pow(2.71828, quest->level * 0.0976) + 1));
 }
@@ -276,7 +276,7 @@ void show_quest_amount(CharacterPtr ch, qint32 remaining)
 
 void show_quest_footer(CharacterPtr ch)
 {
-  quest_info *quest;
+  quest_infoPtr quest;
   qint32 attempting = {};
   qint32 completed = {};
   qint32 total = {};
@@ -314,7 +314,7 @@ void show_quest_footer(CharacterPtr ch)
   ch->sendln("[-----------------------------------------------------------------------------]");
 }
 
-qint32 show_one_quest(CharacterPtr ch, quest_info *quest, qint32 count)
+qint32 show_one_quest(CharacterPtr ch, quest_infoPtr quest, qint32 count)
 {
   qint32 i, amount = {};
 
@@ -347,13 +347,13 @@ qint32 show_one_quest(CharacterPtr ch, quest_info *quest, qint32 count)
   return ++count;
 }
 
-qint32 show_one_complete_quest(CharacterPtr ch, quest_info *quest, qint32 count)
+qint32 show_one_complete_quest(CharacterPtr ch, quest_infoPtr quest, qint32 count)
 {
   ch->send(u" $B$2Name:$7 %1 $2Reward:$7 %2$R\r\n"_s.arg(quest->name, -35).arg(quest->reward, -5));
   return ++count;
 }
 
-qint32 show_one_available_quest(CharacterPtr ch, quest_info *quest, qint32 count)
+qint32 show_one_available_quest(CharacterPtr ch, quest_infoPtr quest, qint32 count)
 {
   ch->sendln(u"$B$7%1. $2Name:$7 %2$R Cost: %3 Reward: %4"_s
                  .arg(quest->name)
@@ -366,7 +366,7 @@ qint32 show_one_available_quest(CharacterPtr ch, quest_info *quest, qint32 count
 void show_available_quests(CharacterPtr ch)
 {
   qint32 count = {};
-  quest_info *quest;
+  quest_infoPtr quest;
 
   show_quest_header(ch);
 
@@ -391,7 +391,7 @@ void show_available_quests(CharacterPtr ch)
 void show_canceled_quests(CharacterPtr ch)
 {
   qint32 count = {};
-  quest_info *quest;
+  quest_infoPtr quest;
 
   show_quest_header(ch);
 
@@ -409,7 +409,7 @@ void show_canceled_quests(CharacterPtr ch)
 void show_current_quests(CharacterPtr ch)
 {
   qint32 num_attempting = {};
-  quest_info *quest;
+  quest_infoPtr quest;
 
   show_quest_header(ch);
 
@@ -426,7 +426,7 @@ void show_current_quests(CharacterPtr ch)
 void show_complete_quests(CharacterPtr ch)
 {
   qint32 count = {};
-  quest_info *quest;
+  quest_infoPtr quest;
 
   show_quest_header(ch);
 
@@ -441,7 +441,7 @@ void show_complete_quests(CharacterPtr ch)
   show_quest_footer(ch);
 }
 
-qint32 start_quest(CharacterPtr ch, quest_info *quest)
+qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
 {
   qint32 count = {};
   quint16 price;
@@ -556,7 +556,7 @@ qint32 start_quest(CharacterPtr ch, quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cancel_quest(CharacterPtr ch, quest_info *quest)
+qint32 cancel_quest(CharacterPtr ch, quest_infoPtr quest)
 {
   qint32 count = {};
 
@@ -581,7 +581,7 @@ qint32 cancel_quest(CharacterPtr ch, quest_info *quest)
   return stop_current_quest(ch, quest);
 }
 
-qint32 complete_quest(CharacterPtr ch, quest_info *quest)
+qint32 complete_quest(CharacterPtr ch, quest_infoPtr quest)
 {
   qint32 count = {};
   ObjectPtr obj;
@@ -622,7 +622,7 @@ qint32 complete_quest(CharacterPtr ch, quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 stop_current_quest(CharacterPtr ch, quest_info *quest)
+qint32 stop_current_quest(CharacterPtr ch, quest_infoPtr quest)
 {
   qint32 count = {};
   ObjectPtr obj;
@@ -657,7 +657,7 @@ qint32 stop_current_quest(CharacterPtr ch, qint32 number)
   if (!number)
     return ReturnValue::eFAILURE;
 
-  quest_info *quest = get_quest_(number);
+  quest_infoPtr quest = get_quest_(number);
   return stop_current_quest(ch, quest);
 }
 
@@ -682,7 +682,7 @@ void quest_update()
   QString buf;
   CharacterPtr mob;
   ObjectPtr obj;
-  quest_info *quest;
+  quest_infoPtr quest;
 
   const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
@@ -735,7 +735,7 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
 {
   qint32 retval = {};
   QString buf;
-  quest_info *quest;
+  quest_infoPtr quest;
 
   if (cmd != cmd_t::QUEST_LIST)
   {
@@ -961,7 +961,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    quest_info *quest;
+    quest_infoPtr quest;
     qint32 attempting = {};
     qint32 completed = {};
     qint32 total = {};
@@ -1042,7 +1042,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   QString value;
   qint32 holdernum;
   qint32 i, lownum, highnum;
-  quest_info *quest = {};
+  quest_infoPtr quest = {};
   CharacterPtr vict = {};
 
   half_chop(argument, arg, argument);
@@ -1266,7 +1266,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  quest_info *oldquest;
+  quest_infoPtr oldquest;
 
   switch (i)
   {

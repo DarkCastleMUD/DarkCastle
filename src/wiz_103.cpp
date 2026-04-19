@@ -7,7 +7,7 @@
 command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString name, type, buf[500];
+  QString name, type, buf;
 
   half_chop(arg, name, type);
 

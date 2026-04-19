@@ -3,18 +3,11 @@
 // Externs
 
 // Locals
-class Path *mPathList = {};
-
-/* PATHFINDING */
-
-QSharedPointer<path_data> newPath(void)
-{
-  return QSharedPointer<path_data>::create();
-}
+PathPtr mPathList = {};
 
 bool Path::isRoomConnected(qint32 room)
 {
-  path_data *p;
+  PathPtr p;
   qint32 i;
 
   for (i = {}; i < MAX_DIRS; i++)
@@ -28,7 +21,7 @@ bool Path::isRoomConnected(qint32 room)
 
 bool Path::isRoomPathed(qint32 room)
 {
-  path_data *p;
+  PathPtr p;
 
   for (p = dc_->world[room].paths; p; p = p->next)
     if (p->p == this)
@@ -129,9 +122,9 @@ qint32 Path::leastSteps(qint32 from, qint32 to, qint32 val, qint32 *bestval)
   return *bestval;
 }
 
-bool Path::isPathConnected(class Path *pa)
+bool Path::isPathConnected(PathPtr pa)
 {
-  path_data *t;
+  PathPtr t;
   for (t = p; t; t = t->next)
     if (t->p == pa)
       return true;
@@ -159,23 +152,23 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
       ch->sendln("This room is already connected to that path.");
     return;
   }
-  path_data *pa;
+  PathPtr pa;
 
   if (dc_->world[room].paths)
   {
-    path_data *t;
+    PathPtr t;
     for (pa = dc_->world[room].paths; pa; pa = pa->next)
     {
       if (isPathConnected(pa->p))
       {
-        path_data *t;
+        PathPtr t;
         for (t = p; t; t = t->next)
           if (t->p == pa->p)
             t->num++;
       }
       else
       {
-        t = newPath();
+        t = PathPtr(new Path(ch->dc_));
         t->p = pa->p;
         t->num = 1;
         t->next = p;
@@ -184,14 +177,14 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
 
       if (pa->p->isPathConnected(this))
       {
-        path_data *t;
+        PathPtr t;
         for (t = pa->p->p; t; t = t->next)
           if (t->p == this)
             t->num++;
       }
       else
       {
-        t = newPath();
+        t = PathPtr(new Path(ch->dc_));
         t->p = this;
         t->num = 1;
         t->next = pa->p->p;
@@ -200,10 +193,11 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
     }
   }
 
-  pa = newPath();
+  pa = PathPtr(new Path(ch->dc_));
   pa->p = this;
-  pa->next = dc_->world[room].paths;
-  dc_->world[room].paths = pa;
+  ch->dc_->world[room].paths
+      dc_->world[room]
+          .paths = pa;
   (*this)[room] = {};
   if (ch)
     ch->sendln("Room successfully added to path.");
@@ -218,7 +212,7 @@ command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
     return ReturnValue::eFAILURE;
   }
-  class Path *p;
+  PathPtr p;
   for (p = mPathList; p; p = p->next)
     if (!str_cmp(p->name, arg1))
       break;
@@ -227,7 +221,7 @@ command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("That path already exists.");
     return ReturnValue::eFAILURE;
   }
-  p = new Path;
+  p = PathPtr(new Path(ch->dc_));
   p->name = (arg1);
   p->addRoom(ch, ch->in_room, true);
   p->next = mPathList;
@@ -247,14 +241,14 @@ command_return_t do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd
   auto &zone = dc_->zones[i];
   qint32 low = zone.getRealBottom(), high = zone.getRealTop();
 
-  class Path *p;
+  PathPtr p;
   bool found = false;
   for (p = mPathList; p; p = p->next)
     for (QMap<qint32, qint32>::iterator iter = p->begin(); iter != p->end(); iter++)
       if ((*iter).first >= low && (*iter).first <= high)
       {
         ch->send(u"Path '%1' connects to this zone.\r\n"_s.arg(p->name));
-        path_data *pa;
+        PathPtr pa;
         for (pa = p->p; pa; pa = pa->next)
           ch->send(u" --- Path '%s' connects to that path in %d places.\r\n"_s.arg(pa->p->name).arg(pa->num));
         found = true;
@@ -268,12 +262,12 @@ command_return_t do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd
 
 command_return_t do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  class Path *p;
+  PathPtr p;
   bool found = false;
   for (p = mPathList; p; p = p->next)
   {
     ch->send(u"Path '%1'.\r\n"_s.arg(p->name));
-    path_data *pa;
+    PathPtr pa;
     for (pa = p->p; pa; pa = pa->next)
       ch->send(u" --- Path '%s' connects to that path in %d places.\r\n"_s.arg(pa->p->name).arg(pa->num));
     found = true;
@@ -293,7 +287,7 @@ command_return_t do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
     return ReturnValue::eFAILURE;
   }
-  class Path *p;
+  PathPtr p;
   for (p = mPathList; p; p = p->next)
     if (!str_cmp(p->name, arg1))
       break;
@@ -315,7 +309,7 @@ command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.");
     return ReturnValue::eFAILURE;
   }
-  class Path *p;
+  PathPtr p;
   for (p = mPathList; p; p = p->next)
     if (!str_cmp(p->name, arg1))
       break;
@@ -349,7 +343,7 @@ command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 leastPathSteps(class Path *goal, class Path *at, qint32 steps, qint32 *beststeps)
+qint32 leastPathSteps(PathPtr goal, PathPtr at, qint32 steps, qint32 *beststeps)
 {
   if (at->s < steps)
     return *beststeps; // bad
@@ -357,7 +351,7 @@ qint32 leastPathSteps(class Path *goal, class Path *at, qint32 steps, qint32 *be
     return *beststeps;
   // Determine path
   at->s = steps;
-  path_data *pt;
+  PathPtr pt;
   for (pt = at->p; pt; pt = pt->next)
   {
     if (pt->p == goal)
@@ -371,7 +365,7 @@ qint32 leastPathSteps(class Path *goal, class Path *at, qint32 steps, qint32 *be
   return 0; // otherwise, warning: control reaches end of non-void function
 }
 
-bool determinePath(class Path *goal, class Path *at, qint32 beststeps, qint32 steps, class Path **end)
+bool determinePath(PathPtr goal, PathPtr at, qint32 beststeps, qint32 steps, PathPtr *end)
 {
   if (at->s < steps)
     return false;
@@ -379,7 +373,7 @@ bool determinePath(class Path *goal, class Path *at, qint32 beststeps, qint32 st
     return false;
   // Determine path
   at->s = steps;
-  path_data *pt;
+  PathPtr pt;
   for (pt = at->p; pt; pt = pt->next)
   {
     if (pt->p == goal)
@@ -402,7 +396,7 @@ command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
-  class Path *pt = {}, *pt2 = {};
+  PathPtr pt = {}, *pt2 = {};
   for (pt = mPathList; pt; pt = pt->next)
     if (!str_cmp(pt->name, arg1))
       break;
@@ -415,7 +409,7 @@ command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("Missing path.");
     return ReturnValue::eFAILURE;
   }
-  class Path *pa;
+  PathPtr pa;
   for (pa = mPathList; pa; pa = pa->next)
     pa->s = 1000;
 
@@ -431,7 +425,7 @@ command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  class Path *p[50]; // Maximum of 50 pathsteps atm
+  QList<PathPtr> p; // Maximum of 50 pathsteps atm
   for (qint32 z = {}; z < 50; z++)
     p[z] = {};
   for (pa = mPathList; pa; pa = pa->next)
@@ -477,9 +471,9 @@ qint32 find_closest_path(qint32 from, qint32 steps, QString buf, QMap<qint32, qi
   return 0;
 }
 
-qint32 Path::connectRoom(class Path *z)
+qint32 Path::connectRoom(PathPtr z)
 {
-  path_data *pa;
+  PathPtr pa;
 
   for (QMap<qint32, qint32>::iterator iter = begin(); iter != end(); iter++)
     for (pa = dc_->world[(*iter).first].paths; pa; pa = pa->next)
@@ -494,7 +488,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
   QString buf;
   static QString endbuf;
   endbuf[0] = buf[0] = '\0';
-  class Path *start, *stop;
+  PathPtr start, *stop;
   if (dc_->world[from].paths)
   {
     ch->send(u"Starting from path %s.\r\n"_s.arg(dc_->world[from].paths->p->name));
@@ -523,7 +517,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
   if (!start || !stop)
     return "Invalid path";
 
-  class Path *pa;
+  PathPtr pa;
   for (pa = mPathList; pa; pa = pa->next)
     pa->s = 1000;
 
@@ -539,7 +533,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
     return "Crazy #";
   }
 
-  class Path *p[50]; // Maximum of 50 pathsteps atm
+  QList<PathPtr> p; // Maximum of 50 pathsteps atm
   for (qint32 z = {}; z < 50; z++)
     p[z] = {};
   for (pa = mPathList; pa; pa = pa->next)
@@ -565,7 +559,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
 
 command_return_t do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  Path *p;
+  PathPtr p;
   for (p = mPathList; p; p = p->next)
     for (QMap<qint32, qint32>::iterator iter = p->begin(); iter != p->end(); iter++)
       ch->send(u"Hmm: %d\r\n"_s.arg((*iter).first));
@@ -582,7 +576,7 @@ command_return_t do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void save_paths()
 { // mkay..
-  Path *p;
+  PathPtr p;
   for (p = mPathList; p; p = p->next)
   {
     // Save pathname

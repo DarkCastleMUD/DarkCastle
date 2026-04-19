@@ -1722,7 +1722,7 @@ command_return_t do_read(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString name, buf[200];
+  QString name, buf;
   CharacterPtr tmp_char;
   ObjectPtr tmp_object;
 

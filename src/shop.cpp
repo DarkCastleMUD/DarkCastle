@@ -584,7 +584,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
   qint32 cost;
   //    extern QStringList drinks;
   qint32 found;
-  qint32 done[100]; // To show 'em numbered instead of a long list of duplicates
+  QList<qint32> done; // To show 'em numbered instead of a long list of duplicates
   qint32 i, a;
   if (!is_ok(keeper, ch, shop_nr))
     return;

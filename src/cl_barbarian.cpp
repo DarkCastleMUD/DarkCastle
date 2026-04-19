@@ -13,7 +13,7 @@ command_return_t do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
   bool battervbrace = false;
   bool batterwins = false;
   QString type, dir;
-  QString buf, buf2, dammsg[20];
+  QString buf, buf2, dammsg;
   RoomDirectionPtr exit, *back;
   qint32 other_room, door, dam, skill, retval;
 
@@ -1174,7 +1174,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 
   dam = (qint32)(dam * (1.0 + dampercent / 100.0));
 
-  QString buf2, dammsg[20];
+  QString buf2, dammsg;
   qint32 prevhps = victim->getHP();
 
   if (!victim_paralyzed && !skill_success(ch, victim, SKILL_KNOCKBACK, 0 - (learned / 4 * 3)))

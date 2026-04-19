@@ -418,7 +418,7 @@ qint32 ki_blast(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   }
   else /* There is no exit there */
   {
-    QString buf, name[100];
+    QString buf, name;
     qint32 prev = vict->getHP();
 
     dc_strcpy(name, qPrintable(vict->shortdesc_or_name()));

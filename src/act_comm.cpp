@@ -567,13 +567,13 @@ command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
         switch (ch->dc_->number(0, 3))
         {
         case 0:
-          if (GET_SEX(victim) == SEX_MALE)
+          if (GET_SEX(victim) == Character::sex_t::MALE)
             act_to_victim("$n accuses you of fighting like a woman!", ch, 0, victim, 0);
           else
             act_to_victim("$n says that women can't fight.", ch, 0, victim, 0);
           break;
         case 1:
-          if (GET_SEX(victim) == SEX_MALE)
+          if (GET_SEX(victim) == Character::sex_t::MALE)
             act_to_victim("$n accuses you of having the smallest.... (brain?)", ch, 0, victim, 0);
           else
             act_to_victim("$n tells you that you'd loose a beauty contest against a troll.", ch, 0, victim, 0);

@@ -935,9 +935,9 @@ command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {
-    if (mob && (real_mobile(i) < 0 || !dc_->mob_index[real_mobile(i)].mobprogs_))
+    if (mob && (real_mobile(i) < 0 || !dc_->mob_index[real_mobile(i)].programs_))
       continue;
-    else if (!mob && (real_object(i) < 0 || !dc_->obj_index[real_object(i)].mobprogs_))
+    else if (!mob && (real_object(i) < 0 || !dc_->obj_index[real_object(i)].programs_))
       continue;
     if (tot++ > 100)
       break;

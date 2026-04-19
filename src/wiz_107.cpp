@@ -185,7 +185,7 @@ command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   CharacterPtr vict;
-  QString name, message[200], buf[350];
+  QString name, message, buf;
 
   half_chop(argument, name, message);
   name[99] = '\0';

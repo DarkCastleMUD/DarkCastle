@@ -4,8 +4,8 @@
 
 #include "DC/DC.h"
 
-Shops::Shops(DCPtr dc)
-    : QObject(dc), dc_(dc)
+Shops::Shops(QObject *parent)
+    : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
 }
 

@@ -307,7 +307,7 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
   CharacterPtr vict, next_v;
   ObjectPtr obj, next_o;
 
-  QString name, buf[300];
+  QString name, buf;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -771,7 +771,7 @@ void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
 
 command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString name, buf[200];
+  QString name, buf;
   QString beginrange;
   QString endrange;
   QString type;
@@ -2020,10 +2020,10 @@ void opstat(CharacterPtr ch, qint32 vnum)
     return;
   }
   ch->sendln("");
-  mob_prog_data *mprg = {};
+  MobileProgramPtr mprg = {};
   qint32 i = {};
   QString buf2 = {};
-  for (mprg = dc_->obj_index[num].mobprogs_, i = 1; mprg != nullptr;
+  for (mprg = dc_->obj_index[num].programs_, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     dc_sprintf(buf, "$3%d$R>$3$B", i);
@@ -2071,7 +2071,7 @@ command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void update_objprog_bits(qint32 num)
 {
-  mob_prog_data *prog = dc_->obj_index[num].mobprogs_;
+  MobileProgramPtr prog = dc_->obj_index[num].programs_;
   dc_->obj_index[num].progtypes = {};
 
   while (prog)
@@ -2114,7 +2114,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
           opstat(ch, vnum);
           return ReturnValue::eSUCCESS;
     }*/
-  mob_prog_data *prog{}, *currprog = {};
+  MobileProgramPtr prog{}, *currprog = {};
   if (!str_cmp(arg, "add"))
   {
     argument = one_argument(argument, arg);
@@ -2131,14 +2131,14 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     prog->comlist = u"say This is my new obj prog!\r\n"_s;
     prog->next = {};
 
-    if ((currprog = dc_->obj_index[num].mobprogs_))
+    if ((currprog = dc_->obj_index[num].programs_))
     {
       while (currprog->next)
         currprog = currprog->next;
       currprog->next = prog;
     }
     else
-      dc_->obj_index[num].mobprogs_ = prog;
+      dc_->obj_index[num].programs_ = prog;
     update_objprog_bits(num);
     ch->sendln("New obj proc created.");
     return ReturnValue::eSUCCESS;
@@ -2156,7 +2156,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     a = dc_atoi(arg);
     prog = {};
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
+    for (i = 1, currprog = dc_->obj_index[num].programs_;
          currprog && i != a;
          i++, prog = currprog, currprog = currprog->next)
       ;
@@ -2168,7 +2168,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (prog)
       prog->next = currprog->next;
     else
-      dc_->obj_index[num].mobprogs_ = currprog->next;
+      dc_->obj_index[num].programs_ = currprog->next;
 
     currprog->type = {};
     currprog->arglist = {};
@@ -2197,7 +2197,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     qint32 a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
+    for (i = 1, currprog = dc_->obj_index[num].programs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
@@ -2262,7 +2262,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
+    for (i = 1, currprog = dc_->obj_index[num].programs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
@@ -2287,7 +2287,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].mobprogs_;
+    for (i = 1, currprog = dc_->obj_index[num].programs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
@@ -2401,7 +2401,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->obj_index[r2].non_combat_func = {};
   dc_->obj_index[r2].qty = {};
   dc_->obj_index[r2].vnum(v2);
-  dc_->obj_index[r2].mobprogs_ = {};
+  dc_->obj_index[r2].programs_ = {};
   dc_->obj_index[r2].combat_func = {};
   dc_->obj_index[r2].mobspec = {};
   // extract_obj(otmp);
@@ -2488,7 +2488,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->mob_index[dst].qty = {};
   dc_->mob_index[dst].non_combat_func = {};
   dc_->mob_index[dst].combat_func = {};
-  dc_->mob_index[dst].mobprogs_ = {};
+  dc_->mob_index[dst].programs_ = {};
   dc_->mob_index[dst].mobspec = {};
   dc_->mob_index[dst].progtypes = {};
   dc_->mob_index[dst].vnum(vdst);
@@ -2503,7 +2503,7 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     ch->sendln("Warning: hardcoded combat function found. Notify coder.");
   }
-  if (dc_->mob_index[src].mobprogs_)
+  if (dc_->mob_index[src].programs_)
   {
     ch->sendln("Warning: mob program found. This will need to be copied manually.");
   }

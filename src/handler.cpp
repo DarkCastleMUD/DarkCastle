@@ -830,11 +830,11 @@ void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool ad
   {
     switch (GET_SEX(ch))
     {
-    case SEX_MALE:
-      GET_SEX(ch) = SEX_FEMALE;
+    case Character::sex_t::MALE:
+      GET_SEX(ch) = Character::sex_t::FEMALE;
       break;
-    case SEX_FEMALE:
-      GET_SEX(ch) = SEX_MALE;
+    case Character::sex_t::FEMALE:
+      GET_SEX(ch) = Character::sex_t::MALE;
       break;
     default:
       break;

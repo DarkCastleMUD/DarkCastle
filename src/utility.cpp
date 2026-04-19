@@ -2152,7 +2152,7 @@ void check_timer()
   dc_->removeDead();
 }
 
-qint32 get_line(auto &streamstream, QString buf)
+qint32 get_line(auto &stream, QString buf)
 {
   QString temp = {};
   qint32 lines = {};

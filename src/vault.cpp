@@ -38,7 +38,7 @@ vault_search_parameter::~vault_search_parameter()
 }
 
 qint32 total_vaults = {};
-qint32 get_line(auto &streamstream, QString buf);
+qint32 get_line(auto &stream, QString buf);
 
 CharacterPtr find_owner(QString name);
 void vault_log(CharacterPtr ch, QString owner);

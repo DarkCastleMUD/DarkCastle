@@ -41,76 +41,6 @@ board.c version 1.2 - Jun 1991 by Twilight.
 */
 #include "DC/DC.h"
 
-class message
-{
-public:
-  QString date;
-  QString title;
-  QString author;
-  QString text;
-};
-
-class BOARD_INFO
-{
-public:
-  CharacterPtr locked_for = {};
-  bool lock = {};
-  qint32 min_read_level = {};
-  qint32 min_write_level = {};
-  qint32 min_remove_level = {};
-  qint32 type = {};
-  qint32 owner = {};
-  QString save_file;
-  QList<message> msgs;
-};
-
-// These are the binary files in which to save/load messages
-
-void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-void board_save_board(QMap<QString, BOARD_INFO>::iterator board);
-void board_load_board();
-qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 fwrite_string(const QString buf, FILE *stream);
-void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort);
-
-constexpr auto ANY_BOARD = 0;
-constexpr auto CLASS_BOARD = 1;
-constexpr auto CLAN_BOARD = 2;
-
-constexpr auto NO_OWNER = -1;
-constexpr auto CLAN_ULNHYRR = 1;
-constexpr auto CLAN_DARKTIDE = 2;
-constexpr auto CLAN_ARCANA = 3;
-constexpr auto CLAN_DARKENED = 4;
-constexpr auto CLAN_DCGUARD = 5;
-constexpr auto CLAN_TIMEWARP = 6;
-constexpr auto CLAN_CONTINUUM = 7;
-constexpr auto CLAN_MERC = 8;
-constexpr auto CLAN_NAZGUL = 9;
-constexpr auto CLAN_BLACKAXE = 10;
-constexpr auto CLAN_TRIAD = 11;
-constexpr auto CLAN_KOBAL = 12;
-constexpr auto CLAN_SLACKERS = 13;
-constexpr auto CLAN_KEHUA = 14;
-constexpr auto CLAN_ASKANI = 15;
-constexpr auto CLAN_HOUSELESSROGUES = 16;
-constexpr auto CLAN_THEHORDE = 17;
-constexpr auto CLAN_ANARCHIST = 18;
-constexpr auto CLAN_SOLARIS = 19;
-constexpr auto CLAN_SINDICATE = 20;
-class RESERVATION_DATA
-{
-public:
-  QString buf;
-  message new_post;
-  QMap<QString, BOARD_INFO>::iterator board;
-};
-
-// QMap to hold callback information for writing
-QMap<CharacterPtr, RESERVATION_DATA *> wait_for_write;
-
 /*
 Function to populate the board_db with all of the current clan info
 */
@@ -648,7 +578,7 @@ and we can copy the QString to the board
 */
 void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort)
 {
-  RESERVATION_DATA *reserve = wait_for_write[ch];
+  ReservationPtr reserve = wait_for_write[ch];
   message new_msg;
 
   new_msg.text = reserve->buf;
@@ -705,7 +635,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
     return;
   }
 
-  RESERVATION_DATA *reserve = new RESERVATION_DATA;
+  ReservationPtr reserve = new Reservation;
 
   reserve->new_post.title = arg;
 
@@ -713,7 +643,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 
   timep = time(0);
   tmstr = asctime(localtime(&timep));
-  dc_sprintf(buf, "%.10s", tmstr);
+  dc_sprintf(buf, "%.10s", qPrintable(tmstr));
 
   reserve->new_post.date = buf;
 
@@ -1067,7 +997,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   return ReturnValue::eSUCCESS;
 }
 
-qint32 fwrite_string(const QString buf, FILE *stream)
+qint32 fwrite_string(QString buf, FILE *stream)
 {
-  return (dc_fprintf(stream, "%s~\n", buf));
+  return (dc_fprintf(stream, "%s~\n", qPrintable(buf)));
 }

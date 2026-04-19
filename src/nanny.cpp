@@ -1143,11 +1143,11 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     {
     case 'm':
     case 'M':
-      ch->sex = SEX_MALE;
+      ch->sex = Character::sex_t::MALE;
       break;
     case 'f':
     case 'F':
-      ch->sex = SEX_FEMALE;
+      ch->sex = Character::sex_t::FEMALE;
       break;
     default:
       write_to_output("That's not a sex.\r\n", d);
@@ -1866,7 +1866,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     conn->connected = Connection::states::SELECT_MENU;
     if (ch->getLevel() > 1)
     {
-      QString blah1, blah2[50];
+      QString blah1, blah2;
       // this prevents a dupe bug
       dc_strcpy(blah1, qPrintable(ch->name()));
       dc_strcpy(blah2, ch->player->pwd);

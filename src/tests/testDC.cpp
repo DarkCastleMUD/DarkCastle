@@ -13,8 +13,7 @@ const auto STRING_LITERAL4 = u"$"_s;
 const auto STRING_LITERAL5 = u"test"_s;
 const auto STRING_LITERAL6 = u"$z$>$;"_s;
 
-QString
-Character::get_parsed_legacy_prompt_variable(QString var)
+QString Character::get_parsed_legacy_prompt_variable(QString var)
 {
   auto saved_prompt = getPrompt();
 

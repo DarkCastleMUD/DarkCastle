@@ -788,7 +788,7 @@ zone_t zedit_add(CharacterPtr ch, QStringList arguments, Zone &zone)
   QString text = arguments.at(0);
   if (isexact(text, "new"))
   {
-    zone.cmd.push_back(QSharedPointer<ResetCommand>::create('J'));
+    zone.cmd.push_back(ResetCommandPtr ::create('J'));
     ch->send(u"New command 'J' added at %1.\r\n"_s.arg(zone.cmd.size()));
     return zone.cmd.size() - 1;
   }
@@ -800,7 +800,7 @@ zone_t zedit_add(CharacterPtr ch, QStringList arguments, Zone &zone)
     return ReturnValue::eFAILURE;
   }
 
-  zone.cmd.insert(i, QSharedPointer<ResetCommand>::create('J'));
+  zone.cmd.insert(i, ResetCommandPtr ::create('J'));
   ch->send(u"New command 'J' added at %1.\r\n"_s.arg(i + 1));
   return i - 1;
 }
@@ -910,7 +910,7 @@ command_return_t do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
   quint32 k = {};
   vnum_t robj = {}, rmob = {};
   bool ok = false;
-  QSharedPointer<ResetCommand> tmp = {}, temp_com = {};
+  ResetCommandPtr tmp = {}, temp_com = {};
   QString str = {};
 
   QStringList arguments = QString(argument).trimmed().split(' ');
@@ -2549,7 +2549,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
 void update_mobprog_bits(qint32 mob_num)
 {
-  mob_prog_data *prog = dc_->mob_index[mob_num].mobprogs_;
+  MobileProgramPtr prog = dc_->mob_index[mob_num].programs_;
   dc_->mob_index[mob_num].progtypes = {};
 
   while (prog)
@@ -2568,8 +2568,8 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 mob_num = -1;
   qint32 intval = {};
   qint32 x{}, i = {};
-  mob_prog_data *prog = {};
-  mob_prog_data *currprog = {};
+  MobileProgramPtr prog = {};
+  MobileProgramPtr currprog = {};
 
   void mpstat(CharacterPtr ch, CharacterPtr victim);
 
@@ -2680,7 +2680,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     prog->next = {};
 
     qint32 prog_num = 1;
-    if ((currprog = dc_->mob_index[mob_num].mobprogs_))
+    if ((currprog = dc_->mob_index[mob_num].programs_))
     {
       while (currprog->next)
       {
@@ -2692,7 +2692,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      dc_->mob_index[mob_num].mobprogs_ = prog;
+      dc_->mob_index[mob_num].programs_ = prog;
     }
 
     update_mobprog_bits(mob_num);
@@ -2716,7 +2716,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     // find program number "intval"
     prog = {};
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].programs_; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -2728,7 +2728,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (prog)
       prog->next = currprog->next;
     else
-      dc_->mob_index[mob_num].mobprogs_ = currprog->next;
+      dc_->mob_index[mob_num].programs_ = currprog->next;
 
     currprog->type = {};
     currprog->arglist = {};
@@ -2778,7 +2778,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].programs_; currprog && i != intval; i++, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -2869,7 +2869,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].programs_; currprog && i != intval; i++, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -2902,7 +2902,7 @@ command_return_t do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    for (i = 1, currprog = dc_->mob_index[mob_num].mobprogs_; currprog && i != intval; i++, currprog = currprog->next)
+    for (i = 1, currprog = dc_->mob_index[mob_num].programs_; currprog && i != intval; i++, currprog = currprog->next)
       ;
 
     if (!currprog)
@@ -3165,17 +3165,17 @@ command_return_t do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (is_abbrev(buf4, "male"))
     {
-      mob->sex = SEX_MALE;
+      mob->sex = Character::sex_t::MALE;
       ch->sendln("Mob sex set to male.");
     }
     else if (is_abbrev(buf4, "female"))
     {
-      mob->sex = SEX_FEMALE;
+      mob->sex = Character::sex_t::FEMALE;
       ch->sendln("Mob sex set to female.");
     }
     else if (is_abbrev(buf4, "neutral"))
     {
-      mob->sex = SEX_NEUTRAL;
+      mob->sex = Character::sex_t::NEUTRAL;
       ch->sendln("Mob sex set to neutral.");
     }
     else
@@ -4624,7 +4624,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
-  QString buf, buf2[50];
+  QString buf, buf2;
   extra_descr_data *i, *extra;
 
   half_chop(arg, buf, buf2);
@@ -4981,7 +4981,7 @@ command_return_t do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
 command_return_t do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   FILE *stream;
-  QString buf, bufl[200] /*,buf2[200],buf3[200]*/;
+  QString buf, bufl /*,buf2,buf3*/;
   qint32 room = 1, x, door /*,direction*/;
   qint32 pos;
   qint32 value;
@@ -5620,7 +5620,7 @@ command_return_t do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
 
 command_return_t do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  QString name, buf[150];
+  QString name, buf;
   CharacterPtr vict;
 
   qint32 i;

@@ -89,8 +89,7 @@ void Player::toggleJoining(QString key)
     joining[key] = true;
 }
 
-PlayerConfig::PlayerConfig(DCPtr dc)
-    : QObject(dc), dc_(dc)
+PlayerConfig::PlayerConfig(QObject *parent) : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
   config["color.good"] = "green";
   config["color.bad"] = "red";
@@ -627,12 +626,12 @@ bool Character::isPlayer(void) const
 
 bool Character::isNonPlayer(void) const
 {
-  return (getType() == Type::NPC || getType() == Type::ObjectProgram) && mobdata;
+  return (getType() == Type::NPC || getType() == Type::Object) && mobdata;
 }
 
 bool Character::isObjectProgram(void) const
 {
-  return getType() == Type::ObjectProgram && mobdata && objdata;
+  return getType() == Type::Object && mobdata && objdata;
 }
 
 auto Character::getType(void) const -> Type
@@ -672,14 +671,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
   bool supports_color = isPlayer() && (isSet(GET_TOGGLES(this), Player::PLR_ANSI) || isSet(GET_TOGGLES(this), Player::PLR_VT100));
   bool use_color = false;
   auto target = this;
-  enum class targets
-  {
-    Self,
-    Tank,
-    Fighting,
-    Charmie,
-    GrouptMember
-  } target_is = targets::Self;
+  targets_t target_is = targets::Self;
 
   QString color{}, value = {};
 

@@ -2105,7 +2105,7 @@ qint32 perform_subst(ConnectionPtr t, QString orig, QString subst)
 // return 0 if we quit everyone out at the bottom
 qint32 close_socket(ConnectionPtr conn)
 {
-  QString buf, idiotbuf[128];
+  QString buf, idiotbuf;
   ConnectionPtr temp;
   // qint32 target_idnum = -1;
   if (!d)

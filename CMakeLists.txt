@@ -57,6 +57,9 @@ else()
     endif()
 endif()
 
+set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CMAKE_COMMAND} -E time")
+
+
 # Removed -fsanitize=leak
 # Removed -fsanitize=address -fsanitize=pointer-compare -fsanitize=pointer-subtract
 set(ASAN_COMMON_FLAGS "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize-address-use-after-scope -fsanitize=undefined -fno-omit-frame-pointer" CACHE STRING "" FORCE)

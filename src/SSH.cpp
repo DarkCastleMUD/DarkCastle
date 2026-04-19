@@ -5,7 +5,7 @@
 namespace SSH
 {
 
-  SSH::SSH(DCPtr dc) : QObject(dc), dc_(dc)
+  SSH::SSH(QObject *parent) : QObject(parent), dc_(qobject_cast<DC *>(parent))
   {
   }
 

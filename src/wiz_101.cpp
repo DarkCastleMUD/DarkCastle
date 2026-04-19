@@ -342,7 +342,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
 command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  QString inout, buf[100];
+  QString inout, buf;
   qint32 ctr, nope;
   QString _convert;
 

@@ -26,7 +26,7 @@ qint16 frozen_start_room = 1;
 
 /* Local Function Declerations */
 
-qint32 get_line_new(auto &streamstream, QString buf);
+qint32 get_line_new(auto &stream, QString buf);
 
 qint32 corpse_save(ObjectPtr obj, FILE *stream, qint32 location, bool recurse_this_tree)
 {
@@ -126,7 +126,7 @@ void DC::load_corpses(void)
 
   QTextStream stream;
   QString line;
-  qint32 t[15], zwei = {};
+  QList<qint32> t, zwei = {};
   qint32 nr, num_objs = {};
   ObjectPtr temp = {}, obj = {}, next_obj = {};
   extra_descr_data *new_descr;
@@ -404,7 +404,7 @@ void DC::load_corpses(void)
   }
 }
 
-qint32 get_line_new(auto &streamstream, QString buf)
+qint32 get_line_new(auto &stream, QString buf)
 {
   QString temp;
   qint32 lines = 0, a = {};

@@ -1,12 +1,12 @@
 #include "DC/DC.h"
 
-Room::Room(DCPtr dc)
-    : dc_(dc), QObject(dc)
+Room::Room(QObject *parent)
+    : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
 }
 
-Room::Room(room_t room_nr, DCPtr dc)
-    : number(room_nr), dc_(dc), QObject(dc)
+Room::Room(room_t room_nr, QObject *parent)
+    : number(room_nr), dc_(qobject_cast<DC *>(parent)), QObject(parent)
 {
 }
 

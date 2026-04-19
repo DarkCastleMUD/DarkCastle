@@ -265,7 +265,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
       "manameta", "movemeta", "armor", "profession", "\n"};
   CharacterPtr vict;
-  QString name, buf2[100], buf[100], help;
+  QString name, buf2, buf, help;
   qint32 skill, value, i, x;
 
   if (ch->isNonPlayer())
@@ -366,13 +366,13 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     switch (*buf)
     {
     case 'm':
-      vict->sex = SEX_MALE;
+      vict->sex = Character::sex_t::MALE;
       break;
     case 'f':
-      vict->sex = SEX_FEMALE;
+      vict->sex = Character::sex_t::FEMALE;
       break;
     case 'n':
-      vict->sex = SEX_NEUTRAL;
+      vict->sex = Character::sex_t::NEUTRAL;
       break;
     }
   }

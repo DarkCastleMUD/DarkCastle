@@ -172,7 +172,7 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
   {
     if (vch != ch)
     {
-      vch->send(u"%1 has just modified the price of one of %2 items.\r\n"_s.arg(qPrintable(ch->name())).arg((GET_SEX(ch) == SEX_MALE) ? "his" : "her"));
+      vch->send(u"%1 has just modified the price of one of %2 items.\r\n"_s.arg(qPrintable(ch->name())).arg((GET_SEX(ch) == Character::sex_t::MALE) ? "his" : "her"));
     }
   }
 
@@ -771,8 +771,8 @@ void AuctionHouse::Save()
   out << UncollectedGold;
 }
 
-AuctionHouse::AuctionHouse(QString filename, DCPtr dc)
-    : filename_(filename), dc_(dc)
+AuctionHouse::AuctionHouse(QString filename, QObject *parent)
+    : filename_(filename), dc_(qobject_cast<DC *>(parent))
 {
 }
 

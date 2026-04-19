@@ -4743,3 +4743,8 @@ qint32 godload_hydratail(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
 
   return damage(ch, victim, dam, damtype, 0);
 }
+
+ObjectProgram::ObjectProgram(void)
+    : is_object_(true)
+{
+}

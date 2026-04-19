@@ -1,24 +1,6 @@
 #include "DC/DC.h"
 
 /******************* Area start **************************************/
-enum SortState
-{
-  SORT_XP,
-  SORT_GOLD,
-  SORT_MOB
-};
-
-class AreaData
-{
-public:
-  void GetAreaData(zone_t zone_nr, qint32 mob, qint64 xps, qint64 gold);
-  void DisplaySingleArea(CharacterPtr ch, zone_t area);
-  void DisplayAreaData(CharacterPtr ch);
-  void SortAreaData(CharacterPtr ch, SortState state);
-
-private:
-  area_stats_t areaStats;
-};
 
 bool CompareAreaXPStats(AreaStats first, AreaStats second)
 {

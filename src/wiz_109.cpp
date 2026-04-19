@@ -126,7 +126,7 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString name, level[100], buf[300], passwd[100];
+  QString name, level, buf, passwd;
   qint32 new_newlevel;
 
   void gain_exp(CharacterPtr ch, qint32 gain);

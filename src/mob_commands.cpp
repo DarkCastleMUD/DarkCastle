@@ -50,7 +50,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
 {
   QString buf;
   QString buf2;
-  mob_prog_data *mprg = {};
+  MobileProgramPtr mprg = {};
   qint32 i;
 
   buf = QString::asprintf("$3Name$R: %s  $3Vnum$R: %llu.\r\n", qPrintable(victim->name()), dc_->mob_index[victim->mobdata->nr].vnum());
@@ -65,7 +65,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
     return;
   }
 
-  for (auto &mprg : dc_->mob_index[victim->mobdata->nr].mobprogs_)
+  for (auto &mprg : dc_->mob_index[victim->mobdata->nr].programs_)
   {
     buf = QString::asprintf("$3%d$R>$3$B", i);
     ch->send(buf);

@@ -1567,7 +1567,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString obj_name, vict_name[200], buf[200];
+  QString obj_name, vict_name, buf;
   QString arg;
   qint32 amount;
   CharacterPtr vict;

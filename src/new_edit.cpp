@@ -12,7 +12,7 @@ void parse_action(parse_t action, QString str, ConnectionPtr conn)
   qint32 indent = 0, rep_all = 0, flags = 0, total_len, replaced;
   qint32 j = {};
   qint32 i, line_low, line_high;
-  QString s, *t, temp, buf[32768], buf2[32768];
+  QString s, t, temp, buf, buf2;
   QString sbuffer;
 
   switch (action)

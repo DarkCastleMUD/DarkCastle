@@ -2,7 +2,7 @@
 
 // Externs
 extern help_index_element_new *new_help_table;
-qint32 get_line(auto &streamstream, QString buf);
+qint32 get_line(auto &stream, QString buf);
 bool is_abbrev(const QString arg1, const QString arg2);
 void help_string_to_file(auto &streamf, QString string);
 
@@ -11,7 +11,7 @@ help_index_element_new *find_help(QString keyword);
 qint32 strn_cmp(QString arg1, QString arg2, qint32 n);
 void show_hedit_usage(CharacterPtr ch);
 void save_help(CharacterPtr ch);
-qint32 get_line_with_space(auto &streamstream, QString buf);
+qint32 get_line_with_space(auto &stream, QString buf);
 qint32 show_one_help_entry(qint32 entry, CharacterPtr ch, qint32 count);
 void show_help_header(CharacterPtr ch);
 void show_help_bar(CharacterPtr ch);
@@ -252,7 +252,7 @@ help_index_element_new &find_help(QString keyword)
 
 constexpr auto ENTRY_MAX = 32384;
 
-qint32 load_new_help(auto &streamstream, qint32 reload, CharacterPtr ch)
+qint32 load_new_help(auto &stream, qint32 reload, CharacterPtr ch)
 {
   QString entry, line, tmpentry, buf, tmpbuffer;
   help_index_element_new new_help;
@@ -663,7 +663,7 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  QString buf, buf2[200], field[200], buf3[200], value[200];
+  QString buf, buf2, field, buf3, value;
   help_index_element_new new_help;
   qint32 help_id = -1, i, key_id = -1, level = -1;
 
@@ -947,7 +947,7 @@ void help_string_to_file(auto &streamf, QString str)
   dc_fprintf(f, "%s\n", newbuf);
 }
 
-qint32 get_line_with_space(auto &streamstream, QString buf)
+qint32 get_line_with_space(auto &stream, QString buf)
 {
   QString temp;
   qint32 lines = {};

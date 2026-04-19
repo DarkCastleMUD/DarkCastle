@@ -3911,8 +3911,8 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
   QString temp1 = {};
   QString temp2 = {};
   QString word = {};
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   QString list = {};
   QString start = {};
   QString dupl = {};
@@ -3920,9 +3920,9 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
   qint32 i = {};
   qint32 retval = {};
   bool done = {};
-  //  for ( mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_; mprg != nullptr; mprg
+  //  for ( mprg = dc_->mob_index[mob->mobdata->nr].programs_; mprg != nullptr; mprg
   //= next )
-  mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+  mprg = dc_->mob_index[mob->mobdata->nr].programs_;
   if (!mprg)
   {
     done = true;
@@ -4006,10 +4006,10 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
 void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
                          void *vo, qint32 type)
 {
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   bool done = false;
-  mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+  mprg = dc_->mob_index[mob->mobdata->nr].programs_;
   if (!mprg)
   {
     done = true;
@@ -4056,7 +4056,7 @@ qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
 
   //  mob_prog_act_list * tmp_act;
   // mob_prog_act_list * curr;
-  //  mob_prog_data *mprg;
+  //  MobileProgramPtr  mprg;
   mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (!MOBtrigger)
@@ -4071,8 +4071,8 @@ qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
 qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 {
 
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   ObjectPtr obj = {};
   bool done = false;
 
@@ -4080,7 +4080,7 @@ qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
   {
     mob->removeGold(amount);
 
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+    mprg = dc_->mob_index[mob->mobdata->nr].programs_;
     if (!mprg)
     {
       done = true;
@@ -4115,13 +4115,13 @@ qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 {
 
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   ObjectPtr obj = {};
   bool done = false;
   if (mob->isNonPlayer() && (dc_->mob_index[mob->mobdata->nr].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+    mprg = dc_->mob_index[mob->mobdata->nr].programs_;
 
     if (!mprg)
     {
@@ -4196,12 +4196,12 @@ qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 {
 
   QString buf;
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   bool done = false, okay = false;
   if (mob->isNonPlayer() && (dc_->mob_index[mob->mobdata->nr].progtypes & GIVE_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+    mprg = dc_->mob_index[mob->mobdata->nr].programs_;
     if (!mprg)
     {
       done = true;
@@ -4265,13 +4265,13 @@ qint32 Character::mprog_greet_trigger(void)
 
 qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
 {
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   bool done = false;
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (dc_->mob_index[mob->mobdata->nr].progtypes & HITPRCNT_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+    mprg = dc_->mob_index[mob->mobdata->nr].programs_;
     if (!mprg)
     {
       done = true;
@@ -4385,15 +4385,15 @@ qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint
     return ReturnValue::eFAILURE;
   }
 
-  mob_prog_data *mprg = {};
-  mob_prog_data *next = {};
+  MobileProgramPtr mprg = {};
+  MobileProgramPtr next = {};
   qint32 curr_catch;
   bool done = false;
   mprog_cur_result = ReturnValue::eFAILURE;
 
   if (mob->isNonPlayer() && (dc_->mob_index[mob->mobdata->nr].progtypes & CATCH_PROG) && isPaused(mob) == false)
   {
-    mprg = dc_->mob_index[mob->mobdata->nr].mobprogs_;
+    mprg = dc_->mob_index[mob->mobdata->nr].programs_;
     if (!mprg || (opt & 1))
     {
       done = true;
@@ -4560,7 +4560,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
 { // Sneakiness.
   CharacterPtr temp;
   temp = clone_mobile(real_mobile(12));
-  mob_index[real_mobile(12)].mobprogs_ = obj_index[obj->item_number].mobprogs_;
+  mob_index[real_mobile(12)].programs_ = obj_index[obj->item_number].programs_;
   mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
 
   if (ch)
@@ -4583,7 +4583,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
     }
   temp->name(buf);
 
-  temp->setType(Character::Type::ObjectProgram);
+  temp->setType(Character::Type::Object);
   temp->objdata = obj;
 
   return temp;
@@ -4607,7 +4607,7 @@ void end_oproc(CharacterPtr ch)
     trace.addTrack("end_oproc");
     extract_char(ch, true, trace);
     dc_->mob_index[real_mobile(12)].progtypes = {};
-    dc_->mob_index[real_mobile(12)].mobprogs_ = {};
+    dc_->mob_index[real_mobile(12)].programs_ = {};
   }
 }
 
@@ -4682,14 +4682,14 @@ qint32 Character::oprog_speech_trigger(const QString txt)
 
 qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm)
 {
-  mob_prog_data *mprg = {};
+  MobileProgramPtr mprg = {};
   qint32 curr_catch;
   mprog_cur_result = ReturnValue::eFAILURE;
   CharacterPtr vmob;
 
   if (obj_index[obj->item_number].progtypes & CATCH_PROG)
   {
-    mprg = obj_index[obj->item_number].mobprogs_;
+    mprg = obj_index[obj->item_number].programs_;
     mprog_command_num = {};
     for (; mprg != nullptr; mprg = mprg->next)
     {
@@ -5020,4 +5020,89 @@ bool isPaused(CharacterPtr mob)
   }
 
   return false;
+}
+
+[[nodiscard]] QString Program::typeString(void) const
+{
+  if (is_object_)
+  {
+    switch (type_)
+    {
+    case ALL_GREET_PROG:
+      return u"all_greet_prog"_s;
+    case WEAPON_PROG:
+      return u"weapon_prog"_s;
+    case ARMOUR_PROG:
+      return u"armour_prog"_s;
+    case LOAD_PROG:
+      return u"load_prog"_s;
+    case COMMAND_PROG:
+      return u"command_prog"_s;
+    case ACT_PROG:
+      return u"act_prog"_s;
+    case ARAND_PROG:
+      return u"arand_prog"_s;
+    case CATCH_PROG:
+      return u"catch_prog"_s;
+    case SPEECH_PROG:
+      return u"speech_prog"_s;
+    case RAND_PROG:
+      return u"rand_prog"_s;
+    case CAN_SEE_PROG:
+      return u"can_see_prog"_s;
+    default:
+      return u"ERROR_PROG"_s;
+    }
+  }
+  else
+  {
+    switch (type_)
+    {
+    case IN_FILE_PROG:
+      return u"in_file_prog"_s;
+    case ACT_PROG:
+      return u"act_prog"_s;
+    case SPEECH_PROG:
+      return u"speech_prog"_s;
+    case RAND_PROG:
+      return u"rand_prog"_s;
+    case ARAND_PROG:
+      return u"arand_prog"_s;
+    case FIGHT_PROG:
+      return u"fight_prog"_s;
+    case HITPRCNT_PROG:
+      return u"hitprcnt_prog"_s;
+    case DEATH_PROG:
+      return u"death_prog"_s;
+    case ENTRY_PROG:
+      return u"entry_prog"_s;
+    case GREET_PROG:
+      return u"greet_prog"_s;
+    case ALL_GREET_PROG:
+      return u"all_greet_prog"_s;
+    case GIVE_PROG:
+      return u"give_prog"_s;
+    case BRIBE_PROG:
+      return u"bribe_prog"_s;
+    case CATCH_PROG:
+      return u"catch_prog"_s;
+    case ATTACK_PROG:
+      return u"attack_prog"_s;
+    case LOAD_PROG:
+      return u"load_prog"_s;
+    case CAN_SEE_PROG:
+      return u"can_see_prog"_s;
+    case DAMAGE_PROG:
+      return u"damage_prog"_s;
+    case COMMAND_PROG:
+      return u"command_prog"_s;
+    default:
+      return u"ERROR_PROG"_s;
+    }
+  }
+}
+
+MobileProgram::MobileProgram(void)
+    : is_object_(false)
+{
 }

@@ -110,7 +110,7 @@ command_return_t Character::check_social(QString pcomm)
   return SOCIAL_TRUE_WITH_NOISE;
 }
 
-QString fread_social_string(auto &streamstream)
+QString fread_social_string(auto &stream)
 {
   QString buf, *rslt;
 

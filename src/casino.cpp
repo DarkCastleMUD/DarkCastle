@@ -10,10 +10,13 @@
 /*
    BLACKJACK!
 */
-cDeck *create_deck(qint32 decks)
+cDeckPtr DC::create_deck(qint32 decks)
 {
-  cDeck *Deck = new cDeck;
-  Deck->cards = new qint32[decks * 52 + 1];
+  cDeckPtr Deck = cDeckPtr(new cDeck(this));
+  if (!Deck)
+    return {};
+
+  Deck->cards.reserve(decks * 52 + 1);
   Deck->decks = decks;
   Deck->pos = {};
   qint32 i, z;
@@ -26,12 +29,11 @@ cDeck *create_deck(qint32 decks)
   return Deck;
 }
 
-void freeDeck(cDeck *deck)
+void freeDeck(cDeckPtr deck)
 {
-  deck = {};
 }
 
-void switch_cards(cDeck *tDeck, qint32 pos1, qint32 pos2)
+void switch_cards(cDeckPtr tDeck, qint32 pos1, qint32 pos2)
 {
   qint32 b = tDeck->cards[pos1];
   tDeck->cards[pos1] = tDeck->cards[pos2];
@@ -146,7 +148,7 @@ bool DC::verify(CasinoPlayerPtr plr)
   return true;
 }
 
-void shuffle_deck(cDeck *tDeck)
+void shuffle_deck(cDeckPtr tDeck)
 { // this would not hold up to a test of true randomization, but then
   // neither would a real dealer shuffling a deck
   CasinoPlayerPtr plr;
@@ -283,7 +285,7 @@ CasinoPlayerPtr createPlayer(CharacterPtr ch, CasinoTablePtr tbl, qint32 noadd =
   return plr;
 }
 
-qint32 pickCard(cDeck *deck)
+qint32 pickCard(cDeckPtr deck)
 {
   if (deck->pos >= deck->decks * 52 - 1)
     shuffle_deck(deck);
@@ -1416,7 +1418,7 @@ qint32 hand[5][2];
 class ttable
 {
 public:
-  cDeck *deck;
+  cDeckPtr deck;
   class pot *pots;
   class tplayer *player[6];
   qint32 cards[5]; // cards on the table
@@ -1861,7 +1863,7 @@ void pulse_holdem(class ttbl *tbl)
 
 /* Slot Machines! */
 
-class machine_data
+class CasinoSlotMachine
 {
 public:
   ObjectPtr obj;
@@ -1977,7 +1979,7 @@ void save_slot_machines()
 
 void create_slot(ObjectPtr obj)
 {
-  auto slot = new machine_data;
+  auto slot = new CasinoSlotMachine;
   slot->obj = obj;
   slot->ch = {};
   slot->prch = {};
@@ -1995,7 +1997,7 @@ void create_slot(ObjectPtr obj)
   obj->slot = slot;
 }
 
-bool verify_slot(machine_data *machine)
+bool verify_slot(CasinoSlotMachinePtr machine)
 {
   if (machine->ch->in_room == machine->obj->in_room)
     return true;
@@ -2003,7 +2005,7 @@ bool verify_slot(machine_data *machine)
   return false;
 }
 
-void update_linked_slots(machine_data *machine)
+void update_linked_slots(CasinoSlotMachinePtr machine)
 {
   QString ldesc;
 
@@ -2045,7 +2047,7 @@ void update_linked_slots(machine_data *machine)
   }
 }
 
-void slot_timer(machine_data *machine, qint32 stop1, qint32 stop2, qint32 delay)
+void slot_timer(CasinoSlotMachinePtr machine, qint32 stop1, qint32 stop2, qint32 delay)
 {
   TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.machine = machine;
@@ -2058,7 +2060,7 @@ void slot_timer(machine_data *machine, qint32 stop1, qint32 stop2, qint32 delay)
 
 void reel_spin(varg_t arg1, void *arg2, void *arg3)
 {
-  machine_data *machine = arg1.machine;
+  CasinoSlotMachinePtr machine = arg1.machine;
   qint32 stop1 = (qint64)arg2;
   qint32 stop2 = (qint64)arg3;
 
@@ -2317,7 +2319,7 @@ public:
   quint32 bet_array[48];
 };
 
-class wheel_data
+class CasinoRouletteWheel
 {
 public:
   ObjectPtr obj;
@@ -2328,7 +2330,7 @@ public:
 
 void create_wheel(ObjectPtr obj)
 {
-  auto wheel = new wheel_data;
+  auto wheel = new CasinoRouletteWheel;
   wheel->obj = obj;
   for (qint32 i = {}; i < 6; i++)
   {
@@ -2342,7 +2344,7 @@ void create_wheel(ObjectPtr obj)
   obj->wheel = wheel;
 }
 
-void send_wheel_bets(CharacterPtr ch, wheel_data *wheel)
+void send_wheel_bets(CharacterPtr ch, CasinoRouletteWheelPtr wheel)
 {
   qint32 i, j;
   bool found = false;
@@ -2479,7 +2481,7 @@ quint32 check_roulette_wins(roulette_player *plr, qint32 num)
   return winnings;
 }
 
-void send_roulette_message(wheel_data *wheel)
+void send_roulette_message(CasinoRouletteWheelPtr wheel)
 {
   QString buf;
 
@@ -2509,7 +2511,7 @@ void send_roulette_message(wheel_data *wheel)
   }
 }
 
-void wheel_stop(wheel_data *wheel)
+void wheel_stop(CasinoRouletteWheelPtr wheel)
 {
   qint32 num = dc_->number(0, 36);
   quint32 payout = {};
@@ -2548,7 +2550,7 @@ void wheel_stop(wheel_data *wheel)
 
 void pulse_countdown(varg_t arg1, void *arg2, void *arg3);
 
-void roulette_timer(wheel_data *wheel, qint32 spin)
+void roulette_timer(CasinoRouletteWheelPtr wheel, qint32 spin)
 {
   TimerPtr timer = TimerPtr(new Timer);
   timer->arg1.wheel = wheel;
@@ -2560,7 +2562,7 @@ void roulette_timer(wheel_data *wheel, qint32 spin)
 
 void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
 {
-  wheel_data *wheel = arg1.wheel;
+  CasinoRouletteWheelPtr wheel = arg1.wheel;
   qint32 spin = (qint64)arg2;
   QString buf;
 

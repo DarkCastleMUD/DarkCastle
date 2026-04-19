@@ -41,9 +41,9 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim == ch)
   {
-    if (GET_SEX(ch) == SEX_MALE)
+    if (GET_SEX(ch) == Character::sex_t::MALE)
       ch->sendln("You'd wither it!");
-    else if (GET_SEX(ch) == SEX_FEMALE)
+    else if (GET_SEX(ch) == Character::sex_t::FEMALE)
       ch->sendln("You naughty naughty girl...at least wait until someone's filming.");
     else
       ch->sendln("Looks like you've already harm touched yourself...");

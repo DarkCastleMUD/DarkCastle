@@ -276,7 +276,7 @@ command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
-  QString name, buf[50];
+  QString name, buf;
 
   /* Verify preconditions */
   assert(ch != 0);
@@ -543,7 +543,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
   do_name(victim, " %");
 
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
 
   if (clan)
   {

@@ -7,6 +7,11 @@
 
 #include "DC/DC.h"
 
+Leaderboard::Leaderboard(QObject *parent)
+    : QObject(parent), dc_(qobject_cast<DC *>(parent))
+{
+}
+
 void Leaderboard::check(void)
 {
   // check online players to the file and make sure the file is up to date
@@ -1151,35 +1156,35 @@ void Leaderboard::write_file(QString filename)
     return;
   }
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", hpactivename[i], hpactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(hpactivename[i]), hpactive[i]);
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", mnactivename[i], mnactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(mnactivename[i]), mnactive[i]);
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", kiactivename[i], kiactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(kiactivename[i]), kiactive[i]);
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", pkactivename[i], pkactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(pkactivename[i]), pkactive[i]);
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", pdactivename[i], pdactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(pdactivename[i]), pdactive[i]);
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", rdactivename[i], rdactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(rdactivename[i]), rdactive[i]);
   for (i = {}; i < 5; i++)
-    dc_fprintf(stream, "%s~ %d\n", mvactivename[i], mvactive[i]);
+    dc_fprintf(stream, "%s~ %d\n", qPrintable(mvactivename[i]), mvactive[i]);
   for (j = {}; j < CLASS_MAX - 2; j++)
   {
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", hpactiveclassname[j][i], hpactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(hpactiveclassname[j][i]), hpactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", mnactiveclassname[j][i], mnactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(mnactiveclassname[j][i]), mnactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", kiactiveclassname[j][i], kiactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(kiactiveclassname[j][i]), kiactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", pkactiveclassname[j][i], pkactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(pkactiveclassname[j][i]), pkactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", pdactiveclassname[j][i], pdactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(pdactiveclassname[j][i]), pdactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", rdactiveclassname[j][i], rdactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(rdactiveclassname[j][i]), rdactiveclass[j][i]);
     for (i = {}; i < 5; i++)
-      dc_fprintf(stream, "%s~ %d\n", mvactiveclassname[j][i], mvactiveclass[j][i]);
+      dc_fprintf(stream, "%s~ %d\n", qPrintable(mvactiveclassname[j][i]), mvactiveclass[j][i]);
   }
 }
 
@@ -1586,9 +1591,9 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
       skippedd++;
     dc_sprintf(buf2,
                "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
-               placea, hponlinename[i], placeb, hpactivename[i],
-               hpactive[0] - hpactive[i], placec, mnonlinename[i], placed,
-               mnactivename[i], mnactive[0] - mnactive[i]);
+               placea, qPrintable(hponlinename[i]), placeb, qPrintable(hpactivename[i]),
+               hpactive[0] - hpactive[i], placec, qPrintable(mnonlinename[i]), placed,
+               qPrintable(mnactivename[i]), mnactive[0] - mnactive[i]);
     dc_strcat(buf, buf2);
   }
   placea = 1;

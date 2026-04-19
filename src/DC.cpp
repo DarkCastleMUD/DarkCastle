@@ -470,7 +470,7 @@ const QString Combinables::Scribe::RECIPES_FILENAME = "scribe.dat";
 QMap<Combinables::Scribe::recipe, qint32> Combinables::Scribe::recipes;
 bool Combinables::Scribe::initialized = false;
 
-qint32 dc_fprintf(auto &streamstream, const QString format, ...)
+qint32 dc_fprintf(auto &stream, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);
@@ -496,18 +496,15 @@ qint32 dc_sprintf(QString &str, const QString format, ...)
   return str.length();
 }
 
-Character::Character(DCPtr dc)
-    : dc_(dc), QObject(dc)
+Character::Character(QObject *parent) : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
 }
 
-Connection::Connection(DCPtr dc)
-    : QObject(dc), dc_(dc)
+Connection::Connection(QObject *parent) : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
 }
 
-RoomDirection::RoomDirection(DCPtr dc)
-    : dc_(dc), QObject(dc)
+RoomDirection::RoomDirection(QObject *parent) : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
 }
 
@@ -531,4 +528,14 @@ QString SANA(ObjectPtr obj)
     return u"an"_s;
   else
     return u"a"_s;
+}
+
+Path::Path(QObject *parent)
+    : QObject(parent), dc_(qobject_cast<DC *>(parent))
+{
+}
+
+cDeck::cDeck(QObject *parent)
+    : QObject(parent), dc_(qobject_cast<DC *>(parent))
+{
 }

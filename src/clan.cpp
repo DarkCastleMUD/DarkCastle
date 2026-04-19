@@ -32,7 +32,7 @@ const QStringList clan_rights = {
 
 void DC::boot_clans(void)
 {
-  ClanMember *new_new_member = {};
+  ClanMemberPtr new_new_member = {};
   qint32 tempint;
   bool skip_clan = false, changes_made = false;
 
@@ -199,7 +199,7 @@ void save_clans(void)
 {
   FILE *stream;
   ClanPtr pclan = {};
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
 
   if (!(stream = fopen("../lib/clan.txt", "w")))
   {
@@ -327,8 +327,8 @@ void remove_clan_member(qint32 clannumber, CharacterPtr ch)
 
 void remove_clan_member(ClanPtr theClan, CharacterPtr ch)
 {
-  ClanMember *pcurr = {};
-  ClanMember *plast = {};
+  ClanMemberPtr pcurr = {};
+  ClanMemberPtr plast = {};
 
   pcurr = theClan->members;
 
@@ -352,7 +352,7 @@ void remove_clan_member(ClanPtr theClan, CharacterPtr ch)
 // Add someone.  Just makes the class, fills it, then calls the other add_clan_member
 void add_clan_member(ClanPtr theClan, CharacterPtr ch)
 {
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
 
   if (!ch || !theClan)
   {
@@ -366,15 +366,15 @@ void add_clan_member(ClanPtr theClan, CharacterPtr ch)
 
 // This should really be done as a binary tree, but I'm lazy, and this doesn't get used
 // very often, so it's just a linked list sorted by member name
-void add_clan_member(ClanPtr theClan, ClanMember *new_new_member)
+void add_clan_member(ClanPtr theClan, ClanMemberPtr new_new_member)
 {
   if (!theClan)
   {
     qWarning("invalid ClanPtr passed to add_clan_member");
     return;
   }
-  ClanMember *pcurr = {};
-  ClanMember *plast = {};
+  ClanMemberPtr pcurr = {};
+  ClanMemberPtr plast = {};
   qint32 result = {};
 
   if (!new_new_member)
@@ -465,7 +465,7 @@ qint32 plr_rights(CharacterPtr ch)
 // see if ch has rights to 'bit' in his clan
 qint32 has_right(CharacterPtr ch, quint32 bit)
 {
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
 
   if (!ch || !(pmember = get_member(qPrintable(ch->name()), ch->clan)))
     return false;
@@ -476,7 +476,7 @@ qint32 has_right(CharacterPtr ch, quint32 bit)
 qint32 num_clan_members(ClanPtr clan)
 {
   qint32 i = {};
-  for (ClanMember *pmem = clan->members;
+  for (ClanMemberPtr pmem = clan->members;
        pmem;
        pmem = pmem->next)
     i++;
@@ -1290,7 +1290,7 @@ command_return_t do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(buf, "You tell the clan, '%s'\r\n", arg);
+  dc_sprintf(buf, "You tell the clan, '%s'\r\n", qPrintable(arg));
   ansi_color(GREEN, ch);
   ch->send(buf);
   ansi_color(NTEXT, ch);
@@ -1364,10 +1364,10 @@ void do_clan_list(CharacterPtr ch)
 
 void do_clan_member_list(CharacterPtr ch)
 {
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
   ClanPtr pclan = {};
   qint32 column = 1;
-  QString buf, buf2[200];
+  QString buf, buf2;
 
   if (!(pclan = get_clan(ch->clan)))
   {
@@ -1413,7 +1413,7 @@ bool is_clan_leader(CharacterPtr ch)
 
 void do_clan_rights(CharacterPtr ch, QString arg)
 {
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
   CharacterPtr victim = {};
   // extern QString clan_rights
 
@@ -1431,11 +1431,11 @@ void do_clan_rights(CharacterPtr ch, QString arg)
     return;
   }
 
-  *name = toupper(*name);
+  name[0] = name[0].toUpper();
 
   if (!(pmember = get_member(name, ch->clan)))
   {
-    dc_sprintf(buf, "Could not find '%s' in your clan.\r\n", name);
+    dc_sprintf(buf, "Could not find '%s' in your clan.\r\n", qPrintable(name));
     ch->send(buf);
     return;
   }
@@ -1446,7 +1446,7 @@ void do_clan_rights(CharacterPtr ch, QString arg)
     ch->send(buf);
     for (auto bit = 0U; *clan_rights[bit] != '\n'; bit++)
     {
-      dc_sprintf(buf, "  %-15s %s\r\n", clan_rights[bit], (isSet(pmember->rights(), 1 << bit) ? "on" : "off"));
+      dc_sprintf(buf, "  %-15s %s\r\n", qPrintable(clan_rights[bit]), (isSet(pmember->rights(), 1 << bit) ? "on" : "off"));
       ch->send(buf);
     }
     return;
@@ -2062,7 +2062,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 
 void do_leader_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  ClanMember *pmember = {};
+  ClanMemberPtr pmember = {};
   //  ClanPtr  tarclan = {};
 
   QString buf;
@@ -2329,7 +2329,7 @@ command_return_t do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
     if (buf.isEmpty()) // only do this if they want clan rights on themselves
     {
       qint32 bit = -1;
-      ClanMember *pmember = {};
+      ClanMemberPtr pmember = {};
 
       if (!(pmember = get_member(qPrintable(ch->name()), ch->clan)))
       {
@@ -2341,7 +2341,7 @@ command_return_t do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       ch->send(buf);
       for (bit = {}; *clan_rights[bit] != '\n'; bit++)
       {
-        dc_sprintf(buf, "  %-15s %s\r\n", clan_rights[bit], (isSet(pmember->rights(), 1 << bit) ? "on" : "off"));
+        dc_sprintf(buf, "  %-15s %s\r\n", qPrintable(clan_rights[bit]), (isSet(pmember->rights(), 1 << bit) ? "on" : "off"));
         ch->send(buf);
       }
       return ReturnValue::eSUCCESS;
@@ -3052,7 +3052,7 @@ void DC::pulse_takeover(void)
     if (take->pulse > 60 && take->clan2 != -2 && can_lose(take))
     {
       QString buf;
-      std::dc_sprintf(buf, "\r\n##Control of%s has been lost!\r\n", qPrintable(dc_->zones.value(take->zone).name()));
+      dc_sprintf(buf, "\r\n##Control of%s has been lost!\r\n", qPrintable(zones.value(take->zone).name()));
       send_info(buf);
       DC::setZoneClanOwner(take->zone, 0);
       recycle_pulse_data(take);
@@ -3355,12 +3355,11 @@ bool others_clan_room(CharacterPtr ch, Room *room)
   return true;
 }
 
-Clan::Clan(DCPtr dc, QString clan_id)
-    : QObject(dc), dc_(dc), MinimumEntity(n)
+Clan::Clan(QObject *parent, QString clan_id) : dc_(qobject_cast<DC *>(parent)), MinimumEntity(clan_id), QObject(parent)
 {
 }
 
-void Clan::cdeposit(const quint64 &deposit)
+void Clan::cdeposit(quint64 deposit)
 {
   balance += deposit;
 }
@@ -3370,18 +3369,17 @@ quint64 Clan::getBalance(void)
   return balance;
 }
 
-void Clan::cwithdraw(const quint64 &withdraw)
+void Clan::cwithdraw(quint64 withdraw)
 {
   balance -= withdraw;
 }
 
-void Clan::setBalance(const quint64 &value)
+void Clan::setBalance(quint64 value)
 {
   balance = value;
 }
 
 ClanMember::ClanMember(CharacterPtr ch)
-    : next(nullptr), name_(QString()), unused1_(0), unused2_(0), unused3_(0), unused4_(QString()), rights_(0), rank_(0), time_joined_(0)
 {
   if (ch)
   {

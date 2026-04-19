@@ -639,7 +639,7 @@ void automail(QString name)
   QString buf;
 
   blah = fopen("../lib/whassup.txt", "w");
-  dc_fprintf(blah, "%s", name);
+  dc_fprintf(blah, "%s", qPrintable(name));
 
   dc_sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
