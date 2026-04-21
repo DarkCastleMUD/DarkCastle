@@ -289,7 +289,7 @@ ObjectPtr Character::clan_altar(void)
           ObjectPtr t = dc_->world[real_room(room->room_number)].contents;
           for (; t; t = t->next_content)
           {
-            if (t->obj_flags.type_flag == ITEM_ALTAR)
+            if (t->flags_.type_flag == ITEM_ALTAR)
               return t;
           }
         }
@@ -1280,7 +1280,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     {
       ch->conn_->stats = {};
     }
-    ch->conn_->stats = new stat_data;
+    ch->conn_->stats = new NewCharacterStats;
 
     conn->connected = Connection::states::OLD_CHOOSE_STATS;
     arg.clear();
@@ -2187,10 +2187,10 @@ void check_silence_beacons(void)
     tmp_obj = obj->next;
     if (dc_->obj_index[obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
-      if (obj->obj_flags.value[0] == 0)
+      if (obj->flags_.value[0] == 0)
         extract_obj(obj);
       else
-        obj->obj_flags.value[0]--;
+        obj->flags_.value[0]--;
     }
   }
 }
@@ -2209,11 +2209,11 @@ void DC::checkConsecrate(qint32 pulseType)
       tmp_obj = obj->next;
       if (dc_->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
       {
-        spl = obj->obj_flags.value[0];
-        obj->obj_flags.value[1]--;
-        if (obj->obj_flags.value[1] <= 0)
+        spl = obj->flags_.value[0];
+        obj->flags_.value[1]--;
+        if (obj->flags_.value[1] <= 0)
         {
-          if ((ch = obj->obj_flags.origin) && charExists(ch))
+          if ((ch = obj->flags_.origin) && charExists(ch))
           {
             ch->cRooms--;
             if (ch->conn_)
@@ -2274,10 +2274,10 @@ void DC::checkConsecrate(qint32 pulseType)
       tmp_obj = obj->next;
       if (dc_->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
       {
-        spl = obj->obj_flags.value[0];
-        if (charExists(obj->obj_flags.origin))
+        spl = obj->flags_.value[0];
+        if (charExists(obj->flags_.origin))
         {
-          ch = obj->obj_flags.origin;
+          ch = obj->flags_.origin;
         }
         for (tmp_ch = dc_->world[obj->in_room].people_; tmp_ch; tmp_ch = next_ch)
         {
@@ -2290,7 +2290,7 @@ void DC::checkConsecrate(qint32 pulseType)
           align = GET_ALIGNMENT(tmp_ch);
           if (align > 0)
           {
-            amount = obj->obj_flags.value[2] + 10 + align / 10;
+            amount = obj->flags_.value[2] + 10 + align / 10;
             if (spl == SPELL_CONSECRATE)
             {
               if (GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch))
@@ -2345,7 +2345,7 @@ void DC::checkConsecrate(qint32 pulseType)
           }
           else if (align < 0)
           {
-            amount = obj->obj_flags.value[2] + 10 - align / 10;
+            amount = obj->flags_.value[2] + 10 - align / 10;
             if (spl == SPELL_DESECRATE)
             {
               if (GET_HIT(tmp_ch) + amount > GET_MAX_HIT(tmp_ch))
@@ -2590,7 +2590,7 @@ bool handle_get_class(ConnectionPtr conn, QString arg)
   return true;
 }
 
-quint8 stat_data::getMin(quint8 cur, qint8 race_mod, quint8 min)
+quint8 NewCharacterStats::getMin(quint8 cur, qint8 race_mod, quint8 min)
 {
   if (min > cur + race_mod)
   {
@@ -2605,7 +2605,7 @@ quint8 stat_data::getMin(quint8 cur, qint8 race_mod, quint8 min)
   return cur;
 }
 
-void stat_data::setMin(void)
+void NewCharacterStats::setMin(void)
 {
   str[0] = getMin(str[0], races[race].mod_str, MAX(races[race].min_str, classes[clss].min_str));
   dex[0] = getMin(dex[0], races[race].mod_dex, MAX(races[race].min_dex, classes[clss].min_dex));
@@ -2623,7 +2623,7 @@ void show_question_stats(ConnectionPtr conn)
 
   if (conn->stats == nullptr)
   {
-    conn->stats = new stat_data;
+    conn->stats = new NewCharacterStats;
 
     CharacterPtr ch = conn->character;
     qint32 race = conn->stats->race = ch->race;
@@ -3062,7 +3062,7 @@ bool check_race_attributes(CharacterPtr ch, qint32 race)
   return false;
 }
 
-stat_data::stat_data(void)
+NewCharacterStats::NewCharacterStats(void)
     : min_str(0), min_dex(0), min_con(0), min_int(0), min_wis(0), points(0), selection(attribute_t::UNDEFINED), race(0), clss(0)
 {
   memset(str, 0, sizeof(str));
@@ -3072,7 +3072,7 @@ stat_data::stat_data(void)
   memset(wis, 0, sizeof(wis));
 }
 
-bool stat_data::increase(quint64 number)
+bool NewCharacterStats::increase(quint64 number)
 {
   if (points <= 0)
   {
@@ -3141,7 +3141,7 @@ bool stat_data::increase(quint64 number)
   return true;
 }
 
-bool stat_data::decrease(quint64 number)
+bool NewCharacterStats::decrease(quint64 number)
 {
   qint32 *attribute_to_change = {};
   switch (selection)

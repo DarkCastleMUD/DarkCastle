@@ -239,7 +239,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
       if ((ch->getLevel() < 108) &&
-          isSet(((dc_->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
+          isSet(((dc_->obj_index[number].item))->flags_.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("Why would you want to load that?");
         return ReturnValue::eFAILURE;
@@ -258,17 +258,17 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
       if (random[0] == 'r')
       {
         ObjectPtr obj = (dc_->obj_index[number].item);
-        if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
         {
           ch->send(u"You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n"_s.arg(num));
           return ReturnValue::eFAILURE;
         }
-        else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
+        else if (isSet(obj->flags_.extra_flags, ITEM_QUEST))
         {
           ch->send(u"You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n"_s.arg(num));
           return ReturnValue::eFAILURE;
         }
-        else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
+        else if (isSet(obj->flags_.more_flags, ITEM_NO_CUSTOM))
         {
           ch->send(u"You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n"_s.arg(num));
           return ReturnValue::eFAILURE;
@@ -284,7 +284,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     if ((ch->getLevel() < IMPLEMENTER) &&
-        isSet(((dc_->obj_index[num].item))->obj_flags.extra_flags,
+        isSet(((dc_->obj_index[num].item))->flags_.extra_flags,
               ITEM_SPECIAL))
     {
       ch->sendln("Why would you want to load that?");
@@ -954,7 +954,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         if ((nr = real_object(begin)) >= 0)
         {
           dc_sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
-                     ((dc_->obj_index[nr].item))->obj_flags.eq_level,
+                     ((dc_->obj_index[nr].item))->flags_.eq_level,
                      qPrintable(((dc_->obj_index[nr].item))->short_description()));
           ch->send(buf);
         }
@@ -969,7 +969,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((dc_->obj_index[nr].item))->obj_flags.eq_level,
+                     ((dc_->obj_index[nr].item))->flags_.eq_level,
                      qPrintable(((dc_->obj_index[nr].item))->short_description()));
           ch->send(buf);
 
@@ -995,7 +995,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         {
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((dc_->obj_index[nr].item))->obj_flags.eq_level,
+                     ((dc_->obj_index[nr].item))->flags_.eq_level,
                      qPrintable(((dc_->obj_index[nr].item))->short_description()));
           ch->send(buf);
         }
@@ -1609,33 +1609,33 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 20; i++)
           if (isSet(wear, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->obj_flags.wear_flags,
+                    ((dc_->obj_index[nr].item))->flags_.wear_flags,
                     1 << i))
               goto endLoop;
       if (type)
-        if (((dc_->obj_index[nr].item))->obj_flags.type_flag != type)
+        if (((dc_->obj_index[nr].item))->flags_.type_flag != type)
           continue;
       if (lweight != -555)
-        if (((dc_->obj_index[nr].item))->obj_flags.weight < lweight)
+        if (((dc_->obj_index[nr].item))->flags_.weight < lweight)
           continue;
       if (hweight != -555)
-        if (((dc_->obj_index[nr].item))->obj_flags.weight > hweight)
+        if (((dc_->obj_index[nr].item))->flags_.weight > hweight)
           continue;
 
       if (levhigh != -555)
-        if (((dc_->obj_index[nr].item))->obj_flags.eq_level > levhigh)
+        if (((dc_->obj_index[nr].item))->flags_.eq_level > levhigh)
           continue;
       if (levlow != -555)
-        if (((dc_->obj_index[nr].item))->obj_flags.eq_level < levlow)
+        if (((dc_->obj_index[nr].item))->flags_.eq_level < levlow)
           continue;
       if (size)
         for (i = {}; i < 10; i++)
           if (isSet(size, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->obj_flags.size,
+                    ((dc_->obj_index[nr].item))->flags_.size,
                     1 << i))
               goto endLoop;
-      if (((dc_->obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
+      if (((dc_->obj_index[nr].item))->flags_.type_flag == ITEM_WEAPON)
       {
         qint32 get_weapon_damage_type(ObjectPtr wielded);
         its = get_weapon_damage_type(
@@ -1647,10 +1647,10 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 30; i++)
           if (isSet(extra, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->obj_flags.extra_flags,
+                    ((dc_->obj_index[nr].item))->flags_.extra_flags,
                     1 << i) &&
                 !(any && isSet(
-                             ((dc_->obj_index[nr].item))->obj_flags.extra_flags,
+                             ((dc_->obj_index[nr].item))->flags_.extra_flags,
                              1 << any)))
               goto endLoop;
 
@@ -1658,7 +1658,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 10; i++)
           if (isSet(more, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->obj_flags.more_flags,
+                    ((dc_->obj_index[nr].item))->flags_.more_flags,
                     1 << i))
               goto endLoop;
       //      qint32 aff,total = {};
@@ -1676,14 +1676,14 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (item_type)
       {
         bool spell_found = false;
-        if (((dc_->obj_index[nr].item))->obj_flags.type_flag != item_type)
+        if (((dc_->obj_index[nr].item))->flags_.type_flag != item_type)
           continue;
         if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
           for (i = 1; i < 4; i++)
-            if (((dc_->obj_index[nr].item))->obj_flags.value[i] == spellnum)
+            if (((dc_->obj_index[nr].item))->flags_.value[i] == spellnum)
               spell_found = true;
         if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
-          if (((dc_->obj_index[nr].item))->obj_flags.value[3] == spellnum)
+          if (((dc_->obj_index[nr].item))->flags_.value[3] == spellnum)
             spell_found = true;
 
         if (!spell_found)
@@ -1696,7 +1696,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((dc_->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((dc_->obj_index[nr].item))->short_description()));
+      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((dc_->obj_index[nr].item))->flags_.eq_level, qPrintable(((dc_->obj_index[nr].item))->short_description()));
       ch->send(buf);
     endLoop:
       continue;
@@ -2386,7 +2386,7 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 
   /*
     if(dc_->obj_index[obj->item_number].non_combat_func ||
-                  obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
+                  obj->flags_.type_flag == ITEM_MEGAPHONE ||
                   has_random(obj)) {
           dc_->obj_free_list.insert(obj);
     }

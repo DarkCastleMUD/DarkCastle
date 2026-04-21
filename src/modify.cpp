@@ -89,7 +89,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
   qint32 field, type, ctr;
   CharacterPtr mob = {};
   ObjectPtr obj;
-  extra_descr_data *ed, *tmp;
+  ExtraDescriptionPtr ed, *tmp;
 
   if (ch->isNonPlayer())
     return 1;
@@ -199,7 +199,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       return 1;
     }
 
-    if (isSet(obj->obj_flags.more_flags, ITEM_NO_RESTRING))
+    if (isSet(obj->flags_.more_flags, ITEM_NO_RESTRING))
     {
       if (ch->getLevel() < IMPLEMENTER)
       {
@@ -213,7 +213,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     switch (field)
     {
     case 1:
-      if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < 110)
+      if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) && ch->getLevel() < 110)
       {
         ch->sendln("The moose will get you if you do that.");
         return 1;
@@ -241,7 +241,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       for (ed = obj->ex_description;; ed = ed->next)
         if (!ed)
         { /* the field was not found. create a new_new one. */
-          ed = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
+          ed = (ExtraDescriptionPtr)dc_alloc(1, sizeof(ExtraDescription));
           ed->next = obj->ex_description;
           obj->ex_description = ed;
           ed->keyword = string;

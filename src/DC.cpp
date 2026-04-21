@@ -439,7 +439,7 @@ command_return_t Character::do_edit_generic_show(QString value, QString fieldnam
 
 bool Object::isPortal(void)
 {
-  return obj_flags.type_flag == ITEM_PORTAL;
+  return flags_.type_flag == ITEM_PORTAL;
 }
 const classes_t Character::classes_ = {
     {"UNDEFINED", "undefined", "Und", false, 0, 0, 0, 0, 0},

@@ -488,12 +488,12 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
-    if (paper->obj_flags.type_flag == ITEM_PEN) /* oops, a pen.. */
+    if (paper->flags_.type_flag == ITEM_PEN) /* oops, a pen.. */
     {
       pen = paper;
       paper = {};
     }
-    else if (paper->obj_flags.type_flag != ITEM_NOTE)
+    else if (paper->flags_.type_flag != ITEM_NOTE)
     {
       ch->sendln("That thing has nothing to do with writing.");
       return ReturnValue::eSUCCESS;
@@ -519,11 +519,11 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   /* ok.. now let's see what kind of stuff we've found */
-  if (pen->obj_flags.type_flag != ITEM_PEN)
+  if (pen->flags_.type_flag != ITEM_PEN)
   {
     act_to_character("$p is no good for writing with.", ch, pen, 0, 0);
   }
-  else if (paper->obj_flags.type_flag != ITEM_NOTE)
+  else if (paper->flags_.type_flag != ITEM_NOTE)
   {
     act_to_character("You can't write on $p.", ch, paper, 0, 0);
   }

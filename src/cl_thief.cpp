@@ -162,7 +162,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (equipment[WEAR_WIELD]->obj_flags.value[3] != 11 && equipment[WEAR_WIELD]->obj_flags.value[3] != 9)
+  if (equipment[WEAR_WIELD]->flags_.value[3] != 11 && equipment[WEAR_WIELD]->flags_.value[3] != 9)
   {
     sendln("You can't stab without a stabbing weapon...");
     return ReturnValue::eFAILURE;
@@ -204,7 +204,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   // Will this be a single or dual backstab this round?
   bool perform_dual_backstab = false;
-  if ((((isPlayer() && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || getLevel() >= ARCHANGEL) || (isNonPlayer() && getLevel() > 70)) && (equipment[WEAR_SECOND_WIELD]) && ((equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 11) || (equipment[WEAR_SECOND_WIELD]->obj_flags.value[3] == 9)) && (cmd != cmd_t::SBS))
+  if ((((isPlayer() && GET_CLASS(this) == CLASS_THIEF && has_skill(SKILL_DUAL_BACKSTAB)) || getLevel() >= ARCHANGEL) || (isNonPlayer() && getLevel() > 70)) && (equipment[WEAR_SECOND_WIELD]) && ((equipment[WEAR_SECOND_WIELD]->flags_.value[3] == 11) || (equipment[WEAR_SECOND_WIELD]->flags_.value[3] == 9)) && (cmd != cmd_t::SBS))
   {
     if (skill_success(victim, SKILL_DUAL_BACKSTAB) || isNonPlayer())
     {
@@ -233,7 +233,7 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   else if (!victim->isImmortalPlayer() &&
            victim->getLevel() <= (getLevel() + 19) &&
            (isImmortalPlayer() || itemp > 95 || (victim->isPlayer() && isSet(victim->player->punish, PUNISH_UNLUCKY))) &&
-           ((equipment[WEAR_WIELD]->obj_flags.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (equipment[WEAR_WIELD]->obj_flags.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
+           ((equipment[WEAR_WIELD]->flags_.value[3] == 11 && !isSet(victim->immune, ISR_PIERCE)) || (equipment[WEAR_WIELD]->flags_.value[3] == 9 && !isSet(victim->immune, ISR_STING))))
   {
     act("$N crumples to the ground, $S body still quivering from "
         "$n's brutal assassination.",
@@ -764,8 +764,8 @@ qint32 max_level(CharacterPtr ch)
   qint32 i = 0, lvl = {};
   for (; i < MAX_WEAR; i++)
     if (ch->equipment[i] && (GET_ITEM_TYPE(ch->equipment[i]) == ITEM_ARMOR || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_WEAPON || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_INSTRUMENT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_FIREWEAPON || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_LIGHT || GET_ITEM_TYPE(ch->equipment[i]) == ITEM_CONTAINER) &&
-        !isSet(ch->equipment[i]->obj_flags.extra_flags, ITEM_SPECIAL))
-      lvl = MAX<level_t>(lvl, ch->equipment[i]->obj_flags.eq_level);
+        !isSet(ch->equipment[i]->flags_.extra_flags, ITEM_SPECIAL))
+      lvl = MAX<level_t>(lvl, ch->equipment[i]->flags_.eq_level);
   if (lvl < 20)
     lvl = 20;
   return lvl;
@@ -877,12 +877,12 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
   if ((obj = get_obj_in_list_vis(ch, obj_name, victim->carrying)))
   {
     chance -= GET_OBJ_WEIGHT(obj);
-    if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     {
       ch->sendln("That item is protected by the gods.");
       return ReturnValue::eFAILURE;
     }
-    if (isSet(obj->obj_flags.extra_flags, ITEM_NEWBIE))
+    if (isSet(obj->flags_.extra_flags, ITEM_NEWBIE))
     {
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return ReturnValue::eFAILURE;
@@ -993,8 +993,8 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
             has_item = search_char_for_item(ch, obj->item_number, false);
             obj_to_char(obj, ch);
           }
-          if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-              (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+          if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) ||
+              (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && has_item))
           {
             ch->send(u"Whoa!  The %1 poofed into thin air!\r\n"_s.arg(obj->short_description()));
             extract_obj(obj);
@@ -1007,8 +1007,8 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
               // has already been extracted
               next_obj = loop_obj->next_content;
 
-              if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-                  (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+              if (isSet(loop_obj->flags_.more_flags, ITEM_NO_TRADE) ||
+                  (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && has_item))
               {
                 ch->send(u"Whoa!  The %s inside the %s poofed into thin air!\r\n"_s.arg(qPrintable(loop_obj->short_description())).arg(qPrintable(obj->short_description())));
                 extract_obj(loop_obj);
@@ -1036,7 +1036,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (obj)
     { // They're wearing it!
-      /*    if (max_level(ch) < obj->obj_flags.eq_level)
+      /*    if (max_level(ch) < obj->flags_.eq_level)
           {
         ch->sendln("You find yourself unable to steal that.");
         return ReturnValue::eFAILURE;
@@ -1086,7 +1086,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       };
       wakey -= GET_DEX(ch) / 2;
-      if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+      if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("That item is protected by the gods.");
         return ReturnValue::eFAILURE;
@@ -1187,8 +1187,8 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         has_item = search_char_for_item(ch, obj->item_number, false);
         obj_to_char(obj, ch);
 
-        if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-            (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+        if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) ||
+            (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && has_item))
         {
           ch->sendln("Whoa! It poofed into thin air!");
           extract_obj(obj);
@@ -1200,8 +1200,8 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
             // has already been extracted
             next_obj = loop_obj->next_content;
 
-            if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-                (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
+            if (isSet(loop_obj->flags_.more_flags, ITEM_NO_TRADE) ||
+                (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && has_item))
             {
               ch->send(u"Whoa! The %s inside the %s poofed into thin air!\r\n"_s.arg(qPrintable(loop_obj->short_description())).arg(qPrintable(obj->short_description())));
               extract_obj(loop_obj);
@@ -1435,11 +1435,11 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // for (obj = ch->carrying; obj; obj = obj->next_content)
-  //    if (obj->obj_flags.type_flag == ITEM_LOCKPICK)
+  //    if (obj->flags_.type_flag == ITEM_LOCKPICK)
   //      has_lockpicks = true;
 
   for (j = {}; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || dc_->obj_index[ch->equipment[j]->item_number].vnum() == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->flags_.type_flag == ITEM_LOCKPICK || dc_->obj_index[ch->equipment[j]->item_number].vnum() == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1456,15 +1456,15 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     // this is an object
 
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+    if (obj->flags_.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
-    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!isSet(obj->flags_.value[1], CONT_CLOSED))
       ch->sendln("Silly, it's not even closed!");
-    else if (obj->obj_flags.value[2] < 0)
+    else if (obj->flags_.value[2] < 0)
       ch->sendln("Odd, you can't seem to find a keyhole.");
-    else if (!isSet(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (!isSet(obj->flags_.value[1], CONT_LOCKED))
       ch->sendln("Oh-ho! This thing is not even locked!");
-    else if (isSet(obj->obj_flags.value[1], CONT_PICKPROOF))
+    else if (isSet(obj->flags_.value[1], CONT_PICKPROOF))
       ch->sendln("The lock resists even your best attempts to pick it.");
     else
     {
@@ -1478,7 +1478,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+      REMOVE_BIT(obj->flags_.value[1], CONT_LOCKED);
       ch->sendln("*Click*");
       act_to_room("$n fiddles with $p.", ch, obj, 0, 0);
     }
@@ -1715,19 +1715,19 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("That sure would be a stupid thing to do.");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
     ch->sendln("You can't seem to get the item to leave you.");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
   {
     if (ch->getLevel() < DEITY)
     {
@@ -1754,15 +1754,15 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("That's not a container.");
       return ReturnValue::eFAILURE;
     }
-    if (isSet(container->obj_flags.value[1], CONT_CLOSED))
+    if (isSet(container->flags_.value[1], CONT_CLOSED))
     {
       ch->sendln("It seems to be closed.");
       return ReturnValue::eFAILURE;
     }
-    if (((container->obj_flags.weight + obj->obj_flags.weight) >=
-         container->obj_flags.value[0]) &&
+    if (((container->flags_.weight + obj->flags_.weight) >=
+         container->flags_.value[0]) &&
         (dc_->obj_index[container->item_number].vnum() != 536 ||
-         weight_in(container) + obj->obj_flags.weight >= 200))
+         weight_in(container) + obj->flags_.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
       return ReturnValue::eFAILURE;
@@ -1814,13 +1814,13 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
+  if (obj->flags_.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
     act_to_character("$E can't carry that much weight.", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
@@ -2203,7 +2203,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (obj)
   {
-    appraised = obj->obj_flags.cost;
+    appraised = obj->flags_.cost;
     found = true;
   }
 

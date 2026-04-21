@@ -1174,7 +1174,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
         return ReturnValue::eSUCCESS;
       }
 
-      if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
+      if (IS_CARRYING_W(ch) + obj->flags_.weight > CAN_CARRY_W(ch))
       {
         ch->sendln("You can't carry that much weight.");
         extract_obj(obj);
@@ -1711,7 +1711,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
         return ReturnValue::eSUCCESS;
       }
 
-      if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
+      if (IS_CARRYING_W(ch) + obj->flags_.weight > CAN_CARRY_W(ch))
       {
         ch->sendln("You can't carry that much weight.");
         extract_obj(obj);

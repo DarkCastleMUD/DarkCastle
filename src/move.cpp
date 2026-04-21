@@ -489,13 +489,13 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       has_boat = false;
       // See if character is carrying a boat
       for (obj = ch->carrying; obj; obj = obj->next_content)
-        if (obj->obj_flags.type_flag == ITEM_BOAT)
+        if (obj->flags_.type_flag == ITEM_BOAT)
           has_boat = true;
       // See if character is wearing a boat (boat ring, etc)
       if (!has_boat)
         for (qint32 x = {}; x < MAX_WEAR; x++)
           if (ch->equipment[x])
-            if (ch->equipment[x]->obj_flags.type_flag == ITEM_BOAT)
+            if (ch->equipment[x]->flags_.type_flag == ITEM_BOAT)
               has_boat = true;
       if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && !ch->isImmortalPlayer() &&
           ch->race != RACE_FISH && ch->race != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
@@ -1026,7 +1026,7 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
       {
         if (k->in_room != DC::NOWHERE && !k->hasPortalFlagNoLeave())
         {
-          if (k->getPortalDestinationRoom() == dc_->world[ch->in_room].number || k->obj_flags.value[2] == dc_->world[ch->in_room].zone)
+          if (k->getPortalDestinationRoom() == dc_->world[ch->in_room].number || k->flags_.value[2] == dc_->world[ch->in_room].zone)
           {
             ch->sendln("You exit the area.");
             act_to_room("$n has left the area.", ch, 0, 0, INVIS_NULL | STAYHIDE);
@@ -1106,10 +1106,10 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->isNonPlayer() && ch->master && dc_->mob_index[ch->mobdata->nr].vnum() == 8)
   {
     sesame = ch->master;
-    if (isSet(dc_->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[real_room(portal->flags_.value[0])].room_flags, CLAN_ROOM))
     {
       // Is golem's master not a member of this clan
-      if (others_clan_room(sesame, &dc_->world[real_room(portal->obj_flags.value[0])]) == true)
+      if (others_clan_room(sesame, &dc_->world[real_room(portal->flags_.value[0])]) == true)
       {
         ch->sendln("Your master is not from that clan.");
         act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
@@ -1124,7 +1124,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // should probably just combine this with 'if' below it, but i'm lazy
-  if (isSet(portal->obj_flags.value[3], Object::portal_flags_t::No_Enter))
+  if (isSet(portal->flags_.value[3], Object::portal_flags_t::No_Enter))
   {
     ch->sendln("The portal's destination rebels against you.");
     act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
@@ -1138,7 +1138,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(dc_->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM) || (portal->obj_flags.value[0] >= 1900 && portal->obj_flags.value[0] <= 1999 && !portal->obj_flags.value[1])))
+  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(dc_->world[real_room(portal->flags_.value[0])].room_flags, CLAN_ROOM) || (portal->flags_.value[0] >= 1900 && portal->flags_.value[0] <= 1999 && !portal->flags_.value[1])))
   {
     ch->sendln("The portal's destination rebels against you.");
     act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
@@ -1151,7 +1151,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  switch (portal->obj_flags.value[1])
+  switch (portal->flags_.value[1])
   {
   case 0:
     ch->sendln("You reach out tentatively and touch the portal...");
@@ -1173,7 +1173,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  retval = move_char(ch, real_room(portal->obj_flags.value[0]));
+  retval = move_char(ch, real_room(portal->flags_.value[0]));
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -1184,7 +1184,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_room("$n recoils in pain as the portal slams shut!", ch, 0, 0, 0);
   }
 
-  switch (portal->obj_flags.value[1])
+  switch (portal->flags_.value[1])
   {
   case 0:
     do_look(ch, "");
@@ -1263,13 +1263,13 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (obj->obj_flags.type_flag != ITEM_CLIMBABLE)
+  if (obj->flags_.type_flag != ITEM_CLIMBABLE)
   {
     ch->sendln("You can't climb that.");
     return ReturnValue::eSUCCESS;
   }
 
-  qint32 dest = obj->obj_flags.value[0];
+  qint32 dest = obj->flags_.value[0];
 
   if (real_room(dest) < 0)
   {

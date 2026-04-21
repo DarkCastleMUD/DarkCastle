@@ -303,7 +303,7 @@ qint32 fighter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (ch->isPlayer() || vict->isPlayer())
     {
       wielded = vict->equipment[WEAR_WIELD];
-      if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
+      if ((!isSet(wielded->flags_.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && ch->getLevel() > 9 && dc_->number(0, 2) == 0)
         {
@@ -1906,7 +1906,7 @@ qint32 fido(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr
 
   for (i = dc_->world[ch->in_room].contents; i; i = i->next_content)
   {
-    if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->obj_flags.value[3])
+    if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->flags_.value[3])
     {
       act_to_room("$n savagely devours a corpse.", ch, 0, 0, 0);
       for (temp = i->contains; temp; temp = next_obj)
@@ -1940,9 +1940,9 @@ qint32 janitor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   for (i = dc_->world[ch->in_room].contents; i; i = i->next_content)
   {
-    if (isSet(i->obj_flags.wear_flags, TAKE) &&
+    if (isSet(i->flags_.wear_flags, TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
-        !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
+        !isSet(i->flags_.extra_flags, ITEM_SPECIAL) &&
         dc_->obj_index[i->item_number].vnum() != CHAMPION_ITEM)
     {
       act_to_room("$n picks up some trash.", ch, 0, 0, 0);
@@ -2742,7 +2742,7 @@ qint32 marauder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (ch->equipment[WEAR_WIELD] && vict->equipment[WEAR_WIELD])
     if (ch->isPlayer() || vict->isPlayer())
-      if ((!isSet(wielded->obj_flags.extra_flags, ITEM_NODROP)) &&
+      if ((!isSet(wielded->flags_.extra_flags, ITEM_NODROP)) &&
           (vict->getLevel() <= DC::MAX_MORTAL_LEVEL))
         if (vict == ch->fighting && ch->getLevel() > 9 && dc_->number(0, 2) == 0)
         {

@@ -92,7 +92,7 @@ qint32 trade_with(ObjectPtr item, qint32 shop_nr)
 {
   qint32 counter;
 
-  if (item->obj_flags.cost < 1)
+  if (item->flags_.cost < 1)
     return false;
 
   for (const auto &type : dc_->shop_index[shop_nr].type)
@@ -167,20 +167,20 @@ void shopping_buy(const QString arg, CharacterPtr ch,
     return;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("The shop keeper changes his mind and refuses to sell such a special item.");
     return;
   }
 
-  if (obj->obj_flags.cost <= 0)
+  if (obj->flags_.cost <= 0)
   {
     extract_obj(obj);
     keeper->do_tell(shop.no_such_item1.arg(qPrintable(ch->name())).split(' '));
     return;
   }
 
-  cost = (qint32)(obj->obj_flags.cost * shop.profit_buy);
+  cost = (qint32)(obj->flags_.cost * shop.profit_buy);
 
   if (cost < 1)
     cost = 1;
@@ -197,13 +197,13 @@ void shopping_buy(const QString arg, CharacterPtr ch,
     return;
   }
 
-  if (IS_CARRYING_W(ch) + obj->obj_flags.weight > CAN_CARRY_W(ch))
+  if (IS_CARRYING_W(ch) + obj->flags_.weight > CAN_CARRY_W(ch))
   {
     ch->sendln("You can't carry that much weight.");
     return;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(ch, obj->item_number, false))
     {
@@ -223,7 +223,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
 
   // Wormhole to map_eq_level
   /*
-  if( obj->obj_flags.eq_level == 1000 )
+  if( obj->flags_.eq_level == 1000 )
        obj = clone_object(obj->item_number);
   else
       obj_from_char( obj );
@@ -272,7 +272,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
     return;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
     ch->sendln("It seems magically attached to you.");
     return;
@@ -289,13 +289,13 @@ void shopping_sell(const QString arg, CharacterPtr ch,
     }
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("That would be really fucking smart.");
     return;
   }
 
-  if (!trade_with(obj, shop_nr) || obj->obj_flags.cost < 1)
+  if (!trade_with(obj, shop_nr) || obj->flags_.cost < 1)
   {
     keeper->do_tell(dc_->shop_index[shop_nr].do_not_buy.arg(qPrintable(ch->name())).split(' '));
     return;
@@ -310,13 +310,13 @@ void shopping_sell(const QString arg, CharacterPtr ch,
   }
 
   // don't allow non-empty containers to be sold
-  if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
+  if (obj->flags_.type_flag == ITEM_CONTAINER && obj->contains)
   {
     keeper->do_tell(u"%1 %2$B$2 needs to be emptied first."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
     return;
   }
 
-  cost = (qint32)(obj->obj_flags.cost * dc_->shop_index[shop_nr].profit_sell);
+  cost = (qint32)(obj->flags_.cost * dc_->shop_index[shop_nr].profit_sell);
   if (keeper->getGold() < cost)
   {
     keeper->do_tell(dc_->shop_index[shop_nr].missing_cash1.arg(qPrintable(ch->name())).split(' '));
@@ -390,19 +390,19 @@ void shopping_value(const QString arg, CharacterPtr ch,
     }
     if (GET_ITEM_TYPE(obj) == ITEM_WEAPON)
     {
-      if (obj->obj_flags.eq_level < 20)
+      if (obj->flags_.eq_level < 20)
       {
         dc_sprintf(buf, "Well, %s is able to be used by ", qPrintable(obj->short_description()));
-        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
+        sprintbit(obj->flags_.size, Object::size_bits, buf2);
         dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "and it can be wielded by these classes: ");
-        sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
+        sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf2);
         dc_strcat(buf, buf2);
         do_say(keeper, buf);
-        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
+        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->flags_.eq_level);
         do_say(keeper, buf);
-        dc_sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
+        dc_sprintf(buf, "The damage dice are '%dD%d'", obj->flags_.value[1], obj->flags_.value[2]);
         do_say(keeper, buf);
         for (qint32 i = {}; i < obj->num_affects; i++)
         {
@@ -439,17 +439,17 @@ void shopping_value(const QString arg, CharacterPtr ch,
     }
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
     {
-      if (obj->obj_flags.eq_level < 20)
+      if (obj->flags_.eq_level < 20)
       {
         dc_sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
-        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
+        sprintbit(obj->flags_.size, Object::size_bits, buf2);
         dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "and it can be worn by these classes: ");
-        sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
+        sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf2);
         dc_strcat(buf, buf2);
         do_say(keeper, buf);
-        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
+        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->flags_.eq_level);
         do_say(keeper, buf);
         for (qint32 i = {}; i < obj->num_affects; i++)
         {
@@ -483,36 +483,36 @@ void shopping_value(const QString arg, CharacterPtr ch,
     }
     if (GET_ITEM_TYPE(obj) == ITEM_SCROLL || GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_POTION || GET_ITEM_TYPE(obj) == ITEM_STAFF)
     {
-      if (obj->obj_flags.value[0] < 20)
+      if (obj->flags_.value[0] < 20)
       {
-        dc_sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", qPrintable(obj->short_description()), obj->obj_flags.value[0]);
+        dc_sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", qPrintable(obj->short_description()), obj->flags_.value[0]);
         do_say(keeper, buf);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {
-          if (obj->obj_flags.value[3] >= 1)
+          if (obj->flags_.value[3] >= 1)
           {
             dc_sprintf(buf, "It is eminating the aura of ");
-            sprinttype(obj->obj_flags.value[3] - 1, spells, buf2);
+            sprinttype(obj->flags_.value[3] - 1, spells, buf2);
             dc_strcat(buf, buf2);
             do_say(keeper, buf);
           }
-          if (obj->obj_flags.value[1] == obj->obj_flags.value[2])
+          if (obj->flags_.value[1] == obj->flags_.value[2])
             do_say(keeper, "It's fully charged as well.");
-          else if (obj->obj_flags.value[2] == 0)
+          else if (obj->flags_.value[2] == 0)
             do_say(keeper, "Though unfortunately, there are no more charges left.");
           else
             do_say(keeper, "It looks like it has been used some.");
         }
         else
         {
-          if (obj->obj_flags.value[1] >= 1)
+          if (obj->flags_.value[1] >= 1)
           {
             dc_sprintf(buf, "I can easily identify the signatures of ");
-            sprinttype(obj->obj_flags.value[1] - 1, spells, buf2);
+            sprinttype(obj->flags_.value[1] - 1, spells, buf2);
             dc_strcat(buf, buf2);
             do_say(keeper, buf);
           }
-          if (obj->obj_flags.value[2] >= 1)
+          if (obj->flags_.value[2] >= 1)
           {
             do_say(keeper, "There are more enchantments held within, but I'm rather busy.");
           }
@@ -531,17 +531,17 @@ void shopping_value(const QString arg, CharacterPtr ch,
     act_to_room("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, 0);
     if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
     {
-      if (obj->obj_flags.eq_level < 20)
+      if (obj->flags_.eq_level < 20)
       {
         dc_sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description()));
-        sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
+        sprintbit(obj->flags_.size, Object::size_bits, buf2);
         dc_strcat(buf, buf2);
         do_say(keeper, buf);
         dc_sprintf(buf, "and it can be worn by these classes: ");
-        sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
+        sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf2);
         dc_strcat(buf, buf2);
         do_say(keeper, buf);
-        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
+        dc_sprintf(buf, "The minimum level necessary to use it is %llu.", obj->flags_.eq_level);
         do_say(keeper, buf);
         for (qint32 i = {}; i < obj->num_affects; i++)
         {
@@ -561,14 +561,14 @@ void shopping_value(const QString arg, CharacterPtr ch,
       do_say(keeper, "I don't know anything about this item, actually.");
   }
 
-  if (!trade_with(obj, shop_nr) || obj->obj_flags.cost < 1)
+  if (!trade_with(obj, shop_nr) || obj->flags_.cost < 1)
   {
     keeper->do_tell(dc_->shop_index[shop_nr].do_not_buy.arg(qPrintable(ch->name())).split(' '));
     return;
   }
   if (!keeperhas)
   {
-    cost = (qint32)(obj->obj_flags.cost * dc_->shop_index[shop_nr].profit_sell);
+    cost = (qint32)(obj->flags_.cost * dc_->shop_index[shop_nr].profit_sell);
     keeper->do_tell(u"%1 I'll give you %2 gold coins for that."_s.arg(qPrintable(ch->name())).arg(QString::number(cost)).split(' '));
   }
 }
@@ -601,12 +601,12 @@ void shopping_list(const QString arg, CharacterPtr ch,
   vnum_t first_vnum = {};
   for (obj = keeper->carrying; obj; obj = obj->next_content)
   {
-    if (!CAN_SEE_OBJ(ch, obj) || obj->obj_flags.cost <= 0)
+    if (!CAN_SEE_OBJ(ch, obj) || obj->flags_.cost <= 0)
       continue;
 
     found = true;
 
-    cost = (qint32)(obj->obj_flags.cost * dc_->shop_index[shop_nr].profit_buy);
+    cost = (qint32)(obj->flags_.cost * dc_->shop_index[shop_nr].profit_buy);
 
     qint32 vnum = dc_->obj_index[obj->item_number].vnum();
     bool loop = false;
@@ -623,11 +623,11 @@ void shopping_list(const QString arg, CharacterPtr ch,
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
       if (dc_->obj_index[tobj->item_number].vnum() == dc_->obj_index[obj->item_number].vnum())
         a++;
-    /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
+    /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->flags_.value[1] )
             {
                 dc_sprintf( buf, "[%3d] [%7d] %s of %s.\r\n",
                     a, cost, qPrintable(obj->short_description()),
-                    drinks[obj->obj_flags.value[2]] );
+                    drinks[obj->flags_.value[2]] );
             }
             else
             {*/
@@ -1073,16 +1073,16 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
   }
 
   // make sure it isn't NO_DROP, NO_TRADE, etc
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) ||
-      isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
-      isSet(obj->obj_flags.extra_flags, ITEM_NODROP) ||
-      isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) ||
+      isSet(obj->flags_.more_flags, ITEM_NO_TRADE) ||
+      isSet(obj->flags_.extra_flags, ITEM_NODROP) ||
+      isSet(obj->flags_.extra_flags, ITEM_NOSAVE))
   {
     ch->sendln("You can't give that to the shop keeper to sell!");
     return;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE))
   {
     ch->sendln("For now you can't sell unique items.");
     return;

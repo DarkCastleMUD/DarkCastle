@@ -777,7 +777,7 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
   act_to_room("$n forages around, turning up $p.", ch, new_obj, 0, 0);
   act_to_character("You forage around, turning up $p.", ch, new_obj, 0, 0);
   obj_to_char(new_obj, ch);
-  new_obj->obj_flags.timer = 4;
+  new_obj->flags_.timer = 4;
   return ReturnValue::eSUCCESS;
 }
 
@@ -820,7 +820,7 @@ ObjectPtr find_arrow(ObjectPtr quiver)
   if (!target)
     return {};
 
-  if (!(target->obj_flags.type_flag == ITEM_MISSILE))
+  if (!(target->flags_.type_flag == ITEM_MISSILE))
     target = {};
 
   return target;
@@ -1111,7 +1111,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(ch->equipment[WEAR_HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
+  if (!(ch->equipment[WEAR_HOLD]->flags_.type_flag == ITEM_FIREWEAPON))
   {
     ch->sendln("You need to be holding a bow, moron.");
     return ReturnValue::eFAILURE;
@@ -1423,9 +1423,9 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   else
   {
-    dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
-    dam += dice(ch->equipment[WEAR_HOLD]->obj_flags.value[1],
-                ch->equipment[WEAR_HOLD]->obj_flags.value[2]);
+    dam = dice(found->flags_.value[1], found->flags_.value[2]);
+    dam += dice(ch->equipment[WEAR_HOLD]->flags_.value[1],
+                ch->equipment[WEAR_HOLD]->flags_.value[2]);
     for (qint32 i = {}; i < found->num_affects; i++)
       if (found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
         dam += found->affected[i].modifier;

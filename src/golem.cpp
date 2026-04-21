@@ -410,7 +410,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  affected_type *aff;
+  affected_typePtr aff;
 
   qint64 exp_needed;
 

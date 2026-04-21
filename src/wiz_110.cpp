@@ -419,7 +419,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   for (quint32 iWear = {}; iWear < MAX_WEAR; iWear++)
   {
     if (victim->equipment[iWear] &&
-        isSet(victim->equipment[iWear]->obj_flags.extra_flags, ITEM_SPECIAL))
+        isSet(victim->equipment[iWear]->flags_.extra_flags, ITEM_SPECIAL))
     {
       QString tmp = victim->equipment[iWear]->name();
       qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
@@ -431,11 +431,11 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       tmp = u"%1 %2"_s.arg(tmp).arg(newname);
       victim->equipment[iWear]->name(tmp);
     }
-    if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
+    if (victim->equipment[iWear] && victim->equipment[iWear]->flags_.type_flag == ITEM_CONTAINER)
     {
       for (ObjectPtr obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
       {
-        if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
         {
           QString tmp = obj->name();
           qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
@@ -453,7 +453,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   ObjectPtr obj = victim->carrying;
   while (obj)
   {
-    if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     {
       QString tmp = u"%1"_s.arg(obj->name());
       qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
@@ -469,7 +469,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
       ObjectPtr obj2;
       for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
       {
-        if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(obj2->flags_.extra_flags, ITEM_SPECIAL))
         {
           QString tmp = u"%1"_s.arg(obj2->name());
           qsizetype x = tmp.length() - dc_strlen(qPrintable(victim->name())) - 1;
@@ -823,7 +823,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
       continue;
     if (!CAN_WEAR(obj, i))
       continue;
-    qint32 ac = 0 - obj->obj_flags.value[0];
+    qint32 ac = 0 - obj->flags_.value[0];
     for (qint32 z = {}; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;

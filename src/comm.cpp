@@ -1664,15 +1664,6 @@ qint32 write_to_descriptor(qint32 desc, QByteArray txt)
   return 0;
 }
 
-enum telnet
-{
-  will_opt = '\xFB',
-  wont_opt = '\xFC',
-  do_opt = '\xFD',
-  dont_opt = '\xFE',
-  iac = '\xFF'
-};
-
 void process_iac(ConnectionPtr t)
 {
   QChar prev = '\0';

@@ -939,7 +939,7 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
           {
             obj_next = tmp_obj->next_content;
 
-            if (tmp_obj->obj_flags.type_flag == ITEM_BOAT)
+            if (tmp_obj->flags_.type_flag == ITEM_BOAT)
             {
               act_to_room("$p carried by $n has capsized!", tmp_victim, tmp_obj, 0, 0);
               act_to_character("Your $p has capsized!", tmp_victim, tmp_obj, 0, 0);
@@ -1444,10 +1444,10 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
-  if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE)
+  if (obj && obj->in_room && obj->flags_.value[0] == SPELL_DESECRATE)
   { // desecrate object
     CharacterPtr pal = {};
-    if ((pal = obj->obj_flags.origin) && charExists(pal))
+    if ((pal = obj->flags_.origin) && charExists(pal))
     {
       pal->cRooms--;
       if (pal->in_room == obj->in_room)
@@ -1493,10 +1493,10 @@ qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
-  if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+  if (obj && obj->in_room && obj->flags_.value[0] == SPELL_CONSECRATE)
   { // consecrate object
     CharacterPtr pal = {};
-    if ((pal = obj->obj_flags.origin) && charExists(pal))
+    if ((pal = obj->flags_.origin) && charExists(pal))
     {
       pal->cRooms--;
       if (pal->in_room == obj->in_room)
@@ -1707,7 +1707,7 @@ qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
     if ((5 * level > GET_OBJ_WEIGHT(obj)) &&
         (GET_POS(ch) != position_t::FIGHTING))
     {
-      SET_BIT(obj->obj_flags.extra_flags, ITEM_BLESS);
+      SET_BIT(obj->flags_.extra_flags, ITEM_BLESS);
       act_to_character("$p briefly glows.", ch, obj, 0, 0);
     }
   }
@@ -1955,7 +1955,7 @@ qint32 spell_create_food(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   else
     tmp_obj = clone_object(real_object(7));
 
-  tmp_obj->obj_flags.value[0] += skill / 2;
+  tmp_obj->flags_.value[0] += skill / 2;
 
   obj_to_room(tmp_obj, ch->in_room);
 
@@ -1977,21 +1977,21 @@ qint32 spell_create_water(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (GET_ITEM_TYPE(obj) == ITEM_DRINKCON)
   {
-    if ((obj->obj_flags.value[2] != LIQ_WATER) && (obj->obj_flags.value[1] != 0))
+    if ((obj->flags_.value[2] != LIQ_WATER) && (obj->flags_.value[1] != 0))
     {
-      obj->obj_flags.value[2] = LIQ_SLIME;
+      obj->flags_.value[2] = LIQ_SLIME;
     }
     else
     {
       water = 20 + skill * 2;
 
       /* Calculate water it can contain, or water created */
-      water = MIN(obj->obj_flags.value[0] - obj->obj_flags.value[1], water);
+      water = MIN(obj->flags_.value[0] - obj->flags_.value[1], water);
 
       if (water > 0)
       {
-        obj->obj_flags.value[2] = LIQ_WATER;
-        obj->obj_flags.value[1] += water;
+        obj->flags_.value[2] = LIQ_WATER;
+        obj->flags_.value[1] += water;
         act_to_character("$p is filled.", ch, obj, 0, 0);
       }
     }
@@ -2217,14 +2217,14 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   if (obj && obj != ch->equipment[WEAR_WIELD] && obj != ch->equipment[WEAR_SECOND_WIELD])
   { // hack for weapon spells
-    SET_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+    SET_BIT(obj->flags_.extra_flags, ITEM_NODROP);
     act_to_character("$p glows $4red$R momentarily, before returning to its original color.", ch, obj, 0, 0);
     /* LOWER ATTACK DICE BY -1 */
-    if (obj->obj_flags.type_flag == ITEM_WEAPON)
+    if (obj->flags_.type_flag == ITEM_WEAPON)
     {
-      if (obj->obj_flags.value[2] > 1)
+      if (obj->flags_.value[2] > 1)
       {
-        obj->obj_flags.value[2]--;
+        obj->flags_.value[2]--;
       }
       //		 else {
       //		  ch->sendln("Your curse has failed.");
@@ -2580,10 +2580,10 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   }
   else
   { /* It's an object */
-    if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
-        (obj->obj_flags.type_flag == ITEM_FOOD))
+    if ((obj->flags_.type_flag == ITEM_DRINKCON) ||
+        (obj->flags_.type_flag == ITEM_FOOD))
     {
-      if (obj->obj_flags.value[3])
+      if (obj->flags_.value[3])
         act_to_character("Poisonous fumes are revealed.", ch, 0, 0, 0);
       else
         ch->sendln("It looks very delicious.");
@@ -2606,21 +2606,21 @@ qint32 spell_enchant_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   return ReturnValue::eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_ARMOR) &&
-      !isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+      !isSet(obj->flags_.extra_flags, ITEM_ENCHANTED))
   {
 
-    SET_BIT(obj->obj_flags.extra_flags, ITEM_ENCHANTED);
+    SET_BIT(obj->flags_.extra_flags, ITEM_ENCHANTED);
 
-    obj->obj_flags.value[1] += 1 + (level >= DC::MAX_MORTAL_LEVEL);
+    obj->flags_.value[1] += 1 + (level >= DC::MAX_MORTAL_LEVEL);
 
     if (IS_GOOD(ch))
     {
-      SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
+      SET_BIT(obj->flags_.extra_flags, ITEM_ANTI_EVIL);
       act_to_character("$p glows $B$3blue$R.", ch, obj, 0, 0);
     }
     else if (IS_EVIL(ch))
     {
-      SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
+      SET_BIT(obj->flags_.extra_flags, ITEM_ANTI_GOOD);
       act_to_character("$p glows $B$4red$R.", ch, obj, 0, 0);
     }
     else
@@ -2645,13 +2645,13 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   return ReturnValue::eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_WEAPON) &&
-      !isSet(obj->obj_flags.extra_flags, ITEM_MAGIC))
+      !isSet(obj->flags_.extra_flags, ITEM_MAGIC))
   {
 
     if (obj->affected)
       return ReturnValue::eFAILURE;
 
-    SET_BIT(obj->obj_flags.extra_flags, ITEM_MAGIC);
+    SET_BIT(obj->flags_.extra_flags, ITEM_MAGIC);
     obj->num_affects = 2;
     obj->affected.resize(obj->num_affects);
 
@@ -2663,12 +2663,12 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
     if (IS_GOOD(ch))
     {
-      SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_EVIL);
+      SET_BIT(obj->flags_.extra_flags, ITEM_ANTI_EVIL);
       act_to_character("$p glows $B$1blue$R.", ch, obj, 0, 0);
     }
     else if (IS_EVIL(ch))
     {
-      SET_BIT(obj->obj_flags.extra_flags, ITEM_ANTI_GOOD);
+      SET_BIT(obj->flags_.extra_flags, ITEM_ANTI_GOOD);
       act_to_character("$p glows $B$4red$R.", ch, obj, 0, 0);
     }
     else
@@ -2678,10 +2678,10 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   }
   if (GET_ITEM_TYPE(obj) == ITEM_MISSILE)
   {
-    if (!obj->obj_flags.value[2] && !obj->obj_flags.value[3])
+    if (!obj->flags_.value[2] && !obj->flags_.value[3])
     {
-      obj->obj_flags.value[2] = (level > 20) + (level > 30) + (level > 40) + (level > 45) + (level > 49);
-      obj->obj_flags.value[3] = obj->obj_flags.value[2];
+      obj->flags_.value[2] = (level > 20) + (level > 30) + (level > 40) + (level > 45) + (level > 49);
+      obj->flags_.value[3] = obj->flags_.value[2];
     }
   }
   return ReturnValue::eSUCCESS;
@@ -2925,11 +2925,11 @@ qint32 spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   {
     if (CAN_WEAR(obj, TAKE))
     {
-      if (!isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+      if (!isSet(obj->flags_.extra_flags, ITEM_INVISIBLE))
       {
         act_to_character("$p turns invisible.", ch, obj, 0, 0);
         act_to_room("$p turns invisible.", ch, obj, 0, INVIS_NULL);
-        SET_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
+        SET_BIT(obj->flags_.extra_flags, ITEM_INVISIBLE);
       }
     }
     else
@@ -3003,7 +3003,7 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
       continue;
     }
 
-    if (isSet(i->obj_flags.more_flags, ITEM_NOLOCATE))
+    if (isSet(i->flags_.more_flags, ITEM_NOLOCATE))
     {
       if (isexact(tmp, i->name()))
       {
@@ -3165,11 +3165,11 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   }
   else
   { /* Object poison */
-    if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
-        (obj->obj_flags.type_flag == ITEM_FOOD))
+    if ((obj->flags_.type_flag == ITEM_DRINKCON) ||
+        (obj->flags_.type_flag == ITEM_FOOD))
     {
       act_to_character("$p glows $2green$R for a moment, before returning to its original colour.", ch, obj, 0, 0);
-      obj->obj_flags.value[3] = 1;
+      obj->flags_.value[3] = 1;
     }
     else
     {
@@ -3261,17 +3261,17 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (obj)
   {
-    if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+    if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
     {
       act_to_character("$p briefly glows $3blue$R.", ch, obj, 0, 0);
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+      REMOVE_BIT(obj->flags_.extra_flags, ITEM_NODROP);
       if (dc_->obj_index[obj->item_number].vnum() == 514)
       {
         qint32 i = {};
         for (i = {}; i < obj->num_affects; i++)
           if (obj->affected[i].location == APPLY_MANA_REGEN)
             return ReturnValue::eSUCCESS; // only do it once
-        SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+        SET_BIT(obj->flags_.extra_flags, ITEM_HUM);
         CharacterPtr t = obj->equipped_by;
         qint32 z = -1;
 
@@ -3310,7 +3310,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   for (j = {}; j < MAX_WEAR; j++)
   {
-    if ((obj = victim->equipment[j]) && isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+    if ((obj = victim->equipment[j]) && isSet(obj->flags_.extra_flags, ITEM_NODROP))
     {
       if (!curses_removed || GET_MANA(victim) > mana_cost)
       {
@@ -3322,7 +3322,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
           for (i = {}; i < obj->num_affects; i++)
             if (obj->affected[i].location == APPLY_MANA_REGEN)
               break; // only do it once
-          SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+          SET_BIT(obj->flags_.extra_flags, ITEM_HUM);
           add_obj_affect(obj, APPLY_MANA_REGEN, 2);
           victim->mana_regen += 2;
           act_to_room("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
@@ -3330,7 +3330,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
         }
         act_to_character("$p briefly glows $3blue$R.", victim, obj, 0, 0);
         act_to_room("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, 0);
-        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+        REMOVE_BIT(obj->flags_.extra_flags, ITEM_NODROP);
         if (!mana_cost)
           return ReturnValue::eSUCCESS;
       }
@@ -3339,7 +3339,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   for (obj = victim->carrying; obj; obj = obj->next_content)
   {
-    if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+    if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
     {
       if (!curses_removed || GET_MANA(victim) > mana_cost)
       {
@@ -3353,12 +3353,12 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
           for (i = {}; i < obj->num_affects; i++)
             if (obj->affected[i].location == APPLY_MANA_REGEN)
               break; // only do it once
-          SET_BIT(obj->obj_flags.extra_flags, ITEM_HUM);
+          SET_BIT(obj->flags_.extra_flags, ITEM_HUM);
           add_obj_affect(obj, APPLY_MANA_REGEN, 2);
           act_to_room("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
           act_to_character("With the restrictive curse lifted, $p begins to hum with renewed power!", victim, obj, 0, 0);
         }
-        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NODROP);
+        REMOVE_BIT(obj->flags_.extra_flags, ITEM_NODROP);
         if (!mana_cost)
           return ReturnValue::eSUCCESS;
       }
@@ -3407,10 +3407,10 @@ qint32 spell_remove_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   }
   else
   {
-    if ((obj->obj_flags.type_flag == ITEM_DRINKCON) ||
-        (obj->obj_flags.type_flag == ITEM_FOOD))
+    if ((obj->flags_.type_flag == ITEM_DRINKCON) ||
+        (obj->flags_.type_flag == ITEM_FOOD))
     {
-      obj->obj_flags.value[3] = {};
+      obj->flags_.value[3] = {};
       act_to_character("The $p steams briefly.", ch, obj, 0, 0);
     }
   }
@@ -4059,7 +4059,7 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 qint32 spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  affected_type *cur_af;
+  affected_typePtr cur_af;
 
   assert(victim);
 
@@ -4576,7 +4576,7 @@ qint32 spell_sense_life(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 void show_obj_class_size_mini(ObjectPtr obj, CharacterPtr ch)
 {
   for (qint32 i = 12; i < 23; i++)
-    if (isSet(obj->obj_flags.extra_flags, 1 << i))
+    if (isSet(obj->flags_.extra_flags, 1 << i))
       ch->send(u" %s"_s.arg(Object::extra_bits.value(qPrintable(i))));
 }
 
@@ -4597,7 +4597,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     if (obj->in_room > DC::NOWHERE)
     {
       // it's an obj in a room.  If it's not a corpse, don't id it
-      if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1)
+      if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->flags_.value[3] != 1)
       {
         ch->sendln("Your magical probing reveals nothing of interest.");
         return ReturnValue::eSUCCESS;
@@ -4610,7 +4610,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
         if (!CAN_SEE_OBJ(ch, iobj))
           continue;
         ch->send(iobj->short_description);
-        if (isSet(iobj->obj_flags.more_flags, ITEM_NO_TRADE))
+        if (isSet(iobj->flags_.more_flags, ITEM_NO_TRADE))
         {
           ch->send(" $BNO_TRADE$R");
           show_obj_class_size_mini(iobj, ch);
@@ -4619,7 +4619,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       }
       return ReturnValue::eSUCCESS;
     }
-    if (isSet(obj->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
+    if (isSet(obj->flags_.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
       ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return ReturnValue::eFAILURE;
@@ -4634,19 +4634,19 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     ch->send(buf);
 
     ch->send("Item is: ");
-    sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
-    sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
+    sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf);
+    sprintbit(obj->flags_.more_flags, Object::more_obj_bits, buf2);
     dc_strcat(buf, " ");
     dc_strcat(buf, buf2);
     dc_strcat(buf, "\r\n");
     ch->send(buf);
 
     ch->send("Worn by: ");
-    sprintbit(obj->obj_flags.size, Object::size_bits, buf);
+    sprintbit(obj->flags_.size, Object::size_bits, buf);
     dc_strcat(buf, "\r\n");
     ch->send(buf);
 
-    dc_sprintf(buf, "Weight: %d, Value: %d, Level: %llu\r\n", obj->obj_flags.weight, obj->obj_flags.cost, obj->obj_flags.eq_level);
+    dc_sprintf(buf, "Weight: %d, Value: %d, Level: %llu\r\n", obj->flags_.weight, obj->flags_.cost, obj->flags_.eq_level);
     ch->send(buf);
 
     switch (GET_ITEM_TYPE(obj))
@@ -4654,23 +4654,23 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     case ITEM_SCROLL:
     case ITEM_POTION:
-      dc_sprintf(buf, "Level %d spells of:\r\n", obj->obj_flags.value[0]);
+      dc_sprintf(buf, "Level %d spells of:\r\n", obj->flags_.value[0]);
       ch->send(buf);
-      if (obj->obj_flags.value[1] >= 1)
+      if (obj->flags_.value[1] >= 1)
       {
-        sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
+        sprinttype(obj->flags_.value[1] - 1, spells, buf);
         dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
-      if (obj->obj_flags.value[2] >= 1)
+      if (obj->flags_.value[2] >= 1)
       {
-        sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
+        sprinttype(obj->flags_.value[2] - 1, spells, buf);
         dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
-      if (obj->obj_flags.value[3] >= 1)
+      if (obj->flags_.value[3] >= 1)
       {
-        sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
+        sprinttype(obj->flags_.value[3] - 1, spells, buf);
         dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
@@ -4679,16 +4679,16 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     case ITEM_WAND:
     case ITEM_STAFF:
       dc_sprintf(buf, "Has %d charges, with %d charges left.\r\n",
-                 obj->obj_flags.value[1],
-                 obj->obj_flags.value[2]);
+                 obj->flags_.value[1],
+                 obj->flags_.value[2]);
       ch->send(buf);
 
-      dc_sprintf(buf, "Level %d spell of:\r\n", obj->obj_flags.value[0]);
+      dc_sprintf(buf, "Level %d spell of:\r\n", obj->flags_.value[0]);
       ch->send(buf);
 
-      if (obj->obj_flags.value[3] >= 1)
+      if (obj->flags_.value[3] >= 1)
       {
-        sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
+        sprinttype(obj->flags_.value[3] - 1, spells, buf);
         dc_strcat(buf, "\r\n");
         ch->send(buf);
       }
@@ -4696,47 +4696,47 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     case ITEM_WEAPON:
       dc_sprintf(buf, "Damage Dice are '%dD%d'\r\n",
-                 obj->obj_flags.value[1],
-                 obj->obj_flags.value[2]);
+                 obj->flags_.value[1],
+                 obj->flags_.value[2]);
       ch->send(buf);
       break;
 
     case ITEM_INSTRUMENT:
       dc_sprintf(buf, "Affects non-combat singing by '%d'\r\nAffects combat singing by '%d'\r\n",
-                 obj->obj_flags.value[0],
-                 obj->obj_flags.value[1]);
+                 obj->flags_.value[0],
+                 obj->flags_.value[1]);
       ch->send(buf);
       break;
 
     case ITEM_MISSILE:
       dc_sprintf(buf, "Damage Dice are '%dD%d'\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
-                 obj->obj_flags.value[0],
-                 obj->obj_flags.value[1],
-                 obj->obj_flags.value[2],
-                 obj->obj_flags.value[3]);
+                 obj->flags_.value[0],
+                 obj->flags_.value[1],
+                 obj->flags_.value[2],
+                 obj->flags_.value[3]);
       ch->send(buf);
       break;
 
     case ITEM_FIREWEAPON:
       dc_sprintf(buf, "Bow is +%d to arrow hit and +%d to arrow damage.\r\n",
-                 obj->obj_flags.value[0],
-                 obj->obj_flags.value[1]);
+                 obj->flags_.value[0],
+                 obj->flags_.value[1]);
       ch->send(buf);
       break;
 
     case ITEM_ARMOR:
 
-      if (isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+      if (isSet(obj->flags_.extra_flags, ITEM_ENCHANTED))
       {
-        value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
+        value = (obj->flags_.value[0]) - (obj->flags_.value[1]);
       }
       else
       {
-        value = obj->obj_flags.value[0];
+        value = obj->flags_.value[0];
       }
 
       dc_sprintf(buf, "AC-apply is %d     Resistance to damage is %d\r\n",
-                 value, obj->obj_flags.value[2]);
+                 value, obj->flags_.value[2]);
       ch->send(buf);
       break;
     }
@@ -4842,9 +4842,9 @@ qint32 spell_frost_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if(!saves_spell(ch, victim, SAVING_BREATH) )
     {
       for(frozen=victim->carrying ;
-      frozen && !(((frozen->obj_flags.type_flag==ITEM_DRINKCON) ||
-        (frozen->obj_flags.type_flag==ITEM_FOOD) ||
-        (frozen->obj_flags.type_flag==ITEM_POTION)) &&
+      frozen && !(((frozen->flags_.type_flag==ITEM_DRINKCON) ||
+        (frozen->flags_.type_flag==ITEM_FOOD) ||
+        (frozen->flags_.type_flag==ITEM_POTION)) &&
         (ch->dc_->number(0,2)==0)) ;
       frozen=frozen->next_content);
       if(frozen)
@@ -4892,16 +4892,16 @@ qint32 spell_acid_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
     {
       for(damaged = {}; damaged<MAX_WEAR &&
       !((victim->equipment[damaged]) &&
-       (victim->equipment[damaged]->obj_flags.type_flag!=ITEM_ARMOR) &&
-       (victim->equipment[damaged]->obj_flags.value[0]>0) &&
+       (victim->equipment[damaged]->flags_.type_flag!=ITEM_ARMOR) &&
+       (victim->equipment[damaged]->flags_.value[0]>0) &&
        (ch->dc_->number(0,2)==0)) ; damaged++);
       if(damaged<MAX_WEAR)
     {
       act("$o is damaged.",victim,victim->equipment[damaged],0,TO_CHAR,0);
       GET_AC(victim)-=apply_ac(victim,damaged);
-      victim->equipment[damaged]->obj_flags.value[0]-=number(1,7);
+      victim->equipment[damaged]->flags_.value[0]-=number(1,7);
       GET_AC(victim)+=apply_ac(victim,damaged);
-      victim->equipment[damaged]->obj_flags.cost = {};
+      victim->equipment[damaged]->flags_.cost = {};
     }
     }
      }
@@ -5135,7 +5135,7 @@ qint32 spell_refresh(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
 qint32 spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  affected_type *cur_af;
+  affected_typePtr cur_af;
 
   if (!ch || !victim)
   {
@@ -5178,7 +5178,7 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (obj)
   {
-    if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
+    if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
     {
       ch->sendln("That item is already glowing with magical light.");
       return ReturnValue::eFAILURE;
@@ -5193,7 +5193,7 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
       ch->sendln("Only earrings, rings, and shields can be magically lit in such a way.");
       return ReturnValue::eFAILURE;
     }
-    SET_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
+    SET_BIT(obj->flags_.extra_flags, ITEM_GLOW);
     act_to_room("$n twiddles $s thumbs and the $p $e is carrying begins to glow.", ch, obj, 0, INVIS_NULL);
     act_to_character("You twiddle your thumbs and the $p begins to glow.", ch, obj, 0, 0);
     return ReturnValue::eSUCCESS;
@@ -5231,7 +5231,7 @@ qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   }
 
   // check to see if its an eligible corpse
-  if ((GET_ITEM_TYPE(corpse) != ITEM_CONTAINER) || !corpse->obj_flags.value[3] || isexact("pc", corpse->name()))
+  if ((GET_ITEM_TYPE(corpse) != ITEM_CONTAINER) || !corpse->flags_.value[3] || isexact("pc", corpse->name()))
   {
     act("$p shudders for a second, then lies still.", ch, corpse, 0,
         TO_CHAR, 0);
@@ -5397,15 +5397,15 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
         ch->sendln("You can't dispel that!");
         return ReturnValue::eFAILURE;
       }
-      if (isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+      if (isSet(obj->flags_.extra_flags, ITEM_INVISIBLE))
       {
-        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
+        REMOVE_BIT(obj->flags_.extra_flags, ITEM_INVISIBLE);
         ch->sendln("You remove the item's invisibility.");
         return ReturnValue::eSUCCESS;
       }
-      else if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
+      else if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
       {
-        REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_GLOW);
+        REMOVE_BIT(obj->flags_.extra_flags, ITEM_GLOW);
         ch->sendln("You remove the item's $Bglowing$R aura.");
         return ReturnValue::eSUCCESS;
       }
@@ -6320,7 +6320,7 @@ qint32 spell_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 qint32 spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  affected_type *cur_af;
+  affected_typePtr cur_af;
   qint32 retval;
   qint32 duration = 0, str = 0, con = {};
   void check_weapon_weights(CharacterPtr ch);
@@ -6538,11 +6538,11 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
   vict_portal->long_description = u"An extradimensional portal shimmers in "_s
                                                  "the air before you.");
 
-  ch_portal->obj_flags.type_flag = ITEM_PORTAL;
-  vict_portal->obj_flags.type_flag = ITEM_PORTAL;
+  ch_portal->flags_.type_flag = ITEM_PORTAL;
+  vict_portal->flags_.type_flag = ITEM_PORTAL;
 
-  ch_portal->obj_flags.timer = 2;
-  vict_portal->obj_flags.timer = 2;
+  ch_portal->flags_.timer = 2;
+  vict_portal->flags_.timer = 2;
 
   chance = ((vict->getLevel() * 2) - ch->getLevel());
 
@@ -7658,7 +7658,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (tar_obj)
     { /* It's an object */
-      if (isSet(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
+      if (isSet(tar_obj->flags_.extra_flags, ITEM_BLESS))
       {
         ch->sendln("Nothing seems to happen.");
         return ReturnValue::eFAILURE;
@@ -7730,7 +7730,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SCROLL:
     if (tar_obj)
     { /* It's an object */
-      if (isSet(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
+      if (isSet(tar_obj->flags_.extra_flags, ITEM_BLESS))
       {
         ch->sendln("Nothing seems to happen.");
         return ReturnValue::eFAILURE;
@@ -7754,7 +7754,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_WAND:
     if (tar_obj)
     { /* It's an object */
-      if (isSet(tar_obj->obj_flags.extra_flags, ITEM_BLESS))
+      if (isSet(tar_obj->flags_.extra_flags, ITEM_BLESS))
       {
         ch->sendln("Nothing seems to happen.");
         return ReturnValue::eFAILURE;
@@ -7990,7 +7990,7 @@ qint32 cast_create_water(quint8 level, CharacterPtr ch, QString arg, qint32 type
   switch (type)
   {
   case SPELL_TYPE_SPELL:
-    if (tar_obj->obj_flags.type_flag != ITEM_DRINKCON)
+    if (tar_obj->flags_.type_flag != ITEM_DRINKCON)
     {
       ch->sendln("It is unable to hold water.");
       return ReturnValue::eFAILURE;
@@ -8933,7 +8933,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
   case SPELL_TYPE_SPELL:
     if (tar_obj)
     {
-      if (isSet(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+      if (isSet(tar_obj->flags_.extra_flags, ITEM_INVISIBLE))
         ch->sendln("Nothing new seems to happen.");
       else
         return spell_invisibility(level, ch, 0, tar_obj, skill);
@@ -8949,7 +8949,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
   case SPELL_TYPE_SCROLL:
     if (tar_obj)
     {
-      if (!(isSet(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE)))
+      if (!(isSet(tar_obj->flags_.extra_flags, ITEM_INVISIBLE)))
         return spell_invisibility(level, ch, 0, tar_obj, skill);
     }
     else
@@ -8963,7 +8963,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
   case SPELL_TYPE_WAND:
     if (tar_obj)
     {
-      if (!(isSet(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE)))
+      if (!(isSet(tar_obj->flags_.extra_flags, ITEM_INVISIBLE)))
         return spell_invisibility(level, ch, 0, tar_obj, skill);
     }
     else
@@ -13191,7 +13191,7 @@ qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 qint32 spell_water_breathing(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  affected_type *cur_af;
+  affected_typePtr cur_af;
 
   if ((cur_af = victim->affected_by_spell(SPELL_WATER_BREATHING)))
     affect_remove(victim, cur_af, SUPPRESS_ALL);
@@ -13290,15 +13290,15 @@ qint32 spell_globe_of_darkness(quint8 level, CharacterPtr ch, CharacterPtr victi
     return ReturnValue::eFAILURE;
   }
 
-  globe->obj_flags.value[0] = dur;
-  globe->obj_flags.value[1] = mod;
+  globe->flags_.value[0] = dur;
+  globe->flags_.value[1] = mod;
 
   act("$n's hand blurs, causing $B$0darkness$R to quickly expand and expunge light from the entire area.",
       ch, 0, 0, TO_ROOM, 0);
   ch->sendln("Your summoned $B$0darkness$R turns the area pitch black.");
 
   obj_to_room(globe, ch->in_room);
-  dc_->world[ch->in_room].light -= globe->obj_flags.value[1];
+  dc_->world[ch->in_room].light -= globe->flags_.value[1];
 
   return ReturnValue::eSUCCESS;
 }
@@ -14461,9 +14461,9 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
   ObjectPtr obj;
   for (obj = ch->carrying; obj; obj = obj->next_content)
   {
-    if (obj->obj_flags.type_flag == ITEM_DRINKCON &&
-        obj->obj_flags.value[2] == liquid &&
-        obj->obj_flags.value[1] >= 5)
+    if (obj->flags_.type_flag == ITEM_DRINKCON &&
+        obj->flags_.value[2] == liquid &&
+        obj->flags_.value[1] >= 5)
       break;
   }
   if (obj == nullptr)
@@ -14481,7 +14481,7 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
   }
   else
   {
-    obj->obj_flags.value[1] -= 5;
+    obj->flags_.value[1] -= 5;
   }
 
   switch (virt)
@@ -14735,7 +14735,7 @@ qint32 spell_silence(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
     return ReturnValue::eFAILURE;
   }
 
-  silence_obj->obj_flags.value[0] = skill / 20 + 1;
+  silence_obj->flags_.value[0] = skill / 20 + 1;
 
   obj_to_room(silence_obj, ch->in_room);
 
@@ -15361,7 +15361,7 @@ qint32 spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   if (!number(0, 49))
     add_obj_affect(ssobj, APPLY_SANCTUARY, 100);
 
-  ssobj->obj_flags.timer = 4 + skill / 5;
+  ssobj->flags_.timer = 4 + skill / 5;
 
   ch->equip_char(ssobj, WEAR_SHIELD);
 
@@ -15520,12 +15520,12 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
         }
       }
     }
-    if (component->obj_flags.value[1] <= 0)
+    if (component->flags_.value[1] <= 0)
     {
       ch->sendln("There is nothing left in the container.");
       return ReturnValue::eFAILURE;
     }
-    if (component->obj_flags.value[2] != 13 && component->obj_flags.value[2] != 17)
+    if (component->flags_.value[2] != 13 && component->flags_.value[2] != 17)
     {
       ch->sendln("You do not have the required components,");
       return ReturnValue::eFAILURE;
@@ -15561,18 +15561,18 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if ((cItem = get_obj_in_list("consecrateitem", dc_->world[ch->in_room].contents)))
   {
-    if (ch == ((CharacterPtr)(cItem->obj_flags.origin)) && spl == SPELL_CONSECRATE)
+    if (ch == ((CharacterPtr)(cItem->flags_.origin)) && spl == SPELL_CONSECRATE)
     {
       ch->sendln("You have already consecrated the ground here!");
       return ReturnValue::eSUCCESS;
     }
 
-    if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
+    if (cItem->flags_.value[0] == SPELL_DESECRATE)
     {
       ch->send("A foul taint prevents you from consecrating the ground here!");
       return ReturnValue::eSUCCESS;
     }
-    if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
+    if (cItem->flags_.value[0] == SPELL_CONSECRATE)
     {
       ch->send("The ground here has already been consecrated!");
       return ReturnValue::eSUCCESS;
@@ -15581,7 +15581,7 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (IS_MORTAL(ch))
   {
-    component->obj_flags.value[1]--;
+    component->flags_.value[1]--;
     ch->decrementMove(100);
   }
 
@@ -15612,11 +15612,11 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     ch->sendln("Consecrate item doesn't exist. Tell an imm.");
     return ReturnValue::eFAILURE;
   }
-  cItem->obj_flags.value[0] = spl;
-  cItem->obj_flags.value[1] = 2 + skill / 50;
-  cItem->obj_flags.value[2] = skill;
-  cItem->obj_flags.value[3] = {};
-  cItem->obj_flags.origin = ch;
+  cItem->flags_.value[0] = spl;
+  cItem->flags_.value[1] = 2 + skill / 50;
+  cItem->flags_.value[2] = skill;
+  cItem->flags_.value[3] = {};
+  cItem->flags_.origin = ch;
 
   obj_to_room(cItem, ch->in_room);
 
@@ -15678,13 +15678,13 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
       }
     }
 
-    if (component->obj_flags.value[1] <= 0)
+    if (component->flags_.value[1] <= 0)
     {
       ch->sendln("There is nothing left in the container.");
       return ReturnValue::eFAILURE;
     }
 
-    if (component->obj_flags.value[2] != 13 && component->obj_flags.value[2] != 17)
+    if (component->flags_.value[2] != 13 && component->flags_.value[2] != 17)
     {
       ch->sendln("You do not have the required components,");
       return ReturnValue::eFAILURE;
@@ -15725,18 +15725,18 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   ObjectPtr cItem = {};
   if ((cItem = get_obj_in_list("consecrateitem", dc_->world[ch->in_room].contents)))
   {
-    if (ch == ((CharacterPtr)(cItem->obj_flags.origin)))
+    if (ch == ((CharacterPtr)(cItem->flags_.origin)))
     {
       ch->sendln("You have already desecrated the ground here!");
       return ReturnValue::eSUCCESS;
     }
 
-    if (cItem->obj_flags.value[0] == SPELL_CONSECRATE)
+    if (cItem->flags_.value[0] == SPELL_CONSECRATE)
     {
       ch->send("A powerful aura of goodness prevents you from desecrating the ground here!");
       return ReturnValue::eSUCCESS;
     }
-    if (cItem->obj_flags.value[0] == SPELL_DESECRATE)
+    if (cItem->flags_.value[0] == SPELL_DESECRATE)
     {
       ch->send("The ground here has already been desecrated!");
       return ReturnValue::eSUCCESS;
@@ -15745,7 +15745,7 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (IS_MORTAL(ch))
   {
-    component->obj_flags.value[1]--;
+    component->flags_.value[1]--;
     ch->decrementMove(100);
   }
 
@@ -15773,11 +15773,11 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   dc_sprintf(buf, "%s",
              "A circle of ominously humming blood runes are etched upon the ground here.");
   cItem->long_description = buf;
-  cItem->obj_flags.value[0] = spl;
-  cItem->obj_flags.value[1] = 2 + skill / 50;
-  cItem->obj_flags.value[2] = skill;
-  cItem->obj_flags.value[3] = {};
-  cItem->obj_flags.origin = ch;
+  cItem->flags_.value[0] = spl;
+  cItem->flags_.value[1] = 2 + skill / 50;
+  cItem->flags_.value[2] = skill;
+  cItem->flags_.value[3] = {};
+  cItem->flags_.origin = ch;
 
   obj_to_room(cItem, ch->in_room);
 

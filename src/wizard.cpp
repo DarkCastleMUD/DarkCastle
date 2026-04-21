@@ -112,7 +112,7 @@ obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
       randomize_object(obj);
     }
 
-    if (obj->obj_flags.type_flag == ITEM_MONEY && !ch->isImplementerPlayer())
+    if (obj->flags_.type_flag == ITEM_MONEY && !ch->isImplementerPlayer())
     {
       extract_obj(obj);
       ch->send("Denied.\r\n");
@@ -159,7 +159,7 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
       randomize_object(obj);
     }
 
-    if ((obj->obj_flags.type_flag == ITEM_MONEY) &&
+    if ((obj->flags_.type_flag == ITEM_MONEY) &&
         (ch->getLevel() < IMPLEMENTER))
     {
       extract_obj(obj);
@@ -214,7 +214,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   QString buf3;
   follow_type *fol;
   ObjectPtr j = {};
-  affected_type *aff;
+  affected_typePtr aff;
 
   sprinttype(k->c_class, pc_clss_types, buf2);
   dc_sprintf(buf, "$R(:)========================================================================(:)\r\n"
@@ -514,7 +514,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   qint32 i2;
   QString buf2;
   ObjectPtr j = {};
-  affected_type *aff;
+  affected_typePtr aff;
 
   if (k->isNonPlayer())
   {
@@ -899,14 +899,14 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   QString buf2;
   QString buf3;
   QString buf4;
-  extra_descr_data *desc;
+  ExtraDescriptionPtr desc;
   bool found;
   qint32 i, virt;
 
   qint32 its;
 
   /*
-    if(isSet(j->obj_flags.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
+    if(isSet(j->flags_.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
       ch->sendln("A magical aura around the item attempts to conceal its secrets.");
       return;
@@ -943,30 +943,30 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     ch->send(buf);
   }
   ch->send("$3Can be worn on$R:");
-  sprintbit(j->obj_flags.wear_flags, QFlagsToStrings<ObjectPositions>(), buf);
+  sprintbit(j->flags_.wear_flags, QFlagsToStrings<ObjectPositions>(), buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Can be worn by$R:");
-  sprintbit(j->obj_flags.size, Object::size_bits, buf);
+  sprintbit(j->flags_.size, Object::size_bits, buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Extra flags$R: ");
-  sprintbit(j->obj_flags.extra_flags, Object::extra_bits, buf);
+  sprintbit(j->flags_.extra_flags, Object::extra_bits, buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3More flags$R: ");
-  sprintbit(j->obj_flags.more_flags, Object::more_obj_bits, buf);
+  sprintbit(j->flags_.more_flags, Object::more_obj_bits, buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
   dc_sprintf(buf, "$3Weight$R: %d  $3Value$R: %d  $3Timer$R: %d  $3Eq Level$R: %llu\r\n",
-             j->obj_flags.weight,
-             j->obj_flags.cost,
-             j->obj_flags.timer,
-             j->obj_flags.eq_level);
+             j->flags_.weight,
+             j->flags_.cost,
+             j->flags_.timer,
+             j->flags_.eq_level);
   ch->send(buf);
 
   dc_strcpy(buf, "$3In room$R: ");
@@ -984,155 +984,155 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
-  switch (j->obj_flags.type_flag)
+  switch (j->flags_.type_flag)
   {
   case ITEM_LIGHT:
     dc_sprintf(buf, "$3Colour (v1)$R: %d\r\n"
                     "$3Type   (v2)$R: %d\r\n"
                     "$3Hours  (v3)$R: %d\r\n"
                     "$3Unused (v4)$R: %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3]);
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3]);
     break;
   case ITEM_SCROLL:
-    sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
-    sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
-    sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
+    sprinttype(j->flags_.value[1] - 1, spells, buf2);
+    sprinttype(j->flags_.value[2] - 1, spells, buf3);
+    sprinttype(j->flags_.value[3] - 1, spells, buf4);
     dc_sprintf(buf, "$3Level(v1)$R  : %d\r\n"
                     " $3Spells(v2)$R: %d (%s)\r\n"
                     " $3Spells(v3)$R: %d (%s)\r\n"
                     " $3Spells(v4)$R: %d (%s)",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1], buf2,
-               j->obj_flags.value[2], buf3,
-               j->obj_flags.value[3], buf4);
+               j->flags_.value[0],
+               j->flags_.value[1], buf2,
+               j->flags_.value[2], buf3,
+               j->flags_.value[3], buf4);
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
-    sprinttype(j->obj_flags.value[3] - 1, spells, buf2);
+    sprinttype(j->flags_.value[3] - 1, spells, buf2);
     dc_sprintf(buf, "$3Level(v1)$R: %d  $3Spell(v4)$R: %d - %s\r\n"
                     "$3Total Charges(v2)$R: %d   $3Current Charges(v3)$R: %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[3],
+               j->flags_.value[0],
+               j->flags_.value[3],
                buf2,
-               j->obj_flags.value[1],
-               j->obj_flags.value[2]);
+               j->flags_.value[1],
+               j->flags_.value[2]);
     break;
   case ITEM_WEAPON:
     qint32 get_weapon_damage_type(ObjectPtr wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern QStringList strs_damage_types;
     dc_sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3],
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3],
                strs_damage_types[its]);
     break;
   case ITEM_MEGAPHONE:
-    dc_sprintf(buf, "Interval(v1): %d\r\nInterval, again(v2): %d", j->obj_flags.value[0], j->obj_flags.value[1]);
+    dc_sprintf(buf, "Interval(v1): %d\r\nInterval, again(v2): %d", j->flags_.value[0], j->flags_.value[1]);
     break;
   case ITEM_FIREWEAPON:
     dc_sprintf(buf, "$3Tohit(v1)$R: %d\r\n$3Todam(v2)d<v3)$R: %dD%d\r\n$3Type(v4)$R: %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3]);
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3]);
     break;
   case ITEM_MISSILE:
     dc_sprintf(buf, "$3Damage(v1dv2)$R: %d$3/$R%d\r\n$3Tohit(v3)$R: %d\r\n$3Todam(v4)$R: %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[3],
-               j->obj_flags.value[2]);
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[3],
+               j->flags_.value[2]);
     break;
   case ITEM_ARMOR:
     dc_sprintf(buf, "$3AC-apply(v1)$R: [%d]\r\n"
                     "$3Unused  (v2)$R: [%d] (make 0)\r\n"
                     "$3Unused  (v3)$R: [%d] (make 0)\r\n"
                     "$3Unused  (v4)$R: [%d] (make 0)",
-               j->obj_flags.value[0], j->obj_flags.value[1], j->obj_flags.value[2], j->obj_flags.value[3]);
+               j->flags_.value[0], j->flags_.value[1], j->flags_.value[2], j->flags_.value[3]);
     break;
   case ITEM_POTION:
-    sprinttype(j->obj_flags.value[1] - 1, spells, buf2);
-    sprinttype(j->obj_flags.value[2] - 1, spells, buf3);
-    sprinttype(j->obj_flags.value[3] - 1, spells, buf4);
+    sprinttype(j->flags_.value[1] - 1, spells, buf2);
+    sprinttype(j->flags_.value[2] - 1, spells, buf3);
+    sprinttype(j->flags_.value[3] - 1, spells, buf4);
     dc_sprintf(buf, "$3Level (v1)$R: %d\r\n"
                     " $3Spell(v2)$R: %d (%s)\r\n"
                     " $3Spell(v3)$R: %d (%s)\r\n"
                     " $3Spell(v4)$R: %d (%s)",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1], buf2,
-               j->obj_flags.value[2], buf3,
-               j->obj_flags.value[3], buf4);
+               j->flags_.value[0],
+               j->flags_.value[1], buf2,
+               j->flags_.value[2], buf3,
+               j->flags_.value[3], buf4);
     break;
   case ITEM_TRAP:
     dc_sprintf(buf, "$3Spell(v1)$R    : %d\r\n"
                     "$3Hitpoints(v2)$R: %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1]);
+               j->flags_.value[0],
+               j->flags_.value[1]);
     break;
   case ITEM_CONTAINER:
     dc_sprintf(buf, "$3Max-contains(v1)$R : %d\r\n"
                     "$3Locktype(v2)$R     : %d\r\n"
                     "$3Key #$R            : %d\r\n"
                     "$3Corpse(v4)$R       : %s",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3] ? "Yes" : "No");
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3] ? "Yes" : "No");
     break;
   case ITEM_DRINKCON:
-    sprinttype(j->obj_flags.value[2], drinks, buf2);
-    //  dc_strcpy(buf2,drinks[j->obj_flags.value[2]]);
+    sprinttype(j->flags_.value[2], drinks, buf2);
+    //  dc_strcpy(buf2,drinks[j->flags_.value[2]]);
     dc_sprintf(buf, "$3Max-contains(v1)$R: %d\r\n"
                     "$3Contains    (v2)$R: %d\r\n"
                     "$3Liquid      (v3)$R: %s (%d)\r\n"
                     "$3Poisoned    (v4)$R: %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
+               j->flags_.value[0],
+               j->flags_.value[1],
                buf2,
-               j->obj_flags.value[2],
-               j->obj_flags.value[3]);
+               j->flags_.value[2],
+               j->flags_.value[3]);
     break;
   case ITEM_NOTE:
     dc_sprintf(buf, "$3Tounge(v1)$R : %d"
                     "$3Unused(v2)$R : %d"
                     "$3Unused(v3)$R : %d"
                     "$3Unused(v4)$R : %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3]);
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3]);
     break;
   case ITEM_UTILITY:
     dc_sprintf(buf2, "$3Utility Type(v1)$R : %d (%s)\r\n",
-               j->obj_flags.value[0],
-               j->obj_flags.value[0] >= 0 && j->obj_flags.value[0] <= UTILITY_ITEM_MAX ? utility_item_types[j->obj_flags.value[0]] : "INVALID TYPE");
-    if (j->obj_flags.value[0] == UTILITY_CATSTINK)
+               j->flags_.value[0],
+               j->flags_.value[0] >= 0 && j->flags_.value[0] <= UTILITY_ITEM_MAX ? utility_item_types[j->flags_.value[0]] : "INVALID TYPE");
+    if (j->flags_.value[0] == UTILITY_CATSTINK)
     {
       dc_sprintf(buf, "%s"
                       "$3Sector(v2)$R : %d (%s)\r\n"
                       "$3Unused(v3)$R : %d "
                       "$3HowMuchLag(v4)$R : %d",
                  buf2,
-                 j->obj_flags.value[1],
-                 j->obj_flags.value[1] >= 0 && j->obj_flags.value[1] <= SECT_MAX_SECT ? sector_types[j->obj_flags.value[1]] : "INVALID SECTOR TYPE",
-                 j->obj_flags.value[2],
-                 j->obj_flags.value[3]);
+                 j->flags_.value[1],
+                 j->flags_.value[1] >= 0 && j->flags_.value[1] <= SECT_MAX_SECT ? sector_types[j->flags_.value[1]] : "INVALID SECTOR TYPE",
+                 j->flags_.value[2],
+                 j->flags_.value[3]);
     }
-    else if (j->obj_flags.value[0] == UTILITY_MORTAR)
+    else if (j->flags_.value[0] == UTILITY_MORTAR)
     {
       dc_sprintf(buf, "%s"
                       "$3NumDice(v2)$R : %d "
                       "$3DiceSize (v3)$R : %d "
                       "$3HowMuchLag(v4)$R : %d ",
                  buf2,
-                 j->obj_flags.value[1],
-                 j->obj_flags.value[2],
-                 j->obj_flags.value[3]);
+                 j->flags_.value[1],
+                 j->flags_.value[2],
+                 j->flags_.value[3]);
     }
     else
     {
@@ -1141,9 +1141,9 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
                       "$3Unused(v3)$R : %d "
                       "$3HowMuchLag(v4)$R : %d",
                  buf2,
-                 j->obj_flags.value[1],
-                 j->obj_flags.value[2],
-                 j->obj_flags.value[3]);
+                 j->flags_.value[1],
+                 j->flags_.value[2],
+                 j->flags_.value[3]);
     }
     break;
   case ITEM_KEY:
@@ -1151,21 +1151,21 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
                     "$3Unused (v2)$R : %d"
                     "$3Unused (v3)$R : %d"
                     "$3Unused (v4)$R : %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3]);
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3]);
     break;
   case ITEM_FOOD:
     dc_sprintf(buf, "$3Makes full(v1)$R : %d\r\n"
                     "$3Poisoned  (v4)$R : %d",
-               j->obj_flags.value[0],
-               j->obj_flags.value[3]);
+               j->flags_.value[0],
+               j->flags_.value[3]);
     break;
   case ITEM_INSTRUMENT:
     dc_sprintf(buf, "$3Song Effect$R:  $3Non-Combat(v1)$R[%d] $3Combat(v2)$R[%d]",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1]);
+               j->flags_.value[0],
+               j->flags_.value[1]);
     break;
   case ITEM_PORTAL:
     dc_sprintf(buf, "$3ToRoom (v1)$R : %lu\r\n"
@@ -1195,18 +1195,18 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     dc_sprintf(buf2, "(can be 0-4)\r\n"
                      "$3Zone   (v3)$R : %d (can 'leave' anywhere from this zone (set to -1 otherwise))\r\n"
                      "$3Flags  (v4)$R : ",
-               j->obj_flags.value[2]);
+               j->flags_.value[2]);
     dc_strcat(buf, buf2);
-    sprintbit(j->obj_flags.value[3], portal_bits, buf2);
+    sprintbit(j->flags_.value[3], portal_bits, buf2);
     dc_strcat(buf, buf2);
     dc_strcat(buf, "\n(0 = nobits, 1 = no_leave, 2 = no_enter)");
     break;
   default:
     dc_sprintf(buf, "Values 0-3 : [%d] [%d] [%d] [%d]",
-               j->obj_flags.value[0],
-               j->obj_flags.value[1],
-               j->obj_flags.value[2],
-               j->obj_flags.value[3]);
+               j->flags_.value[0],
+               j->flags_.value[1],
+               j->flags_.value[2],
+               j->flags_.value[3]);
     break;
   }
   ch->send(buf);
@@ -1874,11 +1874,11 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
           dc_sprintf(buf, "## %s turned into %s!\r\n",
                      qPrintable(obj->short_description()), oitem->short_description);
           send_info(buf);
-          if (isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
+          if (isSet(oitem->flags_.more_flags, ITEM_UNIQUE))
           {
             if (search_char_for_item(ch, oitem->item_number, false))
             {
-              if (isSet(oitem->obj_flags.more_flags, ITEM_24H_SAVE))
+              if (isSet(oitem->flags_.more_flags, ITEM_24H_SAVE))
               {
                 ch->sendln("You already have this item - Timer has been reset!");
                 extract_obj(oitem);
@@ -1913,7 +1913,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
       case 27916:
       case 27917:
       case 27918:
-        gold = obj->obj_flags.value[0];
+        gold = obj->flags_.value[0];
         dc_sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
                    qPrintable(obj->short_description()), gold);
         ch->send(buf);

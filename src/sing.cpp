@@ -249,8 +249,8 @@ void get_instrument_bonus(CharacterPtr ch, qint32 &comb, qint32 &non_comb)
   if (GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT)
     return;
 
-  comb = ch->equipment[WEAR_HOLD]->obj_flags.value[1];
-  non_comb = ch->equipment[WEAR_HOLD]->obj_flags.value[0];
+  comb = ch->equipment[WEAR_HOLD]->flags_.value[1];
+  non_comb = ch->equipment[WEAR_HOLD]->flags_.value[0];
 }
 
 command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
@@ -1271,7 +1271,7 @@ qint32 execute_song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg
   obj = get_obj_in_list((*i).song_data, ch->carrying);
   vict = ch->get_char_room_vis((*i).song_data);
   corpse = get_obj_in_list_vis(ch, (*i).song_data, dc_->world[ch->in_room].contents);
-  if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
+  if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->flags_.value[3] != 1))
     corpse = {};
 
   (*i).song_data = {};
@@ -1967,7 +1967,7 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
   obj_from_room(obj);
 
   // find it's match
-  if (!(tobj = get_obj_in_list("pcportal", dc_->world[real_room(obj->obj_flags.value[0])].contents)))
+  if (!(tobj = get_obj_in_list("pcportal", dc_->world[real_room(obj->flags_.value[0])].contents)))
   {
     ch->sendln("Could not find matching exit portal? Tell an Immortal.");
     return ReturnValue::eFAILURE;
@@ -2647,10 +2647,10 @@ qint32 execute_song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, Cha
   ObjectPtr item;
   for (item = dc_->world[ch->in_room].contents; item; item = item->next_content)
   {
-    if (GET_ITEM_TYPE(item) == ITEM_BEACON && isSet(item->obj_flags.extra_flags, ITEM_INVISIBLE))
+    if (GET_ITEM_TYPE(item) == ITEM_BEACON && isSet(item->flags_.extra_flags, ITEM_INVISIBLE))
     {
       ch->sendln("Your glitter reveals a beacon.");
-      REMOVE_BIT(item->obj_flags.extra_flags, ITEM_INVISIBLE);
+      REMOVE_BIT(item->flags_.extra_flags, ITEM_INVISIBLE);
     }
   }
 

@@ -29,7 +29,7 @@ bool isTimer(CharacterPtr ch, qint32 spell)
 }
 qint32 timerLeft(CharacterPtr ch, qint32 spell)
 {
-  affected_type *af = ch->affected_by_spell(BASE_TIMERS + spell);
+  affected_typePtr af = ch->affected_by_spell(BASE_TIMERS + spell);
   if (af == nullptr)
     return 0;
   else
@@ -228,7 +228,7 @@ qint32 get_max_stat(CharacterPtr ch, attribute_t stat)
 
 bool still_affected_by_poison(CharacterPtr ch)
 {
-  affected_type *af = ch->affected;
+  affected_typePtr af = ch->affected;
 
   while (af)
   {
@@ -1421,8 +1421,8 @@ void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool ad
 
 void affect_total(CharacterPtr ch)
 {
-  affected_type *af;
-  affected_type *tmp_af;
+  affected_typePtr af;
+  affected_typePtr tmp_af;
   qint32 i, j;
   bool already = ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
@@ -1466,10 +1466,10 @@ void affect_total(CharacterPtr ch)
 
 /* Insert an affect_type in a Character structure
  Automatically sets apropriate bits and apply's */
-void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type)
+void affect_to_char(CharacterPtr ch, affected_typePtr af, qint32 duration_type)
 {
   //    bool secFix;
-  affected_type *affected_alloc;
+  affected_typePtr affected_alloc;
   if (af->location >= 1000)
     return; // Skill aff;
 
@@ -1485,9 +1485,9 @@ void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type)
 /* Remove an affected_type structure from a character (called when duration
  reaches zero). Pointer *af must never be NIL! Frees mem and calls
  affect_location_apply                                                */
-void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
+void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
 {
-  affected_type *hjp;
+  affected_typePtr hjp;
   QString buf;
   short dir;
   bool char_died = false;
@@ -1524,7 +1524,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
     hjp->next = af->next; /* skip the af element */
   }
 
-  if (af->next && af->next != (affected_type *)0x95959595 && (af->next->type == af->type))
+  if (af->next && af->next != (affected_typePtr)0x95959595 && (af->next->type == af->type))
     flags = SUPPRESS_MESSAGES;
 
   switch (af->type)
@@ -1628,7 +1628,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
     ObjectPtr obj;
     obj = ch->equipment[WEAR_WIELD];
     if (obj)
-      if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
+      if (obj->flags_.extra_flags & ITEM_TWO_HANDED)
       {
         if ((obj = ch->equipment[WEAR_SECOND_WIELD]))
         {
@@ -1663,7 +1663,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
       }
     obj = ch->equipment[WEAR_SECOND_WIELD];
     if (obj)
-      if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
+      if (obj->flags_.extra_flags & ITEM_TWO_HANDED)
       {
         obj = ch->equipment[WEAR_WIELD];
         if (obj)
@@ -1954,7 +1954,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags)
 /* Call affect_remove with every spell of spelltype "skill" */
 void affect_from_char(CharacterPtr ch, qint32 skill, qint32 flags)
 {
-  affected_type *hjp, *afc, *recheck;
+  affected_typePtr hjp, *afc, *recheck;
   //    bool aff2Fix;
 
   if (skill < 0) // affect types are quint32, so no negatives are possible
@@ -1977,9 +1977,9 @@ void affect_from_char(CharacterPtr ch, qint32 skill, qint32 flags)
  * Return if a character is affected by a spell (SPELL_XXX), nullptr indicates
  * not affected.
  */
-affected_type *Character::affected_by_spell(quint32 skill)
+affected_typePtr Character::affected_by_spell(quint32 skill)
 {
-  affected_type *curr;
+  affected_typePtr curr;
 
   if (skill < 0) // all affect types are quint32
     return {};
@@ -1991,24 +1991,24 @@ affected_type *Character::affected_by_spell(quint32 skill)
   return {};
 }
 
-affected_type *affected_by_spell(CharacterPtr ch, quint32 skill)
+affected_typePtr affected_by_spell(CharacterPtr ch, quint32 skill)
 {
   return ch->affected_by_spell(skill);
 }
 
-affected_type *affected_by_random(CharacterPtr ch)
+affected_typePtr affected_by_random(CharacterPtr ch)
 {
   if (ch->affected == 0)
     return 0;
 
   // Count number of affects
   qint32 aff_cnt = {};
-  for (affected_type *curr = ch->affected; curr; curr = curr->next)
+  for (affected_typePtr curr = ch->affected; curr; curr = curr->next)
     aff_cnt++;
 
   qint32 j = 1;
   qint32 pick = dc_->number(1, aff_cnt);
-  for (affected_type *curr = ch->affected; curr; curr = curr->next)
+  for (affected_typePtr curr = ch->affected; curr; curr = curr->next)
   {
     if (j == pick)
       return curr;
@@ -2019,7 +2019,7 @@ affected_type *affected_by_random(CharacterPtr ch)
   return 0;
 }
 
-void affect_join(CharacterPtr ch, affected_type *af, bool avg_dur, bool avg_mod)
+void affect_join(CharacterPtr ch, affected_typePtr af, bool avg_dur, bool avg_mod)
 {
   bool found = false;
 
@@ -2245,13 +2245,13 @@ qint32 apply_ac(CharacterPtr ch, qint32 eq_pos)
   if (!(GET_ITEM_TYPE(ch->equipment[eq_pos]) == ITEM_ARMOR))
     return 0;
 
-  if (isSet(ch->equipment[eq_pos]->obj_flags.extra_flags, ITEM_ENCHANTED))
+  if (isSet(ch->equipment[eq_pos]->flags_.extra_flags, ITEM_ENCHANTED))
   {
-    value = (ch->equipment[eq_pos]->obj_flags.value[0]) - (ch->equipment[eq_pos]->obj_flags.value[1]);
+    value = (ch->equipment[eq_pos]->flags_.value[0]) - (ch->equipment[eq_pos]->flags_.value[1]);
   }
   else
   {
-    value = (ch->equipment[eq_pos]->obj_flags.value[0]);
+    value = (ch->equipment[eq_pos]->flags_.value[0]);
   }
 
   return value;
@@ -2300,7 +2300,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
 
   if (((IS_OBJ_STAT(obj, ITEM_ANTI_EVIL) && IS_EVIL(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_GOOD) && IS_GOOD(this)) || (IS_OBJ_STAT(obj, ITEM_ANTI_NEUTRAL) && IS_NEUTRAL(this))) && isPlayer())
   {
-    if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isPlayerObjectThief() || contains_no_trade_item(obj))
+    if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) || isPlayerObjectThief() || contains_no_trade_item(obj))
     {
       act_to_character("You are zapped by $p but it stays with you.", this, obj, 0, 0);
       recheck_height_wears();
@@ -2333,23 +2333,23 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
   {
     act_to_character("$p binds to your skin and won't let go. It hurts!", this, obj, 0, 0);
     act_to_room("$p binds to $n's skin!", this, obj, 0, 0);
-    obj->obj_flags.timer = {};
+    obj->flags_.timer = {};
   }
   if (dc_->obj_index[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, 0);
-    obj->obj_flags.timer = {};
+    obj->flags_.timer = {};
   }
   if (dc_->obj_index[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, 0);
-    obj->obj_flags.timer = {};
+    obj->flags_.timer = {};
   }
 
   if (dc_->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, 0);
-    obj->obj_flags.timer = 5;
+    obj->flags_.timer = 5;
   }
 
   equipment[pos] = obj;
@@ -2365,7 +2365,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
       }
     }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
+  if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
   {
     glow_factor++;
     if (in_room > DC::NOWHERE)
@@ -2377,7 +2377,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     //      act_to_room("The soft glow from $p brightens the area around $n.", this, obj, 0,  0);
     //      act_to_character("The soft glow from $p brightens the area around you.", this, obj, 0,  0);
   }
-  if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
+  if (obj->flags_.type_flag == ITEM_LIGHT && obj->flags_.value[2])
   {
     glow_factor++;
     if (in_room > DC::NOWHERE)
@@ -2422,7 +2422,7 @@ ObjectPtr Character::unequip_char(qint32 pos, bool flag)
   if (dc_->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The spring in your step has subsided.", this, obj, 0, 0);
-    obj->obj_flags.timer = {};
+    obj->flags_.timer = {};
   }
 
   if (GET_ITEM_TYPE(obj) == ITEM_ARMOR)
@@ -2469,7 +2469,7 @@ b: // ew
   equipment[pos] = {};
   obj->equipped_by = {};
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_GLOW))
+  if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
   {
     glow_factor--;
     if (in_room > DC::NOWHERE)
@@ -2479,7 +2479,7 @@ b: // ew
     //      act_to_room("The soft glow around $n from $p fades.", this, obj, 0,  0);
     //      act_to_character("The glow around you fades slightly.", this, obj, 0,  0);
   }
-  if (obj->obj_flags.type_flag == ITEM_LIGHT && obj->obj_flags.value[2])
+  if (obj->flags_.type_flag == ITEM_LIGHT && obj->flags_.value[2])
   {
     glow_factor--;
     if (in_room > DC::NOWHERE)
@@ -2822,7 +2822,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
 
   if ((contained_by = obj->in_obj))
   {
-    if ((IS_OBJ_STAT(contained_by, ITEM_PC_CORPSE) || IS_OBJ_STAT(contained_by, ITEM_PC_CORPSE_LOOTED)) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+    if ((IS_OBJ_STAT(contained_by, ITEM_PC_CORPSE) || IS_OBJ_STAT(contained_by, ITEM_PC_CORPSE_LOOTED)) && isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
     {
       if (obj->getOwner().isEmpty() && !contained_by->getOwner().isEmpty())
       {
@@ -2992,7 +2992,7 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
 
   if ((contained_by = obj->in_obj))
   {
-    if (obj->obj_flags.type_flag == ITEM_TOTEM && contained_by->obj_flags.type_flag == ITEM_ALTAR)
+    if (obj->flags_.type_flag == ITEM_TOTEM && contained_by->flags_.type_flag == ITEM_ALTAR)
       remove_totem(contained_by, obj);
 
     if (obj_from_obj(obj) == 0)
@@ -3008,11 +3008,11 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
   /* TODO - This doesn't work for some reason....need to find out why
 
    // This should make sure we don't have any money items on players
-   if(obj->obj_flags.type_flag == ITEM_MONEY &&
-   obj->obj_flags.value[0] >= 1 ) {
-   dc_sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
+   if(obj->flags_.type_flag == ITEM_MONEY &&
+   obj->flags_.value[0] >= 1 ) {
+   dc_sprintf(buffer,"There was %d coins.\r\n", obj->flags_.value[0]);
    send(buffer);
-   GET_GOLD(ch) += obj->obj_flags.value[0];
+   GET_GOLD(ch) += obj->flags_.value[0];
    extract_obj(obj);
    return 1;
    }
@@ -3068,10 +3068,10 @@ qint32 obj_to_char(ObjectPtr object, CharacterPtr ch)
 
   pick_up_item(ch, object);
 
-  if (ch->isPlayer() && object->isTotem() && !isSet(object->obj_flags.more_flags, ITEM_POOF_NEVER) && object->obj_flags.timer == 0)
+  if (ch->isPlayer() && object->isTotem() && !isSet(object->flags_.more_flags, ITEM_POOF_NEVER) && object->flags_.timer == 0)
   {
-    object->obj_flags.timer = 1440;
-    SET_BIT(object->obj_flags.more_flags, ITEM_POOF_AFTER_24H);
+    object->flags_.timer = 1440;
+    SET_BIT(object->flags_.more_flags, ITEM_POOF_AFTER_24H);
   }
 
   return 1;
@@ -3160,7 +3160,7 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
     for (obj = dc_->world[room].contents; obj; obj = obj->next_content)
       if (GET_ITEM_TYPE(obj) == ITEM_MONEY)
       {
-        object->obj_flags.value[0] += obj->obj_flags.value[0];
+        object->flags_.value[0] += obj->flags_.value[0];
         object->long_description = u"A pile of $B$5gold$R coins."_s;
         extract_obj(obj);
         break;
@@ -3454,8 +3454,8 @@ void extract_obj(ObjectPtr obj)
 
 void update_object(ObjectPtr obj, qint32 use)
 {
-  if (obj->obj_flags.timer > 0 && (dc_->obj_index[obj->item_number].vnum() != 30010 && dc_->obj_index[obj->item_number].vnum() != 30036 && dc_->obj_index[obj->item_number].vnum() != 30033 && dc_->obj_index[obj->item_number].vnum() != 30097 && dc_->obj_index[obj->item_number].vnum() != 30019))
-    obj->obj_flags.timer -= use;
+  if (obj->flags_.timer > 0 && (dc_->obj_index[obj->item_number].vnum() != 30010 && dc_->obj_index[obj->item_number].vnum() != 30036 && dc_->obj_index[obj->item_number].vnum() != 30033 && dc_->obj_index[obj->item_number].vnum() != 30097 && dc_->obj_index[obj->item_number].vnum() != 30019))
+    obj->flags_.timer -= use;
   if (obj->contains)
     update_object(obj->contains, use);
   if (obj->next_content)
@@ -3467,11 +3467,11 @@ void update_char_objects(CharacterPtr ch)
   qint32 i;
 
   if (ch->equipment[WEAR_LIGHT])
-    if (ch->equipment[WEAR_LIGHT]->obj_flags.type_flag == ITEM_LIGHT)
-      if (ch->equipment[WEAR_LIGHT]->obj_flags.value[2] > 0)
+    if (ch->equipment[WEAR_LIGHT]->flags_.type_flag == ITEM_LIGHT)
+      if (ch->equipment[WEAR_LIGHT]->flags_.value[2] > 0)
       {
-        (ch->equipment[WEAR_LIGHT]->obj_flags.value[2])--;
-        if (!ch->equipment[WEAR_LIGHT]->obj_flags.value[2])
+        (ch->equipment[WEAR_LIGHT]->flags_.value[2])--;
+        if (!ch->equipment[WEAR_LIGHT]->flags_.value[2])
         {
           ch->sendln("Your light flickers out and dies.");
           ch->glow_factor--;
@@ -3488,7 +3488,7 @@ void update_char_objects(CharacterPtr ch)
       {
         update_object(ch->equipment[i], 1);
 
-        if (ch->equipment[i]->obj_flags.timer < 1)
+        if (ch->equipment[i]->flags_.timer < 1)
         {
           send_to_room("The spirit shield shimmers brightly and then fades away.\r\n", ch->in_room);
           extract_obj(ch->equipment[i]);
@@ -3808,7 +3808,7 @@ CharacterPtr Character::get_char_room_vis(QString name)
 
   if (IS_AFFECTED(this, AFF_BLACKJACK))
   {
-    affected_type *af = affected_by_spell(SKILL_JAB);
+    affected_typePtr af = affected_by_spell(SKILL_JAB);
     if (af)
     {
       if (af->modifier == 1)
@@ -4432,7 +4432,7 @@ ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
     // For now they want me to remove this becuase portals and corpses are item_number -1
     // if (i->item_number == -1) continue;
     //
-    if (loc && isSet(i->obj_flags.more_flags, ITEM_NOLOCATE) &&
+    if (loc && isSet(i->flags_.more_flags, ITEM_NOLOCATE) &&
         ch->getLevel() < 101)
       continue;
     if (isexact(tmp, i->name()))
@@ -4449,7 +4449,7 @@ ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
 ObjectPtr create_money(qint32 amount)
 {
   ObjectPtr obj;
-  extra_descr_data *new_new_descr;
+  ExtraDescriptionPtr new_new_descr;
 
   if (amount <= 0)
   {
@@ -4458,7 +4458,7 @@ ObjectPtr create_money(qint32 amount)
   }
 
   obj = new Object;
-  new_new_descr = new extra_descr_data;
+  new_new_descr = new ExtraDescription;
 
   clear_object(obj);
 
@@ -4484,10 +4484,10 @@ ObjectPtr create_money(qint32 amount)
   new_new_descr->next = {};
   obj->ex_description = new_new_descr;
 
-  obj->obj_flags.type_flag = ITEM_MONEY;
-  obj->obj_flags.wear_flags = {TAKE};
-  obj->obj_flags.value[0] = amount;
-  obj->obj_flags.cost = amount;
+  obj->flags_.type_flag = ITEM_MONEY;
+  obj->flags_.wear_flags = {TAKE};
+  obj->flags_.value[0] = amount;
+  obj->flags_.cost = amount;
   obj->item_number = -1;
 
   obj->next = dc_->object_list;

@@ -166,62 +166,147 @@ enum SortState
   SORT_MOB
 };
 
-using rnum_t = quint64;
+enum ReturnValue
+{
+  eFAILURE = 1U,
+  eSUCCESS = 1U << 1,
+  eCH_DIED = 1U << 2,
+  eVICT_DIED = 1U << 3,
+  eINTERNAL_ERROR = 1U << 4,
+  eEXTRA_VALUE = 1U << 5, // Added to act like a flag, setting if something
+                          // Special happened in the function.. (verify_existing_components use at the moment)
+  eEXTRA_VAL2 = 1U << 6,  // damage() needs two
+
+  eDELAYED_EXEC = 1U << 7, // Mobprogs, MPPAUSE
+  eIMMUNE_VICTIM = 1U << 8 // returned by damage() when attacking somethat's immune to attack
+};
+
+enum telnet
+{
+  will_opt = '\xFB',
+  wont_opt = '\xFC',
+  do_opt = '\xFD',
+  dont_opt = '\xFE',
+  iac = '\xFF'
+};
+
+enum mprog_ifs
+{
+  eUNDEFINED,
+  eRAND,
+  eRAND1K,
+  eAMTITEMS,
+  eNUMPCS,
+  eNUMOFMOBSINWORLD,
+  eNUMOFMOBSINROOM,
+  eISPC,
+  eISWIELDING,
+  eISWEAPPRI,
+  eISWEAPSEC,
+  eISNPC,
+  eISGOOD,
+  eISNEUTRAL,
+  eISEVIL,
+  eISWORN,
+  eISFIGHT,
+  eISTANK,
+  eISIMMORT,
+  eISCHARMED,
+  eISFOLLOW,
+  eISSPELLED,
+  eISAFFECTED,
+  eHITPRCNT,
+  eWEARS,
+  eCARRIES,
+  eNUMBER,
+  eTEMPVAR,
+  eISMOBVNUMINROOM,
+  eISOBJVNUMINROOM,
+  eCANSEE,
+  eHASDONEQUEST1,
+  eINSAMEZONE,
+  eCLAN,
+  eISDAYTIME,
+  eISRAINING,
+  eNUMOFOBJSINWORLD
+};
+
+enum BACKUP_TYPE
+{
+  NONE,
+  SELFDELETED,
+  CONDEATH,
+  ZAPPED
+};
+
+using attribute_points_t = qint8;
+using clan_id_t = quint64;
+using class_t = quint8;
+using command_return_t = qint32;
+using gold_t = quint64;
+using gold_t = quint64;
+using help_index_id_t = quint64;
+using item_types_t = QStringList;
 using legacy_rnum_t = qint32;
 using level_diff_t = qint64;
-using zone_t = quint64;
-using room_t = quint64;
-using gold_t = quint64;
-using attribute_points_t = qint8;
-using help_index_id_t = quint64;
-using clan_id_t = quint64;
-using command_return_t = qint32;
 using level_t = quint64;
-using vnum_t = quint64;
-using room_t = quint64;
-using move_t = quint64;
-using skill_t = qint16;
-using socket_t = qint32;
-using skill_t = qint16;
-using gold_t = quint64;
-using class_t = quint8;
 using location_t = qint32;
 using modifier_t = qint32;
-using vnum_t = quint64;
+using move_t = quint64;
 using object_type_t = quint16;
 using object_value_t = qint32;
 using player_config_key_t = QString;
 using player_config_value_t = QString;
-using item_types_t = QStringList;
+using rnum_t = quint64;
+using room_t = quint64;
+using room_t = quint64;
+using skill_t = qint16;
+using skill_t = qint16;
+using socket_t = qint32;
+using vnum_t = quint64;
+using vnum_t = quint64;
+using zone_t = quint64;
 
-using DCPtr = QPointer<class DC>;
-using CharacterPtr = QPointer<class Character>;
-using ObjectPtr = QPointer<class Object>;
-using TimerPtr = QPointer<class Timer>;
-using ProgramPtr = QPointer<class Program>;
+using affected_typePtr = QPointer<class affected_type>;
 using CasinoPlayerPtr = QPointer<class CasinoPlayer>;
-using CasinoTablePtr = QPointer<class CasinoTable>;
-using ConnectionPtr = QPointer<class Connection>;
-using CasinoSlotMachinePtr = QPointer<class CasinoSlotMachine>;
 using CasinoRouletteWheelPtr = QPointer<class CasinoRouletteWheel>;
+using CasinoSlotMachinePtr = QPointer<class CasinoSlotMachine>;
+using CasinoTablePtr = QPointer<class CasinoTable>;
 using cDeckPtr = QPointer<class cDeck>;
-using ZonePtr = QPointer<class Zone>;
-using ResetCommandPtr = QPointer<class ResetCommand>;
-using TracksPtr = QPointer<class Tracks>;
-using PathPtr = QPointer<class Path>;
-using VaultPtr = QPointer<class Vault>;
+using ChannelMessagePtr = QPointer<class ChannelMessage>;
+using CharacterPtr = QPointer<class Character>;
+using ClanMemberPtr = QPointer<class ClanMember>;
 using ClanPtr = QPointer<class Clan>;
-using ReservationPtr = QPointer<class Reservation>;
+using ColumnPtr = QPointer<class Column>;
+using ConnectionPtr = QPointer<class Connection>;
+using DatabasePtr = QPointer<class Database>;
+using DCPtr = QPointer<class DC>;
+using DenyPtr = QPointer<class Deny>;
+using ExtraDescriptionPtr = QPointer<class ExtraDescription>;
 using hunt_dataPtr = QPointer<class hunt_data>;
 using hunt_itemsPtr = QPointer<class hunt_items>;
-using obj_index_dataPtr = QPointer<class obj_index_data>;
 using MobileProgramPtr = QPointer<class MobileProgram>;
+using MobilePtr = QPointer<class Mobile>;
+using NewCharacterStatsPtr = QPointer<class NewCharacterStats>;
 using ObjectProgramPtr = QPointer<class ObjectProgram>;
+using ObjectPtr = QPointer<class Object>;
+using obj_index_dataPtr = QPointer<class obj_index_data>;
+using PathPtr = QPointer<class Path>;
+using PlayerPtr = QPointer<class Pointer>;
+using ProgramPtr = QPointer<class Program>;
+using PulsePtr = QPointer<class Pulse>;
 using quest_infoPtr = QPointer<class quest_info>;
-using ClanMemberPtr = QPointer<class ClanMember>;
+using ReservationPtr = QPointer<class Reservation>;
+using ResetCommandPtr = QPointer<class ResetCommand>;
+using RoomDirectionPtr = QPointer<class RoomDirection>;
+using RoomPtr = QPointer<class Room>;
 using TablePtr = QPointer<class Table>;
-using DatabasePtr = QPointer<class Database>;
-using ColumnPtr = QPointer<class Column>;
+using TimerPtr = QPointer<class Timer>;
+using TracksPtr = QPointer<class Tracks>;
+using vault_items_dataPtr = QPointer<class vault_items_data>;
+using VaultPtr = QPointer<class Vault>;
+using ZonePtr = QPointer<class Zone>;
+
 union varg_t
 {
   CharacterPtr ch;
@@ -232,42 +317,196 @@ union varg_t
   CasinoRouletteWheelPtr wheel;
 };
 
-using test_function_t = command_return_t (*)(CharacterPtr ch);
-using HAND_FUNC = qint32 (*)(QList<qint32> hand);
-using special_function = qint32 (*)(CharacterPtr, ObjectPtr, cmd_t, QString, CharacterPtr);
-using SPEC_FUN = qint32 (*)(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString argument, CharacterPtr owner);
-using ROOM_PROC = test_function_t (*)(CharacterPtr ch, cmd_t cmd, QString argument);
-using SPELL_POINTER = qint32 (*)(quint8, CharacterPtr, QString, qint32, CharacterPtr, ObjectPtr, qint32);
-using TIMER_FUNC = void (*)(varg_t arg1, void *arg2, void *arg3);
+using command_gen2_t = command_return_t (*)(CharacterPtr ch, QString arguments, cmd_t cmd);
+using command_gen3_t = command_return_t (*)(QStringList arguments, cmd_t cmd);
+using command_special_t = command_return_t (*)(QString arguments, cmd_t cmd);
 using getter_t = QString (*)(void);
+using HAND_FUNC = qint32 (*)(QList<qint32> hand);
+using test_function_t = command_return_t (*)(CharacterPtr ch);
+using ROOM_PROC = test_function_t (*)(CharacterPtr ch, cmd_t cmd, QString argument);
 using setter_t = bool (*)(QString);
+using special_function = qint32 (*)(CharacterPtr, ObjectPtr, cmd_t, QString, CharacterPtr);
+using SPELL_FUN = qint32 (*)(quint8 level, CharacterPtr ch, const QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill);
+using SPELL_FUN2 = qint32 (*)(quint8 level, CharacterPtr ch, const QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill, quint64 mana_cost);
+using spell_gen1_t = qint32 (*)(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill);
+using spell_gen2_t = command_return_t (*)(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill, quint64 mana_cost);
+using SPELL_POINTER = qint32 (*)(quint8, CharacterPtr, QString, qint32, CharacterPtr, ObjectPtr, qint32);
+using SPEC_FUN = qint32 (*)(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString argument, CharacterPtr owner);
+using TIMER_FUNC = void (*)(varg_t arg1, void *arg2, void *arg3);
 
-using zones_t = QMap<zone_t, Zone>;
-using obj_list_t = QSet<ObjectPtr>;
-using joining_t = QMap<QString, bool>;
-using hints_t = QList<QString>;
-using special_function_list_t = QMap<vnum_t, special_function>;
-using character_list_i = QSet<CharacterPtr>::iterator;
-using zone_commands_t = QList<ResetCommandPtr>;
-using history_t = QQueue<class communication>;
-using area_stats_t = QMap<zone_t, class AreaStats>;
-using skill_list_t = QMap<skill_t, class char_skill_data>;
-using ignoring_t = QMap<QString, class ignore_entry>;
-using classes_t = QList<class class_data>;
-using quest_list_t = QList<quest_infoPtr>;
-using client_descriptor_list_t = QSet<qint32>;
-using server_descriptor_list_t = QSet<qint32>;
-using port_list_t = QList<in_port_t>;
-using client_descriptor_list_i = QSet<qint32>::iterator;
-using server_descriptor_list_i = QSet<qint32>::iterator;
-using port_list_i = QList<in_port_t>::iterator;
-using help_index_t = QMap<QString, quint64>;
 using aliases_t = QMap<QString, QString>;
-using player_config_t = QMap<player_config_key_t, player_config_value_t>;
-using tests_t = QMap<QString, class Test>;
+using area_stats_t = QMap<zone_t, class AreaStats>;
+using character_list_i = QSet<CharacterPtr>::iterator;
 using clan_list_t = QMap<clan_id_t, class Clan>;
+using classes_t = QList<class class_data>;
+using client_descriptor_list_i = QSet<qint32>::iterator;
+using client_descriptor_list_t = QSet<qint32>;
+using help_index_t = QMap<QString, quint64>;
+using hints_t = QList<QString>;
+using history_t = QQueue<class communication>;
+using ignoring_t = QMap<QString, class ignore_entry>;
+using joining_t = QMap<QString, bool>;
+using obj_list_t = QSet<ObjectPtr>;
+using player_config_t = QMap<player_config_key_t, player_config_value_t>;
+using port_list_i = QList<in_port_t>::iterator;
+using port_list_t = QList<in_port_t>;
+using quest_list_t = QList<quest_infoPtr>;
+using server_descriptor_list_i = QSet<qint32>::iterator;
+using server_descriptor_list_t = QSet<qint32>;
+using skill_list_t = QMap<skill_t, class char_skill_data>;
+using special_function_list_t = QMap<vnum_t, special_function>;
+using tests_t = QMap<QString, class Test>;
+using zone_commands_t = QList<ResetCommandPtr>;
+using zones_t = QMap<zone_t, Zone>;
+
 using namespace Qt::StringLiterals;
 
+static const QStringList class_names;
+static const QStringList race_names;
+static const QStringList position_types;
+static const QStringList song_names;
+
+constexpr auto MAX_HIDE = 10;
+constexpr auto QUEST_MAX = 1;         // max quests at a time
+constexpr auto QUEST_SHOW = 10;       // max quests shown at a time
+constexpr auto QUEST_MAX_CANCEL = 15; // max quests canceled at a time
+constexpr auto QUEST_TOTAL = 500;     // max total quests in file
+constexpr auto QUEST_MASTER = 10027;  // vnum of questmaster
+
+constexpr auto ITEM_LIGHT = 1;
+constexpr auto ITEM_SCROLL = 2;
+constexpr auto ITEM_WAND = 3;
+constexpr auto ITEM_STAFF = 4;
+constexpr auto ITEM_WEAPON = 5;
+constexpr auto ITEM_FIREWEAPON = 6;
+constexpr auto ITEM_MISSILE = 7;
+constexpr auto ITEM_TREASURE = 8;
+constexpr auto ITEM_ARMOR = 9;
+constexpr auto ITEM_POTION = 10;
+constexpr auto ITEM_WORN = 11; // not used, can change
+constexpr auto ITEM_OTHER = 12;
+constexpr auto ITEM_TRASH = 13;
+constexpr auto ITEM_TRAP = 14;
+constexpr auto ITEM_CONTAINER = 15;
+constexpr auto ITEM_NOTE = 16;
+constexpr auto ITEM_DRINKCON = 17;
+constexpr auto ITEM_KEY = 18;
+constexpr auto ITEM_FOOD = 19;
+constexpr auto ITEM_MONEY = 20;
+constexpr auto ITEM_PEN = 21;
+constexpr auto ITEM_BOAT = 22;
+constexpr auto ITEM_BOARD = 23;
+constexpr auto ITEM_PORTAL = 24;
+constexpr auto ITEM_FOUNTAIN = 25;
+constexpr auto ITEM_INSTRUMENT = 26;
+constexpr auto ITEM_UTILITY = 27;
+constexpr auto ITEM_BEACON = 28;
+constexpr auto ITEM_LOCKPICK = 29;
+constexpr auto ITEM_CLIMBABLE = 30;
+constexpr auto ITEM_MEGAPHONE = 31;
+constexpr auto ITEM_ALTAR = 32;
+constexpr auto ITEM_TOTEM = 33;
+constexpr auto ITEM_KEYRING = 34;
+constexpr auto ITEM_TYPE_MAX = 34;
+
+/* Bitvector for 'extra_flags' */
+
+constexpr auto ITEM_GLOW = 1U;
+constexpr auto ITEM_HUM = 1U << 1;
+constexpr auto ITEM_DARK = 1U << 2;
+constexpr auto ITEM_LOCK = 1U << 3;
+constexpr auto ITEM_ANY_CLASS = 1U << 4;
+constexpr auto ITEM_INVISIBLE = 1U << 5;
+constexpr auto ITEM_MAGIC = 1U << 6;
+constexpr auto ITEM_NODROP = 1U << 7;
+constexpr auto ITEM_BLESS = 1U << 8;
+constexpr auto ITEM_ANTI_GOOD = 1U << 9;
+constexpr auto ITEM_ANTI_EVIL = 1U << 10;
+constexpr auto ITEM_ANTI_NEUTRAL = 1U << 11;
+constexpr auto ITEM_WARRIOR = 1U << 12;
+constexpr auto ITEM_MAGE = 1U << 13;
+constexpr auto ITEM_THIEF = 1U << 14;
+constexpr auto ITEM_CLERIC = 1U << 15;
+constexpr auto ITEM_PAL = 1U << 16;
+constexpr auto ITEM_ANTI = 1U << 17;
+constexpr auto ITEM_BARB = 1U << 18;
+constexpr auto ITEM_MONK = 1U << 19;
+constexpr auto ITEM_RANGER = 1U << 20;
+constexpr auto ITEM_DRUID = 1U << 21;
+constexpr auto ITEM_BARD = 1U << 22;
+constexpr auto ITEM_TWO_HANDED = 1U << 23;
+constexpr auto ITEM_ENCHANTED = 1U << 24;
+constexpr auto ITEM_SPECIAL = 1U << 25;
+constexpr auto ITEM_NOSAVE = 1U << 26;
+constexpr auto ITEM_NOSEE = 1U << 27;
+constexpr auto ITEM_NOREPAIR = 1U << 28;
+constexpr auto ITEM_NEWBIE = 1U << 29;
+constexpr auto ITEM_PC_CORPSE = 1U << 30;
+constexpr auto ITEM_QUEST = 1U << 31;
+
+/* Bitvector for 'more_flags' */
+
+constexpr auto ITEM_NO_RESTRING = 1U;
+constexpr auto ITEM_LIMIT_SACRIFICE = 1U << 1;
+constexpr auto ITEM_UNIQUE = 1U << 2;
+constexpr auto ITEM_NO_TRADE = 1U << 3;
+constexpr auto ITEM_NONOTICE = 1U << 4;
+constexpr auto ITEM_NOLOCATE = 1U << 5;
+constexpr auto ITEM_UNIQUE_SAVE = 1U << 6;
+
+constexpr auto ITEM_NPC_CORPSE = 1U << 7;
+constexpr auto ITEM_PC_CORPSE_LOOTED = 1U << 8;
+constexpr auto ITEM_NO_SCRAP = 1U << 9;
+constexpr auto ITEM_CUSTOM = 1U << 10;
+constexpr auto ITEM_24H_SAVE = 1U << 11;
+constexpr auto ITEM_NO_DISARM = 1U << 12;
+constexpr auto ITEM_TOGGLE = 1U << 13;
+constexpr auto ITEM_NO_CUSTOM = 1U << 14;
+constexpr auto ITEM_24H_NO_SELL = 1U << 15;
+constexpr auto ITEM_POOF_AFTER_24H = 1U << 16;
+constexpr auto ITEM_POOF_NEVER = 1U << 17;
+
+/* Bitvector for 'size' */
+#define SIZE_ANY 1U
+constexpr auto SIZE_SMALL = 1U << 1;
+constexpr auto SIZE_MEDIUM = 1U << 2;
+constexpr auto SIZE_LARGE = 1U << 3;
+
+/* Different types of 'utility' items */
+
+constexpr auto UTILITY_CATSTINK = 1;
+constexpr auto UTILITY_EXIT_TRAP = 2;
+constexpr auto UTILITY_MOVEMENT_TRAP = 3;
+constexpr auto UTILITY_MORTAR = 4;
+constexpr auto UTILITY_ITEM_MAX = 4;
+
+/* Some different kind of liquids */
+constexpr auto LIQ_WATER = 0;
+constexpr auto LIQ_BEER = 1;
+constexpr auto LIQ_WINE = 2;
+constexpr auto LIQ_ALE = 3;
+constexpr auto LIQ_DARKALE = 4;
+constexpr auto LIQ_WHISKY = 5;
+constexpr auto LIQ_LEMONADE = 6;
+constexpr auto LIQ_FIREBRT = 7;
+constexpr auto LIQ_LOCALSPC = 8;
+constexpr auto LIQ_SLIME = 9;
+constexpr auto LIQ_MILK = 10;
+constexpr auto LIQ_TEA = 11;
+constexpr auto LIQ_COFFEE = 12;
+constexpr auto LIQ_BLOOD = 13;
+constexpr auto LIQ_SALTWATER = 14;
+constexpr auto LIQ_COKE = 15;
+constexpr auto LIQ_GATORADE = 16;
+constexpr auto LIQ_HOLYWATER = 17;
+constexpr auto LIQ_INK = 18;
+constexpr auto PLAYER_OBJECT_THIEF = 297UL;
+constexpr auto PLAYER_GOLD_THIEF = 298UL;
+constexpr auto PLAYER_CANTQUIT = 299UL;
+
+constexpr auto MAX_DIRS = 6;
+constexpr auto CLASS_MAX = 13;
+constexpr auto SAVE_TYPE_MAX = 5; // Do not change this value.  Used in pfile writing
 constexpr auto MAX_INDEX = 6000;
 constexpr auto ERROR_PROG = -1;
 constexpr auto IN_FILE_PROG = 0;
@@ -926,12 +1165,6 @@ namespace SSH
   };
 }
 
-class World
-{
-public:
-  Room &operator[](room_t room_key);
-};
-
 class SVoteData
 {
 public:
@@ -1036,13 +1269,11 @@ private:
   type_t type_ = {};
   QDateTime date_;
 };
-
 auto &operator<<(auto &out, Ban::type_t type)
 {
   out << qint32(type);
   return out;
 }
-
 auto &operator>>(auto &stream, Ban::type_t &type)
 {
   qint32 t;
@@ -1082,12 +1313,12 @@ public:
     return {};
   }
   void add_new_vault(QString name, qint32 indexonly);
-  void remove_vault(QString name, BACKUP_TYPE backup = NONE);
+  void remove_vault(QString name, BACKUP_TYPE backup = BACKUP_TYPE::NONE);
   void rename_vault_owner(QString oldname, QString newname);
   void remove_vault_accesses(QString name);
 
   ObjectPtr get_obj_in_all_vaults(QString object, qint32 num);
-  vault_items_data &get_items_in_all_vaults(QString object, qint32 num);
+  vault_items_dataPtr get_items_in_all_vaults(QString object, qint32 num);
 };
 
 class Shops
@@ -1095,6 +1326,11 @@ class Shops
 public:
   explicit Shops(QObject *parent);
   DCPtr dc_;
+};
+
+[[nodiscard]] inline constexpr bool isSet(auto flag, auto bit)
+{
+  return flag & bit;
 };
 
 class Room : public QObject
@@ -1107,10 +1343,10 @@ public:
   zone_t zone = {};   // Room zone (for resetting)
   ZonePtr zonePtr = {};
   qint32 sector_type = {}; // sector type (move/hide)
-  deny_data *denied = {};
+  DenyPtr denied = {};
   QString name_;                              // Rooms name 'You are ...'
   QString description_;                       // Shown when entered
-  extra_descr_data *ex_description = {};      // for examine/look
+  ExtraDescriptionPtr ex_description = {};    // for examine/look
   RoomDirectionPtr dir_option[MAX_DIRS] = {}; // Directions
   quint32 room_flags = {};                    // DEATH, DARK ... etc
   constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }
@@ -1147,7 +1383,7 @@ public:
 
   auto arena() -> class Arena &;
 
-  quint32 temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
+  quint32 temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags_.
   qint16 light = {};            // Light factor of room
 
   qint32 (*funct)(CharacterPtr, cmd_t, const QString) = {}; // special procedure
@@ -1155,7 +1391,7 @@ public:
   QList<ObjectPtr> contents_ = {};  // List of items in room
   QList<CharacterPtr> people_ = {}; // List of NPC / PC in room
   QList<Tracks> tracks_;            // beginning of the list of scents
-  qint32 iFlags = {};               // Internal flags. These do NOT save.
+  qint32 iFlags = {};               // Internal flags_. These do NOT save.
   // QList<path_data> paths_;
   DCPtr dc_;
 
@@ -1182,9 +1418,13 @@ public:
     alllow_class
   };
 };
-auto &operator<<(auto &out, const Room &room);
-bool operator==(const Room &r1, const Room &r2);
-room_t real_room(room_t virt);
+
+class World
+{
+public:
+  Room &operator[](room_t room_key);
+};
+
 namespace DCNS
 {
   Q_NAMESPACE
@@ -1236,7 +1476,7 @@ namespace DCNS
 }
 using namespace DCNS;
 
-class obj_flag_data
+class ObjectFlags
 {
 public:
   object_value_t value[4] = {}; /* Values of the item (see list)    */
@@ -1288,14 +1528,6 @@ public:
   QString off_message_;
   command_return_t (Character::*function_)(QStringList arguments, cmd_t cmd);
 };
-
-constexpr auto MAX_HIDE = 10;
-
-constexpr auto QUEST_MAX = 1;         // max quests at a time
-constexpr auto QUEST_SHOW = 10;       // max quests shown at a time
-constexpr auto QUEST_MAX_CANCEL = 15; // max quests canceled at a time
-constexpr auto QUEST_TOTAL = 500;     // max total quests in file
-constexpr auto QUEST_MASTER = 10027;  // vnum of questmaster
 
 class Player
 {
@@ -1452,7 +1684,7 @@ public:
   bool hide[MAX_HIDE] = {};
   CharacterPtr hiding_from[MAX_HIDE] = {};
   QQueue<QString> away_msgs = {};
-  QQueue<class ChannelMessage> tell_history = {};
+  QQueue<ChannelMessagePtr> tell_history = {};
   history_t gtell_history = {};
   joining_t joining = {};
   quint32 quest_points = {};
@@ -1475,142 +1707,6 @@ public:
 
   aliases_t aliases_; /* Aliases */
 };
-
-constexpr auto ITEM_LIGHT = 1;
-constexpr auto ITEM_SCROLL = 2;
-constexpr auto ITEM_WAND = 3;
-constexpr auto ITEM_STAFF = 4;
-constexpr auto ITEM_WEAPON = 5;
-constexpr auto ITEM_FIREWEAPON = 6;
-constexpr auto ITEM_MISSILE = 7;
-constexpr auto ITEM_TREASURE = 8;
-constexpr auto ITEM_ARMOR = 9;
-constexpr auto ITEM_POTION = 10;
-constexpr auto ITEM_WORN = 11; // not used, can change
-constexpr auto ITEM_OTHER = 12;
-constexpr auto ITEM_TRASH = 13;
-constexpr auto ITEM_TRAP = 14;
-constexpr auto ITEM_CONTAINER = 15;
-constexpr auto ITEM_NOTE = 16;
-constexpr auto ITEM_DRINKCON = 17;
-constexpr auto ITEM_KEY = 18;
-constexpr auto ITEM_FOOD = 19;
-constexpr auto ITEM_MONEY = 20;
-constexpr auto ITEM_PEN = 21;
-constexpr auto ITEM_BOAT = 22;
-constexpr auto ITEM_BOARD = 23;
-constexpr auto ITEM_PORTAL = 24;
-constexpr auto ITEM_FOUNTAIN = 25;
-constexpr auto ITEM_INSTRUMENT = 26;
-constexpr auto ITEM_UTILITY = 27;
-constexpr auto ITEM_BEACON = 28;
-constexpr auto ITEM_LOCKPICK = 29;
-constexpr auto ITEM_CLIMBABLE = 30;
-constexpr auto ITEM_MEGAPHONE = 31;
-constexpr auto ITEM_ALTAR = 32;
-constexpr auto ITEM_TOTEM = 33;
-constexpr auto ITEM_KEYRING = 34;
-constexpr auto ITEM_TYPE_MAX = 34;
-
-/* Bitvector for 'extra_flags' */
-
-constexpr auto ITEM_GLOW = 1U;
-constexpr auto ITEM_HUM = 1U << 1;
-constexpr auto ITEM_DARK = 1U << 2;
-constexpr auto ITEM_LOCK = 1U << 3;
-constexpr auto ITEM_ANY_CLASS = 1U << 4;
-constexpr auto ITEM_INVISIBLE = 1U << 5;
-constexpr auto ITEM_MAGIC = 1U << 6;
-constexpr auto ITEM_NODROP = 1U << 7;
-constexpr auto ITEM_BLESS = 1U << 8;
-constexpr auto ITEM_ANTI_GOOD = 1U << 9;
-constexpr auto ITEM_ANTI_EVIL = 1U << 10;
-constexpr auto ITEM_ANTI_NEUTRAL = 1U << 11;
-constexpr auto ITEM_WARRIOR = 1U << 12;
-constexpr auto ITEM_MAGE = 1U << 13;
-constexpr auto ITEM_THIEF = 1U << 14;
-constexpr auto ITEM_CLERIC = 1U << 15;
-constexpr auto ITEM_PAL = 1U << 16;
-constexpr auto ITEM_ANTI = 1U << 17;
-constexpr auto ITEM_BARB = 1U << 18;
-constexpr auto ITEM_MONK = 1U << 19;
-constexpr auto ITEM_RANGER = 1U << 20;
-constexpr auto ITEM_DRUID = 1U << 21;
-constexpr auto ITEM_BARD = 1U << 22;
-constexpr auto ITEM_TWO_HANDED = 1U << 23;
-constexpr auto ITEM_ENCHANTED = 1U << 24;
-constexpr auto ITEM_SPECIAL = 1U << 25;
-constexpr auto ITEM_NOSAVE = 1U << 26;
-constexpr auto ITEM_NOSEE = 1U << 27;
-constexpr auto ITEM_NOREPAIR = 1U << 28;
-constexpr auto ITEM_NEWBIE = 1U << 29;
-constexpr auto ITEM_PC_CORPSE = 1U << 30;
-constexpr auto ITEM_QUEST = 1U << 31;
-
-/* Bitvector for 'more_flags' */
-
-constexpr auto ITEM_NO_RESTRING = 1U;
-constexpr auto ITEM_LIMIT_SACRIFICE = 1U << 1;
-constexpr auto ITEM_UNIQUE = 1U << 2;
-constexpr auto ITEM_NO_TRADE = 1U << 3;
-constexpr auto ITEM_NONOTICE = 1U << 4;
-constexpr auto ITEM_NOLOCATE = 1U << 5;
-constexpr auto ITEM_UNIQUE_SAVE = 1U << 6;
-
-constexpr auto ITEM_NPC_CORPSE = 1U << 7;
-constexpr auto ITEM_PC_CORPSE_LOOTED = 1U << 8;
-constexpr auto ITEM_NO_SCRAP = 1U << 9;
-constexpr auto ITEM_CUSTOM = 1U << 10;
-constexpr auto ITEM_24H_SAVE = 1U << 11;
-constexpr auto ITEM_NO_DISARM = 1U << 12;
-constexpr auto ITEM_TOGGLE = 1U << 13;
-constexpr auto ITEM_NO_CUSTOM = 1U << 14;
-constexpr auto ITEM_24H_NO_SELL = 1U << 15;
-constexpr auto ITEM_POOF_AFTER_24H = 1U << 16;
-constexpr auto ITEM_POOF_NEVER = 1U << 17;
-
-/* Bitvector for 'size' */
-#define SIZE_ANY 1U
-constexpr auto SIZE_SMALL = 1U << 1;
-constexpr auto SIZE_MEDIUM = 1U << 2;
-constexpr auto SIZE_LARGE = 1U << 3;
-
-/* Different types of 'utility' items */
-
-constexpr auto UTILITY_CATSTINK = 1;
-constexpr auto UTILITY_EXIT_TRAP = 2;
-constexpr auto UTILITY_MOVEMENT_TRAP = 3;
-constexpr auto UTILITY_MORTAR = 4;
-constexpr auto UTILITY_ITEM_MAX = 4;
-
-/* Some different kind of liquids */
-constexpr auto LIQ_WATER = 0;
-constexpr auto LIQ_BEER = 1;
-constexpr auto LIQ_WINE = 2;
-constexpr auto LIQ_ALE = 3;
-constexpr auto LIQ_DARKALE = 4;
-constexpr auto LIQ_WHISKY = 5;
-constexpr auto LIQ_LEMONADE = 6;
-constexpr auto LIQ_FIREBRT = 7;
-constexpr auto LIQ_LOCALSPC = 8;
-constexpr auto LIQ_SLIME = 9;
-constexpr auto LIQ_MILK = 10;
-constexpr auto LIQ_TEA = 11;
-constexpr auto LIQ_COFFEE = 12;
-constexpr auto LIQ_BLOOD = 13;
-constexpr auto LIQ_SALTWATER = 14;
-constexpr auto LIQ_COKE = 15;
-constexpr auto LIQ_GATORADE = 16;
-constexpr auto LIQ_HOLYWATER = 17;
-constexpr auto LIQ_INK = 18;
-constexpr auto PLAYER_OBJECT_THIEF = 297UL;
-constexpr auto PLAYER_GOLD_THIEF = 298UL;
-constexpr auto PLAYER_CANTQUIT = 299UL;
-
-static const QStringList class_names;
-static const QStringList race_names;
-static const QStringList position_types;
-static const QStringList song_names;
 
 class obj_affected_type
 {
@@ -1643,14 +1739,14 @@ public:
   static const QStringList extra_bits;
   static const QStringList apply_types;
 
-  qint32 item_number = {};      /* Where in data-base               */
-  qint32 vroom = {};            /* for corpse saving */
-  obj_flag_data obj_flags = {}; /* Object information               */
+  qint32 item_number = {}; /* Where in data-base               */
+  qint32 vroom = {};       /* for corpse saving */
+  ObjectFlags flags_ = {}; /* Object information               */
   qint16 num_affects = {};
-  QList<obj_affected_type> affected = {}; /* Which abilities in PC to change  */
-  extra_descr_data *ex_description = {};  /* extra descriptions     */
-  CharacterPtr carried_by = {};           /* Carried by :NULL in room/conta   */
-  CharacterPtr equipped_by = {};          /* so I can access the player :)    */
+  QList<obj_affected_type> affected = {};  /* Which abilities in PC to change  */
+  ExtraDescriptionPtr ex_description = {}; /* extra descriptions     */
+  CharacterPtr carried_by = {};            /* Carried by :NULL in room/conta   */
+  CharacterPtr equipped_by = {};           /* so I can access the player :)    */
 
   ObjectPtr in_obj = {};   /* In what object NULL when none    */
   ObjectPtr contains = {}; /* Contains objects                 */
@@ -1669,135 +1765,135 @@ public:
   bool isPortal(void);
   bool isTotem(void)
   {
-    return obj_flags.type_flag == ITEM_TOTEM;
+    return flags_.type_flag == ITEM_TOTEM;
   }
   bool isWeapon(void)
   {
-    return obj_flags.type_flag == ITEM_WEAPON;
+    return flags_.type_flag == ITEM_WEAPON;
   }
   bool isArmor(void)
   {
-    return obj_flags.type_flag == ITEM_ARMOR;
+    return flags_.type_flag == ITEM_ARMOR;
   }
   bool isInstrument(void)
   {
-    return obj_flags.type_flag == ITEM_INSTRUMENT;
+    return flags_.type_flag == ITEM_INSTRUMENT;
   }
   bool isContainer(void)
   {
-    return obj_flags.type_flag == ITEM_CONTAINER;
+    return flags_.type_flag == ITEM_CONTAINER;
   }
   bool isLight(void)
   {
-    return obj_flags.type_flag == ITEM_LIGHT;
+    return flags_.type_flag == ITEM_LIGHT;
   }
   bool isScroll(void)
   {
-    return obj_flags.type_flag == ITEM_SCROLL;
+    return flags_.type_flag == ITEM_SCROLL;
   }
   bool isWand(void)
   {
-    return obj_flags.type_flag == ITEM_WAND;
+    return flags_.type_flag == ITEM_WAND;
   }
   bool isStaff(void)
   {
-    return obj_flags.type_flag == ITEM_STAFF;
+    return flags_.type_flag == ITEM_STAFF;
   }
   bool isFireWeapon(void)
   {
-    return obj_flags.type_flag == ITEM_FIREWEAPON;
+    return flags_.type_flag == ITEM_FIREWEAPON;
   }
   bool isMissle(void)
   {
-    return obj_flags.type_flag == ITEM_MISSILE;
+    return flags_.type_flag == ITEM_MISSILE;
   }
   bool isTreasure(void)
   {
-    return obj_flags.type_flag == ITEM_TREASURE;
+    return flags_.type_flag == ITEM_TREASURE;
   }
   bool isPotion(void)
   {
-    return obj_flags.type_flag == ITEM_POTION;
+    return flags_.type_flag == ITEM_POTION;
   }
   bool isWorn(void)
   {
-    return obj_flags.type_flag == ITEM_WORN;
+    return flags_.type_flag == ITEM_WORN;
   }
   bool isOther(void)
   {
-    return obj_flags.type_flag == ITEM_OTHER;
+    return flags_.type_flag == ITEM_OTHER;
   }
   bool isTrash(void)
   {
-    return obj_flags.type_flag == ITEM_TRASH;
+    return flags_.type_flag == ITEM_TRASH;
   }
   bool isTrap(void)
   {
-    return obj_flags.type_flag == ITEM_TRAP;
+    return flags_.type_flag == ITEM_TRAP;
   }
   bool isNote(void)
   {
-    return obj_flags.type_flag == ITEM_NOTE;
+    return flags_.type_flag == ITEM_NOTE;
   }
   bool isDrinkContainer(void)
   {
-    return obj_flags.type_flag == ITEM_DRINKCON;
+    return flags_.type_flag == ITEM_DRINKCON;
   }
   bool isKey(void)
   {
-    return obj_flags.type_flag == ITEM_KEY;
+    return flags_.type_flag == ITEM_KEY;
   }
   bool isFood(void)
   {
-    return obj_flags.type_flag == ITEM_FOOD;
+    return flags_.type_flag == ITEM_FOOD;
   }
   bool isMoney(void)
   {
-    return obj_flags.type_flag == ITEM_MONEY;
+    return flags_.type_flag == ITEM_MONEY;
   }
   bool isPen(void)
   {
-    return obj_flags.type_flag == ITEM_PEN;
+    return flags_.type_flag == ITEM_PEN;
   }
   bool isBoat(void)
   {
-    return obj_flags.type_flag == ITEM_BOAT;
+    return flags_.type_flag == ITEM_BOAT;
   }
   bool isBoard(void)
   {
-    return obj_flags.type_flag == ITEM_BOARD;
+    return flags_.type_flag == ITEM_BOARD;
   }
   bool isFountain(void)
   {
-    return obj_flags.type_flag == ITEM_FOUNTAIN;
+    return flags_.type_flag == ITEM_FOUNTAIN;
   }
   bool isUtility(void)
   {
-    return obj_flags.type_flag == ITEM_UTILITY;
+    return flags_.type_flag == ITEM_UTILITY;
   }
   bool isBeacon(void)
   {
-    return obj_flags.type_flag == ITEM_BEACON;
+    return flags_.type_flag == ITEM_BEACON;
   }
   bool isLockpick(void)
   {
-    return obj_flags.type_flag == ITEM_LOCKPICK;
+    return flags_.type_flag == ITEM_LOCKPICK;
   }
   bool isClimbable(void)
   {
-    return obj_flags.type_flag == ITEM_CLIMBABLE;
+    return flags_.type_flag == ITEM_CLIMBABLE;
   }
   bool isMegaphone(void)
   {
-    return obj_flags.type_flag == ITEM_MEGAPHONE;
+    return flags_.type_flag == ITEM_MEGAPHONE;
   }
   bool isAltar(void)
   {
-    return obj_flags.type_flag == ITEM_ALTAR;
+    return flags_.type_flag == ITEM_ALTAR;
   }
   bool isKeyring(void)
   {
-    return obj_flags.type_flag == ITEM_KEYRING;
+    return flags_.type_flag == ITEM_KEYRING;
   }
 
   room_t getPortalDestinationRoom(void)
@@ -1806,7 +1902,7 @@ public:
     {
       return 0;
     }
-    return obj_flags.value[0];
+    return flags_.value[0];
   }
   void setPortalDestinationRoom(room_t room)
   {
@@ -1814,7 +1910,7 @@ public:
     {
       return;
     }
-    obj_flags.value[0] = room;
+    flags_.value[0] = room;
   }
 
   portal_types_t getPortalType(void)
@@ -1823,7 +1919,7 @@ public:
     {
       return portal_types_t::Player;
     }
-    return static_cast<portal_types_t>(obj_flags.value[1]);
+    return static_cast<portal_types_t>(flags_.value[1]);
   }
   bool isPortalTypePlayer(void)
   {
@@ -1850,7 +1946,7 @@ public:
   bool isGodload(void);
   bool isCustom(void)
   {
-    return isSet(obj_flags.more_flags, ITEM_NO_CUSTOM);
+    return isSet(flags_.more_flags, ITEM_NO_CUSTOM);
   }
 
   qint32 getPortalLeaveZone(void)
@@ -1859,7 +1955,7 @@ public:
     {
       return -1;
     }
-    return obj_flags.value[2];
+    return flags_.value[2];
   }
   qint32 getPortalFlags(void)
   {
@@ -1867,7 +1963,7 @@ public:
     {
       return 0;
     }
-    return obj_flags.value[3];
+    return flags_.value[3];
   }
   bool hasPortalFlagNoLeave(void);
   bool hasPortalFlagNoEnter(void);
@@ -1880,11 +1976,11 @@ public:
 
   [[nodiscard]] inline bool isCorpse(void) const
   {
-    return isSet(obj_flags.extra_flags, ITEM_PC_CORPSE) || isSet(obj_flags.extra_flags, ITEM_PC_CORPSE_LOOTED);
+    return isSet(flags_.extra_flags, ITEM_PC_CORPSE) || isSet(flags_.extra_flags, ITEM_PC_CORPSE_LOOTED);
   }
   [[nodiscard]] inline bool isTradable(void) const
   {
-    return !isSet(obj_flags.more_flags, ITEM_NO_TRADE);
+    return !isSet(flags_.more_flags, ITEM_NO_TRADE);
   }
   bool ActionDescription(QString action_description)
   {
@@ -1895,21 +1991,21 @@ public:
       return true;
   }
   QString ActionDescription(void) const { return action_description_; }
-  object_type_t Type(void) { return obj_flags.type_flag; }
+  object_type_t Type(void) { return flags_.type_flag; }
   QString TypeString(void);
   bool Type(object_type_t type)
   {
     if (type >= ITEM_TYPE_MAX)
     {
       type = {};
-      obj_flags.Value(2, 0);
+      flags_.Value(2, 0);
       return false;
     }
-    obj_flags.type_flag = type;
-    if (obj_flags.type_flag == 24)
-      obj_flags.Value(2, -1);
+    flags_.type_flag = type;
+    if (flags_.type_flag == 24)
+      flags_.Value(2, -1);
     else
-      obj_flags.Value(2, 0);
+      flags_.Value(2, 0);
     return true;
   }
   bool TypeString(QString type);
@@ -2360,13 +2456,6 @@ enum class create_error
   entry_exists
 };
 
-enum BACKUP_TYPE
-{
-  NONE,
-  SELFDELETED,
-  CONDEATH,
-  ZAPPED
-};
 void remove_character(QString name, BACKUP_TYPE backup = NONE);
 void remove_familiars(QString name, BACKUP_TYPE backup = NONE);
 
@@ -2396,10 +2485,6 @@ public:
   quint32 weight = {};
 };
 
-typedef command_return_t (*command_gen2_t)(CharacterPtr ch, QString arguments, cmd_t cmd);
-typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
-typedef command_return_t (Character::*command_special_t)(QString arguments, cmd_t cmd);
-
 enum class CommandType
 {
   all,
@@ -2419,19 +2504,6 @@ enum class position_t : quint8
   FIGHTING = 7,
   STANDING = 8
 };
-
-typedef qint32 SPELL_FUN(quint8 level, CharacterPtr ch,
-                         const QString arg, qint32 type,
-                         CharacterPtr tar_ch,
-                         ObjectPtr tar_obj,
-                         qint32 skill);
-typedef qint32 SPELL_FUN2(quint8 level, CharacterPtr ch,
-                          const QString arg, qint32 type,
-                          CharacterPtr tar_ch,
-                          ObjectPtr tar_obj,
-                          qint32 skill, quint64 mana_cost);
-// typedef qint32 (*spell_gen1_t)(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill);
-// typedef command_return_t (*spell_gen2_t)(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill, quint64 mana_cost);
 
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C
 // The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is
@@ -2670,7 +2742,7 @@ public:
   qint32 prompt_mode = {};
   quint8 idle_tics = {};
   time_t login_time = {};
-  class stat_data *stats = {}; // for rolling up a character
+  NewCharacterStatsPtr stats = {}; // for rolling up a character
 
   QString *strnew{}; /* for the modify-str system	*/
   QString qstrnew;
@@ -2781,27 +2853,22 @@ enum class load_status_t
 
 bool operator!(load_status_t ls);
 
-[[nodiscard]] inline constexpr bool isSet(auto flag, auto bit)
-{
-  return flag & bit;
-};
-
 class deny_data
 {
 public:
-  deny_data *next;
+  DenyPtr next;
   qint32 vnum;
 };
 
-class extra_descr_data
+class ExtraDescription
 {
 public:
-  QString keyword_ = {};       /* Keyword in look/examine          */
-  QString description_ = {};   /* What to see                      */
-  extra_descr_data *next = {}; /* Next in list                     */
+  QString keyword_ = {};         /* Keyword in look/examine          */
+  QString description_ = {};     /* What to see                      */
+  ExtraDescriptionPtr next = {}; /* Next in list                     */
 };
 
-auto &operator<<(auto &out, extra_descr_data *currdesc)
+auto &operator<<(auto &out, ExtraDescriptionPtr currdesc)
 {
   while (currdesc)
   {
@@ -2826,10 +2893,6 @@ public:
   qint16 to_room;              /* Where direction leeds (NOWHERE) */
   DCPtr dc_;
 };
-using RoomDirectionPtr = QPointer<RoomDirection>;
-
-constexpr auto MAX_DIRS = 6;
-constexpr auto CLASS_MAX = 13;
 
 class follow_type
 {
@@ -2838,12 +2901,9 @@ public:
   class follow_type *next;
 };
 
-constexpr auto AFF_MAX = 73;
-
 class tempvariable
 {
 public:
-  class tempvariable *next = {};
   QString name;
   QString data;
   qint16 save = {}; // save or not
@@ -2859,29 +2919,10 @@ public:
   qint32 location = {};  /* Tells which ability to change(APPLY_XXX)*/
   qint32 bitvector = {}; /* Tells which bits to set (AFF_XXX)       */
   QString caster = {};
-  affected_type *next = {};
+  affected_typePtr next = {};
   CharacterPtr origin = {};
   CharacterPtr victim = {};
 };
-
-enum ReturnValue
-{
-  eFAILURE = 1U,
-  eSUCCESS = 1U << 1,
-  eCH_DIED = 1U << 2,
-  eVICT_DIED = 1U << 3,
-  eINTERNAL_ERROR = 1U << 4,
-  eEXTRA_VALUE = 1U << 5, // Added to act like a flag, setting if something
-                          // Special happened in the function.. (verify_existing_components use at the moment)
-  eEXTRA_VAL2 = 1U << 6,  // damage() needs two
-
-  eDELAYED_EXEC = 1U << 7, // Mobprogs, MPPAUSE
-  eIMMUNE_VICTIM = 1U << 8 // returned by damage() when attacking somethat's immune to attack
-};
-
-constexpr auto SAVE_TYPE_MAX = 5; // Do not change this value.  Used in pfile writing
-// for size of the array.
-
 class Entity
 {
   QString description_;
@@ -2933,7 +2974,6 @@ public:
   QString song_data_;
 };
 
-constexpr auto MAX_WEAR = 23;
 class time_data
 {
 public:
@@ -2941,7 +2981,16 @@ public:
   qint32 logon;  /* Time of the last logon (used to calculate played) */
   qint32 played; /* This is the total accumulated time played in secs */
 };
+
+constexpr auto AFF_MAX = 73;
+constexpr auto MAX_WEAR = 23;
 void char_to_store(CharacterPtr ch, class char_file_u4 *st, time_data &tmpage); /* These data contain information about a players time data */
+time_info_data mud_time_passed(time_t t2, time_t t1);
+constexpr auto ACT_MAX = 38;
+auto &operator<<(auto &out, RoomPtr room);
+bool operator==(RoomPtr r1, RoomPtr r2);
+room_t real_room(room_t virt);
+const qint32 MAX_MOB_VALUES = 4;
 
 class time_info_data
 {
@@ -2951,7 +3000,6 @@ public:
   qint32 month;
   qint32 year;
 };
-time_info_data mud_time_passed(time_t t2, time_t t1);
 
 class Vault
 {
@@ -2966,8 +3014,8 @@ public:
 
   ObjectPtr get_obj(QString keyword, qint32 num);
   ObjectPtr get_unique_obj(QString keyword, qint32 num);
-  vault_items_data &get_item(QString keyword, qint32 num);
-  vault_items_data &get_unique_item(QString keyword, qint32 num);
+  vault_items_dataPtr get_item(QString keyword, qint32 num);
+  vault_items_dataPtr get_unique_item(QString keyword, qint32 num);
 
   void sort(sorted_vault &sv);
   void save(void);
@@ -2991,7 +3039,6 @@ enum mob_type_t
   MOB_TYPE_FIRST = MOB_NORMAL,
   MOB_TYPE_LAST = MOB_CLAN_GUARD
 };
-const qint32 MAX_MOB_VALUES = 4;
 
 class mob_flag_data
 {
@@ -3009,8 +3056,6 @@ public:
   ObjectPtr obj = {};
   void *vo = {};
 };
-
-constexpr auto ACT_MAX = 38;
 
 class Mobile
 {
@@ -3030,7 +3075,7 @@ public:
   mob_prog_act_list *mpact = {}; // list of MOBProgs
   qint16 mpactnum = {};          // num
   qint32 last_room = {};         // Room rnum the mob was last in. Used
-                                 // For !magic,!track changing flags.
+                                 // For !magic,!track changing flags_.
   class threat_data *threat = {};
   ResetCommandPtr reset = {};
   mob_flag_data mob_flags = {}; /* Mobile information               */
@@ -3077,11 +3122,10 @@ public:
   static constexpr qsizetype MAX_NAME_SIZE = 12;
   static const QList<qint32> wear_to_item_wear;
 
-  class Mobile *mobdata = {};
-  class Player *player = {};
-  ObjectPtr objdata = {};
-
-  ConnectionPtr conn_ = {}; // nullptr normally for mobs
+  MobilePtr mobdata;
+  PlayerPtr player;
+  ObjectPtr objdata;
+  ConnectionPtr conn_;
 
   QString title_;
 
@@ -3353,9 +3397,9 @@ public:
 
   ObjectPtr equipment[MAX_WEAR] = {}; // Equipment List
 
-  skill_list_t skills = {};           // Skills List
-  class affected_type *affected = {}; // Affected by list
-  ObjectPtr carrying = {};            // Inventory List
+  skill_list_t skills = {};         // Skills List
+  QList<affected_typePtr> affected; // Affected by list
+  QList<ObjectPtr> carrying;        // Inventory List
 
   qint16 poison_amount = {}; // How much poison damage I'm taking every few seconds
 
@@ -3669,7 +3713,7 @@ public:
 
   bool load_charmie_equipment(QString name, bool previous = false);
   qint32 has_skill(skill_t skill);
-  affected_type *affected_by_spell(quint32 skill);
+  affected_typePtr affected_by_spell(quint32 skill);
   bool skill_success(CharacterPtr victim, qint32 skillnum, qint32 mod = 0);
   qint32 skillmax(qint32 skill, qint32 eh);
   QChar charthing(qint32 known, qint32 skill, qint32 maximum);
@@ -4539,8 +4583,8 @@ void affect_total(CharacterPtr ch);
 void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool add, qint32 flag = 0);
 
 void affect_from_char(CharacterPtr ch, qint32 skill, qint32 flags = 0);
-void affect_remove(CharacterPtr ch, affected_type *af, qint32 flags);
-void affect_join(CharacterPtr ch, affected_type *af, bool avg_dur, bool avg_mod);
+void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags);
+void affect_join(CharacterPtr ch, affected_typePtr af, bool avg_dur, bool avg_mod);
 
 class Sockets
 {
@@ -4676,12 +4720,135 @@ void affects_to_file(auto &out, ObjectPtr obj)
   }
 }
 
-auto &operator<<(auto &out, const obj_flag_data &of)
+auto &operator<<(auto &out, const ObjectFlags &of)
 {
   out << of.type_flag << " " << of.extra_flags << " " << of.wear_flags << " " << of.size << "\n";
   out << of.value[0] << " " << of.value[1] << " " << of.value[2] << " " << of.value[3] << " " << of.eq_level << "\n";
   out << of.weight << " " << of.cost << " " << of.more_flags << "\n";
   return out;
+}
+
+auto &operator<<(auto &out, RoomPtr room)
+{
+  auto temp_room_flags = room.room_flags;
+  if (room.iFlags)
+  {
+    REMOVE_BIT(temp_room_flags, room.iFlags);
+  }
+
+  ExtraDescriptionPtr extra;
+  if (!dc_->rooms.contains(room.number))
+    return out;
+
+  out << "#" << room.number << "\n";
+  string_to_file(out, room.name);
+  string_to_file(out, room.description);
+
+  out << room.zone << " " << room.room_flags << " " << room.sector_type << "\n";
+
+  /* exits */
+  for (qint32 b = {}; b <= 5; b++)
+  {
+    if (!(room.dir_option[b]))
+      continue;
+    out << "D" << b << "\n";
+    if (room.dir_option[b]->general_description)
+      string_to_file(out, room.dir_option[b]->general_description);
+    else
+      out << "~\n"; // print blank
+    if (room.dir_option[b]->keyword)
+      string_to_file(out, room.dir_option[b]->keyword);
+    else
+      out << "~\n"; // print blank
+    out << room.dir_option[b]->exit_info << " " << room.dir_option[b]->key << " " << room.dir_option[b]->to_room << "\n";
+  } /* exits */
+
+  /* extra descriptions */
+  for (extra = room.ex_description; extra; extra = extra->next)
+  {
+    if (!extra)
+      break;
+    out << "E\n";
+    if (extra->keyword)
+      string_to_file(out, extra->keyword);
+    else
+      out << "~\n"; // print blank
+    if (extra->description)
+      string_to_file(out, extra->description);
+    else
+      out << "~\n"; // print blank
+  } /* extra descriptions */
+
+  DenyPtr deni;
+  for (deni = room.denied; deni; deni = deni->next)
+  {
+    out << "B\n"
+        << deni->vnum << "\n";
+  }
+
+  // Write out allowed classes if any
+  for (qint32 i = {}; i < CLASS_MAX; i++)
+  {
+    if (room.allow_class[i] == true)
+    {
+      out << "C" << i << "\n";
+    }
+  }
+
+  out << "S\n";
+  return out;
+}
+auto &operator<<(auto &stream, ObjectPtr obj)
+{
+  if (!obj)
+    return stream;
+
+  stream << "#" << obj->obj_index[obj->item_number].vnum() << "\n";
+  string_to_file(stream, obj->name());
+  string_to_file(stream, obj->short_description());
+  string_to_file(stream, obj->long_description());
+  string_to_file(stream, obj->ActionDescription());
+
+  stream << qint32(obj->flags_.type_flag) << " "
+         << obj->flags_.extra_flags << " "
+         << obj->flags_.wear_flags << " "
+         << obj->flags_.size << "\n";
+
+  stream << obj->flags_.value[0] << " "
+         << obj->flags_.value[1] << " "
+         << obj->flags_.value[2] << " "
+         << obj->flags_.value[3] << " "
+         << obj->flags_.eq_level << "\n";
+
+  stream << obj->flags_.weight << " "
+         << obj->flags_.cost << " "
+         << obj->flags_.more_flags << "\n";
+
+  ExtraDescriptionPtr currdesc = obj->ex_description;
+  while (currdesc)
+  {
+    stream << "E\n";
+    string_to_file(stream, currdesc->keyword_);
+    string_to_file(stream, currdesc->description_);
+    currdesc = currdesc->next;
+  }
+
+  for (qint32 i = {}; i < obj->num_affects; i++)
+  {
+    stream << "A\n";
+    stream << obj->affected[i].location << " "
+           << obj->affected[i].modifier << "\n";
+  }
+
+  if (obj->obj_index[obj->item_number].programs_)
+  {
+    write_mprog_recur(stream, obj->obj_index[obj->item_number].programs_, false);
+    stream << "|\n";
+  }
+
+  stream << "S\n";
+
+  return stream;
 }
 
 template <typename T>
@@ -5360,7 +5527,7 @@ qint32 obj_from_obj(ObjectPtr obj);
 
 ObjectPtr get_obj_in_list(QString name, ObjectPtr list);
 ObjectPtr get_obj_in_list_num(qint32 num, ObjectPtr list);
-class affected_type *affected_by_random(CharacterPtr ch);
+class affected_typePtr affected_by_random(CharacterPtr ch);
 
 ObjectPtr get_obj(QString name);
 ObjectPtr get_obj(qint32 vnum);
@@ -5502,11 +5669,11 @@ void copySaveData(ObjectPtr new_obj, ObjectPtr obj);
 bool verify_item(ObjectPtr obj);
 bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2);
 bool has_random(ObjectPtr obj);
-class pulse_data
+class Pulse
 { /* list for keeping tract of 'pulsing' chars */
 public:
   CharacterPtr thechar;
-  pulse_data *next;
+  PulsePtr next;
 };
 
 bool can_modify_this_room(CharacterPtr ch, qint32 room);
@@ -5736,10 +5903,10 @@ extern CharacterClassSkill c_skills[];
 extern CharacterClassSkill m_skills[];
 extern CharacterPtr character_list;
 extern CharacterPtr combat_list;
-class stat_data
+class NewCharacterStats
 {
 public:
-  stat_data();
+  NewCharacterStats();
   void setMin(void);
   quint8 getMin(quint8 cur, qint8 mod, quint8 min);
   qint32 str[5], tel[5], wis[5], dex[5], con[5];
@@ -6397,14 +6564,14 @@ bool IS_MINLEVEL_NPC(auto ch, auto level) { return ch->getLevel() >= level && ch
 #define GET_OBJ_SHORT(obj) (qPrintable((obj)->short_description()))
 
 #define GET_OBJ_RNUM(obj) ((obj)->item_number)
-#define GET_OBJ_VAL(obj, val) ((obj)->obj_flags.value[(val)])
+#define GET_OBJ_VAL(obj, val) ((obj)->flags_.value[(val)])
 #define GET_OBJ_VROOM(obj) ((obj)->vroom)
-#define GET_OBJ_EXTRA(obj) ((obj)->obj_flags.extra_flags)
-#define GET_OBJ_TIMER(obj) ((obj)->obj_flags.timer)
-#define GET_OBJ_TYPE(obj) ((obj)->obj_flags.type_flag)
-#define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
-#define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
-#define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
+#define GET_OBJ_EXTRA(obj) ((obj)->flags_.extra_flags)
+#define GET_OBJ_TIMER(obj) ((obj)->flags_.timer)
+#define GET_OBJ_TYPE(obj) ((obj)->flags_.type_flag)
+#define GET_OBJ_WEAR(obj) ((obj)->flags_.wear_flags)
+#define GET_OBJ_COST(obj) ((obj)->flags_.cost)
+#define GET_OBJ_RENT(obj) ((obj)->flags_.cost_per_day)
 #define GET_OBJ_VNUM(obj) (GET_OBJ_RNUM(obj) >= 0 ? obj->dc_->obj_index[GET_OBJ_RNUM(obj)].vnum() : -1)
 #define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= dc_->top_of_world)
 #define GET_ROOM_VNUM(rnum) ((qint32)(VALID_ROOM_RNUM(rnum) ? dc_->world[(rnum)].number : DC::NOWHERE))
@@ -6504,11 +6671,11 @@ inline const short IS_ANONYMOUS(CharacterPtr ch)
 */
 /* Object And Carry related macros */
 
-#define GET_ITEM_TYPE(obj) ((obj)->obj_flags.type_flag)
+#define GET_ITEM_TYPE(obj) ((obj)->flags_.type_flag)
 #define GET_MOB_TYPE(mob) ((mob)->mobdata->mob_flags.type)
-#define GET_OBJ_WEIGHT(obj) ((obj)->obj_flags.weight)
+#define GET_OBJ_WEIGHT(obj) ((obj)->flags_.weight)
 
-#define CAN_WEAR(obj, part) (isSet((obj)->obj_flags.wear_flags, part))
+#define CAN_WEAR(obj, part) (isSet((obj)->flags_.wear_flags, part))
 
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w + ch->has_skill(SKILL_VIGOR))
 #define CAN_CARRY_N(ch) (5 + GET_DEX(ch))
@@ -6522,7 +6689,7 @@ inline const short IS_ANONYMOUS(CharacterPtr ch)
   (CAN_WEAR((obj), TAKE) && CAN_CARRY_OBJ((ch), (obj)) && \
    CAN_SEE_OBJ((ch), (obj)))
 
-#define IS_OBJ_STAT(obj, stat) (isSet((obj)->obj_flags.extra_flags, stat))
+#define IS_OBJ_STAT(obj, stat) (isSet((obj)->flags_.extra_flags, stat))
 #define IS_SPECIAL(obj) (IS_OBJ_STAT(obj, ITEM_SPECIAL))
 #define NOT_SPECIAL(obj) (!IS_SPECIAL(obj))
 
@@ -7941,7 +8108,7 @@ public:
   world_file_list_item *mob_file_list = {};   // List of the mob files
   world_file_list_item *obj_file_list = {};   // List of the obj files
   QList<ObjectPtr> object_list_ = {};         // the global linked list of obj's
-  class pulse_data *bard_list = {};           // global l-list of bards
+  QList<PulsePtr> bard_list = {};             // global l-list of bards
   qint32 top_of_helpt = {};                   // top of help index table
   qint32 new_top_of_helpt = {};               // top of help index table
   room_t top_of_world_alloc = {};             // index of last alloc'd memory in world
@@ -7954,6 +8121,8 @@ public:
   QList<TimerPtr> timer_list;
   QList<hunt_dataPtr> hunt_list_ = {};
   QList<hunt_itemsPtr> hunt_items_list_ = {};
+  ObjectPtr obj_proto;
+  qint16 frozen_start_room = 1;
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -8064,7 +8233,7 @@ public:
     /* It can handle regular obj's and XAP objects.                     */
 
     qint32 counter;
-    extra_descr_data *ex_desc;
+    ExtraDescriptionPtr ex_desc;
     // QString buf2;
 
     auto action_description = obj->ActionDescription().remove('\r');
@@ -8168,22 +8337,22 @@ public:
     currentVNUM(nr);
     currentName(obj->name());
     currentType("Object");
-    obj->obj_flags.type_flag = fread_int<decltype(obj->obj_flags.size)>(stream);
-    obj->obj_flags.extra_flags = fread_int<decltype(obj->obj_flags.extra_flags)>(stream);
-    obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(stream);
-    obj->obj_flags.size = fread_int<decltype(obj->obj_flags.size)>(stream);
+    obj->flags_.type_flag = fread_int<decltype(obj->flags_.size)>(stream);
+    obj->flags_.extra_flags = fread_int<decltype(obj->flags_.extra_flags)>(stream);
+    obj->flags_.wear_flags = fread_bitvector<ObjectPositions>(stream);
+    obj->flags_.size = fread_int<decltype(obj->flags_.size)>(stream);
 
-    obj->obj_flags.value[0] = fread_int<object_value_t>(stream);
-    obj->obj_flags.value[1] = fread_int<object_value_t>(stream);
-    obj->obj_flags.value[2] = fread_int<object_value_t>(stream);
-    obj->obj_flags.value[3] = fread_int<object_value_t>(stream);
-    obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(stream, 0, IMPLEMENTER);
+    obj->flags_.value[0] = fread_int<object_value_t>(stream);
+    obj->flags_.value[1] = fread_int<object_value_t>(stream);
+    obj->flags_.value[2] = fread_int<object_value_t>(stream);
+    obj->flags_.value[3] = fread_int<object_value_t>(stream);
+    obj->flags_.eq_level = fread_int<decltype(obj->flags_.eq_level)>(stream, 0, IMPLEMENTER);
 
-    obj->obj_flags.weight = fread_int<decltype(obj->obj_flags.weight)>(stream);
-    obj->obj_flags.cost = fread_int<decltype(obj->obj_flags.cost)>(stream);
-    obj->obj_flags.more_flags = fread_int<decltype(obj->obj_flags.more_flags)>(stream);
+    obj->flags_.weight = fread_int<decltype(obj->flags_.weight)>(stream);
+    obj->flags_.cost = fread_int<decltype(obj->flags_.cost)>(stream);
+    obj->flags_.more_flags = fread_int<decltype(obj->flags_.more_flags)>(stream);
     /* currently not stored in object file */
-    obj->obj_flags.timer = {};
+    obj->flags_.timer = {};
 
     obj->ex_description = {};
     obj->affected = {};
@@ -8199,7 +8368,7 @@ public:
     stream >> chk >> Qt::ws;
     qDebugQTextStreamLine(stream, "read_object(), after stream >> chk >> Qt::ws");
     qDebug() << "First chk " << chk;
-    extra_descr_data *new_new_descr = {};
+    ExtraDescriptionPtr new_new_descr = {};
     qint64 current_pos = {};
     QString current_line = {};
     while (!chk.isEmpty() && chk != "S")
@@ -8209,7 +8378,7 @@ public:
       {
       case 'E':
         qDebugQTextStreamLine(stream, "Type E before first fread_string");
-        new_new_descr = new extra_descr_data;
+        new_new_descr = new ExtraDescription;
 
         new_new_descr->keyword_ = fread_string(stream);
 
@@ -8269,8 +8438,8 @@ public:
     // ITEM_NOSAVE that flag will be removed.
     if (IS_KEY(obj))
     {
-      SET_BIT(obj->obj_flags.more_flags, ITEM_24H_SAVE);
-      REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_NOSAVE);
+      SET_BIT(obj->flags_.more_flags, ITEM_24H_SAVE);
+      REMOVE_BIT(obj->flags_.extra_flags, ITEM_NOSAVE);
     }
 
     return obj;
@@ -8537,7 +8706,7 @@ auto &operator>>(auto &stream, ObjectPtr obj)
   qint32 loc, mod, nr;
 
   QChar chk, c;
-  extra_descr_data *new_new_descr;
+  ExtraDescriptionPtr new_new_descr;
 
   if (obj == nullptr)
   {
@@ -8564,23 +8733,23 @@ auto &operator>>(auto &stream, ObjectPtr obj)
 
   // numeric data
 
-  obj->obj_flags.type_flag = fread_int(stream, -1000, 2147483467);
+  obj->flags_.type_flag = fread_int(stream, -1000, 2147483467);
 
-  obj->obj_flags.extra_flags = fread_uint(stream);
-  obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(stream);
-  obj->obj_flags.size = fread_uint<quint16>(stream);
+  obj->flags_.extra_flags = fread_uint(stream);
+  obj->flags_.wear_flags = fread_bitvector<ObjectPositions>(stream);
+  obj->flags_.size = fread_uint<quint16>(stream);
 
-  obj->obj_flags.value[0] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.value[1] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.value[2] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.value[3] = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.eq_level = fread_int<qint64>(stream, -1000, IMPLEMENTER);
-  obj->obj_flags.weight = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.cost = fread_int(stream, -1000, 2147483467);
-  obj->obj_flags.more_flags = fread_uint<quint32>(stream);
+  obj->flags_.value[0] = fread_int(stream, -1000, 2147483467);
+  obj->flags_.value[1] = fread_int(stream, -1000, 2147483467);
+  obj->flags_.value[2] = fread_int(stream, -1000, 2147483467);
+  obj->flags_.value[3] = fread_int(stream, -1000, 2147483467);
+  obj->flags_.eq_level = fread_int<qint64>(stream, -1000, IMPLEMENTER);
+  obj->flags_.weight = fread_int(stream, -1000, 2147483467);
+  obj->flags_.cost = fread_int(stream, -1000, 2147483467);
+  obj->flags_.more_flags = fread_uint<quint32>(stream);
 
   // currently not stored stream object file
-  obj->obj_flags.timer = {};
+  obj->flags_.timer = {};
 
   obj->ex_description = {};
   obj->affected = {};
@@ -8600,7 +8769,7 @@ auto &operator>>(auto &stream, ObjectPtr obj)
       break;
     case 'E':
     {
-      auto new_new_descr = new extra_descr_data;
+      auto new_new_descr = new ExtraDescription;
       new_new_descr->keyword_ = fread_string(stream);
       new_new_descr->description_ = fread_string(stream);
       new_new_descr->next = obj->ex_description;
@@ -8647,7 +8816,7 @@ void write_object(ObjectPtr obj, auto &out)
   string_to_file(out, obj->short_description());
   string_to_file(out, obj->long_description());
   string_to_file(out, obj->ActionDescription());
-  out << obj->obj_flags;
+  out << obj->flags_;
   out << obj->ex_description;
   affects_to_file(out, obj);
   out << obj->dc_->obj_index[obj->item_number].programs_;
@@ -8721,7 +8890,7 @@ public:
   void set_name(const CharacterPtr sender);
 };
 
-void affect_to_char(CharacterPtr ch, affected_type *af, qint32 duration_type = DC::PULSE_TIME);
+void affect_to_char(CharacterPtr ch, affected_typePtr af, qint32 duration_type = DC::PULSE_TIME);
 QString one_argument(QString arguments, QString &arg1);
 QString one_argumentnolow(QString arguments, QString &arg1);
 RoomDirectionPtr EXIT(auto ch, qsizetype door)
@@ -9972,7 +10141,7 @@ auto &operator>>(QTextStream &stream, Room &room)
   room_t room_nr = {};
   QString temp = {};
   qint32 dir = {};
-  extra_descr_data *new_new_descr{};
+  ExtraDescriptionPtr new_new_descr{};
   zone_t zone_nr = {};
 
   auto c = fread_char(stream);
@@ -10103,7 +10272,7 @@ auto &operator>>(QTextStream &stream, Room &room)
           stream.seek(-1);
         }
 
-        new_new_descr = new extra_descr_data;
+        new_new_descr = new ExtraDescription;
         new_new_descr->keyword_ = fread_string(stream, 0);
         new_new_descr->description_ = fread_string(stream, 0);
 
@@ -10119,9 +10288,9 @@ auto &operator>>(QTextStream &stream, Room &room)
       }
       else if (c == 'B')
       {
-        deny_data *deni;
+        DenyPtr deni;
 
-        deni = new deny_data;
+        deni = new Deny;
         deni->vnum = fread_int(stream, -1, 2147483467);
 
         if (room_nr)
@@ -10240,6 +10409,8 @@ constexpr auto CLAN_THEHORDE = 17;
 constexpr auto CLAN_ANARCHIST = 18;
 constexpr auto CLAN_SOLARIS = 19;
 constexpr auto CLAN_SINDICATE = 20;
+const auto CORPSE_FILE = u"corpse.save"_s;
+
 class Reservation
 {
 public:
@@ -10247,3 +10418,5 @@ public:
   message new_post;
   QMap<QString, BOARD_INFO>::iterator board;
 };
+
+qint32 get_line_new(auto &stream, QString buf);

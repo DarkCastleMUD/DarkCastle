@@ -42,7 +42,7 @@ bool AuctionHouse::IsRace(qint32 vnum, QString israce)
   if (!obj)
     return false;
 
-  if (isSet(obj->obj_flags.size, SIZE_ANY))
+  if (isSet(obj->flags_.size, SIZE_ANY))
     return true;
 
   israce = israce.toLower();
@@ -51,28 +51,28 @@ bool AuctionHouse::IsRace(qint32 vnum, QString israce)
     return true;
 
   if (israce == "ogre")
-    return isSet(obj->obj_flags.size, SIZE_LARGE);
+    return isSet(obj->flags_.size, SIZE_LARGE);
 
   if (israce == "troll")
-    return isSet(obj->obj_flags.size, SIZE_LARGE);
+    return isSet(obj->flags_.size, SIZE_LARGE);
 
   if (israce == "elf")
-    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_LARGE));
+    return (isSet(obj->flags_.size, SIZE_MEDIUM) || isSet(obj->flags_.size, SIZE_LARGE));
 
   if (israce == "orc")
-    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_LARGE));
+    return (isSet(obj->flags_.size, SIZE_MEDIUM) || isSet(obj->flags_.size, SIZE_LARGE));
 
   if (israce == "dwarf")
-    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_SMALL));
+    return (isSet(obj->flags_.size, SIZE_MEDIUM) || isSet(obj->flags_.size, SIZE_SMALL));
 
   if (israce == "gnome")
-    return (isSet(obj->obj_flags.size, SIZE_MEDIUM) || isSet(obj->obj_flags.size, SIZE_SMALL));
+    return (isSet(obj->flags_.size, SIZE_MEDIUM) || isSet(obj->flags_.size, SIZE_SMALL));
 
   if (israce == "pixie")
-    return isSet(obj->obj_flags.size, SIZE_SMALL);
+    return isSet(obj->flags_.size, SIZE_SMALL);
 
   if (israce == "hobbit")
-    return isSet(obj->obj_flags.size, SIZE_SMALL);
+    return isSet(obj->flags_.size, SIZE_SMALL);
 
   return false;
 }
@@ -290,12 +290,12 @@ Is item type ok to sell?
 */
 bool AuctionHouse::IsOkToSell(ObjectPtr obj)
 {
-  if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->flags_.more_flags, ITEM_24H_SAVE))
   {
     return false;
   }
 
-  switch (obj->obj_flags.type_flag)
+  switch (obj->flags_.type_flag)
   {
   case ITEM_LIGHT:
   case ITEM_SCROLL:
@@ -484,7 +484,7 @@ bool AuctionHouse::IsWearable(CharacterPtr ch, qint32 vnum)
     return true;
 
   ObjectPtr obj = (dc_->obj_index[nr].item);
-  return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > ch->getLevel()));
+  return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->flags_.eq_level > ch->getLevel()));
 }
 
 /*
@@ -509,7 +509,7 @@ bool AuctionHouse::IsNoTrade(qint32 vnum)
   qint32 nr = real_object(vnum);
   if (nr < 0)
     return false;
-  return isSet(((dc_->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(((dc_->obj_index[nr].item))->flags_.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -530,7 +530,7 @@ bool AuctionHouse::IsLevel(quint32 to, quint32 from, qint32 vnum)
   if ((nr = real_object(vnum)) < 0)
     return false;
 
-  eq_level = ((dc_->obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = ((dc_->obj_index[nr].item))->flags_.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -934,13 +934,13 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
     return;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
   {
     ch->sendln("Why would you want another one of those?");
     return;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
     ObjectPtr no_trade_obj;
     qint32 nr = real_object(27909);
@@ -1123,7 +1123,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, quint32 ticket)
       return;
     }
 
-    if (isSet(((dc_->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(((dc_->obj_index[rnum].item))->flags_.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1346,13 +1346,13 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     return;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (isSet(obj->flags_.extra_flags, ITEM_NOSAVE))
   {
     ch->sendln("You can't sell that item!");
     return;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("You can't sell godload.");
     return;
@@ -1400,7 +1400,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     advertise = true;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), dc_->obj_index[obj->item_number].vnum()))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), dc_->obj_index[obj->item_number].vnum()))
   {
     ch->send(u"You're selling %1 already and it's unique!\r\n"_s.arg(obj->short_description()));
     return;
@@ -1418,7 +1418,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     return;
   }
 
-  if ((obj->obj_flags.type_flag == ITEM_WAND || obj->obj_flags.type_flag == ITEM_STAFF) && obj->obj_flags.value[1] != obj->obj_flags.value[2])
+  if ((obj->flags_.type_flag == ITEM_WAND || obj->flags_.type_flag == ITEM_STAFF) && obj->flags_.value[1] != obj->flags_.value[2])
   {
     ch->sendln("The Consignment Broker curtly informs you that it needs to have full charges.");
     return;

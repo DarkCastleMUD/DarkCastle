@@ -88,7 +88,7 @@ void Vaults::save_vault(QString name)
 {
   VaultPtr vault;
   vault_access_data *access;
-  vault_items_data *items;
+  vault_items_dataPtr items;
 
   if (name.isEmpty())
   {
@@ -438,7 +438,7 @@ command_return_t do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 void Character::vault_stats(QString name)
 {
   VaultPtr vault = {};
-  vault_items_data *item;
+  vault_items_dataPtr item;
   vault_access_data *access;
   ObjectPtr obj;
   qint32 items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = {};
@@ -490,7 +490,7 @@ void DC::reload_vaults(void)
 {
   VaultPtr vault, *tvault;
   vault_access_data *access, *taccess;
-  vault_items_data *items, *titems;
+  vault_items_dataPtr items, *titems;
   qint32 num = {};
 
   for (vault = vault_table; vault; vault = tvault, num++)
@@ -542,9 +542,9 @@ void Vaults::rename_vault_owner(QString oldname, QString newname)
   if (!vault)
     return;
 
-  for (vault_items_data *items = vault->items; items; items = items->next)
+  for (vault_items_dataPtr items = vault->items; items; items = items->next)
   {
-    if (items->obj && isSet(items->obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (items->obj && isSet(items->obj->flags_.extra_flags, ITEM_SPECIAL))
     {
       QStringList tmp = QString(items->obj->name()).trimmed().split(' ');
       if (tmp.length() >= 2)
@@ -661,7 +661,7 @@ void Vaults::remove_vault(QString name, BACKUP_TYPE backup)
   remove_vault_accesses(name);
 
   VaultPtr vault, *next_vault, *prev_vault = {};
-  vault_items_data *items, *titems;
+  vault_items_dataPtr items, *titems;
   vault_access_data *access, *taccess;
 
   QString buf;
@@ -720,7 +720,7 @@ void DC::testing_load_vaults(void)
 {
   VaultPtr vault;
   vault_access_data *access;
-  vault_items_data *items;
+  vault_items_dataPtr items;
   ObjectPtr obj = {};
   struct stat statbuf = {};
   qint32 vnum = 0, full = 0, count = {};
@@ -849,8 +849,8 @@ void DC::testing_load_vaults(void)
           vault->items = items;
           /*
           dc_sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, qPrintable(fname));
-          if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
-                             (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
+          if (items->obj && ((items->obj->flags_.wear_flags != get_obj(vnum)->flags_.wear_flags) ||
+                             (items->obj->flags_.size != get_obj(vnum)->flags_.size) || (items->obj->flags_.eq_level != get_obj(vnum)->flags_.eq_level)))
             dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
           */
         }
@@ -940,7 +940,7 @@ void DC::load_vaults(void)
 {
   VaultPtr vault;
   vault_access_data *access;
-  vault_items_data *items;
+  vault_items_dataPtr items;
   ObjectPtr obj = {};
   struct stat statbuf = {};
   FILE *stream = {}, *index = {};
@@ -1096,8 +1096,8 @@ void DC::load_vaults(void)
           vault->items = items;
           /*
           dc_sprintf(buf, "boot_vaults: got item [%s(%d)(%d)(%d)] from file [%s].", GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), count, vnum, fname);
-          if (items->obj && ((items->obj->obj_flags.wear_flags != get_obj(vnum)->obj_flags.wear_flags) ||
-                             (items->obj->obj_flags.size != get_obj(vnum)->obj_flags.size) || (items->obj->obj_flags.eq_level != get_obj(vnum)->obj_flags.eq_level)))
+          if (items->obj && ((items->obj->flags_.wear_flags != get_obj(vnum)->flags_.wear_flags) ||
+                             (items->obj->flags_.size != get_obj(vnum)->flags_.size) || (items->obj->flags_.eq_level != get_obj(vnum)->flags_.eq_level)))
             dc_->logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
           */
         }
@@ -1279,9 +1279,9 @@ bool DC::has_vault_access(QString name, VaultPtr vault)
   return ch_has_vault_access;
 }
 
-vault_items_data *get_unique_item_in_vault(VaultPtr vault, QString object, qint32 num)
+vault_items_dataPtr get_unique_item_in_vault(VaultPtr vault, QString object, qint32 num)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
   ObjectPtr obj;
   qint32 i = 1;
 
@@ -1302,7 +1302,7 @@ vault_items_data *get_unique_item_in_vault(VaultPtr vault, QString object, qint3
 
 ObjectPtr get_unique_obj_in_vault(VaultPtr vault, QString object, qint32 num)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
   ObjectPtr obj;
   qint32 i = 1;
 
@@ -1322,9 +1322,9 @@ ObjectPtr get_unique_obj_in_vault(VaultPtr vault, QString object, qint32 num)
   return 0;
 }
 
-vault_items_data *get_item_in_vault(VaultPtr vault, QString object, qint32 num)
+vault_items_dataPtr get_item_in_vault(VaultPtr vault, QString object, qint32 num)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
   ObjectPtr obj;
   qint32 i = 1, j;
 
@@ -1355,7 +1355,7 @@ vault_items_data *get_item_in_vault(VaultPtr vault, QString object, qint32 num)
 
 ObjectPtr get_obj_in_vault(VaultPtr vault, QString object, qint32 num)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
   ObjectPtr obj;
   qint32 i = 1, j;
 
@@ -1383,7 +1383,7 @@ ObjectPtr get_obj_in_vault(VaultPtr vault, QString object, qint32 num)
 
 ObjectPtr exists_in_vault(VaultPtr vault, ObjectPtr obj)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
   if (!obj)
     return 0;
   for (items = vault->items; items; items = items->next)
@@ -1400,7 +1400,7 @@ void Vaults::vault_get(CharacterPtr ch, QString object, QString owner)
   QString sbuf;
   QString obj_list[100];
   ObjectPtr obj, tmp_obj;
-  vault_items_data *items;
+  vault_items_dataPtr items;
   VaultPtr vault;
   qint32 self = 0, i;
 
@@ -1517,13 +1517,13 @@ void Vaults::vault_get(CharacterPtr ch, QString object, QString owner)
       return;
     }
 
-    if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+    if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
     }
 
-    if (!self && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL)) && !ch->isImmortalPlayer())
+    if (!self && (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) || isSet(obj->flags_.extra_flags, ITEM_SPECIAL)) && !ch->isImmortalPlayer())
     {
       ch->sendln("That item seems to be bound to the vault.");
       return;
@@ -1583,7 +1583,7 @@ void item_add(qint32 vnum, VaultPtr vault)
     return;
   }
 
-  vault_items_data *item;
+  vault_items_dataPtr item;
 
   for (item = vault->items; item; item = item->next)
   {
@@ -1606,7 +1606,7 @@ void item_add(qint32 vnum, VaultPtr vault)
 
 void item_add(ObjectPtr obj, VaultPtr vault)
 {
-  vault_items_data *item;
+  vault_items_dataPtr item;
   qint32 vnum = GET_OBJ_VNUM(obj);
 
   remove_from_object_list(obj);
@@ -1632,7 +1632,7 @@ void item_add(ObjectPtr obj, VaultPtr vault)
 
 void item_remove(ObjectPtr obj, VaultPtr vault)
 {
-  vault_items_data *item, *next_item, *prev_item = {};
+  vault_items_dataPtr item, *next_item, *prev_item = {};
   qint32 vnum = GET_OBJ_VNUM(obj);
 
   for (item = vault->items; item; item = next_item)
@@ -1664,7 +1664,7 @@ void item_remove(ObjectPtr obj, VaultPtr vault)
 
 qint32 search_vault_by_vnum(qint32 vnum, VaultPtr vault)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
 
   for (items = vault->items; items; items = items->next)
     if (items && items->item_vnum && items->item_vnum == vnum)
@@ -1798,31 +1798,31 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, VaultPtr vault, CharacterPtr
     return 0;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_vault_by_vnum(GET_OBJ_VNUM(obj), vault))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && search_vault_by_vnum(GET_OBJ_VNUM(obj), vault))
   { // Uniques
     ch->send(u"Why would you need another %1?\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && !self)
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) && !self)
   { // GL
     ch->send(u"%1 is far too valuable to place in someone else's vault.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
-  if (!self && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
+  if (!self && isSet(obj->flags_.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
   { // no_trade
     ch->send(u"%1 seems bound to you.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
   { // cursed
     ch->send(u"%1 is stuck! Ack!.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) || isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->flags_.extra_flags, ITEM_NOSAVE) || isSet(obj->flags_.more_flags, ITEM_24H_SAVE))
   { // nosave
     ch->send(u"%1 doesn't seem to be a permanent part of the world.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
@@ -1839,7 +1839,7 @@ qint32 can_put_in_vault(ObjectPtr obj, qint32 self, VaultPtr vault, CharacterPtr
     ch->send(u"You can't seem to stuff %1 in the vault.  Its too big!\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
   }
-  if (obj->obj_flags.timer > 0)
+  if (obj->flags_.timer > 0)
   {
     ch->send(u"%1 cannot be placed in the vault right now.\r\n"_s.arg(GET_OBJ_SHORT(obj)));
     return 0;
@@ -2020,7 +2020,7 @@ void sort_vault(const VaultPtr vault, sorted_vault &sv)
 {
   ObjectPtr obj;
 
-  for (vault_items_data *items = vault.items; items; items = items->next)
+  for (vault_items_dataPtr items = vault.items; items; items = items->next)
   {
     obj = items->obj;
     if (obj == nullptr)
@@ -2038,14 +2038,14 @@ void sort_vault(const VaultPtr vault, sorted_vault &sv)
         sv.vault_contents.insert(sv.vault_contents.begin(), GET_OBJ_SHORT(obj));
       }
       o.second += items->count;
-      sv.weight += (obj->obj_flags.weight * items->count);
+      sv.weight += (obj->flags_.weight * items->count);
     }
   }
 }
 
 void Character::vault_list(QString owner)
 {
-  vault_items_data *items;
+  vault_items_dataPtr items;
   VaultPtr vault;
   ObjectPtr obj;
   qint32 objects = 0, self = {};
@@ -2126,16 +2126,16 @@ void Character::vault_list(QString owner)
 
     send(u"%1$R"_s.arg(GET_OBJ_SHORT(obj)));
 
-    if (obj->obj_flags.type_flag == ITEM_ARMOR ||
-        obj->obj_flags.type_flag == ITEM_WEAPON ||
-        obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
-        obj->obj_flags.type_flag == ITEM_CONTAINER ||
-        obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
-        obj->obj_flags.type_flag == ITEM_STAFF ||
-        obj->obj_flags.type_flag == ITEM_WAND ||
-        obj->obj_flags.type_flag == ITEM_LIGHT)
+    if (obj->flags_.type_flag == ITEM_ARMOR ||
+        obj->flags_.type_flag == ITEM_WEAPON ||
+        obj->flags_.type_flag == ITEM_FIREWEAPON ||
+        obj->flags_.type_flag == ITEM_CONTAINER ||
+        obj->flags_.type_flag == ITEM_INSTRUMENT ||
+        obj->flags_.type_flag == ITEM_STAFF ||
+        obj->flags_.type_flag == ITEM_WAND ||
+        obj->flags_.type_flag == ITEM_LIGHT)
     {
-      send(u"%1 $3Lvl: %2$R"_s.arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
+      send(u"%1 $3Lvl: %2$R"_s.arg(item_condition(obj)).arg(obj->flags_.eq_level));
     }
 
     if (getLevel() > IMMORTAL && obj->item_number > 0)
@@ -2644,19 +2644,19 @@ qint32 vault_search(CharacterPtr ch, const QString args)
             }
             break;
           case vault_search_type::LEVEL:
-            if (obj->obj_flags.eq_level != (*p).int_argument)
+            if (obj->flags_.eq_level != (*p).int_argument)
             {
               nomatch = true;
             }
             break;
           case vault_search_type::MIN_LEVEL:
-            if (obj->obj_flags.eq_level < (*p).int_argument)
+            if (obj->flags_.eq_level < (*p).int_argument)
             {
               nomatch = true;
             }
             break;
           case vault_search_type::MAX_LEVEL:
-            if (obj->obj_flags.eq_level > (*p).int_argument)
+            if (obj->flags_.eq_level > (*p).int_argument)
             {
               nomatch = true;
             }
@@ -2691,16 +2691,16 @@ qint32 vault_search(CharacterPtr ch, const QString args)
 
         ch->send(fmt::format("{}$R", GET_OBJ_SHORT(obj)));
 
-        if (obj->obj_flags.type_flag == ITEM_ARMOR ||
-            obj->obj_flags.type_flag == ITEM_WEAPON ||
-            obj->obj_flags.type_flag == ITEM_FIREWEAPON ||
-            obj->obj_flags.type_flag == ITEM_CONTAINER ||
-            obj->obj_flags.type_flag == ITEM_INSTRUMENT ||
-            obj->obj_flags.type_flag == ITEM_STAFF ||
-            obj->obj_flags.type_flag == ITEM_WAND ||
-            obj->obj_flags.type_flag == ITEM_LIGHT)
+        if (obj->flags_.type_flag == ITEM_ARMOR ||
+            obj->flags_.type_flag == ITEM_WEAPON ||
+            obj->flags_.type_flag == ITEM_FIREWEAPON ||
+            obj->flags_.type_flag == ITEM_CONTAINER ||
+            obj->flags_.type_flag == ITEM_INSTRUMENT ||
+            obj->flags_.type_flag == ITEM_STAFF ||
+            obj->flags_.type_flag == ITEM_WAND ||
+            obj->flags_.type_flag == ITEM_LIGHT)
         {
-          ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
+          ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->flags_.eq_level));
         }
 
         if (ch->getLevel() > IMMORTAL && obj->item_number > 0)

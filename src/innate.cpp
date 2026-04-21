@@ -234,7 +234,7 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln("You are not carrying anything like that.");
     return ReturnValue::eFAILURE;
   }
-  if (ch->getLevel() < obj->obj_flags.eq_level)
+  if (ch->getLevel() < obj->flags_.eq_level)
   {
     ch->sendln("This item is beyond your skill.");
     return ReturnValue::eFAILURE;

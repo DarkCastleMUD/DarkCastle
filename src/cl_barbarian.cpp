@@ -683,7 +683,7 @@ command_return_t do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
     mod = -25;
 
   if (victim->equipment[WEAR_HEAD])
-    mod -= victim->equipment[WEAR_HEAD]->obj_flags.value[0];
+    mod -= victim->equipment[WEAR_HEAD]->flags_.value[0];
 
   mod -= (GET_DEX(victim) / 2);
   mod += (GET_STR(ch) / 2);
@@ -1101,7 +1101,7 @@ command_return_t do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
 
   bool victim_paralyzed = false;
-  affected_type *af;
+  affected_typePtr af;
   if ((af = victim->affected_by_spell(SPELL_PARALYZE)))
   {
     victim_paralyzed = true;

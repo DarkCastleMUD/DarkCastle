@@ -203,13 +203,13 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
   if (victim->isNonPlayer())
     to_dam = (qint32)((qreal)to_dam * .8);
 
-  dam = dice(ch->equipment[WEAR_WIELD]->obj_flags.value[1],
-             ch->equipment[WEAR_WIELD]->obj_flags.value[2]);
+  dam = dice(ch->equipment[WEAR_WIELD]->flags_.value[1],
+             ch->equipment[WEAR_WIELD]->flags_.value[2]);
   dam += to_dam;
   dam *= (ch->getLevel() / 6); // 10 at level 50
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-  attacktype = ch->equipment[WEAR_WIELD]->obj_flags.value[3] + TYPE_HIT;
+  attacktype = ch->equipment[WEAR_WIELD]->flags_.value[3] + TYPE_HIT;
 
   if (!skill_success(ch, victim, SKILL_DEATHSTROKE, -25))
   {
@@ -508,7 +508,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     modifier = -20;
     // but 3/4 as accurate with a 2hander
-    if (ch->equipment[WEAR_WIELD] && isSet(ch->equipment[WEAR_WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED))
+    if (ch->equipment[WEAR_WIELD] && isSet(ch->equipment[WEAR_WIELD]->flags_.extra_flags, ITEM_TWO_HANDED))
     {
       modifier += 10;
       // if the basher is a barb though, give them the full effect
@@ -748,13 +748,13 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
     modifier = -(level_difference * 2);
 
   // Two handed weapons are twice as hard to disarm
-  if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED))
+  if (isSet(wielded->flags_.extra_flags, ITEM_TWO_HANDED))
     modifier -= 20;
 
   if (skill_success(ch, victim, SKILL_DISARM, modifier))
   {
 
-    if (((isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
+    if (((isSet(wielded->flags_.extra_flags, ITEM_NODROP) || isSet(wielded->flags_.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
         (victim->isPlayer() || dc_->mob_index[victim->mobdata->nr].vnum() > 2400 ||
          dc_->mob_index[victim->mobdata->nr].vnum() < 2300))

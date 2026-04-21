@@ -152,7 +152,7 @@ const qint32 hit_regens[] = {0, 7, 7, 9, 10, 8, 9, 12, 9, 8, 8, 7, 0, 0};
 qint32 Character::hit_gain(position_t position, bool improve)
 {
   qint32 gain = 1;
-  affected_type *af;
+  affected_typePtr af;
   qint32 divisor = 1;
   qint32 learned = has_skill(SKILL_ENHANCED_REGEN);
   /* Neat and fast */
@@ -238,7 +238,7 @@ qint32 Character::move_gain_lookup(qint32 extra)
   qint32 gain;
   qint32 divisor = 100000;
   qint32 learned = has_skill(SKILL_ENHANCED_REGEN);
-  affected_type *af;
+  affected_typePtr af;
   bool improve = true;
   if (extra == 777)
     improve = false;
@@ -300,7 +300,7 @@ qint32 Character::move_gain_lookup(qint32 extra)
 
 void redo_hitpoints(CharacterPtr ch)
 {
-  /*affected_type *af;*/
+  /*affected_typePtr af;*/
   qint32 i, j, bonus = {};
 
   ch->max_hit = ch->raw_hit;
@@ -309,7 +309,7 @@ void redo_hitpoints(CharacterPtr ch)
   //  bonus = (GET_CON(ch) * GET_CON(ch)) / 30;
 
   ch->max_hit += bonus;
-  affected_type *af = ch->affected;
+  affected_typePtr af = ch->affected;
 
   while (af)
   {
@@ -333,7 +333,7 @@ void redo_hitpoints(CharacterPtr ch)
 void redo_mana(CharacterPtr ch)
 
 {
-  /*affected_type *af;*/
+  /*affected_typePtr af;*/
   qint32 i, j, bonus = 0, stat = {};
   if (ch->isNonPlayer())
     return;
@@ -352,7 +352,7 @@ void redo_mana(CharacterPtr ch)
 
   ch->max_mana += bonus;
 
-  affected_type *af;
+  affected_typePtr af;
   af = ch->affected;
   while (af)
   {
@@ -381,7 +381,7 @@ void redo_ki(CharacterPtr ch)
   else if (GET_CLASS(ch) == CLASS_BARD)
     ch->max_ki += GET_INT(ch) > 15 ? GET_INT(ch) - 15 : 0;
 
-  affected_type *af;
+  affected_typePtr af;
   af = ch->affected;
   while (af)
   {
@@ -813,11 +813,11 @@ void DC::update_corpses_and_portals(void)
      |  Type 4 is a no look permanent game portal
      */
 
-    if ((j->isTotem() && isSet(j->obj_flags.more_flags, ITEM_POOF_AFTER_24H)) || ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp())))
+    if ((j->isTotem() && isSet(j->flags_.more_flags, ITEM_POOF_AFTER_24H)) || ((j->isPortal()) && (j->isPortalTypePlayer() || j->isPortalTypeTemp())))
     {
-      if (j->obj_flags.timer > 0)
-        (j->obj_flags.timer)--;
-      if (!(j->obj_flags.timer))
+      if (j->flags_.timer > 0)
+        (j->flags_.timer)--;
+      if (!(j->flags_.timer))
       {
         if (j->in_room != DC::NOWHERE)
         {
@@ -840,7 +840,7 @@ void DC::update_corpses_and_portals(void)
           act_to_character("$p shimmers brightly and then fades away.", j->carried_by, j, 0, INVIS_NULL);
         }
 
-        if (j->isTotem() && j->in_obj && j->in_obj->obj_flags.type_flag == ITEM_ALTAR)
+        if (j->isTotem() && j->in_obj && j->in_obj->flags_.type_flag == ITEM_ALTAR)
           remove_totem(j->in_obj, j);
 
         extract_obj(j);
@@ -849,17 +849,17 @@ void DC::update_corpses_and_portals(void)
     }
 
     /* If this is a corpse */
-    else if ((GET_ITEM_TYPE(j) == ITEM_CONTAINER) && (j->obj_flags.value[3]))
+    else if ((GET_ITEM_TYPE(j) == ITEM_CONTAINER) && (j->flags_.value[3]))
     {
       // TODO ^^^ - makes value[3] for containers a bitvector instead of a boolean
 
       /* timer count down */
-      if (j->obj_flags.timer > 0)
+      if (j->flags_.timer > 0)
       {
-        j->obj_flags.timer--;
+        j->flags_.timer--;
       }
 
-      if (!j->obj_flags.timer)
+      if (!j->flags_.timer)
       {
         if (j->carried_by)
           act_to_character("$p decays in your hands.", j->carried_by, j, 0, 0);
@@ -880,7 +880,7 @@ void DC::update_corpses_and_portals(void)
             {
               oon = oo->next_content;
 
-              if (isSet(oo->obj_flags.more_flags, ITEM_NO_TRADE))
+              if (isSet(oo->flags_.more_flags, ITEM_NO_TRADE))
               {
                 log_sacrifice((CharacterPtr)j, oo, true);
                 extract_obj(oo);
@@ -889,7 +889,7 @@ void DC::update_corpses_and_portals(void)
           }
           if (j->in_obj)
           {
-            if (isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            if (isSet(jj->flags_.more_flags, ITEM_NO_TRADE))
             {
               jj->setOwner(j->getOwner());
             }
@@ -898,7 +898,7 @@ void DC::update_corpses_and_portals(void)
           }
           else if (j->carried_by)
           {
-            if (isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            if (isSet(jj->flags_.more_flags, ITEM_NO_TRADE))
             {
               jj->setOwner(j->getOwner());
             }
@@ -907,7 +907,7 @@ void DC::update_corpses_and_portals(void)
           }
           else if (j->in_room != DC::NOWHERE)
           {
-            if (isSet(jj->obj_flags.more_flags, ITEM_NO_TRADE))
+            if (isSet(jj->flags_.more_flags, ITEM_NO_TRADE))
             {
               jj->setOwner(j->getOwner());
             }

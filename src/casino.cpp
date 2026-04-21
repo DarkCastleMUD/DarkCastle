@@ -797,7 +797,7 @@ void create_table(ObjectPtr obj)
   CasinoTablePtr table;
   table = new CasinoTable;
   table->obj = obj;
-  if (obj->obj_flags.value[2])
+  if (obj->flags_.value[2])
     table->gold = false;
   else
     table->gold = true;
@@ -1134,19 +1134,19 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     qint32 amt = dc_atoi(arg1);
     if (obj->table->gold)
     {
-      if (amt < 0 || amt > obj->obj_flags.value[1] || amt < obj->obj_flags.value[0])
+      if (amt < 0 || amt > obj->flags_.value[1] || amt < obj->flags_.value[0])
       {
 
-        ch->send(u"Minimum bet: %d\r\nMaximum bet: %d\r\n"_s.arg(obj->obj_flags.value[0]).arg(obj->obj_flags.value[1]));
+        ch->send(u"Minimum bet: %d\r\nMaximum bet: %d\r\n"_s.arg(obj->flags_.value[0]).arg(obj->flags_.value[1]));
         return ReturnValue::eSUCCESS;
       }
     }
     else
     {
-      if (amt < 0 || amt > obj->obj_flags.value[3] || amt < obj->obj_flags.value[2])
+      if (amt < 0 || amt > obj->flags_.value[3] || amt < obj->flags_.value[2])
       {
 
-        ch->send(u"Minimum bet: %d\r\nMaximum bet: %d\r\n"_s.arg(obj->obj_flags.value[2]).arg(obj->obj_flags.value[3]));
+        ch->send(u"Minimum bet: %d\r\nMaximum bet: %d\r\n"_s.arg(obj->flags_.value[2]).arg(obj->flags_.value[3]));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1983,12 +1983,12 @@ void create_slot(ObjectPtr obj)
   slot->obj = obj;
   slot->ch = {};
   slot->prch = {};
-  slot->cost = obj->obj_flags.value[0];
-  slot->jackpot = obj->obj_flags.value[1];
-  slot->linkedto = obj->obj_flags.value[3];
+  slot->cost = obj->flags_.value[0];
+  slot->jackpot = obj->flags_.value[1];
+  slot->linkedto = obj->flags_.value[3];
   slot->lastwin = {};
   slot->bet = 1;
-  if (obj->obj_flags.value[2])
+  if (obj->flags_.value[2])
     slot->gold = false;
   else
     slot->gold = true;
@@ -2022,12 +2022,12 @@ void update_linked_slots(CasinoSlotMachinePtr machine)
     // Find all the slot machines linked to the same slot machine as us
     // and update their v1 jackpot, their machine's jackpot (if applicable)
     // and their long description
-    if (slot_obj->obj_flags.value[3] == machine->linkedto)
+    if (slot_obj->flags_.value[3] == machine->linkedto)
     {
       // leaving the original desc from obj loading alone in the hash table
       //  if(!ishashed(slot_obj->long_description)) slot_obj->long_description={};
       slot_obj->long_description(ldesc);
-      slot_obj->obj_flags.value[1] = (qint32)machine->jackpot;
+      slot_obj->flags_.value[1] = (qint32)machine->jackpot;
       if (slot_obj->slot)
         slot_obj->slot->jackpot = machine->jackpot;
 
@@ -2038,7 +2038,7 @@ void update_linked_slots(CasinoSlotMachinePtr machine)
         {
           // if(!ishashed(j->long_description)) j->long_description={};
           j->long_description(ldesc);
-          j->obj_flags.value[1] = (qint32)machine->jackpot;
+          j->flags_.value[1] = (qint32)machine->jackpot;
           if (j->slot)
             j->slot->jackpot = machine->jackpot;
         }
@@ -2117,7 +2117,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        (dc_->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
+        (dc_->obj_index[machine->obj->item_number].item)->flags_.value[1] = (qint32)machine->jackpot;
         dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
@@ -2145,7 +2145,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        (dc_->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (qint32)machine->jackpot;
+        (dc_->obj_index[machine->obj->item_number].item)->flags_.value[1] = (qint32)machine->jackpot;
         dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);

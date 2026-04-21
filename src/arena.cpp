@@ -55,7 +55,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
 {
   QString buf;
   qint32 send_to = DC::NOWHERE;
-  affected_type *af, *next_af;
+  affected_typePtr af, *next_af;
   qint32 pot_low = 6362;
   qint32 pot_hi = 6379;
 

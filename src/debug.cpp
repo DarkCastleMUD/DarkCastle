@@ -37,7 +37,7 @@ void test_handle_ansi(QString test)
 bool test_rolls(quint8 total)
 {
   qint32 x, a, b;
-  stat_data stats;
+  NewCharacterStats stats;
 
   quint64 attempts = {};
   while (1)
@@ -118,16 +118,16 @@ QString showObjectAffects(ObjectPtr obj)
 QString showObjectVault(ObjectPtr obj)
 {
   // std::cerr <<  dc_->obj_index[obj->item_number].vnum() << ":";
-  QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
+  QString buffer = QFlagsToStrings(obj->flags_.wear_flags);
   // std::cerr <<  buf << ":";
 
-  buffer += sprintbit(obj->obj_flags.size, Object::size_bits);
+  buffer += sprintbit(obj->flags_.size, Object::size_bits);
   // std::cerr <<  buf << ":";
 
-  buffer += sprintbit(obj->obj_flags.extra_flags, Object::extra_bits);
+  buffer += sprintbit(obj->flags_.extra_flags, Object::extra_bits);
   // std::cerr <<  buf << ":";
 
-  buffer += sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits);
+  buffer += sprintbit(obj->flags_.more_flags, Object::more_obj_bits);
   // std::cerr <<  buf << ":";
 
   buffer += showObjectAffects(obj);
@@ -141,16 +141,16 @@ void showObject(CharacterPtr ch, ObjectPtr obj)
   // std::cerr <<  dc_->obj_index[obj->item_number].vnum() << ":";
   QString buf;
 
-  QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
+  QString buffer = QFlagsToStrings(obj->flags_.wear_flags);
   // std::cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
+  sprintbit(obj->flags_.size, Object::size_bits, buf);
   // std::cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
+  sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf);
   // std::cerr <<  buf << ":";
 
-  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf);
+  sprintbit(obj->flags_.more_flags, Object::more_obj_bits, buf);
   // std::cerr <<  buf << ":";
 
   showObjectAffects(obj);
@@ -486,7 +486,7 @@ qint32 main(qint32 argc, QString *argv)
 
     for (vault = vault_table; vault; vault = vault->next)
     {
-      for (vault_items_data *items = vault->items; items; items = items->next)
+      for (vault_items_dataPtr items = vault->items; items; items = items->next)
       {
         ObjectPtr obj = items->obj ? items->obj : get_obj(items->item_vnum);
         if (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum)

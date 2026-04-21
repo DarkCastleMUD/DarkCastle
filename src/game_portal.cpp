@@ -139,7 +139,7 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
     from_portal->long_description("A mystical path to a hidden world "
                                   "shimmers in the air before you.");
 
-    from_portal->obj_flags.type_flag = ITEM_PORTAL;
+    from_portal->flags_.type_flag = ITEM_PORTAL;
     from_portal->item_number = (-1);
 
     /* Only need to do this if I didn't clone it */
@@ -161,7 +161,7 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
   }
   /* Nonspecific things -- done to all portals */
 
-  from_portal->obj_flags.timer = timer;
+  from_portal->flags_.timer = timer;
 
   from_portal->in_room = DC::NOWHERE;
 
@@ -169,9 +169,9 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
   from_portal->setPortalDestinationRoom(to_room);
 
   /* Make it game_portal flagged for do_enter and limits.C */
-  from_portal->obj_flags.value[1] = 2;
+  from_portal->flags_.value[1] = 2;
   /* Make it non-zone wide for do_leave */
-  from_portal->obj_flags.value[2] = -1;
+  from_portal->flags_.value[2] = -1;
 
   obj_to_room(from_portal, real_room(from_room));
 

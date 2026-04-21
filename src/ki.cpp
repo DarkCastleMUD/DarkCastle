@@ -737,7 +737,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
   }
 
   // Check if caster gets a bonus against this victim
-  affected_type *af = victim->affected_by_spell(KI_DISRUPT + KI_OFFSET);
+  affected_typePtr af = victim->affected_by_spell(KI_DISRUPT + KI_OFFSET);
   if (af)
   {
     // We've KI_DISRUPTED the victim and failed before so we get a bonus
@@ -891,7 +891,7 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
   // we're keeping a track of which is found so we don't mark them twice
   bool frostshieldFound = false, fireshieldFound = false, sanctuaryFound = false;
 
-  for (affected_type *curr = victim->affected; curr; curr = curr->next)
+  for (affected_typePtr curr = victim->affected; curr; curr = curr->next)
   {
     switch (curr->type)
     {

@@ -54,7 +54,7 @@ qint32 eq_max_damage(ObjectPtr obj)
     break;
   case ITEM_ARMOR:
     amount = 5;
-    amount += ((obj->obj_flags.value[0]) / 2); // + 1 hit per 2ac
+    amount += ((obj->flags_.value[0]) / 2); // + 1 hit per 2ac
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
@@ -133,9 +133,9 @@ void DC::object_activity(quint64 pulse_type)
     {
       obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
     }
-    else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
+    else if (obj->flags_.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->flags_.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = (obj_index[item_number].item)->obj_flags.value[1];
+      obj->flags_.value[0] = (obj_index[item_number].item)->flags_.value[1];
       send_to_room(obj->ex_description->description_, obj->in_room, true);
     }
     else
@@ -236,7 +236,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  if (temp->obj_flags.type_flag != ITEM_POTION)
+  if (temp->flags_.type_flag != ITEM_POTION)
   {
     act_to_character("You can only quaff potions.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -276,17 +276,17 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
 
   for (i = 1; i < 4; i++)
   {
-    if (temp->obj_flags.value[i] >= 1)
+    if (temp->flags_.value[i] >= 1)
     {
-      if (spell_info[temp->obj_flags.value[i]].spell_pointer())
+      if (spell_info[temp->flags_.value[i]].spell_pointer())
       {
-        lvl = (qint32)(1.5 * temp->obj_flags.value[0]);
-        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer())((quint8)temp->obj_flags.value[0], ch, u""_s, SPELL_TYPE_POTION, ch, 0, lvl));
+        lvl = (qint32)(1.5 * temp->flags_.value[0]);
+        retval = ((*spell_info[temp->flags_.value[i]].spell_pointer())((quint8)temp->flags_.value[0], ch, u""_s, SPELL_TYPE_POTION, ch, 0, lvl));
       }
-      else if (spell_info[temp->obj_flags.value[i]].spell_pointer2())
+      else if (spell_info[temp->flags_.value[i]].spell_pointer2())
       {
-        lvl = (qint32)(1.5 * temp->obj_flags.value[0]);
-        retval = ((*spell_info[temp->obj_flags.value[i]].spell_pointer2())((quint8)temp->obj_flags.value[0], ch, u""_s, SPELL_TYPE_POTION, ch, 0, lvl, 0));
+        lvl = (qint32)(1.5 * temp->flags_.value[0]);
+        retval = ((*spell_info[temp->flags_.value[i]].spell_pointer2())((quint8)temp->flags_.value[0], ch, u""_s, SPELL_TYPE_POTION, ch, 0, lvl, 0));
       }
     }
     if (isSet(retval, ReturnValue::eCH_DIED))
@@ -344,7 +344,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_character("Your magic is muffled by greater beings.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
-  if (scroll->obj_flags.type_flag != ITEM_SCROLL)
+  if (scroll->flags_.type_flag != ITEM_SCROLL)
   {
     act_to_character("Recite is normally used for scrolls.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -391,13 +391,13 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
     // success
     for (i = 1; i < 4; i++)
     {
-      if (scroll->obj_flags.value[i] >= 1)
+      if (scroll->flags_.value[i] >= 1)
       {
-        lvl = (qint32)(1.5 * scroll->obj_flags.value[0]);
+        lvl = (qint32)(1.5 * scroll->flags_.value[0]);
 
-        if (spell_info[scroll->obj_flags.value[i]].spell_pointer())
+        if (spell_info[scroll->flags_.value[i]].spell_pointer())
         {
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer())((quint8)scroll->obj_flags.value[0], ch, u""_s, SPELL_TYPE_SCROLL, victim, obj, lvl));
+          retval = ((*spell_info[scroll->flags_.value[i]].spell_pointer())((quint8)scroll->flags_.value[0], ch, u""_s, SPELL_TYPE_SCROLL, victim, obj, lvl));
           if (SOMEONE_DIED(retval))
           {
             break;
@@ -407,9 +407,9 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
             break;
           }
         }
-        else if (spell_info[scroll->obj_flags.value[i]].spell_pointer2())
+        else if (spell_info[scroll->flags_.value[i]].spell_pointer2())
         {
-          retval = ((*spell_info[scroll->obj_flags.value[i]].spell_pointer2())((quint8)scroll->obj_flags.value[0], ch, u""_s, SPELL_TYPE_SCROLL, victim, obj, lvl, 0));
+          retval = ((*spell_info[scroll->flags_.value[i]].spell_pointer2())((quint8)scroll->flags_.value[0], ch, u""_s, SPELL_TYPE_SCROLL, victim, obj, lvl, 0));
           if (SOMEONE_DIED(retval))
           {
             break;
@@ -452,7 +452,7 @@ void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
 
   // copy the data for that trap item over
   for (qint32 i = {}; i < 4; i++)
-    trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
+    trap_obj->flags_.value[i] = obj->flags_.value[i];
 
   // set it up in the room
   SETBIT(ch->affected_by, AFF_UTILITY);
@@ -473,7 +473,7 @@ void set_exit_trap(CharacterPtr ch, ObjectPtr obj, QString arg)
 
   // copy the data for that trap item over
   for (qint32 i = {}; i < 4; i++)
-    trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
+    trap_obj->flags_.value[i] = obj->flags_.value[i];
 
   // set it up in the room
   SETBIT(ch->affected_by, AFF_UTILITY);
@@ -532,7 +532,7 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
 
   // copy the data for that trap item over
   for (qint32 i = {}; i < 4; i++)
-    trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
+    trap_obj->flags_.value[i] = obj->flags_.value[i];
 
   do_say(ch, "Fire in the hole!");
   act_to_room("$n sets off $o with a flash and bang!.", ch, obj, 0, 0);
@@ -568,17 +568,17 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
   act_to_room("$n sprinkles something on the ground around $m.", ch, 0, 0, 0);
 
   // make sure it's useable in the place we're at
-  if (dc_->world[ch->in_room].sector_type != obj->obj_flags.value[1])
+  if (dc_->world[ch->in_room].sector_type != obj->flags_.value[1])
   {
-    if (SECT_MAX_SECT < obj->obj_flags.value[1] ||
-        0 > obj->obj_flags.value[1])
+    if (SECT_MAX_SECT < obj->flags_.value[1] ||
+        0 > obj->flags_.value[1])
     {
       ch->sendln("This item has an illegal value1.  Tell a god.");
       return;
     }
 
     dc_sprintf(buf, "It probably won't work, since %s was designed for the smells of a %s",
-               qPrintable(obj->short_description()), sector_types[obj->obj_flags.value[1]]);
+               qPrintable(obj->short_description()), sector_types[obj->flags_.value[1]]);
     ch->send(buf);
 
     // small chance of success
@@ -600,7 +600,7 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
     return;
   }
 
-  switch (obj->obj_flags.value[0])
+  switch (obj->flags_.value[0])
   {
   case UTILITY_CATSTINK:
     set_catstink(ch, obj);
@@ -621,7 +621,7 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
     break;
   }
 
-  WAIT_STATE(ch, (DC::PULSE_VIOLENCE * obj->obj_flags.value[3]));
+  WAIT_STATE(ch, (DC::PULSE_VIOLENCE * obj->flags_.value[3]));
   extract_obj(obj);
 }
 
@@ -646,7 +646,7 @@ command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  switch (obj->obj_flags.type_flag)
+  switch (obj->flags_.type_flag)
   {
   case ITEM_UTILITY:
     set_utility_item(ch, obj, argument);
@@ -698,20 +698,20 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
 
   argument = one_argument(argument, targ);
   argument = one_argument(argument, xtra_arg);
-  if (stick->obj_flags.type_flag == ITEM_STAFF)
+  if (stick->flags_.type_flag == ITEM_STAFF)
   {
     act_to_room("$n taps $p three times on the ground.", ch, stick, 0, 0);
     act_to_character("You tap $p three times on the ground.", ch, stick, 0, 0);
-    if (stick->obj_flags.value[2] > 0)
+    if (stick->flags_.value[2] > 0)
     { /* Charges left? */
-      stick->obj_flags.value[2]--;
-      lvl = (qint32)(1.5 * stick->obj_flags.value[0]);
+      stick->flags_.value[2]--;
+      lvl = (qint32)(1.5 * stick->flags_.value[0]);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       qint32 retval = {};
-      if (spell_info[stick->obj_flags.value[3]].spell_pointer())
-        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer())((quint8)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
-      else if (spell_info[stick->obj_flags.value[3]].spell_pointer2())
-        retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer2())((quint8)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl, 0));
+      if (spell_info[stick->flags_.value[3]].spell_pointer())
+        retval = ((*spell_info[stick->flags_.value[3]].spell_pointer())((quint8)stick->flags_.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl));
+      else if (spell_info[stick->flags_.value[3]].spell_pointer2())
+        retval = ((*spell_info[stick->flags_.value[3]].spell_pointer2())((quint8)stick->flags_.value[0], ch, xtra_arg, SPELL_TYPE_STAFF, 0, 0, lvl, 0));
       else
         retval = ReturnValue::eFAILURE;
       return retval;
@@ -721,7 +721,7 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("The staff seems powerless.");
     }
   }
-  else if (stick->obj_flags.type_flag == ITEM_WAND)
+  else if (stick->flags_.type_flag == ITEM_WAND)
   {
 
     bits = generic_find(targ, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object, true);
@@ -739,16 +739,16 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
         act_to_character("You point $p at $P.", ch, stick, tmp_object, 0);
       }
 
-      if (stick->obj_flags.value[2] > 0)
+      if (stick->flags_.value[2] > 0)
       { // are there any charges left?
-        stick->obj_flags.value[2]--;
-        lvl = (qint32)(1.5 * stick->obj_flags.value[0]);
+        stick->flags_.value[2]--;
+        lvl = (qint32)(1.5 * stick->flags_.value[0]);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         qint32 retval;
-        if (spell_info[stick->obj_flags.value[3]].spell_pointer())
-          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer())((quint8)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
-        else if (spell_info[stick->obj_flags.value[3]].spell_pointer2())
-          retval = ((*spell_info[stick->obj_flags.value[3]].spell_pointer2())((quint8)stick->obj_flags.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl, 0));
+        if (spell_info[stick->flags_.value[3]].spell_pointer())
+          retval = ((*spell_info[stick->flags_.value[3]].spell_pointer())((quint8)stick->flags_.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl));
+        else if (spell_info[stick->flags_.value[3]].spell_pointer2())
+          retval = ((*spell_info[stick->flags_.value[3]].spell_pointer2())((quint8)stick->flags_.value[0], ch, xtra_arg, SPELL_TYPE_WAND, tmp_char, tmp_object, lvl, 0));
         else
           retval = ReturnValue::eFAILURE;
         return retval;
@@ -839,7 +839,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   }
 
   auto arg1 = arguments.value(0);
-  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[in_room].contents)) && temp->obj_flags.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
+  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[in_room].contents)) && temp->flags_.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
   {
     act_to_character("You drink from $p.", this, temp, 0, 0);
     act_to_room("$n drinks from $p.", this, temp, 0, INVIS_NULL);
@@ -869,37 +869,37 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (temp->obj_flags.type_flag != ITEM_DRINKCON)
+  if (temp->flags_.type_flag != ITEM_DRINKCON)
   {
     act_to_character("You can't drink from that!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (temp->obj_flags.type_flag == ITEM_DRINKCON)
+  if (temp->flags_.type_flag == ITEM_DRINKCON)
   {
-    if (temp->obj_flags.value[1] > 0) /* Not empty */
+    if (temp->flags_.value[1] > 0) /* Not empty */
     {
-      act_to_room(u"$n drinks %1 from $p."_s.arg(drinks[temp->obj_flags.value[2]]), this, temp, 0, INVIS_NULL);
-      sendln(u"You drink the %1."_s.arg(drinks[temp->obj_flags.value[2]]));
+      act_to_room(u"$n drinks %1 from $p."_s.arg(drinks[temp->flags_.value[2]]), this, temp, 0, INVIS_NULL);
+      sendln(u"You drink the %1."_s.arg(drinks[temp->flags_.value[2]]));
 
       if (isImmortalPlayer())
         return ReturnValue::eSUCCESS;
 
       // TODO what is this for?  the statement immediatly afterwards wipes out value
-      if (drink_aff[temp->obj_flags.value[2]][DRUNK] > 0)
-        amount = (25 - GET_COND(this, THIRST)) / drink_aff[temp->obj_flags.value[2]][DRUNK];
+      if (drink_aff[temp->flags_.value[2]][DRUNK] > 0)
+        amount = (25 - GET_COND(this, THIRST)) / drink_aff[temp->flags_.value[2]][DRUNK];
       else
         amount = dc_->number(3, 10);
 
-      amount = MIN(amount, temp->obj_flags.value[1]);
+      amount = MIN(amount, temp->flags_.value[1]);
 
       /* You can't subtract more than the object weighs */
 
-      gain_condition(this, DRUNK, (qint32)((qint32)drink_aff[temp->obj_flags.value[2]][DRUNK] * amount) / 4);
+      gain_condition(this, DRUNK, (qint32)((qint32)drink_aff[temp->flags_.value[2]][DRUNK] * amount) / 4);
 
-      gain_condition(this, FULL, (qint32)((qint32)drink_aff[temp->obj_flags.value[2]][FULL] * amount) / 4);
+      gain_condition(this, FULL, (qint32)((qint32)drink_aff[temp->flags_.value[2]][FULL] * amount) / 4);
 
-      gain_condition(this, THIRST, (qint32)((qint32)drink_aff[temp->obj_flags.value[2]][THIRST] * amount) / 4);
+      gain_condition(this, THIRST, (qint32)((qint32)drink_aff[temp->flags_.value[2]][THIRST] * amount) / 4);
 
       if (GET_COND(this, DRUNK) > 10)
         act_to_character("You feel drunk.", this, 0, 0, 0);
@@ -910,7 +910,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       if (GET_COND(this, FULL) > 20)
         act_to_character("You are full.", this, 0, 0, 0);
 
-      if (temp->obj_flags.value[2] == LIQ_HOLYWATER &&
+      if (temp->flags_.value[2] == LIQ_HOLYWATER &&
           getHP() < GET_MAX_HIT(this) &&
           dc_->number(0, 1))
       {
@@ -918,7 +918,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
         addHP(10);
       }
 
-      if (temp->obj_flags.value[3] && (!isImmortalPlayer()))
+      if (temp->flags_.value[3] && (!isImmortalPlayer()))
       {
         /* The shit was poisoned ! */
         act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
@@ -939,14 +939,14 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
       }
 
       /* empty the container, and no longer poison. */
-      temp->obj_flags.value[1] -= amount;
-      if (!temp->obj_flags.value[1])
+      temp->flags_.value[1] -= amount;
+      if (!temp->flags_.value[1])
       { /* The last bit */
-        temp->obj_flags.value[2] = {};
-        temp->obj_flags.value[3] = {};
+        temp->flags_.value[2] = {};
+        temp->flags_.value[3] = {};
       }
       /*
-              if(temp->obj_flags.value[1]<=0) {
+              if(temp->flags_.value[1]<=0) {
                 act("It is now empty, and it magically disappears in a puff of smoke!",
                   this,0,0,TO_CHAR, 0);
                 extract_obj(temp);
@@ -979,7 +979,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((temp->obj_flags.type_flag != ITEM_FOOD) && (!isImmortalPlayer()))
+  if ((temp->flags_.type_flag != ITEM_FOOD) && (!isImmortalPlayer()))
   {
     act_to_character("Your stomach refuses to eat that!?!", this, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -994,12 +994,12 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   act_to_room("$n eats $p.", this, temp, 0, INVIS_NULL);
   act_to_character("You eat the $o.", this, temp, 0, 0);
 
-  gain_condition(this, FULL, temp->obj_flags.value[0]);
+  gain_condition(this, FULL, temp->flags_.value[0]);
 
   if (GET_COND(this, FULL) > 20)
     act_to_character("You are full.", this, 0, 0, 0);
 
-  if (temp->obj_flags.value[3] && (!isImmortalPlayer()))
+  if (temp->flags_.value[3] && (!isImmortalPlayer()))
   {
     /* The shit was poisoned ! */
     act_to_character("Ooups, it tasted rather strange ?!!?", this, 0, 0, 0);
@@ -1012,7 +1012,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
     else
     {
       af.type = SPELL_POISON;
-      af.duration = temp->obj_flags.value[0] * 2;
+      af.duration = temp->flags_.value[0] * 2;
       af.modifier = {};
       af.location = APPLY_NONE;
       af.bitvector = AFF_POISON;
@@ -1053,13 +1053,13 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (from_obj->obj_flags.type_flag != ITEM_DRINKCON)
+  if (from_obj->flags_.type_flag != ITEM_DRINKCON)
   {
     act_to_character("You can't pour from that!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (from_obj->obj_flags.value[1] == 0)
+  if (from_obj->flags_.value[1] == 0)
   {
     act_to_character("The $p is empty.", ch, from_obj, 0, 0);
     return ReturnValue::eFAILURE;
@@ -1076,9 +1076,9 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_room("$n empties $p", ch, from_obj, 0, INVIS_NULL);
     act_to_character("You empty the $p.", ch, from_obj, 0, 0);
 
-    from_obj->obj_flags.value[1] = {};
-    from_obj->obj_flags.value[2] = {};
-    from_obj->obj_flags.value[3] = {};
+    from_obj->flags_.value[1] = {};
+    from_obj->flags_.value[2] = {};
+    from_obj->flags_.value[3] = {};
     return ReturnValue::eSUCCESS;
   }
 
@@ -1088,7 +1088,7 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (to_obj->obj_flags.type_flag != ITEM_DRINKCON)
+  if (to_obj->flags_.type_flag != ITEM_DRINKCON)
   {
     act_to_character("You can't pour anything into that.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -1100,44 +1100,44 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((to_obj->obj_flags.value[1] != 0) &&
-      (to_obj->obj_flags.value[2] != from_obj->obj_flags.value[2]))
+  if ((to_obj->flags_.value[1] != 0) &&
+      (to_obj->flags_.value[2] != from_obj->flags_.value[2]))
   {
     act_to_character("There is already a different liquid in it!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (!(to_obj->obj_flags.value[1] < to_obj->obj_flags.value[0]))
+  if (!(to_obj->flags_.value[1] < to_obj->flags_.value[0]))
   {
     act_to_character("There is no room for more.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   dc_sprintf(buf, "You pour the %s into the %s.\r\n",
-             drinks[from_obj->obj_flags.value[2]], arg2);
+             drinks[from_obj->flags_.value[2]], arg2);
   ch->send(buf);
 
   /* First same type liq. */
-  to_obj->obj_flags.value[2] = from_obj->obj_flags.value[2];
+  to_obj->flags_.value[2] = from_obj->flags_.value[2];
 
   /* Then how much to pour */
-  from_obj->obj_flags.value[1] -= (amount =
-                                       (to_obj->obj_flags.value[0] - to_obj->obj_flags.value[1]));
+  from_obj->flags_.value[1] -= (amount =
+                                    (to_obj->flags_.value[0] - to_obj->flags_.value[1]));
 
-  to_obj->obj_flags.value[1] = to_obj->obj_flags.value[0];
+  to_obj->flags_.value[1] = to_obj->flags_.value[0];
 
-  if (from_obj->obj_flags.value[1] < 0) /* There was to little */
+  if (from_obj->flags_.value[1] < 0) /* There was to little */
   {
-    to_obj->obj_flags.value[1] += from_obj->obj_flags.value[1];
-    amount += from_obj->obj_flags.value[1];
-    from_obj->obj_flags.value[1] = {};
-    from_obj->obj_flags.value[2] = {};
-    from_obj->obj_flags.value[3] = {};
+    to_obj->flags_.value[1] += from_obj->flags_.value[1];
+    amount += from_obj->flags_.value[1];
+    from_obj->flags_.value[1] = {};
+    from_obj->flags_.value[2] = {};
+    from_obj->flags_.value[3] = {};
   }
 
   /* Then the poison boogie */
-  to_obj->obj_flags.value[3] =
-      (to_obj->obj_flags.value[3] || from_obj->obj_flags.value[3]);
+  to_obj->flags_.value[3] =
+      (to_obj->flags_.value[3] || from_obj->flags_.value[3]);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1162,7 +1162,7 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (temp->obj_flags.type_flag != ITEM_DRINKCON)
+  if (temp->flags_.type_flag != ITEM_DRINKCON)
   {
     act_to_character("You can't sip from that!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -1175,31 +1175,31 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!temp->obj_flags.value[1]) /* Empty */
+  if (!temp->flags_.value[1]) /* Empty */
   {
     act_to_character("But there is nothing in it?", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   act_to_room("$n sips from the $o", ch, temp, 0, INVIS_NULL);
-  dc_sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
+  dc_sprintf(buf, "It tastes like %s.\r\n", drinks[temp->flags_.value[2]]);
   ch->send(buf);
 
   gain_condition(ch, DRUNK,
-                 (qint32)(drink_aff[temp->obj_flags.value[2]][DRUNK] / 4));
+                 (qint32)(drink_aff[temp->flags_.value[2]][DRUNK] / 4));
 
   if (GET_COND(ch, DRUNK) > 10)
     act_to_character("You feel drunk.", ch, 0, 0, 0);
 
-  if (temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch, AFF_POISON))
+  if (temp->flags_.value[3] == 1 && !IS_AFFECTED(ch, AFF_POISON))
     act_to_character("But it also had a strange taste!", ch, 0, 0, 0);
 
-  temp->obj_flags.value[1]--;
+  temp->flags_.value[1]--;
 
-  if (!temp->obj_flags.value[1]) /* The last bit */
+  if (!temp->flags_.value[1]) /* The last bit */
   {
-    temp->obj_flags.value[2] = {};
-    temp->obj_flags.value[3] = {};
+    temp->flags_.value[2] = {};
+    temp->flags_.value[3] = {};
   }
 
   return ReturnValue::eSUCCESS;
@@ -1224,12 +1224,12 @@ command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (temp->obj_flags.type_flag == ITEM_DRINKCON)
+  if (temp->flags_.type_flag == ITEM_DRINKCON)
   {
     return do_sip(ch, argument);
   }
 
-  if (!(temp->obj_flags.type_flag == ITEM_FOOD))
+  if (!(temp->flags_.type_flag == ITEM_FOOD))
   {
     act_to_character("Taste that?!? Your stomach refuses!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
@@ -1238,14 +1238,14 @@ command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_room("$n tastes the $o.", ch, temp, 0, INVIS_NULL);
   act_to_character("You taste the $o.", ch, temp, 0, 0);
 
-  if (temp->obj_flags.value[3] == 1 && !IS_AFFECTED(ch, AFF_POISON))
+  if (temp->flags_.value[3] == 1 && !IS_AFFECTED(ch, AFF_POISON))
   {
     act_to_character("Oops, it did not taste good at all!", ch, 0, 0, 0);
   }
 
-  temp->obj_flags.value[0]--;
+  temp->flags_.value[0]--;
 
-  if (!temp->obj_flags.value[0]) /* Nothing left */
+  if (!temp->flags_.value[0]) /* Nothing left */
   {
     act_to_character("There is nothing left now.", ch, 0, 0, 0);
     extract_obj(temp);
@@ -1402,7 +1402,7 @@ qint32 charmie_restricted(CharacterPtr ch, ObjectPtr obj, qint32 wear_loc)
 
 qint32 size_restricted(CharacterPtr ch, ObjectPtr obj)
 {
-  if (isSet(obj->obj_flags.size, SIZE_ANY))
+  if (isSet(obj->flags_.size, SIZE_ANY))
     return false;
 
   if (ch->race == RACE_HUMAN) // human can wear all sizes
@@ -1413,7 +1413,7 @@ qint32 size_restricted(CharacterPtr ch, ObjectPtr obj)
 
   if (GET_HEIGHT(ch) < 42)
   {
-    if (isSet(obj->obj_flags.size, SIZE_SMALL))
+    if (isSet(obj->flags_.size, SIZE_SMALL))
       return false;
     else
       return true;
@@ -1421,7 +1421,7 @@ qint32 size_restricted(CharacterPtr ch, ObjectPtr obj)
 
   if (GET_HEIGHT(ch) < 66)
   {
-    if (isSet(obj->obj_flags.size, SIZE_SMALL) || isSet(obj->obj_flags.size, SIZE_MEDIUM))
+    if (isSet(obj->flags_.size, SIZE_SMALL) || isSet(obj->flags_.size, SIZE_MEDIUM))
       return false;
     else
       return true;
@@ -1429,7 +1429,7 @@ qint32 size_restricted(CharacterPtr ch, ObjectPtr obj)
 
   if (GET_HEIGHT(ch) < 79)
   {
-    if (isSet(obj->obj_flags.size, SIZE_MEDIUM))
+    if (isSet(obj->flags_.size, SIZE_MEDIUM))
       return false;
     else
       return true;
@@ -1437,13 +1437,13 @@ qint32 size_restricted(CharacterPtr ch, ObjectPtr obj)
 
   if (GET_HEIGHT(ch) < 103)
   {
-    if (isSet(obj->obj_flags.size, SIZE_LARGE) || isSet(obj->obj_flags.size, SIZE_MEDIUM))
+    if (isSet(obj->flags_.size, SIZE_LARGE) || isSet(obj->flags_.size, SIZE_MEDIUM))
       return false;
     else
       return true;
   }
 
-  if (isSet(obj->obj_flags.size, SIZE_LARGE))
+  if (isSet(obj->flags_.size, SIZE_LARGE))
     return false;
 
   return true;
@@ -1553,9 +1553,9 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 
   if (ch->isPlayer())
   {
-    if (ch->getLevel() < obj_object->obj_flags.eq_level)
+    if (ch->getLevel() < obj_object->flags_.eq_level)
     {
-      dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
+      dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->flags_.eq_level);
       act_to_character(buffer, ch, obj_object, 0, 0);
       return;
     }
@@ -1563,9 +1563,9 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   else
   {
     if (dc_->mob_index[ch->mobdata->nr].vnum() != 8)
-      if (ch->getLevel() < obj_object->obj_flags.eq_level)
+      if (ch->getLevel() < obj_object->flags_.eq_level)
       {
-        dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
+        dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->flags_.eq_level);
         act_to_character(buffer, ch, obj_object, 0, 0);
         return;
       }
@@ -1576,7 +1576,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
        return;
     }*/
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) &&
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) &&
       !isexact(qPrintable(ch->name()), obj->name()) && ch->getLevel() < IMPLEMENTER)
   {
     act_to_character("$p can only be worn by its rightful owner.", ch, obj_object, 0, 0);
@@ -1890,7 +1890,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         act_to_character("$p is too heavy for you to use as a secondary weapon.", ch, obj_object, 0, 0);
 
       else if ((!ch->hands_are_free(2)) &&
-               (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+               (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
         ch->sendln("You need both hands for this weapon.");
       else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
@@ -1925,7 +1925,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         act_to_character("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, 0);
       }
       else if ((!ch->hands_are_free(2)) &&
-               (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+               (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
         ch->sendln("You need both hands for this shield.");
       }
@@ -1954,11 +1954,11 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       else if (!ch->hands_are_free(1))
         ch->sendln("Your hands are already full.");
       else if ((!ch->hands_are_free(2)) &&
-               (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+               (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
         ch->sendln("You need both hands for this item.");
       }
-      else if (obj_object->obj_flags.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[WEAR_HOLD] && ch->equipment[WEAR_HOLD]->obj_flags.type_flag == ITEM_INSTRUMENT) || (ch->equipment[WEAR_HOLD2] && ch->equipment[WEAR_HOLD2]->obj_flags.type_flag == ITEM_INSTRUMENT)))
+      else if (obj_object->flags_.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[WEAR_HOLD] && ch->equipment[WEAR_HOLD]->flags_.type_flag == ITEM_INSTRUMENT) || (ch->equipment[WEAR_HOLD2] && ch->equipment[WEAR_HOLD2]->flags_.type_flag == ITEM_INSTRUMENT)))
       {
         ch->sendln("You're busy enough playing the instrument you're already using.");
       }
@@ -2018,13 +2018,13 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       act_to_character("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, 0);
     }
     else if ((!ch->hands_are_free(2)) &&
-             (isSet(obj_object->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
+             (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
     {
       ch->sendln("You need both hands for this light.");
     }
     else if (!ch->hands_are_free(1))
       ch->sendln("Your hands are already full.");
-    else if (obj_object->obj_flags.type_flag != ITEM_LIGHT)
+    else if (obj_object->flags_.type_flag != ITEM_LIGHT)
       ch->sendln("That isn't a light you cheating fuck!");
     else
     {
@@ -2323,7 +2323,7 @@ command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (obj_object)
     {
-      if (obj_object->obj_flags.type_flag == ITEM_LIGHT)
+      if (obj_object->flags_.type_flag == ITEM_LIGHT)
         wear(ch, obj_object, 16);
       else
         wear(ch, obj_object, 14);
@@ -2351,7 +2351,7 @@ qint32 Character::hands_are_free(qint32 number)
   wielded = equipment[WEAR_WIELD];
 
   if (wielded)
-    if (isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && !ISSET(affected_by, AFF_POWERWIELD))
+    if (isSet(wielded->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(affected_by, AFF_POWERWIELD))
       hands = 2;
 
   if (equipment[WEAR_WIELD])
@@ -2361,21 +2361,21 @@ qint32 Character::hands_are_free(qint32 number)
 
   if (equipment[WEAR_SHIELD])
   {
-    if (isSet(equipment[WEAR_SHIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(equipment[WEAR_SHIELD]->flags_.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
   if (equipment[WEAR_HOLD])
   {
-    if (isSet(equipment[WEAR_HOLD]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(equipment[WEAR_HOLD]->flags_.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
   }
   if (equipment[WEAR_LIGHT])
   {
-    if (isSet(equipment[WEAR_LIGHT]->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+    if (isSet(equipment[WEAR_LIGHT]->flags_.extra_flags, ITEM_TWO_HANDED) &&
         !ISSET(affected_by, AFF_POWERWIELD))
       hands++;
     hands++;
@@ -2417,13 +2417,13 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
           if (ch->equipment[j] && CAN_SEE_OBJ(ch, ch->equipment[j]))
           {
             obj_object = ch->equipment[j];
-            if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
+            if (isSet(obj_object->flags_.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
               dc_sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description()));
               send_to_char(arg1, ch);
               continue;
             }
-            if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
+            if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->flags_.timer < 40)
             {
               ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
@@ -2460,13 +2460,13 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (CAN_CARRY_N(ch) != IS_CARRYING_N(ch))
         {
-          if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
+          if (isSet(obj_object->flags_.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
             dc_sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description()));
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
-          if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
+          if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->flags_.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return ReturnValue::eFAILURE;
@@ -2559,17 +2559,17 @@ bool fullSave(ObjectPtr obj)
     return 0;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM))
   {
     return 1;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->flags_.more_flags, ITEM_24H_SAVE))
   {
     return 1;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
+  if (isSet(obj->flags_.more_flags, ITEM_24H_NO_SELL))
   {
     return 1;
   }
@@ -2580,19 +2580,19 @@ bool fullSave(ObjectPtr obj)
   if (obj->name() != tmp_obj->name()) // GL. and stuff.
     return 1;
 
-  if (obj->obj_flags.extra_flags != tmp_obj->obj_flags.extra_flags)
+  if (obj->flags_.extra_flags != tmp_obj->flags_.extra_flags)
     return 1;
 
-  if (obj->obj_flags.more_flags != tmp_obj->obj_flags.more_flags)
+  if (obj->flags_.more_flags != tmp_obj->flags_.more_flags)
     return 1;
 
-  if (obj->obj_flags.type_flag == ITEM_STAFF && obj->obj_flags.value[1] != obj->obj_flags.value[2])
+  if (obj->flags_.type_flag == ITEM_STAFF && obj->flags_.value[1] != obj->flags_.value[2])
     return 1;
 
-  if (obj->obj_flags.type_flag == ITEM_WAND && obj->obj_flags.value[1] != obj->obj_flags.value[2])
+  if (obj->flags_.type_flag == ITEM_WAND && obj->flags_.value[1] != obj->flags_.value[2])
     return 1;
 
-  if (obj->obj_flags.type_flag == ITEM_DRINKCON && obj->obj_flags.value[0] != obj->obj_flags.value[1])
+  if (obj->flags_.type_flag == ITEM_DRINKCON && obj->flags_.value[0] != obj->flags_.value[1])
     return 1;
 
   return 0;
@@ -2657,12 +2657,12 @@ qint32 obj_from(ObjectPtr obj)
 
 bool Object::isDark(void)
 {
-  return isSet(obj_flags.extra_flags, ITEM_DARK);
+  return isSet(flags_.extra_flags, ITEM_DARK);
 }
 
 quint64 Object::getLevel(void)
 {
-  return obj_flags.eq_level;
+  return flags_.eq_level;
 }
 
 bool Object::isQuest(void)
@@ -2685,7 +2685,7 @@ bool Object::isTest(void)
 
 bool Object::isGodload(void)
 {
-  return isexact(u"gl"_s, name()) || isexact(u"godload"_s, name()) || isSet(obj_flags.extra_flags, ITEM_SPECIAL);
+  return isexact(u"gl"_s, name()) || isexact(u"godload"_s, name()) || isSet(flags_.extra_flags, ITEM_SPECIAL);
 }
 
 bool Object::hasPortalFlagNoLeave(void)
@@ -2700,7 +2700,7 @@ bool Object::hasPortalFlagNoEnter(void)
 
 Object::~Object()
 {
-  extra_descr_data *next_one;
+  ExtraDescriptionPtr next_one;
   for (auto ths = ex_description; ths; ths = next_one)
   {
     next_one = ths->next;

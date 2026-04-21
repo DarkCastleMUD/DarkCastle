@@ -466,7 +466,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You do not have that type of herb.");
     return ReturnValue::eFAILURE;
   }
-  if (herbobj->obj_flags.type_flag != ITEM_OTHER)
+  if (herbobj->flags_.type_flag != ITEM_OTHER)
   {
     ch->sendln("That is not an herb.");
     return ReturnValue::eFAILURE;
@@ -477,7 +477,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You do not have that type of liquid.");
     return ReturnValue::eFAILURE;
   }
-  if (liquidobj->obj_flags.type_flag != ITEM_DRINKCON)
+  if (liquidobj->flags_.type_flag != ITEM_DRINKCON)
   {
     ch->sendln("That is not a liquid container.");
     return ReturnValue::eFAILURE;
@@ -489,13 +489,13 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (containerobj->obj_flags.type_flag != ITEM_POTION && containerobj->obj_flags.type_flag != ITEM_DRINKCON)
+  if (containerobj->flags_.type_flag != ITEM_POTION && containerobj->flags_.type_flag != ITEM_DRINKCON)
   {
     ch->sendln("That is not a target container.");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(containerobj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (isSet(containerobj->flags_.more_flags, ITEM_CUSTOM))
   {
     ch->sendln("That container is already a brewed potion.");
     return ReturnValue::eFAILURE;
@@ -507,7 +507,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (liquidobj->obj_flags.value[1] < 1)
+  if (liquidobj->flags_.value[1] < 1)
   {
     ch->sendln("There is no liquid left in that container.");
     return ReturnValue::eFAILURE;
@@ -567,13 +567,13 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   // Search for the current combination as a recipe
   Brew::recipe r = {dc_->obj_index[herbobj->item_number].vnum(),
-                    liquidobj->obj_flags.value[2],
+                    liquidobj->flags_.value[2],
                     dc_->obj_index[containerobj->item_number].vnum()};
   qint32 spell = b.find(r);
 
   //  ch->sendln(u"Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n"_s,
   //	 dc_->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
-  //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
+  //	 liquidobj->flags_.value[2], GET_OBJ_SHORT(liquidobj),
   //	 dc_->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
 
   if (spell == 0)
@@ -610,7 +610,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
     // Find liquid key (salty, milk, strong)
     const QString liquid_key;
-    switch (liquidobj->obj_flags.value[2])
+    switch (liquidobj->flags_.value[2])
     {
     case LIQ_MILK:
       liquid_key = "milky";
@@ -632,16 +632,16 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     auto potionshort = u"a %1 %2 %3 potion"_s.arg(container_key).arg(liquid_key).arg(potion_color);
     auto potionlong = u"a %1 %2 %3 potion lies here."_s.arg(container_key).arg(liquid_key).arg(potion_color);
 
-    containerobj->obj_flags.type_flag = ITEM_POTION;
-    containerobj->obj_flags.value[0] = (learned / 2 - 5) + GET_WIS(ch) / 2 + GET_INT(ch) / 2;
-    containerobj->obj_flags.value[1] = spell;
-    containerobj->obj_flags.value[2] = {};
-    containerobj->obj_flags.value[3] = {};
+    containerobj->flags_.type_flag = ITEM_POTION;
+    containerobj->flags_.value[0] = (learned / 2 - 5) + GET_WIS(ch) / 2 + GET_INT(ch) / 2;
+    containerobj->flags_.value[1] = spell;
+    containerobj->flags_.value[2] = {};
+    containerobj->flags_.value[3] = {};
     containerobj->name(potionname);
     containerobj->short_description(potionshort);
     containerobj->long_description(potionlong);
     // We set the item to custom so that it will save everytime uniquely
-    SET_BIT(containerobj->obj_flags.more_flags, ITEM_CUSTOM);
+    SET_BIT(containerobj->flags_.more_flags, ITEM_CUSTOM);
 
     extract_obj(herbobj);
   }
@@ -655,9 +655,9 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
     extract_obj(containerobj);
     extract_obj(herbobj);
-    if (liquidobj->obj_flags.value[1] > 0)
+    if (liquidobj->flags_.value[1] > 0)
     {
-      liquidobj->obj_flags.value[1]--;
+      liquidobj->flags_.value[1]--;
     }
   }
 
@@ -980,7 +980,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You do not have that type of ink.");
     return ReturnValue::eFAILURE;
   }
-  if (inkobj->obj_flags.type_flag != ITEM_DRINKCON || inkobj->obj_flags.value[2] != LIQ_INK)
+  if (inkobj->flags_.type_flag != ITEM_DRINKCON || inkobj->flags_.value[2] != LIQ_INK)
   {
     ch->sendln("That is not ink.");
     return ReturnValue::eFAILURE;
@@ -991,7 +991,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You do not have that type of dust.");
     return ReturnValue::eFAILURE;
   }
-  if (dustobj->obj_flags.type_flag != ITEM_OTHER)
+  if (dustobj->flags_.type_flag != ITEM_OTHER)
   {
     ch->sendln("That is not dust.");
     return ReturnValue::eFAILURE;
@@ -1002,7 +1002,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You do not have that type of pen.");
     return ReturnValue::eFAILURE;
   }
-  if (penobj->obj_flags.type_flag != ITEM_PEN)
+  if (penobj->flags_.type_flag != ITEM_PEN)
   {
     ch->sendln("That is not a pen.");
     return ReturnValue::eFAILURE;
@@ -1013,13 +1013,13 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln("You do not have that type of paper.");
     return ReturnValue::eFAILURE;
   }
-  if (paperobj->obj_flags.type_flag != ITEM_SCROLL)
+  if (paperobj->flags_.type_flag != ITEM_SCROLL)
   {
     ch->sendln("That is not paper.");
     return ReturnValue::eFAILURE;
   }
 
-  if (inkobj->obj_flags.value[1] < 1)
+  if (inkobj->flags_.value[1] < 1)
   {
     ch->sendln("There is no liquid left in that ink container.");
     return ReturnValue::eFAILURE;
@@ -1042,9 +1042,9 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_character("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, 0);
   act_to_room("$n sits down and carefully inscribes the words of the gods onto some parchment.", ch, 0, 0, 0);
 
-  if (inkobj->obj_flags.value[1] > 0)
+  if (inkobj->flags_.value[1] > 0)
   {
-    inkobj->obj_flags.value[1]--;
+    inkobj->flags_.value[1]--;
   }
 
   if (spell == 0)
@@ -1094,17 +1094,17 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
     auto scrollshort = u"a %1 $B%2$R scroll %3 in %4 ink"_s.arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
     auto scrolllong = u"a %1 $B%2$R scroll %3 in %4 ink lies here."_s.arg(paper_key).arg(dust_key).arg(pen_key).arg(ink_key);
 
-    paperobj->obj_flags.type_flag = ITEM_SCROLL;
-    paperobj->obj_flags.value[0] = learned / 4 + ch->getLevel() / 2;
-    paperobj->obj_flags.value[1] = spell;
-    paperobj->obj_flags.value[2] = {};
-    paperobj->obj_flags.value[3] = {};
+    paperobj->flags_.type_flag = ITEM_SCROLL;
+    paperobj->flags_.value[0] = learned / 4 + ch->getLevel() / 2;
+    paperobj->flags_.value[1] = spell;
+    paperobj->flags_.value[2] = {};
+    paperobj->flags_.value[3] = {};
     paperobj->name(scrollname);
     paperobj->short_description(scrollshort);
     paperobj->long_description(scrolllong);
 
     // We set the item to custom so that it will save uniquely every time
-    SET_BIT(paperobj->obj_flags.more_flags, ITEM_CUSTOM);
+    SET_BIT(paperobj->flags_.more_flags, ITEM_CUSTOM);
 
     extract_obj(penobj);
     extract_obj(dustobj);

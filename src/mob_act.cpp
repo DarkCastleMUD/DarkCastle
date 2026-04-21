@@ -191,10 +191,10 @@ void DC::mobile_activity(void)
       best_obj = {};
       for (obj = dc_->world[ch->in_room].contents; obj; obj = obj->next_content)
       {
-        if (CAN_GET_OBJ(ch, obj) && obj->obj_flags.cost > max)
+        if (CAN_GET_OBJ(ch, obj) && obj->flags_.cost > max)
         {
           best_obj = obj;
-          max = obj->obj_flags.cost;
+          max = obj->flags_.cost;
         }
       }
 
@@ -607,7 +607,7 @@ void mob_suprised_sayings(CharacterPtr ch, CharacterPtr aggressor)
 // protected from.  PAL's ANTI's take spell/level whichever higher
 bool is_protected(CharacterPtr vict, CharacterPtr ch)
 {
-  affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
+  affected_typePtr aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
   qint32 level_protected = aff ? aff->modifier : 0;
   if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && vict->getLevel() > level_protected)
     level_protected = vict->getLevel();
@@ -878,7 +878,7 @@ void scavenge(CharacterPtr ch)
           case 14:
             if ((CAN_WEAR(obj, HOLD)) && (!ch->equipment[WEAR_HOLD]))
             {
-              if ((obj->obj_flags.type_flag == ITEM_LIGHT) &&
+              if ((obj->flags_.type_flag == ITEM_LIGHT) &&
                   (!ch->equipment[WEAR_LIGHT]))
               {
                 move_obj(obj, ch);
@@ -888,7 +888,7 @@ void scavenge(CharacterPtr ch)
                 ch->equip_char(obj, WEAR_LIGHT);
                 done = 1;
               }
-              else if (obj->obj_flags.type_flag != ITEM_LIGHT)
+              else if (obj->flags_.type_flag != ITEM_LIGHT)
               {
                 move_obj(obj, ch);
                 act_to_room("$n gets $p.", ch, obj, 0, 0);

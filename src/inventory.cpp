@@ -18,7 +18,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
 
   if (!sub_object || sub_object->carried_by != ch)
   {
-    if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
+    if (isSet(obj_object->flags_.more_flags, ITEM_NO_TRADE))
     {
       if (ch->isNonPlayer())
       {
@@ -34,7 +34,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
 
     // we only have to check for uniqueness if the container is not on the character
     // or if there is no container
-    if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
+    if (isSet(obj_object->flags_.more_flags, ITEM_UNIQUE))
     {
       if (search_char_for_item(ch, obj_object->item_number, false))
       {
@@ -58,11 +58,11 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
   if (sub_object)
   {
     buffer = u"%1_consent"_s.arg(ch->name());
-    if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
+    if (has_consent && obj_object->flags_.type_flag != ITEM_MONEY)
     {
       if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isexact(buffer, sub_object->name()))
       {
-        SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
+        SET_BIT(sub_object->flags_.more_flags, ITEM_PC_CORPSE_LOOTED);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
         logmortal(u"%1 looted %2[%3] from %4"_s.arg(ch->name()).arg(obj_object->short_description()).arg(ch->dc_->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()));
 
@@ -84,7 +84,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name()))
+    else if (has_consent && obj_object->flags_.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name()))
     {
       if (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name()))
       {
@@ -97,7 +97,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
         pthiefaf.bitvector = -1;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
-        logmortal(u"%1 looted %2 coins from %3"_s.arg(qPrintable(ch->name())).arg(obj_object->obj_flags.value[0]).arg(sub_object->name()));
+        logmortal(u"%1 looted %2 coins from %3"_s.arg(qPrintable(ch->name())).arg(obj_object->flags_.value[0]).arg(sub_object->name()));
 
         if (ch->isPlayerGoldThief())
         {
@@ -109,7 +109,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
       }
     }
 
-    if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
+    if (sub_object->in_room && obj_object->flags_.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
       logobjects(u"%1 gets %2[%3] from %4[%5]"_s.arg(qPrintable(ch->name())).arg(obj_object->name()).arg(ch->dc_->obj_index[obj_object->item_number].vnum()).arg(sub_object->name()).arg(ch->dc_->obj_index[sub_object->item_number].vnum()));
       for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -132,7 +132,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     move_obj(obj_object, ch);
     act_to_character("You get $p.", ch, obj_object, 0, 0);
     act_to_room("$n gets $p.", ch, obj_object, 0, INVIS_NULL);
-    if (obj_object->obj_flags.type_flag != ITEM_MONEY)
+    if (obj_object->flags_.type_flag != ITEM_MONEY)
     {
       logobjects(u"%1 gets %2[%3] from room %4"_s.arg(qPrintable(ch->name())).arg(obj_object->name()).arg(ch->dc_->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
       for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
@@ -146,16 +146,16 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
       send_info(buffer);
     }
   }
-  if (sub_object && sub_object->obj_flags.value[3] == 1 &&
+  if (sub_object && sub_object->flags_.value[3] == 1 &&
       isexact("pc", sub_object->name()))
     ch->save(cmd_t::SAVE_SILENTLY);
 
-  if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
-      (obj_object->obj_flags.value[0] >= 1))
+  if ((obj_object->flags_.type_flag == ITEM_MONEY) &&
+      (obj_object->flags_.value[0] >= 1))
   {
     obj_from_char(obj_object);
 
-    buffer = u"There was %1 coins."_s.arg(obj_object->obj_flags.value[0]);
+    buffer = u"There was %1 coins."_s.arg(obj_object->flags_.value[0]);
     if (ch->isNonPlayer() || !isSet(ch->player->toggles, Player::PLR_BRIEF))
     {
       ch->send(buffer);
@@ -165,8 +165,8 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
 
     if (ch->dc_->zones.value(ch->dc_->world[ch->in_room].zone).clanowner > 0 && ch->clan != ch->dc_->zones.value(ch->dc_->world[ch->in_room].zone).clanowner)
     {
-      qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
-      obj_object->obj_flags.value[0] -= cgold;
+      qint32 cgold = (qint32)((qreal)(obj_object->flags_.value[0]) * 0.1);
+      obj_object->flags_.value[0] -= cgold;
       dc_->zones.value(ch->dc_->world[ch->in_room].zone).addGold(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
@@ -175,19 +175,19 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
         dc_->zones.value(ch->dc_->world[ch->in_room].zone).addGold(cgold);
       }
       else
-        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(ch->dc_->zones.value(ch->dc_->world[ch->in_room].zone).clanowner)->name()).arg(cgold).arg(obj_object->obj_flags.value[0]));
+        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(ch->dc_->zones.value(ch->dc_->world[ch->in_room].zone).clanowner)->name()).arg(cgold).arg(obj_object->flags_.value[0]));
     }
-    //	if (sub_object && sub_object->obj_flags.value[3] == 1 &&
+    //	if (sub_object && sub_object->flags_.value[3] == 1 &&
     //           !isexact("pc",sub_object->name()) && ch->clan
     //            && get_clan(ch)->tax_ && !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
-    if (((sub_object && sub_object->obj_flags.value[3] == 1 && !isexact("pc", sub_object->name())) || !sub_object) &&
+    if (((sub_object && sub_object->flags_.value[3] == 1 && !isexact("pc", sub_object->name())) || !sub_object) &&
         ch->clan &&
         get_clan(ch)->tax_ &&
         !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     {
-      qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * (qreal)((qreal)(get_clan(ch)->tax_) / 100.0));
-      obj_object->obj_flags.value[0] -= cgold;
-      ch->addGold(obj_object->obj_flags.value[0]);
+      qint32 cgold = (qint32)((qreal)(obj_object->flags_.value[0]) * (qreal)((qreal)(get_clan(ch)->tax_) / 100.0));
+      obj_object->flags_.value[0] -= cgold;
+      ch->addGold(obj_object->flags_.value[0]);
       get_clan(ch)->cdeposit(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
@@ -196,12 +196,12 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
       }
       else
       {
-        ch->sendln(u"Your clan taxes you %1 $B$5gold$R, leaving %2 $B$5gold$R for you."_s.arg(cgold).arg(obj_object->obj_flags.value[0]));
+        ch->sendln(u"Your clan taxes you %1 $B$5gold$R, leaving %2 $B$5gold$R for you."_s.arg(cgold).arg(obj_object->flags_.value[0]));
       }
       save_clans();
     }
     else
-      ch->addGold(obj_object->obj_flags.value[0]);
+      ch->addGold(obj_object->flags_.value[0]);
 
     // If a mob gets gold, we disable its ability to receive a gold bonus. This keeps
     // the mob from turning into an interest bearing savings account. :)
@@ -212,7 +212,7 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
 
     if (tax)
     {
-      buffer += u". %1 $B$5gold$R remaining.\r\n"_s.arg(obj_object->obj_flags.value[0]);
+      buffer += u". %1 $B$5gold$R remaining.\r\n"_s.arg(obj_object->flags_.value[0]);
     }
     else
     {
@@ -368,30 +368,30 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         continue;
 
       // Can't pick up NO_NOTICE items with 'get all'  only 'all.X' or 'X'
-      if (!alldot && isSet(obj_object->obj_flags.more_flags, ITEM_NONOTICE) && !ch->isImmortalPlayer())
+      if (!alldot && isSet(obj_object->flags_.more_flags, ITEM_NONOTICE) && !ch->isImmortalPlayer())
         continue;
 
       // Ignore NO_TRADE items on a 'get all'
-      if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
+      if (isSet(obj_object->flags_.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
       {
         ch->send(u"The %1 appears to be NO_TRADE so you don't pick it up.\r\n"_s.arg(obj_object->short_description()));
         continue;
       }
       if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-          obj_object->obj_flags.value[0] > 10000 &&
+          obj_object->flags_.value[0] > 10000 &&
           ch->getLevel() < 5)
       {
         ch->sendln("You cannot pick up that much money!");
         continue;
       }
 
-      if (obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
+      if (obj_object->flags_.eq_level > 9 && ch->getLevel() < 5)
       {
         ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
         continue;
       }
 
-      if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+      if (isSet(obj_object->flags_.extra_flags, ITEM_SPECIAL) &&
           !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
       {
         ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s.arg(obj_object->short_description()));
@@ -399,7 +399,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       }
 
       // PC corpse
-      if ((obj_object->obj_flags.value[3] == 1 && isexact("pc", obj_object->name())) || isexact("thiefcorpse", obj_object->name()))
+      if ((obj_object->flags_.value[3] == 1 && isexact("pc", obj_object->name())) || isexact("thiefcorpse", obj_object->name()))
       {
         dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
         if ((isexact("thiefcorpse", obj_object->name()) &&
@@ -439,7 +439,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
           ch->send(buffer);
           fail = true;
         }
-        else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) && !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
+        else if ((IS_CARRYING_W(ch) + obj_object->flags_.weight) > CAN_CARRY_W(ch) && !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
         {
           dc_sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
           ch->send(buffer);
@@ -483,8 +483,8 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     obj_object = get_obj_in_list_vis(ch, arg1, ch->dc_->world[ch->in_room].contents_);
     if (obj_object)
     {
-      if (obj_object->obj_flags.type_flag == ITEM_CONTAINER &&
-          obj_object->obj_flags.value[3] == 1 &&
+      if (obj_object->flags_.type_flag == ITEM_CONTAINER &&
+          obj_object->flags_.value[3] == 1 &&
           isexact("pc", obj_object->name()))
       {
         dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
@@ -500,7 +500,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         has_consent = false; // reset it
       }
 
-      if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+      if (isSet(obj_object->flags_.extra_flags, ITEM_SPECIAL) &&
           !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
       {
         ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s.arg(obj_object->short_description()));
@@ -512,7 +512,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->send(buffer);
         fail = true;
       }
-      else if ((IS_CARRYING_W(ch) + obj_object->obj_flags.weight) > CAN_CARRY_W(ch) &&
+      else if ((IS_CARRYING_W(ch) + obj_object->flags_.weight) > CAN_CARRY_W(ch) &&
                !ch->isImmortalPlayer() && GET_ITEM_TYPE(obj_object) != ITEM_MONEY)
       {
         dc_sprintf(buffer, "%s : You can't carry that much weight.\r\n", qPrintable(fname(obj_object->name())));
@@ -520,14 +520,14 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         fail = true;
       }
       else if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-               obj_object->obj_flags.value[0] > 10000 &&
+               obj_object->flags_.value[0] > 10000 &&
                ch->getLevel() < 5)
       {
         ch->sendln("You cannot pick up that much money!");
         fail = true;
       }
 
-      else if (obj_object->obj_flags.eq_level > 19 && ch->getLevel() < 5)
+      else if (obj_object->flags_.eq_level > 19 && ch->getLevel() < 5)
       {
         if (ch->in_room != real_room(3099))
         {
@@ -586,8 +586,8 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (sub_object)
     {
-      if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
-          ((sub_object->obj_flags.value[3] == 1 &&
+      if (sub_object->flags_.type_flag == ITEM_CONTAINER &&
+          ((sub_object->flags_.value[3] == 1 &&
             isexact("pc", sub_object->name())) ||
            isexact("thiefcorpse", sub_object->name())))
       {
@@ -602,7 +602,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       if (ARE_CONTAINERS(sub_object))
       {
-        if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
+        if (isSet(sub_object->flags_.value[1], CONT_CLOSED))
         {
           dc_sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
@@ -622,7 +622,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
        for (temp = obj_object->contains;temp;temp = next_contentthing)
        {
       next_contentthing = temp->next_content;
-      if(isSet(temp->obj_flags.more_flags, ITEM_NO_TRADE))
+      if(isSet(temp->flags_.more_flags, ITEM_NO_TRADE))
       {
       ch->send(u"Whoa!  The %s inside the %s poofed into thin air!\r\n"_s.arg(temp->short_description,obj_object->short_description));
       extract_obj(temp);
@@ -636,13 +636,13 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
           }
 
           // Ignore NO_TRADE items on a 'get all'
-          if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) && ch->getLevel() < 100)
+          if (isSet(obj_object->flags_.more_flags, ITEM_NO_TRADE) && ch->getLevel() < 100)
           {
             ch->send(u"The %1 appears to be NO_TRADE so you don't pick it up.\r\n"_s.arg(obj_object->short_description()));
             continue;
           }
 
-          if (isSet(obj_object->obj_flags.extra_flags, ITEM_SPECIAL) &&
+          if (isSet(obj_object->flags_.extra_flags, ITEM_SPECIAL) &&
               !isexact(qPrintable(ch->name()), obj_object->name()) && ch->getLevel() < IMPLEMENTER)
           {
             ch->send(u"The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n"_s.arg(obj_object->short_description()));
@@ -661,10 +661,10 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
             else
             {
               if (inventorycontainer ||
-                  (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) ||
+                  (IS_CARRYING_W(ch) + obj_object->flags_.weight) < CAN_CARRY_W(ch) ||
                   ch->getLevel() > IMMORTAL || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
               {
-                if (has_consent && isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE))
+                if (has_consent && isSet(obj_object->flags_.more_flags, ITEM_NO_TRADE))
                 {
                   // if I have consent and i'm touching the corpse, then I shouldn't be able
                   // to pick up no_trade items because it is someone else's corpse.  If I am
@@ -682,14 +682,14 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
                   }
                 }
                 if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-                    obj_object->obj_flags.value[0] > 10000 &&
+                    obj_object->flags_.value[0] > 10000 &&
                     ch->getLevel() < 5)
                 {
                   ch->sendln("You cannot pick up that much money!");
                   continue;
                 }
 
-                if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
+                if (sub_object->carried_by != ch && obj_object->flags_.eq_level > 9 && ch->getLevel() < 5)
                 {
                   ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
                   continue;
@@ -760,8 +760,8 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (sub_object)
     {
-      if (sub_object->obj_flags.type_flag == ITEM_CONTAINER &&
-          ((sub_object->obj_flags.value[3] == 1 &&
+      if (sub_object->flags_.type_flag == ITEM_CONTAINER &&
+          ((sub_object->flags_.value[3] == 1 &&
             isexact("pc", sub_object->name())) ||
            isexact("thiefcorpse", sub_object->name())))
       {
@@ -769,7 +769,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if ((cmd != cmd_t::LOOT && (isexact("thiefcorpse", sub_object->name()) && !isexact(qPrintable(ch->name()), sub_object->name()))) || isexact(buffer, sub_object->name()))
           has_consent = true;
-        if (!isexact(qPrintable(ch->name()), sub_object->name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isSet(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(ch->dc_->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
+        if (!isexact(qPrintable(ch->name()), sub_object->name()) && (cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isSet(sub_object->flags_.more_flags, ITEM_PC_CORPSE_LOOTED) && !isSet(ch->dc_->world[ch->in_room].room_flags, SAFE) && ch->getLevel() >= 50)
           has_consent = true;
         if (!has_consent && !isexact(qPrintable(ch->name()), sub_object->name()))
         {
@@ -781,7 +781,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       if (ARE_CONTAINERS(sub_object))
       {
-        if (isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
+        if (isSet(sub_object->flags_.value[1], CONT_CLOSED))
         {
           dc_sprintf(buffer, "The %s is closed.\r\n", qPrintable(fname(sub_object->name())));
           ch->send(buffer);
@@ -796,14 +796,14 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
         if (obj_object)
         {
           if (GET_ITEM_TYPE(obj_object) == ITEM_MONEY &&
-              obj_object->obj_flags.value[0] > 10000 &&
+              obj_object->flags_.value[0] > 10000 &&
               ch->getLevel() < 5)
           {
             ch->sendln("You cannot pick up that much money!");
             fail = true;
           }
 
-          else if (sub_object->carried_by != ch && obj_object->obj_flags.eq_level > 9 && ch->getLevel() < 5)
+          else if (sub_object->carried_by != ch && obj_object->flags_.eq_level > 9 && ch->getLevel() < 5)
           {
             ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
             fail = true;
@@ -817,9 +817,9 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
             fail = true;
           }
           else if (inventorycontainer ||
-                   (IS_CARRYING_W(ch) + obj_object->obj_flags.weight) < CAN_CARRY_W(ch) || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
+                   (IS_CARRYING_W(ch) + obj_object->flags_.weight) < CAN_CARRY_W(ch) || GET_ITEM_TYPE(obj_object) == ITEM_MONEY)
           {
-            if (has_consent && (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) ||
+            if (has_consent && (isSet(obj_object->flags_.more_flags, ITEM_NO_TRADE) ||
                                 contains_no_trade_item(obj_object)))
             {
               // if I have consent and i'm touching the corpse, then I shouldn't be able
@@ -846,7 +846,7 @@ command_return_t do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
                   if ((cmd == cmd_t::LOOT && isexact("lootable", sub_object->name())) && !isexact(buffer, sub_object->name()))
                   {
-                    SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
+                    SET_BIT(sub_object->flags_.more_flags, ITEM_PC_CORPSE_LOOTED);
                     affected_type pthiefaf;
 
                     pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
@@ -965,7 +965,7 @@ command_return_t do_consent(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (obj = dc_->object_list; obj; obj = obj->next)
   {
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER || obj->obj_flags.value[3] != 1 || obj->name().isEmpty())
+    if (obj->flags_.type_flag != ITEM_CONTAINER || obj->flags_.value[3] != 1 || obj->name().isEmpty())
       continue;
 
     if (!isexact(qPrintable(ch->name()), obj->name()))
@@ -1003,7 +1003,7 @@ qint32 contents_cause_unique_problem(ObjectPtr obj, CharacterPtr vict)
     if (lastnum == inside->item_number) // items are in order.  If we've already checked
       continue;                         // this item, don't do it again.
 
-    if (isSet(inside->obj_flags.more_flags, ITEM_UNIQUE) &&
+    if (isSet(inside->flags_.more_flags, ITEM_UNIQUE) &&
         search_char_for_item(vict, inside->item_number, false))
       return true;
     lastnum = inside->item_number;
@@ -1017,7 +1017,7 @@ qint32 contains_no_trade_item(ObjectPtr obj)
 
   while (inside)
   {
-    if (isSet(inside->obj_flags.more_flags, ITEM_NO_TRADE))
+    if (isSet(inside->flags_.more_flags, ITEM_NO_TRADE))
       return true;
     inside = inside->next_content;
   }
@@ -1098,7 +1098,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
         if (alldot[0] != '\0' && !isexact(alldot, tmp_object->name()))
           continue;
 
-        if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(tmp_object->flags_.extra_flags, ITEM_SPECIAL))
           continue;
 
         if (!ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
@@ -1106,14 +1106,14 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           ch->sendln("Your criminal acts prohibit it.");
           return ReturnValue::eFAILURE;
         }
-        if (isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE))
+        if (isSet(tmp_object->flags_.more_flags, ITEM_NO_TRADE))
           continue;
         if (contains_no_trade_item(tmp_object))
           continue;
-        if (!isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
+        if (!isSet(tmp_object->flags_.extra_flags, ITEM_NODROP) ||
             ch->isImmortalPlayer())
         {
-          if (isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
+          if (isSet(tmp_object->flags_.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
           if (CAN_SEE_OBJ(ch, tmp_object))
           {
@@ -1127,7 +1127,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           else
             ch->sendln("You drop something.");
 
-          if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
+          if (tmp_object->flags_.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
             dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, dc_->obj_index[tmp_object->item_number].vnum(), ch->in_room);
@@ -1172,7 +1172,7 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           ch->sendln("Your criminal acts prohibit it.");
           return ReturnValue::eFAILURE;
         }
-        if (isSet(tmp_object->obj_flags.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
+        if (isSet(tmp_object->flags_.more_flags, ITEM_NO_TRADE) && !ch->isImmortalPlayer())
         {
           ch->sendln("It seems magically attached to you.");
           return ReturnValue::eFAILURE;
@@ -1183,19 +1183,19 @@ command_return_t do_drop(CharacterPtr ch, QString argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
         }
 
-        if (isSet(tmp_object->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (isSet(tmp_object->flags_.extra_flags, ITEM_SPECIAL))
         {
           ch->sendln("You can't drop godload items.");
           return ReturnValue::eFAILURE;
         }
-        else if (!isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP) ||
+        else if (!isSet(tmp_object->flags_.extra_flags, ITEM_NODROP) ||
                  ch->isImmortalPlayer())
         {
-          if (isSet(tmp_object->obj_flags.extra_flags, ITEM_NODROP))
+          if (isSet(tmp_object->flags_.extra_flags, ITEM_NODROP))
             ch->sendln("(This item is cursed, BTW.)");
           ch->sendln(u"You drop the %1."_s.arg(tmp_object->short_description));
           act_to_room("$n drops $p.", ch, tmp_object, 0, INVIS_NULL);
-          if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
+          if (tmp_object->flags_.type_flag != ITEM_MONEY)
           {
             QString log_buf = {};
             dc_sprintf(log_buf, "%s drops %s[%d] in room %d", qPrintable(ch->name()), tmp_object->short_description, dc_->obj_index[tmp_object->item_number].vnum(), ch->in_room);
@@ -1262,7 +1262,7 @@ qint32 weight_in(ObjectPtr obj)
   qint32 w = {};
   ObjectPtr obj2;
   for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
-    w += obj2->obj_flags.weight;
+    w += obj2->flags_.weight;
   return w;
 }
 
@@ -1310,7 +1310,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (obj_object)
       {
-        if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP))
+        if (isSet(obj_object->flags_.extra_flags, ITEM_NODROP))
         {
           if (!ch->isImmortalPlayer())
           {
@@ -1325,7 +1325,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
           ch->sendln("You must display this flag for all to see!");
           return ReturnValue::eFAILURE;
         }
-        if (isSet(obj_object->obj_flags.extra_flags, ITEM_NEWBIE))
+        if (isSet(obj_object->flags_.extra_flags, ITEM_NEWBIE))
         {
           ch->sendln("The protective enchantment this item holds cannot be held within this container.");
           return ReturnValue::eFAILURE;
@@ -1356,7 +1356,7 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
               return ReturnValue::eFAILURE;
             }
 
-            if (!isSet(sub_object->obj_flags.value[1], CONT_CLOSED))
+            if (!isSet(sub_object->flags_.value[1], CONT_CLOSED))
             {
               // Can't put an item in itself
               if (obj_object == sub_object)
@@ -1373,14 +1373,14 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
               }
 
               // Can't put NO_TRADE item in someone else's container/altar/totem
-              if (isSet(obj_object->obj_flags.more_flags, ITEM_NO_TRADE) &&
+              if (isSet(obj_object->flags_.more_flags, ITEM_NO_TRADE) &&
                   sub_object->carried_by != ch)
               {
                 ch->sendln("You can't trade that item.");
                 return ReturnValue::eFAILURE;
               }
 
-              if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->item_number))
+              if (isSet(obj_object->flags_.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->item_number))
               {
                 ch->sendln("The object's uniqueness prevents it!");
                 return ReturnValue::eFAILURE;
@@ -1403,11 +1403,11 @@ command_return_t do_put(CharacterPtr ch, QString argument, cmd_t cmd)
                 }
               }
 
-              if (((sub_object->obj_flags.weight) +
-                   (obj_object->obj_flags.weight)) <=
-                      (sub_object->obj_flags.value[0]) &&
+              if (((sub_object->flags_.weight) +
+                   (obj_object->flags_.weight)) <=
+                      (sub_object->flags_.value[0]) &&
                   (ch->dc_->obj_index[sub_object->item_number].vnum() != 536 ||
-                   weight_in(sub_object) + obj_object->obj_flags.weight <= 200))
+                   weight_in(sub_object) + obj_object->flags_.weight <= 200))
               {
                 if (bits == FIND_OBJ_INV)
                 {
@@ -1688,7 +1688,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     sendln("You do not seem to have anything like that.");
     return ReturnValue::eFAILURE;
   }
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && getLevel() < OVERSEER)
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) && getLevel() < OVERSEER)
   {
     sendln("That sure would be a fucking stupid thing to do.");
     return ReturnValue::eFAILURE;
@@ -1700,7 +1700,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
   {
     if (getLevel() < DEITY)
     {
@@ -1712,7 +1712,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   }
 
   // Handle no-trade items
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
     // Mortal this can give immortal vict no-trade items
     if (!isImmortalPlayer() && vict->isImmortalPlayer())
@@ -1750,7 +1750,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     act_to_character("$N graciously refuses your gift.", this, 0, vict, 0);
     return ReturnValue::eFAILURE;
   }
-  if (vict->isNonPlayer() && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
+  if (vict->isNonPlayer() && IS_AFFECTED(vict, AFF_CHARM) && (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) || contains_no_trade_item(obj)))
   {
     sendln("The creature doesn't understand what you're trying to do.");
     return ReturnValue::eFAILURE;
@@ -1786,7 +1786,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   }
 
   // Check if mortal this is trying to give more weight to vict than they can carry
-  if (obj->obj_flags.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
+  if (obj->flags_.weight + IS_CARRYING_W(vict) > CAN_CARRY_W(vict))
   {
     if (isImmortalPlayer())
     {
@@ -1808,7 +1808,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE))
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
@@ -1852,7 +1852,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   retval = mprog_give_trigger(vict, this, obj);
   bool objExists(ObjectPtr obj);
-  if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && vict->isNonPlayer() &&
+  if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->flags_.more_flags, ITEM_NO_TRADE) && vict->isNonPlayer() &&
       objExists(obj))
     extract_obj(obj);
 
@@ -1878,7 +1878,7 @@ ObjectPtr bring_type_to_front(CharacterPtr ch, qint32 item_type)
   {
     if (GET_ITEM_TYPE(item_carried) == item_type)
       return item_carried;
-    if (GET_ITEM_TYPE(item_carried) == ITEM_CONTAINER && !isSet(item_carried->obj_flags.value[1], CONT_CLOSED))
+    if (GET_ITEM_TYPE(item_carried) == ITEM_CONTAINER && !isSet(item_carried->flags_.value[1], CONT_CLOSED))
     { // search inside if open
       container_queue.push(item_carried);
     }
@@ -2246,17 +2246,17 @@ command_return_t Character::do_open(QStringList arguments, cmd_t cmd)
   {
     found = true;
     // this is an object
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+    if (obj->flags_.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
-    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!isSet(obj->flags_.value[1], CONT_CLOSED))
       ch->sendln("But it's already open!");
-    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSEABLE))
+    else if (!isSet(obj->flags_.value[1], CONT_CLOSEABLE))
       ch->sendln("You can't do that.");
-    else if (isSet(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (isSet(obj->flags_.value[1], CONT_LOCKED))
       ch->sendln("It seems to be locked.");
     else
     {
-      REMOVE_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+      REMOVE_BIT(obj->flags_.value[1], CONT_CLOSED);
       ch->sendln("Ok.");
       act_to_room("$n opens $p.", ch, obj, 0, 0);
     }
@@ -2327,15 +2327,15 @@ command_return_t do_close(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (generic_find(argument, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, ch, &victim, &obj, true))
   {
     found = true;
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+    if (obj->flags_.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
-    else if (isSet(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (isSet(obj->flags_.value[1], CONT_CLOSED))
       ch->sendln("But it's already closed!");
-    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSEABLE))
+    else if (!isSet(obj->flags_.value[1], CONT_CLOSEABLE))
       ch->sendln("That's impossible.");
     else
     {
-      SET_BIT(obj->obj_flags.value[1], CONT_CLOSED);
+      SET_BIT(obj->flags_.value[1], CONT_CLOSED);
       ch->sendln("Ok.");
       act_to_room("$n closes $p.", ch, obj, 0, 0);
     }
@@ -2401,19 +2401,19 @@ command_return_t do_lock(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     /* ths is an object */
 
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+    if (obj->flags_.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
-    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!isSet(obj->flags_.value[1], CONT_CLOSED))
       ch->sendln("Maybe you should close it first...");
-    else if (obj->obj_flags.value[2] < 0)
+    else if (obj->flags_.value[2] < 0)
       ch->sendln("That thing can't be locked.");
-    else if (!has_key(ch, obj->obj_flags.value[2]))
+    else if (!has_key(ch, obj->flags_.value[2]))
       ch->sendln("You don't seem to have the proper key.");
-    else if (isSet(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (isSet(obj->flags_.value[1], CONT_LOCKED))
       ch->sendln("It is locked already.");
     else
     {
-      SET_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+      SET_BIT(obj->flags_.value[1], CONT_LOCKED);
       ch->sendln("*Cluck*");
       act_to_room("$n locks $p - 'cluck', it says.", ch, obj, 0, 0);
     }
@@ -2475,19 +2475,19 @@ command_return_t do_unlock(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     /* ths is an object */
 
-    if (obj->obj_flags.type_flag != ITEM_CONTAINER)
+    if (obj->flags_.type_flag != ITEM_CONTAINER)
       ch->sendln("That's not a container.");
-    else if (!isSet(obj->obj_flags.value[1], CONT_CLOSED))
+    else if (!isSet(obj->flags_.value[1], CONT_CLOSED))
       ch->sendln("Silly - it ain't even closed!");
-    else if (obj->obj_flags.value[2] < 0)
+    else if (obj->flags_.value[2] < 0)
       ch->sendln("Odd - you can't seem to find a keyhole.");
-    else if (!has_key(ch, obj->obj_flags.value[2]))
+    else if (!has_key(ch, obj->flags_.value[2]))
       ch->sendln("You don't seem to have the proper key.");
-    else if (!isSet(obj->obj_flags.value[1], CONT_LOCKED))
+    else if (!isSet(obj->flags_.value[1], CONT_LOCKED))
       ch->sendln("Oh.. it wasn't locked, after all.");
     else
     {
-      REMOVE_BIT(obj->obj_flags.value[1], CONT_LOCKED);
+      REMOVE_BIT(obj->flags_.value[1], CONT_LOCKED);
       ch->sendln("*Click*");
       act_to_room("$n unlocks $p.", ch, obj, 0, 0);
     }
@@ -2551,7 +2551,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
 
   if (!sub_object || sub_object->carried_by != ch)
   {
-    if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
+    if (isSet(obj_object->flags_.more_flags, ITEM_UNIQUE))
       if (search_char_for_item(ch, obj_object->item_number, false))
       {
         ch->sendln("The item's uniqueness prevents it!");
@@ -2584,11 +2584,11 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
   if (sub_object)
   {
     dc_sprintf(buffer, "%s_consent", qPrintable(ch->name()));
-    if (has_consent && obj_object->obj_flags.type_flag != ITEM_MONEY)
+    if (has_consent && obj_object->flags_.type_flag != ITEM_MONEY)
     {
       if (isexact("lootable", sub_object->name()) && !isexact(buffer, sub_object->name()))
       {
-        SET_BIT(sub_object->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED);
+        SET_BIT(sub_object->flags_.more_flags, ITEM_PC_CORPSE_LOOTED);
         ;
         affected_type pthiefaf;
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
@@ -2609,7 +2609,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
           affect_to_char(ch, &pthiefaf);
       }
     }
-    else if (has_consent && obj_object->obj_flags.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name()))
+    else if (has_consent && obj_object->flags_.type_flag == ITEM_MONEY && !isexact(buffer, sub_object->name()))
     {
       if (isexact("lootable", sub_object->name()))
       {
@@ -2635,7 +2635,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
   }
   move_obj(obj_object, ch);
   QString log_buf = {};
-  if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
+  if (sub_object && sub_object->in_room && obj_object->flags_.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
     //"%s palms %s[%d] from %s", qPrintable(ch->name()), obj_object->name(), dc_->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->name()));
 
@@ -2644,7 +2644,7 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
       dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
                 dc_->obj_index[loop_obj->item_number].vnum());
   }
-  else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
+  else if (!sub_object && obj_object->flags_.type_flag != ITEM_MONEY)
   {
     dc_sprintf(log_buf, "%s palms %s[%d] from room %d", qPrintable(ch->name()), obj_object->name(), dc_->obj_index[obj_object->item_number].vnum(),
                ch->in_room);
@@ -2670,23 +2670,23 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
     else
       act_to_room("$n gets $p.", ch, obj_object, 0, INVIS_NULL);
   }
-  if ((obj_object->obj_flags.type_flag == ITEM_MONEY) &&
-      (obj_object->obj_flags.value[0] >= 1))
+  if ((obj_object->flags_.type_flag == ITEM_MONEY) &&
+      (obj_object->flags_.value[0] >= 1))
   {
     obj_from_char(obj_object);
     dc_sprintf(buffer, "There was %d coins.\r\n",
-               obj_object->obj_flags.value[0]);
+               obj_object->flags_.value[0]);
     ch->send(buffer);
     if (dc_->zones.value(dc_->world[ch->in_room].zone).clanowner > 0 && ch->clan !=
                                                                             dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)
     {
-      qint32 cgold = (qint32)((qreal)(obj_object->obj_flags.value[0]) * 0.1);
-      obj_object->obj_flags.value[0] -= cgold;
-      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
+      qint32 cgold = (qint32)((qreal)(obj_object->flags_.value[0]) * 0.1);
+      obj_object->flags_.value[0] -= cgold;
+      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(dc_->zones.value(dc_->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->flags_.value[0]));
       dc_->zones.value(dc_->world[ch->in_room].zone).addGold(cgold);
     }
 
-    ch->addGold(obj_object->obj_flags.value[0]);
+    ch->addGold(obj_object->flags_.value[0]);
     extract_obj(obj_object);
   }
   return ReturnValue::eSUCCESS;

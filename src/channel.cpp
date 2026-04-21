@@ -5,7 +5,7 @@
 */
 #include "DC/DC.h"
 
-QQueue<ChannelMessage> gossip_history;
+QQueue<ChannelMessagePtr> gossip_history;
 QQueue<QString> auction_history;
 QQueue<QString> newbie_history;
 QQueue<QString> trivia_history;
@@ -262,7 +262,7 @@ command_return_t do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   if (!(*argument))
   {
-    QQueue<ChannelMessage> msgs = gossip_history;
+    QQueue<ChannelMessagePtr> msgs = gossip_history;
     if (msgs.isEmpty())
     {
       ch->sendln("There have not been any player gossips.");

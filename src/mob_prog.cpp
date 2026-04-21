@@ -689,7 +689,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else
       {
-        uintval = (quint32 *)&otarget->obj_flags.cost;
+        uintval = (quint32 *)&otarget->flags_.cost;
       }
     }
     break;
@@ -765,7 +765,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else
       {
-        uintval = &otarget->obj_flags.extra_flags;
+        uintval = &otarget->flags_.extra_flags;
       }
     }
     break;
@@ -898,7 +898,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else if (otarget)
       {
-        intval = reinterpret_cast<decltype(intval)>(&otarget->obj_flags.eq_level);
+        intval = reinterpret_cast<decltype(intval)>(&otarget->flags_.eq_level);
       }
       else
       {
@@ -992,7 +992,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else
       {
-        uintval = &otarget->obj_flags.more_flags;
+        uintval = &otarget->flags_.more_flags;
       }
     }
     else if (!str_cmp(right, "move"))
@@ -1148,7 +1148,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else
       {
-        intval = (qint16 *)&otarget->obj_flags.size;
+        intval = (qint16 *)&otarget->flags_.size;
       }
     }
     else if (!str_cmp(right, "short"))
@@ -1222,7 +1222,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       if (!otarget)
         tError = true;
       else
-        sbval = (qint8 *)&otarget->obj_flags.type_flag;
+        sbval = (qint8 *)&otarget->flags_.type_flag;
     }
     else if (!str_cmp(right, "thirst"))
     {
@@ -1240,28 +1240,28 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       if (!otarget)
         tError = true;
       else
-        uintval = (quint32 *)&otarget->obj_flags.value[0];
+        uintval = (quint32 *)&otarget->flags_.value[0];
     }
     else if (!str_cmp(right, "value1"))
     {
       if (!otarget)
         tError = true;
       else
-        uintval = (quint32 *)&otarget->obj_flags.value[1];
+        uintval = (quint32 *)&otarget->flags_.value[1];
     }
     else if (!str_cmp(right, "value2"))
     {
       if (!otarget)
         tError = true;
       else
-        uintval = (quint32 *)&otarget->obj_flags.value[2];
+        uintval = (quint32 *)&otarget->flags_.value[2];
     }
     else if (!str_cmp(right, "value3"))
     {
       if (!otarget)
         tError = true;
       else
-        uintval = (quint32 *)&otarget->obj_flags.value[3];
+        uintval = (quint32 *)&otarget->flags_.value[3];
     }
     break;
   case 'w':
@@ -1271,7 +1271,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else
       {
-        auto tmp_quint32 = otarget->obj_flags.wear_flags.toInt();
+        auto tmp_quint32 = otarget->flags_.wear_flags.toInt();
         uintval = &tmp_quint32;
       }
     }
@@ -1281,7 +1281,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         tError = true;
       else if (otarget)
       {
-        intval = &otarget->obj_flags.weight;
+        intval = &otarget->flags_.weight;
       }
       else
         sbval = (qint8 *)&target->weight;
@@ -1342,50 +1342,6 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
  * to reduce the redundancy of the mammoth if statement list.
  * If there are errors, then return -1 otherwise return boolean 1,0
  */
-
-// Azrack -- this was originally returning a bool, but its returning all sorts of values,
-// switched it to qint32
-
-enum mprog_ifs
-{
-  eRAND = 1, // start this at 1, QMap returns 0 if not found
-  eRAND1K,
-  eAMTITEMS,
-  eNUMPCS,
-  eNUMOFMOBSINWORLD,
-  eNUMOFMOBSINROOM,
-  eISPC,
-  eISWIELDING,
-  eISWEAPPRI,
-  eISWEAPSEC,
-  eISNPC,
-  eISGOOD,
-  eISNEUTRAL,
-  eISEVIL,
-  eISWORN,
-  eISFIGHT,
-  eISTANK,
-  eISIMMORT,
-  eISCHARMED,
-  eISFOLLOW,
-  eISSPELLED,
-  eISAFFECTED,
-  eHITPRCNT,
-  eWEARS,
-  eCARRIES,
-  eNUMBER,
-  eTEMPVAR,
-  eISMOBVNUMINROOM,
-  eISOBJVNUMINROOM,
-  eCANSEE,
-  eHASDONEQUEST1,
-  eINSAMEZONE,
-  eCLAN,
-  eISDAYTIME,
-  eISRAINING,
-  eNUMOFOBJSINWORLD
-
-};
 
 QMap<QString, mprog_ifs> load_ifchecks()
 {
@@ -1865,34 +1821,34 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eISWEAPPRI:
     if (fvict && fvict->equipment[WEAR_WIELD])
-      return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+      return mprog_veval(fvict->equipment[WEAR_WIELD]->flags_.value[3], opr, dc_atoi(val));
     if (ye)
       return false;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
       if (mob->equipment[WEAR_WIELD])
-        return mprog_veval(mob->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(mob->equipment[WEAR_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'z':
       if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD])
-        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return -1;
     case 'n':
       if (actor && actor->equipment[WEAR_WIELD])
-        return mprog_veval(actor->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(actor->equipment[WEAR_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 't':
       if (vict && vict->equipment[WEAR_WIELD])
-        return mprog_veval(vict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(vict->equipment[WEAR_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'r':
       if (rndm && rndm->equipment[WEAR_WIELD])
-        return mprog_veval(rndm->equipment[WEAR_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(rndm->equipment[WEAR_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     default:
@@ -1903,34 +1859,34 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eISWEAPSEC:
     if (fvict && fvict->equipment[WEAR_SECOND_WIELD])
-      return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+      return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->flags_.value[3], opr, dc_atoi(val));
     if (ye)
       return false;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
       if (mob->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'z':
       if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return -1;
     case 'n':
       if (actor && actor->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 't':
       if (vict && vict->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     case 'r':
       if (rndm && rndm->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, dc_atoi(val));
+        return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->flags_.value[3], opr, dc_atoi(val));
       else
         return 0;
     default:

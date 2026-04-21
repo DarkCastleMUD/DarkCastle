@@ -521,8 +521,8 @@ qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
   dc_sprintf(buf, "%s %s q%d", quest->objkey, qPrintable(ch->name()), quest->number);
   obj->name(buf);
 
-  SET_BIT(obj->obj_flags.extra_flags, ITEM_SPECIAL);
-  SET_BIT(obj->obj_flags.extra_flags, ITEM_QUEST);
+  SET_BIT(obj->flags_.extra_flags, ITEM_SPECIAL);
+  SET_BIT(obj->flags_.extra_flags, ITEM_QUEST);
 
   obj_to_char(obj, mob);
   wear(mob, obj, obj->keywordfind());
@@ -1520,7 +1520,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
          extract_obj(obj);
          return ReturnValue::eSUCCESS;
           } else */
-    if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
+    if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) &&
         search_char_for_item(ch, obj->item_number, false))
     {
       owner->do_tell(u"%1 You already have one of those."_s.arg(qPrintable(ch->name())).split(' '));
@@ -1528,17 +1528,17 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       return ReturnValue::eSUCCESS;
     }
 
-    if (GET_QPOINTS(ch) < (quint32)(obj->obj_flags.cost / 10000))
+    if (GET_QPOINTS(ch) < (quint32)(obj->flags_.cost / 10000))
     {
       owner->do_tell(u"%1 Come back when you've got the qpoints."_s.arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
 
-    GET_QPOINTS(ch) -= (obj->obj_flags.cost / 10000);
+    GET_QPOINTS(ch) -= (obj->flags_.cost / 10000);
 
-    SET_BIT(obj->obj_flags.more_flags, ITEM_24H_NO_SELL);
-    SET_BIT(obj->obj_flags.more_flags, ITEM_CUSTOM);
+    SET_BIT(obj->flags_.more_flags, ITEM_24H_NO_SELL);
+    SET_BIT(obj->flags_.more_flags, ITEM_CUSTOM);
     obj->no_sell_expiration = time(nullptr) + (60 * 60 * 24);
 
     obj_to_char(obj, ch);
@@ -1563,7 +1563,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       return ReturnValue::eSUCCESS;
     }
 
-    if (isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
+    if (isSet(obj->flags_.more_flags, ITEM_24H_NO_SELL))
     {
       time_t now = time(nullptr);
       time_t expires = obj->no_sell_expiration;
@@ -1574,7 +1574,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       }
     }
 
-    qint32 cost = obj->obj_flags.cost / 10000.0;
+    qint32 cost = obj->flags_.cost / 10000.0;
 
     owner->do_tell(u"%1 I'll give you %2 qpoints for that. Thanks for shoppin'."_s.arg(qPrintable(ch->name())).arg(cost).split(' '));
     extract_obj(obj);

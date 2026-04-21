@@ -1080,7 +1080,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
 {
   qint32 skill = {};
-  affected_type *cur_af;
+  affected_typePtr cur_af;
 
   if (!sub->isNonPlayer() && sub->player->holyLite)
     return true;
@@ -1094,13 +1094,13 @@ bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
   skill = {};
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_GOOD)))
     skill = (qint32)cur_af->modifier;
-  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->name()) && obj->obj_flags.value[0] == SPELL_CONSECRATE)
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->name()) && obj->flags_.value[0] == SPELL_CONSECRATE)
     return true;
 
   skill = {};
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_EVIL)))
     skill = (qint32)cur_af->modifier;
-  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->name()) && obj->obj_flags.value[0] == SPELL_DESECRATE)
+  if ((skill >= 80 || sub->getLevel() >= IMMORTAL) && isexact("consecrateitem", obj->name()) && obj->flags_.value[0] == SPELL_DESECRATE)
     return true;
 
   if (IS_OBJ_STAT(obj, ITEM_NOSEE))
@@ -1118,7 +1118,7 @@ bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
   if ((cur_af = sub->affected_by_spell(SPELL_DETECT_MAGIC)))
     skill = (qint32)cur_af->modifier;
 
-  if (GET_ITEM_TYPE(obj) == ITEM_BEACON && isSet(obj->obj_flags.extra_flags, ITEM_INVISIBLE))
+  if (GET_ITEM_TYPE(obj) == ITEM_BEACON && isSet(obj->flags_.extra_flags, ITEM_INVISIBLE))
   {
     if (!IS_AFFECTED(sub, AFF_DETECT_MAGIC))
     {
@@ -1702,7 +1702,7 @@ command_return_t do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
     {
       tmp_obj = obj->next;
       if (dc_->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
-        if (ch == (CharacterPtr)(obj->obj_flags.origin))
+        if (ch == (CharacterPtr)(obj->flags_.origin))
           extract_obj(obj);
     }
   }
@@ -2578,7 +2578,7 @@ void unique_scan(CharacterPtr victim)
   {
     if (victim->equipment[k])
     {
-      if (isSet(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
+      if (isSet(victim->equipment[k]->flags_.more_flags, ITEM_UNIQUE))
       {
         if (virtnums.end() == virtnums.find(dc_->obj_index[victim->equipment[k]->item_number].vnum()))
           virtnums[dc_->obj_index[victim->equipment[k]->item_number].vnum()] = 1;
@@ -2589,7 +2589,7 @@ void unique_scan(CharacterPtr victim)
       { // search inside
         for (j = victim->equipment[k]->contains; j; j = j->next_content)
         {
-          if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
+          if (isSet(j->flags_.more_flags, ITEM_UNIQUE))
           {
             if (virtnums.end() == virtnums.find(dc_->obj_index[j->item_number].vnum()))
               virtnums[dc_->obj_index[j->item_number].vnum()] = 1;
@@ -2603,7 +2603,7 @@ void unique_scan(CharacterPtr victim)
 
   for (i = victim->carrying; i; i = i->next_content)
   {
-    if (isSet(i->obj_flags.more_flags, ITEM_UNIQUE))
+    if (isSet(i->flags_.more_flags, ITEM_UNIQUE))
     {
       if (virtnums.end() == virtnums.find(dc_->obj_index[i->item_number].vnum()))
         virtnums[dc_->obj_index[i->item_number].vnum()] = 1;
@@ -2616,7 +2616,7 @@ void unique_scan(CharacterPtr victim)
     { // search inside
       for (j = i->contains; j; j = j->next_content)
       {
-        if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
+        if (isSet(j->flags_.more_flags, ITEM_UNIQUE))
         {
           if (virtnums.end() == virtnums.find(dc_->obj_index[j->item_number].vnum()))
             virtnums[dc_->obj_index[j->item_number].vnum()] = 1;

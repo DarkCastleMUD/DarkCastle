@@ -1624,14 +1624,14 @@ private slots:
     QCOMPARE(QFlagsToStrings<ObjectPositions>().first(), u"TAKE"_s);
     QCOMPARE(QFlagsToStrings<ObjectPositions>().last(), u"EAR"_s);
     Object obj;
-    obj.obj_flags.wear_flags = {TAKE, SHIELD};
-    qDebug() << obj.obj_flags.wear_flags;
-    QVERIFY(obj.obj_flags.wear_flags.testFlag(TAKE));
+    obj.flags_.wear_flags = {TAKE, SHIELD};
+    qDebug() << obj.flags_.wear_flags;
+    QVERIFY(obj.flags_.wear_flags.testFlag(TAKE));
     QVERIFY(CAN_WEAR(&obj, TAKE));
-    QVERIFY(obj.obj_flags.wear_flags.testFlag(SHIELD));
+    QVERIFY(obj.flags_.wear_flags.testFlag(SHIELD));
     QVERIFY(CAN_WEAR(&obj, SHIELD));
-    QVERIFY(!obj.obj_flags.wear_flags.testFlag(EAR));
-    QCOMPARE(QFlagsToStrings(obj.obj_flags.wear_flags), u"TAKE SHIELD"_s);
+    QVERIFY(!obj.flags_.wear_flags.testFlag(EAR));
+    QCOMPARE(QFlagsToStrings(obj.flags_.wear_flags), u"TAKE SHIELD"_s);
   }
 };
 

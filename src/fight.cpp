@@ -181,7 +181,7 @@ void DC::perform_violence(void)
   CharacterPtr ch;
   bool is_mob = {};
   qint32 retval;
-  static affected_type *af, *next_af_dude;
+  static affected_typePtr af, *next_af_dude;
   follow_type *fol, *folnext;
   extern QStringList spell_wear_off_msg;
 
@@ -325,7 +325,7 @@ void DC::perform_violence(void)
     bool over = false;
     for (af = ch->affected; af; af = next_af_dude)
     {
-      if (af == (affected_type *)0x95959595)
+      if (af == (affected_typePtr)0x95959595)
       {
         over = true;
         break;
@@ -820,7 +820,7 @@ void update_flags(CharacterPtr vict)
   if (isSet(vict->combat, COMBAT_MONK_STANCE))
   {
     // stance lasts 'modifier' rounds.  Remove bit once used up
-    affected_type *pspell;
+    affected_typePtr pspell;
     pspell = vict->affected_by_spell(KI_STANCE + KI_OFFSET);
     if (!pspell)
     {
@@ -901,7 +901,7 @@ bool do_frostshield(CharacterPtr ch, CharacterPtr vict)
 
 command_return_t do_lightning_shield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
-  affected_type *cur_af;
+  affected_typePtr cur_af;
   qint32 learned = {};
 
   if (!ch || !vict)
@@ -995,7 +995,7 @@ command_return_t do_vampiric_aura(CharacterPtr ch, CharacterPtr vict)
   if (GET_POS(vict) == position_t::DEAD)
     return ReturnValue::eFAILURE;
 
-  affected_type *af;
+  affected_typePtr af;
 
   if (nullptr == (af = vict->affected_by_spell(SPELL_VAMPIRIC_AURA)))
     return ReturnValue::eFAILURE;
@@ -1016,7 +1016,7 @@ command_return_t do_fireshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
-  affected_type *cur_af;
+  affected_typePtr cur_af;
   qint32 learned = {};
 
   if (!ch || !vict || ch == vict)
@@ -1105,7 +1105,7 @@ command_return_t do_acidshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
-  affected_type *cur_af;
+  affected_typePtr cur_af;
   qint32 learned = {};
 
   if (!ch || !vict || ch == vict)
@@ -1190,7 +1190,7 @@ command_return_t do_boneshield(CharacterPtr ch, CharacterPtr vict, qint32 dam)
 {
   // ch is the person who just hit the victim
   // so ch takes the damage from this spell
-  affected_type *cur_af;
+  affected_typePtr cur_af;
   qint32 learned = {};
 
   if (!ch || !vict || ch == vict)
@@ -1298,7 +1298,7 @@ void check_weapon_skill_bonus(CharacterPtr ch, qint32 type, ObjectPtr wielded,
   }
 
   // now check for two-handed weapons
-  if (wielded && isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) &&
+  if (wielded && isSet(wielded->flags_.extra_flags, ITEM_TWO_HANDED) &&
       (learned = ch->has_skill(SKILL_TWO_HANDED_WEAPONS)))
   {
     // rare skill increases
@@ -1323,7 +1323,7 @@ qint32 get_weapon_damage_type(ObjectPtr wielded)
 {
   QString log_buf;
 
-  switch (wielded->obj_flags.value[3])
+  switch (wielded->flags_.value[3])
   {
   case 0:
   case 1:
@@ -1350,7 +1350,7 @@ qint32 get_weapon_damage_type(ObjectPtr wielded)
     return TYPE_PIERCE;
     break;
   default:
-    logbug(u"WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3."_s.arg(wielded->item_number).arg(wielded->name()).arg(wielded->obj_flags.value[3]));
+    logbug(u"WORLD: Unknown w_type for object #%1 name: %2, fourth value flag is: %3."_s.arg(wielded->item_number).arg(wielded->name()).arg(wielded->flags_.value[3]));
     break;
   }
   return TYPE_HIT; // should never get here
@@ -1446,10 +1446,10 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
   set_cantquit(ch, vict); /* This sets the flag if necessary */
 
   w_type = TYPE_HIT;
-  if (wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
+  if (wielded && wielded->flags_.type_flag == ITEM_WEAPON)
     w_type = get_weapon_damage_type(wielded);
 
-  if (wielded && dc_->obj_index[wielded->item_number].vnum() == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  if (wielded && dc_->obj_index[wielded->item_number].vnum() == 30019 && isSet(wielded->flags_.more_flags, ITEM_TOGGLE))
   {                     // Durendal - changes damage type and other stuff
     w_type = TYPE_FIRE; // no skill bonus
   }
@@ -1465,14 +1465,14 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
   if (wielded)
   {
     if (ch->affected_by_spell(SKILL_SMITE) && ch->affected_by_spell(SKILL_SMITE)->victim == vict)
-      for (qint32 i = {}; i < wielded->obj_flags.value[1]; i++)
-        dam += wielded->obj_flags.value[2] - dc_->number(0, 1);
+      for (qint32 i = {}; i < wielded->flags_.value[1]; i++)
+        dam += wielded->flags_.value[2] - dc_->number(0, 1);
     else
-      dam = dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]);
+      dam = dice(wielded->flags_.value[1], wielded->flags_.value[2]);
     if (ch->isNonPlayer())
     {
       dam = dice(ch->mobdata->damnodice, ch->mobdata->damsizedice);
-      dam += (dice(wielded->obj_flags.value[1], wielded->obj_flags.value[2]) / 2);
+      dam += (dice(wielded->flags_.value[1], wielded->flags_.value[2]) / 2);
     }
   }
   else if (ch->isNonPlayer())
@@ -1488,7 +1488,7 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
   dam += weapon_skill_dam_bonus;
   dam += calculate_paladin_damage_bonus(ch, vict);
 
-  if (wielded && dc_->obj_index[wielded->item_number].vnum() == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
+  if (wielded && dc_->obj_index[wielded->item_number].vnum() == 30019 && isSet(wielded->flags_.more_flags, ITEM_TOGGLE))
   {
     dam = dam * 85 / 100;
     dam = dam + (getRealSpellDamage(ch) / 2);
@@ -1520,7 +1520,7 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
     }
   }
 
-  if (wielded && isSet(wielded->obj_flags.extra_flags, ITEM_TWO_HANDED) && ch->has_skill(SKILL_EXECUTE))
+  if (wielded && isSet(wielded->flags_.extra_flags, ITEM_TWO_HANDED) && ch->has_skill(SKILL_EXECUTE))
     if (vict->getHP() < 3500 && vict->getHP() * 100 / GET_MAX_HIT(vict) < 15)
     {
       retval = do_execute_skill(ch, vict, w_type);
@@ -1673,9 +1673,9 @@ qint32 one_hit(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 // pos of -1 means inventory
 void eq_destroyed(CharacterPtr ch, ObjectPtr obj, qint32 pos)
 {
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     return;
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_SCRAP))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_SCRAP))
     return;
 
   if (pos != -1) // if its not an inventory item, do this
@@ -1706,7 +1706,7 @@ void eq_destroyed(CharacterPtr ch, ObjectPtr obj, qint32 pos)
 
   while (obj->contains) // drop contents to floor
   {
-    if (isSet(obj->contains->obj_flags.more_flags, ITEM_NO_TRADE))
+    if (isSet(obj->contains->flags_.more_flags, ITEM_NO_TRADE))
     {
       act_to_room("A $p falls to $n's inventory.", ch, obj->contains, 0, 0);
       act_to_character("A $p falls to your inventory from your destroyed container.", ch, obj->contains, 0, 0);
@@ -2503,7 +2503,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
 
   qint32 pre_stoneshield_dam = {};
   std::stringstream string1;
-  affected_type *pspell = {};
+  affected_typePtr pspell = {};
   if (!victim->isImmortalPlayer() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
        (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
@@ -2564,22 +2564,22 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
     if (wielded)
     {
       //      if ((isSet(victim->immune, ISR_MAGIC)) &&
-      //      (isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //      (isSet(wielded->flags_.extra_flags, ITEM_MAGIC)) )
       //    weapon_bit += ISR_MAGIC;
       if ((isSet(victim->immune, ISR_NON_MAGIC)) &&
-          (!isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
+          (!isSet(wielded->flags_.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
       //      if ((isSet(victim->suscept, ISR_MAGIC)) &&
-      //        (isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //        (isSet(wielded->flags_.extra_flags, ITEM_MAGIC)) )
       //        weapon_bit += ISR_MAGIC;
       if ((isSet(victim->suscept, ISR_NON_MAGIC)) &&
-          (!isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
+          (!isSet(wielded->flags_.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
       //      if ((isSet(victim->resist, ISR_MAGIC)) &&
-      //       (isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)) )
+      //       (isSet(wielded->flags_.extra_flags, ITEM_MAGIC)) )
       //       weapon_bit += ISR_MAGIC;
       if ((isSet(victim->resist, ISR_NON_MAGIC)) &&
-          (!isSet(wielded->obj_flags.extra_flags, ITEM_MAGIC)))
+          (!isSet(wielded->flags_.extra_flags, ITEM_MAGIC)))
         weapon_bit += ISR_NON_MAGIC;
     }
   }
@@ -2686,7 +2686,7 @@ qint32 damage(CharacterPtr ch, CharacterPtr victim, qint32 dam, qint32 weapon_ty
   }
   else
   {
-    affected_type *af;
+    affected_typePtr af;
     if (dam >= 350 && (af = victim->affected_by_spell(SPELL_PARALYZE)) && victim->isPlayer())
     {
       act_to_victim("The overpowering magic from $n's spell disrupts the paralysis surrounding you!", ch, 0, victim, 0);
@@ -3840,7 +3840,7 @@ qint32 speciality_bonus(CharacterPtr ch, qint32 attacktype, qint32 level)
 {
   qint32 skill = {};
   /*  qint32 w_type = TYPE_HIT;
-    if(wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
+    if(wielded && wielded->flags_.type_flag == ITEM_WEAPON)
        w_type = get_weapon_damage_type(wielded);*/
   switch (attacktype)
   {
@@ -4199,7 +4199,7 @@ void stop_fighting(CharacterPtr ch, qint32 clearlag)
 
   if (IS_AFFECTED(ch, AFF_PRIMAL_FURY))
   {
-    affected_type *af;
+    affected_typePtr af;
 
     for (af = ch->affected; af; af = af->next)
     {
@@ -4335,16 +4335,16 @@ void make_scraps(CharacterPtr ch, ObjectPtr obj)
   dc_sprintf(buf, "a pile of scraps.");
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {TAKE};
-  corpse->obj_flags.value[0] = {};
-  corpse->obj_flags.value[3] = {};
-  corpse->obj_flags.weight = obj->obj_flags.weight;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {TAKE};
+  corpse->flags_.value[0] = {};
+  corpse->flags_.value[3] = {};
+  corpse->flags_.weight = obj->flags_.weight;
+  corpse->flags_.eq_level = {};
 
-  corpse->obj_flags.more_flags = {};
+  corpse->flags_.more_flags = {};
 
-  corpse->obj_flags.timer = {};
+  corpse->flags_.timer = {};
 
   object_list_new_new_owner(corpse, 0);
   obj_to_room(corpse, ch->in_room);
@@ -4377,17 +4377,17 @@ void make_corpse(CharacterPtr ch)
 
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.wear_flags = {};
+    corpse->flags_.wear_flags = {};
     dc_sprintf(buf, "corpse %s", qPrintable(ch->name()));
   }
   else if (ch->isPlayerObjectThief())
   {
-    corpse->obj_flags.wear_flags = {};
+    corpse->flags_.wear_flags = {};
     dc_sprintf(buf, "corpse %s thiefcorpse", qPrintable(ch->name()));
   }
   else
   {
-    corpse->obj_flags.wear_flags = {TAKE};
+    corpse->flags_.wear_flags = {TAKE};
 
     if (ch->getLevel() >= 50)
       dc_sprintf(buf, "corpse %s pc lootable", qPrintable(ch->name()));
@@ -4402,24 +4402,24 @@ void make_corpse(CharacterPtr ch)
   dc_sprintf(buf, "the corpse of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_CONTAINER;
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifier */
-  corpse->obj_flags.weight = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_CONTAINER;
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->flags_.value[3] = 1;  /* corpse identifier */
+  corpse->flags_.weight = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
+  corpse->flags_.eq_level = {};
 
   SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_UNIQUE_SAVE);
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
-    corpse->obj_flags.more_flags = {};
-    SET_BIT(corpse->obj_flags.more_flags, ITEM_NPC_CORPSE);
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    SET_BIT(corpse->flags_.more_flags, ITEM_NPC_CORPSE);
     GET_OBJ_VROOM(corpse) = DC::NOWHERE;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
     SET_BIT(GET_OBJ_EXTRA(corpse), ITEM_PC_CORPSE);
     GET_OBJ_VROOM(corpse) = GET_ROOM_VNUM(ch->in_room);
   }
@@ -4430,31 +4430,31 @@ void make_corpse(CharacterPtr ch)
     // if they contain items
     if (ISSET(ch->mobdata->actflags, ACT_CHARM))
     {
-      SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+      SET_BIT(corpse->flags_.more_flags, ITEM_LIMIT_SACRIFICE);
     }
     else
     {
       // Mob corpses with level 50+ equipment also get flag ITEM_LIMIT_SACRIFICE
       for (i = {}; i < MAX_WEAR; i++)
       {
-        if (ch->equipment[i] && ch->equipment[i]->obj_flags.eq_level >= 50)
+        if (ch->equipment[i] && ch->equipment[i]->flags_.eq_level >= 50)
         {
-          SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+          SET_BIT(corpse->flags_.more_flags, ITEM_LIMIT_SACRIFICE);
           break;
         }
       }
 
       // If the above didn't already set the corpse object with flag ITEM_LIMIT_SACRIFICE
       // then we search its inventory including container contents
-      if (!isSet(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE))
+      if (!isSet(corpse->flags_.more_flags, ITEM_LIMIT_SACRIFICE))
       {
         for (o = ch->carrying; o; o = next_obj)
         {
           next_obj = o->next_content;
 
-          if (o->obj_flags.eq_level >= 50)
+          if (o->flags_.eq_level >= 50)
           {
-            SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+            SET_BIT(corpse->flags_.more_flags, ITEM_LIMIT_SACRIFICE);
             break;
           }
 
@@ -4463,9 +4463,9 @@ void make_corpse(CharacterPtr ch)
             for (o_in_container = o->contains; o_in_container; o_in_container = next_o_in_container)
             {
               next_o_in_container = o_in_container->next_content;
-              if (o_in_container->obj_flags.eq_level >= 50)
+              if (o_in_container->flags_.eq_level >= 50)
               {
-                SET_BIT(corpse->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE);
+                SET_BIT(corpse->flags_.more_flags, ITEM_LIMIT_SACRIFICE);
                 break;
               }
             } // if and for
@@ -4545,18 +4545,18 @@ void make_corpse(CharacterPtr ch)
     {
       next_obj = o->next_content;
 
-      if (isSet(o->obj_flags.extra_flags, ITEM_SPECIAL) &&
+      if (isSet(o->flags_.extra_flags, ITEM_SPECIAL) &&
           (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
         for (o_in_container = o->contains; o_in_container; o_in_container = next_o_in_container)
         {
           next_o_in_container = o_in_container->next_content;
-          if (!isSet(o_in_container->obj_flags.extra_flags, ITEM_SPECIAL))
+          if (!isSet(o_in_container->flags_.extra_flags, ITEM_SPECIAL))
           {
             move_obj(o_in_container, corpse);
           }
         } // if and for
 
-      if (!isSet(o->obj_flags.extra_flags, ITEM_SPECIAL))
+      if (!isSet(o->flags_.extra_flags, ITEM_SPECIAL))
         move_obj(o, corpse);
 
     } // for
@@ -4598,16 +4598,16 @@ void make_dust(CharacterPtr ch)
   {
     next_obj = o->next_content;
 
-    if (isSet(o->obj_flags.extra_flags, ITEM_SPECIAL) && (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
+    if (isSet(o->flags_.extra_flags, ITEM_SPECIAL) && (GET_ITEM_TYPE(o) == ITEM_CONTAINER))
       for (tmp_o = o->contains; tmp_o; tmp_o = blah)
       {
         blah = tmp_o->next_content;
-        if (!isSet(tmp_o->obj_flags.extra_flags, ITEM_SPECIAL))
+        if (!isSet(tmp_o->flags_.extra_flags, ITEM_SPECIAL))
           move_obj(tmp_o, ch->in_room);
 
       } // if and for
 
-    if (!isSet(o->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (!isSet(o->flags_.extra_flags, ITEM_SPECIAL))
       move_obj(o, ch->in_room);
 
   } // for
@@ -4666,21 +4666,21 @@ void make_husk(CharacterPtr ch)
   dc_sprintf(buf, "Husk of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {};
-  corpse->obj_flags.value[0] = {};
-  corpse->obj_flags.value[3] = 1;
-  corpse->obj_flags.weight = 1000;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {};
+  corpse->flags_.value[0] = {};
+  corpse->flags_.value[3] = 1;
+  corpse->flags_.weight = 1000;
+  corpse->flags_.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
   obj_to_room(corpse, ch->in_room);
 }
@@ -4703,21 +4703,21 @@ void make_head(CharacterPtr ch)
   dc_sprintf(buf, "Head of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
-  corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {TAKE, HOLD};
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->flags_.value[3] = 1;  /* corpse identifyer */
+  corpse->flags_.weight = 5;
+  corpse->flags_.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
@@ -4741,21 +4741,21 @@ void make_arm(CharacterPtr ch)
   dc_sprintf(buf, "Arm of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
-  corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {TAKE, HOLD};
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->flags_.value[3] = 1;  /* corpse identifyer */
+  corpse->flags_.weight = 5;
+  corpse->flags_.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
@@ -4779,21 +4779,21 @@ void make_leg(CharacterPtr ch)
   dc_sprintf(buf, "Leg of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
-  corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {TAKE, HOLD};
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->flags_.value[3] = 1;  /* corpse identifyer */
+  corpse->flags_.weight = 5;
+  corpse->flags_.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
@@ -4817,21 +4817,21 @@ void make_bowels(CharacterPtr ch)
   dc_sprintf(buf, "Bowels of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
-  corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {TAKE, HOLD};
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->flags_.value[3] = 1;  /* corpse identifyer */
+  corpse->flags_.weight = 5;
+  corpse->flags_.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
@@ -4855,21 +4855,21 @@ void make_blood(CharacterPtr ch)
   dc_sprintf(buf, "Pooled blood of %s", (ch->isNonPlayer() ? qPrintable(ch->short_description()) : qPrintable(ch->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_TRASH;
-  corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a corpse */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifyer */
-  corpse->obj_flags.weight = 5;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_TRASH;
+  corpse->flags_.wear_flags = {TAKE, HOLD};
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a corpse */
+  corpse->flags_.value[3] = 1;  /* corpse identifyer */
+  corpse->flags_.weight = 5;
+  corpse->flags_.eq_level = {};
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
 
   obj_to_room(corpse, ch->in_room);
@@ -4896,22 +4896,22 @@ void make_heart(CharacterPtr ch, CharacterPtr vict)
   dc_sprintf(buf, "the heart of %s", (vict->isNonPlayer() ? qPrintable(vict->short_description()) : qPrintable(vict->name())));
   corpse->short_description(buf);
 
-  corpse->obj_flags.type_flag = ITEM_FOOD;
-  corpse->obj_flags.wear_flags = {TAKE, HOLD};
-  corpse->obj_flags.value[0] = {}; /* You can't store stuff in a heart */
-  corpse->obj_flags.value[3] = 1;  /* corpse identifier */
-  corpse->obj_flags.weight = 2;
-  corpse->obj_flags.eq_level = {};
+  corpse->flags_.type_flag = ITEM_FOOD;
+  corpse->flags_.wear_flags = {TAKE, HOLD};
+  corpse->flags_.value[0] = {}; /* You can't store stuff in a heart */
+  corpse->flags_.value[3] = 1;  /* corpse identifier */
+  corpse->flags_.weight = 2;
+  corpse->flags_.eq_level = {};
 
   if (ch->isNonPlayer())
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_NPC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_NPC_CORPSE_TIME;
   }
   else
   {
-    corpse->obj_flags.more_flags = {};
-    corpse->obj_flags.timer = MAX_PC_CORPSE_TIME;
+    corpse->flags_.more_flags = {};
+    corpse->flags_.timer = MAX_PC_CORPSE_TIME;
   }
 
   if (!ch->equipment[WEAR_HOLD] && !ch->equipment[WEAR_WIELD] && !ch->equipment[WEAR_LIGHT])
@@ -6261,7 +6261,7 @@ void disarm(CharacterPtr ch, CharacterPtr victim)
 
   obj = victim->unequip_char(WEAR_WIELD);
   /* If it's gl make it go to inventory. Morc. */
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     obj_to_char(obj, victim);
   else
     obj_to_room(obj, victim->in_room);
@@ -6306,7 +6306,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
   qint32 num;
   QString killer_message;
   //  CharacterPtr i = {};
-  affected_type *af, *afpk;
+  affected_typePtr af, *afpk;
 
   void move_player_home(CharacterPtr victim);
   num = dc_->number(1, 1000);
@@ -7567,17 +7567,17 @@ void remove_nosave(CharacterPtr vict)
     // in this case you lose everything inside the container.
 
     if (GET_ITEM_TYPE(o) == ITEM_CONTAINER &&
-        !isSet(o->obj_flags.extra_flags, ITEM_NOSAVE))
+        !isSet(o->flags_.extra_flags, ITEM_NOSAVE))
     {
       for (tmp_o = o->contains; tmp_o; tmp_o = blah)
       {
         blah = tmp_o->next_content;
-        if (isSet(tmp_o->obj_flags.extra_flags, ITEM_NOSAVE))
+        if (isSet(tmp_o->flags_.extra_flags, ITEM_NOSAVE))
           move_obj(tmp_o, vict->in_room);
       }
     }
 
-    if (isSet(o->obj_flags.extra_flags, ITEM_NOSAVE))
+    if (isSet(o->flags_.extra_flags, ITEM_NOSAVE))
       move_obj(o, vict->in_room);
 
   } // for
@@ -7597,7 +7597,7 @@ void remove_active_potato(CharacterPtr vict)
   for (obj = vict->carrying; obj; obj = next_obj)
   {
     next_obj = obj->next_content;
-    if (dc_->obj_index[obj->item_number].vnum() == 393 && obj->obj_flags.value[3] > 0)
+    if (dc_->obj_index[obj->item_number].vnum() == 393 && obj->flags_.value[3] > 0)
     {
       extract_obj(obj);
     }

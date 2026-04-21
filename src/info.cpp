@@ -76,9 +76,9 @@ ObjectPtr Character::get_object_in_equip_vis(QString arg, ObjectPtr equipment[],
   return {};
 }
 
-QString find_ex_description(QString word, extra_descr_data *list)
+QString find_ex_description(QString word, ExtraDescriptionPtr list)
 {
-  extra_descr_data *i;
+  ExtraDescriptionPtr i;
 
   for (i = list; i; i = i->next)
     if (isexact(word, i->keyword_))
@@ -115,7 +115,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
   //   qint32 percent;
 
   // Don't show NO_NOTICE items in a room with "look" unless they have holylite
-  if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE) &&
+  if (mode == 0 && isSet(object->flags_.more_flags, ITEM_NONOTICE) &&
       (player && !player->holyLite))
     return;
 
@@ -127,7 +127,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
     dc_strcpy(buffer, qPrintable(object->short_description()));
   else if (mode == 5)
   {
-    if (object->obj_flags.type_flag == ITEM_NOTE)
+    if (object->flags_.type_flag == ITEM_NOTE)
     {
       if (!object->ActionDescription().isEmpty())
       {
@@ -139,7 +139,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
         act_to_character("It's blank.", this, 0, 0, 0);
       return;
     }
-    else if ((object->obj_flags.type_flag != ITEM_DRINKCON))
+    else if ((object->flags_.type_flag != ITEM_DRINKCON))
     {
       dc_strcpy(buffer, "You see nothing special.");
     }
@@ -182,14 +182,14 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       dc_strcat(flagbuf, "Humming");
       found++;
     }
-    if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE))
+    if (mode == 0 && isSet(object->flags_.more_flags, ITEM_NONOTICE))
     {
       if (found)
         dc_strcat(flagbuf, "$B/$R");
       dc_strcat(flagbuf, "NO_NOTICE");
       found++;
     }
-    if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NOSEE))
+    if (mode == 0 && isSet(object->flags_.more_flags, ITEM_NOSEE))
     {
       if (found)
         dc_strcat(flagbuf, "$B/$R");
@@ -203,15 +203,15 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
     }
 
     /* show object's condition if is an armor...  */
-    if (object->obj_flags.type_flag == ITEM_ARMOR ||
-        object->obj_flags.type_flag == ITEM_WEAPON ||
-        object->obj_flags.type_flag == ITEM_FIREWEAPON ||
-        object->obj_flags.type_flag == ITEM_CONTAINER ||
+    if (object->flags_.type_flag == ITEM_ARMOR ||
+        object->flags_.type_flag == ITEM_WEAPON ||
+        object->flags_.type_flag == ITEM_FIREWEAPON ||
+        object->flags_.type_flag == ITEM_CONTAINER ||
         IS_KEYRING(object) ||
-        object->obj_flags.type_flag == ITEM_INSTRUMENT ||
-        object->obj_flags.type_flag == ITEM_WAND ||
-        object->obj_flags.type_flag == ITEM_STAFF ||
-        object->obj_flags.type_flag == ITEM_LIGHT)
+        object->flags_.type_flag == ITEM_INSTRUMENT ||
+        object->flags_.type_flag == ITEM_WAND ||
+        object->flags_.type_flag == ITEM_STAFF ||
+        object->flags_.type_flag == ITEM_LIGHT)
     {
       dc_strcat(buffer, item_condition(object)); /*
             percent = 100 - (qint32)(100 * ((qreal)eq_current_damage(object) / (qreal)eq_max_damage(object)));
@@ -231,7 +231,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
             else dc_strcat(buffer, " [$5Pile of Scraps$R]");
    */
     }
-    if (isSet(object->obj_flags.more_flags, ITEM_24H_SAVE) && !isSet(object->obj_flags.extra_flags, ITEM_NOSAVE))
+    if (isSet(object->flags_.more_flags, ITEM_24H_SAVE) && !isSet(object->flags_.extra_flags, ITEM_NOSAVE))
     {
       time_t now = time(nullptr);
       time_t expires = object->save_expiration;
@@ -251,7 +251,7 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       }
     }
 
-    if (isSet(object->obj_flags.more_flags, ITEM_24H_NO_SELL))
+    if (isSet(object->flags_.more_flags, ITEM_24H_NO_SELL))
     {
       time_t now = time(nullptr);
       time_t expires = object->no_sell_expiration;
@@ -268,12 +268,12 @@ void Character::show_obj_to_char(ObjectPtr object, qint32 mode)
       }
     }
 
-    if (isSet(object->obj_flags.more_flags, ITEM_POOF_AFTER_24H))
+    if (isSet(object->flags_.more_flags, ITEM_POOF_AFTER_24H))
     {
-      if (object->obj_flags.timer)
+      if (object->flags_.timer)
       {
         QString timebuffer = {};
-        dc_snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
+        dc_snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->flags_.timer);
         dc_strcat(buffer, timebuffer);
       }
     }
@@ -297,7 +297,7 @@ void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
   for (i = list; i; i = i->next_content)
   {
     if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
-        i->next_content->item_number == i->item_number && i->item_number != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
+        i->next_content->item_number == i->item_number && i->item_number != -1 && !isSet(i->flags_.more_flags, ITEM_NONOTICE))
     {
       number++;
       continue;
@@ -639,7 +639,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
       for (tmp_obj = i->carrying; tmp_obj;
            tmp_obj = tmp_obj->next_content)
       {
-        if ((isSet(tmp_obj->obj_flags.extra_flags, ITEM_QUEST) == false ||
+        if ((isSet(tmp_obj->flags_.extra_flags, ITEM_QUEST) == false ||
              ch->getLevel() > IMMORTAL) &&
             CAN_SEE_OBJ(ch, tmp_obj) &&
             dc_->number(0ULL, MORTAL) < ch->getLevel())
@@ -824,7 +824,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
   dc_sprintf(buf, "You attempt to peek into the %s.\r\n", qPrintable(cont->short_description()));
   ch->send(buf);
 
-  if (isSet(cont->obj_flags.value[1], CONT_CLOSED))
+  if (isSet(cont->flags_.value[1], CONT_CLOSED))
   {
     ch->sendln("It is closed.");
     return;
@@ -927,25 +927,25 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
   ch->send(u"$3Item type: $R%s\r\n"_s.arg(buf2));
 
-  sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf);
+  sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf);
   ch->send(u"$3Extra flags: $R%1\r\n"_s.arg(buf));
 
-  sprintbit(obj->obj_flags.more_flags, Object::more_obj_bits, buf2);
+  sprintbit(obj->flags_.more_flags, Object::more_obj_bits, buf2);
   ch->send(u"$3More flags: $R%s\r\n"_s.arg(buf2));
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) || isSet(obj->obj_flags.more_flags, ITEM_NPC_CORPSE) || isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE) || isSet(obj->obj_flags.more_flags, ITEM_PC_CORPSE_LOOTED))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) || isSet(obj->flags_.more_flags, ITEM_NPC_CORPSE) || isSet(obj->flags_.more_flags, ITEM_PC_CORPSE) || isSet(obj->flags_.more_flags, ITEM_PC_CORPSE_LOOTED))
   {
     ch->send(u"$3Owner: $R%s\r\n"_s.arg(qPrintable(obj->getOwner())));
   }
 
-  ch->send(u"$3Worn on: $R%1\r\n"_s.arg(QFlagsToStrings(obj->obj_flags.wear_flags)));
+  ch->send(u"$3Worn on: $R%1\r\n"_s.arg(QFlagsToStrings(obj->flags_.wear_flags)));
 
-  sprintbit(obj->obj_flags.size, Object::size_bits, buf);
+  sprintbit(obj->flags_.size, Object::size_bits, buf);
   ch->send(u"$3Worn by: $R%1\r\n"_s.arg(buf));
 
-  ch->send(u"$3Level: $R%1\r\n"_s.arg(obj->obj_flags.eq_level));
-  ch->send(u"$3Weight: $R%1\r\n"_s.arg(obj->obj_flags.weight));
-  ch->send(u"$3Value: $R%1\r\n"_s.arg(obj->obj_flags.cost));
+  ch->send(u"$3Level: $R%1\r\n"_s.arg(obj->flags_.eq_level));
+  ch->send(u"$3Weight: $R%1\r\n"_s.arg(obj->flags_.weight));
+  ch->send(u"$3Value: $R%1\r\n"_s.arg(obj->flags_.cost));
 
   const ObjectPtr vobj = {};
   if (obj->item_number >= 0)
@@ -966,31 +966,31 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
   case ITEM_SCROLL:
   case ITEM_POTION:
-    ch->send(u"$3Level $R%d "_s.arg(obj->obj_flags.value[0]));
+    ch->send(u"$3Level $R%d "_s.arg(obj->flags_.value[0]));
 
     if (vobj != nullptr)
     {
       ch->send(u"("_s);
-      showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
+      showStatDiff(ch, vobj->flags_.value[0], obj->flags_.value[0]);
       ch->send(u") "_s);
     }
     ch->sendln("$3spells of:$R");
 
-    if (obj->obj_flags.value[1] >= 1)
+    if (obj->flags_.value[1] >= 1)
     {
-      sprinttype(obj->obj_flags.value[1] - 1, spells, buf);
+      sprinttype(obj->flags_.value[1] - 1, spells, buf);
       dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
-    if (obj->obj_flags.value[2] >= 1)
+    if (obj->flags_.value[2] >= 1)
     {
-      sprinttype(obj->obj_flags.value[2] - 1, spells, buf);
+      sprinttype(obj->flags_.value[2] - 1, spells, buf);
       dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
-    if (obj->obj_flags.value[3] >= 1)
+    if (obj->flags_.value[3] >= 1)
     {
-      sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
+      sprinttype(obj->flags_.value[3] - 1, spells, buf);
       dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
@@ -999,30 +999,30 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   case ITEM_WAND:
   case ITEM_STAFF:
     dc_sprintf(buf, "$3Has $R%d$3 charges, with $R%d$3 charges left.$R\r\n",
-               obj->obj_flags.value[1],
-               obj->obj_flags.value[2]);
+               obj->flags_.value[1],
+               obj->flags_.value[2]);
     ch->send(buf);
 
-    dc_sprintf(buf, "$3Level $R%d$3 spell of:$R\r\n", obj->obj_flags.value[0]);
+    dc_sprintf(buf, "$3Level $R%d$3 spell of:$R\r\n", obj->flags_.value[0]);
     ch->send(buf);
 
-    if (obj->obj_flags.value[3] >= 1)
+    if (obj->flags_.value[3] >= 1)
     {
-      sprinttype(obj->obj_flags.value[3] - 1, spells, buf);
+      sprinttype(obj->flags_.value[3] - 1, spells, buf);
       dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
     break;
 
   case ITEM_WEAPON:
-    ch->send(u"$3Damage Dice are '$R%dD%d$3'$R"_s.arg(obj->obj_flags.value[1]).arg(       obj->obj_flags.value[2]);
+    ch->send(u"$3Damage Dice are '$R%dD%d$3'$R"_s.arg(obj->flags_.value[1]).arg(       obj->flags_.value[2]);
 
     if (vobj != nullptr)
     {
       ch->send(u" ("_s);
-      showStatDiff(ch, vobj->obj_flags.value[1], obj->obj_flags.value[1]);
+      showStatDiff(ch, vobj->flags_.value[1], obj->flags_.value[1]);
       ch->send(u"D"_s);
-      showStatDiff(ch, vobj->obj_flags.value[2], obj->obj_flags.value[2]);
+      showStatDiff(ch, vobj->flags_.value[2], obj->flags_.value[2]);
       ch->send(u")"_s);
     }
     ch->sendln("");
@@ -1035,49 +1035,49 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
   case ITEM_INSTRUMENT:
     dc_sprintf(buf, "$3Affects non-combat singing by '$R%d$3'$R\r\n$3Affects combat singing by '$R%d$3'$R\r\n",
-            obj->obj_flags.value[0],
-            obj->obj_flags.value[1]);
+            obj->flags_.value[0],
+            obj->flags_.value[1]);
     ch->send(buf);
     break;
 
   case ITEM_MISSILE:
     dc_sprintf(buf, "$3Damage Dice are '$R%dD%d$3'$R\r\nIt is +%d to arrow hit and +%d to arrow damage\r\n",
-            obj->obj_flags.value[0],
-            obj->obj_flags.value[1],
-            obj->obj_flags.value[2],
-            obj->obj_flags.value[3]);
+            obj->flags_.value[0],
+            obj->flags_.value[1],
+            obj->flags_.value[2],
+            obj->flags_.value[3]);
     ch->send(buf);
     break;
 
   case ITEM_FIREWEAPON:
     dc_sprintf(buf, "$3Bow is +$R%d$3 to arrow hit and +$R%d$3 to arrow damage.$R\r\n",
-            obj->obj_flags.value[0],
-            obj->obj_flags.value[1]);
+            obj->flags_.value[0],
+            obj->flags_.value[1]);
     ch->send(buf);
     break;
 
   case ITEM_ARMOR:
 
-    if (isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+    if (isSet(obj->flags_.extra_flags, ITEM_ENCHANTED))
     {
-      value = (obj->obj_flags.value[0]) - (obj->obj_flags.value[1]);
+      value = (obj->flags_.value[0]) - (obj->flags_.value[1]);
     }
     else
     {
-      value = obj->obj_flags.value[0];
+      value = obj->flags_.value[0];
     }
 
     dc_sprintf(buf, "$3AC-apply is $R%d (", value);
     ch->send(buf);
     if (vobj != nullptr)
     {
-      showStatDiff(ch, vobj->obj_flags.value[0], obj->obj_flags.value[0]);
+      showStatDiff(ch, vobj->flags_.value[0], obj->flags_.value[0]);
     }
-    if (isSet(obj->obj_flags.extra_flags, ITEM_ENCHANTED))
+    if (isSet(obj->flags_.extra_flags, ITEM_ENCHANTED))
     {
-      ch->send(u"-%d"_s.arg(obj->obj_flags.value[1]));
+      ch->send(u"-%d"_s.arg(obj->flags_.value[1]));
     }
-    ch->send(u")$3     Resistance to damage is $R%d\r\n"_s.arg(obj->obj_flags.value[2]));
+    ch->send(u")$3     Resistance to damage is $R%d\r\n"_s.arg(obj->flags_.value[2]));
     break;
   }
 
@@ -1310,34 +1310,34 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         { /* Found something */
           if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON)
           {
-            if (tmp_object->obj_flags.value[1] <= 0)
+            if (tmp_object->flags_.value[1] <= 0)
             {
               act_to_character("It is empty.", ch, 0, 0, 0);
             }
             else
             {
-              temp = ((tmp_object->obj_flags.value[1] * 3) / tmp_object->obj_flags.value[0]);
+              temp = ((tmp_object->flags_.value[1] * 3) / tmp_object->flags_.value[0]);
               if (temp > 3)
               {
                 dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                           "Bug in object %d. v2: %d > v1: %d. Resetting.",
                           dc_->obj_index[tmp_object->item_number].vnum(),
-                          tmp_object->obj_flags.value[1],
-                          tmp_object->obj_flags.value[0]);
-                tmp_object->obj_flags.value[1] =
-                    tmp_object->obj_flags.value[0];
+                          tmp_object->flags_.value[1],
+                          tmp_object->flags_.value[0]);
+                tmp_object->flags_.value[1] =
+                    tmp_object->flags_.value[0];
                 temp = 3;
               }
 
               dc_sprintf(buffer, "It's %sfull of a %s liquid.\r\n",
                          fullness[temp],
-                         color_liquid[tmp_object->obj_flags.value[2]]);
+                         color_liquid[tmp_object->flags_.value[2]]);
               ch->send(buffer);
             }
           }
           else if (ARE_CONTAINERS(tmp_object))
           {
-            if (!isSet(tmp_object->obj_flags.value[1], CONT_CLOSED))
+            if (!isSet(tmp_object->flags_.value[1], CONT_CLOSED))
             {
               send_to_char(fname(tmp_object->name()), ch);
               switch (bits)
@@ -1353,14 +1353,14 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 break;
               }
 
-              if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight)
+              if (tmp_object->flags_.value[0] && tmp_object->flags_.weight)
               {
 
                 qint32 weight_in(ObjectPtr obj);
                 if (dc_->obj_index[tmp_object->item_number].vnum() == 536)
-                  temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
+                  temp = (3 * weight_in(tmp_object)) / tmp_object->flags_.value[0];
                 else
-                  temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
+                  temp = ((tmp_object->flags_.weight * 3) / tmp_object->flags_.value[0]);
               }
               else
               {
@@ -1377,8 +1377,8 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                           "Bug in object %d. Weight: %d v1: %d",
                           dc_->obj_index[tmp_object->item_number].vnum(),
-                          tmp_object->obj_flags.weight,
-                          tmp_object->obj_flags.value[0]);
+                          tmp_object->flags_.weight,
+                          tmp_object->flags_.value[0]);
               }
 
               if (NOT_KEYRING(tmp_object))
@@ -1815,7 +1815,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   bool affect_found[AFF_MAX + 1] = {false};
   bool modifyOutput;
 
-  affected_type *aff;
+  affected_typePtr aff;
 
   qint64 exp_needed;
   quint32 immune = 0, suscept = 0, resist = {};
@@ -2849,8 +2849,8 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (victim->equipment[WEAR_WIELD])
       {
-        x = victim->equipment[WEAR_WIELD]->obj_flags.value[1];
-        y = victim->equipment[WEAR_WIELD]->obj_flags.value[2];
+        x = victim->equipment[WEAR_WIELD]->flags_.value[1];
+        y = victim->equipment[WEAR_WIELD]->flags_.value[2];
         x = (((x * y - x) / 2) + x);
       }
       else
@@ -3426,10 +3426,10 @@ private:
 
   quint64 o_value[4] = {};
 
-  quint64 o_item_number_ = {};   /* Where in data-base               */
-  quint64 o_in_room_ = {};       /* In what room -1 when conta/carr  */
-  quint64 o_vroo_ = {};          /* for corpse saving */
-  obj_flag_data obj_flags_ = {}; /* Object information               */
+  quint64 o_item_number_ = {}; /* Where in data-base               */
+  quint64 o_in_room_ = {};     /* In what room -1 when conta/carr  */
+  quint64 o_vroo_ = {};        /* for corpse saving */
+  ObjectFlags obj_flags_ = {}; /* Object information               */
   qint16 o_num_affects_ = {};
   obj_affected_type o_affected_ = {}; /* Which abilities in PC to change  */
 
@@ -3499,7 +3499,7 @@ bool Search::operator==(const ObjectPtr obj)
     break;
 
   case O_TYPE_FLAG:
-    if (obj->obj_flags.type_flag == obj_flags_.type_flag)
+    if (obj->flags_.type_flag == obj_flags_.type_flag)
     {
       return true;
     }
@@ -3510,7 +3510,7 @@ bool Search::operator==(const ObjectPtr obj)
     break;
 
   case O_WEAR_FLAGS:
-    if (obj->obj_flags.wear_flags == obj_flags_.wear_flags || isSet(obj->obj_flags.wear_flags, obj_flags_.wear_flags))
+    if (obj->flags_.wear_flags == obj_flags_.wear_flags || isSet(obj->flags_.wear_flags, obj_flags_.wear_flags))
     {
       return true;
     }
@@ -3520,7 +3520,7 @@ bool Search::operator==(const ObjectPtr obj)
     }
     break;
   case O_SIZE:
-    if (obj->obj_flags.size == obj_flags_.size || isSet(obj->obj_flags.size, obj_flags_.size))
+    if (obj->flags_.size == obj_flags_.size || isSet(obj->flags_.size, obj_flags_.size))
     {
       return true;
     }
@@ -3537,29 +3537,29 @@ bool Search::operator==(const ObjectPtr obj)
     break;
 
   case O_WEIGHT:
-    if (o_max_weight_ == -1 && obj->obj_flags.weight >= o_min_weight_)
+    if (o_max_weight_ == -1 && obj->flags_.weight >= o_min_weight_)
     {
       return true;
     }
-    else if (obj->obj_flags.weight >= o_min_weight_ && obj->obj_flags.weight <= o_max_weight_)
+    else if (obj->flags_.weight >= o_min_weight_ && obj->flags_.weight <= o_max_weight_)
     {
       return true;
     }
     break;
 
   case O_COST:
-    if (o_max_cost_ == -1 && obj->obj_flags.cost >= o_min_cost_)
+    if (o_max_cost_ == -1 && obj->flags_.cost >= o_min_cost_)
     {
       return true;
     }
-    else if (obj->obj_flags.cost >= o_min_cost_ && obj->obj_flags.cost <= o_max_cost_)
+    else if (obj->flags_.cost >= o_min_cost_ && obj->flags_.cost <= o_max_cost_)
     {
       return true;
     }
     break;
 
   case O_MORE_FLAGS:
-    if (obj_flags_.more_flags == obj->obj_flags.more_flags || isSet(obj->obj_flags.more_flags, obj_flags_.more_flags))
+    if (obj_flags_.more_flags == obj->flags_.more_flags || isSet(obj->flags_.more_flags, obj_flags_.more_flags))
     {
       return true;
     }
@@ -3569,7 +3569,7 @@ bool Search::operator==(const ObjectPtr obj)
     }
     break;
   case O_EXTRA_FLAGS:
-    if (obj->obj_flags.extra_flags == obj_flags_.extra_flags || isSet(obj->obj_flags.extra_flags, obj_flags_.extra_flags))
+    if (obj->flags_.extra_flags == obj_flags_.extra_flags || isSet(obj->flags_.extra_flags, obj_flags_.extra_flags))
     {
       return true;
     }
@@ -3579,39 +3579,39 @@ bool Search::operator==(const ObjectPtr obj)
     }
     break;
   case O_EQ_LEVEL:
-    if (o_max_level_ == -1 && obj->obj_flags.eq_level >= o_min_level_)
+    if (o_max_level_ == -1 && obj->flags_.eq_level >= o_min_level_)
     {
       return true;
     }
-    else if (obj->obj_flags.eq_level >= o_min_level_ && obj->obj_flags.eq_level <= o_max_level_)
+    else if (obj->flags_.eq_level >= o_min_level_ && obj->flags_.eq_level <= o_max_level_)
     {
       return true;
     }
     break;
 
   case O_V1:
-    if (o_value[0] == obj->obj_flags.value[0])
+    if (o_value[0] == obj->flags_.value[0])
     {
       return true;
     }
     break;
 
   case O_V2:
-    if (o_value[1] == obj->obj_flags.value[1])
+    if (o_value[1] == obj->flags_.value[1])
     {
       return true;
     }
     break;
 
   case O_V3:
-    if (o_value[2] == obj->obj_flags.value[2])
+    if (o_value[2] == obj->flags_.value[2])
     {
       return true;
     }
     break;
 
   case O_V4:
-    if (o_value[3] == obj->obj_flags.value[3])
+    if (o_value[3] == obj->flags_.value[3])
     {
       return true;
     }
@@ -3724,9 +3724,9 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       send("size=small    show objects that can be worn on the neck.\r\n");
       send("size=?        show available sizes.\r\n");
       send("extra=mage    show objects that have the extra flag for mage set.\r\n");
-      send("extra=?       show available extra flags.\r\n");
+      send("extra=?       show available extra flags_.\r\n");
       send("more=unique   show objects that have the extra flag for mage set.\r\n");
-      send("more=?        show available extra flags.\r\n");
+      send("more=?        show available extra flags_.\r\n");
       send("name=moss     show objects matching keyword moss.\r\n");
       send("xyz           show objects matching keyword xyz.\r\n");
       send("Search terms can be combined.\r\n");
@@ -4012,7 +4012,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
         }
 
         // containers must be open to search them
-        if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->obj_flags.value[1], CONT_CLOSED))
+        if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->flags_.value[1], CONT_CLOSED))
         {
           // search inventory containers
           for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
@@ -4044,7 +4044,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
             obj_results.push_back({Search::locations::in_equipment, obj});
           }
 
-          if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->obj_flags.value[1], CONT_CLOSED))
+          if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->flags_.value[1], CONT_CLOSED))
           {
             for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
             {
@@ -4073,7 +4073,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
           obj_results.push_back({Search::locations::in_room, obj});
         }
 
-        if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->obj_flags.value[1], CONT_CLOSED))
+        if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && !isSet(obj->flags_.value[1], CONT_CLOSED))
         {
           // search inventory containers
           for (auto obj_in_container = obj->contains; obj_in_container != nullptr; obj_in_container = obj_in_container->next_content)
@@ -4100,7 +4100,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(qPrintable(name()), vault))
       {
         vaults_searched++;
-        vault_items_data *items;
+        vault_items_dataPtr items;
         sorted_vault sv;
         sort_vault(*vault, sv);
         if (!sv.vault_contents.isEmpty())
@@ -4163,7 +4163,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       // search vault if able
       if (vault)
       {
-        vault_items_data *items;
+        vault_items_dataPtr items;
         sorted_vault sv;
         sort_vault(*vault, sv);
         if (!sv.vault_contents.isEmpty())
@@ -4468,14 +4468,14 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       switch (GET_ITEM_TYPE(obj))
       {
       case ITEM_WEAPON:
-        buffer = u"%1D%2"_s.arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]);
+        buffer = u"%1D%2"_s.arg(obj->flags_.value[1]).arg(obj->flags_.value[2]);
 
         if (search_world && vobj != nullptr)
         {
           buffer += " (";
-          buffer += getStatDiff(vobj->obj_flags.value[1], obj->obj_flags.value[1]);
+          buffer += getStatDiff(vobj->flags_.value[1], obj->flags_.value[1]);
           buffer += "D";
-          buffer += getStatDiff(vobj->obj_flags.value[2], obj->obj_flags.value[2]);
+          buffer += getStatDiff(vobj->flags_.value[2], obj->flags_.value[2]);
           buffer += ")";
         }
         break;
@@ -4543,7 +4543,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       }
     }
 
-    send(u"[%1] [%2]%3\r\n"_s.arg(GET_OBJ_VNUM(obj), 5).arg(obj->obj_flags.eq_level, 3).arg(custom_columns));
+    send(u"[%1] [%2]%3\r\n"_s.arg(GET_OBJ_VNUM(obj), 5).arg(obj->flags_.eq_level, 3).arg(custom_columns));
   }
   send("\r\nIdentify a virtual object with the command: identify v####\r\n");
 

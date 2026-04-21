@@ -68,7 +68,7 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
   {
     if (ch->isMortalPlayer())
     {
@@ -79,13 +79,13 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln("(This item is cursed, BTW.)");
   }
 
-  if (obj->obj_flags.value[3] == 1 && isexact("pc", obj->name()))
+  if (obj->flags_.value[3] == 1 && isexact("pc", obj->name()))
   {
     ch->sendln("You probably don't *really* want to do that.");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL) && ch->getLevel() < ANGEL)
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) && ch->getLevel() < ANGEL)
   {
     ch->sendln("God, what a stupid fucking thing for you to do.");
     return ReturnValue::eFAILURE;
@@ -110,7 +110,7 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
     return (ReturnValue::eFAILURE);
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
+  if (isSet(obj->flags_.more_flags, ITEM_LIMIT_SACRIFICE) && obj->contains)
   {
     act_to_character("You attempt to sacrifice $p to the gods but they refuse your foolish gift. Empty it first.", ch, obj, 0, 0);
     act_to_room("$n attempts to foolishly sacrifices $p to $s god.", ch, obj, 0, 0);
@@ -238,13 +238,13 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NODROP))
+  if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
   {
     ch->sendln("Since you can't let go of it, how are you going to donate it?");
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
+  if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
     if (ch->getLevel() > IMMORTAL)
     {
@@ -270,7 +270,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     ch->sendln("You can't donate godload equipment.");
     return ReturnValue::eFAILURE;
@@ -279,7 +279,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_room("$n donates $p.", ch, obj, 0, 0);
   act_to_character("You donate $p.", ch, obj, 0, 0);
 
-  if (obj->obj_flags.type_flag != ITEM_MONEY)
+  if (obj->flags_.type_flag != ITEM_MONEY)
   {
     QString log_buf = {};
     dc_sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), dc_->obj_index[obj->item_number].vnum());
@@ -1162,7 +1162,7 @@ command_return_t do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
 
 command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  affected_type *paf;
+  affected_typePtr paf;
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
     ch->sendln("SHHHHHH!! Can't you see people are trying to read?");

@@ -632,7 +632,7 @@ qint32 Character::char_to_store_variable_data(auto &streamfpsave)
   }
   fwrite("END", sizeof(QChar), 3, fpsave);
 
-  affected_type *af;
+  affected_typePtr af;
   qint16 aff_count = {}; // do not change from qint16
 
   for (af = affected; af; af = af->next)
@@ -731,7 +731,7 @@ qint32 Character::store_to_char_variable_data(auto &streamfpsave)
     affected = {};
     for (qint16 i = {}; i < aff_count; i++)
     {
-      affected_type *af = new (std::nothrow) affected_type;
+      affected_typePtr af = new (std::nothrow) affected_type;
       af->duration_type = {};
       af->next = affected;
       affected = af;
@@ -1027,8 +1027,8 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
 ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
 {
   ObjectPtr obj;
-  //  extra_descr_data *new_new_descr;
-  //  extra_descr_data *ed, *next_ed;
+  //  ExtraDescriptionPtr new_new_descr;
+  //  ExtraDescriptionPtr ed, *next_ed;
 
   qint32 j;
   qint32 nr;
@@ -1052,7 +1052,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
   else
     obj = clone_object(1);
 
-  obj->obj_flags.timer = object.timer;
+  obj->flags_.timer = object.timer;
   wear_pos = object.wear_pos;
 
   // begin sequence find any modifications to the item the person has
@@ -1067,57 +1067,57 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
 
   if (!dc_strcmp("EQL", mod_type))
   {
-    fread(&obj->obj_flags.eq_level, sizeof(obj->obj_flags.eq_level), 1, fpsave);
+    fread(&obj->flags_.eq_level, sizeof(obj->flags_.eq_level), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("VA0", mod_type))
   {
-    fread(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
+    fread(&obj->flags_.value[0], sizeof(obj->flags_.value[0]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("VA1", mod_type))
   {
-    fread(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
+    fread(&obj->flags_.value[1], sizeof(obj->flags_.value[1]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("VA2", mod_type))
   {
-    fread(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fread(&obj->flags_.value[2], sizeof(obj->flags_.value[2]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("VA3", mod_type))
   {
-    fread(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
+    fread(&obj->flags_.value[3], sizeof(obj->flags_.value[3]), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("EXF", mod_type))
   {
-    fread(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
+    fread(&obj->flags_.extra_flags, sizeof(obj->flags_.extra_flags), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("MOF", mod_type))
   {
-    fread(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
+    fread(&obj->flags_.more_flags, sizeof(obj->flags_.more_flags), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("TYF", mod_type))
   {
-    fread(&obj->obj_flags.type_flag, sizeof(obj->obj_flags.type_flag), 1, fpsave);
+    fread(&obj->flags_.type_flag, sizeof(obj->flags_.type_flag), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("WEA", mod_type))
   {
-    fread(&obj->obj_flags.wear_flags, sizeof(obj->obj_flags.wear_flags), 1, fpsave);
+    fread(&obj->flags_.wear_flags, sizeof(obj->flags_.wear_flags), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("SZE", mod_type))
   {
-    fread(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
+    fread(&obj->flags_.size, sizeof(obj->flags_.size), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("WEI", mod_type))
   {
-    fread(&obj->obj_flags.weight, sizeof(obj->obj_flags.weight), 1, fpsave);
+    fread(&obj->flags_.weight, sizeof(obj->flags_.weight), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("AFF", mod_type))
@@ -1176,7 +1176,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
   }
   if (!dc_strcmp("COS", mod_type))
   {
-    fread(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
+    fread(&obj->flags_.cost, sizeof(obj->flags_.cost), 1, fpsave);
     fread(&mod_type, sizeof(QChar), 3, fpsave);
   }
   if (!dc_strcmp("SAV", mod_type))
@@ -1276,10 +1276,10 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
   if (GET_ITEM_TYPE(obj) == ITEM_NOTE)
     return true;
 
-  if (isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE))
+  if (isSet(obj->flags_.extra_flags, ITEM_NOSAVE))
     return true;
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->flags_.more_flags, ITEM_24H_SAVE))
   {
     // First time we try to save this object we set the
     // expiration to 24 hours from this point
@@ -1301,7 +1301,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
   object.item_number = dc_->obj_index[obj->item_number].vnum();
-  object.timer = obj->obj_flags.timer;
+  object.timer = obj->flags_.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
     object.container_depth = 1;
@@ -1319,88 +1319,88 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
   // If it has, we need to save that particular modification to the file
   // THESE MUST REMAIN IN PROPER ORDER
   // IF YOU HAVE ANYMORE TO ADD, ADD THEM BEFORE THE "STP" FLAG AT END
-  /*  if(obj->obj_flags.eq_level    != standard_obj->obj_flags.eq_level)
+  /*  if(obj->flags_.eq_level    != standard_obj->flags_.eq_level)
     {
       fwrite("EQL", sizeof(QChar), 3, fpsave);
-      fwrite(&obj->obj_flags.eq_level, sizeof(obj->obj_flags.eq_level), 1, fpsave);
+      fwrite(&obj->flags_.eq_level, sizeof(obj->flags_.eq_level), 1, fpsave);
     }
-    if(obj->obj_flags.value[0]    != standard_obj->obj_flags.value[0])
+    if(obj->flags_.value[0]    != standard_obj->flags_.value[0])
     {
       fwrite("VA0", sizeof(QChar), 3, fpsave);
-      fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
+      fwrite(&obj->flags_.value[0], sizeof(obj->flags_.value[0]), 1, fpsave);
     }*/
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[0] != standard_obj->obj_flags.value[0])
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->flags_.value[0] != standard_obj->flags_.value[0])
   {
     fwrite("VA0", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.value[0], sizeof(obj->obj_flags.value[0]), 1, fpsave);
+    fwrite(&obj->flags_.value[0], sizeof(obj->flags_.value[0]), 1, fpsave);
   }
 
-  if ((obj->obj_flags.type_flag == ITEM_CONTAINER || obj->obj_flags.type_flag == ITEM_DRINKCON || isSet(obj->obj_flags.more_flags, ITEM_CUSTOM)) && obj->obj_flags.value[1] != standard_obj->obj_flags.value[1])
+  if ((obj->flags_.type_flag == ITEM_CONTAINER || obj->flags_.type_flag == ITEM_DRINKCON || isSet(obj->flags_.more_flags, ITEM_CUSTOM)) && obj->flags_.value[1] != standard_obj->flags_.value[1])
   {
     fwrite("VA1", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.value[1], sizeof(obj->obj_flags.value[1]), 1, fpsave);
+    fwrite(&obj->flags_.value[1], sizeof(obj->flags_.value[1]), 1, fpsave);
   }
 
-  if ((obj->obj_flags.type_flag == ITEM_DRINKCON || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND || isSet(obj->obj_flags.more_flags, ITEM_CUSTOM)) && obj->obj_flags.value[2] != standard_obj->obj_flags.value[2])
+  if ((obj->flags_.type_flag == ITEM_DRINKCON || obj->flags_.type_flag == ITEM_STAFF || obj->flags_.type_flag == ITEM_WAND || isSet(obj->flags_.more_flags, ITEM_CUSTOM)) && obj->flags_.value[2] != standard_obj->flags_.value[2])
   {
     fwrite("VA2", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.value[2], sizeof(obj->obj_flags.value[2]), 1, fpsave);
+    fwrite(&obj->flags_.value[2], sizeof(obj->flags_.value[2]), 1, fpsave);
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[3] != standard_obj->obj_flags.value[3])
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->flags_.value[3] != standard_obj->flags_.value[3])
   {
     fwrite("VA3", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.value[3], sizeof(obj->obj_flags.value[3]), 1, fpsave);
+    fwrite(&obj->flags_.value[3], sizeof(obj->flags_.value[3]), 1, fpsave);
   }
 
-  if (obj->obj_flags.extra_flags != standard_obj->obj_flags.extra_flags)
+  if (obj->flags_.extra_flags != standard_obj->flags_.extra_flags)
   {
     fwrite("EXF", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.extra_flags, sizeof(obj->obj_flags.extra_flags), 1, fpsave);
+    fwrite(&obj->flags_.extra_flags, sizeof(obj->flags_.extra_flags), 1, fpsave);
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->flags_.more_flags != standard_obj->flags_.more_flags)
   {
     fwrite("MOF", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
+    fwrite(&obj->flags_.more_flags, sizeof(obj->flags_.more_flags), 1, fpsave);
   }
 
   /*
-    if(obj->obj_flags.more_flags != standard_obj->obj_flags.more_flags)
+    if(obj->flags_.more_flags != standard_obj->flags_.more_flags)
     {
       fwrite("MOF", sizeof(QChar), 3, fpsave);
-      fwrite(&obj->obj_flags.more_flags, sizeof(obj->obj_flags.more_flags), 1, fpsave);
+      fwrite(&obj->flags_.more_flags, sizeof(obj->flags_.more_flags), 1, fpsave);
     }
-    if(obj->obj_flags.type_flag != standard_obj->obj_flags.type_flag)
+    if(obj->flags_.type_flag != standard_obj->flags_.type_flag)
     {
       fwrite("TYF", sizeof(QChar), 3, fpsave);
-      fwrite(&obj->obj_flags.type_flag, sizeof(obj->obj_flags.type_flag), 1, fpsave);
+      fwrite(&obj->flags_.type_flag, sizeof(obj->flags_.type_flag), 1, fpsave);
     }
-    if(obj->obj_flags.wear_flags != standard_obj->obj_flags.wear_flags)
+    if(obj->flags_.wear_flags != standard_obj->flags_.wear_flags)
     {
       fwrite("WEA", sizeof(QChar), 3, fpsave);
-      fwrite(&obj->obj_flags.wear_flags, sizeof(obj->obj_flags.wear_flags), 1, fpsave);
+      fwrite(&obj->flags_.wear_flags, sizeof(obj->flags_.wear_flags), 1, fpsave);
     }
-    if(obj->obj_flags.size != standard_obj->obj_flags.size)
+    if(obj->flags_.size != standard_obj->flags_.size)
     {
       fwrite("SZE", sizeof(QChar), 3, fpsave);
-      fwrite(&obj->obj_flags.size, sizeof(obj->obj_flags.size), 1, fpsave);
+      fwrite(&obj->flags_.size, sizeof(obj->flags_.size), 1, fpsave);
     }
 
-    if(obj->obj_flags.weight != standard_obj->obj_flags.weight)
+    if(obj->flags_.weight != standard_obj->flags_.weight)
       {
         fwrite("WEI", sizeof(QChar), 3, fpsave);
-        fwrite(&obj->obj_flags.weight, sizeof(obj->obj_flags.weight), 1, fpsave);
+        fwrite(&obj->flags_.weight, sizeof(obj->flags_.weight), 1, fpsave);
       }
 
 
-    tmp_weight = obj->obj_flags.weight;
+    tmp_weight = obj->flags_.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
     && dc_->obj_index[obj->item->number].vnum() != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
-    if(tmp_weight      != standard_obj->obj_flags.weight)
+    if(tmp_weight      != standard_obj->flags_.weight)
     {
       fwrite("WEI", sizeof(QChar), 3, fpsave);
       fwrite(&tmp_weight, sizeof(tmp_weight), 1, fpsave);
@@ -1420,7 +1420,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
     }
     */
   // Custom objects get all of their affects copied
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM))
   {
     fwrite("AFF", sizeof(QChar), 3, fpsave);
     fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
@@ -1473,19 +1473,19 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
     fwrite(qPrintable(obj->ActionDescription()), sizeof(QChar), length, fpsave);
   }
 
-  if (obj->obj_flags.cost != standard_obj->obj_flags.cost)
+  if (obj->flags_.cost != standard_obj->flags_.cost)
   {
     fwrite("COS", sizeof(QChar), 3, fpsave);
-    fwrite(&obj->obj_flags.cost, sizeof(obj->obj_flags.cost), 1, fpsave);
+    fwrite(&obj->flags_.cost, sizeof(obj->flags_.cost), 1, fpsave);
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(obj->flags_.more_flags, ITEM_24H_SAVE))
   {
     fwrite("SAV", sizeof(QChar), 3, fpsave);
     fwrite(&obj->save_expiration, sizeof(quint32), 1, fpsave);
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_24H_NO_SELL))
+  if (isSet(obj->flags_.more_flags, ITEM_24H_NO_SELL))
   {
     fwrite("SEL", sizeof(QChar), 3, fpsave);
     fwrite(&obj->no_sell_expiration, sizeof(quint32), 1, fpsave);
@@ -1612,7 +1612,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 {
   qint32 i;
   qint32 x;
-  affected_type *af;
+  affected_typePtr af;
   ObjectPtr ch_eq[MAX_WEAR];
 
   // Remove all the eq and store it in temp storage

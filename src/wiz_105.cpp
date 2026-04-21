@@ -9,7 +9,7 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
   bool found = false;
   QString buf;
   CharacterPtr victim;
-  affected_type *af, *afpk;
+  affected_typePtr af, *afpk;
   ObjectPtr dummy;
 
   one_argument(argument, buf);
@@ -776,9 +776,9 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, TAKE) &&
-        !isSet(obj->obj_flags.extra_flags, ITEM_NOSAVE) &&
-        obj->obj_flags.eq_level <= vict->getLevel() &&
-        !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+        !isSet(obj->flags_.extra_flags, ITEM_NOSAVE) &&
+        obj->flags_.eq_level <= vict->getLevel() &&
+        !isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     {
       for (o = {}; o < MAX_WEAR; o++)
         if (CAN_WEAR(obj, wear_bitv[o]))

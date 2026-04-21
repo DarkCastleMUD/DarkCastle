@@ -91,7 +91,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
   act_to_character("\r\n$N examines $p...", ch, obj, owner, 0);
   act_to_room("\r\n$N examines $p...", ch, obj, owner, INVIS_NULL);
 
-  if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->flags_.type_flag != ITEM_ARMOR || isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     do_say(owner, "I can't repair this.");
     act_to_character("$N gives you $p.", ch, obj, owner, 0);
@@ -109,7 +109,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
     return ReturnValue::eSUCCESS;
   }
 
-  cost = obj->obj_flags.cost;
+  cost = obj->flags_.cost;
   value0 = eq_max_damage(obj);
   percent = ((100 * eqdam) / value0);
   price = ((cost * percent) / 100); // now we know what to charge them fuckers!
@@ -185,18 +185,18 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
     return ReturnValue::eSUCCESS;
   }
 
-  cost = obj->obj_flags.cost;
+  cost = obj->flags_.cost;
   value0 = eq_max_damage(obj);
-  value2 = obj->obj_flags.value[2];
+  value2 = obj->flags_.value[2];
 
-  if ((obj->obj_flags.type_flag == ITEM_ARMOR || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_LIGHT) && !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if ((obj->flags_.type_flag == ITEM_ARMOR || ARE_CONTAINERS(obj) || obj->flags_.type_flag == ITEM_LIGHT) && !isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     percent = ((100 * eqdam) / value0); /* now we know what percent to repair ..  */
     price = ((cost * percent) / 100);   /* now we know what to charge */
     price *= 2;                         /* he likes to charge more..  */
                                         /*  for armor... cuz he can.. */
   }
-  else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || obj->obj_flags.type_flag == ITEM_INSTRUMENT || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  else if ((obj->flags_.type_flag == ITEM_WEAPON || obj->flags_.type_flag == ITEM_FIREWEAPON || obj->flags_.type_flag == ITEM_INSTRUMENT || obj->flags_.type_flag == ITEM_STAFF || obj->flags_.type_flag == ITEM_WAND) && !isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     percent = ((100 * eqdam) / (value0 + value2)); /* now we know what percent to repair ..  */
     price = ((cost * percent) / 100);              /* now we know what to charge */
@@ -286,11 +286,11 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     return ReturnValue::eSUCCESS;
   }
 
-  cost = obj->obj_flags.cost;
+  cost = obj->flags_.cost;
   value0 = eq_max_damage(obj);
-  value2 = obj->obj_flags.value[2];
+  value2 = obj->flags_.value[2];
 
-  if ((obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_LIGHT) && !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if ((obj->flags_.type_flag == ITEM_ARMOR || obj->flags_.type_flag == ITEM_LIGHT) && !isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
 
     percent = ((100 * eqdam) / value0); /* now we know what percent to repair ..  */
@@ -298,7 +298,7 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     price *= 4;                         /* he likes to charge more..  */
                                         /*  for armor... cuz he's a crook..  */
   }
-  else if ((obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && !isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  else if ((obj->flags_.type_flag == ITEM_WEAPON || obj->flags_.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj) || obj->flags_.type_flag == ITEM_STAFF || obj->flags_.type_flag == ITEM_WAND) && !isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
 
   {
 
@@ -344,26 +344,26 @@ qint32 corpse_cost(CharacterPtr ch)
 
   for (ObjectPtr obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
   {
-    if (obj2->obj_flags.type_flag == ITEM_MONEY)
+    if (obj2->flags_.type_flag == ITEM_MONEY)
       continue;
     for (curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
     {
-      if (!isSet(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
-        cost += curr_cont->obj_flags.cost;
+      if (!isSet(curr_cont->flags_.extra_flags, ITEM_SPECIAL))
+        cost += curr_cont->flags_.cost;
     }
-    if (!isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
-      cost += obj2->obj_flags.cost;
+    if (!isSet(obj2->flags_.extra_flags, ITEM_SPECIAL))
+      cost += obj2->flags_.cost;
   }
   for (qint32 x = {}; x < MAX_WEAR; x++)
   {
     if (ch->equipment[x])
     {
       for (curr_cont = ch->equipment[x]->contains; curr_cont; curr_cont = curr_cont->next_content)
-        if (!isSet(curr_cont->obj_flags.extra_flags, ITEM_SPECIAL))
-          cost += curr_cont->obj_flags.cost;
+        if (!isSet(curr_cont->flags_.extra_flags, ITEM_SPECIAL))
+          cost += curr_cont->flags_.cost;
 
-      if (!isSet(ch->equipment[x]->obj_flags.extra_flags, ITEM_SPECIAL))
-        cost += ch->equipment[x]->obj_flags.cost;
+      if (!isSet(ch->equipment[x]->flags_.extra_flags, ITEM_SPECIAL))
+        cost += ch->equipment[x]->flags_.cost;
     }
   }
   return cost;
@@ -376,11 +376,11 @@ qint32 corpse_cost(ObjectPtr obj)
 
   for (ObjectPtr obj2 = obj->contains; obj2; obj2 = obj2->next_content)
   {
-    if (obj2->obj_flags.type_flag == ITEM_MONEY)
+    if (obj2->flags_.type_flag == ITEM_MONEY)
       continue;
     for (curr_cont = obj2->contains; curr_cont; curr_cont = curr_cont->next_content)
-      cost += curr_cont->obj_flags.cost;
-    cost += obj2->obj_flags.cost;
+      cost += curr_cont->flags_.cost;
+    cost += obj2->flags_.cost;
   }
   return cost;
 }
@@ -403,7 +403,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     ch->send("Available corpses (freshest first):\r\n$B");
     for (obj = ch->dc_->object_list; obj; obj = obj->next)
     {
-      if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
+      if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->flags_.value[3] != 1) // only look at corpses
         continue;
 
       if (!isexact("pc", obj->name()) || (!isexact(qPrintable(ch->name()), obj->name()) && !isexact(buf, obj->name())))
@@ -451,7 +451,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   {
     dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
 
-    if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
+    if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->flags_.value[3] != 1) // only look at corpses
       continue;
 
     if (!isexact("pc", obj->name()) || (!isexact(qPrintable(ch->name()), obj->name()) && !isexact(buf, obj->name())) || ++x < which)
@@ -472,7 +472,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
       return ReturnValue::eSUCCESS;
     }
     move_obj(obj, ch->in_room);
-    REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
+    REMOVE_BIT(obj->flags_.extra_flags, ITEM_INVISIBLE);
     send_to_char("The mortician goes into his freezer and returns with a corpse, which he\r\n"
                  "places at your feet.\r\n",
                  ch);
@@ -498,9 +498,9 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
     buf = u"$B$7%1$R) $3$B%2$R "_s.arg(number + 1, -2).arg(obj->short_description());
   }
 
-  if (obj->obj_flags.type_flag == ITEM_WEAPON)
+  if (obj->flags_.type_flag == ITEM_WEAPON)
   { // weapon
-    buf = u"%1%2d%3, %4, "_s.arg(buf).arg(obj->obj_flags.value[1]).arg(obj->obj_flags.value[2]).arg(isSet(obj->obj_flags.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
+    buf = u"%1%2d%3, %4, "_s.arg(buf).arg(obj->flags_.value[1]).arg(obj->flags_.value[2]).arg(isSet(obj->flags_.extra_flags, ITEM_TWO_HANDED) ? "Two-handed" : "One-handed");
   }
 
   QString buf2;
@@ -569,7 +569,7 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
   }
   else
   {
-    auto a = obj->obj_flags.extra_flags;
+    auto a = obj->flags_.extra_flags;
     a &= ITEM_WARRIOR | ITEM_MAGE | ITEM_THIEF | ITEM_CLERIC | ITEM_PAL | ITEM_ANTI | ITEM_BARB | ITEM_MONK | ITEM_RANGER | ITEM_DRUID | ITEM_BARD;
 
     QString buffer = sprintbit(a, Object::extra_bits);
@@ -598,11 +598,11 @@ QString gl_item(ObjectPtr obj, qint32 number, CharacterPtr ch, bool platinum = t
 
   if (platinum)
   {
-    buf2 = u"costing %1 coins."_s.arg(obj->obj_flags.cost / 10);
+    buf2 = u"costing %1 coins."_s.arg(obj->flags_.cost / 10);
   }
   else
   {
-    buf2 = u"costing %1 qpoints."_s.arg(obj->obj_flags.cost / 10000);
+    buf2 = u"costing %1 qpoints."_s.arg(obj->flags_.cost / 10000);
   }
 
   QString potential_buffer = buf + buf2;
@@ -708,13 +708,13 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
-    if (GET_PLATINUM(ch) < (quint32)(obj->obj_flags.cost / 10))
+    if (GET_PLATINUM(ch) < (quint32)(obj->flags_.cost / 10))
     {
       owner->do_tell(u"%1 Come back when you've got the platinum."_s.arg(qPrintable(ch->name())).split(' '));
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }
-    GET_PLATINUM(ch) -= obj->obj_flags.cost / 10;
+    GET_PLATINUM(ch) -= obj->flags_.cost / 10;
     dc_sprintf(buf, "%s %s", qPrintable(obj->name()), qPrintable(ch->name()));
     obj->name(buf);
     obj_to_char(obj, ch);
@@ -737,20 +737,20 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       owner->do_tell(u"%1 Try that on the kooky meta-physician.."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+    if (!isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     {
       owner->do_tell(u"%1 I don't deal in worthless junk."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
     // don't allow non-empty containers to be sold
-    if (obj->obj_flags.type_flag == ITEM_CONTAINER && obj->contains)
+    if (obj->flags_.type_flag == ITEM_CONTAINER && obj->contains)
     {
       owner->do_tell(u"%1 %2$B$2 needs to be emptied first."_s.arg(qPrintable(ch->name())).arg(GET_OBJ_SHORT(obj)).split(' '));
       return ReturnValue::eSUCCESS;
     }
 
-    qint32 cost = obj->obj_flags.cost / 10;
+    qint32 cost = obj->flags_.cost / 10;
 
     owner->do_tell(u"%1 I'll give you %2 plats for that. Thanks for shoppin'."_s.arg(qPrintable(ch->name())).arg(cost).split(' '));
     extract_obj(obj);
@@ -813,18 +813,18 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
     return ReturnValue::eSUCCESS;
   }
 
-  cost = obj->obj_flags.cost;
+  cost = obj->flags_.cost;
   value0 = eq_max_damage(obj);
-  value2 = obj->obj_flags.value[2];
+  value2 = obj->flags_.value[2];
 
-  if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (!isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     do_say(owner, "I don't repair this kind of junk.");
     act_to_character("$N gives you $p.", ch, obj, owner, 0);
     act_to_room("$N gives $n $p.", ch, obj, owner, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
-  if (obj->obj_flags.type_flag == ITEM_ARMOR || obj->obj_flags.type_flag == ITEM_LIGHT)
+  if (obj->flags_.type_flag == ITEM_ARMOR || obj->flags_.type_flag == ITEM_LIGHT)
   {
 
     percent = ((100 * eqdam) / value0);
@@ -832,7 +832,7 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
     price *= 4;                       /* he likes to charge more..  */
                                       /*  for armor... cuz he's a crook..  */
   }
-  else if (obj->obj_flags.type_flag == ITEM_WEAPON || obj->obj_flags.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND || obj->obj_flags.type_flag == ITEM_INSTRUMENT)
+  else if (obj->flags_.type_flag == ITEM_WEAPON || obj->flags_.type_flag == ITEM_FIREWEAPON || ARE_CONTAINERS(obj) || obj->flags_.type_flag == ITEM_STAFF || obj->flags_.type_flag == ITEM_WAND || obj->flags_.type_flag == ITEM_INSTRUMENT)
   {
 
     percent = ((100 * eqdam) / (value0 + value2));

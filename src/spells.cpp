@@ -922,7 +922,7 @@ qint32 use_mana(CharacterPtr ch, qint32 sn)
 
 void affect_update(qint32 duration_type)
 {
-  static affected_type *af, *next_af_dude;
+  static affected_typePtr af, *next_af_dude;
   void update_char_objects(CharacterPtr ch); /* handler.c */
 
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
@@ -1010,7 +1010,7 @@ void affect_update(qint32 duration_type)
 void isr_set(CharacterPtr ch)
 {
   // QString buf;
-  static affected_type *afisr;
+  static affected_typePtr afisr;
 
   if (!ch)
   {
@@ -1448,7 +1448,7 @@ QString skip_spaces(QString s)
 */
 command_return_t do_release(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  affected_type *aff, *aff_next;
+  affected_typePtr aff, *aff_next;
   bool printed = false;
   argument = skip_spaces(argument);
 
@@ -1748,7 +1748,7 @@ void set_conc_loss(CharacterPtr ch, qint32 spl)
 }
 bool check_conc_loss(CharacterPtr ch, qint32 spl)
 {
-  affected_type *af;
+  affected_typePtr af;
   qint32 afspl;
   if (!(af = ch->affected_by_spell(CONC_LOSS_FIXER)))
     return false;
@@ -2025,7 +2025,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           target_ok = true;
 
           // Reduce timer on paralyze even the victim is hit by a lightning bolt
-          affected_type *af;
+          affected_typePtr af;
           if ((af = tar_char->affected_by_spell(SPELL_PARALYZE)) != nullptr)
           {
             af->duration--;
@@ -2192,7 +2192,7 @@ command_return_t do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_WORLD))
             if ((tar_obj = get_obj_vis(ch, name, true)) != nullptr)
-              /* && !(isSet(tar_obj->obj_flags.more_flags, ITEM_NOLOCATE)))*/
+              /* && !(isSet(tar_obj->flags_.more_flags, ITEM_NOLOCATE)))*/
               target_ok = true;
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_EQUIP))

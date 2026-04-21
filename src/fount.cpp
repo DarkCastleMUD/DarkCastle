@@ -25,7 +25,7 @@ qint32 FOUNTAINisPresent(CharacterPtr ch)
        tmp != nullptr && !found;
        tmp = tmp->next_content)
   {
-    if ((tmp->obj_flags.type_flag == ITEM_FOUNTAIN) && CAN_SEE_OBJ(ch, tmp))
+    if ((tmp->flags_.type_flag == ITEM_FOUNTAIN) && CAN_SEE_OBJ(ch, tmp))
     {
       return (true);
     }
@@ -58,20 +58,20 @@ command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
   if (FOUNTAINisPresent(ch))
   {
 
-    if (to_obj->obj_flags.type_flag != ITEM_DRINKCON)
+    if (to_obj->flags_.type_flag != ITEM_DRINKCON)
     {
       act_to_character("You can't pour anything into that.", ch, 0, 0, 0);
       return 1;
     }
 
-    if ((to_obj->obj_flags.value[1] != 0) &&
-        (to_obj->obj_flags.value[2] != 0))
+    if ((to_obj->flags_.value[1] != 0) &&
+        (to_obj->flags_.value[2] != 0))
     {
       act_to_character("There is already another liquid in it!", ch, 0, 0, 0);
       return 1;
     }
 
-    if (!(to_obj->obj_flags.value[1] < to_obj->obj_flags.value[0]))
+    if (!(to_obj->flags_.value[1] < to_obj->flags_.value[0]))
     {
       act_to_character("There is no room for more.", ch, 0, 0, 0);
       return 1;
@@ -80,10 +80,10 @@ command_return_t do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_character("You fill $p!", ch, to_obj, 0, 0);
 
     /* First same type liq. */
-    to_obj->obj_flags.value[2] = {};
+    to_obj->flags_.value[2] = {};
 
     /* Then how much to pour */
-    to_obj->obj_flags.value[1] = to_obj->obj_flags.value[0];
+    to_obj->flags_.value[1] = to_obj->flags_.value[0];
   }
   else
   {

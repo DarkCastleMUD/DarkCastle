@@ -2721,7 +2721,7 @@ void remove_totem_stats(CharacterPtr ch, qint32 stat)
   for (a = ch->altar->contains; a; a = a->next_content)
   {
     qint32 j;
-    if (a->obj_flags.type_flag != ITEM_TOTEM)
+    if (a->flags_.type_flag != ITEM_TOTEM)
       continue;
     for (j = {}; j < a->num_affects; j++)
       if (stat && stat == a->affected[j].location)
@@ -2747,7 +2747,7 @@ void add_totem_stats(CharacterPtr ch, qint32 stat)
   for (a = ch->altar->contains; a; a = a->next_content)
   {
     qint32 j;
-    if (a->obj_flags.type_flag != ITEM_TOTEM)
+    if (a->flags_.type_flag != ITEM_TOTEM)
       continue;
     for (j = {}; j < a->num_affects; j++)
       if (stat && stat == a->affected[j].location)

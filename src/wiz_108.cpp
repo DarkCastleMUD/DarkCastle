@@ -65,25 +65,25 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     for (portal = dc_->world[i].contents; portal; portal = portal->next_content)
     {
-      if (portal->obj_flags.type_flag == ITEM_CLIMBABLE)
+      if (portal->flags_.type_flag == ITEM_CLIMBABLE)
       {
-        if (portal->obj_flags.value[0] < 0)
+        if (portal->flags_.value[0] < 0)
         {
           dc_sprintf(buf, "Room %5d - climb to Room %5lu (ERROR)\r\n",
-                     i, real_room(portal->obj_flags.value[0]));
+                     i, real_room(portal->flags_.value[0]));
 
           output += buf;
         }
-        else if (!dc_->rooms.contains(portal->obj_flags.value[0]))
+        else if (!dc_->rooms.contains(portal->flags_.value[0]))
         {
           dc_sprintf(buf, "Room %5d - climb to Room %5lu (DOES NOT EXIST)\r\n",
-                     i, real_room(portal->obj_flags.value[0]));
+                     i, real_room(portal->flags_.value[0]));
 
           output += buf;
         }
-        else if (dc_->world[real_room(portal->obj_flags.value[0])].zone != curZone)
+        else if (dc_->world[real_room(portal->flags_.value[0])].zone != curZone)
         {
-          dc_sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->obj_flags.value[0]), dc_->world[real_room(portal->obj_flags.value[0])].zone, dc_->zones.value(dc_->world[real_room(portal->obj_flags.value[0])].zone).NameC());
+          dc_sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->flags_.value[0]), dc_->world[real_room(portal->flags_.value[0])].zone, dc_->zones.value(dc_->world[real_room(portal->flags_.value[0])].zone).NameC());
 
           output += buf;
         }
@@ -110,7 +110,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if ((portal->isPortal()) && (portal->isPortalTypePermanent() || (portal->isPortalTypeTemp())) && (portal->in_room != DC::NOWHERE) && !portal->hasPortalFlagNoLeave())
       {
-        if ((portal->obj_flags.value[0] == dc_->world[i].number) || (portal->obj_flags.value[2] == dc_->world[i].zone))
+        if ((portal->flags_.value[0] == dc_->world[i].number) || (portal->flags_.value[2] == dc_->world[i].zone))
         {
           if (dc_->world[real_room(portal->in_room)].zone != curZone)
           {

@@ -15,19 +15,6 @@
 #include "DC/DC.h"
 #include <qiodevicebase.h>
 
-/* Set this define to wherever you want to save your corpses */
-const auto CORPSE_FILE = u"corpse.save"_s;
-
-/* External Structures / Variables */
-
-ObjectPtr obj_proto;
-/* index table for object file   */
-qint16 frozen_start_room = 1;
-
-/* Local Function Declerations */
-
-qint32 get_line_new(auto &stream, QString buf);
-
 qint32 corpse_save(ObjectPtr obj, FILE *stream, qint32 location, bool recurse_this_tree)
 {
   /* This function basically is responsible for taking the    */
@@ -129,7 +116,7 @@ void DC::load_corpses(void)
   QList<qint32> t, zwei = {};
   qint32 nr, num_objs = {};
   ObjectPtr temp = {}, obj = {}, next_obj = {};
-  extra_descr_data *new_descr;
+  ExtraDescriptionPtr new_descr;
   QString buf1, buf2, buf3;
   bool end = false;
   qint32 number = -1;
@@ -283,10 +270,10 @@ void DC::load_corpses(void)
             dc_->logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
-        temp->obj_flags.type_flag = t[0];
-        temp->obj_flags.wear_flags = ObjectPositions::fromInt(t[1]);
-        temp->obj_flags.weight = (t[2] > 0 ? t[2] : 0);
-        temp->obj_flags.cost = t[3];
+        temp->flags_.type_flag = t[0];
+        temp->flags_.wear_flags = ObjectPositions::fromInt(t[1]);
+        temp->flags_.weight = (t[2] > 0 ? t[2] : 0);
+        temp->flags_.cost = t[3];
         size_t alloc_num_affects = std::max(0, t[4]);
 
         /* buf2 is error codes pretty much */
@@ -311,7 +298,7 @@ void DC::load_corpses(void)
           switch (*line)
           {
           case 'E':
-            new_descr = new extra_descr_data;
+            new_descr = new ExtraDescription;
             new_descr->keyword_ = fread_string_new(stream);
             new_descr->description_ = fread_string_new(stream);
             new_descr->next = temp->ex_description;

@@ -176,13 +176,13 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->getLevel() < wand->obj_flags.value[0])
+  if (ch->getLevel() < wand->flags_.value[0])
   {
     ch->sendln("This wand is too powerful for you to imbue.");
     return ReturnValue::eFAILURE;
   }
 
-  manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana();
+  manacost = 4 + (11 - lvl / 10) * spell_info[wand->flags_.value[3]].min_usesmana();
 
   if (GET_MANA(ch) < manacost)
   {
@@ -211,10 +211,10 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
   // value[1] == total charges
 
   if (skill_success(ch, 0, SKILL_IMBUE))
-  {                                // success
-    wand->obj_flags.value[1] -= 1; // reduce total by 1
+  {                             // success
+    wand->flags_.value[1] -= 1; // reduce total by 1
 
-    if (wand->obj_flags.value[1] == 0) // no total charges left
+    if (wand->flags_.value[1] == 0) // no total charges left
     {
       act_to_character("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, 0);
       act_to_room("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, 0);
@@ -223,10 +223,10 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    wand->obj_flags.value[2] += charges; // refill charges
-    if (wand->obj_flags.value[2] >= wand->obj_flags.value[1])
+    wand->flags_.value[2] += charges; // refill charges
+    if (wand->flags_.value[2] >= wand->flags_.value[1])
     {
-      wand->obj_flags.value[2] = wand->obj_flags.value[1];
+      wand->flags_.value[2] = wand->flags_.value[1];
       act_to_character("You focus your arcane powers and imbue them into $p restoring its full charge!", ch, wand, 0, 0);
     }
     else
@@ -244,7 +244,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_character("You focus your arcane powers on $p but fail to restore its powers.", ch, wand, 0, 0);
     act_to_room("$n focuses $s arcane powers on $p to no effect.", ch, wand, 0, 0);
 
-    if (wand->obj_flags.value[2] == 0) // no current charges left
+    if (wand->flags_.value[2] == 0) // no current charges left
     {
       act_to_character("Unable to bear the strain, $p splits asunder with a sharp crack!", ch, wand, 0, 0);
       act_to_room("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, 0);
@@ -253,10 +253,10 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    wand->obj_flags.value[2] -= charges;
-    if (wand->obj_flags.value[2] <= 0)
+    wand->flags_.value[2] -= charges;
+    if (wand->flags_.value[2] <= 0)
     {
-      wand->obj_flags.value[2] = {};
+      wand->flags_.value[2] = {};
       act_to_character("The energy in $p has been completely lost!", ch, wand, 0, 0);
     }
     else

@@ -1496,8 +1496,8 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
   ObjectPtr obj = {};
   qint32 num;
 
-  extra_descr_data *curr = {};
-  extra_descr_data *curr2 = {};
+  ExtraDescriptionPtr curr = {};
+  ExtraDescriptionPtr curr2 = {};
 
   const QStringList fields =
       {
@@ -1551,7 +1551,7 @@ qint32 oedit_exdesc(CharacterPtr ch, qint32 item_num, QString buf)
                    ch);
       return ReturnValue::eFAILURE;
     }
-    curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
+    curr = (ExtraDescriptionPtr)calloc(1, sizeof(ExtraDescription));
     curr->keyword = select;
     curr->description = u"Empty desc.\r\n"_s;
     curr->next = obj->ex_description;
@@ -2127,7 +2127,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] type <>\r\n"
                    "$3Current$R: ",
                    this);
-      dc_snprintf(buf, sizeof(buf), "%s\n", item_types[(dc_->obj_index[rnum].item)->obj_flags.type_flag].toStdString().c_str());
+      dc_snprintf(buf, sizeof(buf), "%s\n", item_types[(dc_->obj_index[rnum].item)->flags_.type_flag].toStdString().c_str());
       send(buf);
       sendln("\r\n$3Valid types$R:");
 
@@ -2144,13 +2144,13 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     }
     if (intval == 24)
     {
-      (dc_->obj_index[rnum].item)->obj_flags.value[2] = -1;
+      (dc_->obj_index[rnum].item)->flags_.value[2] = -1;
     }
     else
     {
-      (dc_->obj_index[rnum].item)->obj_flags.value[2] = {};
+      (dc_->obj_index[rnum].item)->flags_.value[2] = {};
     }
-    (dc_->obj_index[rnum].item)->obj_flags.type_flag = intval;
+    (dc_->obj_index[rnum].item)->flags_.type_flag = intval;
     dc_sprintf(buf, "Item type set to %d.\r\n", intval);
     send(buf);
   }
@@ -2165,7 +2165,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
                    "$3Current$R: ",
                    this);
 
-      sendln(QFlagsToStrings<ObjectPositions>((dc_->obj_index[rnum].item)->obj_flags.wear_flags));
+      sendln(QFlagsToStrings<ObjectPositions>((dc_->obj_index[rnum].item)->flags_.wear_flags));
       sendln("$3Valid types$R:");
       for (i = {}; i < QFlagsToStrings<ObjectPositions>().size(); i++)
       {
@@ -2174,7 +2174,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    (dc_->obj_index[rnum].item)->obj_flags.wear_flags = parse_bitstrings<ObjectPositions>(buf4, this, (dc_->obj_index[rnum].item)->obj_flags.wear_flags);
+    (dc_->obj_index[rnum].item)->flags_.wear_flags = parse_bitstrings<ObjectPositions>(buf4, this, (dc_->obj_index[rnum].item)->flags_.wear_flags);
   }
   break;
 
@@ -2186,7 +2186,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] size <size[s]>\r\n"
                    "$3Current$R: ",
                    this);
-      sprintbit((dc_->obj_index[rnum].item)->obj_flags.size,
+      sprintbit((dc_->obj_index[rnum].item)->flags_.size,
                 size_bitfields, buf);
       send(buf);
       sendln("\r\n$3Valid types$R:");
@@ -2198,7 +2198,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     parse_bitstrings_into_int(size_bitfields, buf4, this,
-                              (dc_->obj_index[rnum].item)->obj_flags.size);
+                              (dc_->obj_index[rnum].item)->flags_.size);
   }
   break;
 
@@ -2210,7 +2210,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] extra <bit[s]>\r\n"
                    "$3Current$R: ",
                    this);
-      sprintbit((dc_->obj_index[rnum].item)->obj_flags.extra_flags, Object::extra_bits, buf);
+      sprintbit((dc_->obj_index[rnum].item)->flags_.extra_flags, Object::extra_bits, buf);
       send(buf);
       sendln("\r\n$3Valid types$R:");
       for (i = {}; i < Object::extra_bits.size(); i++)
@@ -2219,7 +2219,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       }
       return ReturnValue::eFAILURE;
     }
-    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), this, (dc_->obj_index[rnum].item)->obj_flags.extra_flags);
+    parse_bitstrings_into_int(Object::extra_bits, QString(buf4), this, (dc_->obj_index[rnum].item)->flags_.extra_flags);
   }
   break;
 
@@ -2236,7 +2236,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Value out of valid range.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.weight = intval;
+    (dc_->obj_index[rnum].item)->flags_.weight = intval;
     dc_sprintf(buf, "Item weight set to %d.\r\n", intval);
     send(buf);
   }
@@ -2255,7 +2255,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Value out of valid range.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.cost = intval;
+    (dc_->obj_index[rnum].item)->flags_.cost = intval;
     dc_sprintf(buf, "Item value set to %d.\r\n", intval);
     send(buf);
   }
@@ -2269,7 +2269,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       send_to_char("$3Syntax$R: oedit [item_num] moreflags <bit[s]>\r\n"
                    "$3Current$R: ",
                    this);
-      sprintbit((dc_->obj_index[rnum].item)->obj_flags.more_flags, Object::more_obj_bits, buf);
+      sprintbit((dc_->obj_index[rnum].item)->flags_.more_flags, Object::more_obj_bits, buf);
       send(buf);
       sendln("\r\n$3Valid types$R:");
       for (i = {}; i < Object::more_obj_bits.size(); i++)
@@ -2278,7 +2278,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       }
       return ReturnValue::eFAILURE;
     }
-    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), this, (dc_->obj_index[rnum].item)->obj_flags.more_flags);
+    parse_bitstrings_into_int(Object::more_obj_bits, QString(buf4), this, (dc_->obj_index[rnum].item)->flags_.more_flags);
   }
   break;
 
@@ -2295,7 +2295,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Value out of valid range.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.eq_level = intval;
+    (dc_->obj_index[rnum].item)->flags_.eq_level = intval;
     dc_sprintf(buf, "Item minimum level set to %d.\r\n", intval);
     send(buf);
   }
@@ -2314,7 +2314,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Please specifiy a valid number.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.value[0] = intval;
+    (dc_->obj_index[rnum].item)->flags_.value[0] = intval;
     dc_sprintf(buf, "Item value 1 set to %d.\r\n", intval);
     send(buf);
   }
@@ -2333,7 +2333,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Please specifiy a valid number.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.value[1] = intval;
+    (dc_->obj_index[rnum].item)->flags_.value[1] = intval;
     dc_sprintf(buf, "Item value 2 set to %d.\r\n", intval);
     send(buf);
   }
@@ -2352,7 +2352,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Please specifiy a valid number.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.value[2] = intval;
+    (dc_->obj_index[rnum].item)->flags_.value[2] = intval;
     dc_sprintf(buf, "Item value 3 set to %d.\r\n", intval);
     send(buf);
   }
@@ -2371,7 +2371,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Please specifiy a valid number.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.value[3] = intval;
+    (dc_->obj_index[rnum].item)->flags_.value[3] = intval;
     dc_sprintf(buf, "Item value 4 set to %d.\r\n", intval);
     send(buf);
   }
@@ -2451,7 +2451,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
     }
 
     VaultPtr vault, *tvault;
-    vault_items_data *items, *titems;
+    vault_items_dataPtr items, *titems;
     ObjectPtr obj;
     qint32 num = 0, real_num = {};
 
@@ -2516,19 +2516,19 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       sendln("Please specifiy a valid number.");
       return ReturnValue::eFAILURE;
     }
-    (dc_->obj_index[rnum].item)->obj_flags.timer = intval;
+    (dc_->obj_index[rnum].item)->flags_.timer = intval;
     dc_sprintf(buf, "Item timer to %d.\r\n", intval);
     send(buf);
   }
   break;
   case 22:
-    extra_descr_data *curr;
+    ExtraDescriptionPtr curr;
     for (curr = (dc_->obj_index[rnum].item)->ex_description; curr; curr = curr->next)
       if (!str_cmp(curr->keyword, qPrintable((dc_->obj_index[rnum].item)->name())))
         break;
     if (!curr)
     { // None existing;
-      curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
+      curr = (ExtraDescriptionPtr)calloc(1, sizeof(ExtraDescription));
       curr->keyword = (qPrintable((dc_->obj_index[rnum].item)->name()));
       curr->description = u""_s;
       curr->next = (dc_->obj_index[rnum].item)->ex_description;
@@ -4033,8 +4033,8 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, remainder_args;
   qint32 x, a, b, c, d = {};
-  extra_descr_data *extra;
-  extra_descr_data *ext;
+  ExtraDescriptionPtr extra;
+  ExtraDescriptionPtr ext;
 
   const QStringList return_directions =
       {
@@ -4379,7 +4379,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       std::tie(arg3, remainder_args) = half_chop(remainder_args);
 
       bool deleted = false;
-      extra_descr_data *prev = {};
+      ExtraDescriptionPtr prev = {};
       for (extra = dc_->world[ch->in_room].ex_description; extra != nullptr; prev = extra, extra = extra->next)
       {
         if (arg3 == QString(extra->keyword))
@@ -4413,7 +4413,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         // No matching extra description found so make a new one
         ch->send(u"Creating new extra description for keyword '%s'.\r\n"_s.arg(arg2.c_str()));
-        CREATE(extra, extra_descr_data, 1);
+        CREATE(extra, ExtraDescription, 1);
         extra->next = {};
 
         if (!(dc_->world[ch->in_room].ex_description))
@@ -4584,7 +4584,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       mob = {};
     }
-    deny_data *nd, *pd = {};
+    DenyPtr nd, *pd = {};
     for (nd = dc_->world[ch->in_room].denied; nd; nd = nd->next)
     {
       if (nd->vnum == mob)
@@ -4602,7 +4602,7 @@ command_return_t do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (done)
       break;
-    auto nd = new deny_data;
+    auto nd = new Deny;
     nd->next = dc_->world[ch->in_room].denied;
     try
     {
@@ -4625,7 +4625,7 @@ command_return_t do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
   QString buf, buf2;
-  extra_descr_data *i, *extra;
+  ExtraDescriptionPtr i, *extra;
 
   half_chop(arg, buf, buf2);
 
@@ -5290,7 +5290,7 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   Room *rm = {};
   CharacterPtr k = {};
   ObjectPtr j = {};
-  extra_descr_data *desc;
+  ExtraDescriptionPtr desc;
   qint32 i, x, loc;
 
   if (ch->isNonPlayer())
@@ -5358,7 +5358,7 @@ command_return_t do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_strcat(buf, "None\r\n");
     ch->send(buf);
   }
-  deny_data *d;
+  DenyPtr d;
   qint32 a = {};
   for (d = rm->denied; d; d = conn->next)
   {

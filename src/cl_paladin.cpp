@@ -200,7 +200,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->equipment[WEAR_WIELD] || !isSet(ch->equipment[WEAR_WIELD]->obj_flags.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WEAR_WIELD]->obj_flags.value[3] != 3)) // TYPE_SLASH
+  if (!ch->equipment[WEAR_WIELD] || !isSet(ch->equipment[WEAR_WIELD]->flags_.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WEAR_WIELD]->flags_.value[3] != 3)) // TYPE_SLASH
   {
     ch->sendln("You need to be wielding a two handed sword to behead!");
     return ReturnValue::eFAILURE;

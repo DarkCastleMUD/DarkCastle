@@ -127,17 +127,17 @@ void Room::AddTrackItem(TracksPtr newTrack)
   }
 }
 
-bool operator==(const deny_data &dd1, const deny_data &dd2)
+bool operator==(const Deny &dd1, const Deny &dd2)
 {
   QList<decltype(dd1.vnum)> denies1;
-  const deny_data *curr1 = &dd1;
+  const DenyPtr curr1 = &dd1;
   do
   {
     denies1.push_back(curr1->vnum);
   } while ((curr1 = curr1->next));
 
   QList<decltype(dd2.vnum)> denies2;
-  const deny_data *curr2 = &dd2;
+  const DenyPtr curr2 = &dd2;
   do
   {
     denies2.push_back(curr2->vnum);
@@ -146,17 +146,17 @@ bool operator==(const deny_data &dd1, const deny_data &dd2)
   return denies1 == denies2;
 }
 
-bool operator==(extra_descr_data &edd1, extra_descr_data &edd2)
+bool operator==(ExtraDescription &edd1, ExtraDescription &edd2)
 {
   QMap<QString, QString> extra_descriptions1;
-  extra_descr_data *curr1 = &edd1;
+  ExtraDescriptionPtr curr1 = &edd1;
   do
   {
     extra_descriptions1.insert(curr1->keyword_, curr1->description_);
   } while ((curr1 = curr1->next));
 
   QMap<QString, QString> extra_descriptions2;
-  extra_descr_data *curr2 = &edd2;
+  ExtraDescriptionPtr curr2 = &edd2;
   do
   {
     extra_descriptions2.insert(curr2->keyword_, curr2->description_);
@@ -232,7 +232,7 @@ void Character::add_to_bard_list(void)
   if (GET_CLASS(this) != CLASS_BARD)
     return;
 
-  auto curr = new pulse_data;
+  auto curr = new Pulse;
 
   curr->thechar = this;
   curr->next = bard_list;
@@ -241,8 +241,8 @@ void Character::add_to_bard_list(void)
 
 void Character::remove_from_bard_list(void)
 {
-  pulse_data *curr = {};
-  pulse_data *last = {};
+  PulsePtr curr = {};
+  PulsePtr last = {};
 
   if (!bard_list)
     return;
@@ -1295,7 +1295,7 @@ obj_index_dataPtr DC::generate_obj_indices(qint32 *top, obj_index_dataPtr index)
 void write_one_room(LegacyFile &lf, qint32 a)
 {
   FILE *f = lf.file_handle_;
-  extra_descr_data *extra;
+  ExtraDescriptionPtr extra;
 
   if (!rooms.contains(a))
     return;
@@ -1332,7 +1332,7 @@ void write_one_room(LegacyFile &lf, qint32 a)
 
   /* extra descriptions */
   // We push C-style linked list into QStack so we can maintain the order when writing
-  QStack<extra_descr_data *> room_extra_descriptions;
+  QStack<ExtraDescriptionPtr> room_extra_descriptions;
   for (extra = world[a].ex_description; extra; extra = extra->next)
   {
     room_extra_descriptions.push(extra);
@@ -1374,7 +1374,7 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_nr)
   QString temp = {};
   QChar ch = {};
   qint32 dir = {};
-  extra_descr_data *new_new_descr = {};
+  ExtraDescriptionPtr new_new_descr = {};
   zone_t zone_nr = {};
 
   ch = fread_char(stream);
@@ -1517,7 +1517,7 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_nr)
         // strip off the \n after the E
         if (fread_char(stream) != '\n')
           fseek(stream, -1, SEEK_CUR);
-        auto new_new_descr = new extra_descr_data;
+        auto new_new_descr = new ExtraDescription;
         new_new_descr->keyword_ = fread_string(stream);
         new_new_descr->description_ = fread_string(stream);
 
@@ -1533,7 +1533,7 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_nr)
       }
       else if (ch == 'B')
       {
-        auto deni = new deny_data;
+        auto deni = new Deny;
         deni->vnum = fread_int(stream, -1, 2147483467);
 
         if (room_nr)
@@ -1751,7 +1751,7 @@ void DC::set_zone_saved_obj(qint32 obj)
 /* de the world */
 void DC::free_world_from_memory(void)
 {
-  extra_descr_data *curr_extra = {};
+  ExtraDescriptionPtr curr_extra = {};
   world_file_list_item *curr_wfli = {};
 
   for (qint32 i = {}; i <= top_of_world; i++)
@@ -1812,7 +1812,7 @@ void DC::free_mobs_from_memory(void)
 void DC::free_objs_from_memory(void)
 {
   ObjectPtr curr = {};
-  // extra_descr_data * curr_extra = {};
+  // ExtraDescriptionPtr  curr_extra = {};
 
   for (qint32 i = {}; i <= top_of_objt; i++)
     if ((curr = obj_index[i].item))
@@ -3570,7 +3570,7 @@ void delete_item_from_index(qint32 nr)
 void write_object(LegacyFile &lf, ObjectPtr obj)
 {
   FILE *stream = lf.file_handle_;
-  extra_descr_data *currdesc;
+  ExtraDescriptionPtr currdesc;
 
   dc_fprintf(stream, "#%lu\n", obj_index[obj->item_number].vnum());
   string_to_file(stream, obj->name());
@@ -3581,20 +3581,20 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
   dc_fprintf(stream, "%d %d %d %d\n"
                      "%d %d %d %d %llu\n"
                      "%d %d %d\n",
-             obj->obj_flags.type_flag,
-             obj->obj_flags.extra_flags,
-             obj->obj_flags.wear_flags.toInt(),
-             obj->obj_flags.size,
+             obj->flags_.type_flag,
+             obj->flags_.extra_flags,
+             obj->flags_.wear_flags.toInt(),
+             obj->flags_.size,
 
-             obj->obj_flags.value[0],
-             obj->obj_flags.value[1],
-             obj->obj_flags.value[2],
-             obj->obj_flags.value[3],
-             obj->obj_flags.eq_level,
+             obj->flags_.value[0],
+             obj->flags_.value[1],
+             obj->flags_.value[2],
+             obj->flags_.value[3],
+             obj->flags_.eq_level,
 
-             obj->obj_flags.weight,
-             obj->obj_flags.cost,
-             obj->obj_flags.more_flags);
+             obj->flags_.weight,
+             obj->flags_.cost,
+             obj->flags_.more_flags);
 
   currdesc = obj->ex_description;
   while (currdesc)
@@ -3617,59 +3617,6 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
   }
 
   dc_fprintf(stream, "S\n");
-}
-
-auto &operator<<(auto &stream, ObjectPtr obj)
-{
-  if (!obj)
-    return stream;
-
-  stream << "#" << obj->obj_index[obj->item_number].vnum() << "\n";
-  string_to_file(stream, obj->name());
-  string_to_file(stream, obj->short_description());
-  string_to_file(stream, obj->long_description());
-  string_to_file(stream, obj->ActionDescription());
-
-  stream << qint32(obj->obj_flags.type_flag) << " "
-         << obj->obj_flags.extra_flags << " "
-         << obj->obj_flags.wear_flags << " "
-         << obj->obj_flags.size << "\n";
-
-  stream << obj->obj_flags.value[0] << " "
-         << obj->obj_flags.value[1] << " "
-         << obj->obj_flags.value[2] << " "
-         << obj->obj_flags.value[3] << " "
-         << obj->obj_flags.eq_level << "\n";
-
-  stream << obj->obj_flags.weight << " "
-         << obj->obj_flags.cost << " "
-         << obj->obj_flags.more_flags << "\n";
-
-  extra_descr_data *currdesc = obj->ex_description;
-  while (currdesc)
-  {
-    stream << "E\n";
-    string_to_file(stream, currdesc->keyword_);
-    string_to_file(stream, currdesc->description_);
-    currdesc = currdesc->next;
-  }
-
-  for (qint32 i = {}; i < obj->num_affects; i++)
-  {
-    stream << "A\n";
-    stream << obj->affected[i].location << " "
-           << obj->affected[i].modifier << "\n";
-  }
-
-  if (obj->obj_index[obj->item_number].programs_)
-  {
-    write_mprog_recur(stream, obj->obj_index[obj->item_number].programs_, false);
-    stream << "|\n";
-  }
-
-  stream << "S\n";
-
-  return stream;
 }
 
 QString quotequotes(QString &s1)
@@ -3766,19 +3713,19 @@ void write_object_csv(ObjectPtr obj, std::ofstream &fout)
     fout << "\"" << quotequotes(obj->short_description()) << "\",";
     fout << "\"" << quotequotes(obj->long_description()) << "\",";
     fout << "\"" << quotequotes(obj->ActionDescription()) << "\",";
-    fout << item_types[obj->obj_flags.type_flag].toStdString() << ",";
-    fout << obj->obj_flags.size << ",";
-    fout << obj->obj_flags.value[0] << ",";
-    fout << obj->obj_flags.value[1] << ",";
-    fout << obj->obj_flags.value[2] << ",";
-    fout << obj->obj_flags.value[3] << ",";
-    fout << obj->obj_flags.eq_level << ",";
-    fout << obj->obj_flags.weight << ",";
-    fout << obj->obj_flags.cost << ",";
+    fout << item_types[obj->flags_.type_flag].toStdString() << ",";
+    fout << obj->flags_.size << ",";
+    fout << obj->flags_.value[0] << ",";
+    fout << obj->flags_.value[1] << ",";
+    fout << obj->flags_.value[2] << ",";
+    fout << obj->flags_.value[3] << ",";
+    fout << obj->flags_.eq_level << ",";
+    fout << obj->flags_.weight << ",";
+    fout << obj->flags_.cost << ",";
 
-    write_bitvector_csv(obj->obj_flags.wear_flags, QFlagsToStrings<ObjectPositions>(), fout);
-    write_bitvector_csv(obj->obj_flags.extra_flags, Object::extra_bits, fout);
-    write_bitvector_csv(obj->obj_flags.more_flags, Object::more_obj_bits, fout);
+    write_bitvector_csv(obj->flags_.wear_flags, QFlagsToStrings<ObjectPositions>(), fout);
+    write_bitvector_csv(obj->flags_.extra_flags, Object::extra_bits, fout);
+    write_bitvector_csv(obj->flags_.more_flags, Object::more_obj_bits, fout);
 
     QString buf, buf2;
     for (qint32 i = {}; i < obj->num_affects; i++)
@@ -3818,7 +3765,7 @@ bool has_random(ObjectPtr obj)
 ObjectPtr clone_object(qint32 nr)
 {
   ObjectPtr obj, old;
-  extra_descr_data *new_new_descr, *descr;
+  ExtraDescriptionPtr new_new_descr, *descr;
 
   if (nr < 0)
     return 0;
@@ -3842,7 +3789,7 @@ ObjectPtr clone_object(qint32 nr)
   obj->ex_description = {};
   for (descr = old->ex_description; descr; descr = descr->next)
   {
-    new_new_descr = new extra_descr_data;
+    new_new_descr = new ExtraDescription;
     new_new_descr->keyword_ = descr->keyword_;
     new_new_descr->description_ = descr->description_;
     new_new_descr->next = obj->ex_description;
@@ -3865,7 +3812,7 @@ ObjectPtr clone_object(qint32 nr)
   obj->no_sell_expiration = {};
 
   if (obj_index[obj->item_number].non_combat_func ||
-      obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
+      obj->flags_.type_flag == ITEM_MEGAPHONE ||
       has_random(obj))
   {
     active_obj_list.insert(obj);
@@ -3881,7 +3828,7 @@ void randomize_object_affects(ObjectPtr obj)
   }
 
   // Don't alter godload
-  if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
+  if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
     return;
   }
@@ -3983,46 +3930,46 @@ void randomize_object(ObjectPtr obj)
     return;
   }
 
-  SET_BIT(obj->obj_flags.more_flags, ITEM_CUSTOM);
+  SET_BIT(obj->flags_.more_flags, ITEM_CUSTOM);
 
-  switch (obj->obj_flags.type_flag)
+  switch (obj->flags_.type_flag)
   {
   case ITEM_WEAPON:
-    obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
-    obj->obj_flags.value[1] = random_percent_change(20, obj->obj_flags.value[1]);
-    obj->obj_flags.value[2] = random_percent_change(20, obj->obj_flags.value[2]);
+    obj->flags_.cost = MAX(1, random_percent_change(33, obj->flags_.cost));
+    obj->flags_.value[1] = random_percent_change(20, obj->flags_.value[1]);
+    obj->flags_.value[2] = random_percent_change(20, obj->flags_.value[2]);
     randomize_object_affects(obj);
     break;
   case ITEM_ARMOR:
-    obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
+    obj->flags_.cost = MAX(1, random_percent_change(33, obj->flags_.cost));
     // v1 AC-apply
-    obj->obj_flags.value[0] = random_percent_change(25, obj->obj_flags.value[0]);
+    obj->flags_.value[0] = random_percent_change(25, obj->flags_.value[0]);
     randomize_object_affects(obj);
     break;
   case ITEM_WAND:
   case ITEM_STAFF:
-    obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
+    obj->flags_.cost = MAX(1, random_percent_change(33, obj->flags_.cost));
     // v2 total charges
-    obj->obj_flags.value[1] = random_percent_change(10, obj->obj_flags.value[2]);
+    obj->flags_.value[1] = random_percent_change(10, obj->flags_.value[2]);
     // v3 current charges
-    obj->obj_flags.value[2] = obj->obj_flags.value[1];
+    obj->flags_.value[2] = obj->flags_.value[1];
     break;
   case ITEM_INSTRUMENT:
-    obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
+    obj->flags_.cost = MAX(1, random_percent_change(33, obj->flags_.cost));
     // v2 non-combat
-    obj->obj_flags.value[1] = random_percent_change(33, obj->obj_flags.value[1]);
+    obj->flags_.value[1] = random_percent_change(33, obj->flags_.value[1]);
     // v3 combat
-    obj->obj_flags.value[2] = random_percent_change(33, obj->obj_flags.value[2]);
+    obj->flags_.value[2] = random_percent_change(33, obj->flags_.value[2]);
     randomize_object_affects(obj);
     break;
   case ITEM_CONTAINER:
-    obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
+    obj->flags_.cost = MAX(1, random_percent_change(33, obj->flags_.cost));
     randomize_object_affects(obj);
     break;
   case ITEM_POTION:
-    obj->obj_flags.cost = MAX(1, random_percent_change(33, obj->obj_flags.cost));
+    obj->flags_.cost = MAX(1, random_percent_change(33, obj->flags_.cost));
     // v1 level of potion
-    obj->obj_flags.value[0] = random_percent_change(10, obj->obj_flags.value[0]);
+    obj->flags_.value[0] = random_percent_change(10, obj->flags_.value[0]);
     break;
   }
 }
@@ -4346,13 +4293,13 @@ void Zone::reset(ResetType reset_type)
 
           if (ISSET(mob->mobdata->actflags, ACT_BOSS))
           {
-            mob->max_hit *= (1 + obj->obj_flags.eq_level / 500);
-            mob->damroll *= (1 + obj->obj_flags.eq_level / 500);
-            mob->hitroll *= (1 + obj->obj_flags.eq_level / 500);
+            mob->max_hit *= (1 + obj->flags_.eq_level / 500);
+            mob->damroll *= (1 + obj->flags_.eq_level / 500);
+            mob->hitroll *= (1 + obj->flags_.eq_level / 500);
             if (mob->armor > 0)
-              mob->armor *= (1 - obj->obj_flags.eq_level / 500);
+              mob->armor *= (1 - obj->flags_.eq_level / 500);
             else
-              mob->armor *= (1 + obj->obj_flags.eq_level / 500);
+              mob->armor *= (1 + obj->flags_.eq_level / 500);
           }
           last_obj = 1;
           last_cmd = 1;
@@ -4547,7 +4494,7 @@ bool Zone::isEmpty(void)
 void free_char(CharacterPtr ch)
 {
   qint32 iWear;
-  //  affected_type *af;
+  //  affected_typePtr af;
   class char_player_alias *x;
   char_player_alias *next;
   mob_prog_act_list *currmprog;
@@ -4634,7 +4581,7 @@ void free_char(CharacterPtr ch)
 /* release memory allocated for an obj  */
 void free_obj(ObjectPtr obj)
 {
-  extra_descr_data *ths, *next_one;
+  ExtraDescriptionPtr ths, *next_one;
 
   for (ths = obj->ex_description; ths; ths = next_one)
   {
@@ -4804,7 +4751,7 @@ void clear_object(ObjectPtr obj)
   obj->item_number = -1;
   obj->in_room = DC::NOWHERE;
   obj->vroom = {};
-  obj->obj_flags = obj_flag_data();
+  obj->flags = {};
   obj->num_affects = {};
   obj->affected = {};
 
@@ -5241,45 +5188,45 @@ void copySaveData(ObjectPtr target, ObjectPtr source)
   if (source->name() != target->name())
     target->name(source->name());
 
-  if (source->obj_flags.type_flag != target->obj_flags.type_flag)
-    target->obj_flags.type_flag = source->obj_flags.type_flag;
+  if (source->flags_.type_flag != target->flags_.type_flag)
+    target->flags_.type_flag = source->flags_.type_flag;
 
-  if (source->obj_flags.extra_flags != target->obj_flags.extra_flags)
-    target->obj_flags.extra_flags = source->obj_flags.extra_flags;
+  if (source->flags_.extra_flags != target->flags_.extra_flags)
+    target->flags_.extra_flags = source->flags_.extra_flags;
 
-  if (source->obj_flags.more_flags != target->obj_flags.more_flags)
-    target->obj_flags.more_flags = source->obj_flags.more_flags;
+  if (source->flags_.more_flags != target->flags_.more_flags)
+    target->flags_.more_flags = source->flags_.more_flags;
 
-  bool custom = isSet(source->obj_flags.more_flags, ITEM_CUSTOM);
+  bool custom = isSet(source->flags_.more_flags, ITEM_CUSTOM);
   if (custom)
   {
-    target->obj_flags.value[0] = source->obj_flags.value[0];
+    target->flags_.value[0] = source->flags_.value[0];
   }
 
-  auto type_flag = source->obj_flags.type_flag;
-  if ((custom || type_flag == ITEM_DRINKCON) && (source->obj_flags.value[1] != target->obj_flags.value[1]))
+  auto type_flag = source->flags_.type_flag;
+  if ((custom || type_flag == ITEM_DRINKCON) && (source->flags_.value[1] != target->flags_.value[1]))
   {
-    target->obj_flags.value[1] = source->obj_flags.value[1];
+    target->flags_.value[1] = source->flags_.value[1];
   }
 
-  if ((custom || type_flag == ITEM_STAFF || type_flag == ITEM_WAND) && (source->obj_flags.value[2] != target->obj_flags.value[2]))
+  if ((custom || type_flag == ITEM_STAFF || type_flag == ITEM_WAND) && (source->flags_.value[2] != target->flags_.value[2]))
   {
-    target->obj_flags.value[2] = source->obj_flags.value[2];
+    target->flags_.value[2] = source->flags_.value[2];
   }
 
-  if (custom && (source->obj_flags.value[3] != target->obj_flags.value[3]))
+  if (custom && (source->flags_.value[3] != target->flags_.value[3]))
   {
-    target->obj_flags.value[3] = source->obj_flags.value[3];
+    target->flags_.value[3] = source->flags_.value[3];
   }
 
   if (type_flag == ITEM_ARMOR || type_flag == ITEM_WEAPON || type_flag == ITEM_INSTRUMENT || type_flag == ITEM_WAND || type_flag == ITEM_CONTAINER)
   {
     if (custom)
     {
-      target->obj_flags.weight = source->obj_flags.weight;
-      target->obj_flags.cost = source->obj_flags.cost;
-      target->obj_flags.value[1] = source->obj_flags.value[1];
-      target->obj_flags.value[2] = source->obj_flags.value[2];
+      target->flags_.weight = source->flags_.weight;
+      target->flags_.cost = source->flags_.cost;
+      target->flags_.value[1] = source->flags_.value[1];
+      target->flags_.value[2] = source->flags_.value[2];
 
       // If new object does not have enough room for affects to be copied then realloc it
       if (source->num_affects > target->num_affects)
@@ -5297,12 +5244,12 @@ void copySaveData(ObjectPtr target, ObjectPtr source)
     }
   }
 
-  if (isSet(source->obj_flags.more_flags, ITEM_24H_SAVE))
+  if (isSet(source->flags_.more_flags, ITEM_24H_SAVE))
   {
     target->save_expiration = source->save_expiration;
   }
 
-  if (isSet(source->obj_flags.more_flags, ITEM_24H_NO_SELL))
+  if (isSet(source->flags_.more_flags, ITEM_24H_NO_SELL))
   {
     target->no_sell_expiration = source->no_sell_expiration;
   }
@@ -5320,53 +5267,53 @@ bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2)
     return false;
   }
 
-  if (obj->obj_flags.extra_flags != obj2->obj_flags.extra_flags)
+  if (obj->flags_.extra_flags != obj2->flags_.extra_flags)
   {
     return false;
   }
 
-  if (obj->obj_flags.more_flags != obj2->obj_flags.more_flags)
+  if (obj->flags_.more_flags != obj2->flags_.more_flags)
   {
     return false;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.cost != obj2->obj_flags.cost)
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->flags_.cost != obj2->flags_.cost)
   {
     return false;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[0] != obj2->obj_flags.value[0])
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->flags_.value[0] != obj2->flags_.value[0])
   {
     return false;
   }
 
-  if (obj->obj_flags.type_flag != obj2->obj_flags.type_flag)
+  if (obj->flags_.type_flag != obj2->flags_.type_flag)
   {
     return false;
   }
 
-  if ((isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_DRINKCON) && obj->obj_flags.value[1] != obj2->obj_flags.value[1])
+  if ((isSet(obj->flags_.more_flags, ITEM_CUSTOM) || obj->flags_.type_flag == ITEM_DRINKCON) && obj->flags_.value[1] != obj2->flags_.value[1])
   {
     return false;
   }
 
-  if ((isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) || obj->obj_flags.type_flag == ITEM_STAFF || obj->obj_flags.type_flag == ITEM_WAND) && (obj->obj_flags.value[2] != obj2->obj_flags.value[2]))
+  if ((isSet(obj->flags_.more_flags, ITEM_CUSTOM) || obj->flags_.type_flag == ITEM_STAFF || obj->flags_.type_flag == ITEM_WAND) && (obj->flags_.value[2] != obj2->flags_.value[2]))
   {
     return false;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->obj_flags.value[3] != obj2->obj_flags.value[3])
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->flags_.value[3] != obj2->flags_.value[3])
   {
     return false;
   }
 
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM) && obj->num_affects != obj2->num_affects)
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM) && obj->num_affects != obj2->num_affects)
   {
     return false;
   }
 
   // check if any of the affects don't match
-  if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
+  if (isSet(obj->flags_.more_flags, ITEM_CUSTOM))
   {
     for (qint32 i = {}; i < obj->num_affects; ++i)
     {
