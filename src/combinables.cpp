@@ -89,7 +89,7 @@ thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_TRADE_POISON);
 
@@ -98,7 +98,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!learned)
   {
-    ch->sendln("You do not know how to make poisons.");
+    ch->sendln(u"You do not know how to make poisons."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -107,7 +107,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!container)
   {
-    ch->sendln("You have nothing to make poisons in.");
+    ch->sendln(u"You have nothing to make poisons in."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -117,7 +117,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   if (index == -2)
     return ReturnValue::eFAILURE;
 
-  ch->sendln("You mix the ingrediants together in an attempt to make a poison..");
+  ch->sendln(u"You mix the ingrediants together in an attempt to make a poison.."_s);
 
   // Clear the items out of the container
   while (container->contains)
@@ -144,7 +144,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (failure)
   {
-    ch->sendln("Ahh crap, something got screwed up.  You are forced to throw away this attempt.");
+    ch->sendln(u"Ahh crap, something got screwed up.  You are forced to throw away this attempt."_s);
     act_to_room("$n fiddles with a mortar and pestle and looks unhappy.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
@@ -153,7 +153,7 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 rewardnum = real_object(poison_vial_data[index].result);
   if (rewardnum < 0)
   {
-    ch->sendln("That poison is broken.  Tell a god.");
+    ch->sendln(u"That poison is broken.  Tell a god."_s);
     return (ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR);
   }
 
@@ -165,11 +165,11 @@ command_return_t do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
-    ch->sendln("Only thieves are trained enough to poison their weapons.");
+    ch->sendln(u"Only thieves are trained enough to poison their weapons."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -179,13 +179,13 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (vialarg.isEmpty())
   {
-    ch->sendln("Poison your weapon with what?");
+    ch->sendln(u"Poison your weapon with what?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->fighting)
   {
-    ch->sendln("You can't do that while fighting!");
+    ch->sendln(u"You can't do that while fighting!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -193,7 +193,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr weapon = ch->equipment[WEAR_WIELD];
   if (!weapon)
   {
-    ch->sendln("You aren't wielding a weapon to poison.");
+    ch->sendln(u"You aren't wielding a weapon to poison."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -207,7 +207,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   qint32 found = -1;
   for (qint32 i = {}; poison_vial_data[i].result != -1; i++)
-    if (poison_vial_data[i].result == dc_->obj_index[vial->item_number].vnum())
+    if (poison_vial_data[i].result == dc_->obj_index_[vial->item_number].vnum())
     {
       found = i;
       break;
@@ -222,7 +222,7 @@ command_return_t do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
   for (qint32 j = {}; j < weapon->num_affects; j++)
     if (weapon->affected[j].location == WEP_THIEF_POISON)
     {
-      ch->sendln("Your weapon is already poisoned.");
+      ch->sendln(u"Your weapon is already poisoned."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -255,7 +255,7 @@ qint32 valid_trade_skill_combine(ObjectPtr container, trade_data_type *data, Cha
   // take all the items in our container and put them in an array by vnum
   for (ObjectPtr j = container->contains; j; j = j->next_content)
     if (j->item_number >= 0)
-      current.push_back(dc_->obj_index[j->item_number].vnum());
+      current.push_back(dc_->obj_index_[j->item_number].vnum());
     else
       return -1; // only valid object ingrediants will match
 
@@ -300,7 +300,7 @@ void determine_trade_skill_increase(CharacterPtr ch, qint32 skillnum, qint32 lea
   // can't learn past item's trivial value
   if (learned >= trivial)
   {
-    ch->sendln("You have learned all you can from making this item.");
+    ch->sendln(u"You have learned all you can from making this item."_s);
     return;
   }
 
@@ -317,7 +317,7 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
 
   if (!ch->equipment[WEAR_WIELD])
   {
-    ch->sendln("In handle_poisoned_weapon_atack() with null wield.  Tell a god.");
+    ch->sendln(u"In handle_poisoned_weapon_atack() with null wield.  Tell a god."_s);
     return (ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR);
   }
 
@@ -369,7 +369,7 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
   return retval;
 }
 
-command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, liquid, container, buffer;
   ObjectPtr herbobj, *liquidobj, containerobj;
@@ -380,7 +380,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isMortalPlayer() && !learned)
   {
-    ch->sendln("You just don't have the mind for potion brewing.");
+    ch->sendln(u"You just don't have the mind for potion brewing."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -434,7 +434,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->affected_by_spell(SKILL_BREW_TIMER))
   {
-    ch->sendln("You aren't ready to brew anything again.");
+    ch->sendln(u"You aren't ready to brew anything again."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -463,53 +463,53 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!herbobj)
   {
-    ch->sendln("You do not have that type of herb.");
+    ch->sendln(u"You do not have that type of herb."_s);
     return ReturnValue::eFAILURE;
   }
   if (herbobj->flags_.type_flag != ITEM_OTHER)
   {
-    ch->sendln("That is not an herb.");
+    ch->sendln(u"That is not an herb."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!liquidobj)
   {
-    ch->sendln("You do not have that type of liquid.");
+    ch->sendln(u"You do not have that type of liquid."_s);
     return ReturnValue::eFAILURE;
   }
   if (liquidobj->flags_.type_flag != ITEM_DRINKCON)
   {
-    ch->sendln("That is not a liquid container.");
+    ch->sendln(u"That is not a liquid container."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!containerobj)
   {
-    ch->sendln("You do not have that type of container.");
+    ch->sendln(u"You do not have that type of container."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (containerobj->flags_.type_flag != ITEM_POTION && containerobj->flags_.type_flag != ITEM_DRINKCON)
   {
-    ch->sendln("That is not a target container.");
+    ch->sendln(u"That is not a target container."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(containerobj->flags_.more_flags, ITEM_CUSTOM))
   {
-    ch->sendln("That container is already a brewed potion.");
+    ch->sendln(u"That container is already a brewed potion."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (containerobj == liquidobj)
   {
-    ch->sendln("Your liquid and target container cannot be the same object!");
+    ch->sendln(u"Your liquid and target container cannot be the same object!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (liquidobj->flags_.value[1] < 1)
   {
-    ch->sendln("There is no liquid left in that container.");
+    ch->sendln(u"There is no liquid left in that container."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -522,7 +522,7 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   const QString potion_color;
   // Determine color to use in message based on herb used
-  switch (dc_->obj_index[herbobj->item_number].vnum())
+  switch (dc_->obj_index_[herbobj->item_number].vnum())
   {
   case 6301:
     potion_color = "$B$2green$R and $B$4red$R";
@@ -566,15 +566,15 @@ command_return_t do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // Search for the current combination as a recipe
-  Brew::recipe r = {dc_->obj_index[herbobj->item_number].vnum(),
+  Brew::recipe r = {dc_->obj_index_[herbobj->item_number].vnum(),
                     liquidobj->flags_.value[2],
-                    dc_->obj_index[containerobj->item_number].vnum()};
+                    dc_->obj_index_[containerobj->item_number].vnum()};
   qint32 spell = b.find(r);
 
   //  ch->sendln(u"Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n"_s,
-  //	 dc_->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
+  //	 dc_->obj_index_[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
   //	 liquidobj->flags_.value[2], GET_OBJ_SHORT(liquidobj),
-  //	 dc_->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
+  //	 dc_->obj_index_[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
 
   if (spell == 0)
   {
@@ -749,7 +749,7 @@ void Brew::list(CharacterPtr ch)
     return;
   }
 
-  ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\r\n");
+  ch->sendln(u"[# ] [herb #] [liquid] [container] Spell Name\r\n"_s);
   for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
@@ -778,7 +778,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
 
   if (arg.isEmpty() 1 || arg.isEmpty() 2 || arg.isEmpty() 3 || arg.isEmpty() 4)
   {
-    ch->sendln("Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]");
+    ch->sendln(u"Syntax: brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -788,7 +788,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
 
   if (herb_vnum < 6301 || herb_vnum > 6312)
   {
-    ch->sendln("Only vnums 6301-6312 are valid herbs.");
+    ch->sendln(u"Only vnums 6301-6312 are valid herbs."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -806,7 +806,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
 
   if (container_vnum < 6320 || container_vnum > 6324)
   {
-    ch->sendln("Only vnums 6320-6324 are valid containers.");
+    ch->sendln(u"Only vnums 6320-6324 are valid containers."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -819,7 +819,7 @@ qint32 Brew::add(CharacterPtr ch, QString argument)
   recipe r = {herb_vnum, liquid_type, container_vnum};
   recipes.insert(std::make_pair(r, spell));
 
-  ch->sendln("New brew recipe added.");
+  ch->sendln(u"New brew recipe added."_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -833,7 +833,7 @@ qint32 Brew::remove(CharacterPtr ch, QString argument)
 
   if (argument.isEmpty())
   {
-    ch->sendln("Syntax: brew remove [recipe_num]");
+    ch->sendln(u"Syntax: brew remove [recipe_num]"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -873,7 +873,7 @@ qint32 Brew::find(Brew::recipe r)
   return spell;
 }
 
-command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, dust, pen, paper;
   ObjectPtr inkobj, *dustobj, *penobj, paperobj;
@@ -884,7 +884,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isMortalPlayer() && !learned)
   {
-    ch->sendln("You just don't have the mind for scribing.");
+    ch->sendln(u"You just don't have the mind for scribing."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -938,7 +938,7 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->affected_by_spell(SKILL_SCRIBE_TIMER))
   {
-    ch->sendln("You aren't ready to scribe anything again.");
+    ch->sendln(u"You aren't ready to scribe anything again."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -977,51 +977,51 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!inkobj)
   {
-    ch->sendln("You do not have that type of ink.");
+    ch->sendln(u"You do not have that type of ink."_s);
     return ReturnValue::eFAILURE;
   }
   if (inkobj->flags_.type_flag != ITEM_DRINKCON || inkobj->flags_.value[2] != LIQ_INK)
   {
-    ch->sendln("That is not ink.");
+    ch->sendln(u"That is not ink."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!dustobj)
   {
-    ch->sendln("You do not have that type of dust.");
+    ch->sendln(u"You do not have that type of dust."_s);
     return ReturnValue::eFAILURE;
   }
   if (dustobj->flags_.type_flag != ITEM_OTHER)
   {
-    ch->sendln("That is not dust.");
+    ch->sendln(u"That is not dust."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!penobj)
   {
-    ch->sendln("You do not have that type of pen.");
+    ch->sendln(u"You do not have that type of pen."_s);
     return ReturnValue::eFAILURE;
   }
   if (penobj->flags_.type_flag != ITEM_PEN)
   {
-    ch->sendln("That is not a pen.");
+    ch->sendln(u"That is not a pen."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!paperobj)
   {
-    ch->sendln("You do not have that type of paper.");
+    ch->sendln(u"You do not have that type of paper."_s);
     return ReturnValue::eFAILURE;
   }
   if (paperobj->flags_.type_flag != ITEM_SCROLL)
   {
-    ch->sendln("That is not paper.");
+    ch->sendln(u"That is not paper."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (inkobj->flags_.value[1] < 1)
   {
-    ch->sendln("There is no liquid left in that ink container.");
+    ch->sendln(u"There is no liquid left in that ink container."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1033,10 +1033,10 @@ command_return_t do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   // Search for the current combination as a recipe
-  Scribe::recipe r = {dc_->obj_index[inkobj->item_number].vnum(),
-                      dc_->obj_index[dustobj->item_number].vnum(),
-                      dc_->obj_index[penobj->item_number].vnum(),
-                      dc_->obj_index[paperobj->item_number].vnum()};
+  Scribe::recipe r = {dc_->obj_index_[inkobj->item_number].vnum(),
+                      dc_->obj_index_[dustobj->item_number].vnum(),
+                      dc_->obj_index_[penobj->item_number].vnum(),
+                      dc_->obj_index_[paperobj->item_number].vnum()};
   qint32 spell = s.find(r);
 
   act_to_character("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, 0);
@@ -1199,7 +1199,7 @@ void Scribe::list(CharacterPtr ch)
     return;
   }
 
-  ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\r\n");
+  ch->sendln(u"[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\r\n"_s);
   for (QMap<recipe, qint32>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
@@ -1229,7 +1229,7 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
 
   if (arg.isEmpty() 1 || arg.isEmpty() 2 || arg.isEmpty() 3 || arg.isEmpty() 4 || arg.isEmpty() 5)
   {
-    ch->sendln("Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]");
+    ch->sendln(u"Syntax: scribe add [ink_vnum] [dust_vnum] [pen_vnum] [paper_vnum] [spell_num]"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1240,25 +1240,25 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
 
   if (ink_vnum < 6326 || ink_vnum > 6328)
   {
-    ch->sendln("Only vnums 6326-6328 are valid inks.");
+    ch->sendln(u"Only vnums 6326-6328 are valid inks."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (dust_vnum < 6335 || dust_vnum > 6337)
   {
-    ch->sendln("Only vnums 6335-6337 are valid dusts.");
+    ch->sendln(u"Only vnums 6335-6337 are valid dusts."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (pen_vnum < 6329 || pen_vnum > 6334)
   {
-    ch->sendln("Only vnums 6329-6334 are valid pens.");
+    ch->sendln(u"Only vnums 6329-6334 are valid pens."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (paper_vnum < 6338 || paper_vnum > 6342)
   {
-    ch->sendln("Only vnums 6338-6342 are valid papers.");
+    ch->sendln(u"Only vnums 6338-6342 are valid papers."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1271,7 +1271,7 @@ qint32 Scribe::add(CharacterPtr ch, QString argument)
   recipe r = {ink_vnum, dust_vnum, pen_vnum, paper_vnum};
   recipes.insert(std::make_pair(r, spell));
 
-  ch->sendln("New scribe recipe added.");
+  ch->sendln(u"New scribe recipe added."_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1285,7 +1285,7 @@ qint32 Scribe::remove(CharacterPtr ch, QString argument)
 
   if (argument.isEmpty())
   {
-    ch->sendln("Syntax: scribe remove [recipe_num]");
+    ch->sendln(u"Syntax: scribe remove [recipe_num]"_s);
     return ReturnValue::eFAILURE;
   }
 

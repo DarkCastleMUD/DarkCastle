@@ -32,7 +32,7 @@ bool is_r_denied(CharacterPtr ch, qint32 room)
   if (ch->isPlayer())
     return false;
   for (auto d = ch->dc_->world[room].denied; d; d = conn->next)
-    if (dc_->mob_index[ch->mobdata->nr].vnum() == conn->vnum)
+    if (dc_->mob_index_[ch->mobdata->nr].vnum() == conn->vnum)
       return true;
   return false;
 }
@@ -90,11 +90,11 @@ void DC::mobile_activity(void)
       continue;
     }
 
-    if (dc_->mob_index[ch->mobdata->nr].non_combat_func)
+    if (dc_->mob_index_[ch->mobdata->nr].non_combat_func)
     {
 
       PerfTimers["mprog"].start();
-      retval = ((*dc_->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
+      retval = ((*dc_->mob_index_[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
       if (!isSet(retval, ReturnValue::eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
@@ -246,7 +246,7 @@ void DC::mobile_activity(void)
     // check hated
     if ((ch->mobdata->hated != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
-      ch->sendln("You're hating.");
+      ch->sendln(u"You're hating."_s);
       CharacterPtr next_blah;
       //      CharacterPtr temp = get_char(get_random_hate(ch));
       done = {};
@@ -660,7 +660,7 @@ void scavenge(CharacterPtr ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (dc_->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
+    if (dc_->obj_index_[obj->item_number].vnum() == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();

@@ -4,13 +4,13 @@
 **********************/
 #include "DC/DC.h"
 
-command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_linkload(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr new_new;
 
   if (arguments.isEmpty())
   {
-    sendln("Linkload whom?");
+    sendln(u"Linkload whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -18,14 +18,14 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
   if (get_pc(arg1))
   {
-    sendln("That person is already on the game!");
+    sendln(u"That person is already on the game!"_s);
     return ReturnValue::eFAILURE;
   }
 
   auto result = dc_->load_char_obj(arg1);
   if (!result || !result.value())
   {
-    sendln("Unable to load! (character might not exist...)");
+    sendln(u"Unable to load! (character might not exist...)"_s);
     return ReturnValue::eFAILURE;
   }
   auto conn = result.value();
@@ -51,7 +51,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   FILE *stream;
   QString tmp;
@@ -70,7 +70,7 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
   if (dc_fprintf(stream, "~\n") < 0)
   {
 
-    ch->sendln("Failure writing to transition file.");
+    ch->sendln(u"Failure writing to transition file."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -86,7 +86,7 @@ command_return_t do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_guide(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim = {};
   QString name = arguments.value(0);
@@ -95,27 +95,27 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
   {
     if (!(victim = get_pc_vis(this, name)))
     {
-      sendln("That player is not here.");
+      sendln(u"That player is not here."_s);
       return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    sendln("Who exactly would you like to be a guide?");
+    sendln(u"Who exactly would you like to be a guide?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
     send(u"%1 is now a guide.\r\n"_s.arg(qPrintable(victim->name())));
-    victim->sendln("You have been selected to be a DC Guide!");
+    victim->sendln(u"You have been selected to be a DC Guide!"_s);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
     send(u"%1 is no longer a guide.\r\n"_s.arg(qPrintable(victim->name())));
-    victim->sendln("You have been removed as a DC guide.");
+    victim->sendln(u"You have been removed as a DC guide."_s);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
@@ -123,7 +123,7 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name, level, buf, passwd;
@@ -141,45 +141,45 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!(victim = get_char_vis(ch, name)))
     {
-      ch->sendln("That player is not here.");
+      ch->sendln(u"That player is not here."_s);
       return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    ch->sendln("Advance whom?");
+    ch->sendln(u"Advance whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer())
   {
-    ch->sendln("NO! Not on NPC's.");
+    ch->sendln(u"NO! Not on NPC's."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (level.isEmpty() ||
       (new_newlevel = dc_atoi(level)) <= 0 || new_newlevel > IMPLEMENTER)
   {
-    ch->sendln("Level must be 1 to 110.");
+    ch->sendln(u"Level must be 1 to 110."_s);
     return ReturnValue::eFAILURE;
   }
 
   if ((new_newlevel > DC::MAX_MORTAL_LEVEL) && (new_newlevel < MIN_GOD))
   {
-    ch->sendln("That level doesn't exist!!");
+    ch->sendln(u"That level doesn't exist!!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < OVERSEER && new_newlevel >= IMMORTAL)
   {
-    ch->sendln("Limited to levels lower than Titan.");
+    ch->sendln(u"Limited to levels lower than Titan."_s);
     return ReturnValue::eFAILURE;
   }
 
   /* Who the fuck took ths out in the first place? -Sadus */
   if (new_newlevel > ch->getLevel())
   {
-    ch->sendln("Yeah right.");
+    ch->sendln(u"Yeah right."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -191,7 +191,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (new_newlevel <= victim->getLevel())
   {
-    ch->sendln("Warning:  Lowering a player's level!");
+    ch->sendln(u"Warning:  Lowering a player's level!"_s);
 
     victim->setLevel(1);
     victim->exp = 1;
@@ -207,7 +207,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
     redo_hitpoints(victim);
   }
 
-  ch->sendln("You feel generous.");
+  ch->sendln(u"You feel generous."_s);
   act("$n makes some strange gestures.\r\nA strange feeling comes upon you,"
       "like a giant hand. Light comes\r\ndown from above, grabbing your "
       "body, which begins to pulse\r\nwith coloured lights from inside.\r\nYo"
@@ -226,7 +226,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
   else
     while (victim->getLevel() < new_newlevel)
     {
-      victim->send("You raise a level!!  ");
+      victim->send(u"You raise a level!!  "_s);
       victim->incrementLevel();
       advance_level(victim, 0);
     }
@@ -234,7 +234,7 @@ command_return_t do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_zap(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim = {};
   qint32 room = {};
@@ -264,7 +264,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
-      sendln("Get stuffed.");
+      sendln(u"Get stuffed."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -315,7 +315,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_global(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
@@ -328,7 +328,7 @@ command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd)
     ;
 
   if (!*(argument + i))
-    ch->sendln("What message do you want to send to all players?");
+    ch->sendln(u"What message do you want to send to all players?"_s);
   else
   {
     dc_sprintf(buf, "\r\n%s\r\n", argument + i);
@@ -339,11 +339,11 @@ command_return_t do_global(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_shutdown(QStringList arguments, cmd_t cmd)
 {
   extern qint32 _shutdown;
   extern qint32 try_to_hotboot_on_crash;
-  extern command_return_t do_not_save_corpses;
+  extern ReturnValue do_not_save_corpses;
   QString *new_argv = {};
 
   if (isNonPlayer())
@@ -351,7 +351,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    sendln("Huh?");
+    sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -411,19 +411,19 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     if (!dc_->write_hotboot_file())
     {
       dc_->logentry(u"Hotboot failed.  Closing all sockets."_s, 0, DC::LogChannel::LOG_MISC);
-      sendln("Hot reboot failed.");
+      sendln(u"Hot reboot failed."_s);
     }
   }
   else if (arg1 == "auto")
   {
     if (try_to_hotboot_on_crash)
     {
-      sendln("Mud will not try to hotboot when it crashes next.");
+      sendln(u"Mud will not try to hotboot when it crashes next."_s);
       try_to_hotboot_on_crash = {};
     }
     else
     {
-      sendln("Mud will now TRY to hotboot when it crashes next.");
+      sendln(u"Mud will now TRY to hotboot when it crashes next."_s);
       try_to_hotboot_on_crash = 1;
     }
   }
@@ -476,25 +476,25 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send("Ok.\r\n");
+    send(u"Ok.\r\n"_s);
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_shutdow(QStringList arguments, cmd_t cmd)
 {
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    sendln("Huh?");
+    sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("If you want to shut something down - say so!");
+  sendln(u"If you want to shut something down - say so!"_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 errnosave = {};
   static pid_t child = {};
@@ -507,7 +507,7 @@ command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isNonPlayer() || !ch->has_skill(COMMAND_TESTPORT))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -515,7 +515,7 @@ command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (*arg1 == 0)
   {
-    ch->sendln("testport <start | stop>\r\n");
+    ch->sendln(u"testport <start | stop>\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -529,7 +529,7 @@ command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     dc_->logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
-    ch->sendln("Testport successfully started.");
+    ch->sendln(u"Testport successfully started."_s);
   }
   else if (!str_cmp(arg1, "stop"))
   {
@@ -541,13 +541,13 @@ command_return_t do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     dc_->logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
-    ch->sendln("Testport successfully shutdown.");
+    ch->sendln(u"Testport successfully shutdown."_s);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -563,7 +563,7 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isNonPlayer() || !ch->has_skill(COMMAND_TESTUSER))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -572,13 +572,13 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (*arg1 == 0 || *arg2 == 0)
   {
-    ch->sendln("testuser <user> <on|off>\r\n");
+    ch->sendln(u"testuser <user> <on|off>\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (dc_strlen(arg1) > 19 || _parse_name(arg1, username))
   {
-    ch->sendln("Invalid username passed.");
+    ch->sendln(u"Invalid username passed."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -593,7 +593,7 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!file_exists(savefile))
   {
-    ch->sendln("Player file not found.");
+    ch->sendln(u"Player file not found."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -607,7 +607,7 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    ch->sendln("Only on or off are valid second arguments to this command.");
+    ch->sendln(u"Only on or off are valid second arguments to this command."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -615,23 +615,23 @@ command_return_t do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (system(command))
   {
-    ch->sendln("Error occurred.");
+    ch->sendln(u"Error occurred."_s);
   }
   else
   {
-    ch->sendln("Ok.");
+    ch->sendln(u"Ok."_s);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->send(u"Bytes sent in %ld seconds: %ld\r\n"_s.arg(get_bandwidth_start()).arg(get_bandwidth_amount()));
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -650,7 +650,7 @@ command_return_t do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = get_pc_vis(ch, name)))
   {
-    ch->sendln("Edit the skills of whom?");
+    ch->sendln(u"Edit the skills of whom?"_s);
     return ReturnValue::eFAILURE;
   }
 

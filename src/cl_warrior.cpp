@@ -11,16 +11,16 @@
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
-command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_kick(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim{}, next_victim = {};
   QString name;
   qint32 dam = {};
-  command_return_t retval = {};
+  ReturnValue retval = {};
 
   if (!canPerform(SKILL_KICK))
   {
-    sendln("You will have to study from a master before you can use this.");
+    sendln(u"You will have to study from a master before you can use this."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -34,14 +34,14 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      sendln("Your foot comes up, but there's nobody there...");
+      sendln(u"Your foot comes up, but there's nobody there..."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (victim == this)
   {
-    sendln("You kick yourself, metaphorically speaking.");
+    sendln(u"You kick yourself, metaphorically speaking."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -50,7 +50,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    sendln("Kicking a bladeshielded opponent would be a good way to lose a leg!");
+    sendln(u"Kicking a bladeshielded opponent would be a good way to lose a leg!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -89,9 +89,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     if (SOMEONE_DIED(retval))
       return retval;
     // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-    if (dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
+    if (dc_->obj_index_[equipment[WEAR_FEET]->item_number].combat_func)
     {
-      retval = ((*dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
+      retval = ((*dc_->obj_index_[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
     }
     if (SOMEONE_DIED(retval))
       return retval;
@@ -120,9 +120,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
       if (SOMEONE_DIED(retval))
         return retval;
       // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-      if (dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
+      if (dc_->obj_index_[equipment[WEAR_FEET]->item_number].combat_func)
       {
-        retval = ((*dc_->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
+        retval = ((*dc_->obj_index_[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
       }
     }
   }
@@ -130,7 +130,7 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -140,7 +140,7 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_DEATHSTROKE))
   {
-    ch->sendln("You have no idea how to deathstroke.");
+    ch->sendln(u"You have no idea how to deathstroke."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -154,26 +154,26 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln("Deathstroke whom?");
+      ch->sendln(u"Deathstroke whom?"_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (victim == ch)
   {
-    ch->sendln("The world would be a better place...");
+    ch->sendln(u"The world would be a better place..."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD])
   {
-    ch->sendln("You must be wielding a weapon to deathstrike someone.");
+    ch->sendln(u"You must be wielding a weapon to deathstrike someone."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(victim) > position_t::SITTING)
   {
-    ch->sendln("Your opponent isn't in a vulnerable enough position!");
+    ch->sendln(u"Your opponent isn't in a vulnerable enough position!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -182,7 +182,7 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Stroking a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Stroking a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -216,7 +216,7 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
     retval = damage(ch, victim, 0, attacktype, SKILL_DEATHSTROKE);
     if (ch->dc_->number(1, 100) > failchance)
     {
-      ch->sendln("You manage to retain your balance!");
+      ch->sendln(u"You manage to retain your balance!"_s);
       return ReturnValue::eFAILURE;
     }
     dam /= 4;
@@ -246,7 +246,7 @@ command_return_t do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 attempt;
   QString buf;
@@ -261,16 +261,16 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_RETREAT))
   {
-    ch->sendln("You dunno how...better flee instead.");
+    ch->sendln(u"You dunno how...better flee instead."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_NO_FLEE))
   {
     if (ch->affected_by_spell(SPELL_IRON_ROOTS))
-      ch->sendln("The roots bracing your legs make it impossible to run!");
+      ch->sendln(u"The roots bracing your legs make it impossible to run!"_s);
     else
-      ch->sendln("Your legs are too tired for running away!");
+      ch->sendln(u"Your legs are too tired for running away!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -288,7 +288,7 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!CAN_GO(ch, attempt))
   {
-    ch->sendln("You cannot retreat in that direction.");
+    ch->sendln(u"You cannot retreat in that direction."_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_SNEAK))
@@ -314,7 +314,7 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
   //   if (CAN_GO(ch, attempt))
   {
     act("$n tries to beat a hasty retreat.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    ch->sendln("You try to beat a hasty retreat....");
+    ch->sendln(u"You try to beat a hasty retreat...."_s);
 
     // check for any spec procs
     retval = ch->special("", static_cast<cmd_t>(attempt + 1));
@@ -345,21 +345,21 @@ command_return_t do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // No exits were found
-  ch->sendln("You cannot retreat in that direction.!");
+  ch->sendln(u"You cannot retreat in that direction.!"_s);
   return ReturnValue::eFAILURE;
 }
 
-command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer() && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
-    ch->sendln("You better learn how to first...");
+    ch->sendln(u"You better learn how to first..."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->getHP() == 1)
   {
-    ch->sendln("You are too weak to do this right now.");
+    ch->sendln(u"You are too weak to do this right now."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -372,7 +372,7 @@ command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
   // TODO - I'm pretty sure we can remove this check....don't feel like checking right now though
   if (isSet(ch->combat, COMBAT_HITALL))
   {
-    ch->sendln("You can't disengage!");
+    ch->sendln(u"You can't disengage!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -411,7 +411,7 @@ command_return_t do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -431,7 +431,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   //    if (ch->isPlayer())
   if (!ch->equipment[WEAR_WIELD])
   {
-    ch->sendln("You need to wield a weapon, to make it a success.");
+    ch->sendln(u"You need to wield a weapon, to make it a success."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -442,7 +442,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!victim)
   {
-    ch->sendln("Bash whom?");
+    ch->sendln(u"Bash whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -454,25 +454,25 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    ch->sendln("You cannot bash something that HUGE!");
+    ch->sendln(u"You cannot bash something that HUGE!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    ch->sendln("You cannot pick just one to bash!");
+    ch->sendln(u"You cannot pick just one to bash!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    ch->sendln("You cannot target something that tiny!");
+    ch->sendln(u"You cannot target something that tiny!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Aren't we funny today...");
+    ch->sendln(u"Aren't we funny today..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -480,7 +480,7 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Bashing a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Bashing a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -586,16 +586,16 @@ command_return_t do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   // if our shield has a combat proc and we hit them, let'um have it!
   if (hit && ch->equipment[WEAR_SHIELD])
   {
-    if (ch->dc_->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
+    if (ch->dc_->obj_index_[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
     {
-      retval = ((*ch->dc_->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
+      retval = ((*ch->dc_->obj_index_[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
     }
   }
 
   return retval;
 }
 
-command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -609,25 +609,25 @@ command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim == nullptr)
   {
-    ch->sendln("Redirect your attacks to whom?");
+    ch->sendln(u"Redirect your attacks to whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Aren't we funny today...");
+    ch->sendln(u"Aren't we funny today..."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->fighting)
   {
-    ch->sendln("You're not fighting anyone to begin with!");
+    ch->sendln(u"You're not fighting anyone to begin with!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!victim->fighting)
   {
-    ch->sendln("He isn't bothering anyone, you have enough problems as it is anyways!");
+    ch->sendln(u"He isn't bothering anyone, you have enough problems as it is anyways!"_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->fighting == victim)
@@ -660,7 +660,7 @@ command_return_t do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   ObjectPtr wielded;
@@ -673,13 +673,13 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_DISARM))
   {
-    ch->sendln("You dunno how.");
+    ch->sendln(u"You dunno how."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->equipment[WEAR_WIELD] == nullptr)
   {
-    ch->sendln("You must wield a weapon to disarm.");
+    ch->sendln(u"You must wield a weapon to disarm."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -690,13 +690,13 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim == nullptr)
   {
-    ch->sendln("Disarm whom?");
+    ch->sendln(u"Disarm whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->equipment[WEAR_WIELD] == nullptr)
   {
-    ch->sendln("Your opponent is not wielding a weapon!");
+    ch->sendln(u"Your opponent is not wielding a weapon!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -705,7 +705,7 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Attempting to disarm a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Attempting to disarm a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -718,16 +718,16 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (victim->getLevel() >= IMMORTAL)
     {
-      ch->sendln("You can't seem to work it loose.");
+      ch->sendln(u"You can't seem to work it loose."_s);
       return ReturnValue::eFAILURE;
     }
-    if (dc_->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
+    if (dc_->obj_index_[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
       return ReturnValue::eSUCCESS;
     }
     act_to_room("$n disarms $mself!", ch, nullptr, victim, NOTVICT);
-    ch->sendln("You disarm yourself!  Congratulations!  Try using 'remove' next-time.");
+    ch->sendln(u"You disarm yourself!  Congratulations!  Try using 'remove' next-time."_s);
     obj = ch->unequip_char(WEAR_WIELD);
     obj_to_char(obj, ch);
     if (ch->equipment[WEAR_SECOND_WIELD])
@@ -756,9 +756,9 @@ command_return_t do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (((isSet(wielded->flags_.extra_flags, ITEM_NODROP) || isSet(wielded->flags_.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
-        (victim->isPlayer() || dc_->mob_index[victim->mobdata->nr].vnum() > 2400 ||
-         dc_->mob_index[victim->mobdata->nr].vnum() < 2300))
-      ch->sendln("You can't seem to work it loose.");
+        (victim->isPlayer() || dc_->mob_index_[victim->mobdata->nr].vnum() > 2400 ||
+         dc_->mob_index_[victim->mobdata->nr].vnum() < 2300))
+      ch->sendln(u"You can't seem to work it loose."_s);
     else
       disarm(ch, victim);
     WAIT_STATE(ch, 2 * DC::PULSE_VIOLENCE);
@@ -794,37 +794,37 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
 
   if (!canPerform(SKILL_RESCUE))
   {
-    sendln("You've got alot to learn before you try to be a bodyguard.");
+    sendln(u"You've got alot to learn before you try to be a bodyguard."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_room_vis(victim_name)))
   {
-    sendln("Whom do you want to rescue?");
+    sendln(u"Whom do you want to rescue?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    sendln("What about fleeing instead?");
+    sendln(u"What about fleeing instead?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isPlayer() && (victim->isNonPlayer() && !IS_AFFECTED(victim, AFF_CHARM)))
   {
-    sendln("Doesn't need your help!");
+    sendln(u"Doesn't need your help!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (fighting == victim)
   {
-    sendln("How can you rescue someone you are trying to kill?");
+    sendln(u"How can you rescue someone you are trying to kill?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!can_be_attacked(this, victim->fighting))
   {
-    sendln("You cannot complete the rescue!");
+    sendln(u"You cannot complete the rescue!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -844,11 +844,11 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
 
   if (!skill_success(victim, SKILL_RESCUE))
   {
-    sendln("You fail the rescue.");
+    sendln(u"You fail the rescue."_s);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("Banzai! To the rescue...");
+  sendln(u"Banzai! To the rescue..."_s);
   act_to_character("You are rescued by $N, you are confused!", victim, 0, this, 0);
   act_to_room("$n heroically rescues $N.", this, 0, victim, NOTVICT);
 
@@ -876,26 +876,26 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   qint32 duration = 12;
 
   if (!ch->canPerform(SKILL_BLADESHIELD))
   {
-    ch->sendln("You'd cut yourself to ribbons just trying!");
+    ch->sendln(u"You'd cut yourself to ribbons just trying!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_BLADESHIELD) && !ch->isImmortalPlayer())
   {
-    ch->sendln("Your body is still recovering from your last use of the blade shield technique.");
+    ch->sendln(u"Your body is still recovering from your last use of the blade shield technique."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(ch->fighting))
   {
-    ch->sendln("But you aren't fighting anyone!");
+    ch->sendln(u"But you aren't fighting anyone!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -905,7 +905,7 @@ command_return_t do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, nullptr, SKILL_BLADESHIELD))
   {
     act_to_room("$n starts swinging $s weapons around but stops before narrowly avoiding dismembering $mself.", ch, 0, 0, NOTVICT);
-    ch->sendln("You try to begin the bladeshield technique and almost chop off your own arm!");
+    ch->sendln(u"You try to begin the bladeshield technique and almost chop off your own arm!"_s);
     duration /= 2;
   }
   else
@@ -1040,14 +1040,14 @@ void stop_guarding_me(CharacterPtr victim)
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr victim = {};
 
   if (!ch->isNonPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
-    ch->sendln("You have no idea how to be a full time bodyguard.");
+    ch->sendln(u"You have no idea how to be a full time bodyguard."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->isNonPlayer())
@@ -1057,20 +1057,20 @@ command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(name)))
   {
-    ch->sendln("Some bodyguard you are.  That person isn't even here!");
+    ch->sendln(u"Some bodyguard you are.  That person isn't even here!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch == victim)
   {
-    ch->sendln("You stop guarding anyone.");
+    ch->sendln(u"You stop guarding anyone."_s);
     stop_guarding(ch);
     return ReturnValue::eSUCCESS;
   }
 
   if (victim == ch->guarding)
   {
-    ch->sendln("You are already guarding that person.");
+    ch->sendln(u"You are already guarding that person."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1080,7 +1080,7 @@ command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
   if (ch->guarding)
   {
     stop_guarding(ch);
-    ch->sendln("You stop guarding anyone.");
+    ch->sendln(u"You stop guarding anyone."_s);
     //      return ReturnValue::eFAILURE;
   }
 
@@ -1090,24 +1090,24 @@ command_return_t do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
   if (!ch->canPerform(SKILL_TACTICS))
   {
-    ch->sendln("You just don't have the mind for strategic battle.");
+    ch->sendln(u"You just don't have the mind for strategic battle."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_TACTICS_TIMER))
   {
-    ch->sendln("You will need more time to work out your tactics.");
+    ch->sendln(u"You will need more time to work out your tactics."_s);
     return ReturnValue::eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    ch->sendln("You have no group to command.");
+    ch->sendln(u"You have no group to command."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1126,13 +1126,13 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_TACTICS))
   {
-    ch->sendln("Guess you just weren't the Patton you thought you were.");
+    ch->sendln(u"Guess you just weren't the Patton you thought you were."_s);
     act_to_room("$n goes on about team not being spelled with an 'I' or something.", ch, 0, 0, 0);
   }
   else
   {
     act_to_room("$n takes command coordinating $s group's efforts.", ch, 0, 0, 0);
-    ch->sendln("You take command coordinating the group's attacks.");
+    ch->sendln(u"You take command coordinating the group's attacks."_s);
 
     af.type = SKILL_TACTICS_TIMER;
     af.duration = 1 + ch->has_skill(SKILL_TACTICS) / 10;
@@ -1167,7 +1167,7 @@ command_return_t do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i, next_i;
   qint32 learned = ch->has_skill(SKILL_MAKE_CAMP);
@@ -1175,7 +1175,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    ch->sendln("You do not know how to set up a safe camp.");
+    ch->sendln(u"You do not know how to set up a safe camp."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1185,7 +1185,7 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
       isSet(dc_->world[ch->in_room].room_flags, FALL_UP) || isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) ||
       dc_->world[ch->in_room].sector_type == SECT_CITY || dc_->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
   {
-    ch->sendln("Something about this area inherently prohibits a rugged camp.");
+    ch->sendln(u"Something about this area inherently prohibits a rugged camp."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1195,20 +1195,20 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if ((i->isNonPlayer() && !IS_AFFECTED(i, AFF_CHARM) && !IS_AFFECTED(i, AFF_FAMILIAR)) || (i->fighting))
     {
-      ch->sendln("This area does not yet feel secure enough to rest.");
+      ch->sendln(u"This area does not yet feel secure enough to rest."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (ch->affected_by_spell(SKILL_MAKE_CAMP_TIMER))
   {
-    ch->sendln("You cannot make another camp so soon.");
+    ch->sendln(u"You cannot make another camp so soon."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_MAKE_CAMP))
   {
-    ch->sendln("You are unable to muster the strength to make a camp.");
+    ch->sendln(u"You are unable to muster the strength to make a camp."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1218,14 +1218,14 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (i->affected_by_spell(SKILL_MAKE_CAMP))
     {
-      ch->sendln("There is already a camp setup here.");
+      ch->sendln(u"There is already a camp setup here."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 2.5));
 
-  ch->sendln("You scan about for signs of danger as you clear an area to make camp...");
+  ch->sendln(u"You scan about for signs of danger as you clear an area to make camp..."_s);
   act_to_room("$n scans about for signs of danger and clears an area to make camp...", ch, 0, 0, 0);
 
   if (!skill_success(ch, 0, SKILL_MAKE_CAMP))
@@ -1272,26 +1272,26 @@ command_return_t do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_TRIAGE);
   affected_type af;
 
   if (ch->isMortalPlayer() && !learned)
   {
-    ch->sendln("You do not know how to aid your regeneration in that way.");
+    ch->sendln(u"You do not know how to aid your regeneration in that way."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->fighting)
   {
-    ch->sendln("You are a little too busy for that right now.");
+    ch->sendln(u"You are a little too busy for that right now."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_TRIAGE_TIMER))
   {
-    ch->sendln("You cannot take care of your battle wounds again so soon.");
+    ch->sendln(u"You cannot take care of your battle wounds again so soon."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1311,7 +1311,7 @@ command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, 0, SKILL_TRIAGE))
   {
-    ch->sendln("You pause to clean and bandage some of your more painful injuries but feel little improvement in your health.");
+    ch->sendln(u"You pause to clean and bandage some of your more painful injuries but feel little improvement in your health."_s);
     act_to_room("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -1323,26 +1323,26 @@ command_return_t do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  ch->sendln("You pause to clean and bandage some of your more painful injuries and speed the healing process.");
+  ch->sendln(u"You pause to clean and bandage some of your more painful injuries and speed the healing process."_s);
   act_to_room("$n pauses to try and bandage some of $s more painful injuries.", ch, 0, 0, 0);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_BATTLESENSE);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    ch->sendln("You do not know how to heighten your battle awareness.");
+    ch->sendln(u"You do not know how to heighten your battle awareness."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->fighting)
   {
-    ch->sendln("You must be in battle to heighten your combat awareness!");
+    ch->sendln(u"You must be in battle to heighten your combat awareness!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1350,11 +1350,11 @@ command_return_t do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, 0, SKILL_BATTLESENSE))
   {
-    ch->sendln("Your body and mind, tired from continued battle, are unable to reach full combat readiness.");
+    ch->sendln(u"Your body and mind, tired from continued battle, are unable to reach full combat readiness."_s);
   }
   else
   {
-    ch->sendln("Your awareness heightens dramatically as the rush of battle courses through your body.");
+    ch->sendln(u"Your awareness heightens dramatically as the rush of battle courses through your body."_s);
     act_to_room("$n's movements become quick and calculated as $s senses heighten with the rush of battle.", ch, 0, 0, 0);
 
     af.type = SKILL_BATTLESENSE;
@@ -1369,7 +1369,7 @@ command_return_t do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString name;
@@ -1378,7 +1378,7 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    ch->sendln("You do not know how to smite your enemies effectively.");
+    ch->sendln(u"You do not know how to smite your enemies effectively."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1386,7 +1386,7 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!ch->fighting)
     {
-      ch->sendln("Smite whom?");
+      ch->sendln(u"Smite whom?"_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -1398,13 +1398,13 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!argument.isEmpty())
     if (!(vict = ch->get_char_room_vis(name)))
     {
-      ch->sendln("Smite whom?");
+      ch->sendln(u"Smite whom?"_s);
       return ReturnValue::eFAILURE;
     }
 
   if (ch == vict)
   {
-    ch->sendln("There's a suicide command for that...");
+    ch->sendln(u"There's a suicide command for that..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1416,7 +1416,7 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->affected_by_spell(SKILL_SMITE_TIMER))
   {
-    ch->sendln("You cannot smite your enemies again so soon.");
+    ch->sendln(u"You cannot smite your enemies again so soon."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1455,48 +1455,48 @@ command_return_t do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
   return ch->fighting ? ReturnValue::eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
-command_return_t do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_LEADERSHIP);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    ch->sendln("You do not know that ability.");
+    ch->sendln(u"You do not know that ability."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->master || !ch->followers)
   {
-    ch->sendln("You must be leading a group to call upon your leadership skills.");
+    ch->sendln(u"You must be leading a group to call upon your leadership skills."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("Stop trying to show off.");
+    ch->sendln(u"Stop trying to show off."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_LEADERSHIP))
   {
-    ch->sendln("You and your followers are already inspired.");
+    ch->sendln(u"You and your followers are already inspired."_s);
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("You loudly call, 'Once more unto the breach, dear friends!'");
+  ch->sendln(u"You loudly call, 'Once more unto the breach, dear friends!'"_s);
   act_to_room("$n loudly calls, 'Once more unto the breach, dear friends!'", ch, 0, 0, 0);
 
   WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 1.5));
 
   if (!skill_success(ch, 0, SKILL_LEADERSHIP))
   {
-    ch->sendln("Your bravery miserably fails to inspire.");
+    ch->sendln(u"Your bravery miserably fails to inspire."_s);
     act_to_room("$n's bravery miserably fails to inspire.", ch, 0, 0, 0);
   }
   else
   {
-    ch->sendln("Your bravery lends you additional might and inspires the group!");
+    ch->sendln(u"Your bravery lends you additional might and inspires the group!"_s);
     act_to_room("$n's bravery lends $m additional might and inspires the group!", ch, 0, 0, 0);
 
     af.type = SKILL_LEADERSHIP;
@@ -1514,20 +1514,20 @@ command_return_t do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_PERSEVERANCE);
   affected_type af;
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    ch->sendln("Your lack of fortitude is stunning.");
+    ch->sendln(u"Your lack of fortitude is stunning."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->fighting)
   {
-    ch->sendln("What, exactly, are you trying to persevere through?");
+    ch->sendln(u"What, exactly, are you trying to persevere through?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1535,11 +1535,11 @@ command_return_t do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, 0, SKILL_PERSEVERANCE))
   {
-    ch->sendln("Your movements seem unchanged, though you strive to gain some momentum in your actions.");
+    ch->sendln(u"Your movements seem unchanged, though you strive to gain some momentum in your actions."_s);
   }
   else
   {
-    ch->sendln("Your movements seem to build energy and gain momentum as you fight with renewed vigor!");
+    ch->sendln(u"Your movements seem to build energy and gain momentum as you fight with renewed vigor!"_s);
     act_to_room("$n seems to build energy and $s movements gain momentum as the battle drags on...", ch, 0, 0, 0);
 
     af.type = SKILL_PERSEVERANCE;
@@ -1554,7 +1554,7 @@ command_return_t do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   qint32 learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
@@ -1562,13 +1562,13 @@ command_return_t do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cm
 
   if (!ch->isNonPlayer() && ch->getLevel() <= ARCHANGEL && !learned)
   {
-    ch->sendln("You do not know how to use this to your advantage.");
+    ch->sendln(u"You do not know how to use this to your advantage."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->fighting)
   {
-    ch->sendln("From whom are you trying to defend yourself?");
+    ch->sendln(u"From whom are you trying to defend yourself?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1599,26 +1599,26 @@ command_return_t do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cm
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_ONSLAUGHT);
   affected_type af;
 
   if (ch->isMortalPlayer() && !learned)
   {
-    ch->sendln("You do not know how to use this to your advantage.");
+    ch->sendln(u"You do not know how to use this to your advantage."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_ONSLAUGHT_TIMER))
   {
-    ch->sendln("You have not yet recovered from your previous onslaught attempt.");
+    ch->sendln(u"You have not yet recovered from your previous onslaught attempt."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_ONSLAUGHT))
   {
-    ch->sendln("You do not have enough energy to attempt this onslaught.");
+    ch->sendln(u"You do not have enough energy to attempt this onslaught."_s);
     return ReturnValue::eFAILURE;
   }
 

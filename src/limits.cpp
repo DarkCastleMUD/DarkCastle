@@ -559,27 +559,27 @@ void advance_level(CharacterPtr ch, bool is_conversion)
     auto &vault = dc_->vaults_.has_vault(ch->name());
     if (vault)
     {
-      ch->sendln("10 lbs has been added to your vault!");
+      ch->sendln(u"10 lbs has been added to your vault!"_s);
       vault.size += 10;
       dc_->vaults_.save(vault.owner);
     }
   }
 
   if (effective_level == 6)
-    ch->sendln("You are now able to participate in pkilling!\r\nRead HELP PKILL for more information.");
+    ch->sendln(u"You are now able to participate in pkilling!\r\nRead HELP PKILL for more information."_s);
   if (effective_level == 10)
   {
-    ch->sendln("You have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information.");
+    ch->sendln(u"You have been given a vault in which to place your valuables!\r\nRead HELP VAULT for more information."_s);
     dc_->vaults_.add_new_vault(ch->name(), 0);
   }
   if (effective_level == 11)
-    ch->sendln("It now costs you $B$5gold$R every time you recall.");
+    ch->sendln(u"It now costs you $B$5gold$R every time you recall."_s);
   if (effective_level == 20)
-    ch->sendln("You will no longer keep your equipment when you suffer a death to a mob.\r\nThere is now a chance you may lose attribute points when you die to a mob.\r\nRead HELP RDEATH and HELP STAT LOSS for more information.");
+    ch->sendln(u"You will no longer keep your equipment when you suffer a death to a mob.\r\nThere is now a chance you may lose attribute points when you die to a mob.\r\nRead HELP RDEATH and HELP STAT LOSS for more information."_s);
   if (effective_level == 40)
-    ch->sendln("You are now able to use the Anonymous command. See \"HELP ANON\" for details.");
+    ch->sendln(u"You are now able to use the Anonymous command. See \"HELP ANON\" for details."_s);
   if (effective_level == 50)
-    ch->sendln("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)");
+    ch->sendln(u"The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)"_s);
 }
 
 void gain_exp(CharacterPtr ch, qint64 gain)
@@ -597,7 +597,7 @@ void gain_exp(CharacterPtr ch, qint64 gain)
 
   /*  if(ch->exp > 2000000000)
    {
-   ch->sendln("You have hit the 2 billion xp cap.  Convert or meta chode.");
+   ch->sendln(u"You have hit the 2 billion xp cap.  Convert or meta chode."_s);
    return;
    }*/
   ch->exp += gain;
@@ -609,7 +609,7 @@ void gain_exp(CharacterPtr ch, qint64 gain)
   if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
 
-  if (ch->isNonPlayer() && dc_->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
+  if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr].vnum() == 8) // it's a golem
     golem_gain_exp(ch);
 
   if (ch->isNonPlayer())
@@ -617,7 +617,7 @@ void gain_exp(CharacterPtr ch, qint64 gain)
 
   if (!x && ch->exp >= y)
   {
-    ch->sendln("You now have enough experience to level!");
+    ch->sendln(u"You now have enough experience to level!"_s);
     if (ch->getLevel() == 1)
       ch->send(u"$B$2An acolyte of Pirahna tells you, 'To find the way to your guild, young %s, please read $7HELP GUILD$2'$R\r\n"_s.arg(pc_clss_types[GET_CLASS(ch)]));
   }
@@ -635,7 +635,7 @@ void gain_exp_regardless(CharacterPtr ch, qint32 gain)
 
   while (ch->exp >= (qint32)exp_table[ch->getLevel() + 1])
   {
-    ch->send("You raise a level!!  ");
+    ch->send(u"You raise a level!!  "_s);
     ch->incrementLevel();
     advance_level(ch, 0);
   }
@@ -667,18 +667,18 @@ void gain_condition(CharacterPtr ch, qint32 condition, qint32 value)
   {
   case FULL:
   {
-    ch->sendln("You are hungry.");
+    ch->sendln(u"You are hungry."_s);
     return;
   }
   case THIRST:
   {
-    ch->sendln("You are thirsty.");
+    ch->sendln(u"You are thirsty."_s);
     return;
   }
   case DRUNK:
   {
     if (intoxicated)
-      ch->sendln("You are now sober.");
+      ch->sendln(u"You are now sober."_s);
     return;
   }
   default:
@@ -688,7 +688,7 @@ void gain_condition(CharacterPtr ch, qint32 condition, qint32 value)
   // just for fun
   if (1 == dc_->number(1, 2000))
   {
-    ch->sendln("You are horny");
+    ch->sendln(u"You are horny"_s);
   }
 }
 
@@ -701,7 +701,7 @@ void DC::food_update(void)
     if (i->affected_by_spell(SPELL_PARALYZE))
       continue;
     qint32 amt = -1;
-    if (i->equipment[WEAR_FACE] && dc_->obj_index[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
+    if (i->equipment[WEAR_FACE] && dc_->obj_index_[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
       amt = -3;
     gain_condition(i, FULL, amt);
     if (!GET_COND(i, FULL) && i->getLevel() < 60)
@@ -709,13 +709,13 @@ void DC::food_update(void)
       if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
       {
         if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
-          i->sendln("It's too dark to see what's safe to eat!");
+          i->sendln(u"It's too dark to see what's safe to eat!"_s);
         else if (FOUNTAINisPresent(i))
           i->do_drink({u"fountain"_s});
         else if ((food = bring_type_to_front(i, ITEM_FOOD)))
           i->do_eat(food->name().split(' '));
         else
-          i->sendln("You are out of food.");
+          i->sendln(u"You are out of food."_s);
       }
     }
     gain_condition(i, DRUNK, -1);
@@ -725,13 +725,13 @@ void DC::food_update(void)
       if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
       {
         if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
-          i->sendln("It's too dark to see if there's any potable liquid around!");
+          i->sendln(u"It's too dark to see if there's any potable liquid around!"_s);
         else if (FOUNTAINisPresent(i))
           i->do_drink({u"fountain"_s});
         else if ((food = bring_type_to_front(i, ITEM_DRINKCON)))
           i->do_drink(food->name().split(' '));
         else
-          i->sendln("You are out of drink.");
+          i->sendln(u"You are out of drink."_s);
       }
     }
   }
@@ -993,7 +993,7 @@ void prepare_character_for_sixty(CharacterPtr ch)
       }
       else if (ch->exp > 0)
       {
-        ch->sendln("Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60.");
+        ch->sendln(u"Since you already have your Quest Skill, your experience has been set to 0 to allow advancement to level 60."_s);
       }
       ch->exp = {};
     }

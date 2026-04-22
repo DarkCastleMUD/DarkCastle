@@ -49,7 +49,7 @@ qint32 get_max_stat_bonus(CharacterPtr ch, qint32 attrs)
 }
 
 // List skill maxes.
-command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg2;
   CharacterClassSkill *classskill;
@@ -65,7 +65,7 @@ command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
   if (pc_clss_types2[i][0] == '\n')
   {
-    ch->sendln("No such class.");
+    ch->sendln(u"No such class."_s);
     return ReturnValue::eFAILURE;
   }
   GET_CLASS(ch) = i;
@@ -96,12 +96,12 @@ command_return_t do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
   }
-  ch->sendln("No such race.");
+  ch->sendln(u"No such race."_s);
   return ReturnValue::eFAILURE;
 }
 
 // give a command to a god
-command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_bestow(QStringList arguments, cmd_t cmd)
 {
   QString victim_name = arguments.value(0);
   QString command = arguments.value(1);
@@ -135,7 +135,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
       }
     }
 
-    sendln("");
+    sendln(u""_s);
     send_to_char("Test Command           Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
                  this);
@@ -174,7 +174,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 }
 
 // take away a command from a god
-command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString buf;
@@ -245,7 +245,7 @@ command_return_t do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 
 /* Thunder is currently in wiz_104.c */
 
-command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   wizlock = !wizlock;
 
@@ -254,14 +254,14 @@ command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
     QString log_buf = {};
     dc_sprintf(log_buf, "Game has been wizlocked by %s.", qPrintable(ch->name()));
     dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
-    ch->sendln("Game wizlocked.");
+    ch->sendln(u"Game wizlocked."_s);
   }
   else
   {
     QString log_buf = {};
     dc_sprintf(log_buf, "Game has been un-wizlocked by %s.", qPrintable(ch->name()));
     dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
-    ch->sendln("Game un-wizlocked.");
+    ch->sendln(u"Game un-wizlocked."_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -273,7 +273,7 @@ command_return_t do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 | Side effects: None
 | Returns: None
 */
-command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name, buf;
@@ -287,13 +287,13 @@ command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    ch->sendln("Change whose password?");
+    ch->sendln(u"Change whose password?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, name)))
   {
-    ch->sendln("That player was not found.");
+    ch->sendln(u"That player was not found."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -301,17 +301,17 @@ command_return_t do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (name.isEmpty() || dc_strlen(name) > 10)
   {
-    ch->sendln("Password must be 10 characters or less.");
+    ch->sendln(u"Password must be 10 characters or less."_s);
     return ReturnValue::eFAILURE;
   }
 
   victim->player->pwd = crypt(qPrintable(name), qPrintable(victim->name()));
 
-  ch->sendln("Ok.");
+  ch->sendln(u"Ok."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString command;
   QString lev_str;
@@ -324,7 +324,7 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (lev.isEmpty() _str)
   {
-    ch->sendln("Also, you must supply a level.");
+    ch->sendln(u"Also, you must supply a level."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -333,7 +333,7 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
     lev_nr = dc_atoi(lev_str);
     if (lev_nr < IMMORTAL || lev_nr > IMPLEMENTER)
     {
-      ch->sendln("You must use a valid level from 100-110.");
+      ch->sendln(u"You must use a valid level from 100-110."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -342,11 +342,11 @@ command_return_t do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_rename_char(QStringList arguments, cmd_t cmd)
 {
   if (arguments.size() < 2)
   {
-    send("Usage: rename <oldname> <newname> [takeplats]\r\n");
+    send(u"Usage: rename <oldname> <newname> [takeplats]\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -371,7 +371,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   if (level_ <= victim->getLevel())
   {
-    send("You can't rename someone your level or higher.\r\n");
+    send(u"You can't rename someone your level or higher.\r\n"_s);
     send(u"%1 just tried to rename you.\r\n"_s.arg(qPrintable(name())));
     return ReturnValue::eFAILURE;
   }
@@ -538,7 +538,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   if (!(victim = get_pc(newname)))
   {
-    sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
+    sendln(u"Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly."_s);
     return ReturnValue::eFAILURE;
   }
   do_name(victim, " %");
@@ -559,14 +559,14 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf, type, arg1, err, arg2;
   qint32 range = 0, type_ok = 0, numrooms = {};
   qint32 ret;
 
   /*  if(!ch->has_skill( COMMAND_INSTALL)) {
-          ch->sendln("Huh?");
+          ch->sendln(u"Huh?"_s);
           return ReturnValue::eFAILURE;
     }
   */
@@ -591,7 +591,7 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (range <= 0)
   {
-    ch->sendln("Range number must be greater than 0");
+    ch->sendln(u"Range number must be greater than 0"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -605,7 +605,7 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (numrooms <= 0)
   {
-    ch->sendln("Number of rooms must be greater than 0.");
+    ch->sendln(u"Number of rooms must be greater than 0."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -660,11 +660,11 @@ command_return_t do_install(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_range(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->has_skill(COMMAND_RANGE))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -675,15 +675,15 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   QString trail = arguments.value(3);
   if (name.isEmpty() || buf.isEmpty() || kind.isEmpty())
   {
-    ch->sendln("Syntax: range <god> <low vnum> <high vnum>");
-    ch->sendln("Syntax: range <god> <r/m/o> <low vnum> <high vnum>");
+    ch->sendln(u"Syntax: range <god> <low vnum> <high vnum>"_s);
+    ch->sendln(u"Syntax: range <god> <r/m/o> <low vnum> <high vnum>"_s);
     return ReturnValue::eFAILURE;
   }
 
   auto victim = get_pc_vis(ch, name);
   if (!victim)
   {
-    ch->sendln("Set whose range?!");
+    ch->sendln(u"Set whose range?!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -692,7 +692,7 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (!buf[0].isDigit() || !trail[0].isDigit())
     {
-      ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
+      ch->sendln(u"Specify valid numbers. To remove, set the ranges to 0 low and 0 high."_s);
       return ReturnValue::eFAILURE;
     }
     low = buf.toULong();
@@ -702,7 +702,7 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (!buf[0].isDigit() || !kind[0].isDigit())
     {
-      ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
+      ch->sendln(u"Specify valid numbers. To remove, set the ranges to 0 low and 0 high."_s);
       return ReturnValue::eFAILURE;
     }
     low = kind.toULong();
@@ -732,7 +732,7 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
       victim->sendln(u"Your R range has been set to %1-%2."_s.arg(low).arg(high));
       return ReturnValue::eSUCCESS;
     default:
-      ch->sendln("Invalid type. Valid ones are r/o/m.");
+      ch->sendln(u"Invalid type. Valid ones are r/o/m."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -746,14 +746,14 @@ command_return_t do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
-    ch->sendln("metastat who?");
+    ch->sendln(u"metastat who?"_s);
     return ReturnValue::eFAILURE;
   }
   QString buf;
@@ -792,14 +792,14 @@ command_return_t do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   argument = one_argument(argument, arg);
 
   if (!arg[0])
   {
-    ch->sendln("Syntax: acfinder <wear slot>");
+    ch->sendln(u"Syntax: acfinder <wear slot>"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -809,7 +809,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
   if (i >= QFlagsToStrings<ObjectPositions>().size())
   {
-    ch->sendln("Syntax: acfinder <wear slot>");
+    ch->sendln(u"Syntax: acfinder <wear slot>"_s);
     return ReturnValue::eFAILURE;
   }
   i = 1 << i;
@@ -818,7 +818,7 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   for (r = {}; r < top_of_objt; r++)
   {
-    obj = dc_->obj_index[r].item;
+    obj = dc_->obj_index_[r]->item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
       continue;
     if (!CAN_WEAR(obj, i))
@@ -828,19 +828,19 @@ command_return_t do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     dc_sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
-               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), dc_->obj_index[r].vnum(), ac);
+               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), dc_->obj_index_[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
     {
-      ch->sendln("Max number of items hit.");
+      ch->sendln(u"Max number of items hit."_s);
       return ReturnValue::eSUCCESS;
     }
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2, arg3;
   argument = one_argument(argument, arg1);
@@ -849,7 +849,7 @@ command_return_t do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!arg3[0])
   {
-    ch->sendln("Syntax: <tohit> <level> <target level>");
+    ch->sendln(u"Syntax: <tohit> <level> <target level>"_s);
     return ReturnValue::eFAILURE;
   }
   qint32 toHit = dc_atoi(arg1), tlevel = dc_atoi(arg3), level = dc_atoi(arg2);
@@ -899,7 +899,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
   }
 }
 
-command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValue do_export(CharacterPtr ch, QString args, cmd_t cmd)
 {
   QString export_type, filename;
   world_file_list_item *curr = dc_->obj_file_list;
@@ -909,7 +909,7 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
 
   if (*export_type == 0 || *filename == 0)
   {
-    ch->sendln("Syntax: export obj <filename>\r\n");
+    ch->sendln(u"Syntax: export obj <filename>\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -934,7 +934,7 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
     {
       for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
       {
-        write_object_csv(dc_->obj_index[x].item, fout);
+        write_object_csv(dc_->obj_index_[x]->item, fout);
       }
       curr = curr->next;
     }
@@ -953,7 +953,7 @@ command_return_t do_export(CharacterPtr ch, QString args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_world(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValue do_world(CharacterPtr ch, QString args, cmd_t cmd)
 {
 
   if (args == "rename")

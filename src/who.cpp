@@ -6,7 +6,7 @@
 
 #include "DC/DC.h"
 
-command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto arguments = QString(argument).split(' ');
   ConnectionPtr conn{};
@@ -113,14 +113,14 @@ command_return_t do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
   } // End for(d).
 
   if (!foundgroup)
-    ch->sendln("\r\nNo groups found.");
+    ch->sendln(u"\r\nNo groups found."_s);
 
   // page it to the player.  the 1 tells page_string to make it's own copy of the data
   page_string(ch->conn_, qPrintable(tempbuffer), 1);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto arguments = QString(argument).split(' ');
   auto target = arguments.value(0);
@@ -173,7 +173,7 @@ command_return_t do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_who(QStringList arguments, cmd_t cmd)
 {
   const QStringList immortFields = {
       "   Immortal  ",
@@ -269,7 +269,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   } // end of for loop
 
   // Display the actual stuff
-  send("[$4:$R]===================================[$4:$R]\r\n"
+  send(u"[$4:$R]===================================[$4:$R]\r\n"
        "|$5/$R|      $BDenizens of Dark Castle$R      |$5/$R|\r\n"
        "[$4:$R]===================================[$4:$R]\r\n\r\n");
 
@@ -470,7 +470,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
 
   if (numPC && numImmort)
   {
-    send("\r\n");
+    send(u"\r\n"_s);
   }
 
   if (numImmort)
@@ -489,12 +489,12 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 count = {};
   ClanPtr clan;
 
-  ch->sendln("\r\nPlayers in the Arena:\r\n--------------------------");
+  ch->sendln(u"\r\nPlayers in the Arena:\r\n--------------------------"_s);
 
   if (ch->getLevel() <= MORTAL)
   {
@@ -515,7 +515,7 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     if (count == 0)
-      ch->sendln("\r\nThere are no visible players in the arena.");
+      ch->sendln(u"\r\nThere are no visible players in the arena."_s);
 
     return ReturnValue::eSUCCESS;
   }
@@ -538,11 +538,11 @@ command_return_t do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (count == 0)
-    ch->sendln("\r\nThere are no visible players in the arena.");
+    ch->sendln(u"\r\nThere are no visible players in the arena."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ConnectionPtr conn;
   qint32 zonenumber;
@@ -552,7 +552,7 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isImmortalPlayer() && *buf && buf == u"all"_s)
   { //  immortal noly, shows all
-    ch->sendln("All Players:\r\n--------");
+    ch->sendln(u"All Players:\r\n--------"_s);
     for (auto &d : dc_->connections_)
     {
       if (conn->character && (conn->connected == Connection::states::PLAYING) && (CAN_SEE(ch, conn->character)) && (conn->character->in_room != DC::NOWHERE))
@@ -570,7 +570,7 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (ch->isImmortalPlayer() && *buf)
   { // immortal only, shows ONE person
-    ch->sendln("Search of Players:\r\n--------");
+    ch->sendln(u"Search of Players:\r\n--------"_s);
     for (auto &d : dc_->connections_)
     {
       if (conn->character && (conn->connected == Connection::states::PLAYING) && (CAN_SEE(ch, conn->character)) && (conn->character->in_room != DC::NOWHERE))
@@ -595,7 +595,7 @@ command_return_t do_where(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   { // normal, mortal where
     zonenumber = dc_->world[ch->in_room].zone;
-    ch->sendln("Players in your vicinity:\r\n-------------------------");
+    ch->sendln(u"Players in your vicinity:\r\n-------------------------"_s);
     if (isSet(dc_->world[ch->in_room].room_flags, NO_WHERE))
       return ReturnValue::eFAILURE;
     for (auto &d : dc_->connections_)

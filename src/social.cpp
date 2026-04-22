@@ -7,7 +7,7 @@ QMap<QString, social_messg> soc_mess_list; // head of social array
 
 social_messg *find_social(QString arg);
 
-command_return_t Character::check_social(QString pcomm)
+ReturnValue Character::check_social(QString pcomm)
 {
   QString arg = {}, buf = {};
   social_messg *action = {};
@@ -22,22 +22,22 @@ command_return_t Character::check_social(QString pcomm)
 
   if (isPlayer() && isSet(player->punish, PUNISH_NOEMOTE))
   {
-    sendln("You are anti-social!");
+    sendln(u"You are anti-social!"_s);
     return SOCIAL_TRUE;
   }
 
   switch (GET_POS(this))
   {
   case position_t::DEAD:
-    sendln("Lie still; you are DEAD.");
+    sendln(u"Lie still; you are DEAD."_s);
     return SOCIAL_TRUE;
 
   case position_t::STUNNED:
-    sendln("You are too stunned to do that.");
+    sendln(u"You are too stunned to do that."_s);
     return SOCIAL_TRUE;
 
   case position_t::SLEEPING:
-    sendln("In your dreams, or what?");
+    sendln(u"In your dreams, or what?"_s);
     return SOCIAL_TRUE;
   case position_t::RESTING:
   case position_t::SITTING:
@@ -48,7 +48,7 @@ command_return_t Character::check_social(QString pcomm)
 
   if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
-    sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return SOCIAL_TRUE;
   }
 
@@ -230,7 +230,7 @@ void DC::clean_socials_from_memory()
   soc_mess_list.clear();
 }
 
-command_return_t do_social(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_social(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i{};

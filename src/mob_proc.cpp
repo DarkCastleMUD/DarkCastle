@@ -104,7 +104,7 @@ qint32 protect(CharacterPtr ch, qint32 iFriendId)
       if (SOMEONE_DIED(retval))
         return retval;
       // pertant rescue code (easier than calling it)
-      ch->sendln("Banzai! To the rescue...");
+      ch->sendln(u"Banzai! To the rescue..."_s);
       act("You are rescued by $N, you are confused!",
           ally, 0, ch, TO_CHAR, 0);
       act_to_room("$n heroically rescues $N.", ch, 0, ally, NOTVICT);
@@ -753,7 +753,7 @@ qint32 brass_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   {
     act("The brass dragon says '$n isn't invited'",
         ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("The brass dragon says 'you're not invited'");
+    ch->sendln(u"The brass dragon says 'you're not invited'"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -879,7 +879,7 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       {
         if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
         {
-          ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln(u"Despite your crimes, the guard allows you to go through because you're an immortal.\r\n"_s);
           return ReturnValue::eFAILURE;
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
@@ -893,17 +893,17 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
         }
         else if (GET_CLASS(ch) != clas)
         {
-          ch->sendln("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln(u"Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n"_s);
           return ReturnValue::eFAILURE;
         }
         else if (align == 1 && !IS_EVIL(ch))
         {
-          ch->sendln("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln(u"Despite not being evil, the guard allows you to go through because you're an immortal.\r\n"_s);
           return ReturnValue::eFAILURE;
         }
         else if (align == 3 && !IS_GOOD(ch))
         {
-          ch->sendln("Despite not being good, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln(u"Despite not being good, the guard allows you to go through because you're an immortal.\r\n"_s);
           return ReturnValue::eFAILURE;
         }
       }
@@ -912,7 +912,7 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
         if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
         {
           act_to_room("The guard humiliates $n, and blocks $s way because of their crimes.", ch, 0, 0, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because of your crimes.");
+          ch->sendln(u"The guard humiliates you, and blocks your way because of your crimes."_s);
           return ReturnValue::eSUCCESS;
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
@@ -926,26 +926,26 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
           else
           {
             act_to_room("The guard humiliates $n, and blocks $s way because they have the Champion flag.", ch, 0, 0, 0);
-            ch->sendln("The guard humiliates you, and blocks your way because you have the Champion flag.");
+            ch->sendln(u"The guard humiliates you, and blocks your way because you have the Champion flag."_s);
           }
           return ReturnValue::eSUCCESS;
         }
         else if (GET_CLASS(ch) != clas)
         {
           act_to_room("The guard humiliates $n, and blocks $s way because they are the wrong class.", ch, 0, 0, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you are the wrong class.");
+          ch->sendln(u"The guard humiliates you, and blocks your way because you are the wrong class."_s);
           return ReturnValue::eSUCCESS;
         }
         else if (align == 1 && !IS_EVIL(ch))
         {
           act_to_room("The guard humiliates $n, and blocks $s way because they are not evil.", ch, 0, 0, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you are not evil.");
+          ch->sendln(u"The guard humiliates you, and blocks your way because you are not evil."_s);
           return ReturnValue::eSUCCESS;
         }
         else if (align == 3 && !IS_GOOD(ch))
         {
           act_to_room("The guard humiliates $n, and blocks $s way because they are not good.", ch, 0, 0, 0);
-          ch->sendln("The guard humiliates you, and blocks your way because you are not good.");
+          ch->sendln(u"The guard humiliates you, and blocks your way because you are not good."_s);
           return ReturnValue::eSUCCESS;
         }
       }
@@ -1008,7 +1008,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   qint32 clan_num = ch->clan;
   if (ch->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM))
   {
-    qint32 b = dc_->mob_index[ch->mobdata->nr].vnum();
+    qint32 b = dc_->mob_index_[ch->mobdata->nr].vnum();
     switch (b)
     {
     case 8:     // golem
@@ -1039,7 +1039,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (clan_num != guard_clan && in_room == real_room(guard_room))
     {
       act_to_room("$n is turned away from the clan hall.", ch, 0, 0, 0);
-      ch->sendln("The clan guard throws you out on your ass.");
+      ch->sendln(u"The clan guard throws you out on your ass."_s);
       return ReturnValue::eSUCCESS;
     }
   }
@@ -1068,7 +1068,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     )
     {
       act_to_room("$n is turned away from the clan hall.", ch, 0, 0, 0);
-      ch->sendln("The clan guard throws you out on your ass.");
+      ch->sendln(u"The clan guard throws you out on your ass."_s);
       return ReturnValue::eSUCCESS;
     }
   }
@@ -1076,13 +1076,13 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
     act_to_room("$n is turned away from the clan hall.", ch, 0, 0, 0);
-    ch->sendln("The clan guard says 'Hey don't be bringing trouble around here!'");
+    ch->sendln(u"The clan guard says 'Hey don't be bringing trouble around here!'"_s);
     return ReturnValue::eSUCCESS;
   }
   else if (IS_AFFECTED(ch, AFF_CHAMPION))
   {
     act_to_room("$n is turned away from the clan hall.", ch, 0, 0, 0);
-    ch->sendln("The clan guard says, 'Hey, don't be a wuss, get outta here.'");
+    ch->sendln(u"The clan guard says, 'Hey, don't be a wuss, get outta here.'"_s);
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
@@ -1943,7 +1943,7 @@ qint32 janitor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (isSet(i->flags_.wear_flags, TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !isSet(i->flags_.extra_flags, ITEM_SPECIAL) &&
-        dc_->obj_index[i->item_number].vnum() != CHAMPION_ITEM)
+        dc_->obj_index_[i->item_number].vnum() != CHAMPION_ITEM)
     {
       act_to_room("$n picks up some trash.", ch, 0, 0, 0);
       move_obj(i, ch);
@@ -1979,7 +1979,7 @@ qint32 mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QSt
     temp = tmp_victim->next_in_room;
     if ((tmp_victim->isNonPlayer() || ch->isNonPlayer()) && (tmp_victim != ch))
     {
-      tmp_victim->sendln("You choke and gag as noxious gases fill the air.");
+      tmp_victim->sendln(u"You choke and gag as noxious gases fill the air."_s);
       dam = dice(ch->getLevel(), 8);
       act("$n floods the surroundings with poisonous gas.", ch, 0, 0,
           TO_ROOM, 0);
@@ -1996,7 +1996,7 @@ qint32 mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QSt
           af.bitvector = AFF_POISON;
 
           affect_join(tmp_victim, &af, false, false);
-          tmp_victim->sendln("You feel very sick.");
+          tmp_victim->sendln(u"You feel very sick."_s);
           return ReturnValue::eSUCCESS;
         }
     }
@@ -2188,7 +2188,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
 
   if (cmd == cmd_t::LIST)
   { /* List */
-    ch->sendln("Available pets are:");
+    ch->sendln(u"Available pets are:"_s);
     for (pet = dc_->world[pet_room].people_; pet; pet = pet->next_in_room)
     {
       dc_sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
@@ -2204,18 +2204,18 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
 
     if (!(pet = get_char_room(buf, pet_room)))
     {
-      ch->sendln("There is no such pet!");
+      ch->sendln(u"There is no such pet!"_s);
       return ReturnValue::eSUCCESS;
     }
 
     if (ch->getGold() < (quint32)(pet->exp * 3))
     {
-      ch->sendln("You don't have enough gold!");
+      ch->sendln(u"You don't have enough gold!"_s);
       return ReturnValue::eSUCCESS;
     }
     if (many_charms(ch))
     {
-      ch->send("How you plan on feeding all your pets?");
+      ch->send(u"How you plan on feeding all your pets?"_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -2246,7 +2246,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
     IS_CARRYING_W(pet) = 1000;
     IS_CARRYING_N(pet) = 100;
 
-    ch->sendln("May you enjoy your pet.");
+    ch->sendln(u"May you enjoy your pet."_s);
     act_to_room("$n bought $N as a pet.", ch, 0, pet, 0);
 
     return ReturnValue::eSUCCESS;
@@ -2277,21 +2277,21 @@ qint32 newbie_zone_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
     {
       act("The guard refuses $n entrance to this sacred school.",
           ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The guard refuses you entrance to the school.");
+      ch->sendln(u"The guard refuses you entrance to the school."_s);
       return ReturnValue::eSUCCESS;
     }
     else if (ch->in_room == real_room(6400)) /* newbie caves */
     {
       act("The guard stops $n from entering the caves.",
           ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The guard refuses you entrance to the caves.");
+      ch->sendln(u"The guard refuses you entrance to the caves."_s);
       return ReturnValue::eSUCCESS;
     }
     else /* default */
     {
       act("The guard humiliates $n, and blocks $s way.",
           ch, 0, 0, TO_ROOM, 0);
-      ch->sendln("The guard humiliates you, and blocks your way.");
+      ch->sendln(u"The guard humiliates you, and blocks your way."_s);
       return ReturnValue::eSUCCESS;
     }
   }
@@ -2517,7 +2517,7 @@ qint32 generic_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
   {
     act("A statue magically holds $n back.",
         ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("A statue magically holds you from going east.");
+    ch->sendln(u"A statue magically holds you from going east."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2539,7 +2539,7 @@ qint32 portal_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
   {
     act("Dense vegetation blocks $n's path through the door.",
         ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("There is too much vegetation in the way to get through.");
+    ch->sendln(u"There is too much vegetation in the way to get through."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2813,7 +2813,7 @@ qint32 foggy_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   // message the player
   act("The foggy guardian flows in front of $n, and blocks $s way.",
       ch, 0, 0, TO_ROOM, 0);
-  ch->sendln("The foggy guardian flows in front of you, and blocks your way.");
+  ch->sendln(u"The foggy guardian flows in front of you, and blocks your way."_s);
 
   // return true.  This lets the mud know that you already took care of
   // the command, and to ignore whatever it was.  (ie, don't move)
@@ -3420,7 +3420,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
     arg = one_argument(arg, arg2);
     if (str_cmp(arg1, "far") && str_cmp(arg1, "near"))
     {
-      ch->sendln("$BDo you want to spy $3far$7 or $3near$7?$R");
+      ch->sendln(u"$BDo you want to spy $3far$7 or $3near$7?$R"_s);
       return ReturnValue::eSUCCESS;
     }
     qint32 dir;
@@ -3430,7 +3430,7 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
         break;
     if (*dirs[dir] == '\n' || !dc_->world[ch->in_room].dir_option[dir])
     {
-      ch->sendln("In what direction did you say?");
+      ch->sendln(u"In what direction did you say?"_s);
       return ReturnValue::eSUCCESS;
     }
     qint32 to_room = {};
@@ -3441,11 +3441,11 @@ qint32 druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString
       to_room = dc_->world[ch->in_room].dir_option[dir]->to_room;
     if (!check_components(ch, 1, 44, 0, 0, 0, true))
     {
-      ch->sendln("The owl requires a feeding to do this for you.");
+      ch->sendln(u"The owl requires a feeding to do this for you."_s);
       return ReturnValue::eSUCCESS;
     }
-    ch->sendln("The owl accepts your mouse greedily.");
-    ch->sendln("You see through the eyes of your familiar, looking into the distant room...");
+    ch->sendln(u"The owl accepts your mouse greedily."_s);
+    ch->sendln(u"You see through the eyes of your familiar, looking into the distant room..."_s);
     qint32 oldroom = ch->in_room;
     char_from_room(ch);
     char_to_room(ch, to_room);
@@ -3559,7 +3559,7 @@ qint32 bodyguard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (dc_->mob_index[ch->mobdata->nr].vnum())
+  switch (dc_->mob_index_[ch->mobdata->nr].vnum())
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

@@ -1199,7 +1199,7 @@ qint32 Leaderboard::pdscore(CharacterPtr ch)
  things, otherwise renames will crash the server hard.
  */
 
-command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ConnectionPtr conn;
   FILE *stream;
@@ -1224,12 +1224,12 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (dc_->cf.leaderboard_check == "suspend")
       {
-        ch->sendln("Leaderboard writes already suspended.");
+        ch->sendln(u"Leaderboard writes already suspended."_s);
       }
       else
       {
         dc_->cf.leaderboard_check = "suspend";
-        ch->sendln("Leaderboard writes suspended.");
+        ch->sendln(u"Leaderboard writes suspended."_s);
         dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
       }
 
@@ -1239,12 +1239,12 @@ command_return_t do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (dc_->cf.leaderboard_check == "")
       {
-        ch->sendln("Leaderboard writes already resumed.");
+        ch->sendln(u"Leaderboard writes already resumed."_s);
       }
       else
       {
         dc_->cf.leaderboard_check = "";
-        ch->sendln("Leaderboard writes resumed.");
+        ch->sendln(u"Leaderboard writes resumed."_s);
         dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
       }
 

@@ -61,7 +61,7 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
       dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
                   qPrintable(ch->name()),
                   cnt,
-                  dc_->mob_index[rnum].vnum(),
+                  dc_->mob_index_[rnum].vnum(),
                   mob->short_desc,
                   dc_->world[ch->in_room].number,
                   dc_->world[ch->in_room].name);
@@ -71,7 +71,7 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
       dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
                   qPrintable(ch->name()),
                   cnt,
-                  dc_->mob_index[rnum].vnum(),
+                  dc_->mob_index_[rnum].vnum(),
                   mob->short_desc,
                   dc_->world[ch->in_room].number,
                   dc_->world[ch->in_room].name);
@@ -83,11 +83,11 @@ void do_mload(CharacterPtr ch, qint32 rnum, qint32 cnt)
     dc_snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
                 qPrintable(ch->name()),
                 cnt,
-                dc_->mob_index[rnum].vnum(),
+                dc_->mob_index_[rnum].vnum(),
                 dc_->world[ch->in_room].number,
                 dc_->world[ch->in_room].name);
     dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-    ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
+    ch->sendln(u"You load the mob(s) but they immediatly destroy themselves."_s);
   }
 }
 
@@ -115,7 +115,7 @@ obj_list_t oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
     if (obj->flags_.type_flag == ITEM_MONEY && !ch->isImplementerPlayer())
     {
       extract_obj(obj);
-      ch->send("Denied.\r\n");
+      ch->send(u"Denied.\r\n"_s);
     }
     else
     {
@@ -163,7 +163,7 @@ void do_oload(CharacterPtr ch, qint32 rnum, qint32 cnt, bool random)
         (ch->getLevel() < IMPLEMENTER))
     {
       extract_obj(obj);
-      ch->sendln("Denied.");
+      ch->sendln(u"Denied."_s);
       return;
     }
     else
@@ -227,7 +227,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
              (k->isPlayer() ? "PC" : "MOB"),
              qPrintable(k->name()),
-             (k->isNonPlayer() ? dc_->mob_index[k->mobdata->nr].vnum() : 0),
+             (k->isNonPlayer() ? dc_->mob_index_[k->mobdata->nr].vnum() : 0),
              (k->in_room == DC::NOWHERE ? 0 : dc_->world[k->in_room].number),
              /* end of first line */
 
@@ -307,12 +307,12 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (k->isNonPlayer())
   {
-    if (dc_->mob_index[k->mobdata->nr].non_combat_func)
+    if (dc_->mob_index_[k->mobdata->nr].non_combat_func)
       dc_strcpy(buf2, "Exists");
     else
       dc_strcpy(buf2, "None");
 
-    if (dc_->mob_index[k->mobdata->nr].combat_func)
+    if (dc_->mob_index_[k->mobdata->nr].combat_func)
       dc_strcpy(buf3, "Exists");
     else
       dc_strcpy(buf3, "None");
@@ -399,14 +399,14 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   ch->send(buf);
 
   // Description
-  ch->sendln("$3Detailed description$R:");
+  ch->sendln(u"$3Detailed description$R:"_s);
   if (!k->description().isEmpty())
     ch->send(k->description());
   else
-    ch->send("None");
+    ch->send(u"None"_s);
 
   // LIST OF FOLLOWERS
-  ch->sendln("$3Followers$R:");
+  ch->sendln(u"$3Followers$R:"_s);
   for (fol = k->followers; fol; fol = fol->next)
     act_to_character("    $N", ch, 0, fol->follower, 0);
 
@@ -470,7 +470,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (k->affected)
   {
-    ch->sendln("\r\n$3Affecting Spells$R:\r\n--------------");
+    ch->sendln(u"\r\n$3Affecting Spells$R:\r\n--------------"_s);
 
     for (aff = k->affected; aff; aff = aff->next)
     {
@@ -486,7 +486,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
       dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
-    ch->sendln("");
+    ch->sendln(u""_s);
   }
 
   if (!k->isNonPlayer())
@@ -501,7 +501,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   ch->send(buf);
 }
 
-command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
+ReturnValue mob_stat(CharacterPtr ch, CharacterPtr k)
 {
   if (!ch || !k)
   {
@@ -520,7 +520,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   {
     dc_sprintf(buf, "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
                (k->isPlayer() ? "PC" : "MOB"), qPrintable(k->name()),
-               (k->isNonPlayer() ? dc_->mob_index[k->mobdata->nr].vnum() : 0),
+               (k->isNonPlayer() ? dc_->mob_index_[k->mobdata->nr].vnum() : 0),
                (k->isNonPlayer() ? k->mobdata->nr : 0),
                k->in_room == DC::NOWHERE ? -1 : dc_->world[k->in_room].number);
 
@@ -546,16 +546,16 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
-  ch->send("$3Long description$R: ");
+  ch->send(u"$3Long description$R: "_s);
   if (!k->long_description().isEmpty())
     ch->send(k->long_description());
   else
-    ch->send("None");
-  ch->sendln("$3Detailed description$R:");
+    ch->send(u"None"_s);
+  ch->sendln(u"$3Detailed description$R:"_s);
   if (!k->description().isEmpty())
     ch->send(k->description());
   else
-    ch->send("None");
+    ch->send(u"None"_s);
 
   dc_strcpy(buf, "\r\n$3Class$R: ");
   sprinttype(k->c_class, pc_clss_types, buf2);
@@ -587,7 +587,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   {
     QString mobspec_status;
 
-    if (dc_->mob_index[k->mobdata->nr].mobspec == nullptr)
+    if (dc_->mob_index_[k->mobdata->nr].mobspec == nullptr)
     {
       mobspec_status = "none";
     }
@@ -596,7 +596,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
       mobspec_status = "exists";
     }
 
-    ch->sendln(u"$3Mobspec$R: %1  $3Progtypes$R: %2"_s.arg(mobspec_status).arg(dc_->mob_index[k->mobdata->nr].progtypes));
+    ch->sendln(u"$3Mobspec$R: %1  $3Progtypes$R: %2"_s.arg(mobspec_status).arg(dc_->mob_index_[k->mobdata->nr]->progtypes_));
   }
   dc_sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
@@ -604,16 +604,16 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   switch (k->sex)
   {
   case Character::sex_t::NEUTRAL:
-    ch->send("NEUTRAL]  ");
+    ch->send(u"NEUTRAL]  "_s);
     break;
   case Character::sex_t::MALE:
-    ch->send("MALE]  ");
+    ch->send(u"MALE]  "_s);
     break;
   case Character::sex_t::FEMALE:
-    ch->send("FEMALE]  ");
+    ch->send(u"FEMALE]  "_s);
     break;
   default:
-    ch->send("ILLEGAL-VALUE!]  ");
+    ch->send(u"ILLEGAL-VALUE!]  "_s);
     break;
   }
 
@@ -623,7 +623,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
     ch->send(buf);
   }
   else
-    ch->sendln("");
+    ch->sendln(u""_s);
 
   dc_sprintf(buf, "$3Str$R:[%2d]+[%2d]=%2d $3Int$R:[%2d]+[%2d]=%2d $3Wis$R:[%2d]+[%2d]=%2d\r\n"
                   "$3Dex$R:[%2d]+[%2d]=%2d $3Con$R:[%2d]+[%2d]=%2d\r\n",
@@ -689,13 +689,13 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   if (k->isNonPlayer())
   {
     dc_strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
-    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
+    dc_strcat(buf, (dc_->mob_index_[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
     ch->send(buf);
     dc_strcpy(buf, "$3Combat Special Proc$R: ");
-    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
+    dc_strcat(buf, (dc_->mob_index_[k->mobdata->nr].combat_func ? "exists  " : "none  "));
     ch->send(buf);
     dc_strcpy(buf, "$3Mob Progs$R: ");
-    dc_strcat(buf, (dc_->mob_index[k->mobdata->nr].programs_ ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->mob_index_[k->mobdata->nr]->programs_ ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 
@@ -769,7 +769,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   dc_sprintf(buf, "$3Master$R: '%s'\r\n",
              ((k->master) ? qPrintable(k->master->name()) : "NOBODY"));
   ch->send(buf);
-  ch->sendln("$3Followers$R:");
+  ch->sendln(u"$3Followers$R:"_s);
   for (fol = k->followers; fol; fol = fol->next)
     act_to_character("    $N", ch, 0, fol->follower, 0);
 
@@ -827,7 +827,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 
   if (k->affected)
   {
-    ch->sendln("\r\n$3Affecting Spells$R:\r\n--------------");
+    ch->sendln(u"\r\n$3Affecting Spells$R:\r\n--------------"_s);
     for (aff = k->affected; aff; aff = aff->next)
     {
 
@@ -853,7 +853,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
       dc_strcat(buf, "\r\n");
       ch->send(buf);
     }
-    ch->sendln("");
+    ch->sendln(u""_s);
   }
 
   if (k->isNonPlayer())
@@ -908,12 +908,12 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
   /*
     if(isSet(j->flags_.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
-      ch->sendln("A magical aura around the item attempts to conceal its secrets.");
+      ch->sendln(u"A magical aura around the item attempts to conceal its secrets."_s);
       return;
     }
 */
 
-  virt = (j->item_number >= 0) ? dc_->obj_index[j->item_number].vnum() : 0;
+  virt = (j->item_number >= 0) ? dc_->obj_index_[j->item_number].vnum() : 0;
   dc_sprintf(buf, "$3Object name$R:[%s]  $3R-number$R:[%d]  $3V-number$R:[%d]  $3Item type$R: ",
              qPrintable(j->name()), j->item_number, virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
@@ -942,22 +942,22 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     dc_strcpy(buf, "$3Extra description keyword(s)$R: None\r\n");
     ch->send(buf);
   }
-  ch->send("$3Can be worn on$R:");
+  ch->send(u"$3Can be worn on$R:"_s);
   sprintbit(j->flags_.wear_flags, QFlagsToStrings<ObjectPositions>(), buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
-  ch->send("$3Can be worn by$R:");
+  ch->send(u"$3Can be worn by$R:"_s);
   sprintbit(j->flags_.size, Object::size_bits, buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
-  ch->send("$3Extra flags$R: ");
+  ch->send(u"$3Extra flags$R: "_s);
   sprintbit(j->flags_.extra_flags, Object::extra_bits, buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
 
-  ch->send("$3More flags$R: ");
+  ch->send(u"$3More flags$R: "_s);
   sprintbit(j->flags_.more_flags, Object::more_obj_bits, buf);
   dc_strcat(buf, "\r\n");
   ch->send(buf);
@@ -1233,13 +1233,13 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
 
   dc_strcpy(buf, "\r\n$3Non-Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    dc_strcat(buf, (dc_->obj_index[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->obj_index_[j->item_number].non_combat_func ? "exists\r\n" : "none\r\n"));
   else
     dc_strcat(buf, "No\r\n");
   ch->send(buf);
   dc_strcpy(buf, "$3Combat Special procedure$R : ");
   if (j->item_number >= 0)
-    dc_strcat(buf, (dc_->obj_index[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
+    dc_strcat(buf, (dc_->obj_index_[j->item_number].combat_func ? "exists\r\n" : "none\r\n"));
   else
     dc_strcat(buf, "No\r\n");
   ch->send(buf);
@@ -1255,7 +1255,7 @@ void obj_stat(CharacterPtr ch, ObjectPtr j)
     dc_strcpy(buf, "$3Contains$R : Nothing\r\n");
   ch->send(buf);
 
-  ch->sendln("$3Can affect character$R :");
+  ch->sendln(u"$3Can affect character$R :"_s);
   for (i = {}; i < j->num_affects; i++)
   {
     //      sprinttype(j->affected[i].location,apply_types,buf2);
@@ -1275,7 +1275,7 @@ void do_start(CharacterPtr ch)
 {
   QString buf;
 
-  ch->sendln("This is now your character in Dark Castle MUD");
+  ch->sendln(u"This is now your character in Dark Castle MUD"_s);
 
   if (ch->isNonPlayer())
     return;
@@ -1336,11 +1336,11 @@ void do_start(CharacterPtr ch)
   ch->player->time.logon = time(0);
 }
 
-command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
+ReturnValue do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
 {
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
-    ch->sendln("You may only repop inside of your room range.");
+    ch->sendln(u"You may only repop inside of your room range."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1349,14 +1349,14 @@ command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
 
   if (arg1 == "full")
   {
-    ch->sendln("Performing full zone reset!");
+    ch->sendln(u"Performing full zone reset!"_s);
     QString buf = fmt::format("{} full repopped zone #{}.", qPrintable(ch->name()), dc_->world[ch->in_room].zone);
     dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(dc_->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
-    ch->sendln("Resetting this entire zone!");
+    ch->sendln(u"Resetting this entire zone!"_s);
     QString buf = fmt::format("{} repopped zone #{}.", qPrintable(ch->name()), dc_->world[ch->in_room].zone);
     dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(dc_->world[ch->in_room].zone);
@@ -1365,14 +1365,14 @@ command_return_t do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 zone = dc_->world[ch->in_room].zone;
 
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
-    ch->sendln("You may only repop inside of your R range.");
+    ch->sendln(u"You may only repop inside of your R range."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1403,16 +1403,16 @@ command_return_t do_clear(CharacterPtr ch, QString argument, cmd_t cmd)
         extract_char(tmp_victim, true);
       }
       else
-        tmp_victim->sendln("You hear unmatched screams of terror as all mobs are summarily executed!");
+        tmp_victim->sendln(u"You hear unmatched screams of terror as all mobs are summarily executed!"_s);
     }
   }
-  ch->sendln("You have just caused the deion of countless creatures in ths area!");
+  ch->sendln(u"You have just caused the deion of countless creatures in ths area!"_s);
   dc_sprintf(buf, "%s just CLEARED zone #%d!", qPrintable(ch->name()), zone);
   dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x = {};
   QString buf;
@@ -1435,11 +1435,11 @@ command_return_t do_linkdead(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   if (!x)
-    ch->sendln("No linkdead players found.");
+    ch->sendln(u"No linkdead players found."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
@@ -1452,7 +1452,7 @@ command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
     ;
 
   if (!*(argument + i))
-    ch->sendln("What message do you want to echo to ths room?");
+    ch->sendln(u"What message do you want to echo to ths room?"_s);
 
   else
   {
@@ -1463,7 +1463,7 @@ command_return_t do_echo(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValue do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString buf;
@@ -1473,19 +1473,19 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
 
   if (!ch->has_skill(COMMAND_RESTORE))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, buf);
   if (buf.isEmpty())
-    ch->sendln("Whom do you wish to restore?");
+    ch->sendln(u"Whom do you wish to restore?"_s);
   else if (dc_strcmp(buf, "all"))
   {
 
     if (!(victim = get_char(buf)))
     {
-      ch->sendln("No-one by that name in the world.");
+      ch->sendln(u"No-one by that name in the world."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1515,7 +1515,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
     redo_hitpoints(victim);
     redo_mana(victim);
     redo_ki(victim);
-    ch->sendln("Done.");
+    ch->sendln(u"Done."_s);
     if (!IS_AFFECTED(ch, AFF_BLIND))
       act("You have been fully healed by $N!",
           victim, 0, ch, TO_CHAR, 0);
@@ -1526,7 +1526,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
 
     if (ch->getLevel() < OVERSEER)
     {
-      ch->sendln("You don't have the ability to do that!");
+      ch->sendln(u"You don't have the ability to do that!"_s);
       dc_sprintf(buf, "%s tried to do a restore all!", qPrintable(ch->name()));
       dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
@@ -1560,7 +1560,7 @@ command_return_t do_restore(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
     dc_sprintf(buf, "%s did a restore all!", qPrintable(ch->name()));
     dc_->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-    ch->sendln("Trying to be Mister Popularity?");
+    ch->sendln(u"Trying to be Mister Popularity?"_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -1608,9 +1608,9 @@ void check_end_of_hunt(hunt_dataPtr h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (dc_->obj_index_[real_object(h->itemnum)]->item)->short_description);
         else
-          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description);
+          dc_sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (dc_->obj_index_[real_object(h->itemnum)]->item)->short_description);
       }
     }
     else
@@ -1621,7 +1621,7 @@ void check_end_of_hunt(hunt_dataPtr h, bool forced = false)
       }
       else
       {
-        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description);
+        dc_sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (dc_->obj_index_[real_object(h->itemnum)]->item)->short_description);
       }
     }
     send_info(buf);
@@ -1644,14 +1644,14 @@ void check_end_of_hunt(hunt_dataPtr h, bool forced = false)
   }
 }
 
-command_return_t do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString arg1;
   arg = one_argument(arg, arg1);
 
   if (str_cmp(arg1, "doit"))
   {
-    ch->sendln("Syntax: huntclear doit\r\nClears all currently running treasure hunts.");
+    ch->sendln(u"Syntax: huntclear doit\r\nClears all currently running treasure hunts."_s);
     return ReturnValue::eSUCCESS;
   }
   else
@@ -1663,7 +1663,7 @@ command_return_t do_huntclear(CharacterPtr ch, QString arg, cmd_t cmd)
       h->time = -1;
       check_end_of_hunt(h, true);
     }
-    ch->sendln("Done!");
+    ch->sendln(u"Done!"_s);
     return ReturnValue::eSUCCESS;
   }
 }
@@ -1796,25 +1796,25 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
     while (1)
     {
       mob = dc_->number(1, top_of_mobt);
-      qint32 vnum = dc_->mob_index[mob].vnum(); // debug
-      if (!(dc_->mob_index[mob].vnum() > 300 &&
-            (dc_->mob_index[mob].vnum() < 2300 || dc_->mob_index[mob].vnum() > 2499) &&
-            (dc_->mob_index[mob].vnum() < 29200 || dc_->mob_index[mob].vnum() > 29299) &&
-            (dc_->mob_index[mob].vnum() < 5600 || dc_->mob_index[mob].vnum() > 5699) &&
-            (dc_->mob_index[mob].vnum() < 16200 || dc_->mob_index[mob].vnum() > 16399) &&
-            (dc_->mob_index[mob].vnum() < 1900 || dc_->mob_index[mob].vnum() > 1999) &&
-            (dc_->mob_index[mob].vnum() < 10500 || dc_->mob_index[mob].vnum() > 10622) &&
-            (dc_->mob_index[mob].vnum() < 8500 || dc_->mob_index[mob].vnum() > 8699)))
+      qint32 vnum = dc_->mob_index_[mob].vnum(); // debug
+      if (!(dc_->mob_index_[mob].vnum() > 300 &&
+            (dc_->mob_index_[mob].vnum() < 2300 || dc_->mob_index_[mob].vnum() > 2499) &&
+            (dc_->mob_index_[mob].vnum() < 29200 || dc_->mob_index_[mob].vnum() > 29299) &&
+            (dc_->mob_index_[mob].vnum() < 5600 || dc_->mob_index_[mob].vnum() > 5699) &&
+            (dc_->mob_index_[mob].vnum() < 16200 || dc_->mob_index_[mob].vnum() > 16399) &&
+            (dc_->mob_index_[mob].vnum() < 1900 || dc_->mob_index_[mob].vnum() > 1999) &&
+            (dc_->mob_index_[mob].vnum() < 10500 || dc_->mob_index_[mob].vnum() > 10622) &&
+            (dc_->mob_index_[mob].vnum() < 8500 || dc_->mob_index_[mob].vnum() > 8699)))
         continue;
 
       // Skip mobs marked NO_HUNT
-      CharacterPtr m = static_cast<CharacterPtr>(dc_->mob_index[mob].item);
+      CharacterPtr m = static_cast<CharacterPtr>(dc_->mob_index_[mob]->item);
       if (m && m->mobdata && ISSET(m->mobdata->actflags, ACT_NO_HUNT))
       {
         continue;
       }
 
-      if (dc_->mob_index[mob].qty <= 0)
+      if (dc_->mob_index_[mob].qty <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
@@ -1852,7 +1852,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
         p->next = in;
       else
         hunt_items_list = in;
-      qint32 vnum = dc_->obj_index[obj->item_number].vnum();
+      qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
       dc_sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n",
                  qPrintable(obj->short_description()), i->mobname, qPrintable(ch->name()));
       send_info(buf);
@@ -1880,7 +1880,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
             {
               if (isSet(oitem->flags_.more_flags, ITEM_24H_SAVE))
               {
-                ch->sendln("You already have this item - Timer has been reset!");
+                ch->sendln(u"You already have this item - Timer has been reset!"_s);
                 extract_obj(oitem);
                 citem = search_char_for_item(ch, oitem->item_number, false);
                 citem->save_expiration = time(nullptr) + (60 * 60 * 24);
@@ -1888,7 +1888,7 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
               }
               else
               {
-                ch->sendln("The item's uniqueness causes it to poof into thin air!");
+                ch->sendln(u"The item's uniqueness causes it to poof into thin air!"_s);
                 extract_obj(oitem);
                 break; // Used to crash it.
               }
@@ -1901,10 +1901,10 @@ void pick_up_item(CharacterPtr ch, ObjectPtr obj)
         }
         else
         {
-          ch->sendln("Brick turned into a non-existent item. Tell an imm.");
+          ch->sendln(u"Brick turned into a non-existent item. Tell an imm."_s);
           break;
         }
-        if (dc_->obj_index[oitem->item_number].vnum() < 27915 || dc_->obj_index[oitem->item_number].vnum() > 27918)
+        if (dc_->obj_index_[oitem->item_number].vnum() < 27915 || dc_->obj_index_[oitem->item_number].vnum() > 27918)
           break;
         else
           obj = oitem; // Gold! Continue on to the next cases.
@@ -1964,7 +1964,7 @@ void pulse_hunts()
   }
 }
 
-command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   hunt_dataPtr h;
@@ -1972,24 +1972,24 @@ command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!hunt_list)
   {
-    ch->sendln("There are no active hunts at the moment.");
+    ch->sendln(u"There are no active hunts at the moment."_s);
 
     ch->send(fmt::format("Last hunt was run: {}\r\n", last_hunt_time(nullptr)));
 
     ch->send(buf);
   }
   else
-    ch->sendln("The following hunts are currently active:");
+    ch->sendln(u"The following hunts are currently active:"_s);
 
   for (h = hunt_list; h; h = h->next)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (dc_->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (dc_->obj_index_[real_object(h->itemnum)]->item)->short_description, h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (dc_->obj_index[real_object(h->itemnum)].item)->short_description, h->time));
+      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (dc_->obj_index_[real_object(h->itemnum)]->item)->short_description, h->time));
     }
 
     qint32 itemsleft = {};
@@ -2012,7 +2012,7 @@ command_return_t do_showhunt(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg2, arg3, buf;
 
@@ -2022,30 +2022,30 @@ command_return_t do_huntstart(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg3[0] == '\0')
   {
-    ch->sendln("Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]");
+    ch->sendln(u"Syntax: huntstart <vnum> <# of items (1-50)> <time limit> [hunt name]"_s);
     return ReturnValue::eSUCCESS;
   }
   qint32 vnum = dc_atoi(arg), num = dc_atoi(arg2), time = dc_atoi(arg3);
   if (vnum <= 0 || real_object(vnum) < 0)
   {
-    ch->sendln("Non-existent item.");
+    ch->sendln(u"Non-existent item."_s);
     return ReturnValue::eSUCCESS;
   }
   if (num <= 0 || num > 50)
   {
-    ch->sendln("Invalid number of items. Maximum of 50 allowed.");
+    ch->sendln(u"Invalid number of items. Maximum of 50 allowed."_s);
     return ReturnValue::eSUCCESS;
   }
   if (time <= 0)
   {
-    ch->sendln("Invalid duration.");
+    ch->sendln(u"Invalid duration."_s);
     return ReturnValue::eSUCCESS;
   }
   hunt_dataPtr h;
   for (h = hunt_list; h; h = h->next)
     if (h->itemnum == vnum)
     {
-      ch->sendln("A hunt for that item is already ongoing!");
+      ch->sendln(u"A hunt for that item is already ongoing!"_s);
       return ReturnValue::eSUCCESS;
     }
   QString huntname;

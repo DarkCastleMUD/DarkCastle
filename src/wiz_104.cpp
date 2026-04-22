@@ -23,7 +23,7 @@ qint32 count_rooms(qint32 start, qint32 end)
   return count;
 }
 
-command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
@@ -39,7 +39,7 @@ command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
     ;
 
   if (!(*argument))
-    ch->sendln("It's not gonna look that impressive...");
+    ch->sendln(u"It's not gonna look that impressive..."_s);
   else
   {
     if (cmd == cmd_t::DEFAULT)
@@ -71,14 +71,14 @@ command_return_t do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (ch->player->incognito == true)
   {
-    ch->sendln("Incognito off.");
+    ch->sendln(u"Incognito off."_s);
     ch->player->incognito = false;
   }
   else
@@ -91,7 +91,7 @@ command_return_t do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString type;
   QString name;
@@ -114,12 +114,12 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!ch->has_skill(COMMAND_LOAD) && cmd == cmd_t::DEFAULT)
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
   if (!ch->has_skill(COMMAND_PRIZE) && cmd == cmd_t::PRIZE)
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -127,35 +127,35 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (cmd == cmd_t::DEFAULT && (type.isEmpty() || arg.isEmpty() 2))
   {
-    ch->sendln("Usage:  load <mob> <name|vnum> [qty]");
-    ch->sendln("        load <obj> <name|vnum> [qty] [random]");
+    ch->sendln(u"Usage:  load <mob> <name|vnum> [qty]"_s);
+    ch->sendln(u"        load <obj> <name|vnum> [qty] [random]"_s);
     return ReturnValue::eFAILURE;
   }
   if (cmd == cmd_t::PRIZE && type.isEmpty())
   {
 
-    ch->sendln("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n");
+    ch->sendln(u"[#  ] [OBJ #] OBJECT'S DESCRIPTION\n"_s);
 
-    for (x = {}; (x < dc_->obj_index[top_of_objt].vnum()); x++)
+    for (x = {}; (x < dc_->obj_index_[top_of_objt].vnum()); x++)
     {
       if ((num = real_object(x)) < 0)
         continue;
 
-      if (isexact("prize", ((dc_->obj_index[num].item))->name()))
+      if (isexact("prize", ((dc_->obj_index_[num]->item))->name()))
       {
         cnt++;
-        dc_sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((dc_->obj_index[num].item))->short_description);
+        dc_sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((dc_->obj_index_[num]->item))->short_description);
         ch->send(buf);
       }
 
       if (cnt > 200)
       {
-        ch->sendln("Maximum number of searchable items hit.  Search ended.");
+        ch->sendln(u"Maximum number of searchable items hit.  Search ended."_s);
         break;
       }
     }
 
-    ch->sendln("To load: prize <name|vnum>");
+    ch->sendln(u"To load: prize <name|vnum>"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -171,7 +171,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (cnt > 50)
     {
-      ch->sendln("Sorry, you can only load at most 50 of something at a time.");
+      ch->sendln(u"Sorry, you can only load at most 50 of something at a time."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -187,7 +187,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (x == 2)
       {
-        ch->sendln("Type must mobile or object.");
+        ch->sendln(u"Type must mobile or object."_s);
         return ReturnValue::eFAILURE;
       }
       if (is_abbrev(type, types[x]))
@@ -200,7 +200,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   switch (x)
   {
   default:
-    ch->sendln("Problem...fuck up in do_load.");
+    ch->sendln(u"Problem...fuck up in do_load."_s);
     dc_->logentry(u"Default in do_load...should NOT happen."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: /* mobile */
@@ -210,12 +210,12 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if ((number = real_mobile(num)) < 0)
       {
-        ch->sendln("No such mobile.");
+        ch->sendln(u"No such mobile."_s);
         return ReturnValue::eFAILURE;
       }
       if (ch->getLevel() < DEITY && !can_modify_mobile(ch, num))
       {
-        ch->sendln("You may only load mobs inside of your range.");
+        ch->sendln(u"You may only load mobs inside of your range."_s);
         return ReturnValue::eFAILURE;
       }
       do_mload(ch, number, cnt);
@@ -223,7 +223,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     if ((num = mob_in_index(c, number)) == -1)
     {
-      ch->sendln("No such mobile.");
+      ch->sendln(u"No such mobile."_s);
       return ReturnValue::eFAILURE;
     }
     do_mload(ch, num, cnt);
@@ -235,29 +235,29 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if ((number = real_object(num)) < 0)
       {
-        ch->sendln("No such object.");
+        ch->sendln(u"No such object."_s);
         return ReturnValue::eFAILURE;
       }
       if ((ch->getLevel() < 108) &&
-          isSet(((dc_->obj_index[number].item))->flags_.extra_flags, ITEM_SPECIAL))
+          isSet(((dc_->obj_index_[number]->item))->flags_.extra_flags, ITEM_SPECIAL))
       {
-        ch->sendln("Why would you want to load that?");
+        ch->sendln(u"Why would you want to load that?"_s);
         return ReturnValue::eFAILURE;
       }
-      else if (cmd == cmd_t::PRIZE && !isexact("prize", ((dc_->obj_index[number].item))->name()))
+      else if (cmd == cmd_t::PRIZE && !isexact("prize", ((dc_->obj_index_[number]->item))->name()))
       {
-        ch->sendln("This command can only load prize items.");
+        ch->sendln(u"This command can only load prize items."_s);
         return ReturnValue::eFAILURE;
       }
       else if (cmd != cmd_t::PRIZE && ch->getLevel() < DEITY && !can_modify_object(ch, num))
       {
-        ch->sendln("You may only load objects inside of your range.");
+        ch->sendln(u"You may only load objects inside of your range."_s);
         return ReturnValue::eFAILURE;
       }
 
       if (random[0] == 'r')
       {
-        ObjectPtr obj = (dc_->obj_index[number].item);
+        ObjectPtr obj = (dc_->obj_index_[number]->item);
         if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
         {
           ch->send(u"You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n"_s.arg(num));
@@ -280,19 +280,19 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     if ((num = obj_in_index(c, number)) == -1)
     {
-      ch->sendln("No such object.");
+      ch->sendln(u"No such object."_s);
       return ReturnValue::eFAILURE;
     }
     if ((ch->getLevel() < IMPLEMENTER) &&
-        isSet(((dc_->obj_index[num].item))->flags_.extra_flags,
+        isSet(((dc_->obj_index_[num]->item))->flags_.extra_flags,
               ITEM_SPECIAL))
     {
-      ch->sendln("Why would you want to load that?");
+      ch->sendln(u"Why would you want to load that?"_s);
       return ReturnValue::eFAILURE;
     }
-    else if (cmd == cmd_t::PRIZE && !isexact("prize", ((dc_->obj_index[num].item))->name()))
+    else if (cmd == cmd_t::PRIZE && !isexact("prize", ((dc_->obj_index_[num]->item))->name()))
     {
-      ch->sendln("This command can only load prize items.");
+      ch->sendln(u"This command can only load prize items."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -302,7 +302,7 @@ command_return_t do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict, next_v;
   ObjectPtr obj, next_o;
@@ -348,7 +348,7 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln("You can't find it to purge!");
+      ch->sendln(u"You can't find it to purge!"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -356,7 +356,7 @@ command_return_t do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
   { /* no argument. clean out the room */
     if (ch->isNonPlayer())
     {
-      ch->sendln("Don't... You would kill yourself too.");
+      ch->sendln(u"Don't... You would kill yourself too."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -452,7 +452,7 @@ qint32 Zone::show_info(CharacterPtr ch)
              repops_without_deaths,
              repops_with_bonus);
   ch->send(buf);
-  ch->sendln("");
+  ch->sendln(u""_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -557,7 +557,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     switch (zone.cmd[j]->command)
     {
     case 'M':
-      virt = ZCMD->active ? dc_->mob_index[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->mob_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) in room ");
@@ -568,7 +568,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       dc_sprintf(buf, "%s\r\n", buf);
       break;
     case 'O':
-      virt = ZCMD->active ? dc_->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) in room ");
@@ -579,17 +579,17 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       dc_sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
       break;
     case 'P':
-      virt = ZCMD->active ? dc_->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) in objt ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
-      virt = ZCMD->active ? dc_->obj_index[ZCMD->arg3].vnum() : ZCMD->arg3;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg3].vnum() : ZCMD->arg3;
       dc_sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
       break;
     case 'G':
-      virt = ZCMD->active ? dc_->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) on last mob loaded.$R\r\n");
@@ -597,7 +597,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
         dc_sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
       break;
     case 'E':
-      virt = ZCMD->active ? dc_->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) on last mob on ");
@@ -707,7 +707,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
 
   if (num_to_show != 1)
   {
-    ch->sendln("\r\nUse zedit to see the rest of the commands if they were truncated.");
+    ch->sendln(u"\r\nUse zedit to see the rest of the commands if they were truncated."_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -738,7 +738,7 @@ void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
   world_file_list_item *curr = head;
   quint64 i = {};
 
-  ch->send("ID ) Filename                       Begin  End\r\n"
+  ch->send(u"ID ) Filename                       Begin  End\r\n"
            "----------------------------------------------------------\r\n");
 
   while (curr != nullptr)
@@ -769,7 +769,7 @@ void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
   }
 }
 
-command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name, buf;
   QString beginrange;
@@ -835,7 +835,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
                                                                                                          100000))
       {
-        ch->sendln("The begin and end ranges must be valid numbers.");
+        ch->sendln(u"The begin and end ranges must be valid numbers."_s);
         return ReturnValue::eFAILURE;
       }
       if (end != -1 && end < begin)
@@ -845,21 +845,21 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         begin = i;
       }
 
-      ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
+      ch->sendln(u"[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n"_s);
 
       if (end == -1)
       {
         if ((nr = real_mobile(begin)) >= 0)
         {
           dc_sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
-                     ((CharacterPtr)(dc_->mob_index[nr].item))->getLevel(),
-                     qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description()));
+                     ((CharacterPtr)(dc_->mob_index_[nr]->item))->getLevel(),
+                     qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description()));
           ch->send(buf);
         }
       }
       else
       {
-        for (i = begin; i <= dc_->mob_index[top_of_mobt].vnum() && i <= end;
+        for (i = begin; i <= dc_->mob_index_[top_of_mobt].vnum() && i <= end;
              i++)
         {
           if ((nr = real_mobile(i)) < 0)
@@ -867,13 +867,13 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((CharacterPtr)(dc_->mob_index[nr].item))->getLevel(),
-                     qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description()));
+                     ((CharacterPtr)(dc_->mob_index_[nr]->item))->getLevel(),
+                     qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
           {
-            ch->sendln("Maximum number of searchable items hit.  Search ended.");
+            ch->sendln(u"Maximum number of searchable items hit.  Search ended."_s);
             break;
           }
         }
@@ -882,31 +882,31 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     else
     {
 
-      ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
+      ch->sendln(u"[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n"_s);
 
-      for (i = {}; (i <= dc_->mob_index[top_of_mobt].vnum()); i++)
+      for (i = {}; (i <= dc_->mob_index_[top_of_mobt].vnum()); i++)
       {
         if ((nr = real_mobile(i)) < 0)
           continue;
 
-        if (isexact(name, qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->name())))
+        if (isexact(name, qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->name())))
         {
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((CharacterPtr)(dc_->mob_index[nr].item))->getLevel(),
-                     qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description()));
+                     ((CharacterPtr)(dc_->mob_index_[nr]->item))->getLevel(),
+                     qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
           {
-            ch->sendln("Maximum number of searchable items hit.  Search ended.");
+            ch->sendln(u"Maximum number of searchable items hit.  Search ended."_s);
             break;
           }
         }
       }
     }
     if (buf.isEmpty())
-      ch->sendln("Couldn't find any MOBS by that NAME.");
+      ch->sendln(u"Couldn't find any MOBS by that NAME."_s);
   } /* "mobile" */
   else if (is_abbrev(type, "counts") && has_range)
   {
@@ -937,7 +937,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
                                                                                                          100000))
       {
-        ch->sendln("The begin and end ranges must be valid numbers.");
+        ch->sendln(u"The begin and end ranges must be valid numbers."_s);
         return ReturnValue::eFAILURE;
       }
       if (end != -1 && end < begin)
@@ -947,21 +947,21 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         begin = i;
       }
 
-      ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
+      ch->sendln(u"[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n"_s);
 
       if (end == -1)
       {
         if ((nr = real_object(begin)) >= 0)
         {
           dc_sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin,
-                     ((dc_->obj_index[nr].item))->flags_.eq_level,
-                     qPrintable(((dc_->obj_index[nr].item))->short_description()));
+                     ((dc_->obj_index_[nr]->item))->flags_.eq_level,
+                     qPrintable(((dc_->obj_index_[nr]->item))->short_description()));
           ch->send(buf);
         }
       }
       else
       {
-        for (i = begin; i <= dc_->obj_index[top_of_objt].vnum() && i <= end;
+        for (i = begin; i <= dc_->obj_index_[top_of_objt].vnum() && i <= end;
              i++)
         {
           if ((nr = real_object(i)) < 0)
@@ -969,13 +969,13 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((dc_->obj_index[nr].item))->flags_.eq_level,
-                     qPrintable(((dc_->obj_index[nr].item))->short_description()));
+                     ((dc_->obj_index_[nr]->item))->flags_.eq_level,
+                     qPrintable(((dc_->obj_index_[nr]->item))->short_description()));
           ch->send(buf);
 
           if (count > 200)
           {
-            ch->sendln("Maximum number of searchable items hit.  Search ended.");
+            ch->sendln(u"Maximum number of searchable items hit.  Search ended."_s);
             break;
           }
         }
@@ -984,38 +984,38 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     else
     {
 
-      ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
+      ch->sendln(u"[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n"_s);
 
-      for (i = {}; (i <= dc_->obj_index[top_of_objt].vnum()); i++)
+      for (i = {}; (i <= dc_->obj_index_[top_of_objt].vnum()); i++)
       {
         if ((nr = real_object(i)) < 0)
           continue;
 
-        if (isexact(name, ((dc_->obj_index[nr].item))->name()))
+        if (isexact(name, ((dc_->obj_index_[nr]->item))->name()))
         {
           count++;
           dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i,
-                     ((dc_->obj_index[nr].item))->flags_.eq_level,
-                     qPrintable(((dc_->obj_index[nr].item))->short_description()));
+                     ((dc_->obj_index_[nr]->item))->flags_.eq_level,
+                     qPrintable(((dc_->obj_index_[nr]->item))->short_description()));
           ch->send(buf);
         }
 
         if (count > 200)
         {
-          ch->sendln("Maximum number of searchable items hit.  Search ended.");
+          ch->sendln(u"Maximum number of searchable items hit.  Search ended."_s);
           break;
         }
       }
     }
     if (buf.isEmpty())
-      ch->sendln("Couldn't find any OBJECTS by that NAME.");
+      ch->sendln(u"Couldn't find any OBJECTS by that NAME."_s);
   } /* "object" */
   else if (is_abbrev(type, "room"))
   {
     argument = one_argument(argument, name);
     if (name.isEmpty())
     {
-      ch->sendln("Format:  show room <beginrange> <endrange>");
+      ch->sendln(u"Format:  show room <beginrange> <endrange>"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1031,7 +1031,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!check_range_valid_and_convert(begin, beginrange, 0, 100000) || !check_range_valid_and_convert(end, endrange, -1,
                                                                                                          100000))
       {
-        ch->sendln("The begin and end ranges must be valid numbers.");
+        ch->sendln(u"The begin and end ranges must be valid numbers."_s);
         return ReturnValue::eFAILURE;
       }
       if (end != -1 && end < begin)
@@ -1041,7 +1041,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         begin = i;
       }
 
-      ch->sendln("[#  ] [ROOM#] ROOM'S NAME\n");
+      ch->sendln(u"[#  ] [ROOM#] ROOM'S NAME\n"_s);
 
       if (end == -1)
       {
@@ -1064,21 +1064,21 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (count > 200)
           {
-            ch->sendln("Maximum number of searchable items hit.  Search ended.");
+            ch->sendln(u"Maximum number of searchable items hit.  Search ended."_s);
             break;
           }
         }
       }
     }
     if (buf.isEmpty())
-      ch->sendln("Couldn't find any ROOMS in that range.");
+      ch->sendln(u"Couldn't find any ROOMS in that range."_s);
   } /* "object" */
   else if (is_abbrev(type, "zone"))
   {
     argument = one_argument(argument, name);
     if (name.isEmpty())
     {
-      ch->sendln("Show which zone? (# or 'all')");
+      ch->sendln(u"Show which zone? (# or 'all')"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1116,7 +1116,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     argument = one_argument(argument, arg1);
     if (!is_number(arg1))
     {
-      ch->sendln("Syntax: show rsearch <zone#> <sectorname/roomflag>");
+      ch->sendln(u"Syntax: show rsearch <zone#> <sectorname/roomflag>"_s);
       return ReturnValue::eSUCCESS;
     }
     zon = dc_atoi(arg1);
@@ -1146,11 +1146,11 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
       if (!found)
-        ch->sendln("Unknown room-flag or sector type.");
+        ch->sendln(u"Unknown room-flag or sector type."_s);
     }
     if (!bits && !sector)
     {
-      ch->sendln("Syntax: show rsearch <zone number> <flags/sector type");
+      ch->sendln(u"Syntax: show rsearch <zone number> <flags/sector type"_s);
       return ReturnValue::eSUCCESS;
     }
     room_t last_room = dc_->zones.lastKey();
@@ -1238,7 +1238,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
           levhigh = dc_atoi(arg1);
         if (levhigh == -555 || levlow == -555)
         {
-          ch->sendln("Incorrect level requirement.");
+          ch->sendln(u"Incorrect level requirement."_s);
           return ReturnValue::eFAILURE;
         }
       }
@@ -1253,128 +1253,128 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         o++;
         send_to_char_nosp(action_bits[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; *isr_bits[z] != '\n'; z++)
       {
         o++;
         send_to_char_nosp(isr_bits[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; *affected_bits[z] != '\n'; z++)
       {
         o++;
         send_to_char_nosp(affected_bits[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; *pc_clss_types2[z] != '\n'; z++)
       {
         o++;
         send_to_char(pc_clss_types2[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (i = {}; i <= MAX_RACE; i++)
       {
         o++;
         send_to_char_nosp(races[i].singular_name, ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
-      ch->send("level");
+      ch->send(u"level"_s);
       if (o % 7 == 0)
-        ch->sendln("");
+        ch->sendln(u""_s);
       else
-        ch->send(" ");
+        ch->send(u" "_s);
 
-      ch->send("good");
+      ch->send(u"good"_s);
       if (o % 7 == 0)
-        ch->sendln("");
+        ch->sendln(u""_s);
       else
-        ch->send(" ");
-      ch->send("evil");
+        ch->send(u" "_s);
+      ch->send(u"evil"_s);
       if (o % 7 == 0)
-        ch->sendln("");
+        ch->sendln(u""_s);
       else
-        ch->send(" ");
-      ch->send("neutral");
+        ch->send(u" "_s);
+      ch->send(u"neutral"_s);
       if (o % 7 == 0)
-        ch->sendln("");
+        ch->sendln(u""_s);
       else
-        ch->send(" ");
+        ch->send(u" "_s);
 
       return ReturnValue::eSUCCESS;
     }
     qint32 c, nr;
     if (act.isEmpty() && !clas && !levlow && !levhigh && affect.isEmpty() && !immune && !race && !align)
     {
-      ch->sendln("No valid search supplied.");
+      ch->sendln(u"No valid search supplied."_s);
       return ReturnValue::eFAILURE;
     }
-    for (c = {}; c < dc_->mob_index[top_of_mobt].vnum(); c++)
+    for (c = {}; c < dc_->mob_index_[top_of_mobt].vnum(); c++)
     {
       if ((nr = real_mobile(c)) < 0)
         continue;
       if (race > -1)
-        if (((CharacterPtr)(dc_->mob_index[nr].item))->race != race)
+        if (((CharacterPtr)(dc_->mob_index_[nr]->item))->race != race)
           continue;
       if (align)
       {
-        if (align == 1 && ((CharacterPtr)(dc_->mob_index[nr].item))->alignment < 350)
+        if (align == 1 && ((CharacterPtr)(dc_->mob_index_[nr]->item))->alignment < 350)
           continue;
-        else if (align == 2 && (((CharacterPtr)(dc_->mob_index[nr].item))->alignment < -350 || ((CharacterPtr)(dc_->mob_index[nr].item))->alignment > 350))
+        else if (align == 2 && (((CharacterPtr)(dc_->mob_index_[nr]->item))->alignment < -350 || ((CharacterPtr)(dc_->mob_index_[nr]->item))->alignment > 350))
           continue;
-        else if (align == 3 && ((CharacterPtr)(dc_->mob_index[nr].item))->alignment > -350)
+        else if (align == 3 && ((CharacterPtr)(dc_->mob_index_[nr]->item))->alignment > -350)
           continue;
       }
       if (immune)
-        if (!isSet(((CharacterPtr)(dc_->mob_index[nr].item))->immune,
+        if (!isSet(((CharacterPtr)(dc_->mob_index_[nr]->item))->immune,
                    immune))
           continue;
       if (clas)
-        if (((CharacterPtr)(dc_->mob_index[nr].item))->c_class != clas)
+        if (((CharacterPtr)(dc_->mob_index_[nr]->item))->c_class != clas)
           continue;
       if (levlow != -555)
-        if (((CharacterPtr)(dc_->mob_index[nr].item))->getLevel() < levlow)
+        if (((CharacterPtr)(dc_->mob_index_[nr]->item))->getLevel() < levlow)
           continue;
       if (levhigh != -555)
-        if (((CharacterPtr)(dc_->mob_index[nr].item))->getLevel() > levhigh)
+        if (((CharacterPtr)(dc_->mob_index_[nr]->item))->getLevel() > levhigh)
           continue;
       if (!act.isEmpty())
         for (i = {}; i < ACT_MAX; i++)
           if (ISSET(act, i))
             if (!ISSET(
-                    ((CharacterPtr)(dc_->mob_index[nr].item))->mobdata->actflags,
+                    ((CharacterPtr)(dc_->mob_index_[nr]->item))->mobdata->actflags,
                     i + 1))
               goto eheh;
       if (!affect.isEmpty())
         for (i = {}; i < AFF_MAX; i++)
           if (ISSET(affect, i))
             if (!ISSET(
-                    ((CharacterPtr)(dc_->mob_index[nr].item))->affected_by,
+                    ((CharacterPtr)(dc_->mob_index_[nr]->item))->affected_by,
                     i + 1))
               goto eheh;
       count++;
       if (count > 200)
       {
-        ch->sendln("Limit reached.");
+        ch->sendln(u"Limit reached."_s);
         break;
       }
       dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c,
-                 ((CharacterPtr)(dc_->mob_index[nr].item))->getLevel(),
-                 qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description()));
+                 ((CharacterPtr)(dc_->mob_index_[nr]->item))->getLevel(),
+                 qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description()));
       ch->send(buf);
     eheh:
       continue;
@@ -1491,7 +1491,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if (levhigh == -555 || levlow == -555)
         {
-          ch->sendln("Incorrect level requirement.");
+          ch->sendln(u"Incorrect level requirement."_s);
           return ReturnValue::eFAILURE;
         }
       }
@@ -1507,7 +1507,7 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if (lweight == -555 || hweight == -555)
         {
-          ch->sendln("Incorrect weight requirement.");
+          ch->sendln(u"Incorrect weight requirement."_s);
           return ReturnValue::eFAILURE;
         }
       }
@@ -1526,27 +1526,27 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         o++;
         send_to_char_nosp(QFlagsToStrings<ObjectPositions>().value(z), ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; z < Object::extra_bits.size(); z++)
       {
         o++;
         send_to_char_nosp(Object::extra_bits[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; *strs_damage_types[z] != '\n'; z++)
       {
         o++;
         send_to_char_nosp(strs_damage_types[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
 
       for (z = {}; z < Object::more_obj_bits.size(); z++)
@@ -1554,53 +1554,53 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         o++;
         send_to_char_nosp(Object::more_obj_bits[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; z < item_types.size(); z++)
       {
         o++;
         send_to_char_nosp(item_types[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; *size_bitfields[z] != '\n'; z++)
       {
         o++;
         send_to_char_nosp(size_bitfields[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
       for (z = {}; *apply_types[z] != '\n'; z++)
       {
         o++;
         send_to_char_nosp(apply_types[z], ch);
         if (o % 7 == 0)
-          ch->sendln("");
+          ch->sendln(u""_s);
         else
-          ch->send(" ");
+          ch->send(u" "_s);
       }
-      ch->send("oweight");
+      ch->send(u"oweight"_s);
       if (o % 7 == 0)
-        ch->sendln("");
+        ch->sendln(u""_s);
       else
-        ch->send(" ");
+        ch->send(u" "_s);
 
-      ch->send("olevel");
+      ch->send(u"olevel"_s);
       if (o % 7 == 0)
-        ch->sendln("");
+        ch->sendln(u""_s);
       else
-        ch->send(" ");
+        ch->send(u" "_s);
 
       return ReturnValue::eSUCCESS;
     }
 
-    for (c = {}; c < dc_->obj_index[top_of_objt].vnum(); c++)
+    for (c = {}; c < dc_->obj_index_[top_of_objt].vnum(); c++)
     {
       found = false;
       if ((nr = real_object(c)) < 0)
@@ -1609,37 +1609,37 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 20; i++)
           if (isSet(wear, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->flags_.wear_flags,
+                    ((dc_->obj_index_[nr]->item))->flags_.wear_flags,
                     1 << i))
               goto endLoop;
       if (type)
-        if (((dc_->obj_index[nr].item))->flags_.type_flag != type)
+        if (((dc_->obj_index_[nr]->item))->flags_.type_flag != type)
           continue;
       if (lweight != -555)
-        if (((dc_->obj_index[nr].item))->flags_.weight < lweight)
+        if (((dc_->obj_index_[nr]->item))->flags_.weight < lweight)
           continue;
       if (hweight != -555)
-        if (((dc_->obj_index[nr].item))->flags_.weight > hweight)
+        if (((dc_->obj_index_[nr]->item))->flags_.weight > hweight)
           continue;
 
       if (levhigh != -555)
-        if (((dc_->obj_index[nr].item))->flags_.eq_level > levhigh)
+        if (((dc_->obj_index_[nr]->item))->flags_.eq_level > levhigh)
           continue;
       if (levlow != -555)
-        if (((dc_->obj_index[nr].item))->flags_.eq_level < levlow)
+        if (((dc_->obj_index_[nr]->item))->flags_.eq_level < levlow)
           continue;
       if (size)
         for (i = {}; i < 10; i++)
           if (isSet(size, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->flags_.size,
+                    ((dc_->obj_index_[nr]->item))->flags_.size,
                     1 << i))
               goto endLoop;
-      if (((dc_->obj_index[nr].item))->flags_.type_flag == ITEM_WEAPON)
+      if (((dc_->obj_index_[nr]->item))->flags_.type_flag == ITEM_WEAPON)
       {
         qint32 get_weapon_damage_type(ObjectPtr wielded);
         its = get_weapon_damage_type(
-            ((dc_->obj_index[nr].item)));
+            ((dc_->obj_index_[nr]->item)));
       }
       if (dam && dam != (its - 1000))
         continue;
@@ -1647,10 +1647,10 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 30; i++)
           if (isSet(extra, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->flags_.extra_flags,
+                    ((dc_->obj_index_[nr]->item))->flags_.extra_flags,
                     1 << i) &&
                 !(any && isSet(
-                             ((dc_->obj_index[nr].item))->flags_.extra_flags,
+                             ((dc_->obj_index_[nr]->item))->flags_.extra_flags,
                              1 << any)))
               goto endLoop;
 
@@ -1658,16 +1658,16 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         for (i = {}; i < 10; i++)
           if (isSet(more, 1 << i))
             if (!isSet(
-                    ((dc_->obj_index[nr].item))->flags_.more_flags,
+                    ((dc_->obj_index_[nr]->item))->flags_.more_flags,
                     1 << i))
               goto endLoop;
       //      qint32 aff,total = {};
       //    bool found = false;
       if (!item_type)
         for (aff = {};
-             aff < ((dc_->obj_index[nr].item))->num_affects;
+             aff < ((dc_->obj_index_[nr]->item))->num_affects;
              aff++)
-          if (affect == ((dc_->obj_index[nr].item))->affected[aff].location)
+          if (affect == ((dc_->obj_index_[nr]->item))->affected[aff].location)
             found = true;
       if (affect && !item_type)
         if (!found)
@@ -1676,14 +1676,14 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (item_type)
       {
         bool spell_found = false;
-        if (((dc_->obj_index[nr].item))->flags_.type_flag != item_type)
+        if (((dc_->obj_index_[nr]->item))->flags_.type_flag != item_type)
           continue;
         if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
           for (i = 1; i < 4; i++)
-            if (((dc_->obj_index[nr].item))->flags_.value[i] == spellnum)
+            if (((dc_->obj_index_[nr]->item))->flags_.value[i] == spellnum)
               spell_found = true;
         if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
-          if (((dc_->obj_index[nr].item))->flags_.value[3] == spellnum)
+          if (((dc_->obj_index_[nr]->item))->flags_.value[3] == spellnum)
             spell_found = true;
 
         if (!spell_found)
@@ -1693,10 +1693,10 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       count++;
       if (count > 200)
       {
-        ch->sendln("Limit reached.");
+        ch->sendln(u"Limit reached."_s);
         break;
       }
-      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((dc_->obj_index[nr].item))->flags_.eq_level, qPrintable(((dc_->obj_index[nr].item))->short_description()));
+      dc_sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((dc_->obj_index_[nr]->item))->flags_.eq_level, qPrintable(((dc_->obj_index_[nr]->item))->short_description()));
       ch->send(buf);
     endLoop:
       continue;
@@ -1718,14 +1718,14 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (name.isEmpty())
     {
-      ch->sendln("Show which key? (# of key)");
+      ch->sendln(u"Show which key? (# of key)"_s);
       return ReturnValue::eFAILURE;
     }
 
     count = dc_atoi(name);
     if ((!count && *name != '0') || count < 0)
     {
-      ch->sendln("Which key was that?");
+      ch->sendln(u"Which key was that?"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1743,11 +1743,11 @@ command_return_t do_show(CharacterPtr ch, QString argument, cmd_t cmd)
         }
   }
   else
-    ch->sendln("Illegal type.  Type just 'show' for legal types.");
+    ch->sendln(u"Illegal type.  Type just 'show' for legal types."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
+ReturnValue do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
 {
   if (ch->isNonPlayer() || ch == nullptr)
   {
@@ -1764,8 +1764,8 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
   std::tie(arg1, arguments) = half_chop(arguments);
   if (arg1.isEmpty())
   {
-    ch->send("Usage: transfer <name>\r\n");
-    ch->send("       transfer all\r\n");
+    ch->send(u"Usage: transfer <name>\r\n"_s);
+    ch->send(u"       transfer all\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1789,21 +1789,21 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
       }
     }
 
-    ch->sendln("Ok.");
+    ch->sendln(u"Ok."_s);
     return ReturnValue::eSUCCESS;
   }
 
   victim = get_char_vis(ch, arg1);
   if (victim == nullptr)
   {
-    ch->send("No-one by that name around.\r\n");
+    ch->send(u"No-one by that name around.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
   source_room = victim->in_room;
 
   if (dc_->world[destination_room].number == IMM_PIRAHNA_ROOM && !isexact(qPrintable(ch->name()), "Pirahna"))
   {
-    ch->sendln("Damn! That is rude! This ain't your place. :P");
+    ch->sendln(u"Damn! That is rude! This ain't your place. :P"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1813,12 +1813,12 @@ command_return_t do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
   act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
   act_to_victim("$n has transferred you!", ch, 0, victim, 0);
   do_look(victim, "");
-  ch->sendln("Ok.");
+  ch->sendln(u"Ok."_s);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim, target_mob, pers;
   QString person, room;
@@ -1832,19 +1832,19 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (person.isEmpty())
   {
-    ch->sendln("Who do you wish to teleport?");
+    ch->sendln(u"Who do you wish to teleport?"_s);
     return ReturnValue::eFAILURE;
   } /* if */
 
   if (room.isEmpty())
   {
-    ch->sendln("Where do you wish to send ths person?");
+    ch->sendln(u"Where do you wish to send ths person?"_s);
     return ReturnValue::eFAILURE;
   } /* if */
 
   if (!(victim = get_char_vis(ch, person)))
   {
-    ch->sendln("No-one by that name around.");
+    ch->sendln(u"No-one by that name around."_s);
     return ReturnValue::eFAILURE;
   } /* if */
 
@@ -1853,7 +1853,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
     target = dc_atoi(&room[0]);
     if ((*room != '0' && target == 0) || !dc_->rooms.contains(target))
     {
-      ch->sendln("No room exists with that number.");
+      ch->sendln(u"No room exists with that number."_s);
       return ReturnValue::eFAILURE;
     }
     //      for (loop = {}; loop <= dc_->top_of_world; loop++) {
@@ -1861,7 +1861,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
     //            target = (qint16)loop;
     //            break;
     //      } else if (loop == dc_->top_of_world) {
-    //            ch->sendln("No room exists with that number.");
+    //            ch->sendln(u"No room exists with that number."_s);
     //            return ReturnValue::eFAILURE;
     //      } /* if */
     //       } /* for */
@@ -1872,7 +1872,7 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    ch->sendln("No such target (person) can be found.");
+    ch->sendln(u"No such target (person) can be found."_s);
     return ReturnValue::eFAILURE;
   } /* if */
 
@@ -1883,21 +1883,21 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
       ;
     if (loop > 1)
     {
-      ch->sendln("There's a private conversation going on in that room");
+      ch->sendln(u"There's a private conversation going on in that room"_s);
       return ReturnValue::eFAILURE;
     } /* if */
   } /* if */
 
   if (isSet(dc_->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
-    ch->sendln("No.");
+    ch->sendln(u"No."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[target].room_flags, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
-    ch->sendln("No.");
+    ch->sendln(u"No."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1907,12 +1907,12 @@ command_return_t do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
   act_to_victim("$n has teleported you!", ch, 0, victim, 0);
   do_look(victim, "");
-  ch->sendln("Teleport completed.");
+  ch->sendln(u"Teleport completed."_s);
 
   return ReturnValue::eSUCCESS;
 } /* do_teleport */
 
-command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  ConnectionPtr i;
   CharacterPtr victim;
@@ -1926,13 +1926,13 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
   one_argument(argument, buf);
   if (buf.isEmpty())
   {
-    ch->sendln("Whom is the group leader you wish to transfer?");
+    ch->sendln(u"Whom is the group leader you wish to transfer?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_vis(ch, buf)))
   {
-    ch->sendln("No-one by that name around.");
+    ch->sendln(u"No-one by that name around."_s);
     return ReturnValue::eFAILURE;
   }
   else
@@ -1964,7 +1964,7 @@ command_return_t do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
           do_look(k->follower, "");
         }
       } /* for */
-    ch->sendln("Ok.");
+    ch->sendln(u"Ok."_s);
   } /* else */
   return ReturnValue::eSUCCESS;
 }
@@ -2007,29 +2007,29 @@ void opstat(CharacterPtr ch, qint32 vnum)
   QString buf;
   if (num < 0)
   {
-    ch->sendln("Error, non-existant object.");
+    ch->sendln(u"Error, non-existant object."_s);
     return;
   }
-  obj = dc_->obj_index[num].item;
+  obj = dc_->obj_index_[num]->item;
   dc_sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
              qPrintable(obj->name()), vnum);
   ch->send(buf);
-  if (dc_->obj_index[num].progtypes == 0)
+  if (dc_->obj_index_[num]->progtypes_ == 0)
   {
-    ch->sendln("This object has no special procedures.");
+    ch->sendln(u"This object has no special procedures."_s);
     return;
   }
-  ch->sendln("");
+  ch->sendln(u""_s);
   MobileProgramPtr mprg = {};
   qint32 i = {};
   QString buf2 = {};
-  for (mprg = dc_->obj_index[num].programs_, i = 1; mprg != nullptr;
+  for (mprg = dc_->obj_index_[num]->programs_, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     dc_sprintf(buf, "$3%d$R>$3$B", i);
     ch->send(buf);
     send_to_char(oprog_type_to_name(mprg->type), ch);
-    ch->send("$R ");
+    ch->send(u"$R "_s);
     dc_sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
     ch->send(buf);
     if (mprg->comlist != nullptr)
@@ -2039,21 +2039,21 @@ void opstat(CharacterPtr ch, qint32 vnum)
   }
 }
 
-command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 vnum = -1;
 
   if (argument.isEmpty())
   {
-    ch->send("Usage: opstat <vnum>\r\n ");
+    ch->send(u"Usage: opstat <vnum>\r\n "_s);
     return ReturnValue::eFAILURE;
   }
   one_argument(argument, buf);
 
   if (!ch->has_skill(COMMAND_OPSTAT))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
   if (isdigit(*buf))
@@ -2071,17 +2071,17 @@ command_return_t do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void update_objprog_bits(qint32 num)
 {
-  MobileProgramPtr prog = dc_->obj_index[num].programs_;
-  dc_->obj_index[num].progtypes = {};
+  MobileProgramPtr prog = dc_->obj_index_[num]->programs_;
+  dc_->obj_index_[num]->progtypes_ = {};
 
   while (prog)
   {
-    SET_BIT(dc_->obj_index[num].progtypes, prog->type);
+    SET_BIT(dc_->obj_index_[num]->progtypes_, prog->type);
     prog = prog->next;
   }
 }
 
-command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 num = -1, vnum = -1, i = -1, a = -1;
   QString arg;
@@ -2100,12 +2100,12 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((num = real_object(vnum)) < 0)
   {
-    ch->sendln("No such object.");
+    ch->sendln(u"No such object."_s);
     return ReturnValue::eFAILURE;
   }
   if (!can_modify_object(ch, vnum))
   {
-    ch->sendln("You are unable to work creation outside your range.");
+    ch->sendln(u"You are unable to work creation outside your range."_s);
     return ReturnValue::eFAILURE;
   }
   ch->player->last_obj_vnum = vnum;
@@ -2125,22 +2125,22 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
                    ch);
       return ReturnValue::eFAILURE;
     }
-    prog = new mob_prog_data;
+    prog = new MobileProgram;
     prog->type = ALL_GREET_PROG;
     prog->arglist = u"80"_s;
     prog->comlist = u"say This is my new obj prog!\r\n"_s;
     prog->next = {};
 
-    if ((currprog = dc_->obj_index[num].programs_))
+    if ((currprog = dc_->obj_index_[num]->programs_))
     {
       while (currprog->next)
         currprog = currprog->next;
       currprog->next = prog;
     }
     else
-      dc_->obj_index[num].programs_ = prog;
+      dc_->obj_index_[num]->programs_ = prog;
     update_objprog_bits(num);
-    ch->sendln("New obj proc created.");
+    ch->sendln(u"New obj proc created."_s);
     return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "remove"))
@@ -2156,19 +2156,19 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     a = dc_atoi(arg);
     prog = {};
-    for (i = 1, currprog = dc_->obj_index[num].programs_;
+    for (i = 1, currprog = dc_->obj_index_[num]->programs_;
          currprog && i != a;
          i++, prog = currprog, currprog = currprog->next)
       ;
     if (!currprog)
     {
-      ch->sendln("Invalid proc number.");
+      ch->sendln(u"Invalid proc number."_s);
       return ReturnValue::eFAILURE;
     }
     if (prog)
       prog->next = currprog->next;
     else
-      dc_->obj_index[num].programs_ = currprog->next;
+      dc_->obj_index_[num]->programs_ = currprog->next;
 
     currprog->type = {};
     currprog->arglist = {};
@@ -2177,7 +2177,7 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     update_objprog_bits(num);
 
-    ch->sendln("Program deleted.");
+    ch->sendln(u"Program deleted."_s);
     return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "type"))
@@ -2185,26 +2185,25 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     argument = one_argument(argument, arg);
     if (arg.isEmpty() || !argument || argument.isEmpty() || !isdigit(*arg) || !isdigit(*(1 + argument)))
     {
-      ch->sendln("$3Syntax$R: opedit [obj_num] type <prog> <type>");
-      ch->sendln("$3Valid types are$R:");
+      ch->sendln(u"$3Syntax$R: opedit [obj_num] type <prog> <type>"_s);
+      ch->sendln(u"$3Valid types are$R:"_s);
       QString buf;
       for (i = {}; *obj_types[i] != '\n'; i++)
       {
-        dc_sprintf(buf, " %2d - %15s\r\n",
-                   i + 1, obj_types[i]);
+        dc_sprintf(buf, " %2d - %15s\r\n", i + 1, obj_types[i]);
         ch->send(buf);
       }
       return ReturnValue::eFAILURE;
     }
     qint32 a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].programs_;
+    for (i = 1, currprog = dc_->obj_index_[num]->programs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
 
     if (!currprog)
     {
-      ch->sendln("Invalid prog number.");
+      ch->sendln(u"Invalid prog number."_s);
       return ReturnValue::eFAILURE;
     }
     switch (dc_atoi(argument + 1))
@@ -2243,12 +2242,12 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
       a = CAN_SEE_PROG;
       break;
     default:
-      ch->sendln("Invalid progtype.");
+      ch->sendln(u"Invalid progtype."_s);
       return ReturnValue::eFAILURE;
     }
     currprog->type = a;
     update_objprog_bits(num);
-    ch->sendln("Proc type changed.");
+    ch->sendln(u"Proc type changed."_s);
     return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "arglist"))
@@ -2258,24 +2257,24 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     //    argument = one_argument(argument, arg1);
     if (arg.isEmpty() || !argument || argument.isEmpty() || !isdigit(*arg))
     {
-      ch->sendln("$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>");
+      ch->sendln(u"$3Syntax$R: opedit [obj_num] arglist <prog> <new arglist>"_s);
       return ReturnValue::eFAILURE;
     }
     a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].programs_;
+    for (i = 1, currprog = dc_->obj_index_[num]->programs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
 
     if (!currprog)
     {
-      ch->sendln("Invalid prog number.");
+      ch->sendln(u"Invalid prog number."_s);
       return ReturnValue::eFAILURE;
     }
     currprog->arglist = {};
     currprog->arglist = strdup(argument + 1);
 
-    ch->sendln("Arglist changed.");
+    ch->sendln(u"Arglist changed."_s);
     return ReturnValue::eSUCCESS;
   }
   else if (!str_cmp(arg, "command"))
@@ -2283,18 +2282,18 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
     argument = one_argument(argument, arg);
     if (arg.isEmpty() || !isdigit(*arg))
     {
-      ch->sendln("$3Syntax$R: opedit [obj_num] command <prog>");
+      ch->sendln(u"$3Syntax$R: opedit [obj_num] command <prog>"_s);
       return ReturnValue::eFAILURE;
     }
     a = dc_atoi(arg);
-    for (i = 1, currprog = dc_->obj_index[num].programs_;
+    for (i = 1, currprog = dc_->obj_index_[num]->programs_;
          currprog && i != a;
          i++, currprog = currprog->next)
       ;
 
     if (!currprog)
     { // intval was too high
-      ch->sendln("Invalid prog number.");
+      ch->sendln(u"Invalid prog number."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -2338,14 +2337,14 @@ command_return_t do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
-    ch->sendln("Syntax: oclone <source vnum> <destination vnum>");
+    ch->sendln(u"Syntax: oclone <source vnum> <destination vnum>"_s);
     return ReturnValue::eFAILURE;
   }
   ObjectPtr obj, otmp;
@@ -2353,13 +2352,13 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 r1 = real_object(v1), r2 = real_object(v2);
   if (r1 < 0)
   {
-    ch->sendln("Source vnum does not exist.");
+    ch->sendln(u"Source vnum does not exist."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!can_modify_object(ch, v2))
   {
-    ch->sendln("You are unable to work creation outside of your range.");
+    ch->sendln(u"You are unable to work creation outside of your range."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2373,37 +2372,37 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
     r2 = real_object(v2);
     if (r2 == -1)
     {
-      ch->sendln("Something failed. Possibly your destination vnum was too high.");
+      ch->sendln(u"Something failed. Possibly your destination vnum was too high."_s);
       return ReturnValue::eFAILURE;
     }
   }
   obj = clone_object(r1);
   if (!obj)
   {
-    ch->sendln("Failure. Unable to clone item.");
+    ch->sendln(u"Failure. Unable to clone item."_s);
     return ReturnValue::eFAILURE;
   }
 
   /*
-    if(dc_->obj_index[obj->item_number].non_combat_func ||
+    if(dc_->obj_index_[obj->item_number].non_combat_func ||
                   obj->flags_.type_flag == ITEM_MEGAPHONE ||
                   has_random(obj)) {
           dc_->obj_free_list.insert(obj);
     }
   */
 
-  ch->sendln(u"Ok.\r\nYou copied item %d (%s) and replaced item %d (%s)."_s.arg(v1).arg((dc_->obj_index[real_object(v1)].item)->short_description()).arg(v2).arg((dc_->obj_index[real_object(v2)].item)->short_description()));
+  ch->sendln(u"Ok.\r\nYou copied item %d (%s) and replaced item %d (%s)."_s.arg(v1).arg((dc_->obj_index_[real_object(v1)]->item)->short_description()).arg(v2).arg((dc_->obj_index_[real_object(v2)]->item)->short_description()));
 
   dc_->object_list = dc_->object_list->next;
-  otmp = dc_->obj_index[r2].item;
+  otmp = dc_->obj_index_[r2]->item;
   obj->item_number = r2;
-  dc_->obj_index[r2].item = (void *)obj;
-  dc_->obj_index[r2].non_combat_func = {};
-  dc_->obj_index[r2].qty = {};
-  dc_->obj_index[r2].vnum(v2);
-  dc_->obj_index[r2].programs_ = {};
-  dc_->obj_index[r2].combat_func = {};
-  dc_->obj_index[r2].mobspec = {};
+  dc_->obj_index_[r2]->item = (void *)obj;
+  dc_->obj_index_[r2].non_combat_func = {};
+  dc_->obj_index_[r2].qty = {};
+  dc_->obj_index_[r2].vnum(v2);
+  dc_->obj_index_[r2]->programs_ = {};
+  dc_->obj_index_[r2].combat_func = {};
+  dc_->obj_index_[r2].mobspec = {};
   // extract_obj(otmp);
 
   ch->player->last_obj_vnum = v2;
@@ -2412,14 +2411,14 @@ command_return_t do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
   one_argument(argument, arg2);
   if (!arg1[0] || !arg2[0] || !is_number(arg1) || !is_number(arg2))
   {
-    ch->sendln("Syntax: mclone <source vnum> <destination vnum>");
+    ch->sendln(u"Syntax: mclone <source vnum> <destination vnum>"_s);
     return ReturnValue::eFAILURE;
   }
   CharacterPtr mob;
@@ -2427,13 +2426,13 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 dst = real_mobile(vdst), src = real_mobile(vsrc);
   if (src < 0)
   {
-    ch->sendln("Source vnum does not exist.");
+    ch->sendln(u"Source vnum does not exist."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!can_modify_mobile(ch, vdst))
   {
-    ch->sendln("You are unable to work creation outside of your range.");
+    ch->sendln(u"You are unable to work creation outside of your range."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2448,27 +2447,27 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
     src = real_mobile(vsrc);
     if (dst == -1)
     {
-      ch->sendln("Something failed. Possibly your destination vnum was too high.");
+      ch->sendln(u"Something failed. Possibly your destination vnum was too high."_s);
       return ReturnValue::eFAILURE;
     }
   }
   mob = ch->dc_->clone_mobile(src);
   if (!mob)
   {
-    ch->sendln("Failure. Unable to copy mobile.");
+    ch->sendln(u"Failure. Unable to copy mobile."_s);
     return ReturnValue::eFAILURE;
   }
 
   // clone_mobile assigns the start of character_list to be mob
   // This undos the change
-  dc_->mob_index[src].qty--;
+  dc_->mob_index_[src].qty--;
 
   auto &character_list = dc_->character_list;
   character_list.erase(mob);
   mob->mobdata->nr = dst;
 
   // Find old mobile in world and remove
-  CharacterPtr old_mob = (CharacterPtr)dc_->mob_index[dst].item;
+  CharacterPtr old_mob = (CharacterPtr)dc_->mob_index_[dst]->item;
   if (old_mob && old_mob->mobdata)
   {
     const auto &character_list = dc_->character_list;
@@ -2481,31 +2480,31 @@ command_return_t do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  ch->sendln(u"Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n"_s.arg(     vsrc).arg(((CharacterPtr )dc_->mob_index[src].item)->short_description()).arg(vdst).arg(((CharacterPtr )dc_->mob_index[dst].item)->short_description());
+  ch->sendln(u"Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n"_s.arg(     vsrc).arg(((CharacterPtr )dc_->mob_index_[src]->item)->short_description()).arg(vdst).arg(((CharacterPtr )dc_->mob_index_[dst]->item)->short_description());
 
   // Overwrite old mob with new mob
-  dc_->mob_index[dst].item = (void *)mob;
-  dc_->mob_index[dst].qty = {};
-  dc_->mob_index[dst].non_combat_func = {};
-  dc_->mob_index[dst].combat_func = {};
-  dc_->mob_index[dst].programs_ = {};
-  dc_->mob_index[dst].mobspec = {};
-  dc_->mob_index[dst].progtypes = {};
-  dc_->mob_index[dst].vnum(vdst);
+  dc_->mob_index_[dst]->item = (void *)mob;
+  dc_->mob_index_[dst].qty = {};
+  dc_->mob_index_[dst].non_combat_func = {};
+  dc_->mob_index_[dst].combat_func = {};
+  dc_->mob_index_[dst]->programs_ = {};
+  dc_->mob_index_[dst].mobspec = {};
+  dc_->mob_index_[dst]->progtypes_ = {};
+  dc_->mob_index_[dst].vnum(vdst);
 
   add_mobspec(dst);
 
-  if (dc_->mob_index[src].non_combat_func)
+  if (dc_->mob_index_[src].non_combat_func)
   {
-    ch->sendln("Warning: hardcoded non_combat function found. Notify coder.");
+    ch->sendln(u"Warning: hardcoded non_combat function found. Notify coder."_s);
   }
-  if (dc_->mob_index[src].combat_func)
+  if (dc_->mob_index_[src].combat_func)
   {
-    ch->sendln("Warning: hardcoded combat function found. Notify coder.");
+    ch->sendln(u"Warning: hardcoded combat function found. Notify coder."_s);
   }
-  if (dc_->mob_index[src].programs_)
+  if (dc_->mob_index_[src]->programs_)
   {
-    ch->sendln("Warning: mob program found. This will need to be copied manually.");
+    ch->sendln(u"Warning: mob program found. This will need to be copied manually."_s);
   }
 
   ch->player->last_mob_edit = dst;

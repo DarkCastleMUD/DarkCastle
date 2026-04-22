@@ -19,7 +19,7 @@
 void huntclear_item(ObjectPtr obj);
 
 /* External procedures */
-command_return_t do_fall(CharacterPtr ch, short dir);
+ReturnValue do_fall(CharacterPtr ch, short dir);
 
 // TIMERS
 
@@ -239,7 +239,7 @@ bool still_affected_by_poison(CharacterPtr ch)
   return 0;
 }
 
-const QList<set_data> set_list = {
+const QList<set_data> DC::set_list = {
     {"Ascetic's Focus",
      19,
      {2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237},
@@ -344,7 +344,7 @@ const QList<set_data> set_list = {
 void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
 {
   // obj has just been worn
-  qint32 obj_vnum = dc_->obj_index[obj->item_number].vnum();
+  qint32 obj_vnum = dc_->obj_index_[obj->item_number].vnum();
   qint32 i;
   qint32 z = 0, y;
   // Quadruple nested for. Annoying, but it's gotta be done.
@@ -364,7 +364,7 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
           bool found = false, doublea = false;
           for (i = {}; i < MAX_WEAR; i++)
           {
-            if (ch->equipment[i] && dc_->obj_index[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
+            if (ch->equipment[i] && dc_->obj_index_[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
             {
               if (y > 0 && !doublea && sl.vnum[y] == sl.vnum[y - 1])
               {
@@ -605,7 +605,7 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
           break;
 
         default:
-          ch->sendln("Tough luck, you completed an unimplemented set. Report what you just wore, eh?");
+          ch->sendln(u"Tough luck, you completed an unimplemented set. Report what you just wore, eh?"_s);
           break;
         }
         break;
@@ -615,7 +615,7 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
 void remove_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag)
 {
   // obj has just been removed
-  qint32 obj_vnum = dc_->obj_index[obj->item_number].vnum();
+  qint32 obj_vnum = dc_->obj_index_[obj->item_number].vnum();
   qint32 i;
   qint32 z = 0, y;
   // Quadruply nested for. Annoying, but it's gotta be done.
@@ -633,7 +633,7 @@ void remove_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag)
           bool found = false, doublea = false;
           for (i = {}; i < MAX_WEAR; i++)
           {
-            if (ch->equipment[i] && dc_->obj_index[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
+            if (ch->equipment[i] && dc_->obj_index_[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
             {
               if (y > 0 && !doublea && sl.vnum[y] == sl.vnum[y - 1])
               {
@@ -1551,78 +1551,78 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
     break;
   case SKILL_INSANE_CHANT:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The insane chanting in your mind wears off.");
+      ch->sendln(u"The insane chanting in your mind wears off."_s);
     break;
   case SKILL_GLITTER_DUST:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The dust around your body stops glowing.");
+      ch->sendln(u"The dust around your body stops glowing."_s);
     break;
   case SKILL_INNATE_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
       switch (ch->race)
       { // Each race has its own wear off messages.
       case RACE_GIANT:
-        ch->sendln("You feel ready to wield mighty weapons again.");
+        ch->sendln(u"You feel ready to wield mighty weapons again."_s);
         break;
       case RACE_TROLL:
-        ch->sendln("Your regenerative abilitiy feels restored.");
+        ch->sendln(u"Your regenerative abilitiy feels restored."_s);
         break;
       case RACE_GNOME:
-        ch->sendln("Your ability to manipulate illusions has returned.");
+        ch->sendln(u"Your ability to manipulate illusions has returned."_s);
         break;
       case RACE_ORC:
-        ch->sendln("Your lust for blood feels restored.");
+        ch->sendln(u"Your lust for blood feels restored."_s);
         break;
       case RACE_DWARVEN:
-        ch->sendln("You feel ready to attempt more repairs.");
+        ch->sendln(u"You feel ready to attempt more repairs."_s);
         break;
       case RACE_ELVEN:
-        ch->sendln("Your mind regains its ability to sharpen concentration for brief periods.");
+        ch->sendln(u"Your mind regains its ability to sharpen concentration for brief periods."_s);
         break;
       case RACE_PIXIE:
-        ch->sendln("Your ability to avoid magical vision has returned.");
+        ch->sendln(u"Your ability to avoid magical vision has returned."_s);
         break;
       case RACE_HOBBIT:
-        ch->sendln("Your innate ability to avoid magical portals has returned.");
+        ch->sendln(u"Your innate ability to avoid magical portals has returned."_s);
         break;
       }
     break;
   case SKILL_BLOOD_FURY:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your blood cools to normal levels.");
+      ch->sendln(u"Your blood cools to normal levels."_s);
     break;
   case SKILL_CRAZED_ASSAULT:
     if (!(flags & SUPPRESS_MESSAGES))
     {
       if (af->location == APPLY_HITROLL)
-        ch->sendln("Your craziness has subsided.");
+        ch->sendln(u"Your craziness has subsided."_s);
       else
-        ch->sendln("You feel ready to go crazy again.");
+        ch->sendln(u"You feel ready to go crazy again."_s);
     }
     break;
   case SKILL_INNATE_BLOODLUST:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your lust for battle has left you.");
+      ch->sendln(u"Your lust for battle has left you."_s);
     break;
   case SKILL_INNATE_ILLUSION:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You slowly fade into existence.");
+      ch->sendln(u"You slowly fade into existence."_s);
     break;
   case SKILL_INNATE_EVASION:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your magical obscurity has left you.");
+      ch->sendln(u"Your magical obscurity has left you."_s);
     break;
   case SKILL_INNATE_SHADOWSLIP:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The ability to avoid magical pathways has left you.");
+      ch->sendln(u"The ability to avoid magical pathways has left you."_s);
     break;
   case SKILL_INNATE_FOCUS:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your concentration lessens to its regular amount.");
+      ch->sendln(u"Your concentration lessens to its regular amount."_s);
     break;
   case SKILL_INNATE_REGENERATION:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your regeneration slows back to normal.");
+      ch->sendln(u"Your regeneration slows back to normal."_s);
     break;
   case SKILL_INNATE_POWERWIELD:
     ObjectPtr obj;
@@ -1674,62 +1674,62 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
         }
       }
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You can no longer wield multiple two handed weapons.");
+      ch->sendln(u"You can no longer wield multiple two handed weapons."_s);
     check_weapon_weights(ch);
     break;
   case SKILL_BLADESHIELD:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The draining affect of the blade shield technique has worn off.");
+      ch->sendln(u"The draining affect of the blade shield technique has worn off."_s);
     break;
   case SKILL_CLANAREA_CLAIM:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You can attempt to claim an area again.");
+      ch->sendln(u"You can attempt to claim an area again."_s);
     break;
   case SKILL_CLANAREA_CHALLENGE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You can attempt to challenge an area again.");
+      ch->sendln(u"You can attempt to challenge an area again."_s);
     break;
   case SKILL_PRIMAL_FURY:
     if (!af->bitvector)
     {
       if (!(flags & SUPPRESS_MESSAGES))
-        ch->sendln("TimerEndyMessage.");
+        ch->sendln(u"TimerEndyMessage."_s);
     }
     else
     {
       if (!(flags & SUPPRESS_MESSAGES))
-        ch->sendln("Your primal fury has abated.");
+        ch->sendln(u"Your primal fury has abated."_s);
     }
     break;
   case SKILL_FOCUSED_REPELANCE:
     REMOVE_BIT(ch->combat, COMBAT_REPELANCE);
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your mind recovers from the repelance.");
+      ch->sendln(u"Your mind recovers from the repelance."_s);
     break;
   case SKILL_JAB:
     if (!(flags & SUPPRESS_MESSAGES) && af->bitvector != AFF_BLACKJACK)
-      ch->sendln("You feel ready to jab some poor sucker again.");
+      ch->sendln(u"You feel ready to jab some poor sucker again."_s);
     break;
   case SKILL_VITAL_STRIKE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The internal strength and speed from your vital strike has returned.");
+      ch->sendln(u"The internal strength and speed from your vital strike has returned."_s);
     break;
   case SKILL_SONG_FLIGHT_OF_BEE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your feet touch the ground once more.");
+      ch->sendln(u"Your feet touch the ground once more."_s);
     break;
   case SKILL_SONG_FANATICAL_FANFARE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your mind no longer races.");
+      ch->sendln(u"Your mind no longer races."_s);
     break;
   case SKILL_SONG_SUBMARINERS_ANTHEM:
     if (!(flags & SUPPRESS_CONSEQUENCES))
     {
-      ch->sendln("Your musical ability to breathe water ends.");
+      ch->sendln(u"Your musical ability to breathe water ends."_s);
       if (dc_->world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
       {
         act_to_room("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n", ch, 0, 0, 0);
-        ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
+        ch->sendln(u"The water rushes into your lungs and the light fades with your oxygen."_s);
       }
     }
     break;
@@ -1746,13 +1746,13 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
 			char_died = true;
 #else
       act_to_room("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\r\n", ch, 0, 0, 0);
-      ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
+      ch->sendln(u"The water rushes into your lungs and the light fades with your oxygen."_s);
 #endif
     }
     break;
   case KI_STANCE + KI_OFFSET:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your body finishes venting the energy absorbed from your last ki stance.");
+      ch->sendln(u"Your body finishes venting the energy absorbed from your last ki stance."_s);
     break;
   case SPELL_CHARM_PERSON: /* Charm Wears off */
     remove_memory(ch, 'h');
@@ -1765,119 +1765,119 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
     break;
   case SKILL_TACTICS:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You forget your instruction in tactical fighting.");
+      ch->sendln(u"You forget your instruction in tactical fighting."_s);
     break;
   case SKILL_DECEIT:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your deceitful practices have stopped helping you.");
+      ch->sendln(u"Your deceitful practices have stopped helping you."_s);
     break;
   case SKILL_FEROCITY:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The ferocity within your mind has dwindled.");
+      ch->sendln(u"The ferocity within your mind has dwindled."_s);
     break;
   case KI_AGILITY + KI_OFFSET:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your body has lost its focused agility.");
+      ch->sendln(u"Your body has lost its focused agility."_s);
     break;
   case BASE_TIMERS + SPELL_MANA:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The magical energy of your robes has recharged.");
+      ch->sendln(u"The magical energy of your robes has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_PROTECT_FROM_EVIL:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The defender's magical energy has recharged.");
+      ch->sendln(u"The defender's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_GROUP_SANC:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The cassock's magical energy has recharged.");
+      ch->sendln(u"The cassock's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_TELEPORT:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The armbands' magical energy has recharged.");
+      ch->sendln(u"The armbands' magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_KNOW_ALIGNMENT:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The gaze's magical energy has recharged.");
+      ch->sendln(u"The gaze's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_PARALYZE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The paralytic's magical energy has recharged.");
+      ch->sendln(u"The paralytic's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_GLOBE_OF_DARKNESS:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The choker's magical energy has recharged.");
+      ch->sendln(u"The choker's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_CONT_LIGHT:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The necklace's magical energy has recharged.");
+      ch->sendln(u"The necklace's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_MISANRA_QUIVER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The quiver's magical energy has recharged.");
+      ch->sendln(u"The quiver's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_ALIGN_GOOD:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The fire's magical energy has recharged.");
+      ch->sendln(u"The fire's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_ALIGN_EVIL:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The blackened heart's magical energy has recharged.");
+      ch->sendln(u"The blackened heart's magical energy has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_EARTHQUAKE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The magical energy of your hammer has recharged.");
+      ch->sendln(u"The magical energy of your hammer has recharged."_s);
     break;
   case BASE_TIMERS + SPELL_WIZARD_EYE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The scrying ball's magical energies have recharged.");
+      ch->sendln(u"The scrying ball's magical energies have recharged."_s);
     break;
   case SPELL_NAT_SELECT_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel capable of studying a new enemy of choice.");
+      ch->sendln(u"You feel capable of studying a new enemy of choice."_s);
     break;
   case SKILL_DECEIT_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel like you could be deceitful again.");
+      ch->sendln(u"You feel like you could be deceitful again."_s);
     break;
   case SKILL_FEROCITY_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel like you could be fierce again.");
+      ch->sendln(u"You feel like you could be fierce again."_s);
     break;
   case SKILL_TACTICS_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel like you could be tactical again.");
+      ch->sendln(u"You feel like you could be tactical again."_s);
     break;
   case SKILL_LAY_HANDS:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your god returns your ability to fill others with life.");
+      ch->sendln(u"Your god returns your ability to fill others with life."_s);
     break;
   case SKILL_HARM_TOUCH:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your god returns your ability to cause pain to others with a touch.");
+      ch->sendln(u"Your god returns your ability to cause pain to others with a touch."_s);
     break;
   case SPELL_DIV_INT_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("The gods smile upon you and are ready to intervene on your behalf again.");
+      ch->sendln(u"The gods smile upon you and are ready to intervene on your behalf again."_s);
     break;
   case SPELL_NO_CAST_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel able to concentrate on spellcasting once again.");
+      ch->sendln(u"You feel able to concentrate on spellcasting once again."_s);
     break;
   case SKILL_QUIVERING_PALM:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your body feels well enough to vibrate intensely once more.");
+      ch->sendln(u"Your body feels well enough to vibrate intensely once more."_s);
     break;
   case SKILL_FORAGE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel ready to look for \"herb\" again.");
+      ch->sendln(u"You feel ready to look for \"herb\" again."_s);
     break;
   case SKILL_TRIAGE_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel ready to mend your wounds once again.");
+      ch->sendln(u"You feel ready to mend your wounds once again."_s);
     break;
   case SKILL_TRIAGE:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You finish cleaning and bandaging your wounds.");
+      ch->sendln(u"You finish cleaning and bandaging your wounds."_s);
     break;
   case SKILL_LEADERSHIP:
     affect_from_char(ch, SKILL_LEADERSHIP_BONUS);
@@ -1890,37 +1890,37 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
       }
     }
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("Your inspirational leadership has ended.");
+      ch->sendln(u"Your inspirational leadership has ended."_s);
     break;
   case SKILL_MAKE_CAMP_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel ready to set up another camp.");
+      ch->sendln(u"You feel ready to set up another camp."_s);
     break;
   case SKILL_SMITE_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel ready to once again smite your opponents.");
+      ch->sendln(u"You feel ready to once again smite your opponents."_s);
     break;
   case SKILL_PERSEVERANCE:
     affect_from_char(ch, SKILL_PERSEVERANCE_BONUS);
     break;
   case SKILL_ONSLAUGHT_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You feel ready to begin another onslaught.");
+      ch->sendln(u"You feel ready to begin another onslaught."_s);
     break;
   case SKILL_ONSLAUGHT:
     if (!(flags & SUPPRESS_MESSAGES))
-      ch->sendln("You don't feel as fast and furious as you once did...");
+      ch->sendln(u"You don't feel as fast and furious as you once did..."_s);
     break;
   case SKILL_BREW_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
     {
-      ch->sendln("You feel ready to brew something again.");
+      ch->sendln(u"You feel ready to brew something again."_s);
     }
     break;
   case SKILL_SCRIBE_TIMER:
     if (!(flags & SUPPRESS_MESSAGES))
     {
-      ch->sendln("You feel ready to scribe something again.");
+      ch->sendln(u"You feel ready to scribe something again."_s);
     }
     break;
   case OBJ_LILITHRING:
@@ -2329,24 +2329,24 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
   }
 
-  if (dc_->obj_index[obj->item_number].vnum() == 30010 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30010 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("$p binds to your skin and won't let go. It hurts!", this, obj, 0, 0);
     act_to_room("$p binds to $n's skin!", this, obj, 0, 0);
     obj->flags_.timer = {};
   }
-  if (dc_->obj_index[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, 0);
     obj->flags_.timer = {};
   }
-  if (dc_->obj_index[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, 0);
     obj->flags_.timer = {};
   }
 
-  if (dc_->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, 0);
     obj->flags_.timer = 5;
@@ -2409,17 +2409,17 @@ ObjectPtr Character::unequip_char(qint32 pos, bool flag)
 
   obj = equipment[pos];
 
-  if (dc_->obj_index[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, 0);
     GET_MANA(this) = GET_MANA(this) / 2;
   }
-  if (dc_->obj_index[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, 0);
     setHP(getHP() / 2);
   }
-  if (dc_->obj_index[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The spring in your step has subsided.", this, obj, 0, 0);
     obj->flags_.timer = {};
@@ -2627,7 +2627,7 @@ ObjectPtr get_obj(qint32 vnum)
 {
   qint32 num = real_object(vnum);
 
-  return dc_->obj_index[num].item;
+  return dc_->obj_index_[num]->item;
 }
 
 /*search the entire world for an object number, and return a pointer  */
@@ -2663,7 +2663,7 @@ CharacterPtr get_char_room(const QString name, room_t room, bool careful)
       continue;
     if (number == 1 || number == 0)
     {
-      if (isexact(tmp, qPrintable(i->name())) && !(careful && i->isNonPlayer() && dc_->mob_index[i->mobdata->nr].vnum() == 12))
+      if (isexact(tmp, qPrintable(i->name())) && !(careful && i->isNonPlayer() && dc_->mob_index_[i->mobdata->nr].vnum() == 12))
         return (i);
       else if (isprefix(tmp, qPrintable(i->name())))
       {
@@ -3287,7 +3287,7 @@ qint32 obj_to_obj(ObjectPtr obj, ObjectPtr obj_to)
 
   // recursively upwards add the weight.  Since we only have 1 layer of containers,
   // this loop only happens once, but it's good to leave later in case we change our mind
-  if (dc_->obj_index[obj_to->item_number].vnum() != 536)
+  if (dc_->obj_index_[obj_to->item_number].vnum() != 536)
   {
     for (tobj = obj->in_obj; tobj;
          GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj), tobj = tobj->in_obj)
@@ -3331,7 +3331,7 @@ qint32 obj_from_obj(ObjectPtr obj)
 
   // Subtract weight from containers container
 
-  if (!obj_from || dc_->obj_index[obj_from->item_number].vnum() != 536)
+  if (!obj_from || dc_->obj_index_[obj_from->item_number].vnum() != 536)
   {
     for (tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
       GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
@@ -3430,7 +3430,7 @@ void extract_obj(ObjectPtr obj)
 
   if (obj->item_number >= 0)
   {
-    (dc_->obj_index[obj->item_number].qty)--;
+    (dc_->obj_index_[obj->item_number].qty)--;
   }
 
   for (auto &r : reroll_sessions)
@@ -3454,7 +3454,7 @@ void extract_obj(ObjectPtr obj)
 
 void update_object(ObjectPtr obj, qint32 use)
 {
-  if (obj->flags_.timer > 0 && (dc_->obj_index[obj->item_number].vnum() != 30010 && dc_->obj_index[obj->item_number].vnum() != 30036 && dc_->obj_index[obj->item_number].vnum() != 30033 && dc_->obj_index[obj->item_number].vnum() != 30097 && dc_->obj_index[obj->item_number].vnum() != 30019))
+  if (obj->flags_.timer > 0 && (dc_->obj_index_[obj->item_number].vnum() != 30010 && dc_->obj_index_[obj->item_number].vnum() != 30036 && dc_->obj_index_[obj->item_number].vnum() != 30033 && dc_->obj_index_[obj->item_number].vnum() != 30097 && dc_->obj_index_[obj->item_number].vnum() != 30019))
     obj->flags_.timer -= use;
   if (obj->contains)
     update_object(obj->contains, use);
@@ -3473,7 +3473,7 @@ void update_char_objects(CharacterPtr ch)
         (ch->equipment[WEAR_LIGHT]->flags_.value[2])--;
         if (!ch->equipment[WEAR_LIGHT]->flags_.value[2])
         {
-          ch->sendln("Your light flickers out and dies.");
+          ch->sendln(u"Your light flickers out and dies."_s);
           ch->glow_factor--;
           if (ch->in_room > DC::NOWHERE)
             dc_->world[ch->in_room].light--;
@@ -3484,7 +3484,7 @@ void update_char_objects(CharacterPtr ch)
   {
     if (ch->equipment[i])
     {
-      if (dc_->obj_index[ch->equipment[i]->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+      if (dc_->obj_index_[ch->equipment[i]->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
       {
         update_object(ch->equipment[i], 1);
 
@@ -3547,7 +3547,7 @@ void extract_char(CharacterPtr ch, bool pull)
       extract_char(ch->player->golem, false);
     }
   }
-  if (ch->isNonPlayer() && dc_->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr].vnum() == 8)
   {
     isGolem = true;
     if (pull)
@@ -3703,7 +3703,7 @@ void extract_char(CharacterPtr ch, bool pull)
     do_return(ch, u""_s, cmd_t::LOOK);
 
   if (ch->isNonPlayer() && ch->mobdata->nr > -1)
-    dc_->mob_index[ch->mobdata->nr].qty--;
+    dc_->mob_index_[ch->mobdata->nr].qty--;
 
   if (pull || isGolem)
   {
@@ -3817,7 +3817,7 @@ CharacterPtr Character::get_char_room_vis(QString name)
         if (rnd)
         {
           // Added get_rand.. check above 'cause ch->fighting would get set to nullptr.
-          sendln("You're so dizzy you don't know who you're hitting.");
+          sendln(u"You're so dizzy you don't know who you're hitting."_s);
           fighting = rnd;
           return fighting;
         }
@@ -4026,7 +4026,7 @@ ObjectPtr get_objindex_vnum(vnum_t vnum)
   if (rnum == -1)
     return {};
 
-  return static_cast<ObjectPtr>(dc_->obj_index[rnum].item);
+  return static_cast<ObjectPtr>(dc_->obj_index_[rnum]->item);
 }
 
 ObjectPtr get_objindex_vnum(QString vnum_str)
@@ -4037,7 +4037,7 @@ ObjectPtr get_objindex_vnum(QString vnum_str)
 CharacterPtr get_random_mob_vnum(qint32 vnum)
 {
   qint32 num = real_mobile(vnum);
-  qint32 total = dc_->mob_index[num].qty;
+  qint32 total = dc_->mob_index_[num].qty;
   qint32 which = dc_->number(1, total);
 
   const auto &character_list = dc_->character_list;
@@ -4558,7 +4558,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else
         {
-          ch->sendln("You find them in this room.");
+          ch->sendln(u"You find them in this room."_s);
         }
       }
       return (FIND_CHAR_ROOM);
@@ -4582,7 +4582,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else
         {
-          ch->sendln("You find them somewhere in the world.");
+          ch->sendln(u"You find them somewhere in the world."_s);
         }
       }
       return (FIND_CHAR_WORLD);
@@ -4606,7 +4606,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else
         {
-          ch->sendln("You find it in your inventory.");
+          ch->sendln(u"You find it in your inventory."_s);
         }
       }
       return (FIND_OBJ_INV);
@@ -4637,7 +4637,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else
         {
-          ch->sendln("You find it among your equipment.");
+          ch->sendln(u"You find it among your equipment."_s);
         }
       }
       return (FIND_OBJ_EQUIP);
@@ -4661,7 +4661,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else
         {
-          ch->sendln("You find it in this room.");
+          ch->sendln(u"You find it in this room."_s);
         }
       }
       return (FIND_OBJ_ROOM);
@@ -4685,7 +4685,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
         }
         else
         {
-          ch->sendln("You find it somewhere in the world");
+          ch->sendln(u"You find it somewhere in the world"_s);
         }
       }
       return (FIND_OBJ_WORLD);
@@ -4856,7 +4856,7 @@ bool Character::charge_moves(qint32 skill, double modifier)
 
   if (getMove() < amt)
   {
-    sendln("You do not have enough movement to do this!");
+    sendln(u"You do not have enough movement to do this!"_s);
     return false;
   }
   decrementMove(amt);

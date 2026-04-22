@@ -20,7 +20,7 @@ const spec_data spec_list[] =
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
-command_return_t do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -46,17 +46,17 @@ command_return_t do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
     if (str_cmp(arg, "iamsure"))
     {
       // messagemoose, couple below too
-      ch->sendln("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.");
+      ch->sendln(u"You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable."_s);
       return ReturnValue::eFAILURE;
     }
     if (ch->spec == 0)
     {
-      ch->sendln("You do not have a specialization.");
+      ch->sendln(u"You do not have a specialization."_s);
       return ReturnValue::eFAILURE;
     }
     if (GET_PLATINUM(ch) < 10000)
     {
-      ch->sendln("You do not have the required 10000 platinum.");
+      ch->sendln(u"You do not have the required 10000 platinum."_s);
       return ReturnValue::eFAILURE;
     }
     for (qint32 i = {}; i < 10; i++)
@@ -104,7 +104,7 @@ command_return_t do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->setLevel(51);
 
     // messagemoose
-    ch->sendln("You forget your specilization.");
+    ch->sendln(u"You forget your specilization."_s);
   }
   else if (!str_cmp(arg, "learn"))
   {

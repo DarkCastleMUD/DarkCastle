@@ -4,7 +4,7 @@
 **********************/
 #include "DC/DC.h"
 
-command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name, type, buf;
@@ -13,8 +13,8 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(*name))
   {
-    ch->sendln("Syntax: boot <victim> [boot]");
-    ch->sendln("The boot option causes the victim to see a large ASCII boot.");
+    ch->sendln(u"Syntax: boot <victim> [boot]"_s);
+    ch->sendln(u"The boot option causes the victim to see a large ASCII boot."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -31,7 +31,7 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     if (!victim->isNonPlayer() && victim->player->possesing)
     {
-      ch->send("Oops! They ain't linkdead! Just possessing.");
+      ch->send(u"Oops! They ain't linkdead! Just possessing."_s);
       return ReturnValue::eFAILURE;
     }
     if (IS_AFFECTED(victim, AFF_CANTQUIT))
@@ -46,8 +46,8 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
     }
 
     /* Still here? Ok, the boot continues */
-    victim->sendln("You have been disconnected.");
-    ch->sendln("Ok.");
+    victim->sendln(u"You have been disconnected."_s);
+    ch->sendln(u"Ok."_s);
     if (victim->isPlayer())
     {
       dc_sprintf(buf, "A stream of fire arcs down from the heavens, striking "
@@ -137,12 +137,12 @@ command_return_t do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
   }
 
   else
-    ch->sendln("Boot Who?");
+    ch->sendln(u"Boot Who?"_s);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString buf;
@@ -156,8 +156,8 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
   sdesc = dc_atoi(arg);
   if (arg == 0)
   {
-    ch->sendln("Illegal descriptor number.");
-    ch->sendln("Usage: release <#>");
+    ch->sendln(u"Illegal descriptor number."_s);
+    ch->sendln(u"Usage: release <#>"_s);
     return ReturnValue::eFAILURE;
   }
   for (auto &d : dc_->connections_)
@@ -168,7 +168,7 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         dc_sprintf(buf, "Heh, %s tried to disconnect you. He has paid.\r\n", qPrintable(ch->name()));
         conn->character->send(buf);
-        ch->sendln("You dummy, can't do that to your elders!");
+        ch->sendln(u"You dummy, can't do that to your elders!"_s);
         close_socket(ch->conn_);
         return ReturnValue::eFAILURE;
       }
@@ -181,11 +181,11 @@ command_return_t do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
   }
-  ch->sendln("Descriptor not found!");
+  ch->sendln(u"Descriptor not found!"_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString name = {}, buf = {};
@@ -198,13 +198,13 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   std::tie(name, argument) = half_chop(argument);
   if (name.isEmpty())
   {
-    ch->sendln("Who do you wish to force to save?");
+    ch->sendln(u"Who do you wish to force to save?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(vict = get_char_vis(ch, name)))
   {
-    ch->sendln("No-one by that name here..");
+    ch->sendln(u"No-one by that name here.."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -213,7 +213,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
     buf = "$n has forced you to 'save'.";
     act_to_victim(buf, ch, 0, vict, 0);
     buf = {};
-    ch->sendln("Ok.");
+    ch->sendln(u"Ok."_s);
   }
   vict->save();
 
@@ -222,7 +222,7 @@ command_return_t do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   const qint32 CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
   CharacterPtr i;
@@ -272,14 +272,14 @@ command_return_t do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
   if (countFighters == 0)
   {
     if (arenaONLY)
-      ch->sendln("No fighting characters found in the arena.");
+      ch->sendln(u"No fighting characters found in the arena."_s);
     else
-      ch->sendln("No fighting characters found.");
+      ch->sendln(u"No fighting characters found."_s);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr rch;
 
@@ -291,11 +291,11 @@ command_return_t do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
       stop_fighting(rch);
   }
   act_to_room("$n makes a gesture and all fighting stops.", ch, 0, 0, 0);
-  ch->sendln("You stop all fighting in this room.");
+  ch->sendln(u"You stop all fighting in this room."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i = {};
@@ -338,8 +338,8 @@ qint32 lookupClass(CharacterPtr ch, QString str)
 
   if (ch != 0)
   {
-    ch->sendln("Invalid class.\r\n");
-    ch->sendln("Valid classes:");
+    ch->sendln(u"Invalid class.\r\n"_s);
+    ch->sendln(u"Valid classes:"_s);
     for (c_class = 1; c_class <= CLASS_MAX; c_class++)
     {
       ch->send(u"%s\r\n"_s.arg(pc_clss_types[c_class]));
@@ -360,7 +360,7 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
   {
     if (ch)
     {
-      ch->sendln("No such room exists.");
+      ch->sendln(u"No such room exists."_s);
     }
 
     return -1;
@@ -369,7 +369,7 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
   return room;
 }
 
-command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 c_class = 0, room = 0, old_room = {};
   QString arg1;
@@ -384,10 +384,10 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
   // No arguments
   if (arg1[0] == 0)
   {
-    ch->sendln("Syntax:");
-    ch->sendln("guild <room #>           - List all classes allowed in room");
-    ch->sendln("guild <class>            - List all rooms that allow that class");
-    ch->sendln("guild <class> <room #>   - Toggle allow/deny class in room\r\n");
+    ch->sendln(u"Syntax:"_s);
+    ch->sendln(u"guild <room #>           - List all classes allowed in room"_s);
+    ch->sendln(u"guild <class>            - List all rooms that allow that class"_s);
+    ch->sendln(u"guild <class> <room #>   - Toggle allow/deny class in room\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -416,11 +416,11 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (found)
       {
-        ch->sendln("");
+        ch->sendln(u""_s);
       }
       else
       {
-        ch->sendln("All");
+        ch->sendln(u"All"_s);
       }
 
       return ReturnValue::eSUCCESS;
@@ -449,18 +449,18 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
           if (cols == 11)
           {
             cols = {};
-            ch->sendln("");
+            ch->sendln(u""_s);
           }
         }
       }
 
       if (count == 0)
       {
-        ch->sendln("None found.");
+        ch->sendln(u"None found."_s);
       }
       else
       {
-        ch->sendln("");
+        ch->sendln(u""_s);
       }
 
       return ReturnValue::eSUCCESS;
@@ -482,7 +482,7 @@ command_return_t do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!can_modify_room(ch, room))
   {
-    ch->sendln("You are unable to work creation outside of your range.");
+    ch->sendln(u"You are unable to work creation outside of your range."_s);
     return ReturnValue::eFAILURE;
   }
 

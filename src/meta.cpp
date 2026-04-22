@@ -668,24 +668,24 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
     if (!is_number(arg2) || !is_number(argument))
     {
-      ch->sendln("$B$2The Meta-physician tells you, 'If you want to estimate a cost, specify which and how many points.'$R ");
-      ch->sendln("$B$2The Meta-physician tells you, 'Example: estimate 1 1000'$R ");
-      ch->sendln("$B$31)$R Estimate hit point cost.$R ");
-      ch->sendln("$B$32)$R Estimate mana cost.$R ");
-      ch->sendln("$B$33)$R Estimate move cost.$R ");
+      ch->sendln(u"$B$2The Meta-physician tells you, 'If you want to estimate a cost, specify which and how many points.'$R "_s);
+      ch->sendln(u"$B$2The Meta-physician tells you, 'Example: estimate 1 1000'$R "_s);
+      ch->sendln(u"$B$31)$R Estimate hit point cost.$R "_s);
+      ch->sendln(u"$B$32)$R Estimate mana cost.$R "_s);
+      ch->sendln(u"$B$33)$R Estimate move cost.$R "_s);
       return ReturnValue::eSUCCESS;
     }
 
     qint32 choice = dc_atoi(argument);
     if (choice < 1 || choice > 3)
     {
-      ch->sendln("$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R ");
+      ch->sendln(u"$B$2The Meta-physician tells you, 'I cannot estimate that. Type estimate by itself for a list.'$R "_s);
       return ReturnValue::eSUCCESS;
     }
     qint32 amount = dc_atoi(arg2);
     if (amount < 5 || amount > 10000)
     {
-      ch->sendln("$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R ");
+      ch->sendln(u"$B$2The Meta-physician tells you, 'The amount cannot be over 10000 or less than 5.'$R "_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -709,52 +709,52 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   else if (cmd == cmd_t::LIST)
   { /* List */
-    ch->sendln("$B$2The Meta-physician tells you, 'This is what I can do for you...'$R ");
+    ch->sendln(u"$B$2The Meta-physician tells you, 'This is what I can do for you...'$R "_s);
 
-    ch->sendln("$BAttribute Meta:$R");
+    ch->sendln(u"$BAttribute Meta:$R"_s);
     ch->meta_list_stats();
 
-    ch->sendln("$BStatistic Meta:$R");
+    ch->sendln(u"$BStatistic Meta:$R"_s);
     if (hit_exp && hit_cost)
-      ch->sendln("$B$36)$R Add 5 points to your hit points:   %ld experience points and %ld Platinum coins.\r\n").arg(hit_exp).arg(hit_cost));
+      ch->sendln(u"$B$36)$R Add 5 points to your hit points:   %ld experience points and %ld Platinum coins.\r\n"_s.arg(hit_exp).arg(hit_cost));
     else
-      ch->sendln("$B$36)$R Add to your hit points:   You cannot do ch.");
+      ch->sendln(u"$B$36)$R Add to your hit points:   You cannot do ch."_s);
 
     if (hit_exp && hit_cost)
-      ch->sendln("$B$37)$R Add 1 point to your hit points:   %ld experience points and %ld Platinum coins.").arg((qint64)(hit_exp / 5 * 1.1)).arg((qint64)(hit_cost / 5 * 1.1)));
+      ch->sendln(u"$B$37)$R Add 1 point to your hit points:   %ld experience points and %ld Platinum coins."_s.arg((qint64)(hit_exp / 5 * 1.1)).arg((qint64)(hit_cost / 5 * 1.1)));
     else
-      ch->sendln("$B$37)$R Add to your hit points:   You cannot do ch.");
+      ch->sendln(u"$B$37)$R Add to your hit points:   You cannot do ch."_s);
 
     if (mana_exp && mana_cost)
       ch->sendln(u"$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld Platinum coins."_s.arg(mana_exp).arg(mana_cost));
     else
-      ch->sendln("$B$38)$R Add to your mana points:  You cannot do ch.");
+      ch->sendln(u"$B$38)$R Add to your mana points:  You cannot do ch."_s);
 
     if (mana_exp && mana_cost)
-      ch->sendln("$B$39)$R Add 1 point to your mana points:   %ld experience points and %ld Platinum coins.\r\n").arg((qint64)(mana_exp / 5 * 1.1)).arg((qint64)(mana_cost / 5 * 1.1)));
+      ch->sendln(u"$B$39)$R Add 1 point to your mana points:   %ld experience points and %ld Platinum coins.\r\n"_s.arg((qint64)(mana_exp / 5 * 1.1)).arg((qint64)(mana_cost / 5 * 1.1)));
     else
-      ch->sendln("$B$39)$R Add to your mana points:   You cannot do ch.");
+      ch->sendln(u"$B$39)$R Add to your mana points:   You cannot do ch."_s);
 
     if (move_exp && move_cost)
       ch->sendln(u"$B$310)$R Add 5 points to your movement points: %ld experience points and %ld Platinum coins."_s.arg(move_exp).arg(move_cost));
     else
-      ch->sendln("$B$310)$R Add to your movement points:  You cannot do ch.");
+      ch->sendln(u"$B$310)$R Add to your movement points:  You cannot do ch."_s);
 
     if (move_exp && move_cost)
-      ch->sendln("$B$311)$R Add 1 points to your movement points:   %ld experience points and %ld Platinum coins.").arg((qint64)(move_exp / 5 * 1.1)).arg((qint64)(move_cost / 5 * 1.1)));
+      ch->sendln(u"$B$311)$R Add 1 points to your movement points:   %ld experience points and %ld Platinum coins."_s.arg((qint64)(move_exp / 5 * 1.1)).arg((qint64)(move_cost / 5 * 1.1)));
     else
-      ch->sendln("$B$311)$R Add to your movement points:   You cannot do ch.");
+      ch->sendln(u"$B$311)$R Add to your movement points:   You cannot do ch."_s);
 
-    ch->sendln("$BUse 'estimate' command to get costs for higher intervals.");
+    ch->sendln(u"$BUse 'estimate' command to get costs for higher intervals."_s);
 
     if (!ch->isNonPlayer() && ki_cost && ki_exp)
     { // mobs can't meta ki
       ch->send(u"$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n"_s.arg(ki_exp).arg(ki_cost));
     }
     else if (!ch->isNonPlayer())
-      ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
+      ch->sendln(u"$B$312)$R Add a point of ki:        You cannot do ch."_s);
 
-    ch->sendln("$BMonetary Exchange:$R");
+    ch->sendln(u"$BMonetary Exchange:$R"_s);
     send_to_char(
         "$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\r\n"
         "$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\r\n"
@@ -769,7 +769,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (!ch->isNonPlayer())
     {
       ch->send(u"$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n"_s.arg(GET_AC_METAS(ch)));
-      ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
+      ch->sendln(u"$B$322)$R Add 2,000,000 experience for 1 qpoint."_s);
     }
 
     return ReturnValue::eSUCCESS;
@@ -779,7 +779,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     one_argument(arg, argument);
     if ((choice = dc_atoi(argument)) == 0 || choice < 0)
     {
-      ch->sendln("The Meta-physician tells you, 'Pick a number.'");
+      ch->sendln(u"The Meta-physician tells you, 'Pick a number.'"_s);
       return ReturnValue::eSUCCESS;
     }
     switch (choice)
@@ -829,17 +829,17 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       if (GET_PLATINUM(ch) < (quint32)statplatprice)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services.  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services.  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->exp < pprice)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (stat >= max_stat)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You're already as good at that as yer gonna get.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You're already as good at that as yer gonna get.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -871,12 +871,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       if (ch->exp < hit_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)hit_cost)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       ch->exp -= hit_exp;
@@ -900,12 +900,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       if (ch->exp < hit_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)hit_cost)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!$R'");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!$R'"_s);
         return ReturnValue::eSUCCESS;
       }
       ch->exp -= hit_exp;
@@ -926,12 +926,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       if (ch->exp < mana_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)mana_cost)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -955,12 +955,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       if (ch->exp < mana_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)mana_cost)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -981,12 +981,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       if (ch->exp < move_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)move_cost)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1010,12 +1010,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
       if (ch->exp < move_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)move_cost)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1035,17 +1035,17 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       if (ch->isNonPlayer())
       {
-        ch->sendln("Mobs cannot meta ki.");
+        ch->sendln(u"Mobs cannot meta ki."_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->exp < ki_exp)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)(ki_cost))
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford my services!  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1065,65 +1065,65 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       if (ch->isPlayerGoldThief())
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You cannot do ch because of your criminal actions!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You cannot do ch because of your criminal actions!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->getGold() < 20000)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       ch->removeGold(20000);
       GET_PLATINUM(ch) += 1;
-      ch->sendln("Ok.");
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
     if (choice == 14)
     {
       if (ch->isPlayerGoldThief())
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You cannot do ch because of your criminal actions!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You cannot do ch because of your criminal actions!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->getGold() < 100000)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
       ch->removeGold(100000);
       GET_PLATINUM(ch) += 5;
-      ch->sendln("Ok.");
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
     if (choice == 15)
     {
       if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
       {
-        ch->sendln("Your criminal acts prohibit it.");
+        ch->sendln(u"Your criminal acts prohibit it."_s);
         return ReturnValue::eSUCCESS;
       }
 
       if (ch->getGold() < 5000000)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) += 250;
       ch->removeGold(5000000);
-      ch->sendln("Ok.");
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
     if (choice == 16)
     {
       if (GET_PLATINUM(ch) < 5)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford that.  SCRAM!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 5;
       ch->addGold(100000);
-      ch->sendln("Ok.");
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -1131,24 +1131,24 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       if (GET_PLATINUM(ch) < 250)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!  SCRAM$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford that!  SCRAM$R"_s);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 250;
       ch->addGold(5000000);
-      ch->sendln("Ok.");
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
     if (choice == 18)
     {
       if (ch->exp < 100000000)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You lack the experience.'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You lack the experience.'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->isNonPlayer())
       {
-        ch->sendln("What would you have to spend $B$5gold$R on chode?");
+        ch->sendln(u"What would you have to spend $B$5gold$R on chode?"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1163,41 +1163,41 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     {
       if (GET_PLATINUM(ch) < 25)
       {
-        ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!'$R");
+        ch->sendln(u"$B$2The Meta-physician tells you, 'You can't afford that!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       ObjectPtr obj = clone_object(real_object(10003));
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
-        ch->sendln("You can't carry that many items.");
+        ch->sendln(u"You can't carry that many items."_s);
         extract_obj(obj);
         return ReturnValue::eSUCCESS;
       }
 
       if (IS_CARRYING_W(ch) + obj->flags_.weight > CAN_CARRY_W(ch))
       {
-        ch->sendln("You can't carry that much weight.");
+        ch->sendln(u"You can't carry that much weight."_s);
         extract_obj(obj);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 25;
       obj_to_char(obj, ch);
-      ch->sendln("$B$2The Meta-physician tells you, 'Here is your potion.'$R");
+      ch->sendln(u"$B$2The Meta-physician tells you, 'Here is your potion.'$R"_s);
       return ReturnValue::eSUCCESS;
     }
     if (choice == 20)
     {
       if (GET_PLATINUM(ch) < 25)
       {
-        ch->sendln("Costs 25 plats...which you don't have.");
+        ch->sendln(u"Costs 25 plats...which you don't have."_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->isNonPlayer())
       {
-        ch->sendln("You can't buy practices chode...");
+        ch->sendln(u"You can't buy practices chode..."_s);
         return ReturnValue::eSUCCESS;
       }
-      ch->sendln("The Meta-Physician gives you a practice session.");
+      ch->sendln(u"The Meta-Physician gives you a practice session."_s);
 
       GET_PLATINUM(ch) -= 25;
       ch->player->practices += 1;
@@ -1207,17 +1207,17 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     { // -2 AC
       if (GET_QPOINTS(ch) < 10)
       {
-        ch->sendln("Costs 10 qpoints...which you don't have.");
+        ch->sendln(u"Costs 10 qpoints...which you don't have."_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->isNonPlayer())
       {
-        ch->sendln("You can't buy AC, chode...");
+        ch->sendln(u"You can't buy AC, chode..."_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_AC_METAS(ch) >= 250)
       {
-        ch->sendln("You've reached the -250 AC limit that can be purchased per character.");
+        ch->sendln(u"You've reached the -250 AC limit that can be purchased per character."_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1235,12 +1235,12 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     { // 2,000,000 experience
       if (GET_QPOINTS(ch) < 1)
       {
-        ch->sendln("Costs 1 qpoint...which you don't have.");
+        ch->sendln(u"Costs 1 qpoint...which you don't have."_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->isNonPlayer())
       {
-        ch->sendln("You can't buy experience, chode...");
+        ch->sendln(u"You can't buy experience, chode..."_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1254,7 +1254,7 @@ qint32 meta_dude(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
       return ReturnValue::eSUCCESS;
     }
   }
-  ch->sendln("$B$2The Meta-physician tells you, 'Buy what?!'$R");
+  ch->sendln(u"$B$2The Meta-physician tells you, 'Buy what?!'$R"_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -1552,18 +1552,18 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
 {
   if (cmd == cmd_t::LIST) // list
   {
-    ch->sendln("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n");
-    ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
+    ch->sendln(u"$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n"_s);
+    ch->sendln(u"$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)"_s);
 
     for (qint32 i = 1; i <= MAX_PC_RACE; i++)
       ch->send(u"$B$3%d)$R  %-32s - %s\r\n"_s.arg(i).arg(races[i].singular_name).arg(ch->race_message(i)));
 
-    ch->sendln("$BOther Services:$R");
+    ch->sendln(u"$BOther Services:$R"_s);
 
     ch->send(u"$B$3%d)$R %-32s - 1000 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 1).arg("Sex Change"));
     ch->send(u"$B$3%d)$R %-32s - 50 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 2).arg("A deep red vial of mana"));
 
-    ch->sendln("$BHeight/Weight Change:$R");
+    ch->sendln(u"$BHeight/Weight Change:$R"_s);
     ch->heightweight(false);
     if (ch->height < races[ch->race].max_height)
       ch->send(u"$B$3%d)$R %-32s - 250 platinum coins.\r\n"_s.arg(MAX_PC_RACE + 3).arg("Increase your height by 1"));
@@ -1600,22 +1600,22 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
     {
       if (ch->would_die())
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'The process would kill you!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->race == choice)
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'You are already a member of that race!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (!ch->is_race_applicable(choice))
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'You do not qualify for becoming that race!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < (quint32)changecost(ch->race, choice))
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1656,13 +1656,13 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
         ch->check_hw();
         ch->recheck_height_wears();
 
-        ch->sendln("The Cardinal prays loudly and summons the magic of the gods...");
-        ch->sendln("After a brief moment of pain you are reborn!");
+        ch->sendln(u"The Cardinal prays loudly and summons the magic of the gods..."_s);
+        ch->sendln(u"After a brief moment of pain you are reborn!"_s);
       }
       else
       {
         ch->send(u"$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n"_s.arg(choice));
-        ch->sendln("$4NOTE$R$B: Your attributes will be adjusted to fit ch new race and then lowered by 2 points each.$R");
+        ch->sendln(u"$4NOTE$R$B: Your attributes will be adjusted to fit ch new race and then lowered by 2 points each.$R"_s);
       }
       return ReturnValue::eSUCCESS;
     }
@@ -1682,44 +1682,44 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       }
       if (GET_SEX(ch) == newsex)
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'That wouldn't change much'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'That wouldn't change much'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_PLATINUM(ch) < 1000)
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 1000;
       GET_SEX(ch) = newsex;
-      ch->sendln("The Cardinal prays loudly and summons the magic of the gods...");
-      ch->sendln("After a brief moment of pain you are reborn!");
+      ch->sendln(u"The Cardinal prays loudly and summons the magic of the gods..."_s);
+      ch->sendln(u"After a brief moment of pain you are reborn!"_s);
       return ReturnValue::eSUCCESS;
     }
     else if (choice == MAX_PC_RACE + 2)
     {
       if (GET_PLATINUM(ch) < 50)
       {
-        ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
+        ch->sendln(u"$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R"_s);
         return ReturnValue::eSUCCESS;
       }
       ObjectPtr obj = clone_object(real_object(10004));
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
-        ch->sendln("You can't carry that many items.");
+        ch->sendln(u"You can't carry that many items."_s);
         extract_obj(obj);
         return ReturnValue::eSUCCESS;
       }
 
       if (IS_CARRYING_W(ch) + obj->flags_.weight > CAN_CARRY_W(ch))
       {
-        ch->sendln("You can't carry that much weight.");
+        ch->sendln(u"You can't carry that much weight."_s);
         extract_obj(obj);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 50;
       obj_to_char(obj, ch);
-      ch->sendln("$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R");
+      ch->sendln(u"$B$2Cardinal Thelonius tells you, 'Here is your potion.'$R"_s);
       return ReturnValue::eSUCCESS;
     }
     else if (choice >= MAX_PC_RACE + 3 && choice <= MAX_PC_RACE + 6)
@@ -1729,25 +1729,25 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
       ch->heightweight(false);
       if (choice == 3 && ch->height >= races[ch->race].max_height)
       {
-        ch->sendln("You cannot increase your height any more.");
+        ch->sendln(u"You cannot increase your height any more."_s);
         ch->heightweight(true);
         return ReturnValue::eSUCCESS;
       }
       else if (choice == 4 && ch->height <= races[ch->race].min_height)
       {
-        ch->sendln("You cannot decrease your height any more.");
+        ch->sendln(u"You cannot decrease your height any more."_s);
         ch->heightweight(true);
         return ReturnValue::eSUCCESS;
       }
       else if (choice == 5 && ch->weight >= races[ch->race].max_weight)
       {
-        ch->sendln("You cannot increase your weight any more.");
+        ch->sendln(u"You cannot increase your weight any more."_s);
         ch->heightweight(true);
         return ReturnValue::eSUCCESS;
       }
       else if (choice == 6 && ch->weight <= races[ch->race].min_weight)
       {
-        ch->sendln("You cannot decrease your weight any more.");
+        ch->sendln(u"You cannot decrease your weight any more."_s);
         ch->heightweight(true);
         return ReturnValue::eSUCCESS;
       }
@@ -1755,11 +1755,11 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
 
       if (GET_PLATINUM(ch) < 250)
       {
-        ch->sendln("You cannot afford it.");
+        ch->sendln(u"You cannot afford it."_s);
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 250;
-      ch->sendln("Cardinal Thelonius gropes you.");
+      ch->sendln(u"Cardinal Thelonius gropes you."_s);
       if (choice == 3)
       {
         ch->height++;
@@ -1786,17 +1786,17 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
     {
       if (GET_QPOINTS(ch) < 5)
       {
-        ch->sendln("Costs 5 qpoints...which you don't have.");
+        ch->sendln(u"Costs 5 qpoints...which you don't have."_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->isNonPlayer())
       {
-        ch->sendln("You can't buy age, chode...");
+        ch->sendln(u"You can't buy age, chode..."_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_AGE(ch) >= 500)
       {
-        ch->sendln("You've reached the 500 age limit that can be purchased per character.");
+        ch->sendln(u"You've reached the 500 age limit that can be purchased per character."_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1813,17 +1813,17 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
     {
       if (GET_QPOINTS(ch) < 5)
       {
-        ch->sendln("Costs 5 qpoints...which you don't have.");
+        ch->sendln(u"Costs 5 qpoints...which you don't have."_s);
         return ReturnValue::eSUCCESS;
       }
       if (ch->isNonPlayer())
       {
-        ch->sendln("You can't buy age, chode...");
+        ch->sendln(u"You can't buy age, chode..."_s);
         return ReturnValue::eSUCCESS;
       }
       if (GET_AGE(ch) <= 18)
       {
-        ch->sendln("You've reached the age 18 minimum limit that can be purchased per character.");
+        ch->sendln(u"You've reached the age 18 minimum limit that can be purchased per character."_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1838,7 +1838,7 @@ qint32 cardinal(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString argumen
     }
     else
     {
-      ch->sendln("$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R");
+      ch->sendln(u"$B$2Cardinal Thelonius tells you, 'I don't have that. Try \"list\".'$R"_s);
       return ReturnValue::eSUCCESS;
     }
   }

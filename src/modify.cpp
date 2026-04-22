@@ -47,7 +47,7 @@ void string_hash_add(ConnectionPtr conn, QString str)
   {
     *conn->hashstr = str.remove(i, str.length() - i);
     conn->connected = Connection::states::PLAYING;
-    conn->character->sendln("Ok.");
+    conn->character->sendln(u"Ok."_s);
     check_for_awaymsgs(ch);
   }
   else
@@ -82,7 +82,7 @@ void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString st
     return;
 }
 
-command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString name, string;
   QString message;
@@ -106,7 +106,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!field)
   {
-    ch->sendln("No field by that name. Try 'help string'.");
+    ch->sendln(u"No field by that name. Try 'help string'."_s);
     return 1;
   }
 
@@ -115,7 +115,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     /* locate the beast */
     if (!(mob = get_char_vis(ch, name)))
     {
-      ch->sendln("I don't know anyone by that name...");
+      ch->sendln(u"I don't know anyone by that name..."_s);
       return 1;
     }
 
@@ -131,11 +131,11 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     case 1:
       if (mob->isPlayer() && ch->getLevel() < IMPLEMENTER)
       {
-        ch->send("You can't change that field for players.");
+        ch->send(u"You can't change that field for players."_s);
         return 1;
       }
 
-      ch->sendln("This is broken.");
+      ch->sendln(u"This is broken."_s);
       dc_->logentry(u"do_string: broken"_s);
       /*
       TODO
@@ -146,12 +146,12 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       */
 
       if (mob->isPlayer())
-        ch->sendln("WARNING: You have changed the name of a player.");
+        ch->sendln(u"WARNING: You have changed the name of a player."_s);
       break;
     case 2:
       if (ch->getLevel() < POWER)
       {
-        ch->sendln("You must be a God to do that.");
+        ch->sendln(u"You must be a God to do that."_s);
         return 1;
       }
       dc_sprintf(message, "%s just restrung short on %s", qPrintable(ch->name()), qPrintable(mob->name()));
@@ -164,7 +164,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     case 3:
       if (mob->isPlayer())
       {
-        ch->sendln("That field is for monsters only.");
+        ch->sendln(u"That field is for monsters only."_s);
         return 1;
       }
       ch->conn_->hashstr = &mob->long_desc;
@@ -178,13 +178,13 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     case 5:
       if (mob->isNonPlayer())
       {
-        ch->sendln("Monsters have no titles.");
+        ch->sendln(u"Monsters have no titles."_s);
         return 1;
       }
       ch->conn_->strnew = &mob->title;
       break;
     default:
-      ch->sendln("That field is undefined for monsters.");
+      ch->sendln(u"That field is undefined for monsters."_s);
       return 1;
     }
   }
@@ -195,7 +195,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     /* locate the object */
     if (!(obj = get_obj_vis(ch, name)))
     {
-      ch->sendln("Can't find such a thing here..");
+      ch->sendln(u"Can't find such a thing here.."_s);
       return 1;
     }
 
@@ -203,11 +203,11 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (ch->getLevel() < IMPLEMENTER)
       {
-        ch->sendln("That item is not restringable.");
+        ch->sendln(u"That item is not restringable."_s);
         return 1;
       }
       else
-        ch->sendln("That item is NO_RESTRING btw.");
+        ch->sendln(u"That item is NO_RESTRING btw."_s);
     }
 
     switch (field)
@@ -215,7 +215,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     case 1:
       if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) && ch->getLevel() < 110)
       {
-        ch->sendln("The moose will get you if you do that.");
+        ch->sendln(u"The moose will get you if you do that."_s);
         return 1;
       }
       // TODO hashstr for qstring
@@ -229,12 +229,12 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       break;
     case 4:
       // TODO - remove this when the obj pfile saving keeps track of extra descs
-      ch->send("Noone may restring object extra descs at this time. -pir");
+      ch->send(u"Noone may restring object extra descs at this time. -pir"_s);
       return 1;
 
       if (string.isEmpty())
       {
-        ch->sendln("You have to supply a keyword.");
+        ch->sendln(u"You have to supply a keyword."_s);
         return 1;
       }
       /* try to locate extra description */
@@ -247,7 +247,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
           ed->keyword = string;
           ed->description = {};
           ch->conn_->hashstr = &ed->description;
-          ch->sendln("New field.");
+          ch->sendln(u"New field."_s);
           break;
         }
         else if (!str_cmp(ed->keyword, string))
@@ -255,7 +255,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
           /* the field exists */
           ed->description = {};
           ch->conn_->hashstr = &ed->description;
-          ch->sendln("Modifying description.");
+          ch->sendln(u"Modifying description."_s);
           break;
         }
       /* the stndrd (see below) procedure does not apply here */
@@ -264,14 +264,14 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
     case 6:
       if (string.isEmpty())
       {
-        ch->sendln("You must supply a field name.");
+        ch->sendln(u"You must supply a field name."_s);
         return 1;
       }
       /* try to locate field */
       for (ed = obj->ex_description;; ed = ed->next)
         if (!ed)
         {
-          ch->sendln("No field with that keyword.");
+          ch->sendln(u"No field with that keyword."_s);
           return 1;
         }
         else if (!str_cmp(ed->keyword, string))
@@ -286,12 +286,12 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
             tmp->next = ed->next;
           }
           ed = {};
-          ch->sendln("Field deleted.");
+          ch->sendln(u"Field deleted."_s);
           return 1;
         }
       break;
     default:
-      ch->sendln("That field is undefined for objects.");
+      ch->sendln(u"That field is undefined for objects."_s);
       return 1;
     }
   }
@@ -309,7 +309,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (dc_strlen(string) > (quint32)length[field - 1])
     {
-      ch->sendln("String too long - truncated.");
+      ch->sendln(u"String too long - truncated."_s);
       *(string + length[field - 1]) = '\0';
     }
     if (type == TP_MOB && mob->isPlayer())
@@ -322,7 +322,7 @@ command_return_t do_string(CharacterPtr ch, QString arg, cmd_t cmd)
       *ch->conn_->hashstr = string;
       ch->conn_->hashstr = {};
     }
-    ch->sendln("Ok.");
+    ch->sendln(u"Ok."_s);
   }
 
   /* there was no string. enter string mode */
@@ -553,7 +553,7 @@ void page_string(ConnectionPtr conn, const QString str, qint32 keep_internal)
 
   if (!str || str.isEmpty())
   {
-    conn->character->send("");
+    conn->character->send(u""_s);
     return;
   }
 
@@ -591,7 +591,7 @@ void page_string_dep(ConnectionPtr conn, const QString str, qint32 keep_internal
     return;
   if (!str || str.isEmpty())
   {
-    conn->character->send("");
+    conn->character->send(u""_s);
     return;
   }
 

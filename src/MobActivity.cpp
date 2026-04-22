@@ -37,7 +37,7 @@ QString Path::determineRoute(CharacterPtr ch, qint32 from, qint32 to)
   if (!isRoomPathed(from) || !isRoomPathed(to))
   {
     if (ch)
-      ch->sendln("Error::determineBestRoute:: Room 'to' or 'from' is not connected to the path.");
+      ch->sendln(u"Error::determineBestRoute:: Room 'to' or 'from' is not connected to the path."_s);
     return {};
   }
   i = 1000;
@@ -142,14 +142,14 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
     if (!isRoomConnected(room))
     {
       if (ch)
-        ch->sendln("This room is does not connect to that path.");
+        ch->sendln(u"This room is does not connect to that path."_s);
       return;
     }
   }
   if (isRoomPathed(room))
   {
     if (ch)
-      ch->sendln("This room is already connected to that path.");
+      ch->sendln(u"This room is already connected to that path."_s);
     return;
   }
   PathPtr pa;
@@ -200,16 +200,16 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
           .paths = pa;
   (*this)[room] = {};
   if (ch)
-    ch->sendln("Room successfully added to path.");
+    ch->sendln(u"Room successfully added to path."_s);
 }
 
-command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    ch->sendln("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
+    ch->sendln(u"Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path."_s);
     return ReturnValue::eFAILURE;
   }
   PathPtr p;
@@ -218,7 +218,7 @@ command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
   if (p)
   {
-    ch->sendln("That path already exists.");
+    ch->sendln(u"That path already exists."_s);
     return ReturnValue::eFAILURE;
   }
   p = PathPtr(new Path(ch->dc_));
@@ -229,7 +229,7 @@ command_return_t do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto &zones = dc_->zones;
   qint32 i = dc_->world[ch->in_room].zone;
@@ -255,12 +255,12 @@ command_return_t do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd
         break;
       }
   if (!found)
-    ch->sendln("No paths connecting to this zone has been found.");
+    ch->sendln(u"No paths connecting to this zone has been found."_s);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   PathPtr p;
   bool found = false;
@@ -273,18 +273,18 @@ command_return_t do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
     found = true;
   }
   if (!found)
-    ch->sendln("No paths found.");
+    ch->sendln(u"No paths found."_s);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    ch->sendln("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
+    ch->sendln(u"Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path."_s);
     return ReturnValue::eFAILURE;
   }
   PathPtr p;
@@ -293,20 +293,20 @@ command_return_t do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
   if (!p)
   {
-    ch->sendln("No such path exists.");
+    ch->sendln(u"No such path exists."_s);
     return ReturnValue::eFAILURE;
   }
   p->addRoom(ch, ch->in_room, false);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.");
+    ch->sendln(u"Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path."_s);
     return ReturnValue::eFAILURE;
   }
   PathPtr p;
@@ -315,7 +315,7 @@ command_return_t do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
   if (!p)
   {
-    ch->sendln("No such path exists.");
+    ch->sendln(u"No such path exists."_s);
     return ReturnValue::eFAILURE;
   }
   qint32 start, end;
@@ -391,7 +391,7 @@ bool determinePath(PathPtr goal, PathPtr at, qint32 beststeps, qint32 steps, Pat
   return false;
 }
 
-command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
@@ -406,7 +406,7 @@ command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
       break;
   if (!pt || !pt2)
   {
-    ch->sendln("Missing path.");
+    ch->sendln(u"Missing path."_s);
     return ReturnValue::eFAILURE;
   }
   PathPtr pa;
@@ -421,7 +421,7 @@ command_return_t do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (i >= 50)
   {
-    ch->sendln("Crazy #. Stopping.");
+    ch->sendln(u"Crazy #. Stopping."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -529,7 +529,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
 
   if (i >= 50)
   {
-    ch->sendln("Crazy #. Stopping.");
+    ch->sendln(u"Crazy #. Stopping."_s);
     return "Crazy #";
   }
 
@@ -557,7 +557,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
   return &endbuf[0];
 }
 
-command_return_t do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   PathPtr p;
   for (p = mPathList; p; p = p->next)
@@ -567,7 +567,7 @@ command_return_t do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
     qint32 i = dc_atoi(arg1), z = dc_atoi(arg2);
-    if (!i || !z) { ch->sendln("BLeh!"); return ReturnValue::eFAILURE; }
+    if (!i || !z) { ch->sendln(u"BLeh!"_s); return ReturnValue::eFAILURE; }
     QString t =  findPath(i, z, ch);
     ch->send(u"Final Path: %1\r\n"_s.arg(t));
     return ReturnValue::eSUCCESS;

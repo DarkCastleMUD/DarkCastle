@@ -25,7 +25,7 @@ public:
 extern bool MOBtrigger;
 
 // This is turned on right before we call game_loop
-command_return_t do_not_save_corpses = 1;
+ReturnValue do_not_save_corpses = 1;
 qint32 try_to_hotboot_on_crash = {};
 qint32 was_hotboot = {};
 qint32 died_from_sigsegv = {};
@@ -248,7 +248,7 @@ vnum_t DC::getObjectVNUM(ObjectPtr obj, bool *ok)
     {
       *ok = true;
     }
-    return obj_index[obj->item_number].vnum();
+    return obj_index_[obj->item_number].vnum();
   }
 
   if (ok)
@@ -266,7 +266,7 @@ vnum_t DC::getObjectVNUM(legacy_rnum_t nr, bool *ok)
     {
       *ok = true;
     }
-    return obj_index[nr].vnum();
+    return obj_index_[nr].vnum();
   }
 
   if (ok)
@@ -284,7 +284,7 @@ vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
     {
       *ok = true;
     }
-    return obj_index[nr].vnum();
+    return obj_index_[nr].vnum();
   }
 
   if (ok)
@@ -857,7 +857,7 @@ void DC::game_loop_init(void)
 
                  auto future = QtConcurrent::run([]() {});
 
-                 command_return_t do_not_save_corpses = 1;
+                 ReturnValue do_not_save_corpses = 1;
 
                  QString buf = u"Hot reboot by %1.\r\n"_s.arg("HTTP /shutdown/");
                  send_to_all(buf);
@@ -1196,52 +1196,52 @@ void telnet_ga(ConnectionPtr conn)
   write_to_output(QByteArray(go_ahead), d);
 }
 
-command_return_t do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->getLastPrompt().isEmpty())
-    ch->sendln("Last prompt: unset");
+    ch->sendln(u"Last prompt: unset"_s);
   else
     ch->sendln(u"Last prompt: %1"_s.arg(ch->getLastPrompt()));
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
 
   if (ch->isNonPlayer())
   {
-    ch->sendln("You're a mob!  You can't set your prompt.");
+    ch->sendln(u"You're a mob!  You can't set your prompt."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (arg.isEmpty())
   {
-    ch->sendln("Set your prompt to what? Try 'help prompt'.");
+    ch->sendln(u"Set your prompt to what? Try 'help prompt'."_s);
     if (!ch->getPrompt().isEmpty())
     {
-      ch->send("Current prompt:  ");
+      ch->send(u"Current prompt:  "_s);
       send_to_char(ch->getPrompt(), ch);
-      ch->sendln("");
-      ch->send("Last prompt: ");
+      ch->sendln(u""_s);
+      ch->send(u"Last prompt: "_s);
       if (!ch->getLastPrompt().isEmpty())
       {
         send_to_char(ch->getLastPrompt(), ch);
       }
       else
       {
-        ch->send("unset");
+        ch->send(u"unset"_s);
       }
-      ch->sendln("");
+      ch->sendln(u""_s);
     }
     return ReturnValue::eSUCCESS;
   }
 
   ch->setLastPrompt(ch->getPrompt());
   ch->setPrompt(arg);
-  ch->sendln("Ok.");
+  ch->sendln(u"Ok."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2377,7 +2377,7 @@ void signal_handler(qint32 signal, siginfo_t *si, void *)
   if (signal == SIGHUP)
   {
     QString *new_argv = {};
-    extern command_return_t do_not_save_corpses;
+    extern ReturnValue do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(u"Hot reboot by SIGHUP.\r\n"_s);
     logentry(u"Hot reboot by SIGHUP.\r\n"_s, ANGEL, DC::LogChannel::LOG_GOD);
@@ -2471,7 +2471,7 @@ void record_msg(QString messg, CharacterPtr ch)
   }
 }
 
-command_return_t do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 lines = {};
   QString tmp;
@@ -2516,8 +2516,8 @@ void check_for_awaymsgs(CharacterPtr ch)
     return;
   }
 
-  ch->send("You have unviewed away messages. ");
-  ch->sendln("Type awaymsgs to view them.");
+  ch->send(u"You have unviewed away messages. "_s);
+  ch->sendln(u"Type awaymsgs to view them."_s);
 }
 
 void send_to_char(QString messg, CharacterPtr ch)
@@ -2747,7 +2747,7 @@ void warn_if_duplicate_ip(CharacterPtr ch)
   }
 }
 
-command_return_t do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   if (argument == 0)
@@ -2765,23 +2765,23 @@ command_return_t do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!dc_strcmp(arg1, "web"))
     {
       SET_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
-      ch->sendln("Changing to web editor.");
-      ch->sendln("Ok.");
+      ch->sendln(u"Changing to web editor."_s);
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
     else if (!dc_strcmp(arg1, "game"))
     {
       REMOVE_BIT(ch->player->toggles, Player::PLR_EDITOR_WEB);
-      ch->sendln("Changing to in game line editor.");
-      ch->sendln("Ok.");
+      ch->sendln(u"Changing to in game line editor."_s);
+      ch->sendln(u"Ok."_s);
       return ReturnValue::eSUCCESS;
     }
   }
 
-  ch->sendln("Usage: editor <type>");
-  ch->sendln("Where type can be:");
-  ch->sendln("web    - use online web editor");
-  ch->sendln("game   - use in game line editor");
+  ch->sendln(u"Usage: editor <type>"_s);
+  ch->sendln(u"Where type can be:"_s);
+  ch->sendln(u"web    - use online web editor"_s);
+  ch->sendln(u"game   - use in game line editor"_s);
 
   return ReturnValue::eSUCCESS;
 }

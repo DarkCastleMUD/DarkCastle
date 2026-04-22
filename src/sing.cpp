@@ -253,7 +253,7 @@ void get_instrument_bonus(CharacterPtr ch, qint32 &comb, qint32 &non_comb)
   non_comb = ch->equipment[WEAR_HOLD]->flags_.value[0];
 }
 
-command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->isPlayer() && GET_CLASS(ch) != CLASS_BARD && !ch->isImmortalPlayer())
   {
@@ -272,7 +272,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   else if (q_arg_quote_count == 1) // only one single-quote so possibly: sing 'SONG
   {
-    ch->sendln("If you start with a ' you have to end with a ' too.");
+    ch->sendln(u"If you start with a ' you have to end with a ' too."_s);
     return ReturnValue::eFAILURE;
   }
   else
@@ -287,46 +287,46 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (spl < 0)
   {
-    ch->sendln("You know not of that song.");
+    ch->sendln(u"You know not of that song."_s);
     return ReturnValue::eFAILURE;
   }
   if (cmd == cmd_t::ORCHESTRATE)
   {
     if (!IS_SINGING(ch))
     {
-      ch->sendln("You must be singing a song to orchestrate another melody.");
+      ch->sendln(u"You must be singing a song to orchestrate another melody."_s);
       return ReturnValue::eFAILURE;
     }
     if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
     {
-      ch->sendln("You must be holding an instrument to orchestrate songs.");
+      ch->sendln(u"You must be holding an instrument to orchestrate songs."_s);
       return ReturnValue::eFAILURE;
     }
   }
   else if (song_info[spl].rating() > 0 && IS_SINGING(ch))
   {
     if (ch->has_skill(SKILL_ORCHESTRATE))
-      ch->sendln("You are already in the middle of another song!  Try using orchestrate.");
+      ch->sendln(u"You are already in the middle of another song!  Try using orchestrate."_s);
     else
-      ch->sendln("You are already in the middle of another song!");
+      ch->sendln(u"You are already in the middle of another song!"_s);
     return ReturnValue::eFAILURE;
   }
   else if (spl == 2 && !IS_SINGING(ch))
   {
-    ch->sendln("You are not even singing a song to stop!");
+    ch->sendln(u"You are not even singing a song to stop!"_s);
     return ReturnValue::eFAILURE;
   }
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
     if ((*i).song_number == spl)
     {
-      ch->sendln("You are already singing this song!");
+      ch->sendln(u"You are already singing this song!"_s);
       return ReturnValue::eFAILURE;
     }
 
   if ((isSet(dc_->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER) && (spl == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || spl == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || spl == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || spl == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || spl == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || spl == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || spl == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || spl == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || spl == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || spl == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || spl == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || spl == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || spl == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || spl == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE))
   {
-    ch->sendln("This room feels too safe to sing an offensive song such as this.");
+    ch->sendln(u"This room feels too safe to sing an offensive song such as this."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -337,19 +337,19 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       switch (GET_POS(ch))
       {
       case position_t::SLEEPING:
-        ch->sendln("You dream of beautiful music.");
+        ch->sendln(u"You dream of beautiful music."_s);
         break;
       case position_t::RESTING:
-        ch->sendln("You can't sing this resting!!");
+        ch->sendln(u"You can't sing this resting!!"_s);
         break;
       case position_t::SITTING:
-        ch->sendln("You can't do this sitting.  You must stand up.");
+        ch->sendln(u"You can't do this sitting.  You must stand up."_s);
         break;
       case position_t::FIGHTING:
-        ch->sendln("This is a peaceful song.  Not for battle.");
+        ch->sendln(u"This is a peaceful song.  Not for battle."_s);
         break;
       default:
-        ch->sendln("It seems like you're in a pretty bad shape!");
+        ch->sendln(u"It seems like you're in a pretty bad shape!"_s);
         break;
       }
       return ReturnValue::eFAILURE;
@@ -363,7 +363,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
             learned = 50;
           else
           {
-            ch->sendln("You haven't learned that song.");
+            ch->sendln(u"You haven't learned that song."_s);
             return ReturnValue::eFAILURE;
           }
         }
@@ -371,7 +371,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (getTotalRating(ch) + song_info[spl].rating() > BARD_MAX_RATING)
     {
-      ch->sendln("You are unable to orchestrate such a complicated melody!");
+      ch->sendln(u"You are unable to orchestrate such a complicated melody!"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -460,23 +460,23 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       if (!name.isEmpty())
       {
         if (isSet(song_info[spl].targets(), TAR_CHAR_ROOM))
-          ch->sendln("Nobody here by that name.");
+          ch->sendln(u"Nobody here by that name."_s);
         else if (isSet(song_info[spl].targets(), TAR_CHAR_WORLD))
-          ch->sendln("Nobody playing by that name.");
+          ch->sendln(u"Nobody playing by that name."_s);
         else if (isSet(song_info[spl].targets(), TAR_OBJ_INV))
-          ch->sendln("You are not carrying anything like that.");
+          ch->sendln(u"You are not carrying anything like that."_s);
         else if (isSet(song_info[spl].targets(), TAR_OBJ_ROOM))
-          ch->sendln("Nothing here by that name.");
+          ch->sendln(u"Nothing here by that name."_s);
         else if (isSet(song_info[spl].targets(), TAR_OBJ_WORLD))
-          ch->sendln("Nothing at all by that name.");
+          ch->sendln(u"Nothing at all by that name."_s);
         else if (isSet(song_info[spl].targets(), TAR_OBJ_EQUIP))
-          ch->sendln("You are not wearing anything like that.");
+          ch->sendln(u"You are not wearing anything like that."_s);
         else if (isSet(song_info[spl].targets(), TAR_OBJ_WORLD))
-          ch->sendln("Nothing at all by that name.");
+          ch->sendln(u"Nothing at all by that name."_s);
       }
       else
         /* No arguments were given */
-        ch->sendln("Whom should you sing to?");
+        ch->sendln(u"Whom should you sing to?"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -484,17 +484,17 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if ((tar_char == ch) && isSet(song_info[spl].targets(), TAR_SELF_NONO))
       {
-        ch->sendln("You cannot sing this to yourself!");
+        ch->sendln(u"You cannot sing this to yourself!"_s);
         return ReturnValue::eFAILURE;
       }
       else if ((tar_char != ch) && isSet(song_info[spl].targets(), TAR_SELF_ONLY))
       {
-        ch->sendln("You can only sing this song to yourself.");
+        ch->sendln(u"You can only sing this song to yourself."_s);
         return ReturnValue::eFAILURE;
       }
       else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
       {
-        ch->sendln("You are afraid that it might harm your master.");
+        ch->sendln(u"You are afraid that it might harm your master."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -511,14 +511,14 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (spl != SKILL_SONG_STOP - SKILL_SONG_BASE && isSet(dc_->world[ch->in_room].room_flags, NO_KI))
     {
-      ch->sendln("You find yourself unable to use energy based chants here.");
+      ch->sendln(u"You find yourself unable to use energy based chants here."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (ch->getLevel() < ARCHANGEL && !ch->isNonPlayer() &&
         GET_KI(ch) < use_song(ch, spl))
     {
-      ch->sendln("You do not have enough ki!");
+      ch->sendln(u"You do not have enough ki!"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -530,7 +530,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if ((song_info[spl].song_pointer() == nullptr) && spl > 0)
     {
-      ch->sendln("Sorry, this power has not yet been implemented.");
+      ch->sendln(u"Sorry, this power has not yet been implemented."_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -542,7 +542,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
         {
-          ch->sendln("You can't even begin this song without an instrument.");
+          ch->sendln(u"You can't even begin this song without an instrument."_s);
           return ReturnValue::eFAILURE;
         }
       }
@@ -552,7 +552,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       if (spl != SPELL_TYPE_WAND && !skill_succeeded && !in_room_safe)
       {
 
-        ch->sendln("You forgot the words!");
+        ch->sendln(u"You forgot the words!"_s);
         GET_KI(ch) -= use_song(ch, spl) / 2;
         return ReturnValue::eSUCCESS;
       }
@@ -561,7 +561,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       if (!isSet(song_info[spl].targets(), TAR_IGNORE) && !tar_obj)
         if (tar_char->isPlayer() && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
-          ch->sendln("That just might annoy them!");
+          ch->sendln(u"That just might annoy them!"_s);
           return ReturnValue::eFAILURE;
         }
 
@@ -569,7 +569,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       if (!isSet(song_info[spl].targets(), TAR_IGNORE) && !tar_obj)
         if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
         {
-          tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
+          tar_char->sendln(u"There is no safe haven from an angry IMPLEMENTER!"_s);
         }
 
       if (cmd != cmd_t::ORCHESTRATE && IS_SINGING(ch)) // I'm singing
@@ -577,14 +577,14 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
         if (!origsing)
         {
           if (ch->songs.size() > 1 && name.isEmpty())
-            ch->sendln("You stop orchestrating all of your music.");
+            ch->sendln(u"You stop orchestrating all of your music."_s);
           else if (ch->songs.size() > 1 && *name)
           {
             qint32 hold = old_search_block(name, 0, dc_strlen(name), Character::song_names, 0);
             bool found = false;
             if (--hold < 0)
             {
-              ch->sendln("You do not know of that song.");
+              ch->sendln(u"You do not know of that song."_s);
               return ReturnValue::eFAILURE;
             }
             for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -595,21 +595,21 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
               }
             if (!found)
             {
-              ch->sendln("You are not singing that song.");
+              ch->sendln(u"You are not singing that song."_s);
               return ReturnValue::eFAILURE;
             }
             else
             {
-              ch->send("You stop singing ");
+              ch->send(u"You stop singing "_s);
               send_to_char(Character::song_names.value((*i).song_number), ch);
-              ch->sendln(".");
+              ch->sendln(u"."_s);
             }
           }
           else
           {
-            ch->send("You stop singing ");
+            ch->send(u"You stop singing "_s);
             send_to_char(Character::song_names.value((*ch->songs.begin()).song_number), ch);
-            ch->sendln(".");
+            ch->sendln(u"."_s);
           }
         }
         // If the song is a steady one, (like flight) than it needs to be
@@ -626,7 +626,7 @@ command_return_t do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         if (!skill_success(ch, nullptr, SKILL_ORCHESTRATE))
         {
-          ch->sendln("You failed to orchestrate your music!");
+          ch->sendln(u"You failed to orchestrate your music!"_s);
           return ReturnValue::eFAILURE;
         }
         else
@@ -663,7 +663,7 @@ void update_character_singing(CharacterPtr ch)
   {
     if ((*j).song_timer == -1)
     {
-      ch->sendln("You run out of lyrics and end the song.");
+      ch->sendln(u"You run out of lyrics and end the song."_s);
       if ((song_info[(*j).song_number].intrp_pointer()))
       {
         ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
@@ -688,11 +688,11 @@ void update_character_singing(CharacterPtr ch)
       if (ISSET(ch->affected_by, AFF_HIDE))
       {
         REMBIT(ch->affected_by, AFF_HIDE);
-        ch->sendln("Your singing ruins your hiding place.");
+        ch->sendln(u"Your singing ruins your hiding place."_s);
       }
       if (ch->getLevel() < IMPLEMENTER && ((isSet(dc_->world[ch->in_room].room_flags, NO_KI) || isSet(dc_->world[ch->in_room].room_flags, SAFE)) && ((*j).song_number == SKILL_SONG_WHISTLE_SHARP - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_UNRESIST_DITTY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_GLITTER_DUST - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_REVEAL_STACATO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_TERRIBLE_CLEF - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_DISCHORDANT_DIRGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_INSANE_CHANT - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_JIG_OF_ALACRITY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SUMMONING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SHATTERING_RESO - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_MKING_CHARGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HYPNOTIC_HARMONY - SKILL_SONG_BASE)))
       {
-        ch->sendln("In this room, your song quiety fades away.");
+        ch->sendln(u"In this room, your song quiety fades away."_s);
         if ((song_info[(*j).song_number].intrp_pointer()))
         {
           ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
@@ -714,7 +714,7 @@ void update_character_singing(CharacterPtr ch)
       }
       else if ((((GET_POS(ch) < song_info[(*j).song_number].minimum_position()) && ch->isPlayer()) || isSet(ch->combat, COMBAT_STUNNED) || isSet(ch->combat, COMBAT_STUNNED2) || isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2) || (isSet(ch->combat, COMBAT_BASH1) || isSet(ch->combat, COMBAT_BASH2))) && ((*j).song_number == SKILL_SONG_TRAVELING_MARCH - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_BOUNT_SONNET - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_HEALING_MELODY - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SYNC_CHORD - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_NOTE_OF_KNOWLEDGE - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SOOTHING_REMEM - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_SEARCHING_SONG - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_STICKY_LULL - SKILL_SONG_BASE || (*j).song_number == SKILL_SONG_FORGETFUL_RHYTHM - SKILL_SONG_BASE))
       {
-        ch->sendln("You can't keep singing in this position!");
+        ch->sendln(u"You can't keep singing in this position!"_s);
         (*j).song_timer = {};
         if ((song_info[(*j).song_number].intrp_pointer()))
         {
@@ -738,7 +738,7 @@ void update_character_singing(CharacterPtr ch)
       {
         if ((!ch->equipment[WEAR_HOLD] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD]) != ITEM_INSTRUMENT) && (!ch->equipment[WEAR_HOLD2] || GET_ITEM_TYPE(ch->equipment[WEAR_HOLD2]) != ITEM_INSTRUMENT))
         {
-          ch->sendln("Without an instrument, your song dies away.");
+          ch->sendln(u"Without an instrument, your song dies away."_s);
           if ((song_info[(*j).song_number].intrp_pointer()))
           {
             ((*song_info[(*j).song_number].intrp_pointer())(ch->getLevel(), ch, nullptr, nullptr, -1));
@@ -794,7 +794,7 @@ void update_character_singing(CharacterPtr ch)
       }
       else
       {
-        ch->sendln("Bad exec pointer on the song you sang.  Tell a god.");
+        ch->sendln(u"Bad exec pointer on the song you sang.  Tell a god."_s);
       }
 
       if (retval == ReturnValue::eEXTRA_VALUE)
@@ -848,7 +848,7 @@ qint32 song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg, Charact
   }
   act_to_victim("$n sings an incredibly beautiful hymn, making you want to just give up your dayjob and follow $m around!", ch, 0, victim, 0);
   act_to_room("$n sings an entrancing hymn to $N!", ch, 0, victim, NOTVICT);
-  ch->sendln("You sing your most enchanting hymn, hoping to attract some fans.");
+  ch->sendln(u"You sing your most enchanting hymn, hoping to attract some fans."_s);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
   {
@@ -883,7 +883,7 @@ qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg,
   {
     (*i).song_data = {};
     (*i).song_data = {};
-    ch->sendln("They seem to have left.\r\nIn the middle of your performance too!");
+    ch->sendln(u"They seem to have left.\r\nIn the middle of your performance too!"_s);
     return ReturnValue::eFAILURE;
   }
   (*i).song_data = {};
@@ -892,14 +892,14 @@ qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg,
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   if (victim->isPlayer() || !ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
   {
-    ch->sendln("They don't seem particularily interested.");
-    victim->sendln("You manage to resist the entrancing lyrics.");
+    ch->sendln(u"They don't seem particularily interested."_s);
+    victim->sendln(u"You manage to resist the entrancing lyrics."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (circle_follow(victim, ch))
   {
-    ch->sendln("Sorry, following in circles can not be allowed.");
+    ch->sendln(u"Sorry, following in circles can not be allowed."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -908,7 +908,7 @@ qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg,
 
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0 && victim->master != ch)
   {
-    ch->sendln("How you plan on controlling so many followers?");
+    ch->sendln(u"How you plan on controlling so many followers?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -931,7 +931,7 @@ qint32 execute_song_hypnotic_harmony(quint8 level, CharacterPtr ch, QString arg,
   check_eq(victim);
 
   act_to_victim("You decide to follow $n's musical genius to the end.", ch, 0, victim, 0);
-  ch->sendln("You succeed, and you find yourself having a new fan.");
+  ch->sendln(u"You succeed, and you find yourself having a new fan."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -947,7 +947,7 @@ qint32 song_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vic
 
   act_to_victim("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", ch, 0, victim, 0);
   act_to_room("$n sings a hilarious limerick about a man from Nantucket to $N!", ch, 0, victim, NOTVICT);
-  ch->sendln("You sing your funniest limerick!");
+  ch->sendln(u"You sing your funniest limerick!"_s);
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   if (ch->dc_->number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC))
@@ -1034,7 +1034,7 @@ qint32 song_whistle_sharp(quint8 level, CharacterPtr ch, QString arg, CharacterP
 
   if (isSet(retval, ReturnValue::eVICT_DIED))
   {
-    ch->sendln("You dance a small jig on the corpse.");
+    ch->sendln(u"You dance a small jig on the corpse."_s);
     act_to_room("$n dances a little jig on the fallen corpse.", ch, 0, victim, 0);
     return retval;
   }
@@ -1047,7 +1047,7 @@ qint32 song_healing_melody(quint8 level, CharacterPtr ch, QString arg, Character
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a song of healing...");
+  ch->sendln(u"You begin to sing a song of healing..."_s);
   act_to_room("$n raises $s voice in a soothing melody...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1078,7 +1078,7 @@ qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, C
 
   if (GET_KI(ch) < 2)
   {
-    ch->sendln("You don't have enough ki to continue singing.");
+    ch->sendln(u"You don't have enough ki to continue singing."_s);
     return ReturnValue::eSUCCESS;
   }
   GET_KI(ch) -= 2;
@@ -1105,7 +1105,7 @@ qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, C
     }
     else
     {
-      tmp_char->sendln("You feel a little better.");
+      tmp_char->sendln(u"You feel a little better."_s);
     }
 
     tmp_char->addHP(heal);
@@ -1113,7 +1113,7 @@ qint32 execute_song_healing_melody(quint8 level, CharacterPtr ch, QString arg, C
 
   if (!skill_success(ch, nullptr, SKILL_SONG_HEALING_MELODY))
   {
-    ch->sendln("You run out of lyrics and end the song.");
+    ch->sendln(u"You run out of lyrics and end the song."_s);
     ch->songs.erase(i);
     return ReturnValue::eEXTRA_VALUE;
   }
@@ -1138,7 +1138,7 @@ qint32 song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg, Charac
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a song of revealing...");
+  ch->sendln(u"You begin to sing a song of revealing..."_s);
   act_to_room("$n begins to chant in rhythm...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1182,7 +1182,7 @@ qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg
     if (i == ch)
     {
       act_to_room("$n continues $s singing...", ch, 0, 0, 0);
-      ch->sendln("Your singing ruins your hiding place.");
+      ch->sendln(u"Your singing ruins your hiding place."_s);
     }
     else
     {
@@ -1214,11 +1214,11 @@ qint32 execute_song_revealing_stacato(quint8 level, CharacterPtr ch, QString arg
       }
     }
   }
-  ch->sendln("You tap your foot along to the revealing staccato.");
+  ch->sendln(u"You tap your foot along to the revealing staccato."_s);
 
   if (!skill_success(ch, nullptr, SKILL_SONG_REVEAL_STACATO))
   {
-    ch->sendln("You run out of lyrics and end the song.");
+    ch->sendln(u"You run out of lyrics and end the song."_s);
     ch->songs.erase(k);
     return ReturnValue::eEXTRA_VALUE;
   }
@@ -1247,7 +1247,7 @@ qint32 song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg, Charac
   // and B, there's no place to save it before we execute
   (*i).song_data = (arg);
 
-  ch->sendln("You begin to sing a long single note...");
+  ch->sendln(u"You begin to sing a long single note..."_s);
   act_to_room("$n sings a long solitary note.", ch, 0, 0, 0);
   (*i).song_timer = song_info[(*i).song_number].beats();
 
@@ -1291,7 +1291,7 @@ qint32 execute_song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg
     spell_identify(ch->getLevel(), ch, vict, 0, 0);
   }
   else
-    ch->sendln("You can't seem to find that item.");
+    ch->sendln(u"You can't seem to find that item."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -1299,7 +1299,7 @@ qint32 song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, CharacterP
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin a song of battle!");
+  ch->sendln(u"You begin a song of battle!"_s);
   act_to_room("$n sings a horrible battle hymn!", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1326,7 +1326,7 @@ qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, Ch
 
   if (!victim)
   {
-    ch->sendln("Your song fades outside of battle.");
+    ch->sendln(u"Your song fades outside of battle."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1348,14 +1348,14 @@ qint32 execute_song_terrible_clef(quint8 level, CharacterPtr ch, QString arg, Ch
     return retval;
   if (isSet(retval, ReturnValue::eVICT_DIED))
   {
-    ch->sendln("You dance a small jig on the corpse.");
+    ch->sendln(u"You dance a small jig on the corpse."_s);
     act_to_room("$n dances a little jig on the fallen corpse.", ch, 0, victim, 0);
     return retval;
   }
 
   if (!skill_success(ch, victim, SKILL_SONG_TERRIBLE_CLEF))
   {
-    ch->sendln("You run out of lyrics and end the song.");
+    ch->sendln(u"You run out of lyrics and end the song."_s);
     ch->songs.erase(i);
     return ReturnValue::eEXTRA_VALUE;
   }
@@ -1377,7 +1377,7 @@ qint32 song_listsongs(quint8 level, CharacterPtr ch, QString arg, CharacterPtr v
 {
   QString buf;
 
-  ch->sendln("Available Songs\r\n---------------");
+  ch->sendln(u"Available Songs\r\n---------------"_s);
   for (qsizetype i = {}; i < Character::song_names.length(); i++)
   {
     if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
@@ -1393,7 +1393,7 @@ qint32 song_soothing_remembrance(quint8 level, CharacterPtr ch, QString arg, Cha
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a song of rememberance...");
+  ch->sendln(u"You begin to sing a song of rememberance..."_s);
   act_to_room("$n raises $s voice in a soothing ballad...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1418,7 +1418,7 @@ qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString 
 
   if (GET_KI(ch) < 3)
   {
-    ch->sendln("You don't have enough ki to continue singing.");
+    ch->sendln(u"You don't have enough ki to continue singing."_s);
     return ReturnValue::eSUCCESS;
   }
   GET_KI(ch) -= 3;
@@ -1444,7 +1444,7 @@ qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString 
       tmp_char->send(buf);
     }
     else
-      tmp_char->sendln("You feel soothed.");
+      tmp_char->sendln(u"You feel soothed."_s);
 
     GET_MANA(tmp_char) += heal;
     if (GET_MANA(tmp_char) > GET_MAX_MANA(tmp_char))
@@ -1453,7 +1453,7 @@ qint32 execute_song_soothing_remembrance(quint8 level, CharacterPtr ch, QString 
 
   if (!skill_success(ch, nullptr, SKILL_SONG_SOOTHING_REMEM))
   {
-    ch->sendln("You run out of lyrics and end the song.");
+    ch->sendln(u"You run out of lyrics and end the song."_s);
     ch->songs.erase(i);
     return ReturnValue::eEXTRA_VALUE;
   }
@@ -1475,7 +1475,7 @@ qint32 song_traveling_march(quint8 level, CharacterPtr ch, QString arg, Characte
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a song of travel...");
+  ch->sendln(u"You begin to sing a song of travel..."_s);
   act_to_room("$n raises $s voice in an uplifting march...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1509,7 +1509,7 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
 
   if (GET_KI(ch) == 0)
   {
-    ch->sendln("You don't have enough ki to continue singing.");
+    ch->sendln(u"You don't have enough ki to continue singing."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1544,14 +1544,14 @@ qint32 execute_song_traveling_march(quint8 level, CharacterPtr ch, QString arg, 
       }
     }
     else
-      tmp_char->sendln("Your feet feel lighter.");
+      tmp_char->sendln(u"Your feet feel lighter."_s);
 
     tmp_char->incrementMove(heal);
   }
 
   if (!skill_success(ch, nullptr, SKILL_SONG_TRAVELING_MARCH))
   {
-    ch->sendln("You run out of lyrics and end the song.");
+    ch->sendln(u"You run out of lyrics and end the song."_s);
     ch->songs.erase(i);
     return ReturnValue::eEXTRA_VALUE;
   }
@@ -1577,7 +1577,7 @@ qint32 song_stop(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim
     return ReturnValue::eFAILURE;
   if (ch->songs.isEmpty())
   {
-    ch->sendln("Might wanna start the performance first...Hope this isn't indicative of your love life...");
+    ch->sendln(u"Might wanna start the performance first...Hope this isn't indicative of your love life..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1616,7 +1616,7 @@ qint32 song_stop(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim
 
   ch->skill_increase_check(SKILL_SONG_STOP, ch->has_skill(song_info[SKILL_SONG_STOP - SKILL_SONG_BASE].skill_num()), SKILL_INCREASE_EASY);
 
-  ch->sendln("You finish off your music with a flourish...");
+  ch->sendln(u"You finish off your music with a flourish..."_s);
   act_to_room("$n finishes $s music in a flourish and a bow.", ch, 0, 0, 0);
 
   return ReturnValue::eSUCCESS;
@@ -1626,7 +1626,7 @@ qint32 song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, CharacterP
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing an astral chanty...");
+  ch->sendln(u"You begin to sing an astral chanty..."_s);
   act_to_room("$n starts quietly in a sea chanty...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1655,25 +1655,25 @@ void do_astral_chanty_movement(CharacterPtr victim, CharacterPtr target)
       isSet(dc_->world[target->in_room].room_flags, IMP_ONLY) ||
       isSet(dc_->world[target->in_room].room_flags, NO_PORTAL))
   {
-    victim->sendln("Your astral travels fail to find your destination.");
+    victim->sendln(u"Your astral travels fail to find your destination."_s);
     return;
   }
 
   if ((target->isPlayer()) && (target->getLevel() >= IMMORTAL))
   {
-    victim->sendln("Just who do you think you are?");
+    victim->sendln(u"Just who do you think you are?"_s);
     return;
   }
 
   if (IS_AFFECTED(target, AFF_SHADOWSLIP))
   {
-    victim->sendln("Something seems to block your astral travel to this target.");
+    victim->sendln(u"Something seems to block your astral travel to this target."_s);
     return;
   }
 
   if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
-    victim->sendln("Your attempt to transport stolen goods through the astral planes fails!");
+    victim->sendln(u"Your attempt to transport stolen goods through the astral planes fails!"_s);
     return;
   }
 
@@ -1682,7 +1682,7 @@ void do_astral_chanty_movement(CharacterPtr victim, CharacterPtr target)
   for (tmpch = dc_->world[target->in_room].people_; tmpch; tmpch = tmpch->next_in_room)
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
     {
-      victim->sendln("Your astral travels fail to find your destination.");
+      victim->sendln(u"Your astral travels fail to find your destination."_s);
       return;
     }
 
@@ -1690,7 +1690,7 @@ void do_astral_chanty_movement(CharacterPtr victim, CharacterPtr target)
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
   {
-    victim->sendln("Mystic winds shock you back into your old reality.");
+    victim->sendln(u"Mystic winds shock you back into your old reality."_s);
     act_to_room("$n shudders as magical reality refuses to set in.", victim, 0, 0, 0);
     WAIT_STATE(victim, DC::PULSE_VIOLENCE * 3);
     return;
@@ -1716,19 +1716,19 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
 
   if (!victim)
   {
-    ch->sendln("You cannot seem to accurately focus your song.");
+    ch->sendln(u"You cannot seem to accurately focus your song."_s);
     status = ReturnValue::eFAILURE;
   }
   else if (victim->getLevel() > ch->getLevel())
   {
-    ch->sendln("Your target resists the song's draw.");
+    ch->sendln(u"Your target resists the song's draw."_s);
     status = ReturnValue::eFAILURE;
   }
   else if (isSet(dc_->world[victim->in_room].room_flags, NO_PORTAL) ||
            dc_->zones.value(dc_->world[victim->in_room].zone).isNoTeleport() ||
            victim->room().isArena())
   {
-    ch->sendln("A mystical force seems to be keeping you out.");
+    ch->sendln(u"A mystical force seems to be keeping you out."_s);
     status = ReturnValue::eFAILURE;
   }
   else
@@ -1739,7 +1739,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
     for (tmpch = dc_->world[victim->in_room].people_; tmpch; tmpch = tmpch->next_in_room)
       if (search_char_for_item(tmpch, real_object(51), false))
       {
-        ch->sendln("$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R");
+        ch->sendln(u"$B$1Phire whispers, 'You had to know I wouldn't make it THAT easy now didn't you? You're just going to have to walk!$R"_s);
         status = ReturnValue::eFAILURE;
         break;
       }
@@ -1751,7 +1751,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
       {
         if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE))
         {
-          ch->sendln("You don't posses the energy to travel that far.");
+          ch->sendln(u"You don't posses the energy to travel that far."_s);
           GET_KI(ch) += use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
 
           // free our stored character name
@@ -1765,7 +1765,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
         }
         else
         {
-          ch->sendln("The long distance drains additional ki from you.");
+          ch->sendln(u"The long distance drains additional ki from you."_s);
           GET_KI(ch) -= use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE);
         }
       }
@@ -1780,7 +1780,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
         do_astral_chanty_movement(tmp_char, victim);
       }
 
-      ch->sendln("Your song completes, and your vision fades.");
+      ch->sendln(u"Your song completes, and your vision fades."_s);
       act_to_room("$n's voice fades off into the ether.", ch, 0, 0, 0);
       status = ReturnValue::eSUCCESS;
     }
@@ -1808,7 +1808,7 @@ qint32 song_forgetful_rhythm(quint8 level, CharacterPtr ch, QString arg, Charact
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a song of forgetfulness...");
+  ch->sendln(u"You begin to sing a song of forgetfulness..."_s);
   act_to_room("$n begins an entrancing rhythm...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1836,7 +1836,7 @@ qint32 execute_song_forgetful_rhythm(quint8 level, CharacterPtr ch, QString arg,
 
   if (!(victim = ch->get_char_room_vis((*i).song_data)))
   {
-    ch->sendln("You don't see that person here.");
+    ch->sendln(u"You don't see that person here."_s);
     (*i).song_data = {};
     (*i).song_data = {};
     return ReturnValue::eFAILURE;
@@ -1848,16 +1848,16 @@ qint32 execute_song_forgetful_rhythm(quint8 level, CharacterPtr ch, QString arg,
 
   if (victim->isPlayer())
   {
-    ch->sendln("They seem to be looking at you really strangly.");
-    victim->sendln("You are sung to about butterflies and bullfrogs.");
+    ch->sendln(u"They seem to be looking at you really strangly."_s);
+    victim->sendln(u"You are sung to about butterflies and bullfrogs."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (ch->dc_->number(0, 1))
   {
     // monster forgets hate/fear/track list
-    victim->sendln("Hrm.....who were you mad at again??");
-    ch->sendln("You have soothed the savage beast.");
+    victim->sendln(u"Hrm.....who were you mad at again??"_s);
+    ch->sendln(u"You have soothed the savage beast."_s);
     remove_memory(victim, 'h');
     remove_memory(victim, 'f');
     remove_memory(victim, 't');
@@ -1865,7 +1865,7 @@ qint32 execute_song_forgetful_rhythm(quint8 level, CharacterPtr ch, QString arg,
   else
   {
     // Die bard!
-    ch->sendln("Uh oh.");
+    ch->sendln(u"Uh oh."_s);
     do_say(victim, "Die you spoony bard!");
     retval = attack(victim, ch, TYPE_UNDEFINED);
     retval = SWAP_CH_VICT(retval);
@@ -1878,7 +1878,7 @@ qint32 song_shattering_resonance(quint8 level, CharacterPtr ch, QString arg, Cha
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a song of shattering...");
+  ch->sendln(u"You begin to sing a song of shattering..."_s);
   act_to_room("$n begins a fading resonance...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1910,7 +1910,7 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
 
   if (!(obj = get_obj_in_list((*i).song_data, dc_->world[ch->in_room].contents)))
   {
-    ch->sendln("You don't see that object here.");
+    ch->sendln(u"You don't see that object here."_s);
     (*i).song_data = {};
     (*i).song_data = {};
     return ReturnValue::eFAILURE;
@@ -1925,14 +1925,14 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
     if (!obj->equipped_by)
     {
       // Someone load it or something?
-      ch->sendln("The magic fades away back to the ether.");
+      ch->sendln(u"The magic fades away back to the ether."_s);
       act_to_room("$p fades away gently.", ch, obj, 0, INVIS_NULL);
     }
     else
     {
-      ch->sendln("The magic is shattered by your will!");
+      ch->sendln(u"The magic is shattered by your will!"_s);
       act_to_room("$p blinks out of existence with a bang!", ch, obj, 0, INVIS_NULL);
-      obj->equipped_by->sendln("Your magic beacon is shattered!");
+      obj->equipped_by->sendln(u"Your magic beacon is shattered!"_s);
       obj->equipped_by->beacon = {};
       obj->equipped_by = {};
     }
@@ -1943,12 +1943,12 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
   // make sure the obj is a player portal
   if (!obj->isPortal())
   {
-    ch->sendln("You can't shatter that!");
+    ch->sendln(u"You can't shatter that!"_s);
     return ReturnValue::eFAILURE;
   }
   if (!isexact("pcportal", obj->name()))
   {
-    ch->sendln("The portal resists your song.");
+    ch->sendln(u"The portal resists your song."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1957,7 +1957,7 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
   // determine chance of destroying it
   if (ch->dc_->number(0, 1)) // 50/50 for now
   {
-    ch->sendln("The portal resists your song.");
+    ch->sendln(u"The portal resists your song."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1969,7 +1969,7 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
   // find it's match
   if (!(tobj = get_obj_in_list("pcportal", dc_->world[real_room(obj->flags_.value[0])].contents)))
   {
-    ch->sendln("Could not find matching exit portal? Tell an Immortal.");
+    ch->sendln(u"Could not find matching exit portal? Tell an Immortal."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1984,7 +1984,7 @@ qint32 song_insane_chant(quint8 level, CharacterPtr ch, QString arg, CharacterPt
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin chanting insanely...");
+  ch->sendln(u"You begin chanting insanely..."_s);
   act_to_room("$n begins chanting wildly...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2007,7 +2007,7 @@ qint32 execute_song_insane_chant(quint8 level, CharacterPtr ch, QString arg, Cha
   af.caster = qPrintable(ch->name());
 
   act_to_room("$n's singing starts to drive you INSANE!!!", ch, 0, 0, 0);
-  ch->sendln("Your singing drives everyone around you INSANE!!!");
+  ch->sendln(u"Your singing drives everyone around you INSANE!!!"_s);
 
   for (victim = dc_->world[ch->in_room].people_; victim && victim != ch; victim = victim->next_in_room)
   {
@@ -2037,7 +2037,7 @@ qint32 song_flight_of_bee(quint8 level, CharacterPtr ch, QString arg, CharacterP
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a lofty song...");
+  ch->sendln(u"You begin to sing a lofty song..."_s);
   act_to_room("$n raises $s voice in an flighty quick march...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2068,7 +2068,7 @@ qint32 execute_song_flight_of_bee(quint8 level, CharacterPtr ch, QString arg, Ch
     if (tmp_char->affected_by_spell(SPELL_FLY))
     {
       affect_from_char(tmp_char, SPELL_FLY);
-      tmp_char->send("Your fly spell dissipates.");
+      tmp_char->send(u"Your fly spell dissipates."_s);
     }
 
     if (tmp_char->affected_by_spell(SKILL_SONG_FLIGHT_OF_BEE))
@@ -2077,7 +2077,7 @@ qint32 execute_song_flight_of_bee(quint8 level, CharacterPtr ch, QString arg, Ch
     }
     affect_to_char(tmp_char, &af);
 
-    tmp_char->sendln("Your feet feel like air.");
+    tmp_char->sendln(u"Your feet feel like air."_s);
   }
 
   return ReturnValue::eSUCCESS;
@@ -2087,7 +2087,7 @@ qint32 song_searching_song(quint8 level, CharacterPtr ch, QString arg, Character
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("Your voice raises sending out a song to search the lands...");
+  ch->sendln(u"Your voice raises sending out a song to search the lands..."_s);
   act_to_room("$n raises $s voice sending out a song to search the lands....", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2124,12 +2124,12 @@ qint32 execute_song_searching_song(quint8 level, CharacterPtr ch, QString arg, C
 
   if (!target || ch->getLevel() < target->getLevel())
   {
-    ch->sendln("Your song fades away, its search unfinished.");
+    ch->sendln(u"Your song fades away, its search unfinished."_s);
     return ReturnValue::eFAILURE;
   }
   if (target->affected_by_spell(SKILL_INNATE_EVASION) || isSet(dc_->world[target->in_room].room_flags, NO_KI))
   {
-    ch->sendln("Something blocks your vision.");
+    ch->sendln(u"Something blocks your vision."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2164,7 +2164,7 @@ qint32 execute_song_searching_song(quint8 level, CharacterPtr ch, QString arg, C
   }
 
   if (target->affected_by_spell(SPELL_DETECT_MAGIC) && target->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
-    target->sendln("You sense you are the target of scrying.");
+    target->sendln(u"You sense you are the target of scrying."_s);
 
   dc_sprintf(buf, "%s%s.\r\n", buf, dc_->world[target->in_room].name);
   ch->send(buf);
@@ -2175,7 +2175,7 @@ qint32 song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, Characte
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a quick little jig of alacrity...");
+  ch->sendln(u"You begin to sing a quick little jig of alacrity..."_s);
   act_to_room("$n starts humming a quick little ditty...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2191,7 +2191,7 @@ qint32 song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString Aag, Charac
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing loudly, and poke everyone in your surroundings with a stick..");
+  ch->sendln(u"You begin to sing loudly, and poke everyone in your surroundings with a stick.."_s);
   act_to_room("$n starts singing loudly, and begins to poke everyone around $m with a stick. Hey!", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2206,7 +2206,7 @@ qint32 song_summon_song(quint8 level, CharacterPtr ch, QString Aag, CharacterPtr
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin an inappropriately bawdy tune of your intimacy with pets.");
+  ch->sendln(u"You begin an inappropriately bawdy tune of your intimacy with pets."_s);
   act_to_room("$n begins an inappropriately bawdy tune of $s intimacy with pets.", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2235,7 +2235,7 @@ qint32 execute_song_summon_song(quint8 level, CharacterPtr ch, QString arg, Char
     }
   if (false == summoned)
   {
-    ch->sendln("You don't have any followers to summon. You are sad. :(");
+    ch->sendln(u"You don't have any followers to summon. You are sad. :("_s);
     act_to_room("$n hangs $s head in disappointment and surreptitiously wipes away a tear.", ch, 0, 0, 0);
   }
   return ReturnValue::eSUCCESS;
@@ -2244,7 +2244,7 @@ qint32 song_mking_charge(quint8 level, CharacterPtr ch, QString Aag, CharacterPt
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You inspire your allies with your rousing songs about rising against oppression!");
+  ch->sendln(u"You inspire your allies with your rousing songs about rising against oppression!"_s);
   act_to_room("$n starts singing songs about former glory and past victories, rousing $s allies!", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2290,7 +2290,7 @@ qint32 execute_song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, 
     if (tmp_char->affected_by_spell(SPELL_HASTE))
     {
       affect_from_char(tmp_char, SPELL_HASTE);
-      tmp_char->sendln("Your limbs slow back to normal.");
+      tmp_char->sendln(u"Your limbs slow back to normal."_s);
     }
 
     if (tmp_char->affected_by_spell(SKILL_SONG_JIG_OF_ALACRITY))
@@ -2301,7 +2301,7 @@ qint32 execute_song_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, 
     if (!tmp_char->affected_by_spell(SKILL_SONG_JIG_OF_ALACRITY))
     {
       affect_to_char(tmp_char, &af);
-      tmp_char->sendln("Your dance quickens your pulse!");
+      tmp_char->sendln(u"Your dance quickens your pulse!"_s);
     }
   }
 
@@ -2359,14 +2359,14 @@ qint32 execute_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg
 
     if (tmp_char->affected_by_spell(SKILL_SONG_FANATICAL_FANFARE))
     {
-      tmp_char->sendln("You manage to get far enough away to avoid being poked again!");
+      tmp_char->sendln(u"You manage to get far enough away to avoid being poked again!"_s);
       continue;
     }
 
     if (tmp_char->affected_by_spell(SPELL_INSOMNIA))
     {
       affect_from_char(tmp_char, SPELL_INSOMNIA);
-      tmp_char->sendln("Your mind returns to its normal state.");
+      tmp_char->sendln(u"Your mind returns to its normal state."_s);
     }
 
     affect_to_char(tmp_char, &af1);
@@ -2376,7 +2376,7 @@ qint32 execute_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg
       affect_to_char(tmp_char, &af3);
 
     if (ch == tmp_char)
-      tmp_char->sendln("Your song causes your mind to race at a thousand miles an hour!");
+      tmp_char->sendln(u"Your song causes your mind to race at a thousand miles an hour!"_s);
     else
       tmp_char->send(u"%s's song causes your mind to race at a thousand miles an hour!\r\n"_s.arg(qPrintable(ch->name())));
   }
@@ -2419,7 +2419,7 @@ qint32 execute_song_mking_charge(quint8 level, CharacterPtr ch, QString arg, Cha
     if (tmp_char->affected_by_spell(SKILL_SONG_MKING_CHARGE))
     {
       affect_from_char(tmp_char, SKILL_SONG_MKING_CHARGE);
-      tmp_char->sendln("You lose the inspiration.");
+      tmp_char->sendln(u"You lose the inspiration."_s);
     }
 
     if (!tmp_char->affected_by_spell(SKILL_SONG_MKING_CHARGE))
@@ -2428,10 +2428,10 @@ qint32 execute_song_mking_charge(quint8 level, CharacterPtr ch, QString arg, Cha
 
       if (ch == tmp_char)
       {
-        tmp_char->sendln("Your songs and tales fuel you with rage, sending you into a temporary frenzy!  To arms!");
+        tmp_char->sendln(u"Your songs and tales fuel you with rage, sending you into a temporary frenzy!  To arms!"_s);
         if (af.bitvector == AFF_HASTE)
         {
-          ch->sendln("Weaving the jig of alacrity into your song of battle, your allies move faster.");
+          ch->sendln(u"Weaving the jig of alacrity into your song of battle, your allies move faster."_s);
         }
       }
       else
@@ -2499,7 +2499,7 @@ qint32 intrp_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, Charact
     if (ISSET(fvictim->follower->affected_by, AFF_HASTE) && !fvictim->follower->affected_by_spell(SPELL_HASTE))
     {
       REMBIT(fvictim->follower->affected_by, AFF_HASTE);
-      fvictim->follower->sendln("Your limbs slow back to normal.");
+      fvictim->follower->sendln(u"Your limbs slow back to normal."_s);
     }
   }
 
@@ -2507,7 +2507,7 @@ qint32 intrp_jig_of_alacrity(quint8 level, CharacterPtr ch, QString arg, Charact
     if (ISSET(master->affected_by, AFF_HASTE) && !master->affected_by_spell(SPELL_HASTE))
     {
       REMBIT(master->affected_by, AFF_HASTE);
-      master->sendln("Your limbs slow back to normal.");
+      master->sendln(u"Your limbs slow back to normal."_s);
     }
   return ReturnValue::eSUCCESS;
 }
@@ -2528,7 +2528,7 @@ qint32 intrp_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg, 
     if (ISSET(fvictim->follower->affected_by, AFF_INSOMNIA) && !fvictim->follower->affected_by_spell(SPELL_INSOMNIA))
     {
       REMBIT(fvictim->follower->affected_by, AFF_INSOMNIA);
-      fvictim->follower->sendln("Your mind returns to its normal state.");
+      fvictim->follower->sendln(u"Your mind returns to its normal state."_s);
     }
     if (IS_AFFECTED(fvictim->follower, AFF_FEARLESS))
       REMBIT(fvictim->follower->affected_by, AFF_FEARLESS);
@@ -2540,7 +2540,7 @@ qint32 intrp_song_fanatical_fanfare(quint8 level, CharacterPtr ch, QString arg, 
     if (ISSET(master->affected_by, AFF_INSOMNIA) && !master->affected_by_spell(SPELL_INSOMNIA))
     {
       REMBIT(master->affected_by, AFF_INSOMNIA);
-      master->sendln("Your mind returns to its normal state.");
+      master->sendln(u"Your mind returns to its normal state."_s);
     }
   if (IS_AFFECTED(master, AFF_FEARLESS))
     REMBIT(master->affected_by, AFF_FEARLESS);
@@ -2566,7 +2566,7 @@ qint32 intrp_mking_charge(quint8 level, CharacterPtr ch, QString arg, CharacterP
     if (fvictim->follower->affected_by_spell(SKILL_SONG_MKING_CHARGE))
     {
       affect_from_char(fvictim->follower, SKILL_SONG_MKING_CHARGE);
-      fvictim->follower->sendln("You lose the inspiration.");
+      fvictim->follower->sendln(u"You lose the inspiration."_s);
     }
   }
 
@@ -2574,7 +2574,7 @@ qint32 intrp_mking_charge(quint8 level, CharacterPtr ch, QString arg, CharacterP
     if (master->affected_by_spell(SKILL_SONG_MKING_CHARGE))
     {
       affect_from_char(master, SKILL_SONG_MKING_CHARGE);
-      master->sendln("You lose the inspiration.");
+      master->sendln(u"You lose the inspiration."_s);
     }
   return ReturnValue::eSUCCESS;
 }
@@ -2583,7 +2583,7 @@ qint32 song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, CharacterPt
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You throw dust in the air and sing a wily ditty...");
+  ch->sendln(u"You throw dust in the air and sing a wily ditty..."_s);
   act_to_room("$n throws some dust in the air and sings a wily ditty...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2615,7 +2615,7 @@ qint32 execute_song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, Cha
   af2.caster = qPrintable(ch->name());
 
   act_to_room("The dust in the air clings to you, and begins to shine!", ch, 0, 0, 0);
-  ch->sendln("Your dust clings to everyone, showing where they are!");
+  ch->sendln(u"Your dust clings to everyone, showing where they are!"_s);
 
   for (victim = dc_->world[ch->in_room].people_; victim; victim = victim->next_in_room)
   {
@@ -2649,7 +2649,7 @@ qint32 execute_song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, Cha
   {
     if (GET_ITEM_TYPE(item) == ITEM_BEACON && isSet(item->flags_.extra_flags, ITEM_INVISIBLE))
     {
-      ch->sendln("Your glitter reveals a beacon.");
+      ch->sendln(u"Your glitter reveals a beacon."_s);
       REMOVE_BIT(item->flags_.extra_flags, ITEM_INVISIBLE);
     }
   }
@@ -2661,7 +2661,7 @@ qint32 song_bountiful_sonnet(quint8 level, CharacterPtr ch, QString arg, Charact
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin long restoring sonnet...");
+  ch->sendln(u"You begin long restoring sonnet..."_s);
   act_to_room("$n begins a long restorous sonnet...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2688,7 +2688,7 @@ qint32 execute_song_bountiful_sonnet(quint8 level, CharacterPtr ch, QString arg,
     if (!ISSET(fvictim->follower->affected_by, AFF_GROUP) || fvictim->follower->in_room != ch->in_room)
       continue;
 
-    fvictim->follower->sendln("Your appetite has been completely satiated.");
+    fvictim->follower->sendln(u"Your appetite has been completely satiated."_s);
     if (GET_COND(fvictim->follower, FULL) != -1 && fvictim->follower->getLevel() < 60)
     {
       GET_COND(fvictim->follower, FULL) = 24;
@@ -2700,7 +2700,7 @@ qint32 execute_song_bountiful_sonnet(quint8 level, CharacterPtr ch, QString arg,
   }
   if (ch->in_room == master->in_room)
   {
-    master->sendln("Your appetite has been completely satiated.");
+    master->sendln(u"Your appetite has been completely satiated."_s);
     if (GET_COND(master, FULL) != -1 && master->getLevel() < 60)
     {
       GET_COND(master, FULL) = 24;
@@ -2734,13 +2734,13 @@ qint32 execute_song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg
 
   if (!target || ch->getLevel() < target->getLevel())
   {
-    ch->sendln("Your dirge fades, its effect neutralized.");
+    ch->sendln(u"Your dirge fades, its effect neutralized."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch == target)
   {
-    ch->sendln("Your loyalties have been broken, what did you think?");
+    ch->sendln(u"Your loyalties have been broken, what did you think?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2751,21 +2751,21 @@ qint32 execute_song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg
   }
   if (!target->affected_by_spell(SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
   {
-    ch->sendln("As far as you can tell, they are not loyal to anyone.");
+    ch->sendln(u"As far as you can tell, they are not loyal to anyone."_s);
     return ReturnValue::eFAILURE;
   }
   qint32 type = {};
-  if (dc_->mob_index[target->mobdata->nr].vnum() == 8)
+  if (dc_->mob_index_[target->mobdata->nr].vnum() == 8)
     type = 4;
   else if (IS_AFFECTED(target, AFF_FAMILIAR))
     type = 3;
-  else if (dc_->mob_index[target->mobdata->nr].vnum() >= 22394 && dc_->mob_index[target->mobdata->nr].vnum() <= 22398)
+  else if (dc_->mob_index_[target->mobdata->nr].vnum() >= 22394 && dc_->mob_index_[target->mobdata->nr].vnum() <= 22398)
     type = 2;
   else
     type = 1;
   if ((type == 4 && !number(0, 9)) || (type == 2 && !number(0, 4)) || (type == 1 && !number(0, 1)))
   {
-    ch->sendln("Ooops, that didn't work out like you hoped.");
+    ch->sendln(u"Ooops, that didn't work out like you hoped."_s);
     act_to_room("$N charges at $n, for trying to break its bond with its master.\r\n", ch, 0, target, NOTVICT);
     act_to_character("$N charges at you!", ch, 0, target, 0);
     return attack(target, ch, TYPE_UNDEFINED);
@@ -2775,7 +2775,7 @@ qint32 execute_song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg
   /*   for (i = 22394; i < 22399; i++)
    if (real_mobile(i) == target->mobdata->nr)
    {
-   ch->sendln("The undead being is unaffected by your song.");
+   ch->sendln(u"The undead being is unaffected by your song."_s);
    return ReturnValue::eFAILURE;
    }*/
   if (IS_AFFECTED(target, AFF_FAMILIAR))
@@ -2801,8 +2801,8 @@ qint32 execute_song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg
     return ReturnValue::eSUCCESS;
   }
   affect_from_char(target, SPELL_CHARM_PERSON);
-  ch->sendln("You shatter their magical chains.");
-  target->sendln("Boogie! Your mind has been set free!");
+  ch->sendln(u"You shatter their magical chains."_s);
+  target->sendln(u"Boogie! Your mind has been set free!"_s);
 
   act_to_character("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, 0);
   act_to_room("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, NOTVICT);
@@ -2820,7 +2820,7 @@ qint32 song_dischordant_dirge(quint8 level, CharacterPtr ch, QString arg, Charac
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin a wailing dirge...");
+  ch->sendln(u"You begin a wailing dirge..."_s);
   act_to_room("$n begins to sing a wailing dirge...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2842,7 +2842,7 @@ qint32 song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg, Charac
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin a strong chord...");
+  ch->sendln(u"You begin a strong chord..."_s);
   act_to_room("$n begins to sound a chord...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2881,19 +2881,19 @@ qint32 execute_song_synchronous_chord(quint8 level, CharacterPtr ch, QString arg
 
   if (!target)
   {
-    ch->sendln("Your song fades away, its target unknown.");
+    ch->sendln(u"Your song fades away, its target unknown."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch == target)
   {
-    ch->sendln("You hate yourself, you self-loathing bastard.");
+    ch->sendln(u"You hate yourself, you self-loathing bastard."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (target->isPlayer())
   {
-    ch->sendln("They don't hate anyone, but they are looking at you kinda funny...");
+    ch->sendln(u"They don't hate anyone, but they are looking at you kinda funny..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2940,7 +2940,7 @@ qint32 song_sticky_lullaby(quint8 level, CharacterPtr ch, QString arg, Character
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin a slow numbing lullaby...");
+  ch->sendln(u"You begin a slow numbing lullaby..."_s);
   act_to_room("$n starts singing an eye-drooping lullaby.", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2974,7 +2974,7 @@ qint32 execute_song_sticky_lullaby(quint8 level, CharacterPtr ch, QString arg, C
       victim = ch->fighting;
     else
     {
-      ch->sendln("You don't see that person here.");
+      ch->sendln(u"You don't see that person here."_s);
       (*i).song_data = {};
       (*i).song_data = {};
       return ReturnValue::eFAILURE;
@@ -2992,7 +2992,7 @@ qint32 execute_song_sticky_lullaby(quint8 level, CharacterPtr ch, QString arg, C
 
   act_to_room("$n lulls $N's feet into a numbing sleep.", ch, 0, victim, NOTVICT);
   act_to_character("$N's feet fall into a numbing sleep.", ch, 0, victim, 0);
-  victim->sendln("Your eyes begin to droop, and your feet fall asleep!");
+  victim->sendln(u"Your eyes begin to droop, and your feet fall asleep!"_s);
   SETBIT(victim->affected_by, AFF_NO_FLEE);
   return ReturnValue::eSUCCESS;
 }
@@ -3001,7 +3001,7 @@ qint32 song_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, Character
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing a fast nervous tune...");
+  ch->sendln(u"You begin to sing a fast nervous tune..."_s);
   act_to_room("$n starts mumbling out a quick, nervous tune...", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3069,7 +3069,7 @@ qint32 execute_song_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, C
     if (skill > 90)
       affect_to_char(tmp_char, &af3);
 
-    tmp_char->sendln("You nervously watch your surroundings with magical speed!");
+    tmp_char->sendln(u"You nervously watch your surroundings with magical speed!"_s);
   }
 
   if (!skill_success(ch, nullptr, SKILL_SONG_VIGILANT_SIREN))
@@ -3117,7 +3117,7 @@ qint32 intrp_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, Characte
     if (ISSET(fvictim->follower->affected_by, AFF_ALERT))
     {
       REMBIT(fvictim->follower->affected_by, AFF_ALERT);
-      fvictim->follower->sendln("You stop watching your back so closely.");
+      fvictim->follower->sendln(u"You stop watching your back so closely."_s);
     }
     if (IS_AFFECTED(fvictim->follower, AFF_NO_CIRCLE))
       REMBIT(fvictim->follower->affected_by, AFF_NO_CIRCLE);
@@ -3129,7 +3129,7 @@ qint32 intrp_vigilant_siren(quint8 level, CharacterPtr ch, QString arg, Characte
     if (ISSET(master->affected_by, AFF_ALERT))
     {
       REMBIT(master->affected_by, AFF_ALERT);
-      master->sendln("You stop watching your back so closely.");
+      master->sendln(u"You stop watching your back so closely."_s);
     }
   if (IS_AFFECTED(master, AFF_NO_CIRCLE))
     REMBIT(master->affected_by, AFF_NO_CIRCLE);
@@ -3157,7 +3157,7 @@ qint32 song_unresistable_ditty(quint8 level, CharacterPtr ch, QString arg, Chara
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing an irresistable little ditty...");
+  ch->sendln(u"You begin to sing an irresistable little ditty..."_s);
   act_to_room("$n begins to sing, 'du du dudu du du dudu du du dudu!'", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3174,7 +3174,7 @@ qint32 execute_song_unresistable_ditty(quint8 level, CharacterPtr ch, QString ar
   CharacterPtr i;
 
   act_to_room("$n finishs $s song, 'Ahhhhh!  Macarena!'", ch, 0, 0, 0);
-  ch->sendln("Ahhh....such beautiful music.");
+  ch->sendln(u"Ahhh....such beautiful music."_s);
 
   //   qint32 specialization = skill / 100;
   skill %= 100;
@@ -3205,7 +3205,7 @@ qint32 song_crushing_crescendo(quint8 level, CharacterPtr ch, QString arg, Chara
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing, approaching crescendo!");
+  ch->sendln(u"You begin to sing, approaching crescendo!"_s);
   act_to_room("$n begins to sing, raising the volume to deafening levels!", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3237,7 +3237,7 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
 
   if (!victim)
   {
-    ch->sendln("With the battle broken you end your crescendo.");
+    ch->sendln(u"With the battle broken you end your crescendo."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -3320,14 +3320,14 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
     dc_sprintf(buf2, "The power of your song has completely crushed %s!", buf);
     act_to_character(buf2, ch, nullptr, victim, 0);
 
-    ch->sendln("You dance a small jig on the corpse.");
+    ch->sendln(u"You dance a small jig on the corpse."_s);
     act_to_room("$n dances a little jig on the fallen corpse.", ch, 0, victim, 0);
     return retval;
   }
 
   if ((qint64)(*i).song_data > ch->has_skill(SKILL_SONG_CRUSHING_CRESCENDO) / 20 || (qint64)(*i).song_data > 3)
   {
-    ch->sendln("You run out of lyrics and end the song.");
+    ch->sendln(u"You run out of lyrics and end the song."_s);
     ch->songs.erase(i);
     return ReturnValue::eEXTRA_VALUE;
   }
@@ -3336,7 +3336,7 @@ qint32 execute_song_crushing_crescendo(quint8 level, CharacterPtr ch, QString ar
   {
     if (GET_KI(ch) < song_info[(*i).song_number].min_useski())
     {
-      ch->sendln("Having run out of ki, your song ends abruptly.");
+      ch->sendln(u"Having run out of ki, your song ends abruptly."_s);
       (*i).song_data = {}; // Reset, just in case.
       return ReturnValue::eSUCCESS;
     }
@@ -3350,7 +3350,7 @@ qint32 song_submariners_anthem(quint8 level, CharacterPtr ch, QString arg, Chara
 {
   QList<songInfo>::iterator i;
 
-  ch->sendln("You begin to sing about the shining sea and her terrible ways...");
+  ch->sendln(u"You begin to sing about the shining sea and her terrible ways..."_s);
   act_to_room("$n sings a surly number about $s fickle mistress, the briny deep.", ch, 0, 0, 0);
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -3390,14 +3390,14 @@ qint32 execute_song_submariners_anthem(quint8 level, CharacterPtr ch, QString ar
     if (fvictim->follower->affected_by_spell(SPELL_WATER_BREATHING))
     {
       affect_from_char(fvictim->follower, SPELL_WATER_BREATHING);
-      fvictim->follower->send("Your magical gills disappear.");
+      fvictim->follower->send(u"Your magical gills disappear."_s);
     }
 
     if (fvictim->follower->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM))
       affect_from_char(fvictim->follower, SKILL_SONG_SUBMARINERS_ANTHEM);
 
     affect_to_char(fvictim->follower, &af);
-    fvictim->follower->sendln("Your lungs absorb oxygen from any fluid!");
+    fvictim->follower->sendln(u"Your lungs absorb oxygen from any fluid!"_s);
   }
 
   if (ch->in_room == master->in_room)
@@ -3405,7 +3405,7 @@ qint32 execute_song_submariners_anthem(quint8 level, CharacterPtr ch, QString ar
     if (master->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM))
       affect_from_char(master, SKILL_SONG_SUBMARINERS_ANTHEM);
     affect_to_char(master, &af);
-    master->sendln("Your lungs absorb oxygen from any fluid!");
+    master->sendln(u"Your lungs absorb oxygen from any fluid!"_s);
   }
 
   return ReturnValue::eSUCCESS;

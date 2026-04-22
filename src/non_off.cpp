@@ -35,14 +35,14 @@ void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
   }
 }
 
-command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj;
   QString name;
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -72,41 +72,41 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ch->isMortalPlayer())
     {
-      ch->sendln("You are unable to destroy this item, it must be CURSED!");
+      ch->sendln(u"You are unable to destroy this item, it must be CURSED!"_s);
       return ReturnValue::eFAILURE;
     }
     else
-      ch->sendln("(This item is cursed, BTW.)");
+      ch->sendln(u"(This item is cursed, BTW.)"_s);
   }
 
   if (obj->flags_.value[3] == 1 && isexact("pc", obj->name()))
   {
-    ch->sendln("You probably don't *really* want to do that.");
+    ch->sendln(u"You probably don't *really* want to do that."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL) && ch->getLevel() < ANGEL)
   {
-    ch->sendln("God, what a stupid fucking thing for you to do.");
+    ch->sendln(u"God, what a stupid fucking thing for you to do."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
+  if (dc_->obj_index_[obj->item_number].vnum() == CHAMPION_ITEM)
   {
-    ch->sendln("In soviet russia, champion flag sacrifice YOU!");
+    ch->sendln(u"In soviet russia, champion flag sacrifice YOU!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->isPlayerCantQuit() && !ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return ReturnValue::eFAILURE;
   }
 
   /* don't let people sac stuff in donations */
   if (ch->in_room == real_room(3099))
   {
-    ch->sendln("Not in the donation room.");
+    ch->sendln(u"Not in the donation room."_s);
     return (ReturnValue::eFAILURE);
   }
 
@@ -125,28 +125,28 @@ command_return_t do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
     affect_from_char(ch, SPELL_INVISIBLE);
-    ch->sendln("You drop your invisiblity spell.");
+    ch->sendln(u"You drop your invisiblity spell."_s);
     if (!IS_AFFECTED(ch, AFF_INVISIBLE))
       act_to_room("$n slowly fades into existence.", ch, 0, 0, 0);
     else
-      ch->sendln("You must remove the equipment making you invis to become visible.");
+      ch->sendln(u"You must remove the equipment making you invis to become visible."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
-    ch->sendln("You must remove the equipment making you invis to become visible.");
+    ch->sendln(u"You must remove the equipment making you invis to become visible."_s);
   else
-    ch->sendln("You aren't invisible.");
+    ch->sendln(u"You aren't invisible."_s);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj = {};
   QString name;
@@ -157,13 +157,13 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->fighting)
   {
-    ch->sendln("Aren't we a little to busy for that right now?");
+    ch->sendln(u"Aren't we a little to busy for that right now?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -171,7 +171,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    ch->sendln("Donate what?");
+    ch->sendln(u"Donate what?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -185,7 +185,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isPlayerCantQuit() && !ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -240,7 +240,7 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(obj->flags_.extra_flags, ITEM_NODROP))
   {
-    ch->sendln("Since you can't let go of it, how are you going to donate it?");
+    ch->sendln(u"Since you can't let go of it, how are you going to donate it?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -248,11 +248,11 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ch->getLevel() > IMMORTAL)
     {
-      ch->sendln("That was a NO_TRADE item btw....");
+      ch->sendln(u"That was a NO_TRADE item btw...."_s);
     }
     else
     {
-      ch->sendln("It seems magically attached to you.");
+      ch->sendln(u"It seems magically attached to you."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -261,18 +261,18 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ch->getLevel() > IMMORTAL)
     {
-      ch->sendln("That was a NO_TRADE item btw....");
+      ch->sendln(u"That was a NO_TRADE item btw...."_s);
     }
     else
     {
-      ch->sendln("Something inside it seems magically attached to you.");
+      ch->sendln(u"Something inside it seems magically attached to you."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
-    ch->sendln("You can't donate godload equipment.");
+    ch->sendln(u"You can't donate godload equipment."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -282,12 +282,12 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   if (obj->flags_.type_flag != ITEM_MONEY)
   {
     QString log_buf = {};
-    dc_sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), dc_->obj_index[obj->item_number].vnum());
+    dc_sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), dc_->obj_index_[obj->item_number].vnum());
     dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description()),
                 qPrintable(loop_obj->short_description()),
-                dc_->obj_index[loop_obj->item_number].vnum());
+                dc_->obj_index_[loop_obj->item_number].vnum());
   }
 
   location = real_room(room);
@@ -305,28 +305,28 @@ command_return_t do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
+auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> ReturnValue
 {
-  sendln("You now have no title.");
+  sendln(u"You now have no title."_s);
   title_ = {};
   save(cmd_t::SAVE_SILENTLY);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 ctr;
 
   if (argument.isEmpty())
   {
-    ch->sendln("Type \"title message\" to set a title or \"notitle\" to remove your title.");
+    ch->sendln(u"Type \"title message\" to set a title or \"notitle\" to remove your title."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOTITLE))
   {
-    ch->sendln("You can't do that.  You must have been naughty.");
+    ch->sendln(u"You can't do that.  You must have been naughty."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -335,13 +335,13 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (dc_strlen(argument) > 40)
   {
-    ch->sendln("Title field too big.  40 characters max.");
+    ch->sendln(u"Title field too big.  40 characters max."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (strchr(argument, '[') || strchr(argument, ']'))
   {
-    ch->sendln("You cannot have a '[' or a ']' in your title.");
+    ch->sendln(u"You cannot have a '[' or a ']' in your title."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -351,7 +351,7 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (((argument[ctr] == '$') && (argument[ctr + 1] == '$')) || ((argument[ctr] == '?') && (argument[ctr + 1] == '?')))
     {
-      ch->sendln("Your title is now: Common Dork of Dark Castle.");
+      ch->sendln(u"Your title is now: Common Dork of Dark Castle."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -364,11 +364,11 @@ command_return_t do_title(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
   {
-    send("You can't toggle anything, you're a mob!\r\n");
+    send(u"You can't toggle anything, you're a mob!\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -412,7 +412,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 
   if (!txt_found || !found_toggle.isValid())
   {
-    send("Bad option.  Type toggle with no arguments for a list of "
+    send(u"Bad option.  Type toggle with no arguments for a list of "
          "good ones.\r\n");
     return ReturnValue::eFAILURE;
   }
@@ -461,13 +461,13 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
 
   if (arguments.size() > 0 && arguments.at(0) == "help")
   {
-    send("Usage:\r\n");
-    send("config                       - Show all currently set configuration options.\r\n");
-    send("config color.good=color name - Set color to use for \"good\" values in game.\r\n");
-    send("config color.bad=color name  - Set color to use for \"bad\" values in game.\r\n");
-    send("                               Use ? as color name to see valid colors.\r\n");
-    send("config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
-    send("config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
+    send(u"Usage:\r\n"_s);
+    send(u"config                       - Show all currently set configuration options.\r\n"_s);
+    send(u"config color.good=color name - Set color to use for \"good\" values in game.\r\n"_s);
+    send(u"config color.bad=color name  - Set color to use for \"bad\" values in game.\r\n"_s);
+    send(u"                               Use ? as color name to see valid colors.\r\n"_s);
+    send(u"config color.good=           - Unset color.good. Will use default \"good\" color.\r\n"_s);
+    send(u"config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -505,7 +505,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
       }
       else
       {
-        send("No config options set.\r\n");
+        send(u"No config options set.\r\n"_s);
       }
       return ReturnValue::eFAILURE;
     }
@@ -536,11 +536,11 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
       {
         if (value == "?")
         {
-          send("Valid colors:\r\n");
+          send(u"Valid colors:\r\n"_s);
         }
         else
         {
-          send("Invalid color specified. Valid colors:\r\n");
+          send(u"Invalid color specified. Valid colors:\r\n"_s);
         }
 
         for (auto color = colors.constBegin(); color != colors.constEnd(); ++color)
@@ -567,7 +567,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
       }
       else if (value.startsWith("line") == false)
       {
-        send("Valid telnet modes are line for linemode or character for character mode.\r\n");
+        send(u"Valid telnet modes are line for linemode or character for character mode.\r\n"_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -628,7 +628,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
           u"ISODate"_s.compare(value, Qt::CaseInsensitive) &&
           u"RFC2822Date"_s.compare(value, Qt::CaseInsensitive))
       {
-        sendln("Valid timestamp formats are:");
+        sendln(u"Valid timestamp formats are:"_s);
         auto timezone_str = getSetting("timezone", "America/Chicago");
         auto timezone = QTimeZone(timezone_str.toLatin1());
         sendln(u"%1 %2"_s.arg("TextDate", 15).arg(QDateTime::currentDateTimeUtc().toTimeZone(timezone).toString(Qt::DateFormat::TextDate)));
@@ -640,13 +640,13 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
     }
     else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
     {
-      send("Invalid config option.\r\n");
+      send(u"Invalid config option.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
 
     if (QRegularExpression("^((tell|gossip).history.timestamp|fighting.showdps)$").match(key).hasMatch() && !QRegularExpression("^([01tf]{1}|true|false)$").match(value).hasMatch())
     {
-      sendln("Invalid config option. Valid options are: 0, 1, t, f, true and false.");
+      sendln(u"Invalid config option. Valid options are: 0, 1, t, f, true and false."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -660,86 +660,86 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_brief(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_BRIEF))
   {
-    send("Brief mode $B$4off$R.\r\n");
+    send(u"Brief mode $B$4off$R.\r\n"_s);
     REMOVE_BIT(player->toggles, Player::PLR_BRIEF);
   }
   else
   {
-    send("Brief mode $B$2on$R.\r\n");
+    send(u"Brief mode $B$2on$R.\r\n"_s);
     SET_BIT(player->toggles, Player::PLR_BRIEF);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_ansi(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_ansi(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_ANSI))
   {
-    sendln("ANSI COLOR $B$4off$R.");
+    sendln(u"ANSI COLOR $B$4off$R."_s);
     REMOVE_BIT(player->toggles, Player::PLR_ANSI);
   }
   else
   {
-    sendln("ANSI COLOR $B$2on$R.");
+    sendln(u"ANSI COLOR $B$2on$R."_s);
     SET_BIT(player->toggles, Player::PLR_ANSI);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_vt100(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_vt100(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_VT100))
   {
-    sendln("VT100 $B$4off$R.");
+    sendln(u"VT100 $B$4off$R."_s);
     REMOVE_BIT(player->toggles, Player::PLR_VT100);
   }
   else
   {
-    sendln("VT100 $B$2on$R.");
+    sendln(u"VT100 $B$2on$R."_s);
     SET_BIT(player->toggles, Player::PLR_VT100);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_compact(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_compact(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_COMPACT))
   {
-    sendln("Compact mode $B$4off$R.");
+    sendln(u"Compact mode $B$4off$R."_s);
     REMOVE_BIT(player->toggles, Player::PLR_COMPACT);
   }
   else
   {
-    sendln("Compact mode $B$2on$R.");
+    sendln(u"Compact mode $B$2on$R."_s);
     SET_BIT(player->toggles, Player::PLR_COMPACT);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_SUMMONABLE))
   {
-    sendln("You may no longer be summoned by other players.");
+    sendln(u"You may no longer be summoned by other players."_s);
     REMOVE_BIT(player->toggles, Player::PLR_SUMMONABLE);
   }
   else
@@ -752,68 +752,68 @@ command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_LFG))
   {
-    sendln("You are no longer Looking For Group.");
+    sendln(u"You are no longer Looking For Group."_s);
     REMOVE_BIT(player->toggles, Player::PLR_LFG);
   }
   else
   {
-    sendln("You are now Looking For Group.");
+    sendln(u"You are now Looking For Group."_s);
     SET_BIT(player->toggles, Player::PLR_LFG);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (!isSet(player->toggles, Player::PLR_GUIDE))
   {
-    sendln("You must be assigned as a $BGuide$R by the gods before you can toggle it.");
+    sendln(u"You must be assigned as a $BGuide$R by the gods before you can toggle it."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(player->toggles, Player::PLR_GUIDE_TOG))
   {
-    sendln("You have hidden your $B(Guide)$R tag.");
+    sendln(u"You have hidden your $B(Guide)$R tag."_s);
     REMOVE_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    sendln("You will now show your $B(Guide)$R tag.");
+    sendln(u"You will now show your $B(Guide)$R tag."_s);
     SET_BIT(player->toggles, Player::PLR_GUIDE_TOG);
   }
 
   return ReturnValue::eSUCCESS;
 }
-command_return_t Character::do_news_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_NEWS))
   {
-    sendln("You now view news in an up-down fashion.");
+    sendln(u"You now view news in an up-down fashion."_s);
     REMOVE_BIT(player->toggles, Player::PLR_NEWS);
   }
   else
   {
-    sendln("You now view news in a down-up fashion..");
+    sendln(u"You now view news in a down-up fashion.."_s);
     SET_BIT(player->toggles, Player::PLR_NEWS);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -821,18 +821,18 @@ command_return_t Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
   if (isSet(player->toggles, Player::PLR_ASCII))
   {
     REMOVE_BIT(player->toggles, Player::PLR_ASCII);
-    sendln("Cards are now displayed through ASCII.");
+    sendln(u"Cards are now displayed through ASCII."_s);
   }
   else
   {
-    sendln("Cards are no longer dislayed through ASCII.");
+    sendln(u"Cards are no longer dislayed through ASCII."_s);
     SET_BIT(player->toggles, Player::PLR_ASCII);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -840,152 +840,152 @@ command_return_t Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
   if (isSet(player->toggles, Player::PLR_DAMAGE))
   {
     REMOVE_BIT(player->toggles, Player::PLR_DAMAGE);
-    sendln("Damage numbers will no longer be displayed in combat.");
+    sendln(u"Damage numbers will no longer be displayed in combat."_s);
   }
   else
   {
-    sendln("Damage numbers will now be displayed in combat.");
+    sendln(u"Damage numbers will now be displayed in combat."_s);
     SET_BIT(player->toggles, Player::PLR_DAMAGE);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_NOTAX))
   {
-    sendln("You will now be taxed on all your loot.");
+    sendln(u"You will now be taxed on all your loot."_s);
     REMOVE_BIT(player->toggles, Player::PLR_NOTAX);
   }
   else
   {
-    sendln("You will no longer be taxed.");
+    sendln(u"You will no longer be taxed."_s);
     SET_BIT(player->toggles, Player::PLR_NOTAX);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_CHARMIEJOIN))
   {
-    sendln("Your followers will no longer automatically join you.");
+    sendln(u"Your followers will no longer automatically join you."_s);
     REMOVE_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
   else
   {
-    sendln("Your followers will automatically aid you in battle.");
+    sendln(u"Your followers will automatically aid you in battle."_s);
     SET_BIT(player->toggles, Player::PLR_CHARMIEJOIN);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_autoeat(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_autoeat(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (isSet(player->toggles, Player::PLR_AUTOEAT))
   {
-    sendln("You no longer automatically eat and drink.");
+    sendln(u"You no longer automatically eat and drink."_s);
     REMOVE_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
   else
   {
-    sendln("You now automatically eat and drink when hungry and thirsty.");
+    sendln(u"You now automatically eat and drink when hungry and thirsty."_s);
     SET_BIT(player->toggles, Player::PLR_AUTOEAT);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_anonymous(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_anonymous(QStringList arguments, cmd_t cmd)
 {
   if (level_ < 40)
   {
-    sendln("You are too inexperienced to disguise your profession.");
+    sendln(u"You are too inexperienced to disguise your profession."_s);
     return ReturnValue::eSUCCESS;
   }
   if (isSet(player->toggles, Player::PLR_ANONYMOUS))
   {
-    sendln("Your class and level information is now public.");
+    sendln(u"Your class and level information is now public."_s);
   }
   else
   {
-    sendln("Your class and level information is now private.");
+    sendln(u"Your class and level information is now private."_s);
   }
 
   TOGGLE_BIT(player->toggles, Player::PLR_ANONYMOUS);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_wimpy(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_wimpy(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_WIMPY))
   {
-    sendln("You are no longer a wimp....maybe.");
+    sendln(u"You are no longer a wimp....maybe."_s);
     REMOVE_BIT(player->toggles, Player::PLR_WIMPY);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("You are now an official wimp.");
+  sendln(u"You are now an official wimp."_s);
   SET_BIT(player->toggles, Player::PLR_WIMPY);
   return ReturnValue::eSUCCESS;
 }
 
 // Remember that his is "no-pager".  So if it's set, we don't page
 // If it's not set, we do.
-command_return_t Character::do_pager(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_pager(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_PAGER))
   {
-    sendln("You now page your strings in 24 line chunks.");
+    sendln(u"You now page your strings in 24 line chunks."_s);
     REMOVE_BIT(player->toggles, Player::PLR_PAGER);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("You no longer page strings in 24 line chunks.");
+  sendln(u"You no longer page strings in 24 line chunks."_s);
   SET_BIT(player->toggles, Player::PLR_PAGER);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_BARD_SONG))
   {
-    sendln("Bard singing now in verbose mode.");
+    sendln(u"Bard singing now in verbose mode."_s);
     REMOVE_BIT(player->toggles, Player::PLR_BARD_SONG);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("Bard singing now in brief mode.");
+  sendln(u"Bard singing now in brief mode."_s);
   SET_BIT(player->toggles, Player::PLR_BARD_SONG);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
-    sendln("You will attach duplicate keys to keyrings.");
+    sendln(u"You will attach duplicate keys to keyrings."_s);
     REMOVE_BIT(player->toggles, Player::PLR_NODUPEKEYS);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("You will not attach duplicate keys to keyrings.");
+  sendln(u"You will not attach duplicate keys to keyrings."_s);
   SET_BIT(player->toggles, Player::PLR_NODUPEKEYS);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_beep_set(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -993,16 +993,16 @@ command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
   if (isSet(player->toggles, Player::PLR_BEEP))
   {
     REMOVE_BIT(player->toggles, Player::PLR_BEEP);
-    sendln("\r\nTell is now silent.");
+    sendln(u"\r\nTell is now silent."_s);
     return ReturnValue::eFAILURE;
   }
 
   SET_BIT(player->toggles, Player::PLR_BEEP);
-  sendln("\r\nTell now beeps.\a");
+  sendln(u"\r\nTell now beeps.\a"_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1054,12 +1054,12 @@ command_return_t do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1074,7 +1074,7 @@ command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case position_t::SITTING:
   {
-    ch->sendln("You're sitting already.");
+    ch->sendln(u"You're sitting already."_s);
   }
   break;
   case position_t::RESTING:
@@ -1108,12 +1108,12 @@ command_return_t do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1160,23 +1160,23 @@ command_return_t do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_typePtr paf;
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_INSOMNIA))
   {
-    ch->sendln("You are far too alert for that.");
+    ch->sendln(u"You are far too alert for that."_s);
     return ReturnValue::eFAILURE;
   }
   if (!isSet(dc_->world[ch->in_room].room_flags, SAFE))
     if (!check_make_camp(ch->in_room))
     {
-      ch->sendln("Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!");
+      ch->sendln(u"Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!"_s);
     }
 
   if ((paf = ch->affected_by_spell(SPELL_SLEEP)) &&
@@ -1186,25 +1186,25 @@ command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
   switch (GET_POS(ch))
   {
   case position_t::STANDING:
-    ch->sendln("You lie down and go to sleep.");
+    ch->sendln(u"You lie down and go to sleep."_s);
     act_to_room("$n lies down and falls asleep.", ch, 0, 0, INVIS_NULL);
     ch->setSleeping();
     break;
   case position_t::SITTING:
   case position_t::RESTING:
-    ch->sendln("You lay back and go to sleep.");
+    ch->sendln(u"You lay back and go to sleep."_s);
     act_to_room("$n lies back and falls asleep.", ch, 0, 0, INVIS_NULL);
     ch->setSleeping();
     break;
   case position_t::SLEEPING:
   {
-    ch->sendln("You are already sound asleep.");
+    ch->sendln(u"You are already sound asleep."_s);
     return ReturnValue::eFAILURE; // so we don't set INTERNAL_SLEEPING
   }
   break;
   case position_t::FIGHTING:
   {
-    ch->sendln("Sleep while fighting? Are you MAD?");
+    ch->sendln(u"Sleep while fighting? Are you MAD?"_s);
     return ReturnValue::eFAILURE; // so we don't set INTERNAL_SLEEPING
   }
   break;
@@ -1228,28 +1228,28 @@ command_return_t do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::wake(CharacterPtr victim)
+ReturnValue Character::wake(CharacterPtr victim)
 {
   if (!isSleeping())
   {
-    sendln("You are already awake...");
+    sendln(u"You are already awake..."_s);
     return ReturnValue::eFAILURE;
   }
 
   auto af = affected_by_spell(SPELL_SLEEP);
   if (af && af->modifier == 1)
   {
-    sendln("You can't wake up!");
+    sendln(u"You can't wake up!"_s);
     return ReturnValue::eFAILURE;
   }
 
-  sendln("You wake, and stand up.");
+  sendln(u"You wake, and stand up."_s);
   act_to_room("$n awakens.", this, 0, 0, 0);
   setStanding();
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_wake(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr tmp_char = {};
   QString arg1 = arguments.value(0);
@@ -1264,7 +1264,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 
   if (!tmp_char)
   {
-    sendln("You do not see that person here.");
+    sendln(u"You do not see that person here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1341,7 +1341,7 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 // global tag var
 CharacterPtr tagged_person;
 
-command_return_t do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr victim;
@@ -1350,7 +1350,7 @@ command_return_t do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (name.isEmpty() || !(victim = ch->get_char_room_vis(name)))
   {
-    ch->sendln("Tag who?");
+    ch->sendln(u"Tag who?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1364,60 +1364,60 @@ void CVoteData::DisplayVote(CharacterPtr ch)
   qint32 i = 1;
   if (vote_question.isEmpty())
   {
-    ch->send("\r\nSorry! There are no active votes right now!\r\n\r\n");
+    ch->send(u"\r\nSorry! There are no active votes right now!\r\n\r\n"_s);
     return;
   }
-  ch->send("\r\n--Current Vote Infortmation--\r\nTo vote, type \"vote #\".\r\n"
+  ch->send(u"\r\n--Current Vote Infortmation--\r\nTo vote, type \"vote #\".\r\n"
            "Enter \"vote results\" to see the current voting demographics.\r\n\r\n");
   dc_strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   ch->send(buf);
-  ch->send("\r\n");
+  ch->send(u"\r\n"_s);
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
     ch->send(u"%1: %2\r\n"_s.arg(i++, 2).arg(answer_it->answer.c_str()));
-  ch->send("\r\n");
+  ch->send(u"\r\n"_s);
 }
 
 void CVoteData::RemoveAnswer(CharacterPtr ch, quint32 answer)
 {
   if (active)
   {
-    ch->sendln("You have to end the current vote before you can remove answers.");
+    ch->sendln(u"You have to end the current vote before you can remove answers."_s);
     return;
   }
   if (answers.isEmpty())
   {
-    ch->sendln("That answer doesn't exist!");
+    ch->sendln(u"That answer doesn't exist!"_s);
     return;
   }
   if (answer > answers.size())
   {
-    ch->sendln("That answer doesn't exist!");
+    ch->sendln(u"That answer doesn't exist!"_s);
     return;
   }
   QList<SVoteData>::iterator answer_it = answers.begin();
   answers.erase(answer_it + answer - 1); // need to offset by 1
-  ch->sendln("Answer removed!");
+  ch->sendln(u"Answer removed!"_s);
 }
 
 void CVoteData::StartVote(CharacterPtr ch)
 {
   if (active)
   {
-    ch->sendln("There is already an active vote, you can't start another");
+    ch->sendln(u"There is already an active vote, you can't start another"_s);
     return;
   }
   if (vote_question.isEmpty())
   {
-    ch->sendln("You can't start a vote without a topic to vote on!");
+    ch->sendln(u"You can't start a vote without a topic to vote on!"_s);
     return;
   }
   if (answers.isEmpty())
   {
-    ch->sendln("You can't start a vote without any answers!");
+    ch->sendln(u"You can't start a vote without any answers!"_s);
     return;
   }
 
-  ch->sendln("$4**MAKE SURE YOU VOTESET CLEAR IF THIS IS A NEW VOTE!**$R");
+  ch->sendln(u"$4**MAKE SURE YOU VOTESET CLEAR IF THIS IS A NEW VOTE!**$R"_s);
   send_info("\r\n##Attention! There is now a vote in progress!\r\n##Type Vote for more information!\r\n");
 
   active = true;
@@ -1428,7 +1428,7 @@ void CVoteData::EndVote(CharacterPtr ch)
 {
   if (!active)
   {
-    ch->sendln("Can't end a vote if there isn't one started.");
+    ch->sendln(u"Can't end a vote if there isn't one started."_s);
     return;
   }
 
@@ -1441,10 +1441,10 @@ void CVoteData::AddAnswer(CharacterPtr ch, QString answer)
 {
   if (active)
   {
-    ch->sendln("You can't add answers during an active vote!");
+    ch->sendln(u"You can't add answers during an active vote!"_s);
     return;
   }
-  ch->sendln("Answer added.");
+  ch->sendln(u"Answer added."_s);
   SVoteData tmp;
   tmp.votes = {};
   tmp.answer = answer;
@@ -1460,19 +1460,19 @@ bool CVoteData::Vote(CharacterPtr ch, quint32 vote)
 {
   if (!ch->conn_)
   {
-    ch->sendln("Monsters don't get to vote!");
+    ch->sendln(u"Monsters don't get to vote!"_s);
     return false;
   }
 
   if (HasVoted(ch))
   {
-    ch->sendln("You have already voted!");
+    ch->sendln(u"You have already voted!"_s);
     return false;
   }
 
   if (vote > answers.size() || vote == 0)
   {
-    ch->sendln("That answer doesn't exist.");
+    ch->sendln(u"That answer doesn't exist."_s);
     return false;
   }
 
@@ -1481,7 +1481,7 @@ bool CVoteData::Vote(CharacterPtr ch, quint32 vote)
   total_votes++;
   answers.at(vote - 1).votes++;
 
-  ch->sendln("Vote sent!");
+  ch->sendln(u"Vote sent!"_s);
   OutToFile();
   return true;
 }
@@ -1490,17 +1490,17 @@ void CVoteData::DisplayResults(CharacterPtr ch)
 {
   if (active && ch->getLevel() > 39 && !ip_voted[ch->conn_->getPeerOriginalAddress().toString(qPrintable())] && ch->isMortalPlayer())
   {
-    ch->sendln("Sorry, but you have to cast a vote before you can see the results.");
+    ch->sendln(u"Sorry, but you have to cast a vote before you can see the results."_s);
     return;
   }
   if (!total_votes)
   {
-    ch->sendln("There hasn't been any votes to view the results of.");
+    ch->sendln(u"There hasn't been any votes to view the results of."_s);
     return;
   }
 
   QList<SVoteData>::iterator answer_it;
-  ch->sendln("--Current Vote Results--");
+  ch->sendln(u"--Current Vote Results--"_s);
   ch->sendln(vote_question);
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
@@ -1512,7 +1512,7 @@ void CVoteData::DisplayResults(CharacterPtr ch)
     else
       ch->send(u"%3d: %s\r\n"_s.arg(answer_it->votes).arg(answer_it->answer.c_str()));
   }
-  ch->sendln("");
+  ch->sendln(u""_s);
 }
 
 void CVoteData::Reset(CharacterPtr ch)
@@ -1520,11 +1520,11 @@ void CVoteData::Reset(CharacterPtr ch)
   if (active)
   {
     if (ch) // this can be called with null
-      ch->sendln("Can't reset a vote while one is active.");
+      ch->sendln(u"Can't reset a vote while one is active."_s);
     return;
   }
   if (ch)
-    ch->sendln("Ok. Vote cleared.");
+    ch->sendln(u"Ok. Vote cleared."_s);
 
   total_votes = {};
   vote_question.clear();
@@ -1581,10 +1581,10 @@ void CVoteData::SetQuestion(CharacterPtr ch, QString question)
 {
   if (active)
   {
-    ch->sendln("Can't change the question while the vote is active.");
+    ch->sendln(u"Can't change the question while the vote is active."_s);
     return;
   }
-  ch->sendln("Ok. Question changed.");
+  ch->sendln(u"Ok. Question changed."_s);
   vote_question = question;
 }
 
@@ -1687,7 +1687,7 @@ CVoteData::~CVoteData()
 {
 }
 
-command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   qint32 vote;
@@ -1701,7 +1701,7 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!dc_->DCVote.IsActive())
   {
-    ch->sendln("Sorry, there is nothing to vote on right now.");
+    ch->sendln(u"Sorry, there is nothing to vote on right now."_s);
     return ReturnValue::eSUCCESS;
   }
   if (!dc_strlen(buf))
@@ -1712,7 +1712,7 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (ch->getLevel() < 40)
   {
-    ch->sendln("Sorry, you must be at least level 40 to vote.");
+    ch->sendln(u"Sorry, you must be at least level 40 to vote."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1723,14 +1723,14 @@ command_return_t do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_random(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_random(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i = {};
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 

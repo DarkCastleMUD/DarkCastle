@@ -100,7 +100,7 @@ void eq_remove_damage(ObjectPtr obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 qint32 damage_eq_once(ObjectPtr obj)
 {
-  if (dc_->obj_index[obj->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (dc_->obj_index_[obj->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -129,13 +129,13 @@ void DC::object_activity(quint64 pulse_type)
   {
     qint32 item_number = obj->item_number;
 
-    if (obj_index[item_number].non_combat_func)
+    if (obj_index_[item_number].non_combat_func)
     {
-      obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
+      obj_index_[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
     }
     else if (obj->flags_.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->flags_.value[0]-- == 0)
     {
-      obj->flags_.value[0] = (obj_index[item_number].item)->flags_.value[1];
+      obj->flags_.value[0] = (obj_index_[item_number]->item)->flags_.value[1];
       send_to_room(obj->ex_description->description_, obj->in_room, true);
     }
     else
@@ -157,13 +157,13 @@ void DC::object_activity(quint64 pulse_type)
   removeDead();
 }
 
-command_return_t do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ObjectPtr between;
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -177,7 +177,7 @@ command_return_t do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (GET_MOVE(ch) < 4)
   {
-    ch->send("You are too tired to switch your weapons!");
+    ch->send(u"You are too tired to switch your weapons!"_s);
     return ReturnValue::eFAILURE;
   }
   ch->decrementMove(4);
@@ -190,17 +190,17 @@ command_return_t do_switch(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   if (GET_OBJ_WEIGHT(ch->equipment[WEAR_WIELD]) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) && !IS_AFFECTED(ch, AFF_POWERWIELD))
   {
-    ch->sendln("Your primary wield is too heavy to wield as secondary.");
+    ch->sendln(u"Your primary wield is too heavy to wield as secondary."_s);
     return ReturnValue::eFAILURE;
   }
   between = ch->equipment[WEAR_WIELD];
   ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
   ch->equipment[WEAR_SECOND_WIELD] = between;
-  ch->sendln("You switch your weapon positions.");
+  ch->sendln(u"You switch your weapon positions."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr temp;
@@ -261,7 +261,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->fighting && isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -301,7 +301,7 @@ command_return_t do_quaff(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr scroll, obj;
@@ -314,7 +314,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
-    ch->sendln("Your magic is muffled by greater beings.");
+    ch->sendln(u"Your magic is muffled by greater beings."_s);
     return ReturnValue::eFAILURE;
   }
   equipped = false;
@@ -355,7 +355,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
     bits = generic_find(argument, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM, ch, &victim, &obj, true);
     if (bits == 0)
     {
-      ch->sendln("No such thing around to recite the scroll on.");
+      ch->sendln(u"No such thing around to recite the scroll on."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -381,12 +381,12 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     // failed to read scroll
     act_to_room("$n mumbles the words on the scroll and it goes up in flame!", ch, 0, 0, 0);
-    ch->sendln("You mumble the words and the scroll goes up in flame!");
+    ch->sendln(u"You mumble the words and the scroll goes up in flame!"_s);
   }
   else
   {
     if (victim && !AWAKE(victim) && dc_->number(1, 5) < 3)
-      victim->sendln("Your sleep is restless.");
+      victim->sendln(u"Your sleep is restless."_s);
 
     // success
     for (i = 1; i < 4; i++)
@@ -421,7 +421,7 @@ command_return_t do_recite(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else
         {
-          dc_->logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", dc_->obj_index[scroll->item_number].vnum(), i, i);
+          dc_->logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", dc_->obj_index_[scroll->item_number].vnum(), i, i);
           continue;
         }
       }
@@ -494,7 +494,7 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
   one_argument(arg, direct);
   if (!arg)
   {
-    ch->sendln("Set it off in which direction?");
+    ch->sendln(u"Set it off in which direction?"_s);
     return false;
   }
 
@@ -512,18 +512,18 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
     dir = 5;
   else
   {
-    ch->sendln("Set it off in which direction?");
+    ch->sendln(u"Set it off in which direction?"_s);
     return false;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("In the rear with the gear huh?  Maybe use this somewhere in the field.");
+    ch->sendln(u"In the rear with the gear huh?  Maybe use this somewhere in the field."_s);
     return false;
   }
   if (CAN_GO(ch, dir) && isSet(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].room_flags, SAFE))
   {
-    ch->sendln("Firing it into a safe room seems wasteful.");
+    ch->sendln(u"Firing it into a safe room seems wasteful."_s);
     return false;
   }
 
@@ -536,7 +536,7 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, QString arg)
 
   do_say(ch, "Fire in the hole!");
   act_to_room("$n sets off $o with a flash and bang!.", ch, obj, 0, 0);
-  ch->sendln("You set off the device with a loud bang.");
+  ch->sendln(u"You set off the device with a loud bang."_s);
 
   if (!CAN_GO(ch, dir))
   {
@@ -573,7 +573,7 @@ void set_catstink(CharacterPtr ch, ObjectPtr obj)
     if (SECT_MAX_SECT < obj->flags_.value[1] ||
         0 > obj->flags_.value[1])
     {
-      ch->sendln("This item has an illegal value1.  Tell a god.");
+      ch->sendln(u"This item has an illegal value1.  Tell a god."_s);
       return;
     }
 
@@ -596,7 +596,7 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
 
   if (class_restricted(ch, obj))
   {
-    ch->sendln("You are forbidden.");
+    ch->sendln(u"You are forbidden."_s);
     return;
   }
 
@@ -616,7 +616,7 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
       return; // it failed
     break;
   default:
-    ch->sendln("Unknown utility item value.  Tell a god.");
+    ch->sendln(u"Unknown utility item value.  Tell a god."_s);
     return;
     break;
   }
@@ -625,7 +625,7 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, QString argument)
   extract_obj(obj);
 }
 
-command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj = {};
   QString arg;
@@ -635,7 +635,7 @@ command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg.isEmpty())
   {
-    ch->sendln("Set what?");
+    ch->sendln(u"Set what?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -655,13 +655,13 @@ command_return_t do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd)
     //      set_trap_item(ch, obj, argument);
     //      break;
   default:
-    ch->sendln("You can't set that.");
+    ch->sendln(u"You can't set that."_s);
     break;
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_use(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString targ;
@@ -673,13 +673,13 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
   {
-    ch->sendln("Your magic is muffled by greater beings.");
+    ch->sendln(u"Your magic is muffled by greater beings."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -718,7 +718,7 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln("The staff seems powerless.");
+      ch->sendln(u"The staff seems powerless."_s);
     }
   }
   else if (stick->flags_.type_flag == ITEM_WAND)
@@ -755,52 +755,52 @@ command_return_t do_use(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        ch->sendln("The wand seems powerless.");
+        ch->sendln(u"The wand seems powerless."_s);
       }
     }
     else
     {
-      ch->sendln("What should the wand be pointed at?");
+      ch->sendln(u"What should the wand be pointed at?"_s);
     }
   }
   else
   {
-    ch->sendln("Use is normally only for wands and staves.");
+    ch->sendln(u"Use is normally only for wands and staves."_s);
   }
   return ReturnValue::eFAILURE;
 }
 
 // Allows a player to change his "name" (short_desc) (Sadus)
-command_return_t do_name(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_name(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   auto arguments = QString(arg).trimmed().split(' ');
   if (arguments.isEmpty())
   {
-    ch->sendln("Set your name to what?");
+    ch->sendln(u"Set your name to what?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NONAME))
   {
-    ch->sendln("You can't do that.  You must have been naughty.");
+    ch->sendln(u"You can't do that.  You must have been naughty."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->getLevel() < 5)
   {
-    ch->sendln("You cannot use the \"name\" command until you have reached level 5.");
+    ch->sendln(u"You cannot use the \"name\" command until you have reached level 5."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (dc_strlen(arg) > 30)
   {
-    ch->sendln("Name too long, must be under 30 characters long.");
+    ch->sendln(u"Name too long, must be under 30 characters long."_s);
     return ReturnValue::eFAILURE;
   }
 
   auto arg1 = arguments.value(0);
   if (!arg1.contains('%'))
   {
-    ch->sendln("You MUST include your real name. Use % to indicate where you want it.");
+    ch->sendln(u"You MUST include your real name. Use % to indicate where you want it."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -809,11 +809,11 @@ command_return_t do_name(CharacterPtr ch, QString arg, cmd_t cmd)
   arg1 = arg1.replace("%", fname(ch->name()));
   ch->short_description(arg1);
 
-  ch->sendln("Ok.");
+  ch->sendln(u"Ok."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_drink(QStringList arguments, cmd_t cmd)
 {
   ObjectPtr temp = {};
   affected_type af = {};
@@ -821,7 +821,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 
   if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
-    sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -859,7 +859,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 
   if (GET_COND(this, THIRST) > 20)
   {
-    sendln("Your stomach cannot contain anymore liquid!");
+    sendln(u"Your stomach cannot contain anymore liquid!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -914,7 +914,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
           getHP() < GET_MAX_HIT(this) &&
           dc_->number(0, 1))
       {
-        sendln("You feel refreshed!");
+        sendln(u"You feel refreshed!"_s);
         addHP(10);
       }
 
@@ -925,7 +925,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
         act_to_room("$n chokes and utters some strange sounds.", this, 0, 0, 0);
         if (ch->dc_->number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
         {
-          sendln("Luckily, your body rejects the poison almost immediately.");
+          sendln(u"Luckily, your body rejects the poison almost immediately."_s);
         }
         else
         {
@@ -960,14 +960,14 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_eat(QStringList arguments, cmd_t cmd)
 {
   ObjectPtr temp = {};
   affected_type af = {};
 
   if (isSet(dc_->world[in_room].room_flags, QUIET))
   {
-    sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1007,7 +1007,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
 
     if (ch->dc_->number(1, 100) < get_saves(this, SAVE_TYPE_POISON) - 15)
     {
-      sendln("Luckily, your body rejects the poison almost immediately.");
+      sendln(u"Luckily, your body rejects the poison almost immediately."_s);
     }
     else
     {
@@ -1024,7 +1024,7 @@ command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -1035,7 +1035,7 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1142,7 +1142,7 @@ command_return_t do_pour(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString buf;
@@ -1150,7 +1150,7 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1205,14 +1205,14 @@ command_return_t do_sip(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_taste(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   ObjectPtr temp;
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1356,7 +1356,7 @@ qint32 charmie_restricted(CharacterPtr ch, ObjectPtr obj, qint32 wear_loc)
   return false; // sigh, work for nohin'
   if (ch->isNonPlayer() && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
-    qint32 vnum = dc_->mob_index[ch->mobdata->nr].vnum();
+    qint32 vnum = dc_->mob_index_[ch->mobdata->nr].vnum();
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
       return false; // golems and corpses wear all
     switch (ch->race)
@@ -1483,7 +1483,7 @@ qint32 will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, qint32 add)
     // Only have to check the item itself if we're wearing it, not removing
     //	  dc_->logf(ANGEL, DC::LogChannel::LOG_BUG, "will_screwup_worn_sizes: %s height %d by -%d = %d", qPrintable(ch->name()), GET_HEIGHT(ch), mod, GET_HEIGHT(ch)-mod);
     GET_HEIGHT(ch) -= mod;
-    ch->sendln("After modifying your height that item would not fit!");
+    ch->sendln(u"After modifying your height that item would not fit!"_s);
     return true;
   }
 
@@ -1562,7 +1562,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
   }
   else
   {
-    if (dc_->mob_index[ch->mobdata->nr].vnum() != 8)
+    if (dc_->mob_index_[ch->mobdata->nr].vnum() != 8)
       if (ch->getLevel() < obj_object->flags_.eq_level)
       {
         dc_sprintf(buffer, "You must be level %llu to use $p.", obj_object->flags_.eq_level);
@@ -1570,8 +1570,8 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
         return;
       }
   }
-  /*  if (ch->isNonPlayer() && (dc_->mob_index[ch->mobdata->nr].vnum() < 22394 &&
-    dc_->mob_index[ch->mobdata->nr].vnum() > 22388))
+  /*  if (ch->isNonPlayer() && (dc_->mob_index_[ch->mobdata->nr].vnum() < 22394 &&
+    dc_->mob_index_[ch->mobdata->nr].vnum() > 22388))
     {
        return;
     }*/
@@ -1585,7 +1585,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 
   if (IS_FAMILIAR(ch))
   {
-    ch->sendln("Familiar's cannot wear eq!");
+    ch->sendln(u"Familiar's cannot wear eq!"_s);
     return;
   }
   switch (keyword)
@@ -1595,7 +1595,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, FINGER))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FINGER_L))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if ((ch->equipment[WEAR_FINGER_L]) && (ch->equipment[WEAR_FINGER_R]))
       {
         act_to_character("You are already wearing $p on your left ring-finger.", ch, ch->equipment[WEAR_FINGER_L], 0, 0);
@@ -1621,7 +1621,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your finger.");
+      ch->sendln(u"You can't wear that on your finger."_s);
   }
   break;
   case 1:
@@ -1629,7 +1629,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, NECK))
     {
       if (charmie_restricted(ch, obj_object, WEAR_NECK_1))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if ((ch->equipment[WEAR_NECK_1]) && (ch->equipment[WEAR_NECK_2]))
       {
         act_to_character("You are already wearing $p on your neck.", ch, ch->equipment[WEAR_NECK_1], 0, 0);
@@ -1651,7 +1651,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that around your neck.");
+      ch->sendln(u"You can't wear that around your neck."_s);
   }
   break;
   case 2:
@@ -1659,7 +1659,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, BODY))
     {
       if (charmie_restricted(ch, obj_object, WEAR_BODY))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_BODY])
       {
         act_to_character("You already wear $p on your body.", ch, ch->equipment[WEAR_BODY], 0, 0);
@@ -1672,7 +1672,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your body.");
+      ch->sendln(u"You can't wear that on your body."_s);
   }
   break;
   case 3:
@@ -1680,7 +1680,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, HEAD))
     {
       if (charmie_restricted(ch, obj_object, WEAR_HEAD))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_HEAD])
       {
         act_to_character("You already wear $p on your head.", ch, ch->equipment[WEAR_HEAD], 0, 0);
@@ -1693,7 +1693,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your head.");
+      ch->sendln(u"You can't wear that on your head."_s);
   }
   break;
   case 4:
@@ -1701,7 +1701,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, LEGS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_LEGS))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_LEGS])
       {
         act_to_character("You already wear $p on your legs.", ch, ch->equipment[WEAR_LEGS], 0, 0);
@@ -1714,7 +1714,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your legs.");
+      ch->sendln(u"You can't wear that on your legs."_s);
   }
   break;
   case 5:
@@ -1722,7 +1722,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, FEET))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FEET))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_FEET])
       {
         act_to_character("You already wear $p on your feet.", ch, ch->equipment[WEAR_FEET], 0, 0);
@@ -1735,7 +1735,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your feet.");
+      ch->sendln(u"You can't wear that on your feet."_s);
   }
   break;
   case 6:
@@ -1743,7 +1743,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, HANDS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_HANDS))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_HANDS])
       {
         act_to_character("You already wear $p on your hands.", ch, ch->equipment[WEAR_HANDS], 0, 0);
@@ -1756,7 +1756,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your hands.");
+      ch->sendln(u"You can't wear that on your hands."_s);
   }
   break;
   case 7:
@@ -1764,7 +1764,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, ARMS))
     {
       if (charmie_restricted(ch, obj_object, WEAR_ARMS))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_ARMS])
       {
         act_to_character("You already wear $p on your arms.", ch, ch->equipment[WEAR_ARMS], 0, 0);
@@ -1777,7 +1777,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your arms.");
+      ch->sendln(u"You can't wear that on your arms."_s);
   }
   break;
   case 8:
@@ -1785,7 +1785,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, ABOUT))
     {
       if (charmie_restricted(ch, obj_object, WEAR_ABOUT))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_ABOUT])
       {
         act_to_character("You already wear $p about your body.", ch, ch->equipment[WEAR_ABOUT], 0, 0);
@@ -1798,7 +1798,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that about your body.");
+      ch->sendln(u"You can't wear that about your body."_s);
   }
   break;
   case 9:
@@ -1806,7 +1806,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, WAISTE))
     {
       if (charmie_restricted(ch, obj_object, WEAR_WAISTE))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_WAISTE])
       {
         act_to_character("You already wear $p about your waist.", ch, ch->equipment[WEAR_WAISTE], 0, 0);
@@ -1819,7 +1819,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that about your waist.");
+      ch->sendln(u"You can't wear that about your waist."_s);
   }
   break;
   case 10:
@@ -1827,7 +1827,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, WRIST))
     {
       if (charmie_restricted(ch, obj_object, WEAR_WRIST_L))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if ((ch->equipment[WEAR_WRIST_L]) && (ch->equipment[WEAR_WRIST_R]))
       {
         act_to_character("You already wear $p around your left wrist.", ch, ch->equipment[WEAR_WRIST_L], 0, 0);
@@ -1852,7 +1852,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that around your wrist.");
+      ch->sendln(u"You can't wear that around your wrist."_s);
   }
   break;
 
@@ -1861,10 +1861,10 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, FACE))
     {
       if (charmie_restricted(ch, obj_object, WEAR_FACE))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if ((ch->equipment[WEAR_FACE]))
       {
-        ch->sendln("You only have one face.");
+        ch->sendln(u"You only have one face."_s);
       }
       else
       {
@@ -1874,7 +1874,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that on your face!");
+      ch->sendln(u"You can't wear that on your face!"_s);
   }
   break;
 
@@ -1883,7 +1883,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     {
       if (!ch->equipment[WEAR_WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN<qint32>(GET_STR(ch), get_max_stat(ch, attribute_t::STRENGTH)) &&
           !ISSET(ch->affected_by, AFF_POWERWIELD))
-        ch->sendln("It is too heavy for you to use.");
+        ch->sendln(u"It is too heavy for you to use."_s);
       else if (ch->equipment[WEAR_WIELD] && GET_OBJ_WEIGHT(obj_object) > MIN(GET_STR(ch) / 2, get_max_stat(ch, attribute_t::STRENGTH) / 2) &&
                !ISSET(ch->affected_by, AFF_POWERWIELD))
 
@@ -1891,13 +1891,13 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 
       else if ((!ch->hands_are_free(2)) &&
                (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
-        ch->sendln("You need both hands for this weapon.");
+        ch->sendln(u"You need both hands for this weapon."_s);
       else if (!ch->hands_are_free(1))
-        ch->sendln("Your hands are already full.");
+        ch->sendln(u"Your hands are already full."_s);
 
       else if (IS_AFFECTED(ch, AFF_CHARM))
       {
-        ch->sendln("Sorry, charmies can't wield stuff anymore:(");
+        ch->sendln(u"Sorry, charmies can't wield stuff anymore:("_s);
         do_say(ch, "I'm sorry my master, I lack the dexterity.");
       }
       else
@@ -1911,7 +1911,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wield that.");
+      ch->sendln(u"You can't wield that."_s);
     break;
 
   case 13:
@@ -1919,7 +1919,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, SHIELD))
     {
       if (charmie_restricted(ch, obj_object, WEAR_SHIELD))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (ch->equipment[WEAR_SHIELD])
       {
         act_to_character("You already using $p as a shield.", ch, ch->equipment[WEAR_SHIELD], 0, 0);
@@ -1927,10 +1927,10 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       else if ((!ch->hands_are_free(2)) &&
                (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
-        ch->sendln("You need both hands for this shield.");
+        ch->sendln(u"You need both hands for this shield."_s);
       }
       else if (!ch->hands_are_free(1))
-        ch->sendln("Your hands are already full.");
+        ch->sendln(u"Your hands are already full."_s);
 
       else
       {
@@ -1941,7 +1941,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     }
 
     else
-      ch->sendln("You can't use that as a shield.");
+      ch->sendln(u"You can't use that as a shield."_s);
   }
   break;
 
@@ -1950,17 +1950,17 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     {
 
       if (charmie_restricted(ch, obj_object, WEAR_HOLD))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if (!ch->hands_are_free(1))
-        ch->sendln("Your hands are already full.");
+        ch->sendln(u"Your hands are already full."_s);
       else if ((!ch->hands_are_free(2)) &&
                (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
       {
-        ch->sendln("You need both hands for this item.");
+        ch->sendln(u"You need both hands for this item."_s);
       }
       else if (obj_object->flags_.extra_flags == ITEM_INSTRUMENT && ((ch->equipment[WEAR_HOLD] && ch->equipment[WEAR_HOLD]->flags_.type_flag == ITEM_INSTRUMENT) || (ch->equipment[WEAR_HOLD2] && ch->equipment[WEAR_HOLD2]->flags_.type_flag == ITEM_INSTRUMENT)))
       {
-        ch->sendln("You're busy enough playing the instrument you're already using.");
+        ch->sendln(u"You're busy enough playing the instrument you're already using."_s);
       }
       else
       {
@@ -1973,7 +1973,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't hold this.");
+      ch->sendln(u"You can't hold this."_s);
     break;
 
   case 15:
@@ -1981,7 +1981,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     if (CAN_WEAR(obj_object, EAR))
     {
       if (charmie_restricted(ch, obj_object, WEAR_EAR_L))
-        ch->sendln("You cannot wear this.");
+        ch->sendln(u"You cannot wear this."_s);
       else if ((ch->equipment[WEAR_EAR_L]) && (ch->equipment[WEAR_EAR_R]))
       {
         act_to_character("You already wearing $p on your left ear.", ch, ch->equipment[WEAR_EAR_L], 0, 0);
@@ -2005,14 +2005,14 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       }
     }
     else
-      ch->sendln("You can't wear that in your ear.");
+      ch->sendln(u"You can't wear that in your ear."_s);
   }
   break;
 
   case 16:
   { /* LIGHT SOURCE */
     if (charmie_restricted(ch, obj_object, WEAR_LIGHT))
-      ch->sendln("You cannot wear this.");
+      ch->sendln(u"You cannot wear this."_s);
     else if (ch->equipment[WEAR_LIGHT])
     {
       act_to_character("You are already holding $p as a light.", ch, ch->equipment[WEAR_LIGHT], 0, 0);
@@ -2020,12 +2020,12 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
     else if ((!ch->hands_are_free(2)) &&
              (isSet(obj_object->flags_.extra_flags, ITEM_TWO_HANDED) && !ISSET(ch->affected_by, AFF_POWERWIELD)))
     {
-      ch->sendln("You need both hands for this light.");
+      ch->sendln(u"You need both hands for this light."_s);
     }
     else if (!ch->hands_are_free(1))
-      ch->sendln("Your hands are already full.");
+      ch->sendln(u"Your hands are already full."_s);
     else if (obj_object->flags_.type_flag != ITEM_LIGHT)
-      ch->sendln("That isn't a light you cheating fuck!");
+      ch->sendln(u"That isn't a light you cheating fuck!"_s);
     else
     {
       obj_from_char(obj_object);
@@ -2047,13 +2047,13 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
 
       if (!ch->hands_are_free(1))
       {
-        ch->sendln("Your hands are already full.");
+        ch->sendln(u"Your hands are already full."_s);
         break;
       }
 
       if (GET_MOVE(ch) < 4)
       {
-        ch->send("You are too tired to switch your weapons!");
+        ch->send(u"You are too tired to switch your weapons!"_s);
         return;
       }
       ch->decrementMove(4);
@@ -2072,7 +2072,7 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, qint32 keyword)
       return;
     }
     else
-      ch->sendln("You can't wield that.");
+      ch->sendln(u"You can't wield that."_s);
     break;
 
   case -1:
@@ -2152,7 +2152,7 @@ bool Object::TypeString(QString type)
     return false;
 }
 
-command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -2183,7 +2183,7 @@ command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2191,7 +2191,7 @@ command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(*arg1))
   {
-    ch->sendln("Wear what?");
+    ch->sendln(u"Wear what?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2247,7 +2247,7 @@ command_return_t do_wear(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -2258,7 +2258,7 @@ command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2292,12 +2292,12 @@ command_return_t do_wield(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    ch->sendln("Wield what?");
+    ch->sendln(u"Wield what?"_s);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -2307,7 +2307,7 @@ command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2338,7 +2338,7 @@ command_return_t do_grab(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    ch->sendln("Hold what?");
+    ch->sendln(u"Hold what?"_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2391,7 +2391,7 @@ qint32 Character::hands_are_free(qint32 number)
     return {};
 }
 
-command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   ObjectPtr obj_object;
@@ -2400,7 +2400,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2423,13 +2423,13 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
               send_to_char(arg1, ch);
               continue;
             }
-            if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->flags_.timer < 40)
+            if (dc_->obj_index_[obj_object->item_number].vnum() == 30010 && obj_object->flags_.timer < 40)
             {
-              ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
+              ch->sendln(u"The ruby brooch is bound to your flesh. You cannot remove it!"_s);
               continue;
             }
 
-            if (dc_->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (dc_->obj_index_[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
@@ -2443,7 +2443,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else
         {
-          ch->sendln("You can't carry that many items.");
+          ch->sendln(u"You can't carry that many items."_s);
           j = MAX_WEAR;
         }
       }
@@ -2466,9 +2466,9 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
-          if (dc_->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->flags_.timer < 40)
+          if (dc_->obj_index_[obj_object->item_number].vnum() == 30010 && obj_object->flags_.timer < 40)
           {
-            ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
+            ch->sendln(u"The ruby brooch is bound to your flesh. You cannot remove it!"_s);
             return ReturnValue::eFAILURE;
           }
 
@@ -2483,7 +2483,7 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
             ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
             ch->equipment[WEAR_SECOND_WIELD] = {};
           }
-          else if (dc_->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (dc_->obj_index_[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
@@ -2499,19 +2499,19 @@ command_return_t do_remove(CharacterPtr ch, QString argument, cmd_t cmd)
         }
         else
         {
-          ch->sendln("You can't carry that many items.");
+          ch->sendln(u"You can't carry that many items."_s);
           j = MAX_WEAR;
         }
       }
       else
       {
-        ch->sendln("You are not using it.");
+        ch->sendln(u"You are not using it."_s);
       }
     }
   }
   else
   {
-    ch->sendln("Remove what?");
+    ch->sendln(u"Remove what?"_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2668,14 +2668,14 @@ quint64 Object::getLevel(void)
 bool Object::isQuest(void)
 {
   return isexact("quest", name()) ||
-         dc_->obj_index[item_number].vnum() == 3124 ||
-         dc_->obj_index[item_number].vnum() == 3125 ||
-         dc_->obj_index[item_number].vnum() == 3126 ||
-         dc_->obj_index[item_number].vnum() == 3127 ||
-         dc_->obj_index[item_number].vnum() == 3128 ||
-         dc_->obj_index[item_number].vnum() == 27997 ||
-         dc_->obj_index[item_number].vnum() == 27998 ||
-         dc_->obj_index[item_number].vnum() == 27999;
+         dc_->obj_index_[item_number].vnum() == 3124 ||
+         dc_->obj_index_[item_number].vnum() == 3125 ||
+         dc_->obj_index_[item_number].vnum() == 3126 ||
+         dc_->obj_index_[item_number].vnum() == 3127 ||
+         dc_->obj_index_[item_number].vnum() == 3128 ||
+         dc_->obj_index_[item_number].vnum() == 27997 ||
+         dc_->obj_index_[item_number].vnum() == 27998 ||
+         dc_->obj_index_[item_number].vnum() == 27999;
 }
 
 bool Object::isTest(void)

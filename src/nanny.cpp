@@ -998,9 +998,9 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     ClanPtr clan;
     if ((clan = get_clan(ch->clan)) && clan->clanmotd)
     {
-      ch->sendln("$B----------------------------------------------------------------------$R");
+      ch->sendln(u"$B----------------------------------------------------------------------$R"_s);
       ch->send(clan->clanmotd);
-      ch->sendln("$B----------------------------------------------------------------------$R");
+      ch->sendln(u"$B----------------------------------------------------------------------$R"_s);
     }
 
     write_to_output(u"\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n"_s.arg(ch->player->last_site), d);
@@ -1358,7 +1358,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 2:
       if (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_ELVEN;
@@ -1373,7 +1373,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 3:
       if (GET_RAW_CON(ch) < 10 || GET_RAW_WIS(ch) < 10)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_DWARVEN;
@@ -1387,7 +1387,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 4:
       if (GET_RAW_DEX(ch) < 10)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_HOBBIT;
@@ -1401,7 +1401,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 5:
       if (GET_RAW_INT(ch) < 12)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_PIXIE;
@@ -1415,7 +1415,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 6:
       if (GET_RAW_STR(ch) < 12)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_GIANT;
@@ -1429,7 +1429,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 7:
       if (GET_RAW_WIS(ch) < 12)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_GNOME;
@@ -1443,7 +1443,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 8:
       if (GET_RAW_CON(ch) < 10 || GET_RAW_STR(ch) < 10)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
 
@@ -1458,7 +1458,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     case 9:
       if (GET_RAW_CON(ch) < 12)
       {
-        ch->sendln("Your stats do not qualify for that race.");
+        ch->sendln(u"Your stats do not qualify for that race."_s);
         return;
       }
       ch->race = RACE_TROLL;
@@ -1687,13 +1687,13 @@ void DC::nanny(ConnectionPtr conn, QString arg)
         dc_sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", qPrintable(ch->name()));
         dc_->logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
-      ch->sendln("\r\nWelcome to Dark Castle.");
+      ch->sendln(u"\r\nWelcome to Dark Castle."_s);
       character_list.insert(ch);
 
       if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
       {
         REMBIT(ch->affected_by, AFF_ITEM_REMOVE);
-        ch->sendln("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R");
+        ch->sendln(u"\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R"_s);
       }
 
       ch->do_on_login_stuff();
@@ -1971,7 +1971,7 @@ bool check_reconnect(ConnectionPtr conn, QString name, bool fReconnect)
       conn->character = tmp_ch;
       tmp_ch->conn_ = d;
       tmp_ch->timer = {};
-      tmp_ch->sendln("Reconnecting.");
+      tmp_ch->sendln(u"Reconnecting."_s);
 
       QString log_buf = u"%1@%2 has reconnected."_s.arg(qPrintable(tmp_ch->name())).arg(conn->getPeerOriginalAddress().toString());
       act_to_room("$n has reconnected and is ready to kick ass.", tmp_ch, 0, 0, INVIS_NULL);
@@ -2113,7 +2113,7 @@ void update_characters()
       if (get_saves(i, SAVE_TYPE_POISON) > dc_->number(1, 101))
       {
         tmp *= get_saves(i, SAVE_TYPE_POISON) / 100;
-        i->sendln("You feel very sick, but resist the $2poison's$R damage.");
+        i->sendln(u"You feel very sick, but resist the $2poison's$R damage."_s);
       }
       if (tmp)
       {
@@ -2185,7 +2185,7 @@ void check_silence_beacons(void)
   for (obj = dc_->object_list; obj; obj = tmp_obj)
   {
     tmp_obj = obj->next;
-    if (dc_->obj_index[obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       if (obj->flags_.value[0] == 0)
         extract_obj(obj);
@@ -2207,7 +2207,7 @@ void DC::checkConsecrate(qint32 pulseType)
     for (obj = dc_->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (dc_->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (dc_->obj_index_[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
       {
         spl = obj->flags_.value[0];
         obj->flags_.value[1]--;
@@ -2223,14 +2223,14 @@ void DC::checkConsecrate(qint32 pulseType)
                 if (ch->in_room != obj->in_room)
                   ch->send(u"You sense your consecration of %s has ended.\r\n"_s.arg(dc_->world[obj->in_room].name));
                 else
-                  ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.");
+                  ch->sendln(u"Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended."_s);
               }
               else
               {
                 if (ch->in_room != obj->in_room)
                   ch->send(u"You sense your desecration of %s has ended.\r\n"_s.arg(dc_->world[obj->in_room].name));
                 else
-                  ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.");
+                  ch->sendln(u"The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended."_s);
               }
             }
           }
@@ -2250,7 +2250,7 @@ void DC::checkConsecrate(qint32 pulseType)
             if (spl == SPELL_CONSECRATE)
             {
               if (tmp_ch->affected_by_spell(SPELL_DETECT_GOOD) && tmp_ch->affected_by_spell(SPELL_DETECT_GOOD)->modifier >= 80)
-                tmp_ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.");
+                tmp_ch->sendln(u"Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended."_s);
             }
             else
             {
@@ -2259,7 +2259,7 @@ void DC::checkConsecrate(qint32 pulseType)
                 {
                   send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
                 }
-              tmp_ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.");
+              tmp_ch->sendln(u"The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended."_s);
             }
           }
           extract_obj(obj);
@@ -2272,7 +2272,7 @@ void DC::checkConsecrate(qint32 pulseType)
     for (obj = dc_->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (dc_->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (dc_->obj_index_[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
       {
         spl = obj->flags_.value[0];
         if (charExists(obj->flags_.origin))
@@ -2322,7 +2322,7 @@ void DC::checkConsecrate(qint32 pulseType)
                 if (tmp_ch->isPlayer())
                 {
                   act_to_character("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, 0);
-                  tmp_ch->sendln("You have been KILLED!!\r\n");
+                  tmp_ch->sendln(u"You have been KILLED!!\r\n"_s);
                 }
                 group_gain(ch, tmp_ch);
                 fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_DESECRATE);
@@ -2378,7 +2378,7 @@ void DC::checkConsecrate(qint32 pulseType)
                 if (tmp_ch->isPlayer())
                 {
                   act_to_character("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, 0);
-                  tmp_ch->sendln("You have been KILLED!!\r\n");
+                  tmp_ch->sendln(u"You have been KILLED!!\r\n"_s);
                 }
                 group_gain(ch, tmp_ch);
                 fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_CONSECRATE);

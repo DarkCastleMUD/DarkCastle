@@ -112,12 +112,12 @@ bool can_heal(CharacterPtr ch, CharacterPtr victim, qint32 spellnum)
 
   // You cannot heal an elemental from "conjure elemental"
   if (victim->isNonPlayer() &&
-      (dc_->mob_index[victim->mobdata->nr].vnum() == 88 ||
-       dc_->mob_index[victim->mobdata->nr].vnum() == 89 ||
-       dc_->mob_index[victim->mobdata->nr].vnum() == 90 ||
-       dc_->mob_index[victim->mobdata->nr].vnum() == 91))
+      (dc_->mob_index_[victim->mobdata->nr].vnum() == 88 ||
+       dc_->mob_index_[victim->mobdata->nr].vnum() == 89 ||
+       dc_->mob_index_[victim->mobdata->nr].vnum() == 90 ||
+       dc_->mob_index_[victim->mobdata->nr].vnum() == 91))
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return false;
   }
 
@@ -144,7 +144,7 @@ bool can_heal(CharacterPtr ch, CharacterPtr victim, qint32 spellnum)
   if (!can_cast)
   {
     if (ch == victim)
-      ch->sendln("You have not received enough damage to warrant this powerful incantation.");
+      ch->sendln(u"You have not received enough damage to warrant this powerful incantation."_s);
     else
       act_to_character("$N has not received enough damage to warrant this powerful incantation.", ch, 0, victim, 0);
   }
@@ -335,12 +335,12 @@ qint32 spell_drown(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   /* Does not work in Desert or Underwater */
   if (dc_->world[ch->in_room].sector_type == SECT_DESERT)
   {
-    ch->sendln("You're trying to drown someone in the desert?  Get a clue!");
+    ch->sendln(u"You're trying to drown someone in the desert?  Get a clue!"_s);
     return ReturnValue::eFAILURE;
   }
   if (dc_->world[ch->in_room].sector_type == SECT_UNDERWATER)
   {
-    ch->sendln("Hello!  You're underwater!  *knock knock*  Anyone home?");
+    ch->sendln(u"Hello!  You're underwater!  *knock knock*  Anyone home?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -375,7 +375,7 @@ qint32 spell_energy_drain(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   gain_exp(victim, 0 - mult);
   victim->removeHP(victim->getHP() / 20);
-  victim->sendln("Your knees buckle as life force is drained from your body!\r\nYou have lost some experience!");
+  victim->sendln(u"Your knees buckle as life force is drained from your body!\r\nYou have lost some experience!"_s);
   act_to_character("You drain some of $N's experience!", ch, 0, victim, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -390,7 +390,7 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You cannot do this in a safe room!");
+    ch->sendln(u"You cannot do this in a safe room!"_s);
     return ReturnValue::eFAILURE;
   }
   mana = dam_percent(skill, 125 + getRealSpellDamage(ch));
@@ -398,7 +398,7 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     mana = GET_MANA(victim);
   if (mana <= 0)
   {
-    ch->sendln("There isn't enough magical energy to be drained.");
+    ch->sendln(u"There isn't enough magical energy to be drained."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->dc_->number(1, 100) < get_saves(victim, SAVE_TYPE_MAGIC) + 40)
@@ -490,7 +490,7 @@ qint32 spell_meteor_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     if (isSet(retval, ReturnValue::eEXTRA_VALUE))
       return retval;
     act_to_character("The force of the spell knocks $N over!", ch, 0, victim, 0);
-    victim->sendln("The force of the spell knocks you over!");
+    victim->sendln(u"The force of the spell knocks you over!"_s);
     victim->setSitting();
   }
   return retval;
@@ -578,7 +578,7 @@ qint32 spell_howl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
     if (tmp_char->affected_by_spell(SPELL_CHARM_PERSON))
     {
       affect_from_char(tmp_char, SPELL_CHARM_PERSON);
-      tmp_char->sendln("You feel less enthused about your master.");
+      tmp_char->sendln(u"You feel less enthused about your master."_s);
       act("$N blinks and shakes its head, clearing its thoughts.",
           ch, 0, tmp_char, TO_CHAR, 0);
       act("$N blinks and shakes its head, clearing its thoughts.",
@@ -619,9 +619,9 @@ qint32 spell_aegis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   affect_to_char(ch, &af);
   if (GET_CLASS(ch) == CLASS_PALADIN)
-    ch->sendln("You invoke your protective aegis.");
+    ch->sendln(u"You invoke your protective aegis."_s);
   else
-    ch->sendln("You invoke your unholy aegis.");
+    ch->sendln(u"You invoke your unholy aegis."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -645,7 +645,7 @@ qint32 spell_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   af.bitvector = -1;
 
   affect_to_char(victim, &af);
-  victim->sendln("You feel a magical armour surround you.");
+  victim->sendln(u"You feel a magical armour surround you."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -676,7 +676,7 @@ qint32 spell_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   af.bitvector = -1;
 
   affect_to_char(victim, &af);
-  victim->sendln("A shield of ethereal stones begins to swirl around you.");
+  victim->sendln(u"A shield of ethereal stones begins to swirl around you."_s);
   act("Ethereal stones form out of nothing and begin to swirl around $n.",
       victim, 0, 0, TO_ROOM, INVIS_NULL);
   return ReturnValue::eSUCCESS;
@@ -689,7 +689,7 @@ qint32 cast_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type
   case SPELL_TYPE_SPELL:
     if (tar_ch->fighting)
     {
-      ch->sendln("The combat disrupts the ether too much to coalesce into stones.");
+      ch->sendln(u"The combat disrupts the ether too much to coalesce into stones."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_stone_shield(level, ch, tar_ch, 0, skill);
@@ -815,7 +815,7 @@ qint32 spell_greater_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr vi
   af.bitvector = -1;
 
   affect_to_char(victim, &af);
-  victim->sendln("A shield of ethereal stones begins to swirl around you.");
+  victim->sendln(u"A shield of ethereal stones begins to swirl around you."_s);
   act("Ethereal stones form out of nothing and begin to swirl around $n.",
       victim, 0, 0, TO_ROOM, INVIS_NULL);
   return ReturnValue::eSUCCESS;
@@ -828,7 +828,7 @@ qint32 cast_greater_stone_shield(quint8 level, CharacterPtr ch, QString arg, qin
   case SPELL_TYPE_SPELL:
     if (tar_ch->fighting)
     {
-      ch->sendln("The combat disrupts the ether too much to coalesce into stones.");
+      ch->sendln(u"The combat disrupts the ether too much to coalesce into stones."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_greater_stone_shield(level, ch, tar_ch, 0, skill);
@@ -868,25 +868,25 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   switch (dc_->world[ch->in_room].sector_type)
   {
   case SECT_AIR:
-    ch->sendln("You attempt to cause an earthquake in the air, but nothing happens.");
+    ch->sendln(u"You attempt to cause an earthquake in the air, but nothing happens."_s);
     act_to_room("$n attempted to cause an earthquake in the air, what an idiot.", ch, 0, 0, 0);
     return retval;
     break;
 
   case SECT_WATER_NOSWIM:
-    ch->sendln("The water turns violent as the earth beneath it trembles.");
+    ch->sendln(u"The water turns violent as the earth beneath it trembles."_s);
     act_to_room("$n's earthquake creates a tsunami that capsizes any ships in the area.", ch, 0, 0, 0);
     capsize = true;
     break;
 
   case SECT_UNDERWATER:
     underwater = true;
-    ch->sendln("The earth trembles below you, the water pressure nearly makes you lose consciousness.");
+    ch->sendln(u"The earth trembles below you, the water pressure nearly makes you lose consciousness."_s);
     act_to_room("$n's earthquake nearly makes you implode from the water pressure.", ch, 0, 0, 0);
     break;
 
   default:
-    ch->sendln("The earth trembles beneath your feet!");
+    ch->sendln(u"The earth trembles beneath your feet!"_s);
     act_to_room("$n makes the earth tremble and shiver.\r\n", ch, 0, 0, 0);
     break;
   }
@@ -925,7 +925,7 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
       if (!underwater && (IS_AFFECTED(tmp_victim, AFF_FREEFLOAT) || IS_AFFECTED(tmp_victim, AFF_FLYING)))
       {
-        tmp_victim->sendln("Debris from the earthquake flies in every direction and strikes you.");
+        tmp_victim->sendln(u"Debris from the earthquake flies in every direction and strikes you."_s);
         dam = 1;
       }
       else
@@ -971,7 +971,7 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     }
     else if (ch_zone == tmp_vict_zone)
     {
-      tmp_victim->sendln("The earth trembles and shivers.");
+      tmp_victim->sendln(u"The earth trembles and shivers."_s);
     }
   } // main for loop of all characters
 
@@ -1046,7 +1046,7 @@ void do_solar_blind(CharacterPtr ch, CharacterPtr tmp_victim, qint32 skill)
   if (!IS_AFFECTED(tmp_victim, AFF_BLIND))
   {
     act_to_room("$n seems to be blinded!", tmp_victim, 0, 0, INVIS_NULL);
-    tmp_victim->sendln("The world dims and goes $B$0black$R as you are blinded!");
+    tmp_victim->sendln(u"The world dims and goes $B$0black$R as you are blinded!"_s);
 
     af.type = SPELL_BLINDNESS;
     af.location = APPLY_HITROLL;
@@ -1089,7 +1089,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
       cmd_t::UP};
 
   // do room caster is in
-  ch->sendln("A Bright light comes down from the heavens.");
+  ch->sendln(u"A Bright light comes down from the heavens."_s);
   act_to_room("$n opens a Solar Gate.\r\n", ch, 0, 0, 0);
 
   // we use "orig_room" for this now, instead of ch->in_room.  The reason for
@@ -1129,10 +1129,10 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
-        if (tmp_victim->isNonPlayer() && dc_->mob_index[tmp_victim->mobdata->nr].vnum() >= 2300 &&
-            dc_->mob_index[tmp_victim->mobdata->nr].vnum() <= 2399)
+        if (tmp_victim->isNonPlayer() && dc_->mob_index_[tmp_victim->mobdata->nr].vnum() >= 2300 &&
+            dc_->mob_index_[tmp_victim->mobdata->nr].vnum() <= 2399)
         {
-          ch->sendln("The clan hall's enchantments absorbs part of your spell.");
+          ch->sendln(u"The clan hall's enchantments absorbs part of your spell."_s);
           continue;
         }
         if ((tmp_victim != ch) && (tmp_victim->in_room != orig_room) &&
@@ -1289,7 +1289,7 @@ qint32 spell_heroes_feast(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     GET_COND(ch, FULL) = result;
     GET_COND(ch, THIRST) = result;
   }
-  ch->sendln("You partake in a magnificent feast!");
+  ch->sendln(u"You partake in a magnificent feast!"_s);
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
@@ -1306,7 +1306,7 @@ qint32 spell_heroes_feast(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
         GET_COND(tmp_victim, FULL) = result;
         GET_COND(tmp_victim, THIRST) = result;
       }
-      tmp_victim->sendln("You partake in a magnificent feast!");
+      tmp_victim->sendln(u"You partake in a magnificent feast!"_s);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -1369,7 +1369,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   qint32 retval2 = {};
   CharacterPtr next_victim = {};
 
-  ch->sendln("$B$4Fire$R falls from the heavens!");
+  ch->sendln(u"$B$4Fire$R falls from the heavens!"_s);
   act_to_room("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, 0);
 
   for (auto victim = dc_->world[ch->in_room].people_; victim; victim = next_victim)
@@ -1427,7 +1427,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     {
       if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
       {
-        tmp_victim->sendln("You feel a HOT blast of air.");
+        tmp_victim->sendln(u"You feel a HOT blast of air."_s);
       }
     }
     catch (...)
@@ -1452,20 +1452,20 @@ qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       pal->cRooms--;
       if (pal->in_room == obj->in_room)
       {
-        pal->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has been destroyed!");
+        pal->sendln(u"The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has been destroyed!"_s);
         victim = pal;
       }
       else
         pal->send(u"You sense your desecration of %s has been destroyed!"_s.arg(dc_->world[obj->in_room].name));
     }
-    ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!");
+    ch->sendln(u"The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!"_s);
     act_to_room("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, NOTVICT);
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
   }
   else if (obj && !victim)
   { // targetting a random object
-    ch->sendln("Nothing happens.");
+    ch->sendln(u"Nothing happens."_s);
     return ReturnValue::eSUCCESS;
   }
   else
@@ -1501,20 +1501,20 @@ qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       pal->cRooms--;
       if (pal->in_room == obj->in_room)
       {
-        pal->sendln("The runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has been destroyed!");
+        pal->sendln(u"The runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has been destroyed!"_s);
         victim = pal;
       }
       else
         pal->send(u"You sense your consecration of %s has been destroyed!"_s.arg(dc_->world[obj->in_room].name));
     }
-    ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!");
+    ch->sendln(u"Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!"_s);
     act_to_room("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, NOTVICT);
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
   }
   else if (obj && !victim)
   { // targetting a random object
-    ch->sendln("Nothing happens.");
+    ch->sendln(u"Nothing happens."_s);
     return ReturnValue::eSUCCESS;
   }
   else
@@ -1618,19 +1618,19 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   if ((ch->in_room >= 0 && ch->in_room <= dc_->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
-    ch->sendln("You can't teleport in potato arenas!");
+    ch->sendln(u"You can't teleport in potato arenas!"_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->isPlayerObjectThief())
   {
-    ch->sendln("Your attempt to transport stolen goods through planes of magic fails!!");
+    ch->sendln(u"Your attempt to transport stolen goods through planes of magic fails!!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    ch->sendln("You find yourself unable to.");
+    ch->sendln(u"You find yourself unable to."_s);
     if (ch != victim)
     {
       dc_sprintf(buf, "%s just tried to teleport you.\r\n", qPrintable(ch->shortdesc_or_name()));
@@ -1715,7 +1715,7 @@ qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   {
     if (victim->affected_by_spell(SPELL_BLESS))
       affect_from_char(victim, SPELL_BLESS);
-    victim->sendln("You feel blessed.");
+    victim->sendln(u"You feel blessed."_s);
 
     if (victim != ch)
       act_to_character("$N receives the blessing from your god.", ch, nullptr, victim, 0);
@@ -1759,17 +1759,17 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       qint32 retval = {};
       if (ch->dc_->number(0, 1))
       {
-        ch->sendln("The combined magics fizzle!");
+        ch->sendln(u"The combined magics fizzle!"_s);
         if (GET_POS(victim) == position_t::SLEEPING)
         {
-          victim->sendln("You are awakened by a burst of $6energy$R!");
+          victim->sendln(u"You are awakened by a burst of $6energy$R!"_s);
           act_to_room("$n is awakened in a burst of $6energy$R!", victim, nullptr, nullptr, 0);
           victim->setSitting();
         }
       }
       else
       {
-        ch->sendln("The combined magics cause an explosion!");
+        ch->sendln(u"The combined magics cause an explosion!"_s);
         retval = damage(ch, ch, dc_->number(5, 10), 0, TYPE_MAGIC);
       }
       return retval;
@@ -1788,7 +1788,7 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   /* save the newbies! */
   if (ch->isPlayer() && victim->isPlayer() && (victim->getLevel() < 10))
   {
-    ch->sendln("Your cold-blooded act causes your magic to misfire!");
+    ch->sendln(u"Your cold-blooded act causes your magic to misfire!"_s);
     victim = ch;
   }
 
@@ -1854,7 +1854,7 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     do_sing(victim, "stop");
 
   act_to_room("$n seems to be paralyzed!", victim, 0, 0, INVIS_NULL);
-  victim->sendln("Your entire body rebels against you and you are paralyzed!");
+  victim->sendln(u"Your entire body rebels against you and you are paralyzed!"_s);
 
   if (victim->isPlayer())
   {
@@ -1929,7 +1929,7 @@ qint32 spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   }
 
   act_to_room("$n seems to be blinded!", victim, 0, 0, INVIS_NULL);
-  victim->sendln("You have been blinded!");
+  victim->sendln(u"You have been blinded!"_s);
 
   af.type = SPELL_BLINDNESS;
   af.location = APPLY_HITROLL;
@@ -2013,11 +2013,11 @@ qint32 spell_remove_paralysis(quint8 level, CharacterPtr ch, CharacterPtr victim
       dc_->number(1, 100) < (80 + skill / 6))
   {
     affect_from_char(victim, SPELL_PARALYZE);
-    ch->sendln("Your spell is successful!");
-    victim->sendln("Your movement returns!");
+    ch->sendln(u"Your spell is successful!"_s);
+    victim->sendln(u"Your movement returns!"_s);
   }
   else
-    ch->sendln("Your spell fails to return the victim's movement.");
+    ch->sendln(u"Your spell fails to return the victim's movement."_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -2037,21 +2037,21 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     if (!victim->affected_by_spell(SPELL_BLINDNESS) && !IS_AFFECTED(victim, AFF_BLIND))
     {
       if (victim == ch)
-        ch->sendln("Seems you weren't blind after all.");
+        ch->sendln(u"Seems you weren't blind after all."_s);
       else
         act_to_character("Seems $N wasn't blind after all.", ch, 0, victim, 0);
     }
     if (victim->affected_by_spell(SPELL_BLINDNESS))
     {
       affect_from_char(victim, SPELL_BLINDNESS);
-      victim->sendln("Your vision returns!");
+      victim->sendln(u"Your vision returns!"_s);
       if (victim != ch)
         act_to_character("$N can see again!", ch, 0, victim, 0);
     }
     if (IS_AFFECTED(victim, AFF_BLIND))
     {
       REMBIT(victim->affected_by, AFF_BLIND);
-      victim->sendln("Your vision returns!");
+      victim->sendln(u"Your vision returns!"_s);
       if (victim != ch)
         act_to_character("$N can see again!", ch, 0, victim, 0);
     }
@@ -2060,7 +2060,7 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   {
     if (ch == victim)
     {
-      ch->sendln("Your spell fails to return your vision!");
+      ch->sendln(u"Your spell fails to return your vision!"_s);
     }
     else
     {
@@ -2086,19 +2086,19 @@ qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2156,19 +2156,19 @@ qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2227,7 +2227,7 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
         obj->flags_.value[2]--;
       }
       //		 else {
-      //		  ch->sendln("Your curse has failed.");
+      //		  ch->sendln(u"Your curse has failed."_s);
       //		 }
     }
   }
@@ -2286,7 +2286,7 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
     if (victim->isPlayer() && victim->getLevel() < 11)
     {
-      ch->sendln("The curse fizzles!");
+      ch->sendln(u"The curse fizzles!"_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -2350,7 +2350,7 @@ qint32 spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (ch != victim && skill < 70)
   {
-    ch->sendln("You aren't practiced enough to be able to cast on others.");
+    ch->sendln(u"You aren't practiced enough to be able to cast on others."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2364,7 +2364,7 @@ qint32 spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   af.bitvector = AFF_DETECT_EVIL;
 
   affect_to_char(victim, &af);
-  victim->sendln("You become more conscious of the evil around you.");
+  victim->sendln(u"You become more conscious of the evil around you."_s);
   act_to_room("$n looks to be more conscious of the evil around $m.", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
@@ -2383,7 +2383,7 @@ qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (ch != victim && skill < 70)
   {
-    ch->sendln("You aren't practiced enough to be able to cast on others.");
+    ch->sendln(u"You aren't practiced enough to be able to cast on others."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2397,7 +2397,7 @@ qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   af.bitvector = AFF_DETECT_GOOD;
 
   affect_to_char(victim, &af);
-  victim->sendln("You are now able to truly recognize the good in others.");
+  victim->sendln(u"You are now able to truly recognize the good in others."_s);
   act_to_room("$n looks to be more conscious of the evil around $m.", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
@@ -2427,7 +2427,7 @@ qint32 spell_TRUE_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   af.bitvector = AFF_TRUE_SIGHT;
 
   affect_to_char(victim, &af);
-  victim->sendln("You feel your vision enhanced with an incredibly keen perception.");
+  victim->sendln(u"You feel your vision enhanced with an incredibly keen perception."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2456,7 +2456,7 @@ qint32 spell_detect_invisibility(quint8 level, CharacterPtr ch, CharacterPtr vic
   af.bitvector = AFF_DETECT_INVISIBLE;
 
   affect_to_char(victim, &af);
-  victim->sendln("Your eyes tingle, allowing you to see the invisible.");
+  victim->sendln(u"Your eyes tingle, allowing you to see the invisible."_s);
   if (ch != victim)
     ch->send(u"%s's eyes tingle briefly.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
   return ReturnValue::eSUCCESS;
@@ -2487,7 +2487,7 @@ qint32 spell_infravision(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   af.bitvector = AFF_INFRARED;
 
   affect_to_char(victim, &af);
-  victim->sendln("Your eyes glow $B$4red$R.");
+  victim->sendln(u"Your eyes glow $B$4red$R."_s);
   if (ch != victim)
     ch->send(u"%s's eyes glow $B$4red$R.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
 
@@ -2516,7 +2516,7 @@ qint32 spell_detect_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   af.bitvector = AFF_DETECT_MAGIC;
 
   affect_to_char(victim, &af);
-  victim->sendln("Your vision temporarily blurs, your focus shifting to the metaphysical realm.");
+  victim->sendln(u"Your vision temporarily blurs, your focus shifting to the metaphysical realm."_s);
   if (ch != victim)
     ch->send(u"%s's eyes appear to blur momentarily.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
   return ReturnValue::eSUCCESS;
@@ -2546,7 +2546,7 @@ qint32 spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
   af.bitvector = AFF_HASTE;
 
   affect_to_char(victim, &af);
-  victim->sendln("You feel fast!");
+  victim->sendln(u"You feel fast!"_s);
   act_to_room("$n begins to move faster.", victim, 0, 0, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -2566,9 +2566,9 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   {
     if (victim == ch)
       if (IS_AFFECTED(victim, AFF_POISON))
-        ch->sendln("You can sense poison in your blood.");
+        ch->sendln(u"You can sense poison in your blood."_s);
       else
-        ch->sendln("You feel healthy.");
+        ch->sendln(u"You feel healthy."_s);
     else if (IS_AFFECTED(victim, AFF_POISON))
     {
       act_to_character("You sense that $E is poisoned.", ch, 0, victim, 0);
@@ -2586,11 +2586,11 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
       if (obj->flags_.value[3])
         act_to_character("Poisonous fumes are revealed.", ch, 0, 0, 0);
       else
-        ch->sendln("It looks very delicious.");
+        ch->sendln(u"It looks very delicious."_s);
     }
     else
     {
-      ch->sendln("There is nothing much that poison would do on this.");
+      ch->sendln(u"There is nothing much that poison would do on this."_s);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -2602,7 +2602,7 @@ qint32 spell_enchant_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 {
   /*qint32 i;*/
 
-  ch->sendln("This spell being revamped.  Sorry.");
+  ch->sendln(u"This spell being revamped.  Sorry."_s);
   return ReturnValue::eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_ARMOR) &&
@@ -2641,7 +2641,7 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("This spell being revamped, sorry.");
+  ch->sendln(u"This spell being revamped, sorry."_s);
   return ReturnValue::eFAILURE;
 
   if ((GET_ITEM_TYPE(obj) == ITEM_WEAPON) &&
@@ -2705,7 +2705,7 @@ qint32 spell_mana(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
     GET_MANA(victim) = GET_MAX_MANA(victim);
 
   update_pos(victim);
-  victim->sendln("You feel magical energy fill your mind!");
+  victim->sendln(u"You feel magical energy fill your mind!"_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -2724,25 +2724,25 @@ qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
   /* Adding paladin ability to heal others back in.
    * if (GET_CLASS(ch) == CLASS_PALADIN && victim != ch)
    * {
-   *   ch->sendln("You cannot target others with this spell.");
+   *   ch->sendln(u"You cannot target others with this spell."_s);
    *   return ReturnValue::eFAILURE;
    * }
    */
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2796,18 +2796,18 @@ qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2857,18 +2857,18 @@ qint32 spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2947,7 +2947,7 @@ qint32 spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       return ReturnValue::eFAILURE;
 
     act_to_room("$n slowly fades out of existence.", victim, 0, 0, INVIS_NULL);
-    victim->sendln("You slowly fade out of existence.");
+    victim->sendln(u"You slowly fade out of existence."_s);
 
     af.type = SPELL_INVISIBLE;
     af.duration = (qint32)(skill / 3.75);
@@ -3098,10 +3098,10 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
   }
 
   if (j == total)
-    ch->sendln("There appears to be no such object.");
+    ch->sendln(u"There appears to be no such object."_s);
 
   if (j == 0)
-    ch->sendln("The tremendous amount of information leaves you very confused.");
+    ch->sendln(u"The tremendous amount of information leaves you very confused."_s);
 
   if (ch->isImmortalPlayer())
   {
@@ -3153,7 +3153,7 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
       af.location = APPLY_NONE;
       af.bitvector = AFF_POISON;
       affect_join(victim, &af, false, false);
-      victim->sendln("You feel very sick.");
+      victim->sendln(u"You feel very sick."_s);
       act_to_character("$N looks very sick.", ch, 0, victim, 0);
     }
     if (victim->isNonPlayer() && (!victim->fighting) && GET_POS(ch) > position_t::SLEEPING)
@@ -3173,7 +3173,7 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
     }
     else
     {
-      ch->sendln("Nothing special seems to happen.");
+      ch->sendln(u"Nothing special seems to happen."_s);
     }
   }
   return retval;
@@ -3213,7 +3213,7 @@ qint32 spell_protection_from_evil(quint8 level, CharacterPtr ch, CharacterPtr vi
   af.location = APPLY_NONE;
   af.bitvector = AFF_PROTECT_EVIL;
   affect_to_char(victim, &af);
-  victim->sendln("You have a righteous, protected feeling!");
+  victim->sendln(u"You have a righteous, protected feeling!"_s);
   act_to_room("A dark, $6pulsing$R aura surrounds $n.", victim, 0, 0, INVIS_NULL);
 
   return ReturnValue::eSUCCESS;
@@ -3246,7 +3246,7 @@ qint32 spell_protection_from_good(quint8 level, CharacterPtr ch, CharacterPtr vi
   af.location = APPLY_NONE;
   af.bitvector = AFF_PROTECT_GOOD;
   affect_to_char(victim, &af);
-  victim->sendln("You feel yourself wrapped in a protective mantle of evil.");
+  victim->sendln(u"You feel yourself wrapped in a protective mantle of evil."_s);
   act_to_room("A light, $B$6pulsing$R aura surrounds $n.", victim, 0, 0, INVIS_NULL);
 
   return ReturnValue::eSUCCESS;
@@ -3265,7 +3265,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       act_to_character("$p briefly glows $3blue$R.", ch, obj, 0, 0);
       REMOVE_BIT(obj->flags_.extra_flags, ITEM_NODROP);
-      if (dc_->obj_index[obj->item_number].vnum() == 514)
+      if (dc_->obj_index_[obj->item_number].vnum() == 514)
       {
         qint32 i = {};
         for (i = {}; i < obj->num_affects; i++)
@@ -3316,7 +3316,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         if (curses_removed++)
           GET_MANA(victim) -= mana_cost;
-        if (skill > 70 && dc_->obj_index[obj->item_number].vnum() == 514)
+        if (skill > 70 && dc_->obj_index_[obj->item_number].vnum() == 514)
         {
           qint32 i = {};
           for (i = {}; i < obj->num_affects; i++)
@@ -3347,7 +3347,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
           GET_MANA(victim) -= mana_cost;
         act_to_room("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, 0);
         act_to_character("$p briefly glows $3blue$R.", victim, obj, 0, 0);
-        if (skill > 70 && dc_->obj_index[obj->item_number].vnum() == 514)
+        if (skill > 70 && dc_->obj_index_[obj->item_number].vnum() == 514)
         {
           qint32 i = {};
           for (i = {}; i < obj->num_affects; i++)
@@ -3422,7 +3422,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
   if (IS_AFFECTED(victim, AFF_FIRESHIELD))
   {
     if (ch == victim)
-      ch->sendln("You are already protected by a shield of fire.");
+      ch->sendln(u"You are already protected by a shield of fire."_s);
     else
       act_to_character("$N is already protected by a shield of fire.", ch, 0, victim, INVIS_NULL);
 
@@ -3432,7 +3432,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
   if (IS_AFFECTED(victim, AFF_LIGHTNINGSHIELD))
   {
     if (ch == victim)
-      ch->sendln("You are already protected by a shield of lightning.");
+      ch->sendln(u"You are already protected by a shield of lightning."_s);
     else
       act_to_character("$N is already protected by a shield of lightning.", ch, 0, victim, INVIS_NULL);
 
@@ -3442,7 +3442,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
   if (IS_AFFECTED(victim, AFF_FROSTSHIELD))
   {
     if (ch == victim)
-      ch->sendln("You are already protected by a $1frost shield$R.");
+      ch->sendln(u"You are already protected by a $1frost shield$R."_s);
     else
       act_to_character("$N is already protected by a $1frost shield$R.", ch, 0, victim, INVIS_NULL);
 
@@ -3452,7 +3452,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
   if (IS_AFFECTED(victim, AFF_ACID_SHIELD))
   {
     if (ch == victim)
-      ch->sendln("You are already protected by a shield of acid.");
+      ch->sendln(u"You are already protected by a shield of acid."_s);
     else
       act_to_character("$N is already protected by a shield of acid.", ch, 0, victim, INVIS_NULL);
 
@@ -3494,7 +3494,7 @@ qint32 spell_mend_golem(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   QString dammsg;
   follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && dc_->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && dc_->mob_index_[fol->follower->mobdata->nr].vnum() == 8)
     {
       heal = (qint32)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = dc_->number(heal - (heal / 10), heal + (heal / 10));
@@ -3514,7 +3514,7 @@ qint32 spell_mend_golem(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
                   dammsg, "You focus your magical enery and many of the scratches on your golem are fixed.", TO_CHAR);
       return ReturnValue::eSUCCESS;
     }
-  ch->sendln("You don't have a golem.");
+  ch->sendln(u"You don't have a golem."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -3718,12 +3718,12 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (GET_CLASS(ch) == CLASS_PALADIN && GET_ALIGNMENT(ch) < 351)
     {
-      ch->sendln("You are not noble enough to cast it.");
+      ch->sendln(u"You are not noble enough to cast it."_s);
       return ReturnValue::eFAILURE;
     }
     if (GET_CLASS(ch) == CLASS_PALADIN && tar_ch != ch)
     {
-      ch->sendln("You can only cast this spell on yourself.");
+      ch->sendln(u"You can only cast this spell on yourself."_s);
       return ReturnValue::eFAILURE;
     }
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
@@ -3954,7 +3954,7 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
   if (!victim->isNonPlayer() && victim->getLevel() <= 15)
   {
-    ch->sendln("Oh come on....at least wait till $e's high enough level to have decent gear.");
+    ch->sendln(u"Oh come on....at least wait till $e's high enough level to have decent gear."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -3984,7 +3984,7 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
         break;
       case 2:
       case 3:
-        ch->sendln("The combined magics fizzle, and cause an explosion!");
+        ch->sendln(u"The combined magics fizzle, and cause an explosion!"_s);
         {
           act_to_room("$n wakes up in a burst of magical energies!", victim, nullptr, nullptr, 0);
           affect_from_char(victim, SPELL_PARALYZE);
@@ -4076,12 +4076,12 @@ qint32 spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
     if (af.modifier < 0)
     { // it's not out yet, so put some back
-      victim->sendln("You feel most of the magical weakness leave your body.");
+      victim->sendln(u"You feel most of the magical weakness leave your body."_s);
       affect_to_char(victim, &af);
     }
     else
     {
-      victim->sendln("You feel the magical weakness leave your body.");
+      victim->sendln(u"You feel the magical weakness leave your body."_s);
     }
 
     return ReturnValue::eSUCCESS;
@@ -4093,12 +4093,12 @@ qint32 spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       affect_from_char(victim, SPELL_STRENGTH);
     else
     {
-      ch->sendln("That person already has a stronger strength spell!");
+      ch->sendln(u"That person already has a stronger strength spell!"_s);
       return ReturnValue::eFAILURE;
     }
   }
 
-  victim->sendln("You feel stronger.");
+  victim->sendln(u"You feel stronger."_s);
   act_to_room("$n's muscles bulge a bit and $e looks stronger.", victim, 0, 0, INVIS_NULL);
 
   af.type = SPELL_STRENGTH;
@@ -4129,7 +4129,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
   {
-    ch->sendln("You find yourself unable to.");
+    ch->sendln(u"You find yourself unable to."_s);
     if (ch != victim)
     {
       dc_sprintf(buf, "%s just tried to recall you.\r\n", qPrintable(ch->shortdesc_or_name()));
@@ -4140,7 +4140,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   assert(victim);
   if (victim->room().isArena())
   {
-    ch->sendln("To the DEATH you wimp!");
+    ch->sendln(u"To the DEATH you wimp!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4149,7 +4149,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   if (IS_AFFECTED(victim, AFF_CURSE))
   {
     if (ch == victim)
-      ch->sendln("Something blocks your attempt to recall.");
+      ch->sendln(u"Something blocks your attempt to recall."_s);
     else
     {
       act_to_character("Something blocks your attempt to recall $N.", ch, 0, victim, 0);
@@ -4160,13 +4160,13 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (victim->fighting && victim->fighting->isPlayer()) // PvP fight?
   {
-    victim->sendln("The fight distracts you from casting word of recall!");
+    victim->sendln(u"The fight distracts you from casting word of recall!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
-    victim->sendln("Your attempt to transport stolen goods through planes of magic fails!");
+    victim->sendln(u"Your attempt to transport stolen goods through planes of magic fails!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4189,7 +4189,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
-        victim->sendln("The gods frown on you, and reset your home.");
+        victim->sendln(u"The gods frown on you, and reset your home."_s);
         location = real_room(START_ROOM);
         victim->hometown = START_ROOM;
       }
@@ -4201,7 +4201,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
         if (!found)
         {
-          victim->sendln("The gods frown on you, and reset your home.");
+          victim->sendln(u"The gods frown on you, and reset your home."_s);
           location = real_room(START_ROOM);
           victim->hometown = START_ROOM;
         }
@@ -4211,18 +4211,18 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (location == -1)
   {
-    victim->sendln("You are completely lost.");
+    victim->sendln(u"You are completely lost."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
-    victim->sendln("No recalling into a clan hall whilst Champion, go to the Tavern!");
+    victim->sendln(u"No recalling into a clan hall whilst Champion, go to the Tavern!"_s);
     location = real_room(START_ROOM);
   }
   if (location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION))
   {
-    victim->sendln("No recalling into a guild hall whilst Champion, go to the Tavern!");
+    victim->sendln(u"No recalling into a guild hall whilst Champion, go to the Tavern!"_s);
     location = real_room(START_ROOM);
   }
 
@@ -4230,13 +4230,13 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   {
     if (GET_MANA(victim) < use_mana(victim, skill))
     {
-      victim->sendln("You don't posses the energy to travel that far.");
+      victim->sendln(u"You don't posses the energy to travel that far."_s);
       GET_MANA(victim) += use_mana(victim, skill);
       return ReturnValue::eFAILURE;
     }
     else
     {
-      ch->sendln("The long distance drains additional mana from you.");
+      ch->sendln(u"The long distance drains additional mana from you."_s);
       GET_MANA(victim) -= use_mana(victim, skill);
     }
   }
@@ -4245,13 +4245,13 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   {
     if (victim->mana < 50)
     {
-      victim->sendln("You don't possses the energy to bring your golem along.");
+      victim->sendln(u"You don't possses the energy to bring your golem along."_s);
     }
     else
     {
       if (victim->player->golem->fighting)
       {
-        victim->sendln("Your golem is too distracted by something to follow.");
+        victim->sendln(u"Your golem is too distracted by something to follow."_s);
       }
       else
       {
@@ -4281,25 +4281,25 @@ qint32 spell_wizard_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (isSet(dc_->world[victim->in_room].room_flags, NO_MAGIC) ||
       (victim->isImmortalPlayer() && !ch->isImmortalPlayer()))
   {
-    ch->sendln("Your vision is too clouded to make out anything.");
+    ch->sendln(u"Your vision is too clouded to make out anything."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_FOREST_MELD))
   {
-    ch->sendln("Your target's location is hidden by the forests.");
+    ch->sendln(u"Your target's location is hidden by the forests."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->affected_by_spell(SKILL_INNATE_EVASION))
   {
-    ch->sendln("Your target evades your magical scrying!");
+    ch->sendln(u"Your target evades your magical scrying!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->dc_->number(0, 100) > skill)
   {
-    ch->sendln("Your spell fails to locate its target.");
+    ch->sendln(u"Your spell fails to locate its target."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4308,10 +4308,10 @@ qint32 spell_wizard_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   /* Detect Magic wiz-eye detection */
   if (victim->affected_by_spell(SPELL_DETECT_MAGIC) && victim->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
-    victim->sendln("You sense you are the target of magical scrying.");
+    victim->sendln(u"You sense you are the target of magical scrying."_s);
 
   move_char(ch, target, false);
-  ch->sendln("A vision forms in your mind... ");
+  ch->sendln(u"A vision forms in your mind... "_s);
   do_look(ch, "");
   move_char(ch, original_loc);
   return ReturnValue::eSUCCESS;
@@ -4327,32 +4327,32 @@ qint32 spell_eagle_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (!OUTSIDE(ch))
   {
-    ch->sendln("Your eagle cannot find its way outside!");
+    ch->sendln(u"Your eagle cannot find its way outside!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!OUTSIDE(victim) ||
       (victim->isImmortalPlayer() && !ch->isImmortalPlayer()))
   {
-    ch->sendln("Your eagle cannot scan the area.");
+    ch->sendln(u"Your eagle cannot scan the area."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_INVISIBLE))
   {
-    ch->sendln("Your eagle can't find the target.");
+    ch->sendln(u"Your eagle can't find the target."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->affected_by_spell(SKILL_INNATE_EVASION))
   {
-    ch->sendln("Your target evades the eagle's eyes!");
+    ch->sendln(u"Your target evades the eagle's eyes!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->dc_->number(0, 100) > skill)
   {
-    ch->sendln("Your eagle fails to locate its target.");
+    ch->sendln(u"Your eagle fails to locate its target."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4360,7 +4360,7 @@ qint32 spell_eagle_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   target = victim->in_room;
 
   move_char(ch, target, false);
-  ch->sendln("You summon a large eagle to scan the area.\r\nThrough the eagle's eyes you see...");
+  ch->sendln(u"You summon a large eagle to scan the area.\r\nThrough the eagle's eyes you see..."_s);
   do_look(ch, "");
   move_char(ch, original_loc);
   return ReturnValue::eSUCCESS;
@@ -4376,21 +4376,21 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
   if (isSet(dc_->world[victim->in_room].room_flags, SAFE))
   {
-    ch->sendln("That person is in a safe area!");
+    ch->sendln(u"That person is in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if ((victim->getLevel() > MIN(MORTAL, level + 3)) && ch->getLevel() < IMPLEMENTER)
   {
-    ch->sendln("You failed.");
+    ch->sendln(u"You failed."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->isPlayer())
     if (victim->isNonPlayer() || !isSet(victim->player->toggles, Player::PLR_SUMMONABLE))
     {
-      victim->sendln("Someone has tried to summon you!");
-      ch->sendln("Something strange about that person prevents your summoning.");
+      victim->sendln(u"Someone has tried to summon you!"_s);
+      ch->sendln(u"Something strange about that person prevents your summoning."_s);
       return ReturnValue::eFAILURE;
     }
   if (ch->isNonPlayer() && victim->isNonPlayer())
@@ -4400,33 +4400,33 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
       isSet(dc_->world[victim->in_room].room_flags, PRIVATE) ||
       isSet(dc_->world[victim->in_room].room_flags, NO_SUMMON))
   {
-    ch->sendln("You have failed to summon your target!");
+    ch->sendln(u"You have failed to summon your target!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->dc_->IS_ARENA(ch->in_room))
     if (!ch->dc_->IS_ARENA(victim->in_room))
     {
-      ch->sendln("You can't summon someone INTO an arena!");
+      ch->sendln(u"You can't summon someone INTO an arena!"_s);
       return ReturnValue::eFAILURE;
     }
 
   if (ch->dc_->IS_ARENA(victim->in_room) && !ch->dc_->IS_ARENA(ch->in_room))
   {
-    ch->sendln("You can't summon someone OUT of an areana!");
+    ch->sendln(u"You can't summon someone OUT of an areana!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->dc_->number(1, 100) > 50 + skill / 2 ||
       victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || victim->isPlayerGoldThief())
   {
-    ch->sendln("Your attempted summoning fails.");
+    ch->sendln(u"Your attempted summoning fails."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
   {
-    ch->sendln("You cannot summon a Champion here.");
+    ch->sendln(u"You cannot summon a Champion here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4434,13 +4434,13 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
-      ch->sendln("You don't posses the energy to travel that far.");
+      ch->sendln(u"You don't posses the energy to travel that far."_s);
       GET_MANA(ch) += use_mana(ch, skill);
       return ReturnValue::eFAILURE;
     }
     else
     {
-      ch->sendln("The long distance drains additional mana from you.");
+      ch->sendln(u"The long distance drains additional mana from you."_s);
       GET_MANA(ch) -= use_mana(ch, skill);
     }
   }
@@ -4476,18 +4476,18 @@ qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   affected_type af;
   ObjectPtr tempobj;
 
-  ch->sendln("Disabled currently.");
+  ch->sendln(u"Disabled currently."_s);
   return ReturnValue::eFAILURE;
 
   if (victim == ch)
   {
-    ch->sendln("You like yourself even better!");
+    ch->sendln(u"You like yourself even better!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isPlayer())
   {
-    ch->sendln("You find yourself unable to charm this player.");
+    ch->sendln(u"You find yourself unable to charm this player."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4496,13 +4496,13 @@ qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (circle_follow(victim, ch))
   {
-    ch->sendln("Sorry, following in circles can not be allowed.");
+    ch->sendln(u"Sorry, following in circles can not be allowed."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (many_charms(ch))
   {
-    ch->sendln("How do you plan on controlling so many followers?");
+    ch->sendln(u"How do you plan on controlling so many followers?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -4562,7 +4562,7 @@ qint32 spell_sense_life(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (victim->affected_by_spell(SPELL_SENSE_LIFE))
     affect_from_char(victim, SPELL_SENSE_LIFE);
 
-  victim->sendln("You feel your awareness improve.");
+  victim->sendln(u"You feel your awareness improve."_s);
 
   af.type = SPELL_SENSE_LIFE;
   af.duration = 18 + skill / 2;
@@ -4599,10 +4599,10 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       // it's an obj in a room.  If it's not a corpse, don't id it
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->flags_.value[3] != 1)
       {
-        ch->sendln("Your magical probing reveals nothing of interest.");
+        ch->sendln(u"Your magical probing reveals nothing of interest."_s);
         return ReturnValue::eSUCCESS;
       }
-      ch->sendln("You probe the contents of the corpse magically....");
+      ch->sendln(u"You probe the contents of the corpse magically...."_s);
       // it's a corpse
       ObjectPtr iobj;
       for (iobj = obj->contains; iobj; iobj = iobj->next_content)
@@ -4612,20 +4612,20 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
         ch->send(iobj->short_description);
         if (isSet(iobj->flags_.more_flags, ITEM_NO_TRADE))
         {
-          ch->send(" $BNO_TRADE$R");
+          ch->send(u" $BNO_TRADE$R"_s);
           show_obj_class_size_mini(iobj, ch);
         }
-        ch->sendln("");
+        ch->sendln(u""_s);
       }
       return ReturnValue::eSUCCESS;
     }
     if (isSet(obj->flags_.extra_flags, ITEM_DARK) && ch->getLevel() < POWER)
     {
-      ch->sendln("A magical aura around the item attempts to conceal its secrets.");
+      ch->sendln(u"A magical aura around the item attempts to conceal its secrets."_s);
       return ReturnValue::eFAILURE;
     }
 
-    ch->sendln("You feel informed:");
+    ch->sendln(u"You feel informed:"_s);
 
     dc_sprintf(buf, "Object '%s', Item type: ", qPrintable(obj->name()));
     sprinttype(GET_ITEM_TYPE(obj), item_types, buf2);
@@ -4633,7 +4633,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     dc_strcat(buf, "\r\n");
     ch->send(buf);
 
-    ch->send("Item is: ");
+    ch->send(u"Item is: "_s);
     sprintbit(obj->flags_.extra_flags, Object::extra_bits, buf);
     sprintbit(obj->flags_.more_flags, Object::more_obj_bits, buf2);
     dc_strcat(buf, " ");
@@ -4641,7 +4641,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     dc_strcat(buf, "\r\n");
     ch->send(buf);
 
-    ch->send("Worn by: ");
+    ch->send(u"Worn by: "_s);
     sprintbit(obj->flags_.size, Object::size_bits, buf);
     dc_strcat(buf, "\r\n");
     ch->send(buf);
@@ -4750,7 +4750,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
       {
         if (!found)
         {
-          ch->sendln("Can affect you as:");
+          ch->sendln(u"Can affect you as:"_s);
           found = true;
         }
 
@@ -4798,7 +4798,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     }
     else
     {
-      ch->sendln("You learn nothing new.");
+      ch->sendln(u"You learn nothing new."_s);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -4929,7 +4929,7 @@ qint32 spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
     {
       if (GET_DEX(tmp_victim) > dc_->number(1, 100)) // roll vs dex dodged
       {
-        ch->sendln("You dive out of the way of the main blast avoiding the inferno!");
+        ch->sendln(u"You dive out of the way of the main blast avoiding the inferno!"_s);
         act_to_room("$n barely dives to the side avoiding the heart of the flame.", ch, 0, 0, 0);
         continue;
       }
@@ -4944,7 +4944,7 @@ qint32 spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
         return retval;
     }
     else if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
-      tmp_victim->sendln("You feel a HOT blast of air.");
+      tmp_victim->sendln(u"You feel a HOT blast of air."_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -4979,7 +4979,7 @@ qint32 spell_gas_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
         return retval;
     }
     else if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
-      tmp_victim->sendln("You wanna choke on the smell in the air.");
+      tmp_victim->sendln(u"You wanna choke on the smell in the air."_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -5022,7 +5022,7 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (GET_POS(victim) == position_t::SLEEPING)
   {
-    ch->sendln("How do you expect a sleeping person to be scared?");
+    ch->sendln(u"How do you expect a sleeping person to be scared?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -5078,7 +5078,7 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
   {
-    victim->sendln("For a moment you feel compelled to run away, but you fight back the urge.");
+    victim->sendln(u"For a moment you feel compelled to run away, but you fight back the urge."_s);
     act("$N doesnt seem to be the yellow-bellied slug you thought!", ch,
         nullptr, victim, TO_CHAR, 0);
 
@@ -5094,7 +5094,7 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
     return retval;
   }
 
-  victim->sendln("You suddenly feel very frightened, and you attempt to flee!");
+  victim->sendln(u"You suddenly feel very frightened, and you attempt to flee!"_s);
   do_flee(victim, "", cmd_t::FEAR);
 
   return ReturnValue::eSUCCESS;
@@ -5149,7 +5149,7 @@ qint32 spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr o
   if (IS_AFFECTED(victim, AFF_FLYING))
     return ReturnValue::eFAILURE;
 
-  victim->sendln("You start flapping and rise off the ground!");
+  victim->sendln(u"You start flapping and rise off the ground!"_s);
   if (ch != victim)
     act_to_character("$N starts flapping and rises off the ground!", ch, nullptr, victim, 0);
   act_to_room("$N's feet rise off the ground.", ch, 0, victim, INVIS_NULL | NOTVICT);
@@ -5180,17 +5180,17 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   {
     if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
     {
-      ch->sendln("That item is already glowing with magical light.");
+      ch->sendln(u"That item is already glowing with magical light."_s);
       return ReturnValue::eFAILURE;
     }
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)
     {
-      ch->sendln("Only pieces of equipment may be magically lit in such a way.");
+      ch->sendln(u"Only pieces of equipment may be magically lit in such a way."_s);
       return ReturnValue::eFAILURE;
     }
     if (!CAN_WEAR(obj, EAR) && !CAN_WEAR(obj, SHIELD) && !CAN_WEAR(obj, FINGER))
     {
-      ch->sendln("Only earrings, rings, and shields can be magically lit in such a way.");
+      ch->sendln(u"Only earrings, rings, and shields can be magically lit in such a way."_s);
       return ReturnValue::eFAILURE;
     }
     SET_BIT(obj->flags_.extra_flags, ITEM_GLOW);
@@ -5220,13 +5220,13 @@ qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (!IS_EVIL(ch) && ch->getLevel() < ARCHANGEL && GET_CLASS(ch) == CLASS_ANTI_PAL)
   {
-    ch->sendln("You aren't evil enough to cast such a repugnant spell.");
+    ch->sendln(u"You aren't evil enough to cast such a repugnant spell."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (many_charms(ch))
   {
-    ch->sendln("How do you plan on controlling so many followers?");
+    ch->sendln(u"How do you plan on controlling so many followers?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -5269,7 +5269,7 @@ qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if ((r_num = real_mobile(number)) < 0)
   {
-    ch->sendln("Mobile: Zombie not found.");
+    ch->sendln(u"Mobile: Zombie not found."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -5366,7 +5366,7 @@ qint32 spell_know_alignment(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (skill == 150)
     duration = 2;
-  ch->sendln("Your eyes tingle, allowing you to see the auras of other creatures.");
+  ch->sendln(u"Your eyes tingle, allowing you to see the auras of other creatures."_s);
   act_to_room("$n's eyes flash with knowledge and insight!", ch, 0, 0, INVIS_NULL);
 
   af.type = SPELL_KNOW_ALIGNMENT;
@@ -5394,38 +5394,38 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       if (!obj->equipped_by && !obj->carried_by)
       {
-        ch->sendln("You can't dispel that!");
+        ch->sendln(u"You can't dispel that!"_s);
         return ReturnValue::eFAILURE;
       }
       if (isSet(obj->flags_.extra_flags, ITEM_INVISIBLE))
       {
         REMOVE_BIT(obj->flags_.extra_flags, ITEM_INVISIBLE);
-        ch->sendln("You remove the item's invisibility.");
+        ch->sendln(u"You remove the item's invisibility."_s);
         return ReturnValue::eSUCCESS;
       }
       else if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
       {
         REMOVE_BIT(obj->flags_.extra_flags, ITEM_GLOW);
-        ch->sendln("You remove the item's $Bglowing$R aura.");
+        ch->sendln(u"You remove the item's $Bglowing$R aura."_s);
         return ReturnValue::eSUCCESS;
       }
       else
       {
-        ch->sendln("That item is not imbued with dispellable magic.");
+        ch->sendln(u"That item is not imbued with dispellable magic."_s);
         return ReturnValue::eFAILURE;
       }
     }
     if (!obj->equipped_by)
     {
       // Someone load it or something?
-      ch->sendln("The magic fades away back to the ether.");
+      ch->sendln(u"The magic fades away back to the ether."_s);
       act_to_room("$p fades away gently.", ch, obj, 0, INVIS_NULL);
     }
     else
     {
-      ch->sendln("The magic is shattered by your will!");
+      ch->sendln(u"The magic is shattered by your will!"_s);
       act_to_room("$p blinks out of existence with a bang!", ch, obj, 0, INVIS_NULL);
-      obj->equipped_by->sendln("Your magic beacon is shattered!");
+      obj->equipped_by->sendln(u"Your magic beacon is shattered!"_s);
       obj->equipped_by->beacon = {};
       obj->equipped_by = {};
     }
@@ -5442,7 +5442,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   if (ch->isPlayer() && victim->isPlayer() && victim->fighting &&
       victim->fighting->isNonPlayer())
   {
-    ch->sendln("You misfire!");
+    ch->sendln(u"You misfire!"_s);
     victim = ch;
   }
 
@@ -5458,7 +5458,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (spell && savebonus != -20 && ch->isPlayer())
   {
-    ch->sendln("You do not know this spell well enough to target it.");
+    ch->sendln(u"You do not know this spell well enough to target it."_s);
     return ReturnValue::eFAILURE;
   }
   if (spell)
@@ -5499,14 +5499,14 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_INVISIBLE))
       {
         affect_from_char(victim, SPELL_INVISIBLE);
-        victim->sendln("You feel your invisibility dissipate.");
+        victim->sendln(u"You feel your invisibility dissipate."_s);
         act_to_room("$n fades into existence.", victim, 0, 0, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_INVISIBLE))
       {
         REMBIT(victim->affected_by, AFF_INVISIBLE);
-        victim->sendln("You feel your invisibility dissipate.");
+        victim->sendln(u"You feel your invisibility dissipate."_s);
         act_to_room("$n fades into existence.", victim, 0, 0, 0);
         done = true;
       }
@@ -5516,7 +5516,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_DETECT_INVISIBLE))
       {
         affect_from_char(victim, SPELL_DETECT_INVISIBLE);
-        victim->sendln("Your ability to detect invisible has been dispelled!");
+        victim->sendln(u"Your ability to detect invisible has been dispelled!"_s);
         act_to_character("$N's ability to detect invisible is removed.", ch, 0, victim, 0);
         done = true;
       }
@@ -5526,7 +5526,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_CAMOUFLAGE))
       {
         affect_from_char(victim, SPELL_CAMOUFLAGE);
-        victim->sendln("Your camouflage has been dispelled!.");
+        victim->sendln(u"Your camouflage has been dispelled!."_s);
         act_to_character("$N's form is less obscured as you dispel $S camouflage.", ch, 0, victim, 0);
         done = true;
       }
@@ -5536,7 +5536,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_RESIST_ACID))
       {
         affect_from_char(victim, SPELL_RESIST_ACID);
-        victim->sendln("The $2green$R in your skin is dispelled!");
+        victim->sendln(u"The $2green$R in your skin is dispelled!"_s);
         act_to_character("$N's skin loses its $2green$R hue.", ch, 0, victim, 0);
         done = true;
       }
@@ -5546,7 +5546,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_RESIST_COLD))
       {
         affect_from_char(victim, SPELL_RESIST_COLD);
-        victim->sendln("The $3blue$R in your skin is dispelled!");
+        victim->sendln(u"The $3blue$R in your skin is dispelled!"_s);
         act_to_character("$N's skin loses its $3blue$R hue.", ch, 0, victim, 0);
         done = true;
       }
@@ -5556,7 +5556,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_RESIST_FIRE))
       {
         affect_from_char(victim, SPELL_RESIST_FIRE);
-        victim->sendln("The $4red$R in your skin is dispelled!");
+        victim->sendln(u"The $4red$R in your skin is dispelled!"_s);
         act_to_character("$N's skin loses its $4red$R hue.", ch, 0, victim, 0);
         done = true;
       }
@@ -5566,7 +5566,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_RESIST_ENERGY))
       {
         affect_from_char(victim, SPELL_RESIST_ENERGY);
-        victim->sendln("The $5yellow$R in your skin is dispelled!");
+        victim->sendln(u"The $5yellow$R in your skin is dispelled!"_s);
         act_to_character("$N's skin loses its $5yellow$R hue.", ch, 0, victim, 0);
         done = true;
       }
@@ -5576,7 +5576,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_BARKSKIN))
       {
         affect_from_char(victim, SPELL_BARKSKIN);
-        victim->sendln("Your woody has been dispelled!");
+        victim->sendln(u"Your woody has been dispelled!"_s);
         act_to_character("$N loses $S woody.", ch, 0, victim, 0);
         done = true;
       }
@@ -5586,7 +5586,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_STONE_SKIN))
       {
         affect_from_char(victim, SPELL_STONE_SKIN);
-        victim->sendln("Your skin loses stone-like consistency.");
+        victim->sendln(u"Your skin loses stone-like consistency."_s);
         act_to_character("$N's looks like less of a stoner as $S skin returns to normal.", ch, 0, victim, 0);
         done = true;
       }
@@ -5596,14 +5596,14 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_FLY))
       {
         affect_from_char(victim, SPELL_FLY);
-        victim->sendln("You do not feel lighter than air anymore.");
+        victim->sendln(u"You do not feel lighter than air anymore."_s);
         act_to_character("$N is no longer lighter than air.", ch, 0, victim, 0);
         done = true;
       }
       if (IS_AFFECTED(victim, AFF_FLYING))
       {
         REMBIT(victim->affected_by, AFF_FLYING);
-        victim->sendln("You do not feel lighter than air anymore.");
+        victim->sendln(u"You do not feel lighter than air anymore."_s);
         act_to_room("$n drops to the ground, no longer lighter than air.", victim, 0, 0, 0);
         done = true;
       }
@@ -5613,7 +5613,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_TRUE_SIGHT))
       {
         affect_from_char(victim, SPELL_TRUE_SIGHT);
-        victim->sendln("You no longer see what is hidden.");
+        victim->sendln(u"You no longer see what is hidden."_s);
         act_to_character("$N no longer sees what is hidden.", ch, 0, victim, 0);
         done = true;
       }
@@ -5623,7 +5623,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_WATER_BREATHING))
       {
         affect_from_char(victim, SPELL_WATER_BREATHING);
-        victim->sendln("You can no longer breathe underwater!");
+        victim->sendln(u"You can no longer breathe underwater!"_s);
         act_to_character("$N can no longer breathe underwater!", ch, 0, victim, 0);
         done = true;
       }
@@ -5633,7 +5633,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_ARMOR);
         done = true;
-        victim->sendln("Your magical armour is dispelled!");
+        victim->sendln(u"Your magical armour is dispelled!"_s);
         act_to_character("$N's magical armour is dispelled!", ch, 0, victim, 0);
       }
       break;
@@ -5642,7 +5642,7 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         affect_from_char(victim, SPELL_SHIELD);
         done = true;
-        victim->sendln("Your force shield shimmers and fades away.");
+        victim->sendln(u"Your force shield shimmers and fades away."_s);
         act_to_character("$N's force shield shimmers and fades away.", ch, 0, victim, 0);
       }
       break;
@@ -5651,14 +5651,14 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       if (victim->affected_by_spell(SPELL_RESIST_MAGIC))
       {
         affect_from_char(victim, SPELL_RESIST_MAGIC);
-        victim->sendln("The $B$7white$R in your skin is dispelled!");
+        victim->sendln(u"The $B$7white$R in your skin is dispelled!"_s);
         act_to_character("$N's skin loses its $B$7white$R hue.", ch, 0, victim, 0);
         done = true;
       }
       break;
 
     default:
-      ch->sendln("Illegal Value send to switch in dispel_minor, tell a god.");
+      ch->sendln(u"Illegal Value send to switch in dispel_minor, tell a god."_s);
       done = true;
       break;
     } // of switch
@@ -5699,7 +5699,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (ISSET(victim->affected_by, AFF_GOLEM))
   {
-    ch->sendln("The golem seems to shrug off your dispel attempt!");
+    ch->sendln(u"The golem seems to shrug off your dispel attempt!"_s);
     act_to_room("The golem seems to ignore $n's dispelling magic!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
@@ -5708,7 +5708,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       victim->fighting->isNonPlayer() &&
      !IS_AFFECTED(victim->fighting, AFF_CHARM))
   {
-     ch->sendln("Your dispelling magic misfires!");
+     ch->sendln(u"Your dispelling magic misfires!"_s);
      victim = ch;
   }*/
   qint32 savebonus = {};
@@ -5735,7 +5735,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (spell < 11 && spell > 0 && skill < 81) // spell-targetted cast
   {
-    ch->sendln("You do not yet know this spell well enough to target it.");
+    ch->sendln(u"You do not yet know this spell well enough to target it."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -5897,7 +5897,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       break;
 
     default:
-      ch->send("Illegal Value sent to dispel_magic switch statement.  Tell a god.");
+      ch->send(u"Illegal Value sent to dispel_magic switch statement.  Tell a god."_s);
       done = true;
       break;
     } // end of switch
@@ -5928,18 +5928,18 @@ qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -6111,7 +6111,7 @@ qint32 spell_resist_cold(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   affected_type af;
   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
   {
-    ch->sendln("You can only cast this on yourself.");
+    ch->sendln(u"You can only cast this on yourself."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -6141,7 +6141,7 @@ qint32 spell_resist_fire(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
   {
-    ch->sendln("You can only cast this on yourself.");
+    ch->sendln(u"You can only cast this on yourself."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -6170,7 +6170,7 @@ qint32 spell_resist_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch != victim)
   {
-    ch->sendln("You can only cast this on yourself.");
+    ch->sendln(u"You can only cast this on yourself."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -6199,7 +6199,7 @@ qint32 spell_staunchblood(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (GET_CLASS(ch) == CLASS_RANGER && ch != victim)
   {
-    ch->sendln("You can only cast this on yourself.");
+    ch->sendln(u"You can only cast this on yourself."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->affected_by_spell(SPELL_STAUNCHBLOOD))
@@ -6227,7 +6227,7 @@ qint32 spell_resist_energy(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
   if (GET_CLASS(ch) != CLASS_DRUID && ch != victim)
   {
-    ch->sendln("You can only cast this on yourself.");
+    ch->sendln(u"You can only cast this on yourself."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->affected_by_spell(SPELL_RESIST_ENERGY))
@@ -6462,7 +6462,7 @@ qint32 spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
         act("$n slowly fades out of existence.", tmp_victim, 0, 0,
             TO_ROOM, INVIS_NULL);
-        tmp_victim->sendln("You vanish.");
+        tmp_victim->sendln(u"You vanish."_s);
 
         af.type = SPELL_INVISIBLE;
         af.duration = 24;
@@ -6605,23 +6605,23 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
       isSet(dc_->world[victim->in_room].room_flags, IMP_ONLY) ||
       isSet(dc_->world[victim->in_room].room_flags, NO_PORTAL))
   {
-    ch->sendln("You can't seem to find a path.");
+    ch->sendln(u"You can't seem to find a path."_s);
     return ReturnValue::eFAILURE;
   }
 
   if ((victim->isPlayer()) && (victim->getLevel() >= IMMORTAL))
   {
-    ch->sendln("Just who do you think you are?");
+    ch->sendln(u"Just who do you think you are?"_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_SHADOWSLIP))
   {
-    ch->sendln("You can't seem to find a definite path.");
+    ch->sendln(u"You can't seem to find a definite path."_s);
     return ReturnValue::eFAILURE;
   }
   if (dc_->zones.value(dc_->world[victim->in_room].zone).isNoTeleport())
   {
-    ch->sendln("A portal shimmers into view but is unstable and immediately fades to nothing.");
+    ch->sendln(u"A portal shimmers into view but is unstable and immediately fades to nothing."_s);
     act_to_room("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
@@ -6630,13 +6630,13 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
-      ch->sendln("You don't posses the energy to portal that far.");
+      ch->sendln(u"You don't posses the energy to portal that far."_s);
       GET_MANA(ch) += use_mana(ch, skill);
       return ReturnValue::eFAILURE;
     }
     else
     {
-      ch->sendln("The long distance drains additional mana from you.");
+      ch->sendln(u"The long distance drains additional mana from you."_s);
       GET_MANA(ch) -= use_mana(ch, skill);
     }
   }
@@ -6676,7 +6676,7 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
   if (portal_found || found_hunt_or_quest_item || ch->dc_->IS_ARENA(victim->in_room) || ch->dc_->IS_ARENA(ch->in_room))
   {
-    ch->sendln("A portal shimmers into view, then fades away again.");
+    ch->sendln(u"A portal shimmers into view, then fades away again."_s);
     act("A portal shimmers into view, then fades away again.",
         ch, 0, 0, TO_ROOM, 0);
     return ReturnValue::eFAILURE;
@@ -6741,7 +6741,7 @@ qint32 cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
       return spell_call_lightning(level, ch, victim, 0, skill);
     else
-      ch->sendln("You fail to call upon the lightning from the sky!");
+      ch->sendln(u"You fail to call upon the lightning from the sky!"_s);
     break;
   case SPELL_TYPE_POTION:
     if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
@@ -7660,7 +7660,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     { /* It's an object */
       if (isSet(tar_obj->flags_.extra_flags, ITEM_BLESS))
       {
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
         return ReturnValue::eFAILURE;
       }
       return spell_bless(level, ch, 0, tar_obj, skill);
@@ -7690,7 +7690,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
               act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
             }
             else if (GET_POS(tar_ch) == position_t::FIGHTING)
-              ch->sendln("Nothing seems to happen.");
+              ch->sendln(u"Nothing seems to happen."_s);
             else
               retval &= spell_bless(level, ch, tar_ch, 0, skill);
           }
@@ -7704,7 +7704,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
             act_to_room("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_ch, NOTVICT);
           }
           else if (GET_POS(leader) == position_t::FIGHTING)
-            ch->sendln("Nothing seems to happen.");
+            ch->sendln(u"Nothing seems to happen."_s);
           else
             retval &= spell_bless(level, ch, leader, 0, skill);
         }
@@ -7713,7 +7713,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       }
       if (GET_POS(tar_ch) == position_t::FIGHTING)
       {
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
         return ReturnValue::eFAILURE;
       }
       return spell_bless(level, ch, tar_ch, 0, skill);
@@ -7722,7 +7722,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_POTION:
     if (GET_POS(ch) == position_t::FIGHTING)
     {
-      ch->sendln("Nothing seems to happen.");
+      ch->sendln(u"Nothing seems to happen."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_bless(level, ch, ch, 0, skill);
@@ -7732,7 +7732,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     { /* It's an object */
       if (isSet(tar_obj->flags_.extra_flags, ITEM_BLESS))
       {
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
         return ReturnValue::eFAILURE;
       }
       return spell_bless(level, ch, 0, tar_obj, skill);
@@ -7745,7 +7745,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
       if (GET_POS(tar_ch) == position_t::FIGHTING)
       {
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
         return ReturnValue::eFAILURE;
       }
       return spell_bless(level, ch, tar_ch, 0, skill);
@@ -7756,7 +7756,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     { /* It's an object */
       if (isSet(tar_obj->flags_.extra_flags, ITEM_BLESS))
       {
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
         return ReturnValue::eFAILURE;
       }
       return spell_bless(level, ch, 0, tar_obj, skill);
@@ -7766,7 +7766,7 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
       if (GET_POS(tar_ch) == position_t::FIGHTING)
       {
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
         return ReturnValue::eFAILURE;
       }
       return spell_bless(level, ch, tar_ch, 0, skill);
@@ -7788,7 +7788,7 @@ qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You can not paralyze anyone in a safe area!");
+    ch->sendln(u"You can not paralyze anyone in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
   switch (type)
@@ -7796,7 +7796,7 @@ qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (IS_AFFECTED(tar_ch, AFF_PARALYSIS))
     {
-      ch->sendln("Nothing seems to happen.");
+      ch->sendln(u"Nothing seems to happen."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_paralyze(level, ch, tar_ch, 0, skill);
@@ -7853,7 +7853,7 @@ qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You can not blind anyone in a safe area!");
+    ch->sendln(u"You can not blind anyone in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -7862,7 +7862,7 @@ qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (IS_AFFECTED(tar_ch, AFF_BLIND))
     {
-      ch->sendln("Nothing seems to happen.");
+      ch->sendln(u"Nothing seems to happen."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_blindness(level, ch, tar_ch, 0, skill);
@@ -7927,20 +7927,20 @@ qint32 cast_control_weather(quint8 level, CharacterPtr ch, QString arg, qint32 t
 
     if (str_cmp("better", buffer) && str_cmp("worse", buffer))
     {
-      ch->sendln("Do you want it to get better or worse?");
+      ch->sendln(u"Do you want it to get better or worse?"_s);
       return ReturnValue::eFAILURE;
     }
 
     if (!str_cmp("better", buffer))
     {
       weather_info.change += (dice(((level) / 3), 9));
-      ch->sendln("The skies around you grow a bit clearer.");
+      ch->sendln(u"The skies around you grow a bit clearer."_s);
       act_to_room("$n's magic causes the skies around you to grow a bit clearer.", ch, 0, 0, 0);
     }
     else
     {
       weather_info.change -= (dice(((level) / 3), 9));
-      ch->sendln("The skies around you grow a bit darker.");
+      ch->sendln(u"The skies around you grow a bit darker."_s);
       act_to_room("$n's magic causes the skies around you to grow a bit darker.", ch, 0, 0, 0);
     }
     break;
@@ -7992,7 +7992,7 @@ qint32 cast_create_water(quint8 level, CharacterPtr ch, QString arg, qint32 type
   case SPELL_TYPE_SPELL:
     if (tar_obj->flags_.type_flag != ITEM_DRINKCON)
     {
-      ch->sendln("It is unable to hold water.");
+      ch->sendln(u"It is unable to hold water."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_create_water(level, ch, 0, tar_obj, skill);
@@ -8245,7 +8245,7 @@ qint32 cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && tar_ch)
   {
-    ch->sendln("You cannot curse someone in a safe area!");
+    ch->sendln(u"You cannot curse someone in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -8934,7 +8934,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
     if (tar_obj)
     {
       if (isSet(tar_obj->flags_.extra_flags, ITEM_INVISIBLE))
-        ch->sendln("Nothing new seems to happen.");
+        ch->sendln(u"Nothing new seems to happen."_s);
       else
         return spell_invisibility(level, ch, 0, tar_obj, skill);
     }
@@ -9018,7 +9018,7 @@ qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
     {
-      ch->sendln("You can not poison someone in a safe area!");
+      ch->sendln(u"You can not poison someone in a safe area!"_s);
       return ReturnValue::eFAILURE;
     }
     return spell_poison(level, ch, tar_ch, tar_obj, skill);
@@ -9056,13 +9056,13 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
   case SPELL_TYPE_SPELL:
     if (IS_EVIL(ch) && ch->getLevel() < ARCHANGEL)
     {
-      ch->sendln("You are too evil to invoke the protection of your god.");
+      ch->sendln(u"You are too evil to invoke the protection of your god."_s);
       return ReturnValue::eFAILURE;
     }
     else if (ch != tar_ch && GET_CLASS(ch) != CLASS_CLERIC)
     {
       /* only let clerics cast on others */
-      ch->sendln("You can only cast this spell on yourself.");
+      ch->sendln(u"You can only cast this spell on yourself."_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -9145,13 +9145,13 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
   case SPELL_TYPE_SPELL:
     if (IS_GOOD(ch) && ch->getLevel() < ARCHANGEL)
     {
-      ch->sendln("Your goodness finds disfavor amongst the forces of darkness.");
+      ch->sendln(u"Your goodness finds disfavor amongst the forces of darkness."_s);
       return ReturnValue::eFAILURE;
     }
     else if (ch != tar_ch && GET_CLASS(ch) != CLASS_CLERIC)
     {
       /* only let clerics cast on others */
-      ch->sendln("You can only cast this spell on yourself.");
+      ch->sendln(u"You can only cast this spell on yourself."_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -9366,7 +9366,7 @@ qint32 cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You can not sleep someone in a safe area!");
+    ch->sendln(u"You can not sleep someone in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
   switch (type)
@@ -9759,7 +9759,7 @@ qint32 cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You can not fear someone in a safe area!");
+    ch->sendln(u"You can not fear someone in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -10031,7 +10031,7 @@ qint32 cast_dispel_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
     }
     if (!spell)
     {
-      ch->sendln("You cannot target that spell.");
+      ch->sendln(u"You cannot target that spell."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -10098,7 +10098,7 @@ qint32 cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
     if (spell == 0)
     {
-      ch->sendln("You cannot target that spell.");
+      ch->sendln(u"You cannot target that spell."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -10140,7 +10140,7 @@ qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch)
     // if (f->follower->isNonPlayer() && f->follower->height == 77)
     if (f->follower->isNonPlayer() && f->follower->mobdata->mob_flags.value[3] == 77)
     {
-      switch (dc_->mob_index[f->follower->mobdata->nr].vnum())
+      switch (dc_->mob_index_[f->follower->mobdata->nr].vnum())
       {
       case 88:
         fire = true;
@@ -10164,7 +10164,7 @@ qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch)
         // if (t->follower->isNonPlayer() && t->follower->height == 77)
         if (t->follower->isNonPlayer() && t->follower->mobdata->mob_flags.value[3] == 77)
         {
-          switch (dc_->mob_index[t->follower->mobdata->nr].vnum())
+          switch (dc_->mob_index_[t->follower->mobdata->nr].vnum())
           {
           case 88:
             fire = true;
@@ -10246,7 +10246,7 @@ bool elemental_score(CharacterPtr ch, qint32 level)
     {
       // if (f->follower->height == 77) // improved
       if (f->follower->mobdata->mob_flags.value[3] == 77)
-        switch (dc_->mob_index[f->follower->mobdata->nr].vnum())
+        switch (dc_->mob_index_[f->follower->mobdata->nr].vnum())
         {
         case 88:
           fire = true;
@@ -10272,7 +10272,7 @@ bool elemental_score(CharacterPtr ch, qint32 level)
         {
           if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
-            switch (dc_->mob_index[t->follower->mobdata->nr].vnum())
+            switch (dc_->mob_index_[t->follower->mobdata->nr].vnum())
             {
             case 88:
               fire = true;
@@ -10858,7 +10858,7 @@ qint32 cast_weaken(quint8 level, CharacterPtr ch, QString arg,
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You can not weaken anyone in a safe area!");
+    ch->sendln(u"You can not weaken anyone in a safe area!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -11048,7 +11048,7 @@ qint32 cast_portal(quint8 level, CharacterPtr ch, QString arg,
     {
       if ((GET_MANA(ch) - 90) < 0)
       {
-        ch->sendln("You just don't have the energy!");
+        ch->sendln(u"You just don't have the energy!"_s);
         GET_MANA(ch) += 50;
         return ReturnValue::eFAILURE;
       }
@@ -11159,7 +11159,7 @@ qint32 spell_bee_sting(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
         af.location = APPLY_STR;
         af.bitvector = AFF_POISON;
         affect_join(victim, &af, false, false);
-        victim->sendln("You seem to have an allergic reaction to these bees!");
+        victim->sendln(u"You seem to have an allergic reaction to these bees!"_s);
         act("$N seems to be allergic to your bees!", ch, 0, victim,
             TO_CHAR, 0);
       }
@@ -11178,7 +11178,7 @@ qint32 cast_bee_sting(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -11203,7 +11203,7 @@ qint32 cast_bee_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -11254,7 +11254,7 @@ qint32 spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     }
     else if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
     {
-      tmp_victim->sendln("You hear the buzzing of hundreds of bees.");
+      tmp_victim->sendln(u"You hear the buzzing of hundreds of bees."_s);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -11301,7 +11301,7 @@ qint32 cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
   if (!OUTSIDE(ch))
   {
-    ch->sendln("Your spell is more draning because you are indoors!");
+    ch->sendln(u"Your spell is more draning because you are indoors!"_s);
     // If they are NOT outside it costs extra mana
     GET_MANA(ch) -= level / 2;
     if (GET_MANA(ch) < 0)
@@ -11350,7 +11350,7 @@ qint32 cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 ty
       af.location = APPLY_NONE;
       af.bitvector = AFF_POISON;
       affect_join(victim, &af, false, false);
-      victim->sendln("The insect $2poison$R has gotten into your blood!");
+      victim->sendln(u"The insect $2poison$R has gotten into your blood!"_s);
       act_to_character("$N has been $2poisoned$R by your insect swarm!", ch, 0, victim, 0);
     }
   }
@@ -11386,7 +11386,7 @@ qint32 cast_barkskin(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -11408,7 +11408,7 @@ qint32 spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (victim->affected_by_spell(SPELL_BARKSKIN))
   {
-    ch->sendln("You cannot make your skin any stronger!");
+    ch->sendln(u"You cannot make your skin any stronger!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -11422,7 +11422,7 @@ qint32 spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   SET_BIT(victim->resist, ISR_SLASH);
 
-  victim->sendln("Your skin turns stiff and bark-like.");
+  victim->sendln(u"Your skin turns stiff and bark-like."_s);
   act_to_room("$N begins to look rather woody.", ch, 0, victim, INVIS_NULL | NOTVICT);
   return ReturnValue::eSUCCESS;
 }
@@ -11436,18 +11436,18 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
   if (victim->race == RACE_UNDEAD)
   {
-    ch->sendln("Healing spells are useless on the undead.");
+    ch->sendln(u"Healing spells are useless on the undead."_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->race == RACE_GOLEM)
   {
-    ch->sendln("The heavy magics surrounding this being prevent healing.");
+    ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->race == RACE_PLANAR)
   {
-    ch->sendln("Healing does not reach their plain of existance.");
+    ch->sendln(u"Healing does not reach their plain of existance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -11464,7 +11464,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       healamount = dam_percent(skill, 150);
       healamount = dc_->number(healamount - (healamount / 10), healamount + (healamount / 10));
       victim->addHP(healamount);
-      ch->sendln("Your spell is less effective because you are indoors!");
+      ch->sendln(u"Your spell is less effective because you are indoors!"_s);
     }
     if (victim->getHP() >= hit_limit(victim))
     {
@@ -11502,10 +11502,10 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     ObjectPtr obj = get_obj_in_list_vis(ch, arg1, ch->carrying);
     if (!obj)
     {
-      ch->sendln("You don't seem to be carrying any such root.");
+      ch->sendln(u"You don't seem to be carrying any such root."_s);
       return ReturnValue::eFAILURE;
     }
-    qint32 virt = dc_->obj_index[obj->item_number].vnum();
+    qint32 virt = dc_->obj_index_[obj->item_number].vnum();
     qint32 aff = 0, spl = {};
     switch (virt)
     {
@@ -11514,7 +11514,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_INVISIBLE;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
@@ -11525,7 +11525,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_HASTE;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n begins moving faster!", victim, 0, 0, 0);
@@ -11536,7 +11536,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_TRUE_SIGHT;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n's eyes starts to gently glow $Bwhite$R.", victim, 0, 0, 0);
@@ -11547,7 +11547,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_INFRAVISION;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n's eyes starts to glow $B$4red$R.", victim, 0, 0, 0);
@@ -11558,7 +11558,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_FARSIGHT;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n's eyes blur and seem to $B$0darken$R.", victim, 0, 0, 0);
@@ -11567,14 +11567,14 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     case LIGHTNING_SHIELD_VNUM:
       if (find_spell_shield(ch, victim))
       {
-        ch->sendln("You cannot do that.");
+        ch->sendln(u"You cannot do that."_s);
         return ReturnValue::eFAILURE;
       }
       aff = AFF_LIGHTNINGSHIELD;
       spl = SPELL_LIGHTNING_SHIELD;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n is surrounded by $B$5electricity$R.", victim, 0, 0, 0);
@@ -11585,7 +11585,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_INSOMNIA;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n blinks and looks a little twitchy.", victim, 0, 0, 0);
@@ -11596,7 +11596,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_DETECT_GOOD;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n's eyes starts to gently glow $B$1blue$R.", victim, 0, 0, 0);
@@ -11607,7 +11607,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_DETECT_EVIL;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n's eyes starts to gently glow $4deep red$R.", victim, 0, 0, 0);
@@ -11618,7 +11618,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_DETECT_INVISIBLE;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n's eyes starts to gently glow $B$5yellow$R.", victim, 0, 0, 0);
@@ -11629,7 +11629,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_SENSE_LIFE;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       //		act_to_room("$n's eyes starts to gently glow a $2deep green$R.", victim, 0, 0,  0);
@@ -11640,7 +11640,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       spl = SPELL_SOLIDITY;
       if (victim->affected_by_spell(spl))
       {
-        ch->sendln("They are already affected by that spell.");
+        ch->sendln(u"They are already affected by that spell."_s);
         return ReturnValue::eFAILURE;
       }
       act_to_room("$n is surrounded by a pulsing, $6violet$R aura.", victim, 0, 0, 0);
@@ -11649,11 +11649,11 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     case 2256:
       aff = {};
       spl = {};
-      ch->sendln("Adding the herbs improve the healing effect of the spell.");
+      ch->sendln(u"Adding the herbs improve the healing effect of the spell."_s);
       victim->addHP(40);
       break;
     default:
-      ch->sendln("That's not a herb!");
+      ch->sendln(u"That's not a herb!"_s);
       return ReturnValue::eFAILURE;
     }
     extract_obj(obj);
@@ -11675,7 +11675,7 @@ qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 {
   if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM))
   {
-    ch->sendln("I don't think your fellow clan members would appreciate the wildlife.");
+    ch->sendln(u"I don't think your fellow clan members would appreciate the wildlife."_s);
     GET_MANA(ch) += 75;
     REM_WAIT_STATE(ch, skill / 10);
     return ReturnValue::eFAILURE;
@@ -11693,7 +11693,7 @@ qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   if (nullptr == victim)
   {
-    ch->sendln("You don't have any tamed friends in need of a summon!");
+    ch->sendln(u"You don't have any tamed friends in need of a summon!"_s);
     REM_WAIT_STATE(ch, skill / 10);
     return ReturnValue::eFAILURE;
   }
@@ -11706,7 +11706,7 @@ qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   if (!OUTSIDE(ch))
   {
-    ch->sendln("Your spell is more draining because you are indoors!");
+    ch->sendln(u"Your spell is more draining because you are indoors!"_s);
     // If they are NOT outside it costs extra mana
     GET_MANA(ch) -= level / 2;
     if (GET_MANA(ch) < 0)
@@ -11747,7 +11747,7 @@ qint32 spell_entangle(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (!OUTSIDE(ch))
   {
-    ch->sendln("You must be outside to cast this spell!");
+    ch->sendln(u"You must be outside to cast this spell!"_s);
     return ReturnValue::eFAILURE;
   }
   set_cantquit(ch, victim);
@@ -11783,7 +11783,7 @@ qint32 cast_eyes_of_the_owl(quint8 level, CharacterPtr ch, QString arg, qint32 t
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -11826,7 +11826,7 @@ qint32 spell_eyes_of_the_owl(quint8 level, CharacterPtr ch, CharacterPtr victim,
   af.bitvector = AFF_INFRARED;
   affect_join(victim, &af, false, false);
   redo_mana(victim);
-  victim->sendln("You feel your vision become much more acute.");
+  victim->sendln(u"You feel your vision become much more acute."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -11844,7 +11844,7 @@ qint32 cast_feline_agility(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -11866,12 +11866,12 @@ qint32 spell_feline_agility(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (ch != victim)
   {
-    ch->sendln("You can only cast this spell on yourself!");
+    ch->sendln(u"You can only cast this spell on yourself!"_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->affected_by_spell(SPELL_FELINE_AGILITY))
   {
-    ch->sendln("You cannot be as agile as TWO cats!");
+    ch->sendln(u"You cannot be as agile as TWO cats!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -11881,7 +11881,7 @@ qint32 spell_feline_agility(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   af.location = APPLY_AC;
   af.bitvector = -1;
   affect_to_char(victim, &af);
-  ch->sendln("Your step lightens as you gain the agility of a cat!");
+  ch->sendln(u"Your step lightens as you gain the agility of a cat!"_s);
   af.modifier = 1 + (skill / 20); /* + dex */
   af.location = APPLY_DEX;
   affect_to_char(victim, &af);
@@ -11904,7 +11904,7 @@ qint32 cast_oaken_fortitude(quint8 level, CharacterPtr ch, QString arg, qint32 t
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -11926,12 +11926,12 @@ qint32 spell_oaken_fortitude(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (ch != victim)
   {
-    ch->sendln("You can only cast this spell on yourself!");
+    ch->sendln(u"You can only cast this spell on yourself!"_s);
     return ReturnValue::eFAILURE;
   }
   if (victim->affected_by_spell(SPELL_OAKEN_FORTITUDE))
   {
-    ch->sendln("You cannot enhance your fortitude further.");
+    ch->sendln(u"You cannot enhance your fortitude further."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -11941,7 +11941,7 @@ qint32 spell_oaken_fortitude(quint8 level, CharacterPtr ch, CharacterPtr victim,
   af.location = APPLY_AC;
   af.bitvector = -1;
   affect_to_char(victim, &af);
-  victim->sendln("Your fortitude increases to that of an oak.");
+  victim->sendln(u"Your fortitude increases to that of an oak."_s);
   af.modifier = 1 + (skill / 20);
   af.location = APPLY_CON;
   affect_to_char(victim, &af);
@@ -11957,7 +11957,7 @@ qint32 cast_clarity(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
 
   if (victim->affected_by_spell(SPELL_CLARITY))
   {
-    ch->sendln("You cannot clear your mind any further without going stupid.");
+    ch->sendln(u"You cannot clear your mind any further without going stupid."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -11968,7 +11968,7 @@ qint32 cast_clarity(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   af.bitvector = -1;
   affect_to_char(victim, &af);
   redo_mana(victim);
-  victim->sendln("You suddenly feel smarter than everyone else.");
+  victim->sendln(u"You suddenly feel smarter than everyone else."_s);
   act_to_room("$n's eyes shine with powerful intellect!", victim, 0, 0, 0);
   af.modifier = 3 + (skill / 20);
   af.location = APPLY_MANA_REGEN;
@@ -11982,7 +11982,7 @@ qint32 cast_forest_meld(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 {
   if (!(dc_->world[ch->in_room].sector_type == SECT_FOREST || dc_->world[ch->in_room].sector_type == SECT_SWAMP))
   {
-    ch->sendln("You are not in a forest!!");
+    ch->sendln(u"You are not in a forest!!"_s);
     return ReturnValue::eFAILURE;
   }
   //	if(victim != ch)
@@ -11993,12 +11993,12 @@ qint32 cast_forest_meld(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   //	}
   if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
-    ch->sendln("The forests reject your naughty, thieving self.");
+    ch->sendln(u"The forests reject your naughty, thieving self."_s);
     return ReturnValue::eFAILURE;
   }
   act("$n melts into the forest and is gone.", ch, 0, 0,
       TO_ROOM, INVIS_NULL);
-  ch->sendln("You feel yourself slowly become a temporary part of the living forest.");
+  ch->sendln(u"You feel yourself slowly become a temporary part of the living forest."_s);
   affected_type af;
   qint32 skil = ch->has_skill(SPELL_FOREST_MELD);
   af.type = SPELL_FOREST_MELD;
@@ -12024,12 +12024,12 @@ qint32 cast_companion(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
   qint32 number = 19309; // Mob number
 
   /* remove this whenever someone actually fixes this spell -pir */
-  ch->sendln("Spell not finished.");
+  ch->sendln(u"Spell not finished."_s);
   return ReturnValue::eFAILURE;
 
   if (!OUTSIDE(ch))
   {
-    ch->sendln("You cannot use such powerful magic indoors!");
+    ch->sendln(u"You cannot use such powerful magic indoors!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -12175,7 +12175,7 @@ qint32 check_components(CharacterPtr ch, qint32 destroy, qint32 item_one = 0,
       gone = true;
     }
     if (gone && !silent)
-      ch->sendln("The spell components poof into smoke.");
+      ch->sendln(u"The spell components poof into smoke."_s);
   }
 
   // Make sure we found everything before saying its OK
@@ -12193,7 +12193,7 @@ qint32 check_components(CharacterPtr ch, qint32 destroy, qint32 item_one = 0,
 
   if (ch->getLevel() > ARCHANGEL && !all_ok && !silent)
   {
-    ch->sendln("You didn't have the right components, but yer a god:)");
+    ch->sendln(u"You didn't have the right components, but yer a god:)"_s);
     return true;
   }
 
@@ -12210,12 +12210,12 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   affected_type af;
 
-  ch->sendln("Disabled currently,");
+  ch->sendln(u"Disabled currently,"_s);
 
   // make sure its a charmie
   if ((victim->isPlayer()) || (victim->master != ch))
   {
-    ch->sendln("You can only do this to someone under your mental control.");
+    ch->sendln(u"You can only do this to someone under your mental control."_s);
     GET_MANA(ch) += 50;
     return ReturnValue::eFAILURE;
   }
@@ -12224,7 +12224,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (isexact("golem", qPrintable(victim->name())))
   {
-    ch->sendln("Isn't that already a golem?");
+    ch->sendln(u"Isn't that already a golem?"_s);
     GET_MANA(ch) += 50;
     return ReturnValue::eFAILURE;
   }
@@ -12232,7 +12232,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
   // check_special_room !
   if (!check_components(ch, true, 14905, 2256, 3181))
   {
-    ch->sendln("Without the proper spell components, your spell fizzles out and dies.");
+    ch->sendln(u"Without the proper spell components, your spell fizzles out and dies."_s);
     act_to_room("$n's hands pop and sizzle with misused spell components.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
@@ -12267,14 +12267,14 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
         "fades revealing $n's new golem servant.",
         ch, 0, victim, TO_ROOM, 0);
 
-  ch->sendln("Delving deep within yourself, you stretch your abilities to the very limit in an effort to create magical life!");
+  ch->sendln(u"Delving deep within yourself, you stretch your abilities to the very limit in an effort to create magical life!"_s);
 
   // create golem
 
   mob = ch->dc_->clone_mobile(real_mobile(201));
   if (!mob)
   {
-    ch->sendln("Warning: Load mob not found in create_corpse");
+    ch->sendln(u"Warning: Load mob not found in create_corpse"_s);
     return ReturnValue::eFAILURE;
   }
   char_to_room(mob, ch->in_room);
@@ -12366,7 +12366,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
   {
     act("$n falls to the ground, unable to move while $s body recovers from such an incredible and draining magical feat.",
         ch, 0, 0, TO_ROOM, 0);
-    ch->sendln("You drop, drained by the release of such power.");
+    ch->sendln(u"You drop, drained by the release of such power."_s);
     ch->setResting();
 
     // why won't this line work?
@@ -12402,7 +12402,7 @@ qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 ty
    temp = ch->followers;
 
    if(!temp) {
-      ch->sendln("You have no golem!");
+      ch->sendln(u"You have no golem!"_s);
       return ReturnValue::eFAILURE;
    }
 
@@ -12413,7 +12413,7 @@ qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 ty
    }
 
    if(!temp) {
-      ch->sendln("You have no golem!");
+      ch->sendln(u"You have no golem!"_s);
       return ReturnValue::eFAILURE;
    }
 
@@ -12430,25 +12430,25 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
 
   if (!ch->beacon)
   {
-    ch->sendln("You have no beacon set!");
+    ch->sendln(u"You have no beacon set!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->isPlayerObjectThief())
   {
-    ch->sendln("Your attempt to transport stolen goods through the astral planes fails!!");
+    ch->sendln(u"Your attempt to transport stolen goods through the astral planes fails!!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->beacon->in_room < 1)
   {
-    ch->sendln("Your magical beacon has been lost!");
+    ch->sendln(u"Your magical beacon has been lost!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->beacon->in_room == ch->in_room)
   {
-    ch->sendln("Hey genius.  Poof.  You're already there.");
+    ch->sendln(u"Hey genius.  Poof.  You're already there."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -12457,7 +12457,7 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
       (ch->room().isArena() &&
        !ch->beacon->room().isArena()))
   {
-    ch->sendln("Your beacon cannot take you into or out of the arena!");
+    ch->sendln(u"Your beacon cannot take you into or out of the arena!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -12465,13 +12465,13 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   {
     if (ch->beacon->in_room >= 1900 && ch->beacon->in_room <= 1999)
     {
-      ch->sendln("You cannot beacon into a guild whilst Champion.");
+      ch->sendln(u"You cannot beacon into a guild whilst Champion."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (isSet(dc_->world[ch->beacon->in_room].room_flags, CLAN_ROOM))
     {
-      ch->sendln("You cannot beacon into a clan hall whilst Champion.");
+      ch->sendln(u"You cannot beacon into a clan hall whilst Champion."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -12480,20 +12480,20 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
-      ch->sendln("You don't posses the energy to travel that far.");
+      ch->sendln(u"You don't posses the energy to travel that far."_s);
       GET_MANA(ch) += use_mana(ch, skill);
       return ReturnValue::eFAILURE;
     }
     else
     {
-      ch->sendln("The long distance drains additional mana from you.");
+      ch->sendln(u"The long distance drains additional mana from you."_s);
       GET_MANA(ch) -= use_mana(ch, skill);
     }
   }
 
   if (others_clan_room(ch, &dc_->world[ch->beacon->in_room]) == true)
   {
-    ch->sendln("You cannot beacon into another clan's hall.");
+    ch->sendln(u"You cannot beacon into another clan's hall."_s);
     ch->beacon->equipped_by = {};
     extract_obj(ch->beacon);
     ch->beacon = {};
@@ -12502,7 +12502,7 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
 
   if (ch->fighting && (0 == dc_->number(0, 20)))
   {
-    ch->sendln("In the heat of combat, you forget your beacon's location!");
+    ch->sendln(u"In the heat of combat, you forget your beacon's location!"_s);
     act_to_room("$n's eyes widen for a moment, $s concentration broken.", ch, 0, 0, 0);
     ch->beacon->equipped_by = {};
     extract_obj(ch->beacon);
@@ -12511,11 +12511,11 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   }
 
   act_to_room("Poof! $e's gone!", ch, 0, 0, 0);
-  ch->sendln("You rip a dimensional hole through space and step out at your beacon.");
+  ch->sendln(u"You rip a dimensional hole through space and step out at your beacon."_s);
 
   if (!move_char(ch, ch->beacon->in_room))
   {
-    ch->sendln("Failure in move_char.  Major fuckup.  Contact a god.");
+    ch->sendln(u"Failure in move_char.  Major fuckup.  Contact a god."_s);
     return ReturnValue::eFAILURE;
   }
   do_look(ch, "");
@@ -12524,47 +12524,47 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr new_obj = {};
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (GET_CLASS(ch) != CLASS_ANTI_PAL && ch->getLevel() < ARCHANGEL)
   {
-    ch->sendln("Sorry, but you cannot do that here!");
+    ch->sendln(u"Sorry, but you cannot do that here!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_CHAMPION) && ch->in_room >= 1900 && ch->in_room <= 1999)
   {
-    ch->sendln("You cannot set a beacon in a guild whilst Champion.");
+    ch->sendln(u"You cannot set a beacon in a guild whilst Champion."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, NOLEARN))
   {
-    ch->sendln("You may not place your beacon in an area protected by the gods.");
+    ch->sendln(u"You may not place your beacon in an area protected by the gods."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_CHAMPION) && isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM))
   {
-    ch->sendln("You cannot set a beacon in a clan hall whilst Champion.");
+    ch->sendln(u"You cannot set a beacon in a clan hall whilst Champion."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (others_clan_room(ch, &dc_->world[ch->in_room]) == true)
   {
-    ch->sendln("You cannot set a beacon in another clan's hall.");
+    ch->sendln(u"You cannot set a beacon in another clan's hall."_s);
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("You set a magical beacon in the air.");
+  ch->sendln(u"You set a magical beacon in the air."_s);
   if (!ch->beacon)
   {
     if (!(new_obj = clone_object(real_object(BEACON_OBJ_NUMBER))))
     {
-      ch->sendln("Error setting beacon.  Contact a god.");
+      ch->sendln(u"Error setting beacon.  Contact a god."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -12586,7 +12586,7 @@ command_return_t do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
 
 qint32 spell_reflect(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  ch->sendln("Tell an immortal what you just did.");
+  ch->sendln(u"Tell an immortal what you just did."_s);
   return ReturnValue::eFAILURE;
 }
 
@@ -12607,7 +12607,7 @@ qint32 choose_druid_familiar(CharacterPtr ch, QString arg)
   {
     if (!check_components(ch, true, 27800))
     {
-      ch->sendln("You remember at the last second that you don't have an acorn ready!");
+      ch->sendln(u"You remember at the last second that you don't have an acorn ready!"_s);
       act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
@@ -12617,7 +12617,7 @@ qint32 choose_druid_familiar(CharacterPtr ch, QString arg)
   {
     if (!check_components(ch, true, 44))
     {
-      ch->sendln("You remember at the last second that you don't have a dead mouse ready!");
+      ch->sendln(u"You remember at the last second that you don't have a dead mouse ready!"_s);
       act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
@@ -12639,7 +12639,7 @@ qint32 choose_mage_familiar(CharacterPtr ch, QString arg)
   {
     if (!check_components(ch, true, 4))
     {
-      ch->sendln("You remember at the last second that you don't have a batwing ready!");
+      ch->sendln(u"You remember at the last second that you don't have a batwing ready!"_s);
       act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
@@ -12649,7 +12649,7 @@ qint32 choose_mage_familiar(CharacterPtr ch, QString arg)
   {
     if (!check_components(ch, true, 43))
     {
-      ch->sendln("You remember at the last second that you don't have a silver piece ready!");
+      ch->sendln(u"You remember at the last second that you don't have a silver piece ready!"_s);
       act_to_room("$n's hands pop with unused mystical energy and $e seems confused.", ch, 0, 0, 0);
       return -1;
     }
@@ -12692,14 +12692,14 @@ void familiar_creation_message(CharacterPtr ch, qint32 fam_type)
     break;
   case FAMILIAR_MOB_OWL:
     act_to_room("$n throws a dead mouse skyward and a large owl swoops down and grabs it in midair.\r\n", ch, 0, 0, 0);
-    ch->sendln("You toss the mouse into the air and grin as an owl swoops down from above.\r\nA voice echoes in your mind...'I can help you to $4watch$7 for nearby enemies.'");
+    ch->sendln(u"You toss the mouse into the air and grin as an owl swoops down from above.\r\nA voice echoes in your mind...'I can help you to $4watch$7 for nearby enemies.'"_s);
     break;
   case FAMILIAR_MOB_GREMLIN:
     act_to_room("$n opens a small portal and throws in a piece of silver.\r\nA confused gremlin is launched out of the portal, hitting its head as it lands on the floor.", ch, 0, 0, 0);
-    ch->sendln("You open a portal to your target and throw in your silver piece.\r\nThe gremlin is expunged from the dimension beyond through your portal, hitting its head in the process.");
+    ch->sendln(u"You open a portal to your target and throw in your silver piece.\r\nThe gremlin is expunged from the dimension beyond through your portal, hitting its head in the process."_s);
     break;
   default:
-    ch->sendln("Illegal message in familar_creation_message.  Tell pir.");
+    ch->sendln(u"Illegal message in familar_creation_message.  Tell pir."_s);
     break;
   }
 }
@@ -12718,7 +12718,7 @@ qint32 spell_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
 
   if ((r_num = real_mobile(fam_type)) < 0)
   {
-    ch->sendln("Summon familiar mob not found.  Tell a god.");
+    ch->sendln(u"Summon familiar mob not found.  Tell a god."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -12726,7 +12726,7 @@ qint32 spell_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
   while (k)
     if (IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
-      ch->sendln("But you already have a devoted pet!");
+      ch->sendln(u"But you already have a devoted pet!"_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -12791,7 +12791,7 @@ qint32 spell_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   if (!ptrack)
   {
-    ch->sendln("You detect no scents in this room.");
+    ch->sendln(u"You detect no scents in this room."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -12821,7 +12821,7 @@ qint32 cast_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -12854,7 +12854,7 @@ qint32 spell_resist_acid(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   affected_type af;
   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch != victim)
   {
-    ch->sendln("You can only cast this on yourself.");
+    ch->sendln(u"You can only cast this on yourself."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -12942,7 +12942,7 @@ qint32 cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
       return spell_sun_ray(level, ch, victim, 0, skill);
     else
-      ch->sendln("You must be outdoors on a day that isn't raining!");
+      ch->sendln(u"You must be outdoors on a day that isn't raining!"_s);
     break;
   case SPELL_TYPE_POTION:
     if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
@@ -12992,7 +12992,7 @@ qint32 spell_rapid_mend(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   if (!victim->affected_by_spell(SPELL_RAPID_MEND))
   {
     act_to_room("$n starts to heal more quickly.", victim, 0, 0, INVIS_NULL);
-    victim->sendln("You feel your body begin to heal more quickly.");
+    victim->sendln(u"You feel your body begin to heal more quickly."_s);
 
     if (skill < 40)
     {
@@ -13099,7 +13099,7 @@ qint32 cast_iron_roots(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_SPELL:
     if (!OUTSIDE(ch))
     {
-      ch->sendln("Your spell is more draining because you are indoors!");
+      ch->sendln(u"Your spell is more draining because you are indoors!"_s);
       GET_MANA(ch) -= level / 2;
       if (GET_MANA(ch) < 0)
         GET_MANA(ch) = {};
@@ -13158,7 +13158,7 @@ qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     {
       if (GET_ALIGNMENT(ch) > -351)
       {
-        ch->sendln("You are not evil enough to cast this spell!");
+        ch->sendln(u"You are not evil enough to cast this spell!"_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -13286,7 +13286,7 @@ qint32 spell_globe_of_darkness(quint8 level, CharacterPtr ch, CharacterPtr victi
 
   if (!globe)
   {
-    ch->sendln("Major screwup in globe of darkness.  Missing util obj.  Tell coder.");
+    ch->sendln(u"Major screwup in globe of darkness.  Missing util obj.  Tell coder."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -13295,7 +13295,7 @@ qint32 spell_globe_of_darkness(quint8 level, CharacterPtr ch, CharacterPtr victi
 
   act("$n's hand blurs, causing $B$0darkness$R to quickly expand and expunge light from the entire area.",
       ch, 0, 0, TO_ROOM, 0);
-  ch->sendln("Your summoned $B$0darkness$R turns the area pitch black.");
+  ch->sendln(u"Your summoned $B$0darkness$R turns the area pitch black."_s);
 
   obj_to_room(globe, ch->in_room);
   dc_->world[ch->in_room].light -= globe->flags_.value[1];
@@ -13337,7 +13337,7 @@ qint32 cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32
 
 qint32 spell_eyes_of_the_eagle(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
-  ch->sendln("This spell doesn't do anything right now.");
+  ch->sendln(u"This spell doesn't do anything right now."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -13383,7 +13383,7 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   else if (dc_->world[ch->in_room].sector_type == SECT_DESERT)
     dam = dam * 1 / 2;
 
-  ch->sendln("$B$3Ice$R erupts from the earth!");
+  ch->sendln(u"$B$3Ice$R erupts from the earth!"_s);
   act_to_room("$n makes $B$3ice$R fall erupt from the earth!", ch, 0, 0, 0);
 
   const auto &character_list = dc_->character_list;
@@ -13424,7 +13424,7 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     else
     {
       if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
-        tmp_victim->sendln("You feel a BLAST of $B$3cold$R air.");
+        tmp_victim->sendln(u"You feel a BLAST of $B$3cold$R air."_s);
     }
   }
 
@@ -13568,7 +13568,7 @@ qint32 spell_blue_bird(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     break;
 
   case SECT_UNDERWATER:
-    ch->sendln("But you're underwater!  Your poor birdie would drown:(");
+    ch->sendln(u"But you're underwater!  Your poor birdie would drown:("_s);
     return ReturnValue::eFAILURE;
 
   default:
@@ -13636,7 +13636,7 @@ qint32 spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (victim->affected_by_spell(SPELL_DEBILITY))
   {
-    ch->sendln("Your victim has already been debilitized.");
+    ch->sendln(u"Your victim has already been debilitized."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -13691,7 +13691,7 @@ qint32 spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     af.location = APPLY_MANA_REGEN;
     af.modifier = 0 - (qint32)((double)victim->mana_gain_lookup() * (percent / 100));
     affect_to_char(victim, &af);
-    victim->sendln("Your body becomes $6debilitized$R, reducing your regenerative abilities!");
+    victim->sendln(u"Your body becomes $6debilitized$R, reducing your regenerative abilities!"_s);
     act_to_room("$N takes on an unhealthy pallor as $n's magic takes hold.", ch, 0, victim, NOTVICT);
     act_to_character("Your magic $6debilitizes$R $N!", ch, 0, victim, 0);
   }
@@ -13759,7 +13759,7 @@ qint32 spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (victim->affected_by_spell(SPELL_ATTRITION))
   {
-    ch->sendln("Your victim is already suffering from the affects of that spell.");
+    ch->sendln(u"Your victim is already suffering from the affects of that spell."_s);
     return ReturnValue::eSUCCESS;
   }
   acmod = skill;
@@ -13810,7 +13810,7 @@ qint32 spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     af.location = APPLY_HITROLL;
     affect_to_char(victim, &af);
 
-    victim->sendln("You feel less energetic as painful magic penetrates your body!");
+    victim->sendln(u"You feel less energetic as painful magic penetrates your body!"_s);
     act_to_room("$N's body takes on an unhealthy colouring as $n's magic enters $M.", ch, 0, victim, NOTVICT);
     act_to_character("$N pales as your devitalizing magic courses through $S veins!", ch, 0, victim, 0);
   }
@@ -13879,13 +13879,13 @@ qint32 spell_vampiric_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   /*
   if (victim->affected_by_spell(SPELL_ACID_SHIELD)){
      act_to_room("A film of $B$0shadow$R begins to rise around $n but fades around $s ankles.", victim, 0, 0,  INVIS_NULL);
-     ch->sendln("A film of $B$0shadow$R tries to rise around you but dissolves in your acid shield.");
+     ch->sendln(u"A film of $B$0shadow$R tries to rise around you but dissolves in your acid shield."_s);
      return ReturnValue::eFAILURE;
   }
 */
   if (ch->affected_by_spell(SPELL_VAMPIRIC_AURA_TIMER))
   {
-    ch->sendln("Your dark power is not available to you so soon.");
+    ch->sendln(u"Your dark power is not available to you so soon."_s);
     return ReturnValue::eFAILURE;
   }
   act_to_room("A film of $B$0shadow$R encompasses $n then fades from view.", victim, 0, 0, INVIS_NULL);
@@ -13914,7 +13914,7 @@ qint32 cast_vampiric_aura(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   case SPELL_TYPE_SPELL:
     if (GET_ALIGNMENT(ch) > -1000)
     {
-      ch->sendln("You must be utterly vile to cast this spell.");
+      ch->sendln(u"You must be utterly vile to cast this spell."_s);
       return ReturnValue::eFAILURE;
     }
     return spell_vampiric_aura(level, ch, tar_ch, 0, skill);
@@ -13934,7 +13934,7 @@ qint32 spell_holy_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (ch->affected_by_spell(SPELL_HOLY_AURA_TIMER))
   {
-    ch->sendln("Your god is not so foolish as to grant that power to you so soon again.");
+    ch->sendln(u"Your god is not so foolish as to grant that power to you so soon again."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -13973,7 +13973,7 @@ qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     }
     if (GET_ALIGNMENT(ch) < 1000)
     {
-      ch->sendln("You are not holy enough to cast this spell.");
+      ch->sendln(u"You are not holy enough to cast this spell."_s);
       return ReturnValue::eFAILURE;
     }
     one_argument(arg, buf);
@@ -13984,14 +13984,14 @@ qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       mod = 50;
     else
     {
-      ch->sendln("You need to specify whether you want protection against magic or physical.");
+      ch->sendln(u"You need to specify whether you want protection against magic or physical."_s);
       ch->mana += spell_info[SPELL_HOLY_AURA].min_usesmana();
       return ReturnValue::eFAILURE;
     }
 
     if (ch->affected_by_spell(SPELL_HOLY_AURA_TIMER))
     {
-      ch->sendln("Your god is not so foolish as to grant that power to you so soon again.");
+      ch->sendln(u"Your god is not so foolish as to grant that power to you so soon again."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -14035,7 +14035,7 @@ qint32 spell_dismiss_familiar(quint8 level, CharacterPtr ch, CharacterPtr victim
 
   if (nullptr == victim)
   {
-    ch->sendln("You don't have a familiar!");
+    ch->sendln(u"You don't have a familiar!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14084,7 +14084,7 @@ qint32 cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
 qint32 spell_dismiss_corpse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   victim = {};
-  // ch->sendln("Disabled.");
+  // ch->sendln(u"Disabled."_s);
   // return ReturnValue::eFAILURE;
 
   for (follow_type *k = ch->followers; k; k = k->next)
@@ -14096,7 +14096,7 @@ qint32 spell_dismiss_corpse(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (nullptr == victim)
   {
-    ch->sendln("You don't have a corpse!");
+    ch->sendln(u"You don't have a corpse!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14141,7 +14141,7 @@ qint32 cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   victim = {};
-  // ch->sendln("Disabled.");
+  // ch->sendln(u"Disabled."_s);
   // return ReturnValue::eFAILURE;
 
   for (follow_type *k = ch->followers; k; k = k->next)
@@ -14153,11 +14153,11 @@ qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victi
 
   if (nullptr == victim)
   {
-    ch->sendln("You don't have an elemental!");
+    ch->sendln(u"You don't have an elemental!"_s);
     return ReturnValue::eFAILURE;
   }
 
-  switch (dc_->mob_index[victim->mobdata->nr].vnum())
+  switch (dc_->mob_index_[victim->mobdata->nr].vnum())
   {
   case FIRE_ELEMENTAL:
     act_to_room("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, INVIS_NULL);
@@ -14219,7 +14219,7 @@ qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    ch->sendln("You have no group to cast this upon.");
+    ch->sendln(u"You have no group to cast this upon."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14231,7 +14231,7 @@ qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, 
       continue;
     affect_from_char(tmp_char, SPELL_VISAGE_OF_HATE);
     affect_from_char(tmp_char, SPELL_VISAGE_OF_HATE);
-    tmp_char->sendln("The violence hate brings shows upon your face.");
+    tmp_char->sendln(u"The violence hate brings shows upon your face."_s);
 
     af.type = SPELL_VISAGE_OF_HATE;
     af.duration = 1 + skill / 10;
@@ -14244,7 +14244,7 @@ qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     affect_to_char(tmp_char, &af);
   }
 
-  ch->sendln("Your disdain and hate for all settles upon your peers.");
+  ch->sendln(u"Your disdain and hate for all settles upon your peers."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -14270,7 +14270,7 @@ qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    ch->sendln("You have no group to cast this upon.");
+    ch->sendln(u"You have no group to cast this upon."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14282,7 +14282,7 @@ qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       continue;
     affect_from_char(tmp_char, SPELL_BLESSED_HALO);
     affect_from_char(tmp_char, SPELL_BLESSED_HALO);
-    tmp_char->sendln("You feel blessed.");
+    tmp_char->sendln(u"You feel blessed."_s);
 
     af.type = SPELL_BLESSED_HALO;
     af.duration = 1 + skill / 10;
@@ -14295,7 +14295,7 @@ qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     affect_to_char(tmp_char, &af);
   }
 
-  ch->sendln("Your group members benefit from your blessing.");
+  ch->sendln(u"Your group members benefit from your blessing."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -14322,19 +14322,19 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (ch->fighting)
   {
-    ch->sendln("You're a bit too distracted by the battle.");
+    ch->sendln(u"You're a bit too distracted by the battle."_s);
     return ReturnValue::eFAILURE;
   }
   if (!ch->conn_ || ch->conn_->snooping || ch->isNonPlayer() || !ch->in_room)
   {
-    ch->sendln("You can't do that at the moment.");
+    ch->sendln(u"You can't do that at the moment."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->conn_->snoop_by)
   {
-    ch->conn_->snoop_by->character->send("Whoa! Almost got caught snooping!\n");
-    ch->conn_->snoop_by->character->sendln("Your victim is casting spiritwalk spell.");
+    ch->conn_->snoop_by->character->send(u"Whoa! Almost got caught snooping!\n"_s);
+    ch->conn_->snoop_by->character->sendln(u"Your victim is casting spiritwalk spell."_s);
     ch->conn_->snoop_by->character->do_snoop(ch->conn_->snoop_by->character->name().split(' '));
   }
   qint32 vnum;
@@ -14374,14 +14374,14 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     vnum = 92;
     break;
   default:
-    ch->sendln("Invalid sectortype. Please report location to an imm.");
+    ch->sendln(u"Invalid sectortype. Please report location to an imm."_s);
     return ReturnValue::eFAILURE;
   }
   qint32 mobile;
   if ((mobile = real_mobile(vnum)) < 0)
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
-    ch->sendln("\"Spirit\" for this sector not yet implented.");
+    ch->sendln(u"\"Spirit\" for this sector not yet implented."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -14390,8 +14390,8 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   mob->hometown = ch->dc_->world[ch->in_room].number;
   char_to_room(mob, ch->in_room);
 
-  ch->sendln("You call upon the spirits of this area, shifting into a trance-state.");
-  ch->sendln("(Use the 'return' command to return to your body).");
+  ch->sendln(u"You call upon the spirits of this area, shifting into a trance-state."_s);
+  ch->sendln(u"(Use the 'return' command to return to your body)."_s);
   ch->player->possesing = 1;
   ch->conn_->character = mob;
   ch->conn_->original = ch;
@@ -14429,7 +14429,7 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
 
   if (many_charms(ch))
   {
-    ch->sendln("How do you plan on controlling so many followers?");
+    ch->sendln(u"How do you plan on controlling so many followers?"_s);
     return ReturnValue::eFAILURE;
   }
   //  ObjectPtr container  = {};
@@ -14455,7 +14455,7 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
   }
   else
   {
-    ch->sendln("Unknown elemental type. Applicable types are: fire, water, air and earth.");
+    ch->sendln(u"Unknown elemental type. Applicable types are: fire, water, air and earth."_s);
     return ReturnValue::eFAILURE;
   }
   ObjectPtr obj;
@@ -14503,12 +14503,12 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
     act_to_room("$n's wine boils with energy as a denizen of the elemental plane of air crackles into existance.", ch, nullptr, nullptr, 0);
     break;
   default:
-    ch->sendln("That item is not used for elemental summoning.");
+    ch->sendln(u"That item is not used for elemental summoning."_s);
     return ReturnValue::eFAILURE;
   }
   if ((r_num = real_mobile(virt)) < 0)
   {
-    ch->sendln("Mobile: Elemental not found.");
+    ch->sendln(u"Mobile: Elemental not found."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14607,7 +14607,7 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You cannot cast this here.");
+    ch->sendln(u"You cannot cast this here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14618,13 +14618,13 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (GET_MANA(ch) < castcost)
   {
-    ch->sendln("You do not have enough mana to cast this spell.");
+    ch->sendln(u"You do not have enough mana to cast this spell."_s);
     return ReturnValue::eFAILURE;
   }
   else
     GET_MANA(ch) -= castcost;
 
-  ch->sendln("You call forth the fury of the gods to consume the area in a holy tempest!");
+  ch->sendln(u"You call forth the fury of the gods to consume the area in a holy tempest!"_s);
   act_to_room("$n calls forth the fury of the gods to consume the area in a holy tempest!", ch, 0, 0, 0);
 
   for (victim = dc_->world[ch->in_room].people_; victim; victim = next_vict)
@@ -14677,12 +14677,12 @@ qint32 spell_atonement(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
   if (heal < 0)
   {
-    ch->sendln("Yeah, right.");
+    ch->sendln(u"Yeah, right."_s);
     return ReturnValue::eFAILURE;
   }
   if (GET_MAX_MANA(ch) - heal < 1)
   {
-    ch->sendln("You do not have enough mana to sacrifice.");
+    ch->sendln(u"You do not have enough mana to sacrifice."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->fighting)
@@ -14691,7 +14691,7 @@ qint32 spell_atonement(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     ch->max_mana -= heal;
   GET_MANA(ch) = GET_MAX_MANA(ch);
 
-  ch->sendln("You pray fervently for the support of the gods and are rewarded restoration...at a price.");
+  ch->sendln(u"You pray fervently for the support of the gods and are rewarded restoration...at a price."_s);
   act_to_room("$n prays fervently for the support of the gods and is rewarded restoration...at a price.", ch, 0, 0, 0);
 
   return ReturnValue::eSUCCESS;
@@ -14722,16 +14722,16 @@ qint32 spell_silence(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You cannot silence this room.");
+    ch->sendln(u"You cannot silence this room."_s);
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("Your chants fade softy to an eerie quiet as the silence takes hold...");
+  ch->sendln(u"Your chants fade softy to an eerie quiet as the silence takes hold..."_s);
   act_to_room("$n's chants fade to an eerie quiet as the silence takes hold...", ch, 0, 0, 0);
 
   if (!(silence_obj = clone_object(real_object(SILENCE_OBJ_NUMBER))))
   {
-    ch->sendln("Error setting silence object.  Tell an immortal.");
+    ch->sendln(u"Error setting silence object.  Tell an immortal."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14767,13 +14767,13 @@ qint32 spell_immunity(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if ((spell_info[spl].targets() & TAR_IGNORE))
   {
-    ch->sendln("You find it impossible to immunize yourself against this type of spell.");
+    ch->sendln(u"You find it impossible to immunize yourself against this type of spell."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (ch->fighting)
   {
-    ch->sendln("You cannot concentrate enough to immunize yourself.");
+    ch->sendln(u"You cannot concentrate enough to immunize yourself."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -14783,7 +14783,7 @@ qint32 spell_immunity(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     return ReturnValue::eSUCCESS;
   }
 
-  ch->send("You reach forth and etch a protective sigil in the air that briefly surrounds you in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.");
+  ch->send(u"You reach forth and etch a protective sigil in the air that briefly surrounds you in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R."_s);
   act_to_room("$n reaches forth and etches a protective sigil in the air that briefly surrounds $m in a soft $Bs$3h$5i$7m$3m$5e$7r$3i$5n$7g$3 l$5i$7g$3h$5t$R.", ch, 0, 0, 0);
 
   af.type = SPELL_IMMUNITY;
@@ -14822,7 +14822,7 @@ qint32 spell_boneshield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   if (victim->isPlayer() || victim->master != ch)
   {
-    ch->sendln("You cannot cast this spell on that.");
+    ch->sendln(u"You cannot cast this spell on that."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -14981,7 +14981,7 @@ SPELL_POINTER get_wild_magic_offensive(quint8 level, CharacterPtr ch, CharacterP
 
   // default case calls spell wild magic with opposite effect
   default:
-    ch->sendln("Your magic goes wild and has the opposite effect!");
+    ch->sendln(u"Your magic goes wild and has the opposite effect!"_s);
     spell_to_cast = get_wild_magic_defensive(level, ch, victim, obj, skill);
     break;
   }
@@ -15302,7 +15302,7 @@ SPELL_POINTER get_wild_magic_defensive(quint8 level, CharacterPtr ch, CharacterP
 
     // default case calls wild magic with opposite effect
   default:
-    ch->sendln("Your magic goes wild and has the opposite effect!");
+    ch->sendln(u"Your magic goes wild and has the opposite effect!"_s);
     spell_to_cast = get_wild_magic_offensive(level, ch, victim, obj, skill);
     break;
   }
@@ -15324,7 +15324,7 @@ qint32 cast_wild_magic(quint8 level, CharacterPtr ch, QString arg,
     spell_to_cast = get_wild_magic_defensive(level, ch, tar_ch, 0, skill);
   else
   {
-    ch->sendln("You need to specify offensive or defensive.");
+    ch->sendln(u"You need to specify offensive or defensive."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -15343,13 +15343,13 @@ qint32 spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
   if (ch->equipment[WEAR_SHIELD])
   {
-    ch->sendln("Your prayers are ignored by the gods as your hands are not free to receive thief gifts.");
+    ch->sendln(u"Your prayers are ignored by the gods as your hands are not free to receive thief gifts."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(ssobj = clone_object(real_object(SPIRIT_SHIELD_OBJ_NUMBER))))
   {
-    ch->sendln("Error setting spirit shield object.  Tell an immortal.");
+    ch->sendln(u"Error setting spirit shield object.  Tell an immortal."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -15365,7 +15365,7 @@ qint32 spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
   ch->equip_char(ssobj, WEAR_SHIELD);
 
-  ch->sendln("Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!");
+  ch->sendln(u"Your prayers to the gods for protection are answered as a glowing shield suddenly appears in your hand!"_s);
   act_to_room("$n's prays to the gods for protection and a glowing shield appears in $s hand!", ch, 0, 0, 0);
 
   WAIT_STATE(ch, (qint32)(DC::PULSE_VIOLENCE * 2.5));
@@ -15407,7 +15407,7 @@ qint32 spell_villainy(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   affect_to_char(victim, &af);
 
-  victim->sendln("You call upon the gods to grant you the magic and skill to defeat all that is good!");
+  victim->sendln(u"You call upon the gods to grant you the magic and skill to defeat all that is good!"_s);
   act_to_room("$n calls upon the gods to grant $m magic and skill in $s fight for evil!", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
@@ -15460,7 +15460,7 @@ qint32 spell_heroism(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
 
   affect_to_char(victim, &af);
 
-  victim->sendln("You call upon the gods to grant you courage and skill in your fight for justice!");
+  victim->sendln(u"You call upon the gods to grant you courage and skill in your fight for justice!"_s);
   act_to_room("$n calls upon the gods to grant $m courage and skill in $s fight for justice!", victim, 0, 0, INVIS_NULL);
   return ReturnValue::eSUCCESS;
 }
@@ -15510,36 +15510,36 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[WEAR_HOLD];
-      if ((component == 0) || (compNum != dc_->obj_index[component->item_number].vnum()))
+      if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
       {
         component = ch->equipment[WEAR_HOLD2];
-        if ((component == 0) || (compNum != dc_->obj_index[component->item_number].vnum()))
+        if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
         {
-          ch->sendln("You do not have the required components.");
+          ch->sendln(u"You do not have the required components."_s);
           return ReturnValue::eFAILURE;
         }
       }
     }
     if (component->flags_.value[1] <= 0)
     {
-      ch->sendln("There is nothing left in the container.");
+      ch->sendln(u"There is nothing left in the container."_s);
       return ReturnValue::eFAILURE;
     }
     if (component->flags_.value[2] != 13 && component->flags_.value[2] != 17)
     {
-      ch->sendln("You do not have the required components,");
+      ch->sendln(u"You do not have the required components,"_s);
       return ReturnValue::eFAILURE;
     }
 
     if (ch->getMove() < 100)
     {
-      ch->sendln("You do not have enough energy to complete the incantation.");
+      ch->sendln(u"You do not have enough energy to complete the incantation."_s);
       return ReturnValue::eFAILURE;
     }
   }
   else if (IS_IMMORTAL(ch))
   {
-    ch->send("You manifest the missing components.\r\n");
+    ch->send(u"You manifest the missing components.\r\n"_s);
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) ||
@@ -15548,12 +15548,12 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   {
     if (IS_MORTAL(ch))
     {
-      ch->sendln("Something about this room prohibits your incantation from being completed.");
+      ch->sendln(u"Something about this room prohibits your incantation from being completed."_s);
       return ReturnValue::eSUCCESS;
     }
     else if (IS_IMMORTAL(ch))
     {
-      ch->send("Bypassing room restrictions.\r\n");
+      ch->send(u"Bypassing room restrictions.\r\n"_s);
     }
   }
 
@@ -15563,18 +15563,18 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   {
     if (ch == ((CharacterPtr)(cItem->flags_.origin)) && spl == SPELL_CONSECRATE)
     {
-      ch->sendln("You have already consecrated the ground here!");
+      ch->sendln(u"You have already consecrated the ground here!"_s);
       return ReturnValue::eSUCCESS;
     }
 
     if (cItem->flags_.value[0] == SPELL_DESECRATE)
     {
-      ch->send("A foul taint prevents you from consecrating the ground here!");
+      ch->send(u"A foul taint prevents you from consecrating the ground here!"_s);
       return ReturnValue::eSUCCESS;
     }
     if (cItem->flags_.value[0] == SPELL_CONSECRATE)
     {
-      ch->send("The ground here has already been consecrated!");
+      ch->send(u"The ground here has already been consecrated!"_s);
       return ReturnValue::eSUCCESS;
     }
   }
@@ -15594,7 +15594,7 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
   if (ch->cRooms >= 1 + skill / 25)
   {
-    ch->sendln("You cannot keep up this many consecrated areas.");
+    ch->sendln(u"You cannot keep up this many consecrated areas."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -15609,7 +15609,7 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
   if (cItem == nullptr)
   {
-    ch->sendln("Consecrate item doesn't exist. Tell an imm.");
+    ch->sendln(u"Consecrate item doesn't exist. Tell an imm."_s);
     return ReturnValue::eFAILURE;
   }
   cItem->flags_.value[0] = spl;
@@ -15667,12 +15667,12 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[WEAR_HOLD];
-      if ((component == 0) || (compNum != dc_->obj_index[component->item_number].vnum()))
+      if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
       {
         component = ch->equipment[WEAR_HOLD2];
-        if ((component == 0) || (compNum != dc_->obj_index[component->item_number].vnum()))
+        if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
         {
-          ch->sendln("You do not have the required components.");
+          ch->sendln(u"You do not have the required components."_s);
           return ReturnValue::eFAILURE;
         }
       }
@@ -15680,25 +15680,25 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
     if (component->flags_.value[1] <= 0)
     {
-      ch->sendln("There is nothing left in the container.");
+      ch->sendln(u"There is nothing left in the container."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (component->flags_.value[2] != 13 && component->flags_.value[2] != 17)
     {
-      ch->sendln("You do not have the required components,");
+      ch->sendln(u"You do not have the required components,"_s);
       return ReturnValue::eFAILURE;
     }
 
     if (ch->getMove() < 100)
     {
-      ch->sendln("You do not have enough energy to complete the incantation.");
+      ch->sendln(u"You do not have enough energy to complete the incantation."_s);
       return ReturnValue::eFAILURE;
     }
   }
   else if (IS_IMMORTAL(ch))
   {
-    ch->send("You manifest the missing components.\r\n");
+    ch->send(u"You manifest the missing components.\r\n"_s);
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) ||
@@ -15707,18 +15707,18 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   {
     if (IS_MORTAL(ch))
     {
-      ch->sendln("Something about this room prohibits your incantation from being completed.");
+      ch->sendln(u"Something about this room prohibits your incantation from being completed."_s);
       return ReturnValue::eSUCCESS;
     }
     else if (IS_IMMORTAL(ch))
     {
-      ch->send("You bypass the room restrictions.\r\n");
+      ch->send(u"You bypass the room restrictions.\r\n"_s);
     }
   }
 
   if (ch->cRooms >= 1 + skill / 25)
   {
-    ch->sendln("You cannot keep up this many desecrated areas.");
+    ch->sendln(u"You cannot keep up this many desecrated areas."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -15727,18 +15727,18 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   {
     if (ch == ((CharacterPtr)(cItem->flags_.origin)))
     {
-      ch->sendln("You have already desecrated the ground here!");
+      ch->sendln(u"You have already desecrated the ground here!"_s);
       return ReturnValue::eSUCCESS;
     }
 
     if (cItem->flags_.value[0] == SPELL_CONSECRATE)
     {
-      ch->send("A powerful aura of goodness prevents you from desecrating the ground here!");
+      ch->send(u"A powerful aura of goodness prevents you from desecrating the ground here!"_s);
       return ReturnValue::eSUCCESS;
     }
     if (cItem->flags_.value[0] == SPELL_DESECRATE)
     {
-      ch->send("The ground here has already been desecrated!");
+      ch->send(u"The ground here has already been desecrated!"_s);
       return ReturnValue::eSUCCESS;
     }
   }
@@ -15767,7 +15767,7 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   cItem = clone_object(real_object(CONSECRATE_OBJ_NUMBER));
   if (!cItem)
   {
-    ch->sendln("Consecrate item doesn't exist. Tell an imm.");
+    ch->sendln(u"Consecrate item doesn't exist. Tell an imm."_s);
     return ReturnValue::eFAILURE;
   }
   dc_sprintf(buf, "%s",
@@ -15817,7 +15817,7 @@ qint32 cast_desecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 qint32 spell_elemental_wall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
-  ch->sendln("Pirahna is still working on this.");
+  ch->sendln(u"Pirahna is still working on this."_s);
   return ReturnValue::eFAILURE;
 }
 
@@ -15857,7 +15857,7 @@ qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
   affect_to_char(ch, &af);
 
-  ch->sendln("You focus the minds of your allies to react to the slightest movement...");
+  ch->sendln(u"You focus the minds of your allies to react to the slightest movement..."_s);
   act_to_room("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, INVIS_NULL);
   // loop through group members in room
   for (ally = dc_->world[ch->in_room].people_; ally; ally = next_ally)
@@ -15867,7 +15867,7 @@ qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     if (ally->isPlayer() && GET_POS(ally) > position_t::SLEEPING &&
         (ally->master == ch || ch->master == ally || (ch->master && ch->master == ally->master)))
     {
-      ally->sendln("Your mind's eye focuses, you still your body, and poise yourself to react to anything!");
+      ally->sendln(u"Your mind's eye focuses, you still your body, and poise yourself to react to anything!"_s);
     }
     // TODO if not toggle set
     //    send_to_char("You refuse to be affected by %s's magic but you probably shouldn't move or do anything right now.\r\n"

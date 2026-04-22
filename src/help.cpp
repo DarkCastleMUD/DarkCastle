@@ -17,7 +17,7 @@ void show_help_header(CharacterPtr ch);
 void show_help_bar(CharacterPtr ch);
 
 // da functions
-command_return_t do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern QString new_help;
   ch->send(new_help);
@@ -67,7 +67,7 @@ qint32 levenshtein(const QString s, const QString t)
   return d[m][n];
 }
 
-command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   extern QString new_help;
@@ -92,7 +92,7 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!new_help_table)
   {
-    ch->sendln("No help available.");
+    ch->sendln(u"No help available."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -168,7 +168,7 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if (results.size() == 0)
         {
-          ch->send("Suggested help entries: ");
+          ch->send(u"Suggested help entries: "_s);
         }
 
         results.push_back((*cur).second);
@@ -176,12 +176,12 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
         if (results.size() >= 5)
         {
-          ch->sendln("");
+          ch->sendln(u""_s);
           break;
         }
         else
         {
-          ch->send(", ");
+          ch->send(u", "_s);
         }
       }
     }
@@ -198,7 +198,7 @@ command_return_t do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 a = ch->getLevel() == 0 ? 1 : ch->getLevel();
   if (this_help->min_level > a)
   {
-    ch->sendln("There is no help on that word.");
+    ch->sendln(u"There is no help on that word."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -351,7 +351,7 @@ qint32 load_new_help(auto &stream, qint32 reload, CharacterPtr ch)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   dc_strcpy(arg, "areas");
   return do_new_help(ch, arg, cmd);
@@ -359,7 +359,7 @@ command_return_t do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
 
 QString help_buf;
 
-command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i, minlen, count = {};
   QString arg;
@@ -389,7 +389,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
       { // not valid numbers
         if (dc_atoi(argument) > dc_atoi(arg))
         {
-          ch->sendln("Usage: hindex -l <low level> <high level>");
+          ch->sendln(u"Usage: hindex -l <low level> <high level>"_s);
           return ReturnValue::eFAILURE;
         }
         if (arg.isEmpty())
@@ -438,17 +438,17 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   { // index #s out of range
     if (dc_atoi(argument) > dc_atoi(arg))
     {
-      ch->sendln("Usage: hindex <low ID#> <high ID#>"); // wrong order, first > second
+      ch->sendln(u"Usage: hindex <low ID#> <high ID#>"_s); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
     else if ((dc_atoi(arg) - dc_atoi(argument)) >= 30)
     { // too many listed, only 30 at a time or we get too much spam
-      ch->sendln("You can only list 30 help entries at a time.");
+      ch->sendln(u"You can only list 30 help entries at a time."_s);
       return ReturnValue::eFAILURE;
     }
     else if (dc_atoi(argument) >= dc_->new_top_of_helpt || dc_atoi(arg) >= dc_->new_top_of_helpt)
     {
-      ch->sendln("Out of range."); // wrong order, first > second
+      ch->sendln(u"Out of range."_s); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
 
@@ -463,7 +463,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   { // show a specific ID #
     if (dc_atoi(argument) >= dc_->new_top_of_helpt)
     {
-      ch->sendln("Out of range."); // wrong order, first > second
+      ch->sendln(u"Out of range."_s); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
 
@@ -495,7 +495,7 @@ command_return_t do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_index(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i, minlen, count = {};
   QString arg;
@@ -511,12 +511,12 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
   { // index #s out of range
     if (dc_atoi(argument) > dc_atoi(arg))
     {
-      ch->sendln("Usage: index <low ID#> <high ID#>"); // wrong order, first > second
+      ch->sendln(u"Usage: index <low ID#> <high ID#>"_s); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
     if (dc_atoi(argument) >= dc_->new_top_of_helpt || dc_atoi(arg) >= dc_->new_top_of_helpt)
     {
-      ch->sendln("Out of range."); // wrong order, first > second
+      ch->sendln(u"Out of range."_s); // wrong order, first > second
       return ReturnValue::eFAILURE;
     }
     show_help_header(ch);
@@ -534,12 +534,12 @@ command_return_t do_index(CharacterPtr ch, QString argument, cmd_t cmd)
   { // show a specific ID #
     if (dc_atoi(argument) >= dc_->new_top_of_helpt)
     {
-      ch->sendln("Out of range.");
+      ch->sendln(u"Out of range."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (new_help_table[dc_atoi(argument)].min_level > 1)
-      ch->sendln("You are not high enough level to view this helpfile.");
+      ch->sendln(u"You are not high enough level to view this helpfile."_s);
     else
     {
       show_help_header(ch);
@@ -624,13 +624,13 @@ qint32 strn_cmp(QString arg1, QString arg2, qint32 n)
   return {};
 }
 
-command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   FILE *new_help_fl;
   qint32 help_rec_count = 0, ret = {};
 
-  // ch->sendln("Command disabled!");
+  // ch->sendln(u"Command disabled!"_s);
   // return ReturnValue::eFAILURE;
 
   if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
@@ -653,15 +653,15 @@ command_return_t do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ret == ReturnValue::eFAILURE)
   {
-    ch->sendln("Error reloading help files!");
+    ch->sendln(u"Error reloading help files!"_s);
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("Help files reloaded.");
+  ch->sendln(u"Help files reloaded."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, buf2, field, buf3, value;
   help_index_element_new new_help;
@@ -672,7 +672,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->has_skill(COMMAND_HEDIT))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -725,7 +725,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
       help_id = {};
     if (help_id < 0 || help_id >= dc_->new_top_of_helpt)
     {
-      ch->sendln("Not a valid help ID number.  Try using 'hindex'");
+      ch->sendln(u"Not a valid help ID number.  Try using 'hindex'"_s);
       return ReturnValue::eFAILURE;
     }
     half_chop(buf2, field, buf2);
@@ -734,7 +734,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
       half_chop(buf2, buf3, value);
       if (buf.isEmpty() 3 || value.isEmpty())
       {
-        ch->sendln("Not a valid key # or no value specified.");
+        ch->sendln(u"Not a valid key # or no value specified."_s);
         return ReturnValue::eFAILURE;
       }
       if ((key_id = dc_atoi(buf3)))
@@ -763,7 +763,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
           new_help_table[help_id].keyword5 = value;
           break;
         default:
-          ch->sendln("Not a valid key #.");
+          ch->sendln(u"Not a valid key #."_s);
           return ReturnValue::eFAILURE;
           break;
         }
@@ -772,7 +772,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        ch->sendln("Not a valid key #.");
+        ch->sendln(u"Not a valid key #."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -788,7 +788,7 @@ command_return_t do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        ch->sendln("Invalid level specified.");
+        ch->sendln(u"Invalid level specified."_s);
       }
     }
     else if (is_abbrev(field, "related"))
@@ -884,11 +884,11 @@ void save_help(CharacterPtr ch)
   }
   else
   {
-    ch->sendln("Couldn't open help file for saving.");
+    ch->sendln(u"Couldn't open help file for saving."_s);
     return;
   }
 
-  ch->sendln("Saved.");
+  ch->sendln(u"Saved."_s);
   dc_sprintf(buf, "%s just saved the help files.", qPrintable(ch->name()));
   dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_HELP);
 
@@ -919,7 +919,7 @@ void save_help(CharacterPtr ch)
   }
   else
   {
-    ch->sendln("Couldn't open web help file for saving.");
+    ch->sendln(u"Couldn't open web help file for saving."_s);
     perror("Couldn't open web help file for saving.\r\n");
     return;
   }

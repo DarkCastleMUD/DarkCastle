@@ -121,7 +121,7 @@ const QString newsify(QString string)
   //  return (tmp);
 }
 
-command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool up;
   if (ch->isNonPlayer())
@@ -163,21 +163,21 @@ command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
   if (QString(buf).isEmpty())
   {
     if (QString(argument) == u"all"_s)
-      ch->sendln("There's been no news recorded ever.");
+      ch->sendln(u"There's been no news recorded ever."_s);
     else
-      ch->sendln("There's been no recent news. Type 'news all' to see all news.");
+      ch->sendln(u"There's been no recent news. Type 'news all' to see all news."_s);
 
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (!ch->has_skill(COMMAND_ADDNEWS))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -195,7 +195,7 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!str_cmp(arg, "save"))
   {
     savenews();
-    ch->sendln("Saved!");
+    ch->sendln(u"Saved!"_s);
     return ReturnValue::eSUCCESS;
   }
   if (str_cmp(arg, "today"))
@@ -238,7 +238,7 @@ command_return_t do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
     addnews(nnews);
     nnews->news = {};
   }
-  ch->sendln("        Enter news item.  (/s saves /h for help)");
+  ch->sendln(u"        Enter news item.  (/s saves /h for help)"_s);
   if (nnews->news)
     ch->send(nnews->news);
   //  nnews->news = u"Temporary data.\r\n"_s;

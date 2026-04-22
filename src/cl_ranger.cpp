@@ -48,14 +48,14 @@ qint32 charm_levels(CharacterPtr ch)
   return i;
 }
 
-command_return_t do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim = {};
   QString buf;
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
-    ch->sendln("Try learning HOW to free an animal first.");
+    ch->sendln(u"Try learning HOW to free an animal first."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -70,7 +70,7 @@ command_return_t do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!victim)
   {
-    ch->sendln("They aren't even here!");
+    ch->sendln(u"They aren't even here!"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -96,7 +96,7 @@ command_return_t do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   CharacterPtr victim;
@@ -107,7 +107,7 @@ command_return_t do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (arg.isEmpty())
   {
-    ch->sendln("Who do you want to tame?");
+    ch->sendln(u"Who do you want to tame?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -120,38 +120,38 @@ command_return_t do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(buf)))
   {
-    ch->sendln("No one here by that name!");
+    ch->sendln(u"No one here by that name!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Tame the wild beast!");
+    ch->sendln(u"Tame the wild beast!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isPlayer())
   {
-    ch->sendln("You find yourself unable to tame this player.");
+    ch->sendln(u"You find yourself unable to tame this player."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
       (ch->getLevel() < victim->getLevel()))
   {
-    ch->sendln("You find yourself unable to tame this creature.");
+    ch->sendln(u"You find yourself unable to tame this creature."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (circle_follow(victim, ch))
   {
-    ch->sendln("Sorry, following in circles can not be allowed.");
+    ch->sendln(u"Sorry, following in circles can not be allowed."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0)
   {
-    ch->sendln("How you plan on controlling so many followers?");
+    ch->sendln(u"How you plan on controlling so many followers?"_s);
     return ReturnValue::eFAILURE;
     /*   CharacterPtr  vict = {};
        for(follow_type *k = ch->followers; k; k = k->next)
@@ -218,7 +218,7 @@ command_return_t do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_track(QStringList arguments, cmd_t cmd)
 {
   qint32 x, y;
   qint32 retval, how_deep, learned;
@@ -244,7 +244,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      sendln("You have found your target!");
+      sendln(u"You have found your target!"_s);
       ansi_color(NTEXT, this);
 
       //      remove_memory(this, 't');
@@ -254,14 +254,14 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   else if (quarry)
   {
-    sendln("There's one right here ;)");
+    sendln(u"There's one right here ;)"_s);
     //  remove_memory(this, 't');
     return ReturnValue::eSUCCESS;
   }
 
   if (!victim.isEmpty() && isPlayer() && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && getLevel() < ANGEL)
   {
-    sendln("Only a ranger could track someone by name.");
+    sendln(u"Only a ranger could track someone by name."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -269,7 +269,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
 
   act_to_room("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, INVIS_NULL);
-  sendln("You search for signs of your quarry...\r\n");
+  sendln(u"You search for signs of your quarry...\r\n"_s);
 
   if (learned)
     skill_increase_check(SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
@@ -279,7 +279,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   // That way possessing imms can track.
   if (isNonPlayer() && ISSET(mobdata->actflags, ACT_STUPID))
   {
-    sendln("Being stupid, you cannot find any..");
+    sendln(u"Being stupid, you cannot find any.."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -289,12 +289,12 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      sendln("You have lost the trail.");
+      sendln(u"You have lost the trail."_s);
       ansi_color(NTEXT, this);
       // remove_memory(this, 't');
     }
     else
-      sendln("There are no distinct scents here.");
+      sendln(u"There are no distinct scents here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -312,11 +312,11 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
         {
           ansi_color(RED, this);
           ansi_color(BOLD, this);
-          sendln("You have lost the trail.");
+          sendln(u"You have lost the trail."_s);
           ansi_color(NTEXT, this);
         }
         else
-          sendln("You can't find any traces of such a scent.");
+          sendln(u"You can't find any traces of such a scent."_s);
         //         remove_memory(this, 't');
         if (isNonPlayer())
           swap_hate_memory();
@@ -398,11 +398,11 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      sendln("You have lost the trail.");
+      sendln(u"You have lost the trail."_s);
       ansi_color(NTEXT, this);
     }
     else
-      sendln("You can't find any traces of such a scent.");
+      sendln(u"You can't find any traces of such a scent."_s);
 
     //    remove_memory(this, 't');
     return ReturnValue::eFAILURE;
@@ -413,7 +413,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     if ((x > dc_->world[in_room].tracks_.size()) || !(pScent = dc_->world[in_room].TrackItem(x)))
     {
       if (x == 1)
-        sendln("There are no distinct smells here.");
+        sendln(u"There are no distinct smells here."_s);
       break;
     }
 
@@ -469,7 +469,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
       dc_strcpy(sex, "");
 
     if (x == 1)
-      sendln("Freshest scents first...");
+      sendln(u"Freshest scents first..."_s);
 
     dc_sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
                weight,
@@ -482,11 +482,11 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_ambush(QStringList arguments, cmd_t cmd)
 {
   if (!canPerform(SKILL_AMBUSH))
   {
-    sendln("You don't know how to ambush people!");
+    sendln(u"You don't know how to ambush people!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -678,7 +678,7 @@ forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 learned;
   ObjectPtr new_obj = {};
@@ -687,9 +687,9 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_FORAGE))
   {
     if (ch->dc_->number(0, 1) == 0)
-      ch->sendln("You already foraged recently.  Give mother nature a break!");
+      ch->sendln(u"You already foraged recently.  Give mother nature a break!"_s);
     else
-      ch->sendln("There's a limit to how often you can play with your nuts.  Give it some time.");
+      ch->sendln(u"There's a limit to how often you can play with your nuts.  Give it some time."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -699,7 +699,7 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
   learned = ch->has_skill(SKILL_FORAGE);
   if (!learned)
   {
-    ch->sendln("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.");
+    ch->sendln(u"Not knowing how to forage, you poke at the dirt with a stick, finding nothing."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -743,7 +743,7 @@ command_return_t do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
 
       if ((1 + IS_CARRYING_N(ch)) > CAN_CARRY_N(ch))
       {
-        ch->sendln("You can't carry that many items!");
+        ch->sendln(u"You can't carry that many items!"_s);
         return ReturnValue::eFAILURE;
       }
 
@@ -833,22 +833,22 @@ void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, qint32 dir, ObjectPtr f
   switch (ch->dc_->number(1, 6))
   {
   case 1:
-    ch->sendln("You miss your shot.");
+    ch->sendln(u"You miss your shot."_s);
     break;
   case 2:
-    ch->sendln("Your arrow wizzes by the target harmlessely.");
+    ch->sendln(u"Your arrow wizzes by the target harmlessely."_s);
     break;
   case 3:
-    ch->sendln("Your pitiful aim spears a poor woodland creature instead..");
+    ch->sendln(u"Your pitiful aim spears a poor woodland creature instead.."_s);
     break;
   case 4:
-    ch->sendln("Your shot misses your target, and goes skittering across the ground.");
+    ch->sendln(u"Your shot misses your target, and goes skittering across the ground."_s);
     break;
   case 5:
-    ch->sendln("A slight breeze forces your arrow off the mark.");
+    ch->sendln(u"A slight breeze forces your arrow off the mark."_s);
     break;
   case 6:
-    ch->sendln("Your shot narrowly misses the mark.");
+    ch->sendln(u"Your shot narrowly misses the mark."_s);
     break;
   }
 
@@ -996,7 +996,7 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
 }
 
 /* no need anymore
-command_return_t do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
+ReturnValue do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
                      qint32 dir, qint32 dam, qint32 artype,
                      ObjectPtr found)
 {
@@ -1083,7 +1083,7 @@ command_return_t do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
 }
 */
 
-command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   qint32 dam, dir = -1, artype, cost, retval, victroom;
@@ -1101,31 +1101,31 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_ARCHERY))
   {
-    ch->sendln("You've no idea how those pointy things with strings and feathers work.");
+    ch->sendln(u"You've no idea how those pointy things with strings and feathers work."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_HOLD])
   {
-    ch->sendln("You need to be holding a bow, moron.");
+    ch->sendln(u"You need to be holding a bow, moron."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(ch->equipment[WEAR_HOLD]->flags_.type_flag == ITEM_FIREWEAPON))
   {
-    ch->sendln("You need to be holding a bow, moron.");
+    ch->sendln(u"You need to be holding a bow, moron."_s);
     return ReturnValue::eFAILURE;
   }
   /*
    if(GET_POS(ch) == position_t::FIGHTING)
    {
-   ch->sendln("Aren't you a bit busy with hand to hand combat?");
+   ch->sendln(u"Aren't you a bit busy with hand to hand combat?"_s);
    return ReturnValue::eFAILURE;
    }*/
 
   if (ch->shotsthisround > 0)
   {
-    ch->sendln("Slow down there tiger, you can't fire them that fast!");
+    ch->sendln(u"Slow down there tiger, you can't fire them that fast!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1138,7 +1138,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (arg.isEmpty())
   {
-    ch->sendln("Shoot at whom?");
+    ch->sendln(u"Shoot at whom?"_s);
     return ReturnValue::eFAILURE;
   }
   half_chop(arg, target, buf2);
@@ -1151,7 +1151,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   /* make safe rooms checks */
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("You can't shoot arrows if yer in a safe room silly.");
+    ch->sendln(u"You can't shoot arrows if yer in a safe room silly."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1164,7 +1164,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     artype = parse_arrow(ch, arrow);
     if (!artype)
     {
-      ch->sendln("You don't know of that type of arrow.");
+      ch->sendln(u"You don't know of that type of arrow."_s);
       return ReturnValue::eFAILURE;
     }
     switch (artype)
@@ -1201,13 +1201,13 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
       artype = parse_arrow(ch, direct);
     else
     {
-      ch->sendln("Shoot in which direction?");
+      ch->sendln(u"Shoot in which direction?"_s);
       return ReturnValue::eFAILURE;
     }
 
     if (dir >= 0 && !CAN_GO(ch, dir))
     {
-      ch->sendln("There is nothing to shoot in that direction.");
+      ch->sendln(u"There is nothing to shoot in that direction."_s);
       return ReturnValue::eFAILURE;
     }
     else if (artype)
@@ -1232,7 +1232,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if ((GET_MANA(ch) < cost) && (ch->getLevel() < ANGEL))
   {
-    ch->sendln("You don't have enough mana for that arrow.");
+    ch->sendln(u"You don't have enough mana for that arrow."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1254,7 +1254,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           new_room = dc_->world[cur_room].dir_option[dir]->to_room;
           if (isSet(dc_->world[new_room].room_flags, SAFE))
           {
-            ch->sendln("Don't shoot into a safe room!  You might hit someone!");
+            ch->sendln(u"Don't shoot into a safe room!  You might hit someone!"_s);
             return ReturnValue::eFAILURE;
           }
           char_from_room(ch, false);
@@ -1262,7 +1262,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
-            ch->sendln("Error moving you to room in do_fire");
+            ch->sendln(u"Error moving you to room in do_fire"_s);
             return ReturnValue::eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
@@ -1277,7 +1277,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           char_from_room(ch, false);
           if (isSet(dc_->world[new_room].room_flags, SAFE))
           {
-            ch->sendln("Don't shoot into a safe room!  You might hit someone!");
+            ch->sendln(u"Don't shoot into a safe room!  You might hit someone!"_s);
             char_to_room(ch, cur_room);
             return ReturnValue::eFAILURE;
           }
@@ -1285,7 +1285,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
-            ch->sendln("Error moving you to room in do_fire");
+            ch->sendln(u"Error moving you to room in do_fire"_s);
             return ReturnValue::eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
@@ -1300,7 +1300,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           char_from_room(ch, false);
           if (isSet(dc_->world[new_room].room_flags, SAFE))
           {
-            ch->sendln("Don't shoot into a safe room!  You might hit someone!");
+            ch->sendln(u"Don't shoot into a safe room!  You might hit someone!"_s);
             char_to_room(ch, cur_room);
             return ReturnValue::eFAILURE;
           }
@@ -1308,7 +1308,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
-            ch->sendln("Error moving you to room in do_fire");
+            ch->sendln(u"Error moving you to room in do_fire"_s);
             return ReturnValue::eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
@@ -1325,41 +1325,41 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     else if (dir < 0)
     {
-      ch->sendln("You aren't skilled enough to fire at a target this close.");
+      ch->sendln(u"You aren't skilled enough to fire at a target this close."_s);
       return ReturnValue::eFAILURE;
     }
     if (!victim)
     {
       if (dir >= 0)
-        ch->sendln("You cannot concentrate enough to fire into an adjacent room while fighting.");
+        ch->sendln(u"You cannot concentrate enough to fire into an adjacent room while fighting."_s);
       else
-        ch->sendln("You cannot seem to locate your target.");
+        ch->sendln(u"You cannot seem to locate your target."_s);
       return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    ch->sendln("Sorry, you must specify a target.");
+    ch->sendln(u"Sorry, you must specify a target."_s);
     return ReturnValue::eFAILURE;
   }
 
   /* check for accidental targeting of self */
   if (victim == ch)
   {
-    ch->sendln("You need to type more of the target's name.");
+    ch->sendln(u"You need to type more of the target's name."_s);
     return ReturnValue::eFAILURE;
   }
 
   /* Protect the newbies! */
   if (victim->isPlayer() && victim->getLevel() < 6)
   {
-    ch->sendln("Don't shoot at a poor defenseless n00b! :(");
+    ch->sendln(u"Don't shoot at a poor defenseless n00b! :("_s);
     return ReturnValue::eFAILURE;
   }
   /* check if target is fighting */
   /*  if(victim->fighting)
    {
-   ch->sendln("You can't seem to get a clear line of sight.");
+   ch->sendln(u"You can't seem to get a clear line of sight."_s);
    return ReturnValue::eFAILURE;
    }*/
 
@@ -1383,13 +1383,13 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (!found)
   {
-    ch->sendln("You aren't wearing any quivers with arrows!");
+    ch->sendln(u"You aren't wearing any quivers with arrows!"_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (victim->isNonPlayer() && dc_->mob_index[victim->mobdata->nr].vnum() >= 2300 && dc_->mob_index[victim->mobdata->nr].vnum() <= 2399)
+  if (victim->isNonPlayer() && dc_->mob_index_[victim->mobdata->nr].vnum() >= 2300 && dc_->mob_index_[victim->mobdata->nr].vnum() <= 2399)
   {
-    ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
+    ch->sendln(u"Your arrow is disintegrated by the fortress' enchantments."_s);
     extract_obj(found);
     return ReturnValue::eFAILURE;
   }
@@ -1534,7 +1534,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
       if (!char_to_room(ch, victim->in_room))
       {
         char_to_room(ch, cur_room);
-        ch->sendln("Error moving you to room in do_fire.");
+        ch->sendln(u"Error moving you to room in do_fire."_s);
         return ReturnValue::eFAILURE;
       }
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
@@ -1674,7 +1674,7 @@ command_return_t do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   CharacterPtr target = {};
@@ -1682,7 +1682,7 @@ command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (arg.isEmpty())
   {
-    ch->sendln("Delve into whom?");
+    ch->sendln(u"Delve into whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1694,7 +1694,7 @@ command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
     if(ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
        learned = 75;
     else if(!(learned = ch->has_skill( SKILL_MIND_DELVE))) {
-       ch->sendln("You try to think like a chipmunk and go nuts.");
+       ch->sendln(u"You try to think like a chipmunk and go nuts."_s);
        return ReturnValue::eFAILURE;
     }
     specialization = learned / 100;
@@ -1706,7 +1706,7 @@ command_return_t do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (ch->getLevel() < target->getLevel())
   {
-    ch->sendln("You can't seem to understand your target's mental processes.");
+    ch->sendln(u"You can't seem to understand your target's mental processes."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1740,7 +1740,7 @@ void check_eq(CharacterPtr ch)
   }
 }
 
-command_return_t do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 i;
   QString buf;
@@ -1751,13 +1751,13 @@ command_return_t do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
   qint32 learned = ch->has_skill(SKILL_NAT_SELECT);
   if (ch->isNonPlayer() || !learned)
   {
-    ch->sendln("You don't know how to use this to your advantage.");
+    ch->sendln(u"You don't know how to use this to your advantage."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SPELL_NAT_SELECT_TIMER))
   {
-    ch->sendln("You cannot yet select a new enemy of choice.");
+    ch->sendln(u"You cannot yet select a new enemy of choice."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1769,14 +1769,14 @@ command_return_t do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (cur && cur->modifier == i)
       {
-        ch->sendln("You are already studying this race.");
+        ch->sendln(u"You are already studying this race."_s);
         return ReturnValue::eFAILURE;
       }
       break;
     }
     if (i == 32)
     {
-      ch->sendln("Please select a valid race.");
+      ch->sendln(u"Please select a valid race."_s);
       return ReturnValue::eFAILURE;
     }
   }

@@ -13,7 +13,7 @@ qint32 get_weapon_damage_type(ObjectPtr wielded);
 qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0);
 qint32 check_joincharmie(CharacterPtr ch, qint32 skill = 0);
 
-command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -26,23 +26,23 @@ command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(name)) && !(victim = ch->fighting))
   {
-    ch->sendln("There is no one like that here to gouge.");
+    ch->sendln(u"There is no one like that here to gouge."_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(victim, AFF_BLIND))
   {
-    ch->sendln("They are already blinded!");
+    ch->sendln(u"They are already blinded!"_s);
     return ReturnValue::eFAILURE;
   }
   if (victim == ch)
   {
-    ch->sendln("That sounds...stupid.");
+    ch->sendln(u"That sounds...stupid."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!level)
   {
-    ch->sendln("You would...if you knew how.");
+    ch->sendln(u"You would...if you knew how."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -51,7 +51,7 @@ command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Trying to eyegouge a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Trying to eyegouge a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -93,7 +93,7 @@ command_return_t do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval | ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_backstab(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim;
 
@@ -104,37 +104,37 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   if (!has_skill(SKILL_BACKSTAB) && !isNonPlayer())
   {
-    sendln("You don't know how to backstab people!");
+    sendln(u"You don't know how to backstab people!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_room_vis(name)))
   {
-    sendln("Backstab whom?");
+    sendln(u"Backstab whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    sendln("How can you sneak up on yourself?");
+    sendln(u"How can you sneak up on yourself?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    sendln("You cannot backstab someone that HUGE!");
+    sendln(u"You cannot backstab someone that HUGE!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    sendln("You cannot target just one to backstab!");
+    sendln(u"You cannot target just one to backstab!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
-    sendln("You cannot target someone that tiny to backstab!");
+    sendln(u"You cannot target someone that tiny to backstab!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -152,25 +152,25 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 
   if (getHP() < min_hp)
   {
-    sendln("You are feeling too weak right now to attempt such a bold maneuver.");
+    sendln(u"You are feeling too weak right now to attempt such a bold maneuver."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!equipment[WEAR_WIELD])
   {
-    sendln("You need to wield a weapon to make it a success.");
+    sendln(u"You need to wield a weapon to make it a success."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (equipment[WEAR_WIELD]->flags_.value[3] != 11 && equipment[WEAR_WIELD]->flags_.value[3] != 9)
   {
-    sendln("You can't stab without a stabbing weapon...");
+    sendln(u"You can't stab without a stabbing weapon..."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->fighting)
   {
-    sendln("You can't backstab a fighting person, they are too alert!");
+    sendln(u"You can't backstab a fighting person, they are too alert!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -314,14 +314,14 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   qint32 retval;
 
   if (!ch->canPerform(SKILL_CIRCLE))
   {
-    ch->sendln("You do not know how to circle!");
+    ch->sendln(u"You do not know how to circle!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -330,7 +330,7 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->getHP() < min_hp)
   {
-    ch->send("You are feeling too weak right now to attempt such a bold maneuver.");
+    ch->send(u"You are feeling too weak right now to attempt such a bold maneuver."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -338,28 +338,28 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
     victim = ch->fighting;
   else
   {
-    ch->sendln("You have be in combat to perform this action.  Try using 'backstab' instead.");
+    ch->sendln(u"You have be in combat to perform this action.  Try using 'backstab' instead."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
-    ch->sendln("You cannot circle behind someone that HUGE!");
+    ch->sendln(u"You cannot circle behind someone that HUGE!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
-    ch->sendln("You cannot pick just one to circle behind!");
+    ch->sendln(u"You cannot pick just one to circle behind!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY) &&
       ch->has_skill(SKILL_CIRCLE) <= 80)
   {
-    ch->sendln("You cannot target something that tiny to circle behind!");
+    ch->sendln(u"You cannot target something that tiny to circle behind!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -373,13 +373,13 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim == ch)
   {
-    ch->sendln("How can you sneak up on yourself?");
+    ch->sendln(u"How can you sneak up on yourself?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD])
   {
-    ch->sendln("You need to wield a weapon to make it a success.");
+    ch->sendln(u"You need to wield a weapon to make it a success."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -402,14 +402,14 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
     stabbingCircle = true;
     break;
   default:
-    //     ch->sendln("Only certain weapons can be used for backstabbing, this is not one of them.");
+    //     ch->sendln(u"Only certain weapons can be used for backstabbing, this is not one of them."_s);
     //     return ReturnValue::eFAILURE;
     break;
   }
 
   if (ch == victim->fighting && !IS_AFFECTED(victim, AFF_BLACKJACK))
   {
-    ch->sendln("You can't break away while that person is hitting you!");
+    ch->sendln(u"You can't break away while that person is hitting you!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -478,7 +478,7 @@ command_return_t do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
   QString name;
@@ -486,7 +486,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_TRIP))
   {
-    ch->sendln("You should learn how to trip first!");
+    ch->sendln(u"You should learn how to trip first!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -498,7 +498,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 
       for(i = ch->songs.begin(); i != ch->songs.end(); ++i) {
        if((*i).song_number == SKILL_SONG_CRUSHING_CRESCENDO - SKILL_SONG_BASE) {
-         ch->sendln("You are too distracted by your song to do this.");
+         ch->sendln(u"You are too distracted by your song to do this."_s);
     return ReturnValue::eFAILURE;
        }
       }
@@ -513,19 +513,19 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!victim)
   {
-    ch->sendln("Trip whom?");
+    ch->sendln(u"Trip whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room != victim->in_room)
   {
-    ch->sendln("That person seems to have left.");
+    ch->sendln(u"That person seems to have left."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("(You would look pretty silly trying to trip yourself.)");
+    ch->sendln(u"(You would look pretty silly trying to trip yourself.)"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -534,7 +534,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Tripping a bladeshielded opponent would be impossible!");
+    ch->sendln(u"Tripping a bladeshielded opponent would be impossible!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -589,7 +589,7 @@ command_return_t do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   auto &arena = dc_->arena_;
@@ -597,13 +597,13 @@ command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((ch->in_room >= 0 && ch->in_room <= dc_->top_of_world) && ch->room().isArena() && arena.isPotato())
   {
-    ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
+    ch->sendln(u"You can't do that in a potato arena ya sneaky bastard!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_SNEAK))
   {
-    ch->sendln("You just don't seem like the sneaky type.");
+    ch->sendln(u"You just don't seem like the sneaky type."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -612,7 +612,7 @@ command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
     affect_from_char(ch, SKILL_SNEAK);
     if (cmd != cmd_t::PALM)
     {
-      ch->sendln("You won't be so sneaky anymore.");
+      ch->sendln(u"You won't be so sneaky anymore."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -622,7 +622,7 @@ command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
 
   do_hide(ch, u""_s, cmd_t::LOOK);
 
-  ch->sendln("You try to move silently for a while.");
+  ch->sendln(u"You try to move silently for a while."_s);
 
   //   ch->skill_increase_check(SKILL_SNEAK, ch->has_skill(SKILL_SNEAK),
   // SKILL_INCREASE_HARD);
@@ -636,14 +636,14 @@ command_return_t do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr leader;
 
   if (!ch->canPerform(SKILL_STALK))
   {
-    ch->sendln("I bet you think you're a thief. ;)");
+    ch->sendln(u"I bet you think you're a thief. ;)"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -652,7 +652,7 @@ command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
     if (ch->master)
       ch->send(u"You are currently stalking %s.\r\n"_s.arg(qPrintable(ch->master->shortdesc_or_name())));
     else
-      ch->sendln("Pick a name, any name.");
+      ch->sendln(u"Pick a name, any name."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -660,23 +660,23 @@ command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(leader = ch->get_char_room_vis(name)))
   {
-    ch->sendln("I see no person by that name here!");
+    ch->sendln(u"I see no person by that name here!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (leader == ch)
   {
     if (!ch->master)
-      ch->sendln("You are already following yourself.");
+      ch->sendln(u"You are already following yourself."_s);
     else if (IS_AFFECTED(ch, AFF_GROUP))
-      ch->sendln("You must first abandon your group.");
+      ch->sendln(u"You must first abandon your group."_s);
     else
       stop_follower(ch, follower_reasons_t::END_STALK);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_GROUP))
   {
-    ch->sendln("You must first abandon your group.");
+    ch->sendln(u"You must first abandon your group."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -696,20 +696,20 @@ command_return_t do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValue do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   auto &arena = dc_->arena_;
   if (!ch->canPerform(SKILL_HIDE))
   {
     if (cmd != cmd_t::LOOK)
-      ch->sendln("You don't know how to hide. What do you think you are, a thief?");
+      ch->sendln(u"You don't know how to hide. What do you think you are, a thief?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if ((ch->in_room >= 0 && ch->in_room <= dc_->top_of_world) &&
       ch->room().isArena() && arena.isPotato())
   {
-    ch->sendln("You can't do that in a potato arena ya sneaky bastard!");
+    ch->sendln(u"You can't do that in a potato arena ya sneaky bastard!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -717,7 +717,7 @@ command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
   {
     if (curr->fighting == ch)
     {
-      ch->sendln("In the middle of combat?!  Impossible!");
+      ch->sendln(u"In the middle of combat?!  Impossible!"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -726,7 +726,7 @@ command_return_t do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     if (!charge_moves(ch, SKILL_HIDE))
       return ReturnValue::eSUCCESS;
 
-  ch->sendln("You attempt to hide yourself.");
+  ch->sendln(u"You attempt to hide yourself."_s);
 
   if (!IS_AFFECTED(ch, AFF_HIDE))
     SETBIT(ch->affected_by, AFF_HIDE);
@@ -772,7 +772,7 @@ qint32 max_level(CharacterPtr ch)
 }
 
 // steal an ITEM... not gold
-command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   ObjectPtr obj, *loop_obj, next_obj;
@@ -791,11 +791,11 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
   one_argument(argument, victim_name);
   if (ch->c_class != CLASS_THIEF || !ch->has_skill(SKILL_STEAL))
   {
-    ch->sendln("You are not experienced within that field.");
+    ch->sendln(u"You are not experienced within that field."_s);
     return ReturnValue::eFAILURE;
   }
   //  if (ch->isPlayerObjectThief()){
-  //     ch->sendln("You're too busy watching your back to steal anything right now!");
+  //     ch->sendln(u"You're too busy watching your back to steal anything right now!"_s);
   //     return ReturnValue::eFAILURE;
   //  }
   pthiefaf.type = Character::PLAYER_OBJECT_THIEF;
@@ -806,18 +806,18 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(victim_name)))
   {
-    ch->sendln("Steal what from who?");
+    ch->sendln(u"Steal what from who?"_s);
     return ReturnValue::eFAILURE;
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
+    ch->sendln(u"Got it!\r\nYou receive 30000000000 experience."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    ch->sendln("Don't steal from dead people!");
+    ch->sendln(u"Don't steal from dead people!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -826,25 +826,25 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
-    ch->sendln("That person is far too experienced for you to steal from.");
+    ch->sendln(u"That person is far too experienced for you to steal from."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("No stealing permitted in safe areas!");
+    ch->sendln(u"No stealing permitted in safe areas!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (check_make_camp(ch->in_room))
   {
-    ch->sendln("You can't steal inside of a camp!");
+    ch->sendln(u"You can't steal inside of a camp!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->room().isArena())
   {
-    ch->sendln("Do what!? This is an Arena, go kill someone!");
+    ch->sendln(u"Do what!? This is an Arena, go kill someone!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -855,13 +855,13 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->fighting)
   {
-    ch->sendln("You can't get close enough because of the fight.");
+    ch->sendln(u"You can't get close enough because of the fight."_s);
     return ReturnValue::eFAILURE;
   }
 
   /*  if(victim->isPlayer() &&
       !(victim->conn_) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
-      ch->sendln("That person is not really there.");
+      ch->sendln(u"That person is not really there."_s);
       return ReturnValue::eFAILURE;
     }*/
 
@@ -879,27 +879,27 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
     chance -= GET_OBJ_WEIGHT(obj);
     if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
     {
-      ch->sendln("That item is protected by the gods.");
+      ch->sendln(u"That item is protected by the gods."_s);
       return ReturnValue::eFAILURE;
     }
     if (isSet(obj->flags_.extra_flags, ITEM_NEWBIE))
     {
-      ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
+      ch->sendln(u"That piece of equipment is protected by the powerful magics of the MUD-school elders."_s);
       return ReturnValue::eFAILURE;
     }
-    if (dc_->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
+    if (dc_->obj_index_[obj->item_number].vnum() == CHAMPION_ITEM)
     {
-      ch->send("You must earn that flag, no stealing allowed!");
+      ch->send(u"You must earn that flag, no stealing allowed!"_s);
       return ReturnValue::eFAILURE;
     }
     if (victim->isNonPlayer() && isexact("prize", obj->name()))
     {
-      ch->sendln("You have to HUNT the targets...its not a Treasture Steal!");
+      ch->sendln(u"You have to HUNT the targets...its not a Treasture Steal!"_s);
       return ReturnValue::eFAILURE;
     }
     if (GET_OBJ_WEIGHT(obj) > 50)
     {
-      ch->sendln("That item is too heavy to steal.");
+      ch->sendln(u"That item is too heavy to steal."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -907,7 +907,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
     {
       set_cantquit(ch, victim);
-      ch->sendln("Oops, that was clumsy...");
+      ch->sendln(u"Oops, that was clumsy..."_s);
       ohoh = true;
       if (!number(0, 4))
       {
@@ -937,7 +937,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
             _exp = {};
 
-          ch->sendln("Got it!");
+          ch->sendln(u"Got it!"_s);
           if (_exp)
           {
             ch->exp += _exp; /* exp for stealing :) */
@@ -952,12 +952,12 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
             if (!AWAKE(victim))
             {
               //              if(ch->dc_->number(1, 3) == 1)
-              victim->sendln("You dream of someone stealing your equipment...");
+              victim->sendln(u"You dream of someone stealing your equipment..."_s);
 
               // if i'm not a thief, or if I fail dex-roll wake up victim
               //              if(GET_CLASS(ch) != CLASS_THIEF || dc_->number(1, 100) > GET_DEX(ch))
               //              {
-              //                ch->sendln("Oops...");
+              //                ch->sendln(u"Oops..."_s);
               if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
               {
                 paf->modifier = {}; // make sleep no longer work
@@ -982,12 +982,12 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             QString log_buf = {};
-            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), dc_->obj_index[obj->item_number].vnum(), qPrintable(victim->name()));
+            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), dc_->obj_index_[obj->item_number].vnum(), qPrintable(victim->name()));
             dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), dc_->obj_index[loop_obj->item_number].vnum());
+              dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), dc_->obj_index_[loop_obj->item_number].vnum());
           }
-          if (dc_->obj_index[obj->item_number].vnum() != 76)
+          if (dc_->obj_index_[obj->item_number].vnum() != 76)
           {
             obj_from_char(obj);
             has_item = search_char_for_item(ch, obj->item_number, false);
@@ -1016,10 +1016,10 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
             }
         }
         else
-          ch->sendln("You cannot carry that much weight.");
+          ch->sendln(u"You cannot carry that much weight."_s);
       }
       else
-        ch->sendln("You cannot carry that many items.");
+        ch->sendln(u"You cannot carry that many items."_s);
     }
   }
   else // not in inventory
@@ -1038,14 +1038,14 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
     { // They're wearing it!
       /*    if (max_level(ch) < obj->flags_.eq_level)
           {
-        ch->sendln("You find yourself unable to steal that.");
+        ch->sendln(u"You find yourself unable to steal that."_s);
         return ReturnValue::eFAILURE;
           }*/
 
       chance -= GET_OBJ_WEIGHT(obj);
       if (GET_OBJ_WEIGHT(obj) > 50)
       {
-        ch->sendln("That item is too heavy to steal.");
+        ch->sendln(u"That item is too heavy to steal."_s);
         return ReturnValue::eFAILURE;
       }
 
@@ -1082,18 +1082,18 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         wakey = 90;
         break;
       default:
-        ch->sendln("Something just screwed up. Tell an imm what you did.");
+        ch->sendln(u"Something just screwed up. Tell an imm what you did."_s);
         return ReturnValue::eFAILURE;
       };
       wakey -= GET_DEX(ch) / 2;
       if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
       {
-        ch->sendln("That item is protected by the gods.");
+        ch->sendln(u"That item is protected by the gods."_s);
         return ReturnValue::eFAILURE;
       }
       if (!ch->has_skill(SKILL_STEAL))
       {
-        ch->sendln("You don't know how to steal.");
+        ch->sendln(u"You don't know how to steal."_s);
         return ReturnValue::eFAILURE;
       }
       qint32 mod = ch->has_skill(SKILL_STEAL) - chance;
@@ -1101,14 +1101,14 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
       if (GET_POS(victim) > position_t::SLEEPING ||
           GET_POS(victim) == position_t::STUNNED)
       {
-        ch->sendln("Steal the equipment now? Impossible!");
+        ch->sendln(u"Steal the equipment now? Impossible!"_s);
         return ReturnValue::eFAILURE;
       }
       else if (!skill_success(ch, victim, SKILL_STEAL, 0 - mod))
       {
         set_cantquit(ch, victim);
         ohoh = true;
-        ch->sendln("Oops, that was clumsy...");
+        ch->sendln(u"Oops, that was clumsy..."_s);
         if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
         {
           paf->modifier = {}; // make sleep no longer work
@@ -1121,7 +1121,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
       else if (!number(1, 4))
       {
         act_to_character("You remove $p and attempt to steal it.", ch, obj, 0, 0);
-        ch->sendln("Your victim wakes up before you can complete the theft!");
+        ch->sendln(u"Your victim wakes up before you can complete the theft!"_s);
         act_to_room("$n tries to steal $p from $N, but fails.", ch, obj, victim, NOTVICT);
         obj_to_char(victim->unequip_char(eq_pos), victim);
         act_to_victim("You awake to find $n removing some of your equipment.", ch, obj, victim, 0);
@@ -1157,12 +1157,12 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (!AWAKE(victim))
           {
             //            if(ch->dc_->number(1, 3) == 1)
-            victim->sendln("You dream of someone stealing your equipment...");
+            victim->sendln(u"You dream of someone stealing your equipment..."_s);
 
             // if i'm not a thief, or if I fail dex-roll wake up victim
             //            if(ch->dc_->number(1,101) > wakey)
             //            {
-            //              ch->sendln("Oops, that was clumsy...");
+            //              ch->sendln(u"Oops, that was clumsy..."_s);
             if ((paf = victim->affected_by_spell(SPELL_SLEEP)) && paf->modifier == 1)
             {
               paf->modifier = {}; // make sleep no longer work
@@ -1190,7 +1190,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
         if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE) ||
             (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && has_item))
         {
-          ch->sendln("Whoa! It poofed into thin air!");
+          ch->sendln(u"Whoa! It poofed into thin air!"_s);
           extract_obj(obj);
         }
         else
@@ -1234,7 +1234,7 @@ command_return_t do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // Steal gold
-command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   affected_type pthiefaf;
@@ -1255,48 +1255,48 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(victim_name)))
   {
-    ch->sendln("Steal what from who?");
+    ch->sendln(u"Steal what from who?"_s);
     return ReturnValue::eFAILURE;
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
+    ch->sendln(u"Got it!\r\nYou receive 30000000000 experience."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
-    ch->sendln("Don't steal from dead people.");
+    ch->sendln(u"Don't steal from dead people."_s);
     return ReturnValue::eFAILURE;
   }
 
   if ((ch->getLevel() < (victim->getLevel() - 19)))
   {
-    ch->sendln("That person is far too experienced to steal from.");
+    ch->sendln(u"That person is far too experienced to steal from."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isPlayer() && ((victim->getLevel() + 20) < ch->getLevel()))
   {
-    ch->sendln("That person is too low level, you don't want to tarnish your reputation!");
+    ch->sendln(u"That person is too low level, you don't want to tarnish your reputation!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("No stealing permitted in safe areas!");
+    ch->sendln(u"No stealing permitted in safe areas!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (check_make_camp(ch->in_room))
   {
-    ch->sendln("You can't pocket $B$5gold$R while inside of a camp!");
+    ch->sendln(u"You can't pocket $B$5gold$R while inside of a camp!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->room().isArena())
   {
-    ch->sendln("Do what!? This is an Arena, go kill someone!");
+    ch->sendln(u"Do what!? This is an Arena, go kill someone!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1307,19 +1307,19 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->fighting)
   {
-    ch->sendln("You can't get close enough because of the fight.");
+    ch->sendln(u"You can't get close enough because of the fight."_s);
     return ReturnValue::eFAILURE;
   }
 
   /*if(victim->isPlayer() &&
     !(victim->conn_) && !victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) ){
-    ch->sendln("That person is not really there.");
+    ch->sendln(u"That person is not really there."_s);
     return ReturnValue::eFAILURE;
   }
 */
   if (!ch->has_skill(SKILL_POCKET) && ch->isPlayer())
   {
-    ch->sendln("Well, you would, if you knew how.");
+    ch->sendln(u"Well, you would, if you knew how."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1333,7 +1333,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, victim, SKILL_POCKET))
   {
     set_cantquit(ch, victim);
-    ch->sendln("Oops, that was clumsy...");
+    ch->sendln(u"Oops, that was clumsy..."_s);
     ohoh = true;
     if (ch->dc_->number(0, 6))
     {
@@ -1396,7 +1396,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else
     {
-      ch->sendln("You couldn't get any gold...");
+      ch->sendln(u"You couldn't get any gold..."_s);
     }
   }
 
@@ -1417,7 +1417,7 @@ command_return_t do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room, j;
   QString type, dir;
@@ -1430,7 +1430,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->has_skill(SKILL_PICK_LOCK))
   {
-    ch->sendln("You don't know how to pick locks!");
+    ch->sendln(u"You don't know how to pick locks!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1439,33 +1439,33 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   //      has_lockpicks = true;
 
   for (j = {}; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->flags_.type_flag == ITEM_LOCKPICK || dc_->obj_index[ch->equipment[j]->item_number].vnum() == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->flags_.type_flag == ITEM_LOCKPICK || dc_->obj_index_[ch->equipment[j]->item_number].vnum() == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
   {
-    ch->sendln("But...you don't have a lockpick!");
+    ch->sendln(u"But...you don't have a lockpick!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (type.isEmpty())
   {
-    ch->sendln("Pick what?");
+    ch->sendln(u"Pick what?"_s);
   }
   else if (generic_find(argument, (FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM), ch, &victim, &obj, true))
   {
     // this is an object
 
     if (obj->flags_.type_flag != ITEM_CONTAINER)
-      ch->sendln("That's not a container.");
+      ch->sendln(u"That's not a container."_s);
     else if (!isSet(obj->flags_.value[1], CONT_CLOSED))
-      ch->sendln("Silly, it's not even closed!");
+      ch->sendln(u"Silly, it's not even closed!"_s);
     else if (obj->flags_.value[2] < 0)
-      ch->sendln("Odd, you can't seem to find a keyhole.");
+      ch->sendln(u"Odd, you can't seem to find a keyhole."_s);
     else if (!isSet(obj->flags_.value[1], CONT_LOCKED))
-      ch->sendln("Oh-ho! This thing is not even locked!");
+      ch->sendln(u"Oh-ho! This thing is not even locked!"_s);
     else if (isSet(obj->flags_.value[1], CONT_PICKPROOF))
-      ch->sendln("The lock resists even your best attempts to pick it.");
+      ch->sendln(u"The lock resists even your best attempts to pick it."_s);
     else
     {
       if (!charge_moves(ch, SKILL_PICK_LOCK))
@@ -1473,13 +1473,13 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
-        ch->sendln("You failed to pick the lock.");
+        ch->sendln(u"You failed to pick the lock."_s);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
         return ReturnValue::eFAILURE;
       }
 
       REMOVE_BIT(obj->flags_.value[1], CONT_LOCKED);
-      ch->sendln("*Click*");
+      ch->sendln(u"*Click*"_s);
       act_to_room("$n fiddles with $p.", ch, obj, 0, 0);
     }
   }
@@ -1489,23 +1489,23 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (!isSet(EXIT(ch, door)->exit_info, EX_ISDOOR))
     {
-      ch->sendln("That's absurd.");
+      ch->sendln(u"That's absurd."_s);
     }
     else if (!isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
-      ch->sendln("You realize that the door is already open!");
+      ch->sendln(u"You realize that the door is already open!"_s);
     }
     else if (EXIT(ch, door)->key < 0)
     {
-      ch->sendln("You can't seem to spot any lock to pick.");
+      ch->sendln(u"You can't seem to spot any lock to pick."_s);
     }
     else if (!isSet(EXIT(ch, door)->exit_info, EX_LOCKED))
     {
-      ch->sendln("Oh...it wasn't locked at all.");
+      ch->sendln(u"Oh...it wasn't locked at all."_s);
     }
     else if (isSet(EXIT(ch, door)->exit_info, EX_PICKPROOF))
     {
-      ch->sendln("You seem to be unable to pick this lock.");
+      ch->sendln(u"You seem to be unable to pick this lock."_s);
     }
     else
     {
@@ -1517,7 +1517,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
       // ch->skill_increase_check(SKILL_PICK_LOCK, ch->has_skill(SKILL_PICK_LOCK), SKILL_INCREASE_MEDIUM);
       if (!skill_success(ch, nullptr, SKILL_PICK_LOCK))
       {
-        ch->sendln("You failed to pick the lock.");
+        ch->sendln(u"You failed to pick the lock."_s);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
         return ReturnValue::eFAILURE;
@@ -1533,7 +1533,7 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
         act_to_room("$n picks the lock of the.", ch, 0, 0, INVIS_NULL);
       }
 
-      ch->sendln("The lock quickly yields to your skills.");
+      ch->sendln(u"The lock quickly yields to your skills."_s);
 
       /* now for unlocking the other side, too */
       if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
@@ -1559,13 +1559,13 @@ command_return_t do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else
   {
-    ch->sendln("Pick what?");
+    ch->sendln(u"Pick what?"_s);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString obj_name, vict_name, buf;
   QString arg;
@@ -1577,12 +1577,12 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->isNonPlayer() && ch->isPlayerObjectThief())
   {
-    ch->sendln("Your criminal acts prohibit this action.");
+    ch->sendln(u"Your criminal acts prohibit this action."_s);
     return ReturnValue::eFAILURE;
   }
   if (!ch->has_skill(SKILL_SLIP))
   {
-    ch->sendln("You don't know how to slip.");
+    ch->sendln(u"You don't know how to slip."_s);
     return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, obj_name);
@@ -1591,12 +1591,12 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
     {
-      ch->sendln("Your criminal acts prohibit this action.");
+      ch->sendln(u"Your criminal acts prohibit this action."_s);
       return ReturnValue::eFAILURE;
     }
     if (dc_strlen(obj_name) > 7)
     {
-      ch->sendln("Number field too large.  Try something smaller.");
+      ch->sendln(u"Number field too large.  Try something smaller."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1605,17 +1605,17 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (str_cmp("coins", arg) && str_cmp("coin", arg))
     {
-      ch->sendln("Sorry, you can't do that (yet)...");
+      ch->sendln(u"Sorry, you can't do that (yet)..."_s);
       return ReturnValue::eFAILURE;
     }
     if (amount <= 0)
     {
-      ch->sendln("Sorry, you can't do that!");
+      ch->sendln(u"Sorry, you can't do that!"_s);
       return ReturnValue::eFAILURE;
     }
     if ((ch->getGold() < (quint32)amount) && (ch->getLevel() < DEITY))
     {
-      ch->sendln("You haven't got that many coins!");
+      ch->sendln(u"You haven't got that many coins!"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1623,17 +1623,17 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (vict.isEmpty() _name)
     {
-      ch->sendln("To who?");
+      ch->sendln(u"To who?"_s);
       return ReturnValue::eFAILURE;
     }
     if (!(vict = ch->get_char_room_vis(vict_name)))
     {
-      ch->sendln("To who?");
+      ch->sendln(u"To who?"_s);
       return ReturnValue::eFAILURE;
     }
     if (ch == vict)
     {
-      ch->sendln("To yourself?!  Very cute...");
+      ch->sendln(u"To yourself?!  Very cute..."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1642,7 +1642,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     // Failure
     if (!skill_success(ch, vict, SKILL_SLIP))
     {
-      ch->sendln("Whoops!  You dropped the coins!");
+      ch->sendln(u"Whoops!  You dropped the coins!"_s);
       if (ch->isImmortalPlayer())
       {
         special_log(QString(u"%1 tries to slip %2 coins to %3 and drops them in room %4!"_s.arg(ch->name()).arg(amount).arg(vict->name()).arg(ch->in_room));
@@ -1705,25 +1705,25 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (obj.isEmpty() _name || vict.isEmpty() _name)
   {
-    ch->sendln("Slip what to who?");
+    ch->sendln(u"Slip what to who?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, obj_name, ch->carrying)))
   {
-    ch->sendln("You do not seem to have anything like that.");
+    ch->sendln(u"You do not seem to have anything like that."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
-    ch->sendln("That sure would be a stupid thing to do.");
+    ch->sendln(u"That sure would be a stupid thing to do."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
-    ch->sendln("You can't seem to get the item to leave you.");
+    ch->sendln(u"You can't seem to get the item to leave you."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1731,18 +1731,18 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ch->getLevel() < DEITY)
     {
-      ch->sendln("You can't let go of it! Yeech!!");
+      ch->sendln(u"You can't let go of it! Yeech!!"_s);
       return ReturnValue::eFAILURE;
     }
     else
     {
-      ch->sendln("This item is NODROP btw.");
+      ch->sendln(u"This item is NODROP btw."_s);
     }
   }
 
   if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
   {
-    ch->sendln("That would ruin it!");
+    ch->sendln(u"That would ruin it!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1751,20 +1751,20 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (GET_ITEM_TYPE(container) != ITEM_CONTAINER)
     {
-      ch->sendln("That's not a container.");
+      ch->sendln(u"That's not a container."_s);
       return ReturnValue::eFAILURE;
     }
     if (isSet(container->flags_.value[1], CONT_CLOSED))
     {
-      ch->sendln("It seems to be closed.");
+      ch->sendln(u"It seems to be closed."_s);
       return ReturnValue::eFAILURE;
     }
     if (((container->flags_.weight + obj->flags_.weight) >=
          container->flags_.value[0]) &&
-        (dc_->obj_index[container->item_number].vnum() != 536 ||
+        (dc_->obj_index_[container->item_number].vnum() != 536 ||
          weight_in(container) + obj->flags_.weight >= 200))
     {
-      ch->sendln("It won't fit...cheater.");
+      ch->sendln(u"It won't fit...cheater."_s);
       return ReturnValue::eFAILURE;
     }
     if (!skill_success(ch, nullptr, SKILL_SLIP))
@@ -1776,7 +1776,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       act_to_room("$n slips $p in $P.", ch, obj, container, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (dc_->obj_index[container->item_number].vnum() != 536)
+    if (dc_->obj_index_[container->item_number].vnum() != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act_to_character("You slip $p in $P.", ch, obj, container, 0);
@@ -1784,11 +1784,11 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (!(vict = ch->get_char_room_vis(vict_name)))
   {
-    ch->sendln("No one by that name around here.");
+    ch->sendln(u"No one by that name around here."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (vict->isNonPlayer() && dc_->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+  if (vict->isNonPlayer() && dc_->mob_index_[vict->mobdata->nr].non_combat_func == shop_keeper)
   {
     act_to_character("$N graciously refuses your gift.", ch, 0, vict, 0);
     return ReturnValue::eFAILURE;
@@ -1796,7 +1796,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch == vict)
   {
-    ch->sendln("To yourself?!  Very cute...");
+    ch->sendln(u"To yourself?!  Very cute..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1824,7 +1824,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (search_char_for_item(vict, obj->item_number, false))
     {
-      ch->sendln("The item's uniqueness prevents it!");
+      ch->sendln(u"The item's uniqueness prevents it!"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -1833,9 +1833,9 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (dc_->obj_index[obj->item_number].vnum() == 393)
+    if (dc_->obj_index_[obj->item_number].vnum() == 393)
     {
-      ch->sendln("Whoa, you almost dropped your hot potato!");
+      ch->sendln(u"Whoa, you almost dropped your hot potato!"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1852,7 +1852,7 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     act("$n tries to slip $N something, but $e accidentally drops "
         "it.\r\n",
         ch, 0, vict, TO_ROOM, NOTVICT);
-    ch->sendln("Whoops!  You dropped it.");
+    ch->sendln(u"Whoops!  You dropped it."_s);
     ch->save();
   }
 
@@ -1876,25 +1876,25 @@ command_return_t do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
   if (ch->affected_by_spell(SKILL_VITAL_STRIKE) && !ch->isImmortalPlayer())
   {
-    ch->sendln("Your body is still recovering from your last vitalstrike technique.");
+    ch->sendln(u"Your body is still recovering from your last vitalstrike technique."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_VITAL_STRIKE))
   {
-    ch->sendln("You'd cut yourself to ribbons just trying!");
+    ch->sendln(u"You'd cut yourself to ribbons just trying!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(ch->fighting))
   {
-    ch->sendln("But you aren't fighting anyone!");
+    ch->sendln(u"But you aren't fighting anyone!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1905,7 +1905,7 @@ command_return_t do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!skill_success(ch, nullptr, SKILL_VITAL_STRIKE))
   {
     act_to_room("$n starts jabbing $s weapons around $mself and almost chops off $s pinkie finger.", ch, 0, 0, NOTVICT);
-    ch->sendln("You try to begin the vital strike technique and nearly slice off your own pinkie finger!");
+    ch->sendln(u"You try to begin the vital strike technique and nearly slice off your own pinkie finger!"_s);
   }
   else
   {
@@ -1935,24 +1935,24 @@ command_return_t do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
   if (!ch->canPerform(SKILL_DECEIT))
   {
-    ch->sendln("You do not yet understand enough of the workings of your marks.");
+    ch->sendln(u"You do not yet understand enough of the workings of your marks."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_DECEIT_TIMER))
   {
-    ch->sendln("You have to wait to be more deceitful!");
+    ch->sendln(u"You have to wait to be more deceitful!"_s);
     return ReturnValue::eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    ch->sendln("You have no group to instruct!");
+    ch->sendln(u"You have no group to instruct!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1971,13 +1971,13 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_DECEIT))
   {
-    ch->sendln("Your class just isn't up to the task.");
+    ch->sendln(u"Your class just isn't up to the task."_s);
     act_to_room("$n tries to explain to you the weaknesses of others, but you do not understand.", ch, 0, 0, 0);
   }
   else
   {
     act_to_room("$n instructs $s group on the virtues of deceit.", ch, 0, 0, 0);
-    ch->sendln("Your instruction is well received and your pupils are more able to exploit weaknesses.");
+    ch->sendln(u"Your instruction is well received and your pupils are more able to exploit weaknesses."_s);
 
     af.type = SKILL_DECEIT_TIMER;
     af.duration = 1 + ch->has_skill(SKILL_DECEIT) / 10;
@@ -2015,25 +2015,25 @@ command_return_t do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 retval = ReturnValue::eFAILURE, learned;
 
   if (ch->affected_by_spell(SKILL_JAB) && !ch->isImmortalPlayer())
   {
-    ch->sendln("Your arm is still sore from your last attempt.");
+    ch->sendln(u"Your arm is still sore from your last attempt."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(learned = ch->has_skill(SKILL_JAB)))
   {
-    ch->sendln("You don't know how to jab.");
+    ch->sendln(u"You don't know how to jab."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_WIELD])
   {
-    ch->sendln("Your must be wielding a weapon to make it a success.");
+    ch->sendln(u"Your must be wielding a weapon to make it a success."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2048,37 +2048,37 @@ command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!victim)
   {
-    ch->sendln("Jab whom?");
+    ch->sendln(u"Jab whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room != victim->in_room)
   {
-    ch->sendln("That person seems to have left.");
+    ch->sendln(u"That person seems to have left."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Why are you trying to hit yourself on the head???.");
+    ch->sendln(u"Why are you trying to hit yourself on the head???."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && (ISSET(victim->mobdata->actflags, ACT_HUGE) && learned < 81))
   {
-    ch->sendln("You cannot jab someone that HUGE!");
+    ch->sendln(u"You cannot jab someone that HUGE!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM) && learned < 81)
   {
-    ch->sendln("You cannot target just one to jab!");
+    ch->sendln(u"You cannot target just one to jab!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY) && learned < 81)
   {
-    ch->sendln("You cannot target someone that tiny to jab!");
+    ch->sendln(u"You cannot target someone that tiny to jab!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2165,7 +2165,7 @@ command_return_t do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 }
 
-command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
   ObjectPtr obj = {};
@@ -2179,13 +2179,13 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(learned = ch->has_skill(SKILL_APPRAISE)))
   {
-    ch->sendln("Your estimate would be baseless.");
+    ch->sendln(u"Your estimate would be baseless."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (name[0] == '\0')
   {
-    ch->sendln("Appraise whom?");
+    ch->sendln(u"Appraise whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2194,7 +2194,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!bits)
   {
-    ch->sendln("Appraise whom?");
+    ch->sendln(u"Appraise whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2211,7 +2211,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (victim == ch && item.isEmpty())
     {
-      ch->sendln("You're worth a million bucks, baby.");
+      ch->sendln(u"You're worth a million bucks, baby."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -2227,7 +2227,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
           weight = true;
         }
         else
-          ch->sendln("You don't seem to be carrying anything like that.");
+          ch->sendln(u"You don't seem to be carrying anything like that."_s);
       }
       else
       {
@@ -2282,7 +2282,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_APPRAISE))
   {
-    ch->sendln("You estimate a worth of 30000000000?!?");
+    ch->sendln(u"You estimate a worth of 30000000000?!?"_s);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
   else
@@ -2308,7 +2308,7 @@ command_return_t do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   QString name;
@@ -2318,37 +2318,37 @@ command_return_t do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(skill = ch->has_skill(SKILL_CRIPPLE)))
   {
-    ch->sendln("You don't know how to cripple anybody.");
+    ch->sendln(u"You don't know how to cripple anybody."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(vict = ch->get_char_room_vis(name)) && !(vict = ch->fighting))
   {
-    ch->sendln("Cripple whom?");
+    ch->sendln(u"Cripple whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (vict == ch)
   {
-    ch->sendln("You turn your head and grimace as you break your ankles with a sledgehammer.");
+    ch->sendln(u"You turn your head and grimace as you break your ankles with a sledgehammer."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_HUGE) && skill < 81)
   {
-    ch->sendln("You cannot cripple someone that HUGE!");
+    ch->sendln(u"You cannot cripple someone that HUGE!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_SWARM) && skill < 81)
   {
-    ch->sendln("You cannot pick just one to cripple!");
+    ch->sendln(u"You cannot pick just one to cripple!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (vict->isNonPlayer() && ISSET(vict->mobdata->actflags, ACT_TINY) && skill < 81)
   {
-    ch->sendln("You cannot target someone that tiny to cripple!");
+    ch->sendln(u"You cannot target someone that tiny to cripple!"_s);
     return ReturnValue::eFAILURE;
   }
 

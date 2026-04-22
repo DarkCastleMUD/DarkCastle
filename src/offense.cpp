@@ -8,38 +8,38 @@
 
 #include "DC/DC.h"
 
-command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // just in case
   if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
   {
-    ch->sendln("This place is too peaceful for that.");
+    ch->sendln(u"This place is too peaceful for that."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->room().isArena())
   {
-    ch->sendln("You can't do that in the arena.");
+    ch->sendln(u"You can't do that in the arena."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->isPlayerObjectThief() || (ch->isPlayerGoldThief()))
   {
-    ch->sendln("You're too busy running from the law!");
+    ch->sendln(u"You're too busy running from the law!"_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_CHAMPION))
   {
-    ch->sendln("You have no reason to feel sad, oh great Champion!");
+    ch->sendln(u"You have no reason to feel sad, oh great Champion!"_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_AFFECTED(ch, AFF_CURSE) || IS_AFFECTED(ch, AFF_SOLIDITY))
   {
-    ch->sendln("Something blocks your attempted suicide, be happy!  You have a new lease on life!");
+    ch->sendln(u"Something blocks your attempted suicide, be happy!  You have a new lease on life!"_s);
     return ReturnValue::eFAILURE;
   }
   if (GET_POS(ch) == position_t::FIGHTING || ch->fighting)
   {
-    ch->sendln("You are too busy trying to kill somebody else!");
+    ch->sendln(u"You are too busy trying to kill somebody else!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -49,11 +49,11 @@ command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (percent > 50)
   {
-    ch->sendln("You miss your wrists with the blade and knick your kneecap!");
+    ch->sendln(u"You miss your wrists with the blade and knick your kneecap!"_s);
     act_to_room("$n tries to suicide, but fails miserably.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
-  ch->sendln("Looking out upon the world, you decide that it would be a better place without you.");
+  ch->sendln(u"Looking out upon the world, you decide that it would be a better place without you."_s);
   act_to_room("Tired of life, $n decides to end $s.", ch, 0, 0, 0);
   fight_kill(ch, ch, TYPE_PKILL, 0);
   return ReturnValue::eSUCCESS;
@@ -61,7 +61,7 @@ command_return_t do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
-command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_hit(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim, k, next_char;
   qint32 count = {};
@@ -75,7 +75,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
     {
       if (victim == this)
       {
-        sendln("You hit yourself..OUCH!.");
+        sendln(u"You hit yourself..OUCH!."_s);
         act("$n hits $mself, and says OUCH!",
             this, 0, victim, TO_ROOM, 0);
       }
@@ -103,7 +103,7 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
           }
           /*
           if (count >= 6) {
-                  send("You can't get close enough to do anything.");
+                  send(u"You can't get close enough to do anything."_s);
             return ReturnValue::eFAILURE;
           }
           */
@@ -111,18 +111,18 @@ command_return_t Character::do_hit(QStringList arguments, cmd_t cmd)
           return attack(this, victim, TYPE_UNDEFINED);
         }
         else
-          sendln("You do the best you can!");
+          sendln(u"You do the best you can!"_s);
       }
     }
     else
-      sendln("They aren't here.");
+      sendln(u"They aren't here."_s);
   }
   else
-    sendln("Hit whom?");
+    sendln(u"Hit whom?"_s);
   return ReturnValue::eFAILURE;
 }
 
-command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -136,7 +136,7 @@ command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (victim == ch)
       {
-        ch->sendln("You hit yourself..OUCH!.");
+        ch->sendln(u"You hit yourself..OUCH!."_s);
         act_to_room("$n hits $mself, and says OUCH!", ch, 0, victim, 0);
       }
       else
@@ -161,18 +161,18 @@ command_return_t do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
           return attack(ch, victim, TYPE_UNDEFINED);
         }
         else
-          ch->sendln("You do the best you can!");
+          ch->sendln(u"You do the best you can!"_s);
       }
     }
     else
-      ch->sendln("They aren't here.");
+      ch->sendln(u"They aren't here."_s);
   }
   else
-    ch->sendln("Hit whom?");
+    ch->sendln(u"Hit whom?"_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -182,13 +182,13 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg.isEmpty())
   {
-    ch->sendln("Slay whom?");
+    ch->sendln(u"Slay whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(arg)))
   {
-    ch->sendln("They aren't here.");
+    ch->sendln(u"They aren't here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -204,18 +204,18 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (ch == victim)
-    ch->sendln("Your mother would be so sad.. :(");
+    ch->sendln(u"Your mother would be so sad.. :("_s);
   else
   {
     if (victim->isImplementerPlayer())
     {
-      ch->sendln("You no make ME into chop suey!");
+      ch->sendln(u"You no make ME into chop suey!"_s);
       dc_sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
       victim->send(buf);
       if (ch->isImmortalPlayer())
       {
         fight_kill(victim, ch, TYPE_RAW_KILL, 0);
-        ch->sendln("Lunch.");
+        ch->sendln(u"Lunch."_s);
       }
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
     }
@@ -231,7 +231,7 @@ command_return_t do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
-command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -241,13 +241,13 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arg.isEmpty())
   {
-    ch->sendln("Slay whom?");
+    ch->sendln(u"Slay whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = ch->get_char_room_vis(arg)))
   {
-    ch->sendln("They aren't here.");
+    ch->sendln(u"They aren't here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -271,18 +271,18 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     if (ch == victim)
-      ch->sendln("Your mother would be so sad.. :(");
+      ch->sendln(u"Your mother would be so sad.. :("_s);
     else
     {
       if (victim->getLevel() >= IMPLEMENTER)
       {
-        ch->sendln("You no make ME into chop suey!");
+        ch->sendln(u"You no make ME into chop suey!"_s);
         dc_sprintf(buf, "%s just tried to kill you.\r\n", qPrintable(ch->name()));
         victim->send(buf);
         if (ch->getLevel() > IMMORTAL)
         {
           fight_kill(victim, ch, TYPE_CHOOSE, 0);
-          ch->sendln("Lunch.");
+          ch->sendln(u"Lunch."_s);
         }
         return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
       }
@@ -302,11 +302,11 @@ command_return_t do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 // if you send do_join a number as the argument, ch will attempt to
 // join a mob of that number.  Only works if ch is mob.
 //
-command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_join(QStringList arguments, cmd_t cmd)
 {
   if (fighting)
   {
-    sendln("Aren't you helping enough as it is?");
+    sendln(u"Aren't you helping enough as it is?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -327,7 +327,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 
     if (!victim)
     {
-      sendln("You have no loyal subjects engaged in combat!");
+      sendln(u"You have no loyal subjects engaged in combat!"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -342,7 +342,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
       CharacterPtr possible_victim = dc_->world[in_room].people_;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
-        if (possible_victim->isNonPlayer() && dc_->mob_index[victim->mobdata->nr].vnum() == victim_vnum)
+        if (possible_victim->isNonPlayer() && dc_->mob_index_[victim->mobdata->nr].vnum() == victim_vnum)
         {
           victim = possible_victim;
           break;
@@ -363,25 +363,25 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
 
   if (!victim)
   {
-    sendln("Join whom?");
+    sendln(u"Join whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!victim->fighting)
   {
-    sendln("But they're not fighting anyone.");
+    sendln(u"But they're not fighting anyone."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    sendln("You can't join yourself.");
+    sendln(u"You can't join yourself."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->fighting == this)
   {
-    sendln("But why join someone who is trying to kill YOU?");
+    sendln(u"But why join someone who is trying to kill YOU?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -403,7 +403,7 @@ command_return_t Character::do_join(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sendln("ARGGGGG!!!! *** K I L L ***!!!!.");
+  sendln(u"ARGGGGG!!!! *** K I L L ***!!!!."_s);
   act_to_character("$N joins you in the fight!", victim, 0, this, 0);
   act_to_room("$n has joined $N in the battle.", this, 0, victim, NOTVICT);
 

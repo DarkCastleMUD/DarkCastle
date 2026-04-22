@@ -140,7 +140,7 @@ bool DC::verify(CasinoPlayerPtr plr)
       QString buf;
       buf = u"%1 folds as %2 leaves the room.\r\n"_s.arg(plr->ch->name()).arg(HSSH(plr->ch));
       send_to_table(buf, plr->table);
-      plr->ch->sendln("Your hand is folded as you leave the room.");
+      plr->ch->sendln(u"Your hand is folded as you leave the room."_s);
     }
     free_player(plr);
     return false;
@@ -258,7 +258,10 @@ bool canSplit(CasinoPlayerPtr plr)
 
 CasinoPlayerPtr createPlayer(CharacterPtr ch, CasinoTablePtr tbl, qint32 noadd = 0)
 {
-  CasinoPlayerPtr plr = new CasinoPlayer;
+  if (!ch)
+    return {};
+
+  CasinoPlayerPtr plr = CasinoPlayerPtr(new CasinoPlayer(ch->dc_));
   plr->table = tbl;
   plr->ch = ch;
   for (qint32 i = {}; i < 21; i++)
@@ -401,7 +404,7 @@ void DC::check_active(varg_t arg1, void *arg2, void *arg3)
     QString buf;
     dc_sprintf(buf, "The dealer nudges %s.\r\n", qPrintable(plr->ch->name()));
     send_to_table(buf, plr->table, plr);
-    plr->ch->sendln("The dealer nudges you.");
+    plr->ch->sendln(u"The dealer nudges you."_s);
   }
   if ((quint64)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
   { // inactive
@@ -420,7 +423,7 @@ void DC::check_active(varg_t arg1, void *arg2, void *arg3)
     }
     if (tbl->cr && tbl->cr->ch == ch)
       free_player(tbl->cr);
-    ch->sendln("Security helps you up from the table where you've apparently fallen asleep!");
+    ch->sendln(u"Security helps you up from the table where you've apparently fallen asleep!"_s);
   }
 }
 
@@ -556,7 +559,7 @@ void DC::check_winner(CasinoTablePtr tbl)
     if (dealer > 21 || (hand_strength(plr) > dealer && hand_strength(plr) <= 21))
     {
       QString buf;
-      plr->ch->sendln("$BYou WIN!$R");
+      plr->ch->sendln(u"$BYou WIN!$R"_s);
       dc_sprintf(buf, "The dealer takes your cards and gives you %d %s coins.\r\n",
                  plr->bet * 2, plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
@@ -573,7 +576,7 @@ void DC::check_winner(CasinoTablePtr tbl)
     {
       if (verify(plr))
       {
-        plr->ch->sendln("$BYou LOSE your bet!$R");
+        plr->ch->sendln(u"$BYou LOSE your bet!$R"_s);
         free_player(plr);
       }
     }
@@ -676,7 +679,7 @@ void DC::check_blackjacks(CasinoTablePtr tbl)
     {
       buf = u"%1 blackjacks!\r\n"_s.arg(qPrintable(plr->ch->name()));
       send_to_table(buf, tbl, plr);
-      plr->ch->sendln("$BYou BLACKJACK!$R");
+      plr->ch->sendln(u"$BYou BLACKJACK!$R"_s);
       buf = u"The dealer gives you %1 %2 coins.\r\n"_s.arg((qint32)(plr->bet * 2.5)).arg(plr->table->gold ? "gold" : "platinum");
       plr->ch->send(buf);
       plr->ch->sendBlackjackPrompt();
@@ -794,8 +797,7 @@ void DC::pulse_table_bj(CasinoTablePtr tbl, qint32 recall)
 
 void create_table(ObjectPtr obj)
 {
-  CasinoTablePtr table;
-  table = new CasinoTable;
+  auto table = CasinoTablePtr(new CasinoTable(obj));
   table->obj = obj;
   if (obj->flags_.value[2])
     table->gold = false;
@@ -1108,7 +1110,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     create_table(obj);
   if (ch->isPlayerCantQuit() || ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
-    ch->sendln("You cannot play blackjack while you are flagged as naughty.");
+    ch->sendln(u"You cannot play blackjack while you are flagged as naughty."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1118,17 +1120,17 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   {
     if (obj->table->state > 1 || obj->table->cr || obj->table->hand_data[0])
     {
-      ch->sendln("There is a hand in progress. No bets are accepted at the moment.");
+      ch->sendln(u"There is a hand in progress. No bets are accepted at the moment."_s);
       return ReturnValue::eSUCCESS;
     }
     if (playing(ch, obj->table))
     {
-      ch->sendln("You have already made your bet.");
+      ch->sendln(u"You have already made your bet."_s);
       return ReturnValue::eSUCCESS;
     }
     if (!is_number(arg1))
     {
-      ch->sendln("Bet how much?\r\nSyntax: bet <amount>");
+      ch->sendln(u"Bet how much?\r\nSyntax: bet <amount>"_s);
       return ReturnValue::eSUCCESS;
     }
     qint32 amt = dc_atoi(arg1);
@@ -1152,17 +1154,17 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     }
     if (obj->table->gold && (quint32)amt > ch->getGold())
     {
-      ch->sendln("You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R");
+      ch->sendln(u"You cannot afford that.\r\n$B$7The dealer whispers to you, 'You can find an ATM machine in the lobby, buddy.'$R"_s);
       return ReturnValue::eSUCCESS;
     }
     else if (!obj->table->gold && (quint32)amt > GET_PLATINUM(ch))
     {
-      ch->sendln("You cannot afford that.");
+      ch->sendln(u"You cannot afford that."_s);
       return ReturnValue::eSUCCESS;
     }
     if (players(obj->table) > 5)
     {
-      ch->sendln("The table is currently full.");
+      ch->sendln(u"The table is currently full."_s);
       return ReturnValue::eSUCCESS;
     }
     plr = createPlayer(ch, obj->table);
@@ -1171,7 +1173,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       ch->removeGold(amt);
     else
       GET_PLATINUM(ch) -= amt;
-    ch->sendln("The dealer accepts your bet.");
+    ch->sendln(u"The dealer accepts your bet."_s);
     QString buf;
     dc_sprintf(buf, "%s bets %d.\r\n", qPrintable(ch->name()), amt);
     send_to_table(buf, obj->table, plr);
@@ -1211,22 +1213,22 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   {
     if (!plr)
     {
-      ch->sendln("You are not currently playing.");
+      ch->sendln(u"You are not currently playing."_s);
       return ReturnValue::eSUCCESS;
     }
     if (!canInsurance(plr))
     {
-      ch->sendln("You cannot make an insurance bet at the moment.");
+      ch->sendln(u"You cannot make an insurance bet at the moment."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->table->gold && ch->getGold() < (quint32)(plr->bet / 2))
     {
-      ch->sendln("You cannot afford an insurance bet right now.");
+      ch->sendln(u"You cannot afford an insurance bet right now."_s);
       return ReturnValue::eSUCCESS;
     }
     if (!plr->table->gold && GET_PLATINUM(ch) < (quint32)(plr->bet / 2))
     {
-      ch->sendln("You cannot afford an insurance bet right now.");
+      ch->sendln(u"You cannot afford an insurance bet right now."_s);
       return ReturnValue::eSUCCESS;
     }
     plr->table->handnr++;
@@ -1238,29 +1240,29 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       GET_PLATINUM(ch) -= plr->bet / 2;
     dc_sprintf(buf, "%s makes an insurance bet.\r\n", qPrintable(ch->name()));
     send_to_table(buf, plr->table, plr);
-    ch->sendln("You make an insurance bet.");
+    ch->sendln(u"You make an insurance bet."_s);
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::DOUBLE) // doubledown
   {
     if (!plr)
     {
-      ch->sendln("You are not currently playing.");
+      ch->sendln(u"You are not currently playing."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->table->cr != plr)
     {
-      ch->sendln("It is not currently your turn.");
+      ch->sendln(u"It is not currently your turn."_s);
       return ReturnValue::eSUCCESS;
     }
     if ((plr->table->gold && plr->ch->getGold() < (quint32)plr->bet) || (!plr->table->gold && GET_PLATINUM(plr->ch) < (quint32)plr->bet))
     {
-      ch->sendln("You cannot afford to double your bet.");
+      ch->sendln(u"You cannot afford to double your bet."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->hand_data[2] || plr->doubled)
     {
-      ch->sendln("You cannot double right now.");
+      ch->sendln(u"You cannot double right now."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->table->gold)
@@ -1273,7 +1275,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     QString buf;
     dc_sprintf(buf, "%s doubles %s bet.\r\n", qPrintable(ch->name()), HSHR(ch));
     send_to_table(buf, plr->table, plr);
-    ch->sendln("You double your bet.");
+    ch->sendln(u"You double your bet."_s);
 
     plr->hand_data[2] = pickCard(plr->table->deck);
     dc_sprintf(buf, "%s receives a %s%s%c%s.\r\n", qPrintable(ch->name()),
@@ -1289,7 +1291,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       QString buf;
       dc_sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
       send_to_table(buf, plr->table, plr);
-      ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
+      ch->sendln(u"$BYou BUSTED!$R\r\nThe dealer takes your bet."_s);
       nextturn(plr->table);
 
       if (plr->table->plr != plr || plr->next != nullptr) // make dealer show cards..
@@ -1306,12 +1308,12 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   {
     if (!plr)
     {
-      ch->sendln("You are not currently playing.");
+      ch->sendln(u"You are not currently playing."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->table->cr != plr)
     {
-      ch->sendln("It is not currently your turn.");
+      ch->sendln(u"It is not currently your turn."_s);
       return ReturnValue::eSUCCESS;
     }
     QString buf;
@@ -1325,17 +1327,17 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   {
     if (!plr)
     {
-      ch->sendln("You are not currently playing.");
+      ch->sendln(u"You are not currently playing."_s);
       return ReturnValue::eSUCCESS;
     }
     if (!canSplit(plr))
     {
-      ch->sendln("You cannot split right now.");
+      ch->sendln(u"You cannot split right now."_s);
       return ReturnValue::eSUCCESS;
     }
     if ((ch->getGold() < (quint32)plr->bet && plr->table->gold) || (GET_PLATINUM(ch) < (quint32)plr->bet && !plr->table->gold))
     {
-      ch->sendln("You cannot afford to split.");
+      ch->sendln(u"You cannot afford to split."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->table->gold)
@@ -1351,7 +1353,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     plr->hand_data[1] = pickCard(plr->table->deck);
     nw->hand_data[1] = pickCard(plr->table->deck);
     nw->doubled = plr->doubled;
-    ch->sendln("You split your hand.");
+    ch->sendln(u"You split your hand."_s);
     QString buf;
     dc_sprintf(buf, "%s splits %s hand.\r\n", qPrintable(ch->name()), HSHR(ch));
     send_to_table(buf, plr->table, plr);
@@ -1362,12 +1364,12 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   {
     if (!plr)
     {
-      ch->sendln("You are not currently playing.");
+      ch->sendln(u"You are not currently playing."_s);
       return ReturnValue::eSUCCESS;
     }
     if (plr->table->cr != plr)
     {
-      ch->sendln("It is not currently your turn.");
+      ch->sendln(u"It is not currently your turn."_s);
       return ReturnValue::eSUCCESS;
     }
     qint32 i;
@@ -1389,7 +1391,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
       QString buf;
       dc_sprintf(buf, "%s busted.\r\n", qPrintable(ch->name()));
       send_to_table(buf, plr->table, plr);
-      ch->sendln("$BYou BUSTED!$R\r\nThe dealer takes your bet.");
+      ch->sendln(u"$BYou BUSTED!$R\r\nThe dealer takes your bet."_s);
       nextturn(plr->table);
       if (plr->table->plr != plr || plr->next != nullptr) // make dealer show cards..
         free_player(plr);
@@ -1415,21 +1417,21 @@ qint32 hand[5][2];
 // cycles between using two spaces for temporary data
 // as comparisons need to be made
 
-class ttable
+class TexasHoldemTable
 {
 public:
   cDeckPtr deck;
-  class pot *pots;
-  class tplayer *player[6];
+  QList<CasinoPotPTr> pots;
+  class CasinoTablePlayerPtr player[6];
   qint32 cards[5]; // cards on the table
   qint32 bet;
   qint32 crPlayer;
   qint32 state;
 };
-class tplayer
+class CasinoTablePlayer
 {
 public:
-  ttable *table;
+  TexasHoldemTablePtr table;
   qint32 hand[5]; // 0-1 playercards, 2-4 = top table cards
   qint32 chips;
   qint32 pos;
@@ -1437,14 +1439,13 @@ public:
   bool nw;
   bool dealer;
 };
-class pot
+class CasinoPot
 {
 public:
-  pot *next;
-  tplayer *player[6];
+  QList<CasinoTablePlayerPtr> player;
 };
 
-qint32 has_seat(ttable *ttbl)
+qint32 has_seat(TexasHoldemTablePtr ttbl)
 {
   for (qint32 i = {}; i < 6; i++)
     if (ttbl->player[i] == nullptr)
@@ -1670,11 +1671,11 @@ QString hand_name(qint32 hand[5])
   return buf;
 }
 
-qint32 get_hand(tplayer *tplr, qint32 which)
+qint32 get_hand(CasinoTablePlayerPtr tplr, qint32 which)
 {
   static qint32 i = {};
 
-  ttable *ttbl = tplr->table;
+  TexasHoldemTablePtr ttbl = tplr->table;
   TOGGLE_BIT(i, 1); // if it's 1, set to 0, if 0, set to 1. Gooo toggle!
   qint32 z;
   for (z = {}; z < 5; z++)
@@ -1754,7 +1755,7 @@ qint32 handcompare(qint32 hand1[5], qint32 hand2[5])
   return -1;
 }
 
-command_return_t do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   one_argument(argument, arg);
@@ -1769,7 +1770,7 @@ command_return_t do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 find_highhand(tplayer *tplr)
+qint32 find_highhand(CasinoTablePlayerPtr tplr)
 {
   qint32 handnr = {};
   for (qint32 i = 1; i < 21; i++)
@@ -1781,14 +1782,13 @@ qint32 find_highhand(tplayer *tplr)
   return handnr;
 }
 
-tplayer *createTplayer(ttable *ttbl)
+CasinoTablePlayerPtr createTplayer(TexasHoldemTablePtr ttbl)
 {
   qint32 seat = has_seat(ttbl);
   if (seat < 0)
     return {};
-  tplayer *tplr;
 
-  tplr = new tplayer;
+  auto tplr = CasinoTablePlayerPtr(new CasinoTablePlayer(ttbl));
   ttbl->player[seat] = tplr;
   tplr->nw = true;
   tplr->table = ttbl;
@@ -1801,7 +1801,7 @@ tplayer *createTplayer(ttable *ttbl)
   return tplr;
 }
 
-qint32 first_to_act(qint32 state, tplayer *player[6])
+qint32 first_to_act(qint32 state, CasinoTablePlayerPtr player[6])
 {
   qint32 plrs = 0, dlr = {};
   for (qint32 i = {}; i < 6; i++)
@@ -1829,7 +1829,7 @@ qint32 first_to_act(qint32 state, tplayer *player[6])
   return dlr; // shouldn't happen
 }
 
-qint32 find_winner(ttable *ttbl)
+qint32 find_winner(TexasHoldemTablePtr ttbl)
 {
   qint32 i, win = -1, winhand = {};
   for (i = {}; i < 6; i++)
@@ -1971,7 +1971,7 @@ void save_slot_machines()
   {
     for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
     {
-      write_object(lf, dc_->obj_index[x].item);
+      write_object(lf, dc_->obj_index_[x]->item);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
   }
@@ -2017,7 +2017,7 @@ void update_linked_slots(CasinoSlotMachinePtr machine)
   // Find all the slot machines
   for (qint32 i = 21906; i < 21918; i++)
   {
-    ObjectPtr slot_obj = dc_->obj_index[real_object(i)].item;
+    ObjectPtr slot_obj = dc_->obj_index_[real_object(i)]->item;
 
     // Find all the slot machines linked to the same slot machine as us
     // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2117,11 +2117,11 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        (dc_->obj_index[machine->obj->item_number].item)->flags_.value[1] = (qint32)machine->jackpot;
+        (dc_->obj_index_[machine->obj->item_number]->item)->flags_.value[1] = (qint32)machine->jackpot;
         dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
-        (dc_->obj_index[machine->obj->item_number].item)->long_description(buf);
+        (dc_->obj_index_[machine->obj->item_number]->item)->long_description(buf);
       }
     }
 
@@ -2145,13 +2145,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        (dc_->obj_index[machine->obj->item_number].item)->flags_.value[1] = (qint32)machine->jackpot;
+        (dc_->obj_index_[machine->obj->item_number]->item)->flags_.value[1] = (qint32)machine->jackpot;
         dc_sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (qint32)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) machine->obj->long_description={};
         machine->obj->long_description(buf);
-        // if(!ishashed(((ObjectPtr )dc_->obj_index[machine->obj->item_number].item)->long_description))
-        //    ((Object*)obj_index[machine->obj->item_number].item)->long_description={};
-        (dc_->obj_index[machine->obj->item_number].item)->long_description(buf);
+        // if(!ishashed(((ObjectPtr )dc_->obj_index_[machine->obj->item_number]->item)->long_description))
+        //    ((Object*)obj_index_[machine->obj->item_number]->item)->long_description={};
+        (dc_->obj_index_[machine->obj->item_number]->item)->long_description(buf);
       }
     }
     else if (payout)
@@ -2164,7 +2164,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       else
         GET_PLATINUM(machine->ch) += machine->lastwin;
       machine->ch->send(buf);
-      machine->ch->sendln("A tiny panel flips open on the slot machine, revealing red and black buttons.");
+      machine->ch->sendln(u"A tiny panel flips open on the slot machine, revealing red and black buttons."_s);
       machine->button = true;
       machine->prch = machine->ch;
     }
@@ -2189,7 +2189,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (ch->isPlayerCantQuit() || ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
-    ch->sendln("You cannot play the slots while you are flagged as naughty.");
+    ch->sendln(u"You cannot play the slots while you are flagged as naughty."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2197,7 +2197,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (cmd == cmd_t::PULL && dc_strcmp(buf, "handle"))
   {
-    ch->sendln("Try pulling the handle.");
+    ch->sendln(u"Try pulling the handle."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2206,7 +2206,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (obj->slot->busy)
   {
-    ch->sendln("This machine is already in use, try another one.");
+    ch->sendln(u"This machine is already in use, try another one."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2218,16 +2218,16 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       obj->slot->prch = ch;
       if (obj->slot->button)
       {
-        ch->sendln("The panel closes quietly.");
+        ch->sendln(u"The panel closes quietly."_s);
         obj->slot->button = false;
       }
       if (obj->slot->bet == 1)
-        ch->sendln("You place only the minimum bet into the slot machine now.");
+        ch->sendln(u"You place only the minimum bet into the slot machine now."_s);
       else
         ch->send(u"You now start placing %1 times the base amount into the slot machine.\r\n"_s.arg(obj->slot->bet));
       return ReturnValue::eSUCCESS;
     }
-    ch->sendln("You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1.");
+    ch->sendln(u"You can only multiply the bet by 2, 3, 4, or 5, or set it back to 1."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2241,11 +2241,11 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
         {
           if ((obj->slot->gold && (ch->getGold() < obj->slot->lastwin)) || (!obj->slot->gold && (GET_PLATINUM(ch) < obj->slot->lastwin)))
           {
-            ch->sendln("You don't have enough money to try to double your last win.");
+            ch->sendln(u"You don't have enough money to try to double your last win."_s);
           }
           else if (ch->dc_->number(0, 1))
           {
-            ch->sendln("$BWinner!!$R The button lights up and the room is filled with whirring noises!");
+            ch->sendln(u"$BWinner!!$R The button lights up and the room is filled with whirring noises!"_s);
             if (obj->slot->gold)
               ch->addGold(obj->slot->lastwin);
             else
@@ -2254,7 +2254,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
           }
           else
           {
-            ch->sendln("Oh no!! The other button lights up! You lose everything!");
+            ch->sendln(u"Oh no!! The other button lights up! You lose everything!"_s);
             if (obj->slot->gold)
               ch->removeGold(obj->slot->lastwin);
             else
@@ -2263,26 +2263,26 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
           }
         }
         else
-          ch->sendln("You must push either the red or black button.");
+          ch->sendln(u"You must push either the red or black button."_s);
       }
       else
-        ch->sendln("Nothing seems to happen.");
+        ch->sendln(u"Nothing seems to happen."_s);
     }
     else
-      ch->sendln("You can find nothing to push.");
+      ch->sendln(u"You can find nothing to push."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if ((obj->slot->gold && (ch->getGold() < (obj->slot->cost * obj->slot->bet))) || (!obj->slot->gold && (GET_PLATINUM(ch) < (obj->slot->cost * obj->slot->bet))))
   {
-    ch->sendln("You don't have enough money to start the machine.");
+    ch->sendln(u"You don't have enough money to start the machine."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (obj->slot->prch != ch)
     obj->slot->bet = 1;
   if (obj->slot->button)
-    ch->sendln("The panel closes quietly.");
+    ch->sendln(u"The panel closes quietly."_s);
   obj->slot->button = false;
 
   if (obj->slot->gold)
@@ -2293,7 +2293,7 @@ qint32 slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   dc_sprintf(buf, "You place %d %s into the slot and set the reels spinning!\r\n", obj->slot->cost * obj->slot->bet, obj->slot->gold ? "coins" : "plats");
   ch->send(buf);
   act_to_room("$n reaches for the handle and pulls down.", ch, 0, 0, 0);
-  ch->sendln("   |      |      |");
+  ch->sendln(u"   |      |      |"_s);
   obj->slot->ch = ch;
 
   slot_timer(obj->slot, -1, -1, 2);
@@ -2362,11 +2362,11 @@ void send_wheel_bets(CharacterPtr ch, CasinoRouletteWheelPtr wheel)
         {
           if (!found)
           {
-            ch->send("You have");
+            ch->send(u"You have"_s);
             found = true;
           }
           else
-            ch->send(" and");
+            ch->send(u" and"_s);
           ch->send(u" a bet of %u on %s"_s.arg(wheel->plr[i]->bet_array[j]).arg(bet_name[j]));
         }
       }
@@ -2376,19 +2376,19 @@ void send_wheel_bets(CharacterPtr ch, CasinoRouletteWheelPtr wheel)
         {
           if (!found)
           {
-            ch->send("You have");
+            ch->send(u"You have"_s);
             found = true;
           }
           else
-            ch->send(" and");
+            ch->send(u" and"_s);
           ch->send(u" a bet of %u on %s"_s.arg(wheel->plr[i]->bet_array[j]).arg(roulette_display[j - 11]));
         }
       }
     }
   }
   if (!found)
-    ch->send("You have not placed any bets"); // how the hell?
-  ch->sendln(".");
+    ch->send(u"You have not placed any bets"_s); // how the hell?
+  ch->sendln(u"."_s);
 }
 
 quint32 check_roulette_wins(roulette_player *plr, qint32 num)
@@ -2615,13 +2615,13 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
       ch->isPlayerObjectThief() ||
       ch->isPlayerGoldThief())
   {
-    ch->sendln("You cannot play roulette while you are flagged as naughty.");
+    ch->sendln(u"You cannot play roulette while you are flagged as naughty."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (obj->wheel->spinning)
   {
-    ch->sendln("No bets may be placed while the wheel is spinning.");
+    ch->sendln(u"No bets may be placed while the wheel is spinning."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2640,7 +2640,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
     {
       if (i == 6)
       {
-        ch->sendln("You cannot muscle your way to the table.");
+        ch->sendln(u"You cannot muscle your way to the table."_s);
         return ReturnValue::eSUCCESS;
       }
       if (obj->wheel->plr[i]->ch && charExists(obj->wheel->plr[i]->ch) && obj->wheel->plr[i]->ch->in_room != obj->in_room)
@@ -2659,24 +2659,24 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
   {
     if (arg.isEmpty() 2)
     {
-      ch->sendln("Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>");
+      ch->sendln(u"Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>"_s);
       return ReturnValue::eSUCCESS;
     }
     if (!is_number(arg2) || dc_atoi(arg2) < 100)
     {
-      ch->sendln("You must bet an amount greater than 100 coins.");
+      ch->sendln(u"You must bet an amount greater than 100 coins."_s);
       return ReturnValue::eSUCCESS;
     }
     else
       bet = dc_atoi(arg2);
     if (bet > 20000000)
     {
-      ch->sendln("The maximum bet is 20 million coins.");
+      ch->sendln(u"The maximum bet is 20 million coins."_s);
       bet = 20000000;
     }
     if (ch->getGold() < bet)
     {
-      ch->sendln("You do not have enough money to place that bet.");
+      ch->sendln(u"You do not have enough money to place that bet."_s);
       return ReturnValue::eSUCCESS;
     }
     else
@@ -2689,7 +2689,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2714,7 +2714,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2739,7 +2739,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2764,7 +2764,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2789,7 +2789,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2814,7 +2814,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2839,7 +2839,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2864,7 +2864,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2889,7 +2889,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2914,7 +2914,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2939,7 +2939,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2965,7 +2965,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         {
           ch->addGold(bet);
           bet = {};
-          ch->sendln("That bet would put you over the 20 million coin limit.");
+          ch->sendln(u"That bet would put you over the 20 million coin limit."_s);
         }
         else
         {
@@ -2985,7 +2985,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
     }
     else
     {
-      ch->sendln("Bet what?");
+      ch->sendln(u"Bet what?"_s);
       ch->addGold(bet);
       return ReturnValue::eSUCCESS;
     }

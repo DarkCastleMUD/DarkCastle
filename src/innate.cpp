@@ -59,13 +59,13 @@ const QStringList innate_skills =
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-command_return_t do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   auto &arena = dc_->arena_;
   if (ch && ch->in_room > 0 &&
       ch->room().isArena() && arena.isPotato())
   {
-    ch->sendln("Cannot use innate skills within a potato arena.");
+    ch->sendln(u"Cannot use innate skills within a potato arena."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -86,13 +86,13 @@ command_return_t do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
       {
         if (str_cmp(buf, "fly") && ch->affected_by_spell(SKILL_INNATE_TIMER))
         {
-          ch->sendln("You cannot use that yet.");
+          ch->sendln(u"You cannot use that yet."_s);
           return ReturnValue::eFAILURE;
         }
         if (GET_POS(ch) == position_t::SLEEPING &&
             i != 1)
         {
-          ch->sendln("In your dreams, or what?");
+          ch->sendln(u"In your dreams, or what?"_s);
           return ReturnValue::eFAILURE;
         }
         qint32 retval = (*(innates[i].func))(ch, arg, cmd);
@@ -125,11 +125,11 @@ command_return_t do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (buf[0] == 0)
     {
-      ch->sendln("Your race has no innate abilities.");
+      ch->sendln(u"Your race has no innate abilities."_s);
     }
     else
     {
-      ch->sendln("You do not have access to any such ability.");
+      ch->sendln(u"You do not have access to any such ability."_s);
     }
     return ReturnValue::eFAILURE;
   }
@@ -148,7 +148,7 @@ qint32 innate_regeneration(CharacterPtr ch, QString arg, cmd_t cmd)
   af.location = {};
   af.bitvector = AFF_REGENERATION;
   affect_to_char(ch, &af);
-  ch->sendln("Your innate regenerative abilities allow you to heal quickly.");
+  ch->sendln(u"Your innate regenerative abilities allow you to heal quickly."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -161,7 +161,7 @@ qint32 innate_powerwield(CharacterPtr ch, QString arg, cmd_t cmd)
   af.location = {};
   af.bitvector = AFF_POWERWIELD;
   affect_to_char(ch, &af);
-  ch->sendln("You gather your energy in an effort to wield two mighty weapons.");
+  ch->sendln(u"You gather your energy in an effort to wield two mighty weapons."_s);
   act_to_room("$n gathers his strength in order to wield two mighty weapons.", ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -170,11 +170,11 @@ qint32 innate_focus(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (IS_AFFECTED(ch, AFF_FOCUS))
   {
-    ch->sendln("But you are already focusing!  Why waste it?");
+    ch->sendln(u"But you are already focusing!  Why waste it?"_s);
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("You enter a trance and find yourself able to concentrate much better.");
+  ch->sendln(u"You enter a trance and find yourself able to concentrate much better."_s);
 
   affected_type af;
   af.type = SKILL_INNATE_FOCUS;
@@ -191,7 +191,7 @@ qint32 innate_illusion(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
-    ch->sendln("But you're already invisible!");
+    ch->sendln(u"But you're already invisible!"_s);
     return ReturnValue::eFAILURE;
   }
   affected_type af;
@@ -204,7 +204,7 @@ qint32 innate_illusion(CharacterPtr ch, QString arg, cmd_t cmd)
   af.type = SPELL_INVISIBLE;
   af.bitvector = AFF_INVISIBLE;
   affect_to_char(ch, &af);
-  ch->sendln("You use your race's innate illusion powers, and fade out of existence.");
+  ch->sendln(u"You use your race's innate illusion powers, and fade out of existence."_s);
   act_to_room("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -213,11 +213,11 @@ qint32 innate_bloodlust(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->fighting)
   {
-    ch->sendln("You need to be fighting to use that.");
+    ch->sendln(u"You need to be fighting to use that."_s);
     return ReturnValue::eFAILURE;
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
-  ch->sendln("Your blood boils as you drive yourself into a war-like state.");
+  ch->sendln(u"Your blood boils as you drive yourself into a war-like state."_s);
   act_to_room("$n's blood boils has $e drives $mself into warlike rage.", ch, nullptr, nullptr, 0);
   return ReturnValue::eSUCCESS;
 }
@@ -231,17 +231,17 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
   arg = one_argument(arg, buf);
   if ((obj = get_obj_in_list_vis(ch, buf, ch->carrying)) == nullptr)
   {
-    ch->sendln("You are not carrying anything like that.");
+    ch->sendln(u"You are not carrying anything like that."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->getLevel() < obj->flags_.eq_level)
   {
-    ch->sendln("This item is beyond your skill.");
+    ch->sendln(u"This item is beyond your skill."_s);
     return ReturnValue::eFAILURE;
   }
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
-    ch->sendln("This item is unrepairable.");
+    ch->sendln(u"This item is unrepairable."_s);
     return ReturnValue::eFAILURE;
   }
   for (i = {}; i < obj->num_affects; i++)
@@ -250,7 +250,7 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (ch->dc_->number(1, 101) < chance)
       {
-        ch->sendln("You failed to repair it!");
+        ch->sendln(u"You failed to repair it!"_s);
         act_to_room("$n fails to repair $p.", ch, obj, obj, 0);
         return ReturnValue::eSUCCESS;
       }
@@ -270,7 +270,7 @@ qint32 innate_repair(CharacterPtr ch, QString arg, cmd_t cmd)
   }
   else
   {
-    ch->sendln("That item is already in excellent condition!");
+    ch->sendln(u"That item is already in excellent condition!"_s);
     return ReturnValue::eFAILURE;
   }
 }
@@ -284,7 +284,7 @@ qint32 innate_evasion(CharacterPtr ch, QString arg, cmd_t cmd)
   af.location = {};
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  ch->sendln("You bring up an aura, blocking all forms of scrying your location.");
+  ch->sendln(u"You bring up an aura, blocking all forms of scrying your location."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -297,7 +297,7 @@ qint32 innate_shadowslip(CharacterPtr ch, QString arg, cmd_t cmd)
   af.location = {};
   af.bitvector = AFF_SHADOWSLIP;
   affect_to_char(ch, &af);
-  ch->sendln("You blend with the shadows, preventing people from reaching you magically.");
+  ch->sendln(u"You blend with the shadows, preventing people from reaching you magically."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -306,14 +306,14 @@ qint32 innate_fly(CharacterPtr ch, QString arg, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_INNATE_FLY))
   {
     affect_from_char(ch, SKILL_INNATE_FLY);
-    ch->sendln("You fold your wings smoothly behind you and settle gently to the ground.");
+    ch->sendln(u"You fold your wings smoothly behind you and settle gently to the ground."_s);
     act_to_room("$n folds $s wings smoothly behind $m and settles gently to the ground.", ch, nullptr, nullptr, 0);
   }
   else
   {
     if (ISSET(ch->affected_by, AFF_FLYING))
     {
-      ch->sendln("You are already flying.");
+      ch->sendln(u"You are already flying."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -324,7 +324,7 @@ qint32 innate_fly(CharacterPtr ch, QString arg, cmd_t cmd)
     af.location = {};
     af.bitvector = AFF_FLYING;
     affect_to_char(ch, &af);
-    ch->sendln("You spread your delicate wings and lift lightly into the air.");
+    ch->sendln(u"You spread your delicate wings and lift lightly into the air."_s);
     act_to_room("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, 0);
   }
 

@@ -75,7 +75,7 @@ qint32 spellcraft(CharacterPtr ch, qint32 spell)
   return false;
 }
 
-command_return_t do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   // quint8 percent;
   affected_type af;
@@ -88,7 +88,7 @@ command_return_t do_focused_repelance(CharacterPtr ch, QString argument, cmd_t c
 
   if (ch->affected_by_spell(SKILL_FOCUSED_REPELANCE))
   {
-    ch->sendln("Your mind can not yet take the strain of another repelance.");
+    ch->sendln(u"Your mind can not yet take the strain of another repelance."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -96,7 +96,7 @@ command_return_t do_focused_repelance(CharacterPtr ch, QString argument, cmd_t c
   {
     act("$n closes $s eyes and chants quietly, $s head shakes suddenly in confusion.",
         ch, nullptr, nullptr, TO_ROOM, NOTVICT);
-    ch->sendln("Your mind cannot handle the strain!");
+    ch->sendln(u"Your mind cannot handle the strain!"_s);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
     duration = 20 - (ch->has_skill(SKILL_FOCUSED_REPELANCE) / 10);
   }
@@ -122,7 +122,7 @@ command_return_t do_focused_repelance(CharacterPtr ch, QString argument, cmd_t c
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 lvl = ch->has_skill(SKILL_IMBUE);
@@ -134,25 +134,25 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!lvl)
   {
-    ch->sendln("The best you can do to a wand is polish it.");
+    ch->sendln(u"The best you can do to a wand is polish it."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_IMBUE))
   {
-    ch->sendln("Your mind has not yet recovered from the previous imbuement.");
+    ch->sendln(u"Your mind has not yet recovered from the previous imbuement."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (*buf == '\0')
   {
-    ch->sendln("Imbue what?");
+    ch->sendln(u"Imbue what?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room && (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC) || isSet(dc_->world[ch->in_room].room_flags, SAFE)))
   {
-    ch->sendln("Something about this room prohibits your magical imbuement.");
+    ch->sendln(u"Something about this room prohibits your magical imbuement."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -164,7 +164,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
       wand = ch->equipment[WEAR_HOLD2];
       if ((wand == 0) || !isexact(buf, wand->name()))
       {
-        ch->sendln("You do not have that wand.");
+        ch->sendln(u"You do not have that wand."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -172,13 +172,13 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (GET_ITEM_TYPE(wand) != ITEM_WAND)
   {
-    ch->sendln("That \"wand\" doesn't seem very wand-like.");
+    ch->sendln(u"That \"wand\" doesn't seem very wand-like."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < wand->flags_.value[0])
   {
-    ch->sendln("This wand is too powerful for you to imbue.");
+    ch->sendln(u"This wand is too powerful for you to imbue."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -186,7 +186,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (GET_MANA(ch) < manacost)
   {
-    ch->sendln("You do not have enough magical energy to imbue this wand.");
+    ch->sendln(u"You do not have enough magical energy to imbue this wand."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -235,7 +235,7 @@ command_return_t do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
       act_to_character(buf, ch, wand, 0, 0);
     }
 
-    ch->sendln("As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.");
+    ch->sendln(u"As you finish, the tip of the freshly charged wand $Bglows$R briefly and returns to normal."_s);
     act_to_room("$n focuses $s arcane powers and imbues them into $p!", ch, wand, 0, 0);
     act_to_room("As $e finishes, the tip of the freshly charged wand $Bglows$R briefly and returns to normal.", ch, wand, 0, 0);
   }

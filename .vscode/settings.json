@@ -133,7 +133,6 @@
         "--compile-commands-dir=build/debug",
         "-j=32",
         "--pch-storage=memory",
-        "--clang-tidy",
         "--background-index"
     ],
 }

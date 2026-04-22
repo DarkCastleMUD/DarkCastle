@@ -80,13 +80,13 @@ void Bans::save(void) const
   }
 }
 
-command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_ban(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
     if (dc_->bans_)
     {
-      sendln("No sites are banned.");
+      sendln(u"No sites are banned."_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -105,20 +105,20 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
   auto site = arguments.value(1);
   if (flag.isEmpty() || site.isEmpty())
   {
-    sendln("Usage: ban {all | select | new} site_name");
+    sendln(u"Usage: ban {all | select | new} site_name"_s);
     return ReturnValue::eSUCCESS;
   }
 
   struct sockaddr_in sa{};
   if (inet_pton(AF_INET, qPrintable(site), &(sa.sin_addr)) == 0)
   {
-    sendln("Invalid IP address.");
+    sendln(u"Invalid IP address."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (flag != "SELECT" && flag != "ALL" && flag != "NEW")
   {
-    sendln("Flag must be ALL, SELECT, or NEW.");
+    sendln(u"Flag must be ALL, SELECT, or NEW."_s);
     return ReturnValue::eSUCCESS;
   }
   switch (dc_->bans_.is_banned(site))
@@ -128,7 +128,7 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
   case Ban::type_t::NEW:
   case Ban::type_t::SELECT:
   case Ban::type_t::ALL:
-    sendln("That site has already been banned -- unban it to change the ban type.");
+    sendln(u"That site has already been banned -- unban it to change the ban type."_s);
     return ReturnValue::eSUCCESS;
     break;
   }
@@ -141,24 +141,24 @@ command_return_t Character::do_ban(QStringList arguments, cmd_t cmd)
   dc_->bans_.add(ban);
 
   loggod(u"1s has banned %2 for %3 players."_s.arg(name()).arg(site).arg(Ban::ban_types.value(qsizetype(ban.type()))));
-  sendln("Site banned.");
+  sendln(u"Site banned."_s);
   dc_->bans_.save();
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_unban(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_unban(QStringList arguments, cmd_t cmd)
 {
   auto site = arguments.value(0);
   if (site.isEmpty())
   {
-    sendln("A site to unban might help.");
+    sendln(u"A site to unban might help."_s);
     return ReturnValue::eSUCCESS;
   }
 
   switch (dc_->bans_.is_banned(site))
   {
   case Ban::type_t::NOT:
-    sendln("That site is not currently banned.");
+    sendln(u"That site is not currently banned."_s);
     return ReturnValue::eSUCCESS;
     break;
   case Ban::type_t::NEW:
@@ -168,7 +168,7 @@ command_return_t Character::do_unban(QStringList arguments, cmd_t cmd)
   }
 
   dc_->bans_.remove(site);
-  sendln("Site unbanned.");
+  sendln(u"Site unbanned."_s);
   loggod(u"%1 removed the %2-player ban."_s.arg(name()).arg(site));
   dc_->bans_.save();
 

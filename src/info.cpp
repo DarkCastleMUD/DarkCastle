@@ -316,7 +316,7 @@ void Character::list_obj_to_char(ObjectPtr list, qint32 mode, bool show)
   }
 
   if ((!found) && (show))
-    sendln("Nothing");
+    sendln(u"Nothing"_s);
 }
 
 void show_spells(CharacterPtr i, CharacterPtr ch)
@@ -401,12 +401,12 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
     {
       if (IS_AFFECTED(ch, AFF_SENSE_LIFE))
       {
-        ch->sendln("$R$7You sense a hidden life form in the room.");
+        ch->sendln(u"$R$7You sense a hidden life form in the room."_s);
       }
 
       return;
     }
-    ch->send("$B$3");
+    ch->send(u"$B$3"_s);
 
     if (i->long_description().isEmpty() || (i->isNonPlayer() && (GET_POS(i) != i->mobdata->default_pos)))
     {
@@ -545,7 +545,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
       send_to_char(buffer, ch);
 
       show_spells(i, ch);
-      ch->send("$R$7");
+      ch->send(u"$R$7"_s);
     }
   }
   else if ((mode == 1) || (mode == 3))
@@ -635,7 +635,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
     if ((GET_CLASS(ch) == CLASS_THIEF && ch != i) || ch->getLevel() > IMMORTAL)
     {
       found = false;
-      ch->sendln("\r\nYou attempt to peek at the inventory:");
+      ch->sendln(u"\r\nYou attempt to peek at the inventory:"_s);
       for (tmp_obj = i->carrying; tmp_obj;
            tmp_obj = tmp_obj->next_content)
       {
@@ -649,7 +649,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
         }
       }
       if (!found)
-        ch->sendln("You can't see anything.");
+        ch->sendln(u"You can't see anything."_s);
     }
   }
   else if (mode == 2)
@@ -660,12 +660,12 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
   }
 }
 
-command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_botcheck(QStringList arguments, cmd_t cmd)
 {
   QString name = arguments.value(0);
   if (name.isEmpty())
   {
-    sendln("botcheck <player> or all\r\n");
+    sendln(u"botcheck <player> or all\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -686,7 +686,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
       if (!CAN_SEE(this, i))
         continue;
       sendln(u"\r\n%1"_s.arg(i->name()));
-      sendln("----------");
+      sendln(u"----------"_s);
       do_botcheck(i->name().split(' '));
     }
     return ReturnValue::eSUCCESS;
@@ -700,14 +700,14 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
   if (victim->getLevel() > getLevel())
   {
-    sendln("Unable to show information.");
+    sendln(u"Unable to show information."_s);
     send(u"%s is a higher level than you.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer())
   {
-    sendln("Unable to show information.");
+    sendln(u"Unable to show information."_s);
     send(u"%s is a mob.\r\n"_s.arg(qPrintable(victim->name())));
     return ReturnValue::eFAILURE;
   }
@@ -744,7 +744,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
     if (nr >= 0)
     {
-      send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index[nr].vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index[nr].item))->short_description())));
+      send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index_[nr].vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description())));
     }
   }
 
@@ -787,9 +787,9 @@ void Character::list_char_to_char(CharacterPtr list, qint32 mode)
     else if (IS_DARK(in_room))
     {
       if (known && skill_success(nullptr, SKILL_BLINDFIGHTING))
-        sendln("Your blindfighting awareness alerts you to a presense in the area.");
+        sendln(u"Your blindfighting awareness alerts you to a presense in the area."_s);
       else if (ch->dc_->number(1, 10) == 1)
-        sendln("$B$4You see a pair of glowing red eyes looking your way.$R$7");
+        sendln(u"$B$4You see a pair of glowing red eyes looking your way.$R$7"_s);
     }
   }
 }
@@ -803,20 +803,20 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
 
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() < DEITY)
   {
-    ch->send("They might object to you trying to look in their pockets...");
+    ch->send(u"They might object to you trying to look in their pockets..."_s);
     return;
   }
 
   if (!(cont = get_obj_in_list_vis(ch, container, vict->carrying)) ||
       dc_->number(level_(0), MORTAL + 30) > ch->getLevel())
   {
-    ch->sendln("You cannot see a container named that to peek into.");
+    ch->sendln(u"You cannot see a container named that to peek into."_s);
     return;
   }
 
   if (NOT_CONTAINERS(cont))
   {
-    ch->sendln("It's not a container....");
+    ch->sendln(u"It's not a container...."_s);
     return;
   }
 
@@ -826,7 +826,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
 
   if (isSet(cont->flags_.value[1], CONT_CLOSED))
   {
-    ch->sendln("It is closed.");
+    ch->sendln(u"It is closed."_s);
     return;
   }
 
@@ -838,7 +838,7 @@ void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
     }
 
   if (!found)
-    ch->sendln("You don't see anything inside it.");
+    ch->sendln(u"You don't see anything inside it."_s);
 }
 
 QString Character::getStatDiff(qint32 base, qint32 random, bool swapcolors)
@@ -909,7 +909,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
 
   if (obj->isDark() && !ch->isImmortalPlayer())
   {
-    ch->sendln("A magical aura around the item attempts to conceal its secrets.");
+    ch->sendln(u"A magical aura around the item attempts to conceal its secrets."_s);
     return false;
   }
 
@@ -919,7 +919,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   }
   else
   {
-    ch->sendln("$3Short description: $R");
+    ch->sendln(u"$3Short description: $R"_s);
   }
 
   ch->send(u"$3Keywords: '$R%1$3'$R\r\n"_s.arg(obj->name()));
@@ -950,13 +950,13 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   const ObjectPtr vobj = {};
   if (obj->item_number >= 0)
   {
-    const qint32 vnum = dc_->obj_index[obj->item_number].vnum();
+    const qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
     if (vnum >= 0)
     {
       const qint32 rn_of_vnum = real_object(vnum);
       if (rn_of_vnum >= 0)
       {
-        vobj = dc_->obj_index[rn_of_vnum].item;
+        vobj = dc_->obj_index_[rn_of_vnum]->item;
       }
     }
   }
@@ -974,7 +974,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
       showStatDiff(ch, vobj->flags_.value[0], obj->flags_.value[0]);
       ch->send(u") "_s);
     }
-    ch->sendln("$3spells of:$R");
+    ch->sendln(u"$3spells of:$R"_s);
 
     if (obj->flags_.value[1] >= 1)
     {
@@ -1025,7 +1025,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
       showStatDiff(ch, vobj->flags_.value[2], obj->flags_.value[2]);
       ch->send(u")"_s);
     }
-    ch->sendln("");
+    ch->sendln(u""_s);
 
     qint32 get_weapon_damage_type(ObjectPtr  wielded);
     bits = get_weapon_damage_type(obj) - 1000;
@@ -1094,7 +1094,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
     {
       if (!found)
       {
-        ch->sendln("$3Can affect you as:$R");
+        ch->sendln(u"$3Can affect you as:$R"_s);
         found = true;
       }
 
@@ -1132,11 +1132,11 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   return true;
 }
 
-command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_identify(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
-    send("What object do you want to identify?\r\n");
+    send(u"What object do you want to identify?\r\n"_s);
     return ReturnValue::eFAILURE;
   }
   QString arg1 = arguments.at(0);
@@ -1152,14 +1152,14 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     vnum_t rnum = real_object(vnum);
     if (rnum == -1)
     {
-      send("Invalid VNUM.\r\n");
+      send(u"Invalid VNUM.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
-    obj = dc_->obj_index[rnum].item;
+    obj = dc_->obj_index_[rnum]->item;
 
     if (obj->isDark() && !isImmortalPlayer())
     {
-      send("This object cannot be identified by mortals.\r\n");
+      send(u"This object cannot be identified by mortals.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
     return identify(this, obj);
@@ -1184,7 +1184,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buffer;
   QString arg1;
@@ -1215,9 +1215,9 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   if (!ch->conn_)
     return 1;
   if (GET_POS(ch) < position_t::SLEEPING)
-    ch->sendln("You can't see anything but stars!");
+    ch->sendln(u"You can't see anything but stars!"_s);
   else if (GET_POS(ch) == position_t::SLEEPING)
-    ch->sendln("You can't see anything, you're sleeping!");
+    ch->sendln(u"You can't see anything, you're sleeping!"_s);
   else if (check_blind(ch))
   {
     ansi_color(GREY, ch);
@@ -1225,9 +1225,9 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   }
   else if (IS_DARK(ch->in_room) && (!ch->isNonPlayer() && !ch->player->holyLite))
   {
-    ch->sendln("It is pitch black...");
+    ch->sendln(u"It is pitch black..."_s);
     ch->list_char_to_char(dc_->world[ch->in_room].people_, 0);
-    ch->send("$R");
+    ch->send(u"$R"_s);
     // TODO - if have blindfighting, list some of the room exits sometimes
   }
   else
@@ -1272,7 +1272,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         }
         else
         {
-          ch->sendln("You see nothing special.");
+          ch->sendln(u"You see nothing special."_s);
         }
 
         if (isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
@@ -1292,7 +1292,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
       else
       {
-        ch->sendln("You see nothing special.");
+        ch->sendln(u"You see nothing special."_s);
       }
     }
     break;
@@ -1321,7 +1321,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               {
                 dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                           "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                          dc_->obj_index[tmp_object->item_number].vnum(),
+                          dc_->obj_index_[tmp_object->item_number].vnum(),
                           tmp_object->flags_.value[1],
                           tmp_object->flags_.value[0]);
                 tmp_object->flags_.value[1] =
@@ -1343,13 +1343,13 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               switch (bits)
               {
               case FIND_OBJ_INV:
-                ch->send(" (carried) ");
+                ch->send(u" (carried) "_s);
                 break;
               case FIND_OBJ_ROOM:
-                ch->send(" (in room) ");
+                ch->send(u" (in room) "_s);
                 break;
               case FIND_OBJ_EQUIP:
-                ch->send(" (equipped) ");
+                ch->send(u" (equipped) "_s);
                 break;
               }
 
@@ -1357,7 +1357,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               {
 
                 qint32 weight_in(ObjectPtr obj);
-                if (dc_->obj_index[tmp_object->item_number].vnum() == 536)
+                if (dc_->obj_index_[tmp_object->item_number].vnum() == 536)
                   temp = (3 * weight_in(tmp_object)) / tmp_object->flags_.value[0];
                 else
                   temp = ((tmp_object->flags_.weight * 3) / tmp_object->flags_.value[0]);
@@ -1376,7 +1376,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 temp = 3;
                 dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                           "Bug in object %d. Weight: %d v1: %d",
-                          dc_->obj_index[tmp_object->item_number].vnum(),
+                          dc_->obj_index_[tmp_object->item_number].vnum(),
                           tmp_object->flags_.weight,
                           tmp_object->flags_.value[0]);
               }
@@ -1387,27 +1387,27 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               }
               else
               {
-                ch->sendln(": ");
+                ch->sendln(u": "_s);
               }
 
               ch->list_obj_to_char(tmp_object->contains, 2, true);
             }
             else
-              ch->sendln("It is closed.");
+              ch->sendln(u"It is closed."_s);
           }
           else
           {
-            ch->sendln("That is not a container.");
+            ch->sendln(u"That is not a container."_s);
           }
         }
         else
         { /* wrong argument */
-          ch->sendln("You do not see that item here.");
+          ch->sendln(u"You do not see that item here."_s);
         }
       }
       else
       { /* no argument */
-        ch->sendln("Look in what?!");
+        ch->sendln(u"Look in what?!"_s);
       }
     }
     break;
@@ -1542,13 +1542,13 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         }
         else if (!found)
         {
-          ch->sendln("You do not see that here.");
+          ch->sendln(u"You do not see that here."_s);
         }
       }
       else
       {
         /* no argument */
-        ch->sendln("Look at what?");
+        ch->sendln(u"Look at what?"_s);
       }
     }
     break;
@@ -1566,7 +1566,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
       if (found != true)
       {
-        ch->sendln("Nothing much to see there.");
+        ch->sendln(u"Nothing much to see there."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -1595,7 +1595,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
           }
           else
           {
-            ch->sendln("Look through what?");
+            ch->sendln(u"Look through what?"_s);
             return ReturnValue::eFAILURE;
           }
         }
@@ -1603,7 +1603,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
       if (found != true)
       {
-        ch->sendln("You can't seem to look through that.");
+        ch->sendln(u"You can't seem to look through that."_s);
         return ReturnValue::eFAILURE;
       }
       /* no break */
@@ -1637,7 +1637,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         }
       }
 
-      ch->sendln("");
+      ch->sendln(u""_s);
 
       if (!ch->isNonPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
         send_to_char(dc_->world[ch->in_room].description, ch);
@@ -1682,12 +1682,12 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                      is_closed ? "-closed" : "");
       }
       ansi_color(NTEXT, ch);
-      ch->send("Exits: ");
+      ch->send(u"Exits: "_s);
       if (!buffer.isEmpty())
         ch->send(buffer);
       else
-        ch->send("None.");
-      ch->sendln("");
+        ch->send(u"None."_s);
+      ch->sendln(u""_s);
       if (ch->isPlayer() && !ch->hunting.isEmpty())
         ch->do_track(QString(ch->hunting).split(' '), cmd_t::TRACK);
     }
@@ -1696,7 +1696,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
       /* wrong arg 	*/
     case -1:
-      ch->sendln("Sorry, I didn't understand that!");
+      ch->sendln(u"Sorry, I didn't understand that!"_s);
       break;
     }
 
@@ -1708,7 +1708,7 @@ command_return_t do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
 /* end of look */
 
-command_return_t do_read(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_read(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
 
@@ -1720,7 +1720,7 @@ command_return_t do_read(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name, buf;
   CharacterPtr tmp_char;
@@ -1733,7 +1733,7 @@ command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    ch->sendln("Examine what?");
+    ch->sendln(u"Examine what?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1743,7 +1743,7 @@ command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (GET_ITEM_TYPE(tmp_object) == ITEM_DRINKCON || ARE_CONTAINERS(tmp_object))
     {
-      ch->sendln("When you look inside, you see:");
+      ch->sendln(u"When you look inside, you see:"_s);
       dc_sprintf(buf, "in %s", argument);
       do_look(ch, buf);
     }
@@ -1751,7 +1751,7 @@ command_return_t do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door;
   QString buf;
@@ -1789,12 +1789,12 @@ command_return_t do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
                  dc_->world[EXIT(ch, door)->to_room].name);
   }
 
-  ch->sendln("You scan around the exits to see where they lead.");
+  ch->sendln(u"You scan around the exits to see where they lead."_s);
 
   if (buf[0])
     ch->send(buf);
   else
-    ch->sendln("None.");
+    ch->sendln(u"None."_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1805,7 +1805,7 @@ QList<QChar> frills = {
     '~',
     '\\'};
 
-command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_score(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString race;
   QString buf, scratch;
@@ -1905,7 +1905,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
                    .arg(GET_PLATINUM(ch), 7));                                                                                 // -6d
   }
   else
-    ch->sendln("($5:$7)===================================($5:$7)==================================($5:$7)");
+    ch->sendln(u"($5:$7)===================================($5:$7)==================================($5:$7)"_s);
   qint32 found = false;
 
   if ((immune = ch->immune))
@@ -2124,7 +2124,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
     elemental_score(ch, level);
 
   if (found)
-    ch->sendln("($5:$7)=========================================================================($5:$7)");
+    ch->sendln(u"($5:$7)=========================================================================($5:$7)"_s);
 
   found = false;
 
@@ -2151,7 +2151,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (found)
-    ch->sendln("($5:$7)=========================================================================($5:$7)");
+    ch->sendln(u"($5:$7)=========================================================================($5:$7)"_s);
 
   if (ch->isPlayer()) // mob can't view this part
   {
@@ -2177,7 +2177,7 @@ command_return_t do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_time(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString suf;
@@ -2261,14 +2261,14 @@ command_return_t do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern weather_data weather_info;
   QString buf;
 
   if (GET_POS(ch) <= position_t::SLEEPING)
   {
-    ch->sendln("You dream of being on a tropical island surrounded by beautiful members of the attractive sex.");
+    ch->sendln(u"You dream of being on a tropical island surrounded by beautiful members of the attractive sex."_s);
     return ReturnValue::eSUCCESS;
   }
   if (OUTSIDE(ch))
@@ -2279,7 +2279,7 @@ command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_character(buf, ch, 0, 0, 0);
   }
   else
-    ch->sendln("You have no feeling about the weather at all.");
+    ch->sendln(u"You have no feeling about the weather at all."_s);
 
   if (ch->isImmortalPlayer())
   {
@@ -2289,7 +2289,7 @@ command_return_t do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern FILE *help_fl;
   extern QString help;
@@ -2307,7 +2307,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!dc_->help_index_)
     {
-      ch->sendln("No help available.");
+      ch->sendln(u"No help available."_s);
       return ReturnValue::eSUCCESS;
     }
     bot = {};
@@ -2337,7 +2337,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else if (bot >= top)
       {
-        ch->sendln("There is no help on that word.");
+        ch->sendln(u"There is no help on that word."_s);
         return 1;
       }
       else if (chk > 0)
@@ -2351,7 +2351,7 @@ command_return_t do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_count(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ConnectionPtr conn;
   CharacterPtr i;
@@ -2388,19 +2388,19 @@ command_return_t do_count(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_inventory(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_inventory(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  ch->sendln("You are carrying:");
+  ch->sendln(u"You are carrying:"_s);
   ch->list_obj_to_char(ch->carrying, 1, true);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 j;
   bool found;
 
-  ch->sendln("You are using:");
+  ch->sendln(u"You are using:"_s);
   found = false;
   for (j = {}; j < MAX_WEAR; j++)
   {
@@ -2419,45 +2419,45 @@ command_return_t do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         send_to_char(where[j], ch);
-        ch->sendln("something");
+        ch->sendln(u"something"_s);
         found = true;
       }
     }
   }
   if (!found)
   {
-    ch->sendln("Nothing.");
+    ch->sendln(u"Nothing."_s);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->conn_, credits, 0);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_story(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_story(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->conn_, story, 0);
   return ReturnValue::eSUCCESS;
 }
 /*
-command_return_t do_news(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
    page_string(ch->conn_, news, 0);
    return ReturnValue::eSUCCESS;
 }
 
 */
-command_return_t do_info(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_info(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->conn_, info, 0);
   return ReturnValue::eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
-command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
+ReturnValue do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
   QString buf, buf2;
   ObjectPtr k;
@@ -2472,7 +2472,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
     searchnum = real_object(vnum);
   }
 
-  ch->sendln("-#-- Short Description ------- Room Number\n");
+  ch->sendln(u"-#-- Short Description ------- Room Number\n"_s);
 
   for (k = dc_->object_list; k; k = k->next)
   {
@@ -2559,7 +2559,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
     }
     if (dc_strlen(buf2) + dc_strlen(buf) + 3 >= MAX_STRING_LENGTH)
     {
-      ch->sendln("LIST TRUNCATED...TOO LONG");
+      ch->sendln(u"LIST TRUNCATED...TOO LONG"_s);
       break;
     }
     dc_strcat(buf2, buf);
@@ -2567,7 +2567,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
   }
 
   if (buf.isEmpty() 2)
-    ch->sendln("Couldn't find any such OBJECT.");
+    ch->sendln(u"Couldn't find any such OBJECT."_s);
   else
     page_string(ch->conn_, buf2, 1);
   return ReturnValue::eSUCCESS;
@@ -2576,7 +2576,7 @@ command_return_t do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 
 /* -----------------   MOB LOCATE FUNCTION ---------------------------- */
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
-command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
+ReturnValue do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
   QString buf, buf2;
   qint32 count = {};
@@ -2590,7 +2590,7 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
   }
 
   *buf2 = '\0';
-  ch->sendln(" #   Short description          Room Number\n");
+  ch->sendln(u" #   Short description          Room Number\n"_s);
 
   const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
@@ -2619,21 +2619,21 @@ command_return_t do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
     dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), dc_->world[i->in_room].number);
     if (dc_strlen(buf) + dc_strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
-      ch->sendln("LIST TRUNCATED...TOO LONG");
+      ch->sendln(u"LIST TRUNCATED...TOO LONG"_s);
       break;
     }
     dc_strcat(buf2, buf);
   }
 
   if (buf.isEmpty() 2)
-    ch->sendln("Couldn't find any MOBS by that NAME.");
+    ch->sendln(u"Couldn't find any MOBS by that NAME."_s);
   else
     page_string(ch->conn_, buf2, 1);
   return ReturnValue::eSUCCESS;
 }
 /* --------------------- End of Mob locate function -------------------- */
 
-command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -2722,13 +2722,13 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(name)))
   {
-    ch->sendln("Who was that you're scoping out?");
+    ch->sendln(u"Who was that you're scoping out?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Looks like a WIMP! (Used to be \"Looks like a PUSSY!\" but we got complaints.)");
+    ch->sendln(u"Looks like a WIMP! (Used to be \"Looks like a PUSSY!\" but we got complaints.)"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2739,7 +2739,7 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, nullptr, SKILL_CONSIDER))
   {
-    ch->sendln("You try really hard, but you really have no idea about their capabilties!");
+    ch->sendln(u"You try really hard, but you really have no idea about their capabilties!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -2983,12 +2983,12 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
   else
     y = 8;
 
-  ch->send("Level comparison: ");
+  ch->send(u"Level comparison: "_s);
   ch->send(level_messages[y]).arg(qPrintable(victim->shortdesc_or_name()));
 
   if (Learned > 89)
   {
-    ch->send("Training: ");
+    ch->send(u"Training: "_s);
 
     if (GET_CLASS(victim) == CLASS_WARRIOR ||
         GET_CLASS(victim) == CLASS_THIEF ||
@@ -3009,14 +3009,14 @@ command_return_t do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
     else if (GET_CLASS(victim))
       ch->send(u"%s appears to have training, but you are unfamiliar with what.\r\n"_s.arg(qPrintable(victim->shortdesc_or_name())));
     else
-      ch->sendln("You've seen stray dogs that were better trained.");
+      ch->sendln(u"You've seen stray dogs that were better trained."_s);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
-command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   CharacterPtr vict;
@@ -3040,7 +3040,7 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
-  ch->sendln("You carefully search the surroundings...\r\n");
+  ch->sendln(u"You carefully search the surroundings...\r\n"_s);
 
   for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
   {
@@ -3146,20 +3146,20 @@ command_return_t do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 ntick;
   QString buf;
 
   if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return 1;
   }
 
   if (ch->isNonPlayer())
   {
-    ch->sendln("Monsters don't wait for anything.");
+    ch->sendln(u"Monsters don't wait for anything."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -3187,11 +3187,11 @@ command_return_t do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_experience(QStringList arguments, cmd_t cmd)
 {
   if (level_ >= IMMORTAL)
   {
-    send("Immortals cannot gain levels by gaining experience.\r\n");
+    send(u"Immortals cannot gain levels by gaining experience.\r\n"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -3284,7 +3284,7 @@ void check_champion_and_website_who_list()
   flwo.close();
 }
 
-command_return_t do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString art = "a";
 
@@ -3307,7 +3307,7 @@ command_return_t do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_version(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_version(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch)
   {
@@ -3651,7 +3651,7 @@ bool search_object(ObjectPtr obj, QList<Search> sl)
   return matches;
 }
 
-command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_search(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
@@ -3709,33 +3709,33 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     if (arg1 == "help" || arg1 == "?")
     {
-      send("Usage: search <search terms> <other options>\r\n");
-      send("       Searches object database.\r\n\r\n");
-      send("Usage: search world <search terms> <other options>\r\n");
-      send("       Searches your reachable world.\r\n\r\n");
-      send("Search terms:\r\n");
-      send("level=50      show objects that are level 50.\r\n");
-      send("level=50-60   show objects with level including and between 50 to 60.\r\n");
-      send("level=?       show objects with level including and between 50 to 60.\r\n");
-      send("type=weapon   show objects of type weapon.\r\n");
-      send("type=?        show available object types.\r\n");
-      send("wear=neck     show objects that can be worn on the neck.\r\n");
-      send("wear=?        show available wear locations.\r\n");
-      send("size=small    show objects that can be worn on the neck.\r\n");
-      send("size=?        show available sizes.\r\n");
-      send("extra=mage    show objects that have the extra flag for mage set.\r\n");
-      send("extra=?       show available extra flags_.\r\n");
-      send("more=unique   show objects that have the extra flag for mage set.\r\n");
-      send("more=?        show available extra flags_.\r\n");
-      send("name=moss     show objects matching keyword moss.\r\n");
-      send("xyz           show objects matching keyword xyz.\r\n");
-      send("Search terms can be combined.\r\n");
-      send("Example: search level=1-10 type=ARMOR golden\r\n");
-      send("\r\n");
-      send("Other options:\r\n");
-      send("limit=10       limit output to only 10 results.\r\n");
-      send("affects        shows affects.\r\n");
-      send("details        shows certain details depending on object type.\r\n");
+      send(u"Usage: search <search terms> <other options>\r\n"_s);
+      send(u"       Searches object database.\r\n\r\n"_s);
+      send(u"Usage: search world <search terms> <other options>\r\n"_s);
+      send(u"       Searches your reachable world.\r\n\r\n"_s);
+      send(u"Search terms:\r\n"_s);
+      send(u"level=50      show objects that are level 50.\r\n"_s);
+      send(u"level=50-60   show objects with level including and between 50 to 60.\r\n"_s);
+      send(u"level=?       show objects with level including and between 50 to 60.\r\n"_s);
+      send(u"type=weapon   show objects of type weapon.\r\n"_s);
+      send(u"type=?        show available object types.\r\n"_s);
+      send(u"wear=neck     show objects that can be worn on the neck.\r\n"_s);
+      send(u"wear=?        show available wear locations.\r\n"_s);
+      send(u"size=small    show objects that can be worn on the neck.\r\n"_s);
+      send(u"size=?        show available sizes.\r\n"_s);
+      send(u"extra=mage    show objects that have the extra flag for mage set.\r\n"_s);
+      send(u"extra=?       show available extra flags_.\r\n"_s);
+      send(u"more=unique   show objects that have the extra flag for mage set.\r\n"_s);
+      send(u"more=?        show available extra flags_.\r\n"_s);
+      send(u"name=moss     show objects matching keyword moss.\r\n"_s);
+      send(u"xyz           show objects matching keyword xyz.\r\n"_s);
+      send(u"Search terms can be combined.\r\n"_s);
+      send(u"Example: search level=1-10 type=ARMOR golden\r\n"_s);
+      send(u"\r\n"_s);
+      send(u"Other options:\r\n"_s);
+      send(u"limit=10       limit output to only 10 results.\r\n"_s);
+      send(u"affects        shows affects.\r\n"_s);
+      send(u"details        shows certain details depending on object type.\r\n"_s);
       return ReturnValue::eSUCCESS;
     }
     else if (arg1 == "world")
@@ -3823,7 +3823,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     {
       if (arg2.isEmpty())
       {
-        send("What name are you searching for? You can use name=value multiple times.\r\n");
+        send(u"What name are you searching for? You can use name=value multiple times.\r\n"_s);
         return ReturnValue::eFAILURE;
       }
       else
@@ -3862,8 +3862,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
       if (!found)
       {
-        send("What type are you searching for?\r\n");
-        send("Here are some valid types:\r\n");
+        send(u"What type are you searching for?\r\n"_s);
+        send(u"Here are some valid types:\r\n"_s);
         for (const auto &i : item_types)
         {
           send(i + "\r\n");
@@ -3887,8 +3887,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       }
       if (!found)
       {
-        send("What type are you searching for?\r\n");
-        send("Here are some valid wear locations:\r\n");
+        send(u"What type are you searching for?\r\n"_s);
+        send(u"Here are some valid wear locations:\r\n"_s);
         for (const auto &w : QFlagsToStrings<ObjectPositions>())
         {
           send(w + "\r\n");
@@ -3913,8 +3913,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       }
       if (!found)
       {
-        send("What size are you searching for?\r\n");
-        send("Here are some valid sizes:\r\n");
+        send(u"What size are you searching for?\r\n"_s);
+        send(u"Here are some valid sizes:\r\n"_s);
         for (const auto &s : Object::size_bits)
         {
           send(s + "\r\n");
@@ -3939,8 +3939,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       }
       if (!found)
       {
-        send("What more flag are you searching for?\r\n");
-        send("Here are some valid more flags:\r\n");
+        send(u"What more flag are you searching for?\r\n"_s);
+        send(u"Here are some valid more flags:\r\n"_s);
         for (const auto &s : Object::more_obj_bits)
         {
           send(s + "\r\n");
@@ -3965,8 +3965,8 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       }
       if (!found)
       {
-        send("What extra flag are you searching for?\r\n");
-        send("Here are some valid extra flags:\r\n");
+        send(u"What extra flag are you searching for?\r\n"_s);
+        send(u"Here are some valid extra flags:\r\n"_s);
         for (const auto &s : Object::extra_bits)
         {
           send(s + "\r\n");
@@ -4243,7 +4243,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    for (qint32 vnum = {}; vnum < dc_->obj_index[top_of_objt].vnum(); ++vnum)
+    for (qint32 vnum = {}; vnum < dc_->obj_index_[top_of_objt].vnum(); ++vnum)
     {
       qint32 rnum = {};
       // real_object returns -1 for missing VNUMs
@@ -4251,7 +4251,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       {
         continue;
       }
-      ObjectPtr obj = static_cast<ObjectPtr>(dc_->obj_index[rnum].item);
+      ObjectPtr obj = static_cast<ObjectPtr>(dc_->obj_index_[rnum]->item);
       if (obj == nullptr)
       {
         continue;
@@ -4451,13 +4451,13 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     const ObjectPtr vobj = {};
     if (obj->item_number >= 0)
     {
-      const qint32 vnum = dc_->obj_index[obj->item_number].vnum();
+      const qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
       if (vnum >= 0)
       {
         const qint32 rn_of_vnum = real_object(vnum);
         if (rn_of_vnum >= 0)
         {
-          vobj = dc_->obj_index[rn_of_vnum].item;
+          vobj = dc_->obj_index_[rn_of_vnum]->item;
         }
       }
     }
@@ -4545,7 +4545,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     send(u"[%1] [%2]%3\r\n"_s.arg(GET_OBJ_VNUM(obj), 5).arg(obj->flags_.eq_level, 3).arg(custom_columns));
   }
-  send("\r\nIdentify a virtual object with the command: identify v####\r\n");
+  send(u"\r\nIdentify a virtual object with the command: identify v####\r\n"_s);
 
   return ReturnValue::eSUCCESS;
 }

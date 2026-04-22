@@ -79,11 +79,11 @@ qint16 use_ki(CharacterPtr ch, qint32 kn)
   return (ki_info[kn].min_useski());
 }
 
-command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->getLevel() < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
   {
-    ch->sendln("You are unable to control your ki in this way!");
+    ch->sendln(u"You are unable to control your ki in this way!"_s);
     return ReturnValue::eFAILURE;
   }
   /*
@@ -99,14 +99,14 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    ch->sendln("Yes, but WHAT would you like to do?");
+    ch->sendln(u"Yes, but WHAT would you like to do?"_s);
     return ReturnValue::eFAILURE;
   }
 
   auto spl = ki.indexOf(ki_skill);
   if (spl < 0)
   {
-    ch->sendln("You cannot harness that energy!");
+    ch->sendln(u"You cannot harness that energy!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -119,7 +119,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
   auto learned = ch->has_skill(spl + KI_OFFSET);
   if (!learned)
   {
-    ch->sendln("You do not know that ki power!");
+    ch->sendln(u"You do not know that ki power!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -130,19 +130,19 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
       switch (GET_POS(ch))
       {
       case position_t::SLEEPING:
-        ch->sendln("You dream of wonderful ki powers.");
+        ch->sendln(u"You dream of wonderful ki powers."_s);
         break;
       case position_t::RESTING:
-        ch->sendln("You cannot harness that much energy while resting!");
+        ch->sendln(u"You cannot harness that much energy while resting!"_s);
         break;
       case position_t::SITTING:
-        ch->sendln("You can't do this sitting!");
+        ch->sendln(u"You can't do this sitting!"_s);
         break;
       case position_t::FIGHTING:
-        ch->sendln("This is a peaceful ki power.");
+        ch->sendln(u"This is a peaceful ki power."_s);
         break;
       default:
-        ch->sendln("It seems like you're in a pretty bad shape!");
+        ch->sendln(u"It seems like you're in a pretty bad shape!"_s);
         break;
       }
       return ReturnValue::eFAILURE;
@@ -189,26 +189,26 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     if (target_ok != true)
     {
       if (!target_name.isEmpty())
-        ch->sendln("Nobody here by that name.");
+        ch->sendln(u"Nobody here by that name."_s);
       else /* No arguments were given */
-        ch->sendln("Whom should the power be used upon?");
+        ch->sendln(u"Whom should the power be used upon?"_s);
       return ReturnValue::eFAILURE;
     }
     else if (target_ok)
     {
       if ((tar_char == ch) && isSet(ki_info[spl].targets(), TAR_SELF_NONO))
       {
-        ch->sendln("You cannot use this power on yourself.");
+        ch->sendln(u"You cannot use this power on yourself."_s);
         return ReturnValue::eFAILURE;
       }
       else if ((tar_char != ch) && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
       {
-        ch->sendln("You can only use this power upon yourself.");
+        ch->sendln(u"You can only use this power upon yourself."_s);
         return ReturnValue::eFAILURE;
       }
       else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
       {
-        ch->sendln("You are afraid that it might harm your master.");
+        ch->sendln(u"You are afraid that it might harm your master."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -228,7 +228,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
     /* crasher right here */
     if (isSet(dc_->world[ch->in_room].room_flags, NO_KI))
     {
-      ch->sendln("You find yourself unable to focus your energy here.");
+      ch->sendln(u"You find yourself unable to focus your energy here."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -238,19 +238,19 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (ch->getLevel() < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl))
     {
-      ch->sendln("You do not have enough ki!");
+      ch->sendln(u"You do not have enough ki!"_s);
       return ReturnValue::eFAILURE;
     }
 
     WAIT_STATE(ch, ki_info[spl].beats());
 
     if ((ki_info[spl].ki_pointer() == nullptr) && spl > 0)
-      ch->sendln("Sorry, this power has not yet been implemented.");
+      ch->sendln(u"Sorry, this power has not yet been implemented."_s);
     else
     {
       if (!skill_success(ch, tar_char, spl + KI_OFFSET) && !isSet(dc_->world[ch->in_room].room_flags, SAFE))
       {
-        ch->sendln("You lost your concentration!");
+        ch->sendln(u"You lost your concentration!"_s);
         GET_KI(ch) -= use_ki(ch, spl) / 2;
         WAIT_STATE(ch, ki_info[spl].beats() / 2);
 
@@ -260,7 +260,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (!tar_char || (ch->in_room != tar_char->in_room))
         {
-          ch->sendln("Whom should the power be used upon?");
+          ch->sendln(u"Whom should the power be used upon?"_s);
           return ReturnValue::eFAILURE;
         }
 
@@ -268,7 +268,7 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (tar_char->isPlayer() && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
-          ch->sendln("That just might annoy them!");
+          ch->sendln(u"That just might annoy them!"_s);
           return ReturnValue::eFAILURE;
         }
 
@@ -276,10 +276,10 @@ command_return_t do_ki(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
         {
-          tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
+          tar_char->sendln(u"There is no safe haven from an angry IMPLEMENTER!"_s);
         }
 
-      ch->sendln("Ok.");
+      ch->sendln(u"Ok."_s);
       GET_KI(ch) -= use_ki(ch, spl);
 
       return ((*ki_info[spl].ki_pointer())(ch->getLevel(), ch, argument, tar_char));
@@ -471,7 +471,7 @@ qint32 ki_punch(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   else
   {
-    ch->sendln("Your opponent has too many hit points!");
+    ch->sendln(u"Your opponent has too many hit points!"_s);
     if (!vict->fighting)
       return attack(vict, ch, TYPE_UNDEFINED);
   }
@@ -493,7 +493,7 @@ qint32 ki_sense(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   af.duration = level;
   af.bitvector = AFF_INFRARED;
   affect_to_char(vict, &af);
-  vict->sendln("You feel your sense become more acute.");
+  vict->sendln(u"You feel your sense become more acute."_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -505,7 +505,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   CharacterPtr tmp_victim, temp;
 
   dam = dc_->number(135, 165);
-  //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
+  //  ch->sendln(u"Your wholeness of spirit purges the souls of those around you!"_s);
   //  act("$n's eyes flash as $e pools the energy within $m!\r\nA burst of energy slams into you!\r\n",
   qint32 room = ch->in_room;
   for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
@@ -521,7 +521,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       act_to_room("A burst of energy slams into you!", ch, 0, 0, 0);
     } // else
     //		if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
-    //	tmp_victim->sendln("A crackle of energy echos past you.");
+    //	tmp_victim->sendln(u"A crackle of energy echos past you."_s);
   }
   qint32 dir = dc_->number(0, 5), distance = dc_->number(1, 3), i;
   if (room > 0)
@@ -533,7 +533,7 @@ qint32 ki_storm(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       if (room == DC::NOWHERE)
         break;
       for (tmp_victim = dc_->world[room].people_; tmp_victim; tmp_victim = tmp_victim->next_in_room)
-        tmp_victim->sendln("A crackle of energy echoes past you.");
+        tmp_victim->sendln(u"A crackle of energy echoes past you."_s);
     }
   if (ch->dc_->number(1, 4) == 4 && !ch->fighting)
   {
@@ -577,7 +577,7 @@ qint32 ki_speed(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   affect_to_char(vict, &af);
 
-  vict->sendln("You feel a quickening in your limbs!");
+  vict->sendln(u"You feel a quickening in your limbs!"_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -590,7 +590,7 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   }
   if (!arg)
   {
-    ch->send("You can only purify poison, blindness, alcohol or weaken.");
+    ch->send(u"You can only purify poison, blindness, alcohol or weaken."_s);
     return ReturnValue::eFAILURE;
   }
   if (!str_cmp(arg, "poison"))
@@ -599,10 +599,10 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       affect_from_char(vict, SPELL_POISON);
     else
     {
-      ch->sendln("That taint is not present.");
+      ch->sendln(u"That taint is not present."_s);
       return ReturnValue::eFAILURE;
     }
-    ch->sendln("You purge the poison.");
+    ch->sendln(u"You purge the poison."_s);
   }
   else if (!str_cmp(arg, "blindness"))
   {
@@ -610,10 +610,10 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       affect_from_char(vict, SPELL_BLINDNESS);
     else
     {
-      ch->sendln("That taint is not present.");
+      ch->sendln(u"That taint is not present."_s);
       return ReturnValue::eFAILURE;
     }
-    ch->sendln("You purge the blindness.");
+    ch->sendln(u"You purge the blindness."_s);
   }
   else if (!str_cmp(arg, "weaken"))
   {
@@ -621,10 +621,10 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       affect_from_char(vict, SPELL_WEAKEN);
     else
     {
-      ch->sendln("That taint is not present.");
+      ch->sendln(u"That taint is not present."_s);
       return ReturnValue::eFAILURE;
     }
-    ch->sendln("You purge the poison.");
+    ch->sendln(u"You purge the poison."_s);
   }
   else if (!str_cmp(arg, "alcohol"))
   {
@@ -632,14 +632,14 @@ qint32 ki_purify(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
       gain_condition(vict, DRUNK, -GET_COND(ch, DRUNK));
     else
     {
-      ch->sendln("That taint is not present.");
+      ch->sendln(u"That taint is not present."_s);
       return ReturnValue::eFAILURE;
     }
-    ch->sendln("You purge the alcohol.");
+    ch->sendln(u"You purge the alcohol."_s);
   }
   else
   {
-    ch->sendln("You cannot purge that.");
+    ch->sendln(u"You cannot purge that."_s);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -690,18 +690,18 @@ qint32 ki_disrupt(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victi
   {
     act_to_victim("$n slams a bolt of focused ki energy into the flow of magic all around you!", ch, 0, victim, 0);
     act_to_room("$n focuses a blast of ki to disrupt the flow of magic all around $N!", ch, 0, victim, 0);
-    ch->sendln("You focus your ki to disrupt the flow of magic all around your opponent!");
+    ch->sendln(u"You focus your ki to disrupt the flow of magic all around your opponent!"_s);
   }
   else
   {
     act_to_victim("$n slams a bolt of focused ki energy into the flow of magic around you!", ch, 0, victim, 0);
     act_to_room("$n focuses a blast of ki to disrupt the flow of magic around $N!", ch, 0, victim, 0);
-    ch->sendln("You focus your ki to disrupt the flow of magic around your opponent!");
+    ch->sendln(u"You focus your ki to disrupt the flow of magic around your opponent!"_s);
   }
 
   if (ISSET(victim->affected_by, AFF_GOLEM))
   {
-    ch->sendln("The golem seems to shrug off your ki disrupt attempt!");
+    ch->sendln(u"The golem seems to shrug off your ki disrupt attempt!"_s);
     act_to_room("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
@@ -1047,18 +1047,18 @@ qint32 ki_stance(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
 
   if (ch->affected_by_spell(KI_STANCE + KI_OFFSET))
   {
-    ch->sendln("You focus your ki to harden your stance, but your body is still recovering from last time...");
+    ch->sendln(u"You focus your ki to harden your stance, but your body is still recovering from last time..."_s);
     return ReturnValue::eFAILURE;
   }
 
   act("$n assumes a defensive stance and attempts to absorb the energies that surround $m.",
       ch, 0, vict, TO_ROOM, 0);
-  ch->sendln("You take a defensive stance and try to aborb the energies seeking to harm you.");
+  ch->sendln(u"You take a defensive stance and try to aborb the energies seeking to harm you."_s);
 
   // chance of failure - can be meta'd past that point though
   if (ch->dc_->number(1, 100) > (GET_DEX(ch) * 4))
   {
-    ch->sendln("You accidently stub your toe and fall out of the defenseive stance.");
+    ch->sendln(u"You accidently stub your toe and fall out of the defenseive stance."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1083,13 +1083,13 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
     learned = 75;
   else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {
-    ch->sendln("You aren't experienced enough to teach others graceful movement.");
+    ch->sendln(u"You aren't experienced enough to teach others graceful movement."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
-    ch->sendln("You have no group to instruct.");
+    ch->sendln(u"You have no group to instruct."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1101,12 +1101,12 @@ qint32 ki_agility(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict)
   percent = dc_->number(1, 101);
   if (percent > chance)
   {
-    ch->sendln("Hopefully none of them noticed you trip on that rock.");
+    ch->sendln(u"Hopefully none of them noticed you trip on that rock."_s);
     act_to_room("$n tries to show everyone how to be graceful and trips over a rock.", ch, 0, 0, 0);
   }
   else
   {
-    ch->sendln("You instruct your party on more graceful movement.");
+    ch->sendln(u"You instruct your party on more graceful movement."_s);
     act_to_room("$n holds a quick tai chi class.", ch, 0, 0, 0);
 
     for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
@@ -1166,13 +1166,13 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
 
   if (amount < 0)
   {
-    ch->sendln("Trying to be a funny guy?");
+    ch->sendln(u"Trying to be a funny guy?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (amount > GET_KI(ch))
   {
-    ch->sendln("You do not have that much energy to transfer.");
+    ch->sendln(u"You do not have that much energy to transfer."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1236,7 +1236,7 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
   }
   else
   {
-    ch->sendln("You do not know of that essense.");
+    ch->sendln(u"You do not know of that essense."_s);
     return ReturnValue::eFAILURE;
   }
 

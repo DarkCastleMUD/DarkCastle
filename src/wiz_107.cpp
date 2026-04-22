@@ -3,7 +3,7 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr victim;
@@ -12,7 +12,7 @@ command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    ch->sendln("Archive whom?");
+    ch->sendln(u"Archive whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -40,7 +40,7 @@ command_return_t do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   argument = one_argument(argument, name);
@@ -49,20 +49,20 @@ command_return_t do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_pview(QStringList arguments, cmd_t cmd)
 {
   auto name = arguments.value(0);
   auto victim = get_pc_vis(this, name);
 
   if (name.isEmpty() || !victim)
   {
-    sendln("View the prompt of whom?");
+    sendln(u"View the prompt of whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!victim->conn_)
   {
-    sendln("This can only be used on linkalive players.");
+    sendln(u"This can only be used on linkalive players."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -70,7 +70,7 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim;
 
@@ -79,13 +79,13 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   if (isNonPlayer())
   {
-    send("Did you ever try this before?");
+    send(u"Did you ever try this before?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!has_skill(COMMAND_SNOOP))
   {
-    sendln("Huh?");
+    sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -93,7 +93,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    sendln("Snoop whom?");
+    sendln(u"Snoop whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -102,19 +102,19 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
     send_to_char("Your victim is either not available or "
                  "linkdead.\r\n",
                  this);
-    sendln("(You can only snoop a link-active pc.)");
+    sendln(u"(You can only snoop a link-active pc.)"_s);
     return ReturnValue::eFAILURE;
   }
   if ((victim->getLevel() > getLevel()) && (qPrintable(name()) != qPrintable(victim->name())))
   {
-    sendln("Can't do that. That mob is higher than you!");
+    sendln(u"Can't do that. That mob is higher than you!"_s);
     dc_->logentry(u"%1 tried to snoop a higher mob\r\n"_s.arg(qPrintable(name())), OVERSEER, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    sendln("Ok, you just snoop yourself.");
+    sendln(u"Ok, you just snoop yourself."_s);
     if (conn_->snooping)
     {
       conn_->snooping->snoop_by = {};
@@ -126,7 +126,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   if (victim->getLevel() == IMPLEMENTER)
   {
-    sendln("What are you!? Crazy! You can't snoop an Imp.");
+    sendln(u"What are you!? Crazy! You can't snoop an Imp."_s);
     victim->sendln(u"%1 failed snooping you."_s.arg(name()));
     return ReturnValue::eFAILURE;
   }
@@ -147,7 +147,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 
   /* It's power trip time again, eh? */
 
-  sendln("Ok.");
+  sendln(u"Ok."_s);
 
   if (conn_->snooping)
     conn_->snooping->snoop_by = {};
@@ -158,30 +158,30 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (argument[0] != '\0')
   {
-    ch->sendln("STEALTH doesn't take any arguments; arg ignored.");
+    ch->sendln(u"STEALTH doesn't take any arguments; arg ignored."_s);
   } /* if */
 
   if (ch->player->stealth)
   {
     ch->player->stealth = false;
-    ch->sendln("Stealth mode off.");
+    ch->sendln(u"Stealth mode off."_s);
   }
   else
   {
     ch->player->stealth = true;
-    ch->sendln("Stealth mode on.");
+    ch->sendln(u"Stealth mode on."_s);
   } /* if */
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_send(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   CharacterPtr vict;
@@ -193,19 +193,19 @@ command_return_t do_send(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (name.isEmpty() || message.isEmpty())
   {
-    ch->sendln("Send what to who?");
+    ch->sendln(u"Send what to who?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(vict = ch->get_active_pc_vis(name)))
   {
-    ch->sendln("Noone by that name here.");
+    ch->sendln(u"Noone by that name here."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch == vict)
   {
-    ch->sendln("That's you, ya moron.");
+    ch->sendln(u"That's you, ya moron."_s);
     return ReturnValue::eFAILURE;
   }
 

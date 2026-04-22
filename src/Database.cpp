@@ -1,7 +1,7 @@
 #include "DC/DC.h"
 
-Database::Database(QObject *parent, const QString &name, const QString &hostname, const QString &type)
-    : dc_(qobject_cast<DC *>(parent)), name_(name), hostname_(hostname), type_(type)
+Database::Database(QObject *parent, QString name, QString hostname, QString type)
+    : QObject(parent, dc_(qobject_cast<DC *>(parent)), name_(name), hostname_(hostname), type_(type)
 {
   if (QSqlDatabase::contains("qt_sql_default_connection"))
   {

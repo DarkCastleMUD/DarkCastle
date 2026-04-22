@@ -7,14 +7,14 @@
 
 extern QList<profession> professions;
 
-command_return_t do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   /* Call "guild" with a null QString for an argument.
      This displays the character's skills. */
 
   if (arg[0] != '\0')
   {
-    ch->sendln("You can only practice in a guild.");
+    ch->sendln(u"You can only practice in a guild."_s);
   }
   else
   {
@@ -23,12 +23,12 @@ command_return_t do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_profession(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValue do_profession(CharacterPtr ch, QString args, cmd_t cmd)
 {
   // Command is enabled by giving someone the profession skill
   if (!ch->has_skill(SKILL_PROFESSION))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -36,7 +36,7 @@ command_return_t do_profession(CharacterPtr ch, QString args, cmd_t cmd)
   CharacterPtr victim = get_mob_room_vis(ch, "guildmaster");
   if (victim == nullptr)
   {
-    ch->sendln("You can't pick a profession here. You need to find a Guild Master.");
+    ch->sendln(u"You can't pick a profession here. You need to find a Guild Master."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -74,7 +74,7 @@ command_return_t do_profession(CharacterPtr ch, QString args, cmd_t cmd)
       }
       else
       {
-        ch->sendln("That profession is not available to your class.");
+        ch->sendln(u"That profession is not available to your class."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -490,8 +490,8 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
       {
         last_profession = skilllist[i].group;
         send(u"\r\n$B%s Profession Skills:$R\r\n"_s.arg(qPrintable(find_profession(c_class).arg(skilllist[i].group))));
-        sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
-        sendln("--------------------------------------------------------------------------------");
+        sendln(u" Ability:                Current/Practice/Autolearn  Cost:     Group:"_s);
+        sendln(u"--------------------------------------------------------------------------------"_s);
       }
     }
 
@@ -556,7 +556,7 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
       send(u"Move: $B%1$R "_s.arg(skill_cost.find(skilllist[i].skillnum)->second, 3));
     }
     else
-      send("          ");
+      send(u"          "_s);
     if (skilllist[i].attrs)
     {
       if (skilllist != g_skills)
@@ -565,38 +565,38 @@ void Character::output_praclist(CharacterClassSkill *skilllist)
         send(buf);
       }
       else
-        send(" General");
+        send(u" General"_s);
     }
     if (skilllist[i].skillnum == SKILL_SONG_DISARMING_LIMERICK)
     {
-      sendln("$B        #$R");
+      sendln(u"$B        #$R"_s);
     }
     else if (skilllist[i].skillnum == SKILL_SONG_FANATICAL_FANFARE)
     {
-      sendln("$B  #$R");
+      sendln(u"$B  #$R"_s);
     }
     else if (skilllist[i].skillnum == SKILL_SONG_SEARCHING_SONG)
     {
-      sendln("$B    #$R");
+      sendln(u"$B    #$R"_s);
     }
     else if (skilllist[i].skillnum == SKILL_SONG_VIGILANT_SIREN)
     {
-      sendln("$B  #$R");
+      sendln(u"$B  #$R"_s);
     }
     else if (skilllist[i].skillnum == SKILL_SONG_MKING_CHARGE)
     {
-      sendln("$B      #$R");
+      sendln(u"$B      #$R"_s);
     }
     else if (skilllist[i].skillnum == SKILL_SONG_HYPNOTIC_HARMONY)
     {
-      sendln("$B        #$R");
+      sendln(u"$B        #$R"_s);
     }
     else if (skilllist[i].skillnum == SKILL_SONG_SHATTERING_RESO)
     {
-      sendln("$B        #$R");
+      sendln(u"$B        #$R"_s);
     }
     else
-      sendln("");
+      sendln(u""_s);
   }
 }
 
@@ -619,36 +619,36 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
   {
     dc_sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
     send(buf);
-    sendln("You can practice any of these skills:\r\n");
+    sendln(u"You can practice any of these skills:\r\n"_s);
 
-    sendln("$BUniversal skills:$R");
-    sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
-    sendln("--------------------------------------------------------------------------------");
+    sendln(u"$BUniversal skills:$R"_s);
+    sendln(u" Ability:                Current/Practice/Autolearn  Cost:     Group:"_s);
+    sendln(u"--------------------------------------------------------------------------------"_s);
     output_praclist(g_skills);
 
     dc_sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(this)]), (1 + pc_clss_types[GET_CLASS(this)]));
     send(buf);
 
     if (GET_CLASS(this) != CLASS_MONK)
-      sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
+      sendln(u" Ability:                Current/Practice/Autolearn  Cost:     Group:"_s);
     else
-      sendln(" Ability:                Current/Practice/Autolearn  Cost:     Style:");
+      sendln(u" Ability:                Current/Practice/Autolearn  Cost:     Style:"_s);
 
-    sendln("--------------------------------------------------------------------------------");
+    sendln(u"--------------------------------------------------------------------------------"_s);
 
     output_praclist(skilllist);
 
-    sendln("");
+    sendln(u""_s);
 
     if (GET_CLASS(this) == CLASS_BARD)
-      sendln("$B#$R denotes a song which requires an instrument.");
+      sendln(u"$B#$R denotes a song which requires an instrument."_s);
 
     return ReturnValue::eSUCCESS;
   }
 
   if (GET_POS(this) == position_t::SLEEPING)
   {
-    sendln("You cannot practice in your sleep.");
+    sendln(u"You cannot practice in your sleep."_s);
     return ReturnValue::eSUCCESS;
   }
   skillnumber = search_skills(arg, skilllist);
@@ -660,7 +660,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 
   if (getLevel() < skilllist[skillnumber].levelavailable)
   {
-    sendln("You aren't advanced enough for that yet.");
+    sendln(u"You aren't advanced enough for that yet."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -713,7 +713,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
   }
   if (player->practices <= 0)
   {
-    sendln("You do not seem to be able to practice now.");
+    sendln(u"You do not seem to be able to practice now."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -727,7 +727,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    sendln("You are already learned in this area.");
+    sendln(u"You are already learned in this area."_s);
     return ReturnValue::eSUCCESS;
   }
   qreal maxlearn = (qreal)skilllist[skillnumber].maximum;
@@ -735,12 +735,12 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 
   if (known >= (getLevel() * 2))
   {
-    sendln("You are not experienced enough to practice that any further right now.");
+    sendln(u"You are not experienced enough to practice that any further right now."_s);
     return ReturnValue::eSUCCESS;
   }
   if (known >= maxlearn)
   {
-    sendln("You cannot learn more here.. you need to go out into the world and use it.");
+    sendln(u"You cannot learn more here.. you need to go out into the world and use it."_s);
     return ReturnValue::eSUCCESS;
   }
   switch (skillnumber)
@@ -801,7 +801,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
       break;
     }
 
-  sendln("You practice for a while...");
+  sendln(u"You practice for a while..."_s);
   player->practices--;
 
   percent = 1 + (qint32)int_app[GET_INT(this)].learn_bonus;
@@ -810,7 +810,7 @@ qint32 Character::skills_guild(const QString arg, CharacterPtr owner)
 
   if (known >= skilllist[skillnumber].maximum)
   {
-    sendln("You are now learned in this area.");
+    sendln(u"You are now learned in this area."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -827,7 +827,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
 
     if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)
     {
-      ch->sendln("You have already reached the highest level!");
+      ch->sendln(u"You have already reached the highest level!"_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -874,7 +874,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
       }
       if (!ch->has_skill(skl))
       {
-        ch->sendln("You need to learn your Quest Skill before you can progress further.");
+        ch->sendln(u"You need to learn your Quest Skill before you can progress further."_s);
         return ReturnValue::eSUCCESS;
       }
     }
@@ -888,7 +888,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
       return ReturnValue::eSUCCESS;
     }
 
-    ch->sendln("You raise a level!");
+    ch->sendln(u"You raise a level!"_s);
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", qPrintable(ch->name()), pc_clss_types3[(qint32)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
@@ -939,11 +939,11 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     }
     else
     {
-      ch->sendln("You have not even chosen a profession out of which to remort!");
+      ch->sendln(u"You have not even chosen a profession out of which to remort!"_s);
       return ReturnValue::eSUCCESS;
     }
 
-    ch->sendln("Your profession skills have been reset.");
+    ch->sendln(u"Your profession skills have been reset."_s);
     CharacterClassSkill *class_skills = ch->get_skill_list();
     char_skill_data *skill;
 
@@ -956,7 +956,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
         }
       }
 
-    ch->sendln("You have remorted back to level 50.");
+    ch->sendln(u"You have remorted back to level 50."_s);
     if (ch->getLevel() <= DC::MAX_MORTAL_LEVEL)
       ch->setLevel(50);
 
@@ -971,7 +971,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
 
   if (ch->isNonPlayer())
   {
-    ch->sendln("Why practice?  You're just going to die anyway...");
+    ch->sendln(u"Why practice?  You're just going to die anyway..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -989,7 +989,7 @@ qint32 guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
     else if (search_skills(arg, g_skills) != -1)
       do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn ch ability.");
     else
-      ch->sendln("You do not know of ch ability...");
+      ch->sendln(u"You do not know of ch ability..."_s);
   }
 
   return ReturnValue::eSUCCESS;
@@ -1004,7 +1004,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (ch->isNonPlayer())
   {
-    ch->sendln("Why practice?  You're just going to die anyway...");
+    ch->sendln(u"Why practice?  You're just going to die anyway..."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1107,7 +1107,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   {
     dc_sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
     ch->send(buf);
-    ch->sendln("You can practice any of these skills:");
+    ch->sendln(u"You can practice any of these skills:"_s);
     for (i = {}; *g_skills[i].skillname != '\n'; i++)
     {
       qint32 known = ch->has_skill(g_skills[i].skillnum);
@@ -1127,29 +1127,29 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
     if (search_skills(arg, skilllist) != -1)
       do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.");
     else
-      ch->sendln("You do not know of ch skill...");
+      ch->sendln(u"You do not know of ch skill..."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (ch->player->practices <= 0)
   {
-    ch->sendln("You do not seem to be able to practice now.");
+    ch->sendln(u"You do not seem to be able to practice now."_s);
     return ReturnValue::eSUCCESS;
   }
   learned = ch->has_skill(g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
-    ch->sendln("You are already learned in ch area.");
+    ch->sendln(u"You are already learned in ch area."_s);
     return ReturnValue::eSUCCESS;
   }
   if (learned >= (ch->getLevel() * 3))
   {
-    ch->sendln("You aren't experienced enough to practice that any further right now.");
+    ch->sendln(u"You aren't experienced enough to practice that any further right now."_s);
     return ReturnValue::eSUCCESS;
   }
 
-  ch->sendln("You practice for a while...");
+  ch->sendln(u"You practice for a while..."_s);
   ch->player->practices--;
 
   percent = 1 + (qint32)int_app[GET_INT(ch)].learn_bonus;
@@ -1159,7 +1159,7 @@ qint32 skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (learned >= g_skills[number].maximum)
   {
-    ch->sendln("You are now learned in ch area.");
+    ch->sendln(u"You are now learned in ch area."_s);
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eSUCCESS;

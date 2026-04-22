@@ -43,7 +43,7 @@ void DC::assign_one_mob_non(qint32 vnum, special_function func)
 
   if (rnum >= 0)
   {
-    mob_index[rnum].non_combat_func = func;
+    mob_index_[rnum].non_combat_func = func;
   }
 }
 
@@ -58,7 +58,7 @@ void DC::assign_one_mob_com(qint32 vnum, special_function func)
 
   if (rnum >= 0)
   {
-    mob_index[rnum].combat_func = func;
+    mob_index_[rnum].combat_func = func;
   }
 }
 
@@ -73,7 +73,7 @@ void DC::assign_one_obj_non(qint32 vnum, special_function func)
 
   if (rnum >= 0)
   {
-    obj_index[rnum].non_combat_func = func;
+    obj_index_[rnum].non_combat_func = func;
   }
 }
 
@@ -88,7 +88,7 @@ void DC::assign_one_obj_com(qint32 vnum, special_function func)
 
   if (rnum >= 0)
   {
-    obj_index[rnum].combat_func = func;
+    obj_index_[rnum].combat_func = func;
   }
 }
 

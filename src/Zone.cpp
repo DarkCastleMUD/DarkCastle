@@ -221,7 +221,7 @@ bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key)
       ch->send(u"Zone %1 not found.\r\n"_s.arg(zone_key));
       if (dc->zones.isEmpty())
       {
-        ch->send("There are no zones currently.\r\n");
+        ch->send(u"There are no zones currently.\r\n"_s);
       }
       else
       {
@@ -252,7 +252,7 @@ bool isValidZoneCommandKey(CharacterPtr ch, const Zone &zone, const qsizetype zo
       ch->send(u"Zone command %1 not found.\r\n"_s.arg(zone_command_key + 1));
       if (zone.cmd.isEmpty())
       {
-        ch->send("There are no zone commands.\r\n");
+        ch->send(u"There are no zone commands.\r\n"_s);
       }
       else
       {

@@ -66,7 +66,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
   if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -74,7 +74,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
   if (item.isEmpty())
   {
-    ch->sendln("What item?");
+    ch->sendln(u"What item?"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -82,7 +82,7 @@ qint32 repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charac
 
   if (obj == nullptr)
   {
-    ch->sendln("You don't have that item.");
+    ch->sendln(u"You don't have that item."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -144,7 +144,7 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
   if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -152,7 +152,7 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
   if (item.isEmpty())
   {
-    ch->sendln("What item?");
+    ch->sendln(u"What item?"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -160,7 +160,7 @@ qint32 super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
   if (obj == nullptr)
   {
-    ch->sendln("You don't have that item.");
+    ch->sendln(u"You don't have that item."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -245,7 +245,7 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
 
   if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -253,7 +253,7 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
 
   if (item.isEmpty())
   {
-    ch->sendln("What item?");
+    ch->sendln(u"What item?"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -261,7 +261,7 @@ qint32 repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
 
   if (obj == nullptr)
   {
-    ch->sendln("You don't have that item.");
+    ch->sendln(u"You don't have that item."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -400,7 +400,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
   if (cmd == cmd_t::LIST) // list
   {
     dc_sprintf(buf, "%s_consent", qPrintable(ch->name()));
-    ch->send("Available corpses (freshest first):\r\n$B");
+    ch->send(u"Available corpses (freshest first):\r\n$B"_s);
     for (obj = ch->dc_->object_list; obj; obj = obj->next)
     {
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->flags_.value[3] != 1) // only look at corpses
@@ -468,7 +468,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     cost = MAX(cost, 30);
     if (GET_PLATINUM(ch) < (quint32)cost)
     {
-      ch->sendln("You can't afford that!");
+      ch->sendln(u"You can't afford that!"_s);
       return ReturnValue::eSUCCESS;
     }
     move_obj(obj, ch->in_room);
@@ -482,7 +482,7 @@ qint32 mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     return ReturnValue::eSUCCESS;
   }
 
-  ch->sendln("No such corpse was found.  Try \"list\".");
+  ch->sendln(u"No such corpse was found.  Try \"list\"."_s);
   return ReturnValue::eSUCCESS;
 }
 
@@ -641,7 +641,7 @@ const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 
 qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
 
-  qint32 mobvnum = ch->dc_->mob_index[owner->mobdata->nr].vnum();
+  qint32 mobvnum = ch->dc_->mob_index_[owner->mobdata->nr].vnum();
   qint32 o;
   QString buf;
   //  return ReturnValue::eFAILURE; //disabled for now
@@ -665,7 +665,7 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
 
     for (qint32 z = {}; z < 13 && platsmith_list[o].sales[z] != 0; z++)
     {
-      auto tmp = gl_item(dc_->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
+      auto tmp = gl_item(dc_->obj_index_[real_object(platsmith_list[o].sales[z])]->item, z, ch);
       ch->send(tmp);
     }
     return ReturnValue::eSUCCESS;
@@ -772,7 +772,7 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 
   if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -780,7 +780,7 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 
   if (item.isEmpty())
   {
-    ch->sendln("What item?");
+    ch->sendln(u"What item?"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -788,7 +788,7 @@ qint32 gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 
   if (obj == nullptr)
   {
-    ch->sendln("You don't have that item.");
+    ch->sendln(u"You don't have that item."_s);
     return ReturnValue::eSUCCESS;
   }
 

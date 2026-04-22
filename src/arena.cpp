@@ -11,12 +11,12 @@
 
 #include "DC/DC.h"
 
-auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
+auto Character::do_arena(QStringList arguments, cmd_t cmd) -> ReturnValue
 {
   auto rufus = get_mob_room_vis(this, "rufus arena-keeper");
   if (!isImmortalPlayer() && !rufus)
   {
-    sendln("You must be in the same room as Rufus the Arena-keeper to use this command.");
+    sendln(u"You must be in the same room as Rufus the Arena-keeper to use this command."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -61,42 +61,42 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
 
   if (ch->dc_->arena_.Low() > ch->getLevel() || ch->dc_->arena_.High() < ch->getLevel())
   {
-    ch->sendln("The arena is not open for anyone your level.");
+    ch->sendln(u"The arena is not open for anyone your level."_s);
     return ReturnValue::eFAILURE;
   }
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOARENA))
   {
-    ch->sendln("You have been banned from arenas.");
+    ch->sendln(u"You have been banned from arenas."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
-    ch->sendln("They don't allow criminals in the arena.");
+    ch->sendln(u"They don't allow criminals in the arena."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->dc_->arena_.isChaos() && !ch->clan)
   {
-    ch->sendln("Only clan members may join this arena.");
+    ch->sendln(u"Only clan members may join this arena."_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->room().isArena())
   {
-    ch->sendln("You are already there!");
+    ch->sendln(u"You are already there!"_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->dc_->arena_.CurrentNumber() >= ch->dc_->arena_.Number() && ch->dc_->arena_.Number() > 0)
   {
-    ch->sendln("The arena is already full!");
+    ch->sendln(u"The arena is already full!"_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->dc_->arena_.isHP() && GET_RAW_HIT(ch) > ch->dc_->arena_.HPLimit())
   {
-    ch->sendln("You are too strong for this arena!");
+    ch->sendln(u"You are too strong for this arena!"_s);
     return ReturnValue::eFAILURE;
   }
   if (ch->fighting)
   {
-    ch->sendln("You're ALREADY in a fight...isn't that kinda silly?");
+    ch->sendln(u"You're ALREADY in a fight...isn't that kinda silly?"_s);
     return ReturnValue::eFAILURE;
   }
 

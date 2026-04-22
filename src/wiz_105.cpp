@@ -4,7 +4,7 @@
 **********************/
 #include "DC/DC.h"
 
-command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
   QString buf;
@@ -31,7 +31,7 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        ch->sendln("Removing unknown affect.");
+        ch->sendln(u"Removing unknown affect."_s);
       }
 
       affect_remove(victim, af, 0);
@@ -39,17 +39,17 @@ command_return_t do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (found == false)
     {
-      ch->sendln("No affects found.");
+      ch->sendln(u"No affects found."_s);
     }
 
-    //    ch->sendln("Done.");
-    //  victim->sendln("Your affects have been cleared.");
+    //    ch->sendln(u"Done."_s);
+    //  victim->sendln(u"Your affects have been cleared."_s);
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
 }
 
-command_return_t do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   dc_->free_help_from_memory();
   QFile help_keyword_file(HELP_KWRD_FILE);
@@ -61,11 +61,11 @@ command_return_t do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
   QTextStream help_fl(&help_keyword_file);
   help_index = build_help_index(help_fl);
 
-  ch->sendln("Reloaded.");
+  ch->sendln(u"Reloaded."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   ObjectPtr dummy;
@@ -74,7 +74,7 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isNonPlayer() || !ch->has_skill(COMMAND_LOG))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -82,24 +82,24 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (buf.isEmpty())
   {
-    ch->sendln("Log who?");
+    ch->sendln(u"Log who?"_s);
   }
   else if (!(vict = get_pc_vis(ch, buf)))
-    ch->sendln("Couldn't find any such creature.");
+    ch->sendln(u"Couldn't find any such creature."_s);
   else if (vict->isNonPlayer())
-    ch->sendln("Can't do that to a beast.");
+    ch->sendln(u"Can't do that to a beast."_s);
   else if (vict->getLevel() > ch->getLevel())
     act_to_character("$E might object to that.. better not.", ch, 0, vict, 0);
   else if (isSet(vict->player->punish, PUNISH_LOG))
   {
-    ch->sendln("LOG removed.");
+    ch->sendln(u"LOG removed."_s);
     REMOVE_BIT(vict->player->punish, PUNISH_LOG);
     dc_sprintf(buf2, "%s removed log on %s.", qPrintable(ch->name()), qPrintable(vict->name()));
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   else
   {
-    ch->sendln("LOG set.");
+    ch->sendln(u"LOG set."_s);
     SET_BIT(vict->player->punish, PUNISH_LOG);
     dc_sprintf(buf2, "%s just logged %s.", qPrintable(ch->name()), qPrintable(vict->name()));
     dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
@@ -107,7 +107,7 @@ command_return_t do_log(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString person;
   CharacterPtr victim;
@@ -128,93 +128,93 @@ command_return_t do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (!(victim = get_char(person)))
   {
-    ch->sendln("They aren't here.");
+    ch->sendln(u"They aren't here."_s);
     return ReturnValue::eFAILURE;
   }
 
   ch->send(u"Player: %s\r\n"_s.arg(qPrintable(victim->name())));
 
   if (isSet(victim->combat, COMBAT_SHOCKED))
-    ch->sendln("COMBAT_SHOCKED");
+    ch->sendln(u"COMBAT_SHOCKED"_s);
 
   if (isSet(victim->combat, COMBAT_BASH1))
-    ch->sendln("COMBAT_BASH1");
+    ch->sendln(u"COMBAT_BASH1"_s);
 
   if (isSet(victim->combat, COMBAT_BASH2))
-    ch->sendln("COMBAT_BASH2");
+    ch->sendln(u"COMBAT_BASH2"_s);
 
   if (isSet(victim->combat, COMBAT_STUNNED))
-    ch->sendln("COMBAT_STUNNED");
+    ch->sendln(u"COMBAT_STUNNED"_s);
 
   if (isSet(victim->combat, COMBAT_STUNNED2))
-    ch->sendln("COMBAT_STUNNED2");
+    ch->sendln(u"COMBAT_STUNNED2"_s);
 
   if (isSet(victim->combat, COMBAT_CIRCLE))
-    ch->sendln("COMBAT_CIRCLE");
+    ch->sendln(u"COMBAT_CIRCLE"_s);
 
   if (isSet(victim->combat, COMBAT_BERSERK))
-    ch->sendln("COMBAT_BERSERK");
+    ch->sendln(u"COMBAT_BERSERK"_s);
 
   if (isSet(victim->combat, COMBAT_HITALL))
-    ch->sendln("COMBAT_HITALL");
+    ch->sendln(u"COMBAT_HITALL"_s);
 
   if (isSet(victim->combat, COMBAT_RAGE1))
-    ch->sendln("COMBAT_RAGE1");
+    ch->sendln(u"COMBAT_RAGE1"_s);
 
   if (isSet(victim->combat, COMBAT_RAGE1))
-    ch->sendln("COMBAT_RAGE2");
+    ch->sendln(u"COMBAT_RAGE2"_s);
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1))
-    ch->sendln("COMBAT_BLADESHIELD1");
+    ch->sendln(u"COMBAT_BLADESHIELD1"_s);
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD2))
-    ch->sendln("COMBAT_BLADESHIELD2");
+    ch->sendln(u"COMBAT_BLADESHIELD2"_s);
 
   if (isSet(victim->combat, COMBAT_REPELANCE))
-    ch->sendln("COMBAT_REPELANCE");
+    ch->sendln(u"COMBAT_REPELANCE"_s);
 
   if (isSet(victim->combat, COMBAT_VITAL_STRIKE))
-    ch->sendln("COMBAT_VITAL_STRIKE");
+    ch->sendln(u"COMBAT_VITAL_STRIKE"_s);
 
   if (isSet(victim->combat, COMBAT_MONK_STANCE))
-    ch->sendln("COMBAT_MONK_STANCE");
+    ch->sendln(u"COMBAT_MONK_STANCE"_s);
 
   if (isSet(victim->combat, COMBAT_MISS_AN_ATTACK))
-    ch->sendln("COMBAT_MISS_AN_ATTACK");
+    ch->sendln(u"COMBAT_MISS_AN_ATTACK"_s);
 
   if (isSet(victim->combat, COMBAT_ORC_BLOODLUST1))
-    ch->sendln("COMBAT_ORC_BLOODLUST1");
+    ch->sendln(u"COMBAT_ORC_BLOODLUST1"_s);
 
   if (isSet(victim->combat, COMBAT_ORC_BLOODLUST2))
-    ch->sendln("COMBAT_ORC_BLOODLUST2");
+    ch->sendln(u"COMBAT_ORC_BLOODLUST2"_s);
 
   if (isSet(victim->combat, COMBAT_THI_EYEGOUGE))
-    ch->sendln("COMBAT_THI_EYEGOUGE");
+    ch->sendln(u"COMBAT_THI_EYEGOUGE"_s);
 
   if (isSet(victim->combat, COMBAT_THI_EYEGOUGE2))
-    ch->sendln("COMBAT_THI_EYEGOUGE2");
+    ch->sendln(u"COMBAT_THI_EYEGOUGE2"_s);
 
   if (isSet(victim->combat, COMBAT_FLEEING))
-    ch->sendln("COMBAT_FLEEING");
+    ch->sendln(u"COMBAT_FLEEING"_s);
 
   if (isSet(victim->combat, COMBAT_SHOCKED2))
-    ch->sendln("COMBAT_SHOCKED2");
+    ch->sendln(u"COMBAT_SHOCKED2"_s);
 
   if (isSet(victim->combat, COMBAT_CRUSH_BLOW))
-    ch->sendln("COMBAT_CRUSH_BLOW");
+    ch->sendln(u"COMBAT_CRUSH_BLOW"_s);
 
   if (isSet(victim->combat, COMBAT_CRUSH_BLOW2))
-    ch->sendln("COMBAT_CRUSH_BLOW2");
+    ch->sendln(u"COMBAT_CRUSH_BLOW2"_s);
 
   if (isSet(victim->combat, COMBAT_ATTACKER))
-    ch->sendln("COMBAT_ATTACKER");
+    ch->sendln(u"COMBAT_ATTACKER"_s);
 
-  ch->sendln("--------------------\r\n");
+  ch->sendln(u"--------------------\r\n"_s);
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValue do_debug(CharacterPtr ch, QString args, cmd_t cmd)
 {
   QString arg1, arg2, arg3;
   QString remainder;
@@ -270,12 +270,12 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
         }
         else
         {
-          ch->sendln("performance timer key not found");
+          ch->sendln(u"performance timer key not found"_s);
         }
       }
       else
       {
-        ch->sendln("Please specify a performance timer key. Run debug perf list");
+        ch->sendln(u"Please specify a performance timer key. Run debug perf list"_s);
       }
     }
   }
@@ -297,7 +297,7 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
     auto victim = get_pc(arg2.c_str());
     if (!victim)
     {
-      ch->sendln("Player not found.");
+      ch->sendln(u"Player not found."_s);
       return ReturnValue::eFAILURE;
     }
     victim->setDebug(!victim->getDebug());
@@ -323,7 +323,7 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : dc_->character_list)
         {
-          if (c->isNonPlayer() && c->mobdata && dc_->mob_index[c->mobdata->nr].vnum() == vnum)
+          if (c->isNonPlayer() && c->mobdata && dc_->mob_index_[c->mobdata->nr].vnum() == vnum)
           {
             if (!first_npc_found)
             {
@@ -340,23 +340,23 @@ command_return_t do_debug(CharacterPtr ch, QString args, cmd_t cmd)
       }
     }
 
-    ch->sendln("Invalid vnum. Valid example: 1 or v1");
+    ch->sendln(u"Invalid vnum. Valid example: 1 or v1"_s);
     return ReturnValue::eFAILURE;
   }
   else
   {
-    ch->sendln("debug perf list");
-    ch->sendln("      perf show <key>");
-    ch->sendln("      perf set <key> <value>");
-    ch->sendln("      charmie <name> [previous]");
-    ch->sendln("      player <name>");
-    ch->sendln("      mobile <vnum>");
+    ch->sendln(u"debug perf list"_s);
+    ch->sendln(u"      perf show <key>"_s);
+    ch->sendln(u"      perf set <key> <value>"_s);
+    ch->sendln(u"      charmie <name> [previous]"_s);
+    ch->sendln(u"      player <name>"_s);
+    ch->sendln(u"      mobile <vnum>"_s);
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString person;
   QString flag;
@@ -369,13 +369,13 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (person.isEmpty())
   {
-    ch->sendln("Pardon whom?");
+    ch->sendln(u"Pardon whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, person)))
   {
-    ch->sendln("They aren't here.");
+    ch->sendln(u"They aren't here."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -383,13 +383,13 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
     {
-      ch->sendln("Thief flag removed.");
+      ch->sendln(u"Thief flag removed."_s);
       affect_from_char(victim, Character::PLAYER_OBJECT_THIEF);
-      victim->sendln("A nice god has pardoned you of your thievery.");
+      victim->sendln(u"A nice god has pardoned you of your thievery."_s);
     }
     else
     {
-      ch->sendln("That character is not a thief!");
+      ch->sendln(u"That character is not a thief!"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -397,23 +397,23 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (ISSET(victim->affected_by, AFF_CANTQUIT))
     {
-      ch->sendln("Killer flag removed.");
+      ch->sendln(u"Killer flag removed."_s);
       affect_from_char(victim, Character::PLAYER_CANTQUIT);
-      victim->sendln("A nice god has pardoned you of your murdering.");
+      victim->sendln(u"A nice god has pardoned you of your murdering."_s);
     }
     else
     {
-      ch->sendln("That player has no CANTQUIT flag!");
+      ch->sendln(u"That player has no CANTQUIT flag!"_s);
       return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    ch->sendln("No flag specified! (Flags are 'thief' & 'killer')");
+    ch->sendln(u"No flag specified! (Flags are 'thief' & 'killer')"_s);
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln("Done.");
+  ch->sendln(u"Done."_s);
   QString log_buf = {};
   dc_sprintf(log_buf, "%s pardons %s for %s.",
              qPrintable(ch->name()), qPrintable(victim->name()), flag);
@@ -421,7 +421,7 @@ command_return_t do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr obj_object;
@@ -431,7 +431,7 @@ command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (buf.isEmpty())
   {
-    ch->sendln("Syntax: damage <item>");
+    ch->sendln(u"Syntax: damage <item>"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -439,7 +439,7 @@ command_return_t do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!obj_object)
   {
-    ch->sendln("You don't seem to have that item.");
+    ch->sendln(u"You don't seem to have that item."_s);
     return ReturnValue::eFAILURE;
   }
   eqdam = damage_eq_once(obj_object);
@@ -483,7 +483,7 @@ skill_quest *find_sq(qint32 sq)
   return {};
 }
 
-command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString command;
   argument = one_argument(argument, command);
@@ -501,7 +501,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
       "\n"};
   if (!ch->has_skill(COMMAND_SQEDIT))
   {
-    ch->sendln("You are unable to do so.");
+    ch->sendln(u"You are unable to do so."_s);
     return ReturnValue::eFAILURE;
   }
   //  if (argument && *argument && !is_number(argument))
@@ -510,7 +510,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
        send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
                     "$3Syntax:$R sqedit message/new/<skillname>\r\n",ch)={};
-       ch->sendln("$3Syntax:$R sqedit list.");
+       ch->sendln(u"$3Syntax:$R sqedit list."_s);
        return ReturnValue::eFAILURE;
     }*/
   qint32 i;
@@ -527,8 +527,8 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
                  "$3Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",
                  ch);
-    ch->sendln("$3Syntax:$R sqedit list <class>.");
-    ch->sendln("$3Syntax:$R sqedit save.");
+    ch->sendln(u"$3Syntax:$R sqedit list <class>."_s);
+    ch->sendln(u"$3Syntax:$R sqedit save."_s);
     return ReturnValue::eFAILURE;
   }
   QString arg1, arg2, arg3;
@@ -547,7 +547,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (skill == nullptr && (skill = find_sq(arg1)) == nullptr && i != 0 && i != 6 && i != 7)
   {
-    ch->sendln("Unknown skill.");
+    ch->sendln(u"Unknown skill."_s);
     return ReturnValue::eFAILURE;
   }
   skill_quest *curren, *last = {};
@@ -561,12 +561,12 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
       i = find_skill_num(arg1);
     if (i <= 0 || arg2[0] == '\0')
     {
-      ch->sendln("Skill not found.");
+      ch->sendln(u"Skill not found."_s);
       return ReturnValue::eFAILURE;
     }
     if (find_sq(i))
     {
-      ch->sendln("Skill quest already exists. Stop duping the damn sqs ;)");
+      ch->sendln(u"Skill quest already exists. Stop duping the damn sqs ;)"_s);
       return ReturnValue::eFAILURE;
     }
     //	argument = one_argument(argument,arg3);
@@ -584,7 +584,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     newOne->clas = (1 << (clas - 1));
     newOne->next = skill_list;
     skill_list = newOne;
-    ch->sendln("Skill quest added.");
+    ch->sendln(u"Skill quest added."_s);
     break;
   case 1:
     for (curren = skill_list; curren; curren = curren->next)
@@ -595,18 +595,18 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
           last->next = curren->next;
         else
           skill_list = curren->next;
-        ch->sendln("Deleted.");
+        ch->sendln(u"Deleted."_s);
         curren->message = {};
         curren = {};
         return ReturnValue::eSUCCESS;
       }
       last = curren;
     }
-    ch->sendln("Error in sqedit. Tell Urizen.");
+    ch->sendln(u"Error in sqedit. Tell Urizen."_s);
     break;
     break;
   case 2:
-    ch->sendln("Enter new message. End with \\s.");
+    ch->sendln(u"Enter new message. End with \\s."_s);
     ch->conn_->connected = Connection::states::EDITING;
     ch->conn_->strnew = &(skill->message);
     break;
@@ -614,11 +614,11 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (is_number(arg2))
     {
       skill->level = dc_atoi(arg2);
-      ch->sendln("Level modified.");
+      ch->sendln(u"Level modified."_s);
     }
     else
     {
-      ch->sendln("Invalid level.");
+      ch->sendln(u"Invalid level."_s);
       return ReturnValue::eFAILURE;
     }
     break;
@@ -633,7 +633,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       /*	if (*pc_clss_types[i] == '\n')
         {
-          ch->sendln("Invalid class.");
+          ch->sendln(u"Invalid class."_s);
           return ReturnValue::eFAILURE;
         }*/
     }
@@ -643,7 +643,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (i < 1 || i > 11)
     {
-      ch->sendln("Invalid class.");
+      ch->sendln(u"Invalid class."_s);
       return ReturnValue::eFAILURE;
     }
     if (isSet(skill->clas, 1 << (i - 1)))
@@ -651,7 +651,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     // skill->clas = i;
     else
       SET_BIT(skill->clas, 1 << (i - 1));
-    ch->sendln("Class modified.");
+    ch->sendln(u"Class modified."_s);
     break;
   case 5: // show
     ch->send(u"$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n"_s.arg(qPrintable(get_skill_name(skill->num))).arg(skill->message).arg(print_classes(skill->clas)).arg(skill->level));
@@ -665,10 +665,10 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (*pc_clss_types2[l] == '\n')
     {
-      ch->send("Unknown class.");
+      ch->send(u"Unknown class."_s);
       return ReturnValue::eFAILURE;
     }
-    ch->sendln("These are the current sqs:");
+    ch->sendln(u"These are the current sqs:"_s);
     ch->send(u"$3%s skillquests.$R\r\n"_s.arg(pc_clss_types2[l]));
     for (curren = skill_list; curren; curren = curren->next)
     {
@@ -678,7 +678,7 @@ command_return_t do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
       done = true;
     }
     if (!done)
-      ch->sendln("    No skill quests.");
+      ch->sendln(u"    No skill quests."_s);
     break;
   case 7: // save
     do_write_skillquest(ch, argument, cmd);
@@ -719,7 +719,7 @@ qint32 wear_bitv[MAX_WEAR] = {
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   QString arg;
@@ -730,7 +730,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
-    ch->sendln("Who?");
+    ch->sendln(u"Who?"_s);
     return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, arg);
@@ -759,7 +759,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
     type = 1 << APPLY_MANA;
   else
   {
-    ch->sendln("$3Syntax$R: eqmax <character> <damage/hp/mana> <optional: nodouble>");
+    ch->sendln(u"$3Syntax$R: eqmax <character> <damage/hp/mana> <optional: nodouble>"_s);
     return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, arg);
@@ -772,7 +772,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (real_object(i) < 0)
       continue;
-    obj = dc_->obj_index[real_object(i)].item;
+    obj = dc_->obj_index_[real_object(i)]->item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, TAKE) &&
@@ -788,7 +788,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = dc_->obj_index[obj->item_number].vnum();
+              last_vnum[0][o] = dc_->obj_index_[obj->item_number].vnum();
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -802,7 +802,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
               for (v = {}; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = dc_->obj_index[obj->item_number].vnum();
+                  last_vnum[v][o] = dc_->obj_index_[obj->item_number].vnum();
                   break;
                 }
             }
@@ -825,7 +825,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable((dc_->obj_index[real_object(last_vnum[a][i])].item)->short_description()), last_vnum[a][i]);
+        dc_sprintf(buf1, "%s %s(%d)   ", buf1, qPrintable((dc_->obj_index_[real_object(last_vnum[a][i])]->item)->short_description()), last_vnum[a][i]);
         //    else dc_sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     dc_sprintf(buf1, "%s\n", buf1);
@@ -836,7 +836,7 @@ command_return_t do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern QString motd;
   extern QString imotd;
@@ -869,7 +869,7 @@ command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4);
-    ch->sendln("Done!");
+    ch->sendln(u"Done!"_s);
   }
   else if (!str_cmp(arg, "credits"))
     file_to_string(CREDITS_FILE, credits);
@@ -890,7 +890,7 @@ command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (!str_cmp(arg, "xhelp"))
   {
     do_reload_help(ch, u""_s);
-    ch->sendln("Done!");
+    ch->sendln(u"Done!"_s);
   }
   else if (!str_cmp(arg, "greetings"))
   {
@@ -898,23 +898,23 @@ command_return_t do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
     file_to_string(GREETINGS2_FILE, greetings2);
     file_to_string(GREETINGS3_FILE, greetings3);
     file_to_string(GREETINGS4_FILE, greetings4);
-    ch->sendln("Done!");
+    ch->sendln(u"Done!"_s);
   }
   else if (!str_cmp(arg, "vaults"))
   {
     dc_->reload_vaults();
-    ch->sendln("Done!");
+    ch->sendln(u"Done!"_s);
   }
   else
   {
-    ch->sendln("Unknown reload option. Try 'help reload'.");
+    ch->sendln(u"Unknown reload option. Try 'help reload'."_s);
     return ReturnValue::eFAILURE;
   }
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg1, arg2;
   qint32 start, i, end, tot;
@@ -927,7 +927,7 @@ command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
       !check_range_valid_and_convert(end, arg2, 0, 100000) ||
       start > end)
   {
-    ch->sendln("$3Syntax:$n listproc <obj/mob> <low vnum> <high vnum>");
+    ch->sendln(u"$3Syntax:$n listproc <obj/mob> <low vnum> <high vnum>"_s);
     return ReturnValue::eFAILURE;
   }
   mob = !str_cmp(arg, "mob"); // typoed mob means obj. who cares.
@@ -935,19 +935,19 @@ command_return_t do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {
-    if (mob && (real_mobile(i) < 0 || !dc_->mob_index[real_mobile(i)].programs_))
+    if (mob && (real_mobile(i) < 0 || !dc_->mob_index_[real_mobile(i)]->programs_))
       continue;
-    else if (!mob && (real_object(i) < 0 || !dc_->obj_index[real_object(i)].programs_))
+    else if (!mob && (real_object(i) < 0 || !dc_->obj_index_[real_object(i)]->programs_))
       continue;
     if (tot++ > 100)
       break;
     if (mob)
     {
-      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg(((CharacterPtr)dc_->mob_index[real_mobile(i)].item)->name()));
+      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg(((CharacterPtr)dc_->mob_index_[real_mobile(i)]->item)->name()));
     }
     else
     {
-      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg((dc_->obj_index[real_object(i)].item)->name()));
+      ch->sendln(u"[%1] [%2] %3"_s.arg(tot, -3).arg(i, -3).arg((dc_->obj_index_[real_object(i)]->item)->name()));
     }
   }
   return ReturnValue::eSUCCESS;

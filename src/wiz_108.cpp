@@ -6,7 +6,7 @@
 
 qint32 get_number(QString *name);
 
-command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  try
   // {
@@ -22,7 +22,7 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!can_modify_room(ch, ch->in_room))
   {
-    ch->sendln("You are unable to do this outside of your range.");
+    ch->sendln(u"You are unable to do this outside of your range."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -128,14 +128,14 @@ command_return_t do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
   // catch(QString errmsg)
   // {
   //   ch->send(u"Error encountered while finding zone exits:\r\n%1\r\n"_s.arg(errmsg));
-  //   ch->sendln("Ask Rubicon if it needs fixed...");
+  //   ch->sendln(u"Ask Rubicon if it needs fixed..."_s);
   //   return ReturnValue::eFAILURE;
   //}
 
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString bufName, *pBuf;
   ObjectPtr k;
@@ -143,7 +143,7 @@ command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->has_skill(COMMAND_PURLOIN))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -164,7 +164,7 @@ command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
   // sets pBuf so it points to the name.
   if ((nIndex = get_number(&pBuf)) == 0)
   {
-    ch->sendln("get_number failed.  bad input?");
+    ch->sendln(u"get_number failed.  bad input?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -242,11 +242,11 @@ command_return_t do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
     j++;
   }
 
-  ch->sendln("Sorry, couldn't find it or something.");
+  ch->sendln(u"Sorry, couldn't find it or something."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //   renamed the command "setup" so don't need this anymore
   //    void do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd);
@@ -273,14 +273,14 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->has_skill(COMMAND_SET))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, name);
   if (name.isEmpty()) // no arguments. print an informative text
   {
-    ch->sendln("Usage:\r\nset <name> <field> <value>");
+    ch->sendln(u"Usage:\r\nset <name> <field> <value>"_s);
 
     dc_strcpy(help, "\r\nField being one of the following:\r\n");
     ch->display_string_list(values);
@@ -296,18 +296,18 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
             }
             if (!help.isEmpty())
                 ch->send(help);
-            ch->sendln("");*/
+            ch->sendln(u""_s);*/
     return ReturnValue::eFAILURE;
   }
   if (!(vict = get_char_vis(ch, name)))
   {
-    ch->sendln("No living thing by that name.");
+    ch->sendln(u"No living thing by that name."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < vict->getLevel())
   {
-    ch->sendln("Get real! You ain't that big.");
+    ch->sendln(u"Get real! You ain't that big."_s);
     if (vict->isPlayer())
     {
       dc_sprintf(buf2, "%s just tried to set: %s\r\n", qPrintable(ch->name()), buf);
@@ -318,21 +318,21 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (vict->isPlayer() && (vict->getLevel() == IMPLEMENTER) && (qPrintable(vict->name()) != qPrintable(ch->name())))
   {
-    ch->sendln("Forget it dweeb.");
+    ch->sendln(u"Forget it dweeb."_s);
     return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, buf);
   if (buf.isEmpty())
   {
-    ch->sendln("A field was expected.");
+    ch->sendln(u"A field was expected."_s);
     return ReturnValue::eFAILURE;
   }
 
   skill = values.indexOf(buf, Qt::CaseInsensitive);
   if (skill < 0)
   {
-    ch->sendln("That value not recognized.");
+    ch->sendln(u"That value not recognized."_s);
     return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, buf); /* update argument */
@@ -344,7 +344,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (vict->isNonPlayer())
     {
-      ch->sendln("Can't set a mob's age.");
+      ch->sendln(u"Can't set a mob's age."_s);
       return ReturnValue::eFAILURE;
     }
     value = dc_atoi(buf);
@@ -358,7 +358,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (str_cmp(buf, "m") && str_cmp(buf, "f") && str_cmp(buf, "n"))
     {
-      ch->sendln("Sex must be 'm','f' or 'n'.");
+      ch->sendln(u"Sex must be 'm','f' or 'n'."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -438,18 +438,18 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if (value > DC::MAX_MORTAL_LEVEL && value < MIN_GOD)
     {
-      ch->sendln("That level doesn't exist!");
+      ch->sendln(u"That level doesn't exist!"_s);
       return ReturnValue::eFAILURE;
     }
     if (((value < 0) || (value > DC::MAX_MORTAL_LEVEL)) && ch->getLevel() < OVERSEER)
     {
-      ch->sendln("Level must be between 0 and 101.");
+      ch->sendln(u"Level must be between 0 and 101."_s);
       return ReturnValue::eFAILURE;
     }
     /* why the fuck was ths missing? -Sadus */
     if (vict->isPlayer() && value > ch->getLevel())
     {
-      ch->sendln("That level is higher than you!");
+      ch->sendln(u"That level is higher than you!"_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -479,8 +479,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      ch->sendln("Strength must be more than 0");
-      ch->sendln("and less than 26.");
+      ch->sendln(u"Strength must be more than 0"_s);
+      ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -490,7 +490,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   case 7: /* stradd */
   {
-    ch->sendln("Strength addition not supported.");
+    ch->sendln(u"Strength addition not supported."_s);
   }
   break;
   case 8: /* qint32 */
@@ -498,8 +498,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      ch->sendln("Intelligence must be more than 0");
-      ch->sendln("and less than 26.");
+      ch->sendln(u"Intelligence must be more than 0"_s);
+      ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -514,8 +514,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      ch->sendln("Wisdom must be more than 0");
-      ch->sendln("and less than 26.");
+      ch->sendln(u"Wisdom must be more than 0"_s);
+      ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -528,8 +528,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      ch->sendln("Dexterity must be more than 0");
-      ch->sendln("and less than 26.");
+      ch->sendln(u"Dexterity must be more than 0"_s);
+      ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -542,8 +542,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value <= 0) || (value > 30))
     {
-      ch->sendln("Constitution must be more than 0");
-      ch->sendln("and less than 26.");
+      ch->sendln(u"Constitution must be more than 0"_s);
+      ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -600,7 +600,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (vict->isNonPlayer())
     {
-      ch->sendln("Can't set a mob's pracs...");
+      ch->sendln(u"Can't set a mob's pracs..."_s);
       return ReturnValue::eFAILURE;
     }
     value = dc_atoi(buf);
@@ -614,8 +614,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value < -1000) || (value > 1000))
     {
-      ch->sendln("Alignment must be more than -1000");
-      ch->sendln("and less than 1000.");
+      ch->sendln(u"Alignment must be more than -1000"_s);
+      ch->sendln(u"and less than 1000."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -628,8 +628,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value < -1) || (value > 100))
     {
-      ch->sendln("Thirst must be more than -2");
-      ch->sendln("and less than 101.");
+      ch->sendln(u"Thirst must be more than -2"_s);
+      ch->sendln(u"and less than 101."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -642,8 +642,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value < -1) || (value > 100))
     {
-      ch->sendln("Drunk must be more than -2");
-      ch->sendln("and less than 101.");
+      ch->sendln(u"Drunk must be more than -2"_s);
+      ch->sendln(u"and less than 101."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -656,8 +656,8 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     value = dc_atoi(buf);
     if ((value < -1) || (value > 100))
     {
-      ch->sendln("Full must be more than -2");
-      ch->sendln("and less than 101.");
+      ch->sendln(u"Full must be more than -2"_s);
+      ch->sendln(u"and less than 101."_s);
       return ReturnValue::eFAILURE;
     }
     dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
@@ -671,7 +671,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (x == 31)
       {
-        ch->sendln("No such race.");
+        ch->sendln(u"No such race."_s);
         return ReturnValue::eFAILURE;
       }
       if (isexact(races[x].singular_name, buf))
@@ -720,25 +720,25 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     one_argument(argument, buf2);
     if (buf.isEmpty() || buf.isEmpty() 2)
     {
-      ch->sendln("Syntax: set <vict> saves <0-5> <num>");
+      ch->sendln(u"Syntax: set <vict> saves <0-5> <num>"_s);
       return ReturnValue::eFAILURE;
     }
 
     if (vict->isNonPlayer())
     {
-      ch->sendln("You cannot set saves_bases on mobs.");
+      ch->sendln(u"You cannot set saves_bases on mobs."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (!check_range_valid_and_convert(i, buf, 0, 5))
     {
-      ch->sendln("Save type be from 0 to 5.");
+      ch->sendln(u"Save type be from 0 to 5."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (!check_range_valid_and_convert(value, buf2, 0, 5))
     {
-      ch->sendln("Value must be from -10 to 100.");
+      ch->sendln(u"Value must be from -10 to 100."_s);
       return ReturnValue::eFAILURE;
     }
     vict->player->saves_mods[i] = value;
@@ -778,7 +778,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (vict->isNonPlayer())
     {
-      ch->sendln("You cannot set profession on mobs.");
+      ch->sendln(u"You cannot set profession on mobs."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -794,7 +794,7 @@ command_return_t do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   break;
   }
 
-  ch->sendln("Ok.");
+  ch->sendln(u"Ok."_s);
   affect_total(vict);
   return ReturnValue::eSUCCESS;
 }

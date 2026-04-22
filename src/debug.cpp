@@ -117,7 +117,7 @@ QString showObjectAffects(ObjectPtr obj)
 
 QString showObjectVault(ObjectPtr obj)
 {
-  // std::cerr <<  dc_->obj_index[obj->item_number].vnum() << ":";
+  // std::cerr <<  dc_->obj_index_[obj->item_number].vnum() << ":";
   QString buffer = QFlagsToStrings(obj->flags_.wear_flags);
   // std::cerr <<  buf << ":";
 
@@ -138,7 +138,7 @@ QString showObjectVault(ObjectPtr obj)
 
 void showObject(CharacterPtr ch, ObjectPtr obj)
 {
-  // std::cerr <<  dc_->obj_index[obj->item_number].vnum() << ":";
+  // std::cerr <<  dc_->obj_index_[obj->item_number].vnum() << ":";
   QString buf;
 
   QString buffer = QFlagsToStrings(obj->flags_.wear_flags);
@@ -391,7 +391,7 @@ qint32 main(qint32 argc, QString *argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum)
+                    if (vnum > 0 && dc_->obj_index_[obj->item_number].vnum() == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -401,7 +401,7 @@ qint32 main(qint32 argc, QString *argv)
 
               for (ObjectPtr obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum))
+                if (vnum == 0 || (vnum > 0 && dc_->obj_index_[obj->item_number].vnum() == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -410,7 +410,7 @@ qint32 main(qint32 argc, QString *argv)
                 {
                   for (ObjectPtr container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && dc_->obj_index[container->item_number].vnum() == vnum)
+                    if (vnum > 0 && dc_->obj_index_[container->item_number].vnum() == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -489,7 +489,7 @@ qint32 main(qint32 argc, QString *argv)
       for (vault_items_dataPtr items = vault->items; items; items = items->next)
       {
         ObjectPtr obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && dc_->obj_index[obj->item_number].vnum() == vnum)
+        if (vnum > 0 && dc_->obj_index_[obj->item_number].vnum() == vnum)
         {
           ch->send(showObjectVault(obj));
         }

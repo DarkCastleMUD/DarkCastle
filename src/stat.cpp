@@ -57,7 +57,7 @@ void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
 {
   if (dc_->zones.contains(area) == false)
   {
-    ch->send("Area number is outside the limits\r\n");
+    ch->send(u"Area number is outside the limits\r\n"_s);
     return;
   }
 
@@ -69,7 +69,7 @@ void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
     auto tmpchar = get_mob_vnum(mobs->name);
     if (!tmpchar)
     {
-      ch->sendln("Shit a mob is missing from game!!!");
+      ch->sendln(u"Shit a mob is missing from game!!!"_s);
       continue;
     }
     ch->sendln(u"%1 %2 %3"_s.arg(get_mob_vnum(mobs->name)->short_description(), -30).arg(mobs->howmany, -5).arg(mobs->howmany < 2 ? "time" : "times"));
@@ -114,18 +114,18 @@ void AreaData::GetAreaData(zone_t zone, qint32 mob, qint64 xps, qint64 gold)
 
 AreaData areaData;
 
-command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
 
   argument = one_argument(argument, buf);
   if (buf.isEmpty())
   {
-    ch->sendln("$BUsage:$R ");
-    ch->sendln("$Bareastats$R ");
-    ch->sendln("$Bareastats area #$R");
-    ch->sendln("$Bareastats topxps$R");
-    ch->sendln("$Bareastats topgold$R");
+    ch->sendln(u"$BUsage:$R "_s);
+    ch->sendln(u"$Bareastats$R "_s);
+    ch->sendln(u"$Bareastats area #$R"_s);
+    ch->sendln(u"$Bareastats topxps$R"_s);
+    ch->sendln(u"$Bareastats topgold$R"_s);
     return ReturnValue::eSUCCESS;
   }
   if (buf == u"area"_s)
@@ -133,7 +133,7 @@ command_return_t do_areastats(CharacterPtr ch, QString argument, cmd_t cmd)
     argument = one_argument(argument, buf);
     if (buf.isEmpty())
     {
-      ch->sendln("You need to specify a zone number.");
+      ch->sendln(u"You need to specify a zone number."_s);
       return ReturnValue::eSUCCESS;
     }
     areaData.DisplaySingleArea(ch, dc_atoi(buf));

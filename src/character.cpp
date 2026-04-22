@@ -592,7 +592,7 @@ const QList<Toggle> Player::togglables = {
     {"damage", PLR_DAMAGE_BIT, &Character::do_damage_toggle},
     {"nodupekeys", PLR_NODUPEKEYS_BIT, &Character::do_nodupekeys_toggle}};
 
-Toggle::Toggle(QString name, quint64 shift, command_return_t (Character::*function)(QStringList arguments, cmd_t cmd), quint64 dependency_shift, QString on_message, QString off_message)
+Toggle::Toggle(QString name, quint64 shift, ReturnValue (Character::*function)(QStringList arguments, cmd_t cmd), quint64 dependency_shift, QString on_message, QString off_message)
     : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
 {
 }

@@ -135,7 +135,7 @@ quest_infoPtr get_quest_(QString name)
   return 0;
 }
 
-command_return_t do_add_quest(CharacterPtr ch, QString name)
+ReturnValue do_add_quest(CharacterPtr ch, QString name)
 {
   auto quest = new quest_info;
 
@@ -204,7 +204,7 @@ void show_quest_info(CharacterPtr ch, qint32 num)
                      .arg(quest->reward)
                      .arg(quest->timer)
                      .arg(quest->mobnum)
-                     .arg(real_mobile(quest->mobnum) > 0 ? qPrintable(((CharacterPtr)(dc_->mob_index[real_mobile(quest->mobnum)].item))->short_description()) : "no current mob")
+                     .arg(real_mobile(quest->mobnum) > 0 ? qPrintable(((CharacterPtr)(dc_->mob_index_[real_mobile(quest->mobnum)]->item))->short_description()) : "no current mob")
                      .arg(quest->objnum)
                      .arg(quest->objkey)
                      .arg(quest->objshort)
@@ -215,7 +215,7 @@ void show_quest_info(CharacterPtr ch, qint32 num)
       return;
     }
   }
-  ch->sendln("That quest doesn't exist.");
+  ch->sendln(u"That quest doesn't exist."_s);
 }
 
 bool check_available_quest(CharacterPtr ch, quest_infoPtr quest)
@@ -311,7 +311,7 @@ void show_quest_footer(CharacterPtr ch)
 
   ch->send(u"\r\n $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n"_s.arg(attempting).arg(completed).arg(total - completed - attempting).arg(total));
 
-  ch->sendln("[-----------------------------------------------------------------------------]");
+  ch->sendln(u"[-----------------------------------------------------------------------------]"_s);
 }
 
 qint32 show_one_quest(CharacterPtr ch, quest_infoPtr quest, qint32 count)
@@ -381,7 +381,7 @@ void show_available_quests(CharacterPtr ch)
     }
   }
   if (!count)
-    ch->sendln("$B$7There are currently no available quests for you, try later.$R");
+    ch->sendln(u"$B$7There are currently no available quests for you, try later.$R"_s);
   else
     //       show_quest_amount(ch, count);
 
@@ -460,7 +460,7 @@ qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
 
   if (!check_available_quest(ch, quest))
   {
-    ch->sendln("That quest is not available to you.");
+    ch->sendln(u"That quest is not available to you."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -471,7 +471,7 @@ qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
     count++;
     if (count == QUEST_MAX)
     {
-      ch->sendln("You've got too many quests started already.");
+      ch->sendln(u"You've got too many quests started already."_s);
       return ReturnValue::eEXTRA_VALUE;
     }
   }
@@ -510,7 +510,7 @@ qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
 
   if (!mob)
   {
-    ch->sendln("This quest is temporarily unavailable.");
+    ch->sendln(u"This quest is temporarily unavailable."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -605,7 +605,7 @@ qint32 complete_quest(CharacterPtr ch, quest_infoPtr quest)
 
   if (!obj)
   {
-    ch->sendln("You do not appear to have the quest object yet.");
+    ch->sendln(u"You do not appear to have the quest object yet."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -742,7 +742,7 @@ qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString n
     quest = get_quest_(name);
     if (quest == 0)
     {
-      ch->sendln("That is not a valid quest name or number.");
+      ch->sendln(u"That is not a valid quest name or number."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -888,7 +888,7 @@ qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 retval = {};
   QString name;
@@ -914,7 +914,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
     if (!qmaster)
       return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
-      ch->sendln("You must ask the Quest Master for available quests.");
+      ch->sendln(u"You must ask the Quest Master for available quests."_s);
     else
       retval = quest_handler(ch, qmaster, cmd_t::QUEST_LIST, 0);
   }
@@ -923,7 +923,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
     if (!qmaster)
       return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
-      ch->sendln("You must let the Quest Master know of your intentions.");
+      ch->sendln(u"You must let the Quest Master know of your intentions."_s);
     else
       retval = quest_handler(ch, qmaster, cmd_t::QUEST_CANCEL, name);
     return retval;
@@ -933,7 +933,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
     if (!qmaster)
       return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
-      ch->sendln("You may only begin quests given from the Quest Master.");
+      ch->sendln(u"You may only begin quests given from the Quest Master."_s);
     else
       retval = quest_handler(ch, qmaster, cmd_t::QUEST_START, name);
     return retval;
@@ -943,7 +943,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
     if (!qmaster)
       return ReturnValue::eFAILURE;
     if (ch->in_room != qmaster->in_room)
-      ch->sendln("You may only finish quests in the presence of the Quest Master.");
+      ch->sendln(u"You may only finish quests in the presence of the Quest Master."_s);
     else
       retval = quest_handler(ch, qmaster, cmd_t::QUEST_FINISH, name);
     return retval;
@@ -957,7 +957,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (ch->in_room != qmaster->in_room)
     {
-      ch->sendln("You may only reset all quests in the presence of the Quest Master.");
+      ch->sendln(u"You may only reset all quests in the presence of the Quest Master."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -993,20 +993,20 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 
     if (completed < 100)
     {
-      ch->sendln("You will need to complete at least 100 quests before you can reset.");
+      ch->sendln(u"You will need to complete at least 100 quests before you can reset."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (GET_PLATINUM(ch) < 2000)
     {
-      ch->sendln("You need 2000 platinum coins to reset all quests, which you don't have!");
+      ch->sendln(u"You need 2000 platinum coins to reset all quests, which you don't have!"_s);
       return ReturnValue::eEXTRA_VAL2;
     }
 
     ObjectPtr brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
     if (!brownie)
     {
-      ch->sendln("You need a brownie point to reset all quests!");
+      ch->sendln(u"You need a brownie point to reset all quests!"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -1023,7 +1023,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
     }
     memset(ch->player->quest_cancel, 0, sizeof(ch->player->quest_cancel));
     memset(ch->player->quest_complete, 0, sizeof(ch->player->quest_complete));
-    ch->sendln("All quests have been reset.");
+    ch->sendln(u"All quests have been reset."_s);
     return retval;
   }
   else
@@ -1035,7 +1035,7 @@ command_return_t do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString field;
@@ -1062,18 +1062,18 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(u"%1\t"_s.arg(*tmp));
       if (++i % 4 == 0)
       {
-        ch->sendln("");
+        ch->sendln(u""_s);
       }
       tmp++;
     }
-    ch->sendln("");
+    ch->sendln(u""_s);
 
     return ReturnValue::eFAILURE;
   }
 
   if (is_abbrev(arg, "save"))
   {
-    ch->sendln("Quests saved.");
+    ch->sendln(u"Quests saved."_s);
     return save_quests();
   }
 
@@ -1081,7 +1081,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (argument.isEmpty())
     {
-      ch->sendln("Usage: qedit new <name>");
+      ch->sendln(u"Usage: qedit new <name>"_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -1089,7 +1089,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
       quest = get_quest_(argument);
       if (quest)
       {
-        ch->sendln("A quest by this name already exists.");
+        ch->sendln(u"A quest by this name already exists."_s);
         return ReturnValue::eFAILURE;
       }
       else
@@ -1114,14 +1114,14 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (field.isEmpty())
     {
-      ch->sendln("Usage: qedit stat <playername>");
+      ch->sendln(u"Usage: qedit stat <playername>"_s);
       return ReturnValue::eFAILURE;
     }
     else
     {
       if (!(vict = get_char_vis(ch, field)) || vict->isNonPlayer())
       {
-        ch->sendln("No living thing by that name.");
+        ch->sendln(u"No living thing by that name."_s);
         return ReturnValue::eFAILURE;
       }
 
@@ -1134,14 +1134,14 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (field.isEmpty())
     {
-      ch->sendln("Usage: qedit reset <playername>");
+      ch->sendln(u"Usage: qedit reset <playername>"_s);
       return ReturnValue::eFAILURE;
     }
     else
     {
       if (!(vict = get_char_vis(ch, field)) || vict->isNonPlayer())
       {
-        ch->sendln("No living thing by that name.");
+        ch->sendln(u"No living thing by that name."_s);
         return ReturnValue::eFAILURE;
       }
 
@@ -1162,14 +1162,14 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (field.isEmpty() || value.isEmpty() || !is_number(value))
     {
-      ch->sendln("Usage: qedit set <playername> <value>");
+      ch->sendln(u"Usage: qedit set <playername> <value>"_s);
       return ReturnValue::eFAILURE;
     }
     else
     {
       if (!(vict = get_char_vis(ch, field)) || vict->isNonPlayer())
       {
-        ch->sendln("No living thing by that name.");
+        ch->sendln(u"No living thing by that name."_s);
         return ReturnValue::eFAILURE;
       }
 
@@ -1185,7 +1185,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   if (is_abbrev(arg, "show"))
   {
     if (field.isEmpty() || !is_number(field))
-      ch->sendln("Usage: qedit show <number>");
+      ch->sendln(u"Usage: qedit show <number>"_s);
     else
       show_quest_info(ch, dc_atoi(field));
     return ReturnValue::eSUCCESS;
@@ -1221,7 +1221,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!is_number(arg))
   {
-    ch->sendln("Usage: qedit <number> <field> <value>");
+    ch->sendln(u"Usage: qedit <number> <field> <value>"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1229,25 +1229,25 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (holdernum <= 0 || holdernum > QUEST_TOTAL)
   {
-    ch->sendln("Invalid quest number.");
+    ch->sendln(u"Invalid quest number."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(quest = get_quest_(holdernum)))
   {
-    ch->sendln("That quest doesn't exist.");
+    ch->sendln(u"That quest doesn't exist."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (field.isEmpty())
   {
-    ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints.");
+    ch->sendln(u"Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward or hints."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(*value))
   {
-    ch->sendln("You must enter a value.");
+    ch->sendln(u"You must enter a value."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1262,7 +1262,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (valid_fields[i] == nullptr)
   {
-    ch->sendln("Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3.");
+    ch->sendln(u"Valid fields: name, level, cost, brownie, objnum, objshort, objlong, objkey, mobnum, timer, reward, hint1, hint2, or hint3."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1275,7 +1275,7 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
     oldquest = get_quest_(field);
     if (oldquest)
     {
-      ch->sendln("A quest by this name already exists.");
+      ch->sendln(u"A quest by this name already exists."_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -1354,12 +1354,12 @@ command_return_t do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
   case 13: // brownie
     if (quest->brownie)
     {
-      ch->sendln("Brownie toggled to NOT required.");
+      ch->sendln(u"Brownie toggled to NOT required."_s);
       quest->brownie = {};
     }
     else
     {
-      ch->sendln("Brownie toggled to required.");
+      ch->sendln(u"Brownie toggled to required."_s);
       quest->brownie = 1;
     }
     break;
@@ -1399,8 +1399,8 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
 
   if (cmd == cmd_t::LIST)
   { /* List */
-    ch->sendln("$B$2Orro tells you, 'This is what I can do for you...$R ");
-    ch->sendln("$BQuest Equipment:$R");
+    ch->sendln(u"$B$2Orro tells you, 'This is what I can do for you...$R "_s);
+    ch->sendln(u"$BQuest Equipment:$R"_s);
 
     qint32 n = {};
     for (qint32 qvnum = 27975; qvnum < 27997; qvnum++)
@@ -1408,7 +1408,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index_[rnum]->item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1417,7 +1417,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index_[rnum]->item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1426,7 +1426,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index_[rnum]->item, n++, ch, false);
         ch->send(buffer);
       }
     }
@@ -1435,7 +1435,7 @@ qint32 quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
       rnum = real_object(qvnum);
       if (rnum >= 0)
       {
-        auto buffer = gl_item(dc_->obj_index[rnum].item, n++, ch, false);
+        auto buffer = gl_item(dc_->obj_index_[rnum]->item, n++, ch, false);
         ch->send(buffer);
       }
     }

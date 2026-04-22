@@ -5,7 +5,7 @@
 */
 #include "DC/DC.h"
 
-command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_alias(QStringList arguments, cmd_t cmd)
 {
   if (!player)
   {
@@ -16,18 +16,18 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
   {
     if (player->aliases_.isEmpty())
     {
-      sendln("No aliases defined.");
+      sendln(u"No aliases defined."_s);
       return ReturnValue::eSUCCESS;
     }
 
     auto removed_count = player->aliases_.remove("");
     if (removed_count)
     {
-      sendln("Removed an alias with an empty alias.");
+      sendln(u"Removed an alias with an empty alias."_s);
     }
 
     quint64 x = {};
-    sendln("Aliases:");
+    sendln(u"Aliases:"_s);
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {
       sendln(u"%2=%3"_s.arg(alias).arg(command));
@@ -47,19 +47,19 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 
     if (alias == "alias" || alias == "deleteall")
     {
-      sendln("You cannot create a command alias named 'alias' or 'deleteall'.");
+      sendln(u"You cannot create a command alias named 'alias' or 'deleteall'."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (alias.isEmpty())
     {
-      sendln("You need to specify an alias.");
+      sendln(u"You need to specify an alias."_s);
       return ReturnValue::eFAILURE;
     }
 
     if (command.isEmpty())
     {
-      sendln("You need to specify a command for your alias.");
+      sendln(u"You need to specify a command for your alias."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -85,7 +85,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
   {
     if (player->aliases_.isEmpty())
     {
-      sendln("No aliases defined.");
+      sendln(u"No aliases defined."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -142,7 +142,7 @@ QString pet_info(CharacterPtr ch, QString type, quint32 victim_count)
       .arg((victim_count ? "$B$5*$R" : ""));
 }
 
-command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_pets(QStringList arguments, cmd_t cmd)
 {
   QString arg1 = arguments.value(0);
   bool arg1_level_ok = false;
@@ -155,18 +155,18 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   extern qint32 top_of_mobt;
   QMultiMap<level_t, QString> results;
 
-  for (vnum_t vnum = {}; (vnum <= dc_->mob_index[top_of_mobt].vnum()); ++vnum)
+  for (vnum_t vnum = {}; (vnum <= dc_->mob_index_[top_of_mobt].vnum()); ++vnum)
   {
     auto nr = real_mobile(vnum);
     if (nr < 0)
       continue;
 
-    auto victim = (CharacterPtr)(dc_->mob_index[nr].item);
+    auto victim = (CharacterPtr)(dc_->mob_index_[nr]->item);
     if ((arg1_level_ok && victim->getLevel() < arg1_level) ||
         (arg2_level_ok && victim->getLevel() < arg2_level))
       continue;
 
-    auto victim_qty = dc_->mob_index[nr].qty;
+    auto victim_qty = dc_->mob_index_[nr].qty;
     bool include_bard = false;
     if (ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
     {
@@ -264,12 +264,12 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
       sendln(u"No charmable pets found for a %1."_s.arg(Character::classes_[c_class].name));
     else
       sendln(u"No charmable pets found for a %1."_s.arg(arg1));
-    sendln("Type 'pets all' to see charmable pets for all classes.");
-    sendln("Type 'pets bard' to see charmable pets for bards.");
-    sendln("Type 'pets bard 50' or 'pets 50' to only see pets level 50 or above.");
+    sendln(u"Type 'pets all' to see charmable pets for all classes."_s);
+    sendln(u"Type 'pets bard' to see charmable pets for bards."_s);
+    sendln(u"Type 'pets bard 50' or 'pets 50' to only see pets level 50 or above."_s);
     return ReturnValue::eSUCCESS;
   }
-  sendln("$B$7LVL,ATK,HIT,DAM,   HP, -AC, dice, class, description$R");
+  sendln(u"$B$7LVL,ATK,HIT,DAM,   HP, -AC, dice, class, description$R"_s);
   for (const auto &line : results)
     sendln(line);
   sendln(u"$B$5*$R = in world now"_s);
@@ -278,5 +278,5 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   // search npcs affect of charmable
   // sort by class
 
-  return command_return_t();
+  return ReturnValue();
 }

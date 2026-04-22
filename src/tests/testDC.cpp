@@ -3,7 +3,6 @@
 #include <qhashfunctions.h>
 #include "DC/DC.h"
 
-using namespace Qt::StringLiterals;
 const auto STRING_LITERAL1 = u"$00$11$22$33$44$55$66$77$88$99$II$LL$**$RR$BB$$"_s;
 const auto STRING_LITERAL1_NOCOLOR = u"0123456789IL*RB$"_s;
 const auto STRING_LITERAL1_COLOR = BLACK + "0"_ba + BLUE + "1"_ba + GREEN + "2"_ba + CYAN + "3"_ba + RED + "4"_ba + YELLOW + "5"_ba + PURPLE + "6"_ba + GREY + "7"_ba + "8"_ba + "9"_ba + INVERSE + "I"_ba + FLASH + "L"_ba + "*"_ba + NTEXT + "R"_ba + BOLD + "B"_ba + "$"_ba;
@@ -345,7 +344,7 @@ private slots:
     o3->name(u"mushroom"_s);
     GET_OBJ_SHORT(o3) = u"a small mushroom"_s;
 
-    command_return_t rc;
+    ReturnValue rc;
     rc = do_vault(&ch, u"put all"_s);
     QCOMPARE(rc, ReturnValue::eSUCCESS);
     QCOMPARE(conn->output, "You don't feel safe enough to manage your valuables.\r\n");
@@ -732,11 +731,11 @@ private slots:
       QVERIFY(fstream_world_file.is_open());
 
       QTextStream in(&qf);
-      qint32 room_nr = {};
+      qint32 room_number = {};
 
       Room original_room1 = dc_->world[1];
-      qint32 new_room_nr = dc_->read_one_room(stream, room_nr);
-      QCOMPARE(room_nr, 1);
+      qint32 new_room_nr = dc_->read_one_room(stream, room_number);
+      QCOMPARE(room_number, 1);
       QCOMPARE(new_room_nr, 1);
       Room new_room1 = dc_->world[1];
       QCOMPARE(new_room1, original_room1);
@@ -1042,22 +1041,22 @@ private slots:
 
     DC dc(cf);
     dc.boot_db();
-    auto obj = reinterpret_cast<ObjectPtr>(dc_->obj_index[0].item);
-    QCOMPARE(dc_->getObjectVNUM(obj), dc_->obj_index[0].vnum());
-    QCOMPARE(dc_->getObjectVNUM(obj->item_number), dc_->obj_index[obj->item_number].vnum());
+    auto obj = reinterpret_cast<ObjectPtr>(dc_->obj_index_[0]->item);
+    QCOMPARE(dc_->getObjectVNUM(obj), dc_->obj_index_[0].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number), dc_->obj_index_[obj->item_number].vnum());
     QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
 
     bool ok = false;
     dc_->getObjectVNUM(obj, &ok);
     QCOMPARE(ok, true);
     ok = false;
-    QCOMPARE(dc_->getObjectVNUM(obj->item_number, &ok), dc_->obj_index[obj->item_number].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number, &ok), dc_->obj_index_[obj->item_number].vnum());
     QCOMPARE(ok, true);
     QCOMPARE(dc_->getObjectVNUM(DC::INVALID_RNUM, &ok), DC::INVALID_VNUM);
     QCOMPARE(ok, false);
 
-    QCOMPARE(dc_->getObjectVNUM(obj, nullptr), dc_->obj_index[0].vnum());
-    QCOMPARE(dc_->getObjectVNUM(obj->item_number, nullptr), dc_->obj_index[obj->item_number].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj, nullptr), dc_->obj_index_[0].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number, nullptr), dc_->obj_index_[obj->item_number].vnum());
     QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
   }
   void test_blackjack()
@@ -1348,7 +1347,7 @@ private slots:
       ch->name(names.value(count++));
       ch->plat = 1111;
       ch->setGold(40000);
-      ch->player = new Player;
+      ch->player = PlayerPtr(new Player(ch));
       ch->setType(Character::Type::Player);
       ch->setPosition(position_t::STANDING);
       ch->title = u"the great"_s;
@@ -1610,11 +1609,11 @@ private slots:
     QCOMPARE(get_obj_vnum(u"v1"_s), nullptr);
     QCOMPARE_NE(get_obj_vnum(u"v99"_s), nullptr);
 
-    QCOMPARE(dc_->obj_index[get_obj_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(dc_->obj_index_[get_obj_vnum(u"v99"_s)->item_number].vnum(), 99);
     QCOMPARE(get_obj_vnum(u"v99"_s)->carried_by, nullptr);
-    QCOMPARE(dc_->obj_index[get_objindex_vnum(u"v1"_s)->item_number].vnum(), 1);
+    QCOMPARE(dc_->obj_index_[get_objindex_vnum(u"v1"_s)->item_number].vnum(), 1);
     QCOMPARE(get_objindex_vnum(u"v1"_s)->carried_by, nullptr);
-    QCOMPARE(dc_->obj_index[get_objindex_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(dc_->obj_index_[get_objindex_vnum(u"v99"_s)->item_number].vnum(), 99);
     QCOMPARE(get_objindex_vnum(u"v99"_s)->carried_by, nullptr);
   }
 

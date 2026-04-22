@@ -87,7 +87,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      qint32 vnum = dc_->obj_index[curr->item_number].vnum();
+      qint32 vnum = dc_->obj_index_[curr->item_number].vnum();
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -105,7 +105,7 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == dc_->obj_index[curr->item_number].vnum())
+      if (golem_list[golemtype].components[i] == dc_->obj_index_[curr->item_number].vnum())
       {
         if (ch->dc_->number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
@@ -281,7 +281,7 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return ReturnValue::eFAILURE;
   if (ch->player->golem)
   {
-    ch->sendln("You already have a golem.");
+    ch->sendln(u"You already have a golem."_s);
     return ReturnValue::eFAILURE;
   }
   for (i = {}; i < MAX_GOLEMS; i++)
@@ -291,13 +291,13 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
   }
   if (i >= MAX_GOLEMS)
   {
-    ch->sendln("You cannot create any such golem.");
+    ch->sendln(u"You cannot create any such golem."_s);
     return ReturnValue::eFAILURE;
   }
   qint32 retval = verify_existing_components(ch, i);
   if (isSet(retval, ReturnValue::eFAILURE))
   {
-    ch->sendln("Since you do not have the required spell components, the magic fades into nothingness.");
+    ch->sendln(u"Since you do not have the required spell components, the magic fades into nothingness."_s);
     return ReturnValue::eFAILURE;
   }
   ch->load_golem_data(i); // Load the golem up;
@@ -305,12 +305,12 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
   golem = ch->player->golem;
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
-    ch->send("Something goes wrong, and you fail!");
+    ch->send(u"Something goes wrong, and you fail!"_s);
     return ReturnValue::eFAILURE;
   }
   if (isSet(retval, ReturnValue::eEXTRA_VALUE))
   {
-    ch->sendln("Adding in the final ingredient, your golem increases in strength!");
+    ch->sendln(u"Adding in the final ingredient, your golem increases in strength!"_s);
     SETBIT(golem->affected_by, golem_list[i].special_aff);
     SET_BIT(golem->resist, golem_list[i].special_res);
   }
@@ -324,7 +324,7 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 extern QString frills;
 
-command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
 { /* Pretty much a rip of score */
   QString race;
   QString buf, scratch;
@@ -338,7 +338,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!ch->player->golem)
     {
-      ch->sendln("But you don't have a golem!");
+      ch->sendln(u"But you don't have a golem!"_s);
       return ReturnValue::eFAILURE;
     }
     else
@@ -369,7 +369,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
         auto vict = get_mob_room_vis(ch, argument);
         if (!vict)
         {
-          ch->sendln("No mob by that name here.");
+          ch->sendln(u"No mob by that name here."_s);
           return ReturnValue::eFAILURE;
         }
         if (!IS_AFFECTED(vict, AFF_CHARM))
@@ -400,7 +400,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (ch == master)
     {
-      ch->sendln("But you don't have any non-player followers!");
+      ch->sendln(u"But you don't have any non-player followers!"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -421,7 +421,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
     dc_->logentry(u"do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60."_s.arg(qPrintable(master->name())).arg(ch->getLevel()).arg(ch->getLevel() + 19));
-    master->send("There is an error with your golem. Contact an immortal.\r\n");
+    master->send(u"There is an error with your golem. Contact an immortal.\r\n"_s);
     produce_coredump(ch);
     return ReturnValue::eSUCCESS;
   }
@@ -600,7 +600,7 @@ command_return_t do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  master->sendln("($5:$7)=========================================================================($5:$7)");
+  master->sendln(u"($5:$7)=========================================================================($5:$7)"_s);
 
   return ReturnValue::eSUCCESS;
 }
@@ -609,12 +609,12 @@ qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 {
   follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && dc_->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && dc_->mob_index_[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);
       return ReturnValue::eSUCCESS;
     }
-  ch->sendln("You don't have a golem.");
+  ch->sendln(u"You don't have a golem."_s);
   return ReturnValue::eSUCCESS;
 }

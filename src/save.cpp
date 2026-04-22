@@ -180,7 +180,7 @@ void Mobile::read(auto &streamfpsave)
   // at this point, typeflag should = "STP", and we're done reading mob data
 }
 
-// TODO - make sure I go back and update the time_data s everywhere when
+// TODO - make sure I go back and update the Time s everywhere when
 // we lose link, or logout, etc so that the 'played' variable is correct
 
 void fwrite_string_tilde(auto &streamfpsave)
@@ -189,7 +189,7 @@ void fwrite_string_tilde(auto &streamfpsave)
   dc_strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
-void Player::save(auto &streamfpsave, time_data tmpage)
+void Player::save(auto &streamfpsave, Time tmpage)
 {
   fwrite(qPrintable(password_), sizeof(QChar), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(fpsave);
@@ -200,7 +200,7 @@ void Player::save(auto &streamfpsave, time_data tmpage)
   fwrite(&(pkills), sizeof(pkills), 1, fpsave);
   fwrite(&(pklvl), sizeof(pklvl), 1, fpsave);
   // we save tmpage cause it was calculated when all eq was off
-  fwrite(&(tmpage), sizeof(time_data), 1, fpsave);
+  fwrite(&(tmpage), sizeof(Time), 1, fpsave);
   fwrite(&(bad_pw_tries), sizeof(bad_pw_tries), 1, fpsave);
   fwrite(&(practices), sizeof(practices), 1, fpsave);
   fwrite(&(bank), sizeof(bank), 1, fpsave);
@@ -404,7 +404,7 @@ bool Player::read(auto &streamfpsave, CharacterPtr ch, QString filename)
   fread(&(pdeaths), sizeof(pdeaths), 1, fpsave);
   fread(&(pkills), sizeof(pkills), 1, fpsave);
   fread(&(pklvl), sizeof(pklvl), 1, fpsave);
-  fread(&(time), sizeof(time_data), 1, fpsave);
+  fread(&(time), sizeof(Time), 1, fpsave);
   fread(&(bad_pw_tries), sizeof(bad_pw_tries), 1, fpsave);
   fread(&(practices), sizeof(practices), 1, fpsave);
   fread(&(bank), sizeof(bank), 1, fpsave);
@@ -555,7 +555,7 @@ bool Player::read(auto &streamfpsave, CharacterPtr ch, QString filename)
   return true;
 }
 
-bool Character::save_pc_or_mob_data(auto &streamfpsave, time_data tmpage)
+bool Character::save_pc_or_mob_data(auto &streamfpsave, Time tmpage)
 {
   if (isNonPlayer())
   {
@@ -786,7 +786,7 @@ void save_char_obj_db(CharacterPtr ch)
   SETBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
   char_file_u4 uchar;
-  time_data tmpage;
+  Time tmpage;
   memset(&uchar, 0, sizeof(uchar));
   memset(&tmpage, 0, sizeof(tmpage));
 
@@ -828,7 +828,7 @@ void save_char_obj_db(CharacterPtr ch)
     if(fpsave != nullptr)
 
     dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
-    ch->send("WARNING: file problem. You did not save!");
+    ch->send(u"WARNING: file problem. You did not save!"_s);
     perror(log_buf);
     dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
@@ -845,7 +845,7 @@ void save_char_obj_db(CharacterPtr ch)
 void Character::save_char_obj(void)
 {
   char_file_u4 uchar = {};
-  time_data tmpage;
+  Time tmpage;
   FILE *fpsave = {};
   QString strsave;
   QString name;
@@ -876,7 +876,7 @@ void Character::save_char_obj(void)
 
   if (!(fpsave = fopen(strsave, "wb")))
   {
-    sendln("Warning!  Did not save.  Could not open file.  Contact a god, do not logoff.");
+    sendln(u"Warning!  Did not save.  Could not open file.  Contact a god, do not logoff."_s);
     QString log_buf = {};
     dc_sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
@@ -922,7 +922,7 @@ void Character::save_char_obj(void)
 
       QString log_buf = {};
     dc_sprintf(log_buf, "Save_char_obj: %s", strsave);
-    send("WARNING: file problem. You did not save!");
+    send(u"WARNING: file problem. You did not save!"_s);
     perror(log_buf);
     dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
@@ -1217,7 +1217,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && dc_->obj_index[last_cont->item_number].vnum() != 536)
+      if (!last_cont->equipped_by && dc_->obj_index_[last_cont->item_number].vnum() != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1300,7 +1300,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.item_number = dc_->obj_index[obj->item_number].vnum();
+  object.item_number = dc_->obj_index_[obj->item_number].vnum();
   object.timer = obj->flags_.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1313,7 +1313,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
     return false;
 
   // get a pointer to the standard version of this item
-  standard_obj = (dc_->obj_index[obj->item_number].item);
+  standard_obj = (dc_->obj_index_[obj->item_number]->item);
 
   // Begin checking if this item has been modified in any way from the standard
   // If it has, we need to save that particular modification to the file
@@ -1397,7 +1397,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
 
     tmp_weight = obj->flags_.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
-    && dc_->obj_index[obj->item->number].vnum() != 536)
+    && dc_->obj_index_[obj->item->number].vnum() != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
     if(tmp_weight      != standard_obj->flags_.weight)
@@ -1515,7 +1515,7 @@ void restore_weight(ObjectPtr obj)
 
   if (obj == nullptr)
     return;
-  if (dc_->obj_index[obj->item_number].vnum() == 536)
+  if (dc_->obj_index_[obj->item_number].vnum() == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);
@@ -1608,7 +1608,7 @@ void store_to_char(char_file_u4 *st, CharacterPtr ch)
 
 // copy vital data from a players character-ure to the file ure
 // return 'age' of character unmodified
-void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
+void Character::char_to_store(char_file_u4 *st, Time &tmpage)
 {
   qint32 i;
   qint32 x;

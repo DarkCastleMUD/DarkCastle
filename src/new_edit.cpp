@@ -785,7 +785,7 @@ void new_string_add(ConnectionPtr conn, QString str)
         if (conn->connected != Connection::states::EXDSCR)
           conn->connected = Connection::states::PLAYING;
       }
-      ch->sendln("Aborted.");
+      ch->sendln(u"Aborted."_s);
       if (conn->connected == Connection::states::EXDSCR)
       {
         conn->connected = Connection::states::SELECT_MENU;
@@ -818,7 +818,7 @@ void new_string_add(ConnectionPtr conn, QString str)
         }
         else
         {
-          ch->sendln("Ok.");
+          ch->sendln(u"Ok."_s);
 
           if (conn->connected != Connection::states::EXDSCR)
           {

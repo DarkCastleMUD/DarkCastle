@@ -51,7 +51,7 @@ void move_player_home(CharacterPtr victim)
   {
     if (!victim->clan || !(clan = get_clan(victim)))
     {
-      victim->sendln("The gods frown on you, and reset your home.");
+      victim->sendln(u"The gods frown on you, and reset your home."_s);
       victim->hometown = START_ROOM;
       move_player(victim, real_room(victim->hometown));
     }
@@ -67,7 +67,7 @@ void move_player_home(CharacterPtr victim)
 
       if (!found)
       {
-        victim->sendln("The gods frown on you, and reset your home.");
+        victim->sendln(u"The gods frown on you, and reset your home."_s);
         victim->hometown = START_ROOM;
       }
       move_player(victim, real_room(victim->hometown));
@@ -129,7 +129,7 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
 //   }
 //}
 
-command_return_t do_unstable(CharacterPtr ch)
+ReturnValue do_unstable(CharacterPtr ch)
 {
   QString death_log;
   qint32 retval;
@@ -163,7 +163,7 @@ command_return_t do_unstable(CharacterPtr ch)
     return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_fall(CharacterPtr ch, short dir)
+ReturnValue do_fall(CharacterPtr ch, short dir)
 {
   qint32 target;
   QString damage;
@@ -189,7 +189,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   if (IS_AFFECTED(ch, AFF_FREEFLOAT))
   {
     dam = {};
-    ch->sendln("Your freefloating magics reduce your fall to a safer speed.");
+    ch->sendln(u"Your freefloating magics reduce your fall to a safer speed."_s);
   }
 
   // Don't effect mobs
@@ -216,7 +216,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
         ppl++;
     if (ppl > 2)
     {
-      ch->sendln("There isn't enough space for you to follow.");
+      ch->sendln(u"There isn't enough space for you to follow."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -230,7 +230,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
         ppl++;
     if (ppl > 4)
     {
-      ch->sendln("There isn't enough space for you to follow.");
+      ch->sendln(u"There isn't enough space for you to follow."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -239,27 +239,27 @@ command_return_t do_fall(CharacterPtr ch, short dir)
   {
   case 0:
     act_to_room("$n rolls out to the north.", ch, 0, 0, 0);
-    ch->sendln("You tumble to the north...");
+    ch->sendln(u"You tumble to the north..."_s);
     break;
   case 1:
     act_to_room("$n rolls out to the east.", ch, 0, 0, 0);
-    ch->sendln("You tumble to the east...");
+    ch->sendln(u"You tumble to the east..."_s);
     break;
   case 2:
     act_to_room("$n rolls out to the south.", ch, 0, 0, 0);
-    ch->sendln("You tumble to the south...");
+    ch->sendln(u"You tumble to the south..."_s);
     break;
   case 3:
     act_to_room("$n rolls out to the west.", ch, 0, 0, 0);
-    ch->sendln("You tumble to the west...");
+    ch->sendln(u"You tumble to the west..."_s);
     break;
   case 4:
     act_to_room("$n is launched upwards.", ch, 0, 0, 0);
-    ch->sendln("You are launched into the air...");
+    ch->sendln(u"You are launched into the air..."_s);
     break;
   case 5:
     act_to_room("$n falls through the room.", ch, 0, 0, 0);
-    ch->sendln("You fall...");
+    ch->sendln(u"You fall..."_s);
     break;
   default:
     dc_->logentry(u"Default hit in do_fall"_s, IMMORTAL, DC::LogChannel::LOG_MORTAL);
@@ -270,7 +270,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
   {
-    ch->sendln("You are miraculously upheld by divine powers!");
+    ch->sendln(u"You are miraculously upheld by divine powers!"_s);
     return retval;
   }
 
@@ -300,7 +300,7 @@ command_return_t do_fall(CharacterPtr ch, short dir)
 // Assumes
 // 1. No master and no followers.
 // 2. That the direction exists.
-command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
+ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 {
   QString tmp;
   qint32 was_in;
@@ -326,7 +326,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   if (ch == nullptr || ch->in_room < 1 || !valid_dir || dc_->world[ch->in_room].dir_option[dir] == nullptr || dc_->world[ch->in_room].dir_option[dir]->to_room < 1)
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
-    ch->send("There was an error performing that movement.\r\n");
+    ch->send(u"There was an error performing that movement.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -479,7 +479,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
                                          (cmd == cmd_t::DOWN && isSet(dc_->world[dc_->world[ch->in_room].dir_option[DOWN]->to_room].room_flags, FALL_UP)) ||
                                          cmd_to_dir && dc_->world[dc_->world[ch->in_room].dir_option[*cmd_to_dir]->to_room].sector_type == SECT_AIR))
     {
-      ch->sendln("You would need to fly to go there!");
+      ch->sendln(u"You would need to fly to go there!"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -500,7 +500,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       if (!has_boat && !IS_AFFECTED(ch, AFF_FLYING) && !ch->isImmortalPlayer() &&
           ch->race != RACE_FISH && ch->race != RACE_SLIME && !IS_AFFECTED(ch, AFF_FREEFLOAT))
       {
-        ch->sendln("You need a boat to go there.");
+        ch->sendln(u"You need a boat to go there."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -510,7 +510,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
       // It's NOT a water room and we don't have fly
       if (ch->race == RACE_FISH)
       {
-        ch->sendln("You can't swim around outside water without being able to fly!");
+        ch->sendln(u"You can't swim around outside water without being able to fly!"_s);
         act_to_room("$n flops around in a futile attempt to move out of water.", ch, 0, 0, INVIS_NULL);
         return ReturnValue::eFAILURE;
       }
@@ -520,7 +520,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   if (isSet(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].room_flags, IMP_ONLY) &&
       ch->getLevel() < IMPLEMENTER)
   {
-    ch->sendln("No.");
+    ch->sendln(u"No."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -531,7 +531,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     qint32 s2 = rm->sector_type, s1 = dc_->world[ch->in_room].sector_type;
     if ((s1 == SECT_CITY && (s2 != SECT_INSIDE && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_INSIDE && (s2 != SECT_CITY && s2 != SECT_PAVED_ROAD)) || (s1 == SECT_PAVED_ROAD && (s2 != SECT_INSIDE && s2 != SECT_CITY)) || (s1 == SECT_FIELD && (s2 != SECT_HILLS && s2 != SECT_MOUNTAIN)) || (s1 == SECT_HILLS && (s2 != SECT_MOUNTAIN && s2 != SECT_FIELD)) || (s1 == SECT_MOUNTAIN && (s2 != SECT_HILLS && s2 != SECT_FIELD)) || (s1 == SECT_WATER_NOSWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_SWIM)) || (s1 == SECT_WATER_SWIM && (s2 != SECT_UNDERWATER && s2 != SECT_WATER_NOSWIM)) || (s1 == SECT_UNDERWATER && (s2 != SECT_WATER_NOSWIM && s2 != SECT_WATER_SWIM)) || (s1 == SECT_BEACH && (s2 != SECT_DESERT)) || (s1 == SECT_DESERT && (s2 != SECT_BEACH)) || (s1 == SECT_FROZEN_TUNDRA && (s2 != SECT_ARCTIC)) || (s1 == SECT_ARCTIC && (s2 != SECT_FROZEN_TUNDRA)) || (s1 == SECT_AIR) || (s1 == SECT_SWAMP))
     {
-      ch->sendln("The ghost evaporates as you leave its habitat.");
+      ch->sendln(u"The ghost evaporates as you leave its habitat."_s);
       do_return(ch, "");
       // extract_char(ch,true);
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
@@ -547,7 +547,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
         ppl++;
     if (ppl > 2)
     {
-      ch->sendln("There's no room.");
+      ch->sendln(u"There's no room."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -568,7 +568,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     {
       if (rm->allow_class[GET_CLASS(ch)] != true)
       {
-        ch->sendln("Your class is not allowed there.");
+        ch->sendln(u"Your class is not allowed there."_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -583,15 +583,15 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
         ppl++;
     if (ppl > 4)
     {
-      ch->sendln("There's no room.");
+      ch->sendln(u"There's no room."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (ch->isPlayer() && dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
-    ch->sendln("You feel air trying to explode from your lungs as you swim around.");
-    // ch->sendln("Underwater?!");
+    ch->sendln(u"You feel air trying to explode from your lungs as you swim around."_s);
+    // ch->sendln(u"Underwater?!"_s);
     // return ReturnValue::eFAILURE;
   }
 
@@ -606,9 +606,9 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   if (GET_MOVE(ch) < need_movement && ch->isPlayer())
   {
     if (!following)
-      ch->sendln("You are too exhausted.");
+      ch->sendln(u"You are too exhausted."_s);
     else
-      ch->sendln("You are too exhausted to follow.");
+      ch->sendln(u"You are too exhausted to follow."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -617,13 +617,13 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   {
     if (ch->affected_by_spell(SPELL_IRON_ROOTS))
     {
-      ch->sendln("The roots bracing your legs keep you from moving!");
+      ch->sendln(u"The roots bracing your legs keep you from moving!"_s);
       return ReturnValue::eFAILURE;
     }
     else
     {
       REMBIT(ch->affected_by, AFF_NO_FLEE);
-      ch->sendln("The travel wakes you up some, and clears the drowsiness from your legs.");
+      ch->sendln(u"The travel wakes you up some, and clears the drowsiness from your legs."_s);
     }
   }
 
@@ -659,7 +659,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     {
       dc_sprintf(tmp, "$n leaves %s.", dirs[dir]);
       REMBIT(ch->affected_by, AFF_FOREST_MELD);
-      ch->sendln("You detach yourself from the forest.");
+      ch->sendln(u"You detach yourself from the forest."_s);
       act_to_room(tmp, ch, 0, 0, INVIS_NULL);
     }
     else
@@ -681,22 +681,22 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
   if (isSet(retval, ReturnValue::eSUCCESS) && IS_AFFECTED(ch, AFF_CRIPPLE))
   {
-    ch->sendln("Your crippled body responds slowly.");
+    ch->sendln(u"Your crippled body responds slowly."_s);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
-      ch->sendln("The sounds around you fade to nothing as the silence takes hold...");
+    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+      ch->sendln(u"The sounds around you fade to nothing as the silence takes hold..."_s);
 
   for (tmp_obj = dc_->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
-      ch->sendln("The noise around you returns as you leave the silenced area!");
+    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+      ch->sendln(u"The noise around you returns as you leave the silenced area!"_s);
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
   {
-    ch->sendln("You fail to move.");
+    ch->sendln(u"You fail to move."_s);
     return retval;
   }
 
@@ -749,7 +749,7 @@ command_return_t do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   // Elemental stuff goes HERE
   if (ch->isNonPlayer())
   {
-    qint32 a = dc_->mob_index[ch->mobdata->nr].vnum();
+    qint32 a = dc_->mob_index_[ch->mobdata->nr].vnum();
     // code a bit repeaty, but whatever ;)
     if (a == 88 && dc_->world[ch->in_room].sector_type == SECT_UNDERWATER)
     {
@@ -854,31 +854,31 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
   auto opt_dir = getDirectionFromCommand(cmd);
   if (!opt_dir)
   {
-    ch->sendln("Error. Tell an immortal.");
+    ch->sendln(u"Error. Tell an immortal."_s);
     return ReturnValue::eFAILURE;
   }
   auto dir = *opt_dir;
 
   if (!dc_->world[ch->in_room].dir_option[dir])
   {
-    ch->sendln("You can't go that way.");
+    ch->sendln(u"You can't go that way."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(EXIT(ch, dir)->exit_info, EX_CLOSED))
   {
     if (isSet(EXIT(ch, dir)->exit_info, EX_HIDDEN))
-      ch->sendln("You can't go that way.");
+      ch->sendln(u"You can't go that way."_s);
     else if (EXIT(ch, dir)->keyword)
       ch->send(u"The %s seems to be closed.\r\n"_s.arg(qPrintable(fname(EXIT(ch).arg(dir)->keyword))));
     else
-      ch->sendln("It seems to be closed.");
+      ch->sendln(u"It seems to be closed."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (EXIT(ch, dir)->to_room == DC::NOWHERE)
   {
-    ch->sendln("Alas, you can't go that way.");
+    ch->sendln(u"Alas, you can't go that way."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -905,18 +905,18 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
 
   if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master) && (ch->in_room == ch->master->in_room))
   {
-    ch->sendln("You are unable to abandon your master.");
+    ch->sendln(u"You are unable to abandon your master."_s);
     act_to_room("$n trembles as $s mind attempts to free itself from its magical bondage.", ch, 0, 0, 0);
     if (ch->master->isPlayer() && GET_CLASS(ch->master) == CLASS_BARD)
     {
-      ch->master->sendln("You struggle to maintain control.");
+      ch->master->sendln(u"You struggle to maintain control."_s);
       /*
        if (GET_KI(ch->master) < 5) {
        ch->add_memory(qPrintable(ch->master->name()), 'h');
        stop_follower(ch, follower_reasons_t::BROKE_CHARM);
        //ch->add_memory(qPrintable(ch->master->name()), 'h');
        do_say(ch, "Hey! You tricked me!");
-       ch->master->sendln("You lose control.");
+       ch->master->sendln(u"You lose control."_s);
        }
        else
        GET_KI(ch->master) -= 5;
@@ -957,9 +957,9 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
         if (IS_AFFECTED(k->follower, AFF_NO_FLEE))
         {
           if (k->follower->affected_by_spell(SPELL_IRON_ROOTS))
-            k->follower->sendln("The roots bracing your legs make it impossible to run!");
+            k->follower->sendln(u"The roots bracing your legs make it impossible to run!"_s);
           else
-            k->follower->sendln("Your legs are too tired for running away!");
+            k->follower->sendln(u"Your legs are too tired for running away!"_s);
           continue; // keep going through the groupies
         }
         if (is_retreat && k->follower->fighting && (ch->dc_->number(1, 100) < 4) && k->follower->fighting->isNonPlayer())
@@ -1007,12 +1007,12 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
 //   1 : If success.
 //   0 : If fail
 //  -1 : If dead.
-command_return_t do_move(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValue do_move(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   return attempt_move(ch, cmd);
 }
 
-command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
+ReturnValue do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
 {
   ObjectPtr k;
   QString buf;
@@ -1028,12 +1028,12 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
         {
           if (k->getPortalDestinationRoom() == dc_->world[ch->in_room].number || k->flags_.value[2] == dc_->world[ch->in_room].zone)
           {
-            ch->sendln("You exit the area.");
+            ch->sendln(u"You exit the area."_s);
             act_to_room("$n has left the area.", ch, 0, 0, INVIS_NULL | STAYHIDE);
             retval = move_char(ch, real_room(dc_->world[k->in_room].number));
             if (!isSet(retval, ReturnValue::eSUCCESS))
             {
-              ch->sendln("You attempt to leave, but the door slams in your face!");
+              ch->sendln(u"You attempt to leave, but the door slams in your face!"_s);
               act_to_room("$n attempts to leave, but can't!", ch, 0, 0, INVIS_NULL | STAYHIDE);
               return ReturnValue::eFAILURE;
             }
@@ -1047,12 +1047,12 @@ command_return_t do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
     }
   }
 
-  ch->sendln("There are no exits around!");
+  ch->sendln(u"There are no exits around!"_s);
 
   return ReturnValue::eFAILURE;
 }
 
-command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 retval;
@@ -1067,19 +1067,19 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (buf.isEmpty())
   {
-    ch->sendln("Enter what?");
+    ch->sendln(u"Enter what?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if ((portal = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room].contents)) == nullptr)
   {
-    ch->sendln("Nothing here by that name.");
+    ch->sendln(u"Nothing here by that name."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!portal->isPortal())
   {
-    ch->sendln("You can't enter that.");
+    ch->sendln(u"You can't enter that."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1087,23 +1087,23 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     dc_sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
     dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
-    ch->sendln("You can't enter that.");
+    ch->sendln(u"You can't enter that."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (dc_->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
-    ch->sendln("You bravely attempt to plunge through the portal - let's hope you have gills!");
+    ch->sendln(u"You bravely attempt to plunge through the portal - let's hope you have gills!"_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(dc_->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
   {
-    ch->sendln("You may not enter a clanhall at your level.");
+    ch->sendln(u"You may not enter a clanhall at your level."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isNonPlayer() && ch->master && dc_->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && ch->master && dc_->mob_index_[ch->mobdata->nr].vnum() == 8)
   {
     sesame = ch->master;
     if (isSet(dc_->world[real_room(portal->flags_.value[0])].room_flags, CLAN_ROOM))
@@ -1111,7 +1111,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
       // Is golem's master not a member of this clan
       if (others_clan_room(sesame, &dc_->world[real_room(portal->flags_.value[0])]) == true)
       {
-        ch->sendln("Your master is not from that clan.");
+        ch->sendln(u"Your master is not from that clan."_s);
         act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
         do_say(ch, "I may not enter.");
         return ReturnValue::eFAILURE;
@@ -1126,7 +1126,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   // should probably just combine this with 'if' below it, but i'm lazy
   if (isSet(portal->flags_.value[3], Object::portal_flags_t::No_Enter))
   {
-    ch->sendln("The portal's destination rebels against you.");
+    ch->sendln(u"The portal's destination rebels against you."_s);
     act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
@@ -1134,27 +1134,27 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   // Thieves arent allowed through cleric portals
   if (ch->isPlayerObjectThief() && portal->isPortalTypePlayer())
   {
-    ch->sendln("Your attempt to transport stolen goods through planes of magic fails!");
+    ch->sendln(u"Your attempt to transport stolen goods through planes of magic fails!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(dc_->world[real_room(portal->flags_.value[0])].room_flags, CLAN_ROOM) || (portal->flags_.value[0] >= 1900 && portal->flags_.value[0] <= 1999 && !portal->flags_.value[1])))
   {
-    ch->sendln("The portal's destination rebels against you.");
+    ch->sendln(u"The portal's destination rebels against you."_s);
     act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
   if (isexact("only", portal->name()) && !isexact(qPrintable(sesame->name()), portal->name()))
   {
-    ch->sendln("The portal fades when you draw near, then shimmers as you withdraw.");
+    ch->sendln(u"The portal fades when you draw near, then shimmers as you withdraw."_s);
     return ReturnValue::eFAILURE;
   }
 
   switch (portal->flags_.value[1])
   {
   case 0:
-    ch->sendln("You reach out tentatively and touch the portal...");
+    ch->sendln(u"You reach out tentatively and touch the portal..."_s);
     act_to_room("$n reaches out to the glowing dimensional portal....", ch, 0, 0, 0);
     break;
   case 1:
@@ -1165,7 +1165,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     act_to_room(buf, ch, 0, 0, INVIS_NULL | STAYHIDE);
     break;
   case 3:
-    ch->sendln("You cannot enter that.");
+    ch->sendln(u"You cannot enter that."_s);
     return ReturnValue::eFAILURE;
   default:
     dc_sprintf(buf, "Error in do_enter(), value 1 on object %d returned default case", portal->item_number);
@@ -1180,7 +1180,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
   {
-    ch->sendln("You recoil in pain as the portal slams shut!");
+    ch->sendln(u"You recoil in pain as the portal slams shut!"_s);
     act_to_room("$n recoils in pain as the portal slams shut!", ch, 0, 0, 0);
   }
 
@@ -1189,7 +1189,7 @@ command_return_t do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
   case 0:
     do_look(ch, "");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    ch->sendln("\r\nYou are momentarily dazed from the dimensional shift.");
+    ch->sendln(u"\r\nYou are momentarily dazed from the dimensional shift."_s);
     act_to_room("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, 0);
     break;
   case 1:
@@ -1244,7 +1244,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr obj = {};
@@ -1253,19 +1253,19 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (buf.isEmpty())
   {
-    ch->sendln("Climb what?");
+    ch->sendln(u"Climb what?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (!(obj = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room].contents)))
   {
-    ch->sendln("Climb what?");
+    ch->sendln(u"Climb what?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (obj->flags_.type_flag != ITEM_CLIMBABLE)
   {
-    ch->sendln("You can't climb that.");
+    ch->sendln(u"You can't climb that."_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1273,8 +1273,8 @@ command_return_t do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (real_room(dest) < 0)
   {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", dc_->obj_index[obj->item_number].vnum());
-    ch->sendln("You can't climb that.");
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", dc_->obj_index_[obj->item_number].vnum());
+    ch->sendln(u"You can't climb that."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1324,7 +1324,7 @@ qint32 ambush(CharacterPtr ch)
 
       if (IS_AFFECTED(ch, AFF_ALERT))
       {
-        i->sendln("Your target is far too alert to accomplish an ambush!");
+        i->sendln(u"Your target is far too alert to accomplish an ambush!"_s);
         continue;
       }
 

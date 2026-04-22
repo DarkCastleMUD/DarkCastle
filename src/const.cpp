@@ -15,8 +15,6 @@
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 #include "DC/DC.h"
 
-room_t IMM_PIRAHNA_ROOM = 25;
-
 QMap<qint32, qint32> fill_skill_cost()
 {
   QMap<qint32, qint32> skill_cost_map;
@@ -313,21 +311,6 @@ QList<profession> fill_professions(void)
 }
 
 QList<profession> professions = fill_professions();
-
-// Obj proc types
-const QStringList obj_types = {
-    "act_prog",
-    "speech_prog",
-    "rand_prog",
-    "all_greet_prog",
-    "catch_prog",
-    "arand_prog",
-    "load_prog",
-    "command_prog",
-    "weapon_prog",
-    "armour_prog",
-    "can_see_prog",
-    "\n"};
 
 const QStringList utility_item_types{
     "Nothing - Useless",
@@ -1994,7 +1977,7 @@ public:
 };
 */
 
-race_data races[] =
+QList<race_data> races =
     {
         // Name,        Lowercase    Plural,       Playable Parts, Immun,    Res,  Sus,  Hates/Fears,  Frnd, MinWt, MaxWt, MinHt, MaxHt,    Str      Dex         Con      Int    Wis,   Mob Affects, UnarmedHitType
         {"NPC", "npc", "NPC", false, 63, 0, 0, 0, 0, 0, 150, 150, 72, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "hit"},
@@ -2034,7 +2017,7 @@ race_data races[] =
         {"Immortal", "immortal", "Immortals", false, 127, 1288, 1048576, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_DETECT_INVISIBLE | AFF_FLYING | AFF_TRUE_SIGHT | AFF_SOLIDITY | AFF_SANCTUARY, "ethereal strike"},
         {"Feline", "feline", "Felines", false, 27, 0, 0, 128, 8388608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT | AFF_INFRARED | AFF_SENSE_LIFE | AFF_SNEAK, "claw"}};
 
-qint32 mob_race_mod[][5] =
+const QList<QList<qint32>> DC::mob_race_mod =
     /* str, dex, con, qint32, wis */
     {
         {15, 15, 15, 15, 15}, // NPC

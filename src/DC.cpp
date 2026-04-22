@@ -109,10 +109,10 @@ DCPtr DC::getInstance(void)
   return dynamic_cast<DC *>(DC::instance());
 }
 
-zone_t DC::getRoomZone(room_t room_nr)
+zone_t DC::getRoomZone(room_t room_number)
 {
   for (auto [zone_key, zone] : zones_.asKeyValueRange())
-    if (room_nr >= zone.getRealBottom() && room_nr <= zone.getTop())
+    if (room_number >= zone.getRealBottom() && room_number <= zone.getTop())
       return zone_key;
   return zone_t();
 }
@@ -281,7 +281,7 @@ ObjectPtr DC::getObject(vnum_t vnum)
     return {};
   }
 
-  return obj_index[rnum].item;
+  return obj_index_[rnum]->item;
 }
 
 void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
@@ -314,13 +314,13 @@ auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_co
   return std::unexpected(search_error::not_found);
 }
 
-auto Character::do_arena_info(QStringList arguments) -> command_return_t
+auto Character::do_arena_info(QStringList arguments) -> ReturnValue
 {
-  sendln("Arena info:");
-  return command_return_t();
+  sendln(u"Arena info:"_s);
+  return ReturnValue();
 }
 
-auto Character::do_arena_start(QStringList arguments) -> command_return_t
+auto Character::do_arena_start(QStringList arguments) -> ReturnValue
 {
   /*
   if (*arg4)
@@ -367,35 +367,35 @@ else
 {
   arena.type = NORMAL;
 }
-  ch->sendln("The Arena has been opened for the specified levels.");
+  ch->sendln(u"The Arena has been opened for the specified levels."_s);
 */
-  sendln("Arena start:");
-  return command_return_t();
+  sendln(u"Arena start:"_s);
+  return ReturnValue();
 }
 
-auto Character::do_arena_join(QStringList arguments) -> command_return_t
+auto Character::do_arena_join(QStringList arguments) -> ReturnValue
 {
-  sendln("Arena join:");
-  return command_return_t();
+  sendln(u"Arena join:"_s);
+  return ReturnValue();
 }
 
-auto Character::do_arena_cancel(QStringList arguments) -> command_return_t
+auto Character::do_arena_cancel(QStringList arguments) -> ReturnValue
 {
-  sendln("Arena cancel:");
-  return command_return_t();
+  sendln(u"Arena cancel:"_s);
+  return ReturnValue();
 }
 
-auto Character::do_arena_usage(QStringList arguments) -> command_return_t
+auto Character::do_arena_usage(QStringList arguments) -> ReturnValue
 {
-  sendln("Usage:");
-  sendln("arena info          - Shows current arena status");
-  sendln("arena start         - Start an arena open to anyone for free");
-  sendln("arena start # gold  - Start an arena open to anyone whom pays # gold. Winner takes all.");
-  sendln("arena join          - Join an arena that's free to play");
-  sendln("arena join # gold   - Join an arena by paying the entrance fee of # gold");
-  sendln("arena cancel        - Cancel an arena");
+  sendln(u"Usage:"_s);
+  sendln(u"arena info          - Shows current arena status"_s);
+  sendln(u"arena start         - Start an arena open to anyone for free"_s);
+  sendln(u"arena start # gold  - Start an arena open to anyone whom pays # gold. Winner takes all."_s);
+  sendln(u"arena join          - Join an arena that's free to play"_s);
+  sendln(u"arena join # gold   - Join an arena by paying the entrance fee of # gold"_s);
+  sendln(u"arena cancel        - Cancel an arena"_s);
 
-  return command_return_t();
+  return ReturnValue();
 }
 
 QString Character::getPrompt(void) const
@@ -426,7 +426,7 @@ bool Character::isNowhere(void)
   return in_room == DC::NOWHERE;
 }
 
-command_return_t Character::do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd)
 {
   sendln(u"$3%1$R: %2"_s.arg(desc).arg(value));
 
@@ -539,3 +539,12 @@ cDeck::cDeck(QObject *parent)
     : QObject(parent), dc_(qobject_cast<DC *>(parent))
 {
 }
+
+const QStringList cond_colorcodes = {
+    BOLD + GREEN,
+    GREEN,
+    BOLD + YELLOW,
+    YELLOW,
+    RED,
+    BOLD + RED,
+    BOLD + GREY};

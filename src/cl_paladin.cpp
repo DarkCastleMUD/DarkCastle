@@ -14,7 +14,7 @@
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   // CharacterPtr tmp_ch;
@@ -34,7 +34,7 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
     victim = ch->fighting;
     if (!victim)
     {
-      ch->sendln("Whom do you want to harmtouch?");
+      ch->sendln(u"Whom do you want to harmtouch?"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -42,23 +42,23 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
   if (victim == ch)
   {
     if (GET_SEX(ch) == Character::sex_t::MALE)
-      ch->sendln("You'd wither it!");
+      ch->sendln(u"You'd wither it!"_s);
     else if (GET_SEX(ch) == Character::sex_t::FEMALE)
-      ch->sendln("You naughty naughty girl...at least wait until someone's filming.");
+      ch->sendln(u"You naughty naughty girl...at least wait until someone's filming."_s);
     else
-      ch->sendln("Looks like you've already harm touched yourself...");
+      ch->sendln(u"Looks like you've already harm touched yourself..."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_HARM_TOUCH) && ch->getLevel() <= IMMORTAL)
   {
-    ch->sendln("You have not spend enough time in devotion to your god to warrant such a favor yet.");
+    ch->sendln(u"You have not spend enough time in devotion to your god to warrant such a favor yet."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->getHP() < GET_MAX_HIT(ch) / 4)
   {
-    ch->sendln("You don't posess the energy to do it!");
+    ch->sendln(u"You don't posess the energy to do it!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -68,7 +68,7 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 duration = 24;
   if (!skill_success(ch, victim, SKILL_HARM_TOUCH))
   {
-    ch->sendln("Your god refuses you.");
+    ch->sendln(u"Your god refuses you."_s);
     duration = 1;
     WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2 + dc_->number((quint64)1, (quint64)DC::PULSE_VIOLENCE / 2));
   }
@@ -108,7 +108,7 @@ command_return_t do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   // CharacterPtr tmp_ch;
@@ -124,30 +124,30 @@ command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(victim_name)))
   {
-    ch->sendln("Whom do you want to layhands on?");
+    ch->sendln(u"Whom do you want to layhands on?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Oh yeah...that's really holy....pervert...");
+    ch->sendln(u"Oh yeah...that's really holy....pervert..."_s);
     return ReturnValue::eFAILURE;
   }
 
   //   if (ch->fighting == victim) {
-  //     ch->sendln("Aren't you a little busy trying to KILL them right now?");
+  //     ch->sendln(u"Aren't you a little busy trying to KILL them right now?"_s);
   //     return ReturnValue::eFAILURE;
   //   }
 
   if (ch->affected_by_spell(SKILL_LAY_HANDS))
   {
-    ch->sendln("You have not spent enough time in devotion to your god to warrant such a favor yet.");
+    ch->sendln(u"You have not spent enough time in devotion to your god to warrant such a favor yet."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (ch->getHP() < GET_MAX_HIT(ch) / 4)
   {
-    ch->sendln("You don't posess the energy to do it!");
+    ch->sendln(u"You don't posess the energy to do it!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -156,7 +156,7 @@ command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_LAY_HANDS))
   {
-    ch->sendln("Your god refuses you.");
+    ch->sendln(u"Your god refuses you."_s);
     duration = 1;
   }
   else
@@ -184,7 +184,7 @@ command_return_t do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;
@@ -202,7 +202,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!ch->equipment[WEAR_WIELD] || !isSet(ch->equipment[WEAR_WIELD]->flags_.extra_flags, ITEM_TWO_HANDED) || (ch->equipment[WEAR_WIELD]->flags_.value[3] != 3)) // TYPE_SLASH
   {
-    ch->sendln("You need to be wielding a two handed sword to behead!");
+    ch->sendln(u"You need to be wielding a two handed sword to behead!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -212,7 +212,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
       vict = ch->fighting;
     else
     {
-      ch->sendln("Whom do you want behead?");
+      ch->sendln(u"Whom do you want behead?"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -222,7 +222,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(vict->combat, COMBAT_BLADESHIELD1) || isSet(vict->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("You can't behead a bladeshielded opponent!");
+    ch->sendln(u"You can't behead a bladeshielded opponent!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -233,7 +233,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_BEHEAD))
   {
-    ch->sendln("Your mighty swing goes wild!");
+    ch->sendln(u"Your mighty swing goes wild!"_s);
     act_to_victim("$n takes a mighty swing at your head, but it goes wild!", ch, 0, vict, 0);
     act_to_room("$n takes a mighty swing at $n's head, but it goes wild!", ch, 0, vict, NOTVICT);
     retval = one_hit(ch, vict, SKILL_BEHEAD, WEAR_WIELD);
@@ -271,7 +271,7 @@ command_return_t do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   if ((ch->dc_->number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {
     if ((
-            (vict->equipment[WEAR_NECK_1] && dc_->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && dc_->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
+            (vict->equipment[WEAR_NECK_1] && dc_->obj_index_[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && dc_->obj_index_[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
       act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);

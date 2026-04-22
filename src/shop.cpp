@@ -156,7 +156,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
 
   if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return;
   }
 
@@ -169,7 +169,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
 
   if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
-    ch->sendln("The shop keeper changes his mind and refuses to sell such a special item.");
+    ch->sendln(u"The shop keeper changes his mind and refuses to sell such a special item."_s);
     return;
   }
 
@@ -193,13 +193,13 @@ void shopping_buy(const QString arg, CharacterPtr ch,
 
   if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
   {
-    ch->sendln("You can't carry that many items.");
+    ch->sendln(u"You can't carry that many items."_s);
     return;
   }
 
   if (IS_CARRYING_W(ch) + obj->flags_.weight > CAN_CARRY_W(ch))
   {
-    ch->sendln("You can't carry that much weight.");
+    ch->sendln(u"You can't carry that much weight."_s);
     return;
   }
 
@@ -207,7 +207,7 @@ void shopping_buy(const QString arg, CharacterPtr ch,
   {
     if (search_char_for_item(ch, obj->item_number, false))
     {
-      ch->sendln("The item's uniqueness prevents it!");
+      ch->sendln(u"The item's uniqueness prevents it!"_s);
       return;
     }
   }
@@ -262,7 +262,7 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   if (!ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
-    ch->sendln("Your criminal acts prohibit it.");
+    ch->sendln(u"Your criminal acts prohibit it."_s);
     return;
   }
 
@@ -274,24 +274,24 @@ void shopping_sell(const QString arg, CharacterPtr ch,
 
   if (isSet(obj->flags_.more_flags, ITEM_NO_TRADE))
   {
-    ch->sendln("It seems magically attached to you.");
+    ch->sendln(u"It seems magically attached to you."_s);
     return;
   }
 
   if (contains_no_trade_item(obj))
   {
     if (ch->getLevel() > IMMORTAL)
-      ch->sendln("That was a NO_TRADE item btw....");
+      ch->sendln(u"That was a NO_TRADE item btw...."_s);
     else
     {
-      ch->sendln("Something inside it seems magically attached to you.");
+      ch->sendln(u"Something inside it seems magically attached to you."_s);
       return;
     }
   }
 
   if (isSet(obj->flags_.extra_flags, ITEM_SPECIAL))
   {
-    ch->sendln("That would be really fucking smart.");
+    ch->sendln(u"That would be really fucking smart."_s);
     return;
   }
 
@@ -301,9 +301,9 @@ void shopping_sell(const QString arg, CharacterPtr ch,
     return;
   }
 
-  qint32 virt = dc_->obj_index[obj->item_number].vnum();
+  qint32 virt = dc_->obj_index_[obj->item_number].vnum();
   if (virt >= 13400 && virt <= 13707 &&
-      dc_->mob_index[keeper->mobdata->nr].vnum() != 13416)
+      dc_->mob_index_[keeper->mobdata->nr].vnum() != 13416)
   {
     keeper->do_tell(u"%1 There is only one merchant in the land that deals with such fine jewels."_s.arg(qPrintable(ch->name())).split(' '));
     return;
@@ -375,7 +375,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     }
   }
 
-  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3003)
+  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -424,7 +424,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.");
   }
-  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3004)
+  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -468,7 +468,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     else
       do_say(keeper, "I deal with armor exclusively.");
   }
-  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3000)
+  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -525,7 +525,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
-  if (dc_->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
+  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
   { // if the leather worker in town
     act_to_character("The Leather Worker holds up $p for you to examine.", ch, obj, 0, 0);
     act_to_room("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, 0);
@@ -596,7 +596,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
     restock_keeper(keeper, shop_nr);
   }
   i = {};
-  ch->sendln("[Amt] [ Price ] [ VNUM ] Item");
+  ch->sendln(u"[Amt] [ Price ] [ VNUM ] Item"_s);
   found = false;
   vnum_t first_vnum = {};
   for (obj = keeper->carrying; obj; obj = obj->next_content)
@@ -608,7 +608,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
 
     cost = (qint32)(obj->flags_.cost * dc_->shop_index[shop_nr].profit_buy);
 
-    qint32 vnum = dc_->obj_index[obj->item_number].vnum();
+    qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
     bool loop = false;
     for (a = {}; a < i; a++)
       if (done[a] == vnum)
@@ -616,12 +616,12 @@ void shopping_list(const QString arg, CharacterPtr ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = dc_->obj_index[obj->item_number].vnum();
+      done[i++] = dc_->obj_index_[obj->item_number].vnum();
     else
       break;
     a = {};
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (dc_->obj_index[tobj->item_number].vnum() == dc_->obj_index[obj->item_number].vnum())
+      if (dc_->obj_index_[tobj->item_number].vnum() == dc_->obj_index_[obj->item_number].vnum())
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->flags_.value[1] )
             {
@@ -645,7 +645,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
   }
 
   if (!found)
-    ch->sendln("You can't buy anything here!");
+    ch->sendln(u"You can't buy anything here!"_s);
 }
 
 // Spec proc for shop keepers.
@@ -662,7 +662,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( keeper->isNonPlayer() && dc_->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( keeper->isNonPlayer() && dc_->mob_index_[keeper->mobdata->nr].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -779,14 +779,14 @@ void DC::boot_the_shops(void)
 
     fscanf(stream, "%d \n", &temp);
 
-    qint32 room_nr = real_room(temp);
-    if (room_nr < 0 || room_nr > dc_->top_of_world)
+    qint32 room_number = real_room(temp);
+    if (room_number < 0 || room_number > dc_->top_of_world)
     {
-      dc_->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
-      room_nr = {};
+      dc_->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_number);
+      room_number = {};
     }
 
-    dc_->shop_index[max_shop].in_room = room_nr;
+    dc_->shop_index[max_shop].in_room = room_number;
 
     fscanf(stream, "%d \n", &dc_->shop_index[max_shop].open1);
     fscanf(stream, "%d \n", &dc_->shop_index[max_shop].close1);
@@ -812,7 +812,7 @@ void DC::assign_the_shopkeepers(void)
   qint32 shop_nr;
 
   for (shop_nr = {}; shop_nr < max_shop; shop_nr++)
-    dc_->mob_index[dc_->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
+    dc_->mob_index_[dc_->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
 }
 
 void DC::fix_shopkeepers_inventory(void)
@@ -828,7 +828,7 @@ void DC::fix_shopkeepers_inventory(void)
     for (keeper = dc_->world[dc_->shop_index[shop_nr].in_room].people_; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (keeper->isNonPlayer() && dc_->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (keeper->isNonPlayer() && dc_->mob_index_[keeper->mobdata->nr].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
@@ -1034,13 +1034,13 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    ch->sendln("Invalid player shop keeper.  Let a god know.");
+    ch->sendln(u"Invalid player shop keeper.  Let a god know."_s);
     return;
   }
 
   if (dc_strcmp(shop->owner, qPrintable(ch->name())))
   {
-    ch->sendln("You don't own this shop, you can't stock the shelves!");
+    ch->sendln(u"You don't own this shop, you can't stock the shelves!"_s);
     return;
   }
 
@@ -1051,7 +1051,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
 
   if (item.isEmpty() || price.isEmpty())
   {
-    ch->sendln("Syntax:  stock <item> <price>");
+    ch->sendln(u"Syntax:  stock <item> <price>"_s);
     return;
   }
 
@@ -1059,7 +1059,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
   value = atol(price);
   if (value < 1 || value > 20000000)
   {
-    ch->sendln("Invalid price.  The price must be between 1 $B$5gold$R and 20 million $B$5gold$R.");
+    ch->sendln(u"Invalid price.  The price must be between 1 $B$5gold$R and 20 million $B$5gold$R."_s);
     return;
   }
 
@@ -1068,7 +1068,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
 
   if ((obj = get_obj_in_list_vis(ch, item, ch->carrying)) == nullptr)
   {
-    ch->sendln("Stock what item?");
+    ch->sendln(u"Stock what item?"_s);
     return;
   }
 
@@ -1078,24 +1078,24 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
       isSet(obj->flags_.extra_flags, ITEM_NODROP) ||
       isSet(obj->flags_.extra_flags, ITEM_NOSAVE))
   {
-    ch->sendln("You can't give that to the shop keeper to sell!");
+    ch->sendln(u"You can't give that to the shop keeper to sell!"_s);
     return;
   }
 
   if (isSet(obj->flags_.more_flags, ITEM_UNIQUE))
   {
-    ch->sendln("For now you can't sell unique items.");
+    ch->sendln(u"For now you can't sell unique items."_s);
     return;
   }
 
   // add it to list
   auto newitem = new player_shop_item;
-  newitem->item_vnum = dc_->obj_index[obj->item_number].vnum();
+  newitem->item_vnum = dc_->obj_index_[obj->item_number].vnum();
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
   extract_obj(obj);
-  ch->sendln("You put the item up for sale.");
+  ch->sendln(u"You put the item up for sale."_s);
   write_one_player_shop(shop);
 }
 
@@ -1104,7 +1104,7 @@ void player_shopping_buy(const QString arg, CharacterPtr ch, CharacterPtr keeper
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    ch->sendln("Invalid player shop keeper.  Let a god know.");
+    ch->sendln(u"Invalid player shop keeper.  Let a god know."_s);
     return;
   }
 
@@ -1124,21 +1124,21 @@ void player_shopping_buy(const QString arg, CharacterPtr ch, CharacterPtr keeper
 
   if (!item || item_pos < 1)
   {
-    ch->sendln("Choose a valid number!");
+    ch->sendln(u"Choose a valid number!"_s);
     return;
   }
 
   // make sure they can afford it
   if (ch->getGold() < item->price)
   {
-    ch->sendln("You can't afford that!");
+    ch->sendln(u"You can't afford that!"_s);
     return;
   }
 
   qint32 robj = real_object(item->item_vnum);
   if (robj < 0)
   {
-    ch->sendln("Error, that is not a valid item.  Let a god know.");
+    ch->sendln(u"Error, that is not a valid item.  Let a god know."_s);
     return;
   }
 
@@ -1183,13 +1183,13 @@ void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr k
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    ch->sendln("Invalid player shop keeper.  Let a god know.");
+    ch->sendln(u"Invalid player shop keeper.  Let a god know."_s);
     return;
   }
 
   if (dc_strcmp(shop->owner, qPrintable(ch->name())))
   {
-    ch->sendln("You don't own this shop!  Go rob a bank or something.");
+    ch->sendln(u"You don't own this shop!  Go rob a bank or something."_s);
     return;
   }
 
@@ -1198,7 +1198,7 @@ void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr k
 
   if (price.isEmpty())
   {
-    ch->sendln("Withdraw how much from your store?");
+    ch->sendln(u"Withdraw how much from your store?"_s);
     return;
   }
 
@@ -1206,13 +1206,13 @@ void player_shopping_withdraw(const QString arg, CharacterPtr ch, CharacterPtr k
   value = atol(price);
   if (value < 1 || value > 20000000)
   {
-    ch->sendln("Invalid amount.  The amount must be between 1 gold and 20 million gold.");
+    ch->sendln(u"Invalid amount.  The amount must be between 1 gold and 20 million gold."_s);
     return;
   }
 
   if (value > shop->money_on_hand)
   {
-    ch->sendln("You don't have that much in the till!");
+    ch->sendln(u"You don't have that much in the till!"_s);
     return;
   }
 
@@ -1240,13 +1240,13 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    ch->sendln("Invalid player shop keeper.  Let a god know.");
+    ch->sendln(u"Invalid player shop keeper.  Let a god know."_s);
     return;
   }
 
   if (dc_strcmp(shop->owner, qPrintable(ch->name())))
   {
-    ch->sendln("You don't own this shop, you can't change the design!");
+    ch->sendln(u"You don't own this shop, you can't change the design!"_s);
     return;
   }
 
@@ -1265,7 +1265,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
   {
     if (pdesign_values[skill][0] == '\n')
     {
-      ch->sendln("Invalid field.");
+      ch->sendln(u"Invalid field."_s);
       return;
     }
     if (is_abbrev(select, pdesign_values[skill]))
@@ -1284,7 +1284,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
     }
     if (dc_strlen(text) > (PC_SHOP_SELL_MESS_SIZE - 20))
     {
-      ch->sendln("That sell message is too long.");
+      ch->sendln(u"That sell message is too long."_s);
       return;
     }
     if (text == u"none"_s)
@@ -1298,12 +1298,12 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
   case 1: // roomname
     if (text.isEmpty())
     {
-      ch->sendln("$3Syntax$R: design roomname <name>");
+      ch->sendln(u"$3Syntax$R: design roomname <name>"_s);
       return;
     }
     if (dc_strlen(text) > 60)
     {
-      ch->sendln("That room name is too long (60 chars max).");
+      ch->sendln(u"That room name is too long (60 chars max)."_s);
       return;
     }
     dc_->world[shop->room_num].name_ = text;
@@ -1312,7 +1312,7 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
     break;
 
   case 2: // roomdesc
-    ch->sendln("Not active yet.");
+    ch->sendln(u"Not active yet."_s);
     break;
 
   default:
@@ -1324,12 +1324,12 @@ void player_shopping_design(const QString arg, CharacterPtr ch, CharacterPtr kee
 
 void player_shopping_sell(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
-  ch->sendln("These shop keeper's don't buy stuff.");
+  ch->sendln(u"These shop keeper's don't buy stuff."_s);
 }
 
 void player_shopping_value(const QString arg, CharacterPtr ch, CharacterPtr keeper)
 {
-  ch->sendln("These shop keeper's don't buy stuff.");
+  ch->sendln(u"These shop keeper's don't buy stuff."_s);
 }
 
 void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keeper)
@@ -1339,7 +1339,7 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
   player_shop *shop = find_player_shop(keeper);
   if (!shop)
   {
-    ch->sendln("Invalid player shop keeper.  Let a god know.");
+    ch->sendln(u"Invalid player shop keeper.  Let a god know."_s);
     return;
   }
   send_to_char("Item                                          Price\r\n"
@@ -1347,7 +1347,7 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
                ch);
 
   if (!shop->sale_list)
-    ch->sendln("There is nothing for sale here :(");
+    ch->sendln(u"There is nothing for sale here :("_s);
 
   else
     for (player_shop_item *item = shop->sale_list; item; item = item->next)
@@ -1357,7 +1357,7 @@ void player_shopping_list(const QString arg, CharacterPtr ch, CharacterPtr keepe
       if (robj < 0)
         ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg((dc_->obj_index[robj].item)->short_description(), -40).arg(QString::number(item->price)));
+        ch->send(u"%1$3)$R %2 %3\r\n"_s.arg(QString::number(count), -3).arg((dc_->obj_index_[robj]->item)->short_description(), -40).arg(QString::number(item->price)));
     }
 
   if (!dc_strcmp(shop->owner, qPrintable(ch->name())))
@@ -1407,7 +1407,7 @@ qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
   return ReturnValue::eSUCCESS;
 }
 /*
-command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
+ReturnValue do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
 {
   QString buf;
   QString select;
@@ -1419,7 +1419,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
 
   if(!ch->has_skill( COMMAND_PSHOPEDIT)) {
-        ch->sendln("Huh?");
+        ch->sendln(u"Huh?"_s);
         return ReturnValue::eFAILURE;
   }
 
@@ -1443,7 +1443,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
   {
     if(pshopedit_values[skill][0] == '\n')
     {
-      ch->sendln("Invalid field.");
+      ch->sendln(u"Invalid field."_s);
       return ReturnValue::eFAILURE;
     }
     if(is_abbrev(select, pshopedit_values[skill]))
@@ -1461,7 +1461,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
       }
       i = dc_atoi(text);
       if(i < 1 || i > dc_->top_of_world || !dc_->rooms[i]) {
-         ch->sendln("You must choose a valid room number.");
+         ch->sendln(u"You must choose a valid room number."_s);
          return ReturnValue::eFAILURE;
       }
       shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
@@ -1483,9 +1483,9 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
       break;
 
     case 2: // list
-      ch->sendln("Player Shops\r\n-------------------------");
+      ch->sendln(u"Player Shops\r\n-------------------------"_s);
       if(!g_playershops)
-         ch->sendln("No current shops.");
+         ch->sendln(u"No current shops."_s);
       else for(i = 1, shop = g_playershops; shop; shop = shop->next, i++)
         ch->send(u"%2d$3)$R %-15s $3Room$R: %5d\r\n"_s.arg(i).arg(shop->owner).arg(shop->room_num));
       break;
@@ -1503,7 +1503,7 @@ command_return_t do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
 */
 void DC::assign_the_player_shopkeepers(void)
 {
-  mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
+  mob_index_[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
 }
 
 void DC::redo_shop_profit(void)
@@ -1578,7 +1578,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
-    ch->send("You're too blind to do that!\r\n");
+    ch->send(u"You're too blind to do that!\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1588,8 +1588,8 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
   if (cmd == cmd_t::LIST)
   {
     ch->send(u"$B$2%s tells you, 'This is what I can do for you...\r\n$R"_s.arg(qPrintable(owner->shortdesc_or_name())));
-    ch->sendln("  | Item                              | Cost                                   |");
-    ch->sendln("--------------------------------------------------------------------------------");
+    ch->sendln(u"  | Item                              | Cost                                   |"_s);
+    ch->sendln(u"--------------------------------------------------------------------------------"_s);
     qint32 last_vnum = {};
     for (qint32 i = {}; i < MAX_EDDIE_ITEMS; i++)
     {
@@ -1598,7 +1598,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       QString cost_buf = {};
       if (eddie[i].item_vnum > 0)
       {
-        dc_strncpy(item_buf, qPrintable((dc_->obj_index[real_object(eddie[i].item_vnum)].item)->short_description()), 1024);
+        dc_strncpy(item_buf, qPrintable((dc_->obj_index_[real_object(eddie[i].item_vnum)]->item)->short_description()), 1024);
       }
       else
       {
@@ -1607,7 +1607,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
       if (eddie[i].cost_vnum > 0)
       {
-        dc_strncpy(cost_buf, qPrintable((dc_->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description()), 1024);
+        dc_strncpy(cost_buf, qPrintable((dc_->obj_index_[real_object(eddie[i].cost_vnum)]->item)->short_description()), 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1622,7 +1622,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
       if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)
       {
-        ch->sendln("--------------------------------------------------------------------------------");
+        ch->sendln(u"--------------------------------------------------------------------------------"_s);
       }
 
       last_vnum = eddie[i].item_vnum;
@@ -1646,25 +1646,25 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
         ch->sendln(u"$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\r\n"_.arg(i + 1).arg(item_qty).arg(item_buf).arg(cost_buf));
       }
     }
-    ch->sendln("--------------------------------------------------------------------------------");
+    ch->sendln(u"--------------------------------------------------------------------------------"_s);
 
     /*
-    ch->sendln(" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens.");
-    ch->sendln(" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens.");
-    ch->sendln(" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens.");
+    ch->sendln(u" $B$31)$R Cloverleaf Token      Cost: 2 Wingding tokens."_s);
+    ch->sendln(u" $B$32)$R Cloverleaf Token      Cost: 2 Meatball tokens."_s);
+    ch->sendln(u" $B$33)$R Cloverleaf Token      Cost: 2 Apocalypse tokens."_s);
 
-    ch->sendln(" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens.");
-    ch->sendln(" $B$35)$R Wingding Token        Cost: 2 Meatball tokens.");
-    ch->sendln(" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens.");
+    ch->sendln(u" $B$34)$R Wingding Token        Cost: 3 Cloverleaf tokens."_s);
+    ch->sendln(u" $B$35)$R Wingding Token        Cost: 2 Meatball tokens."_s);
+    ch->sendln(u" $B$36)$R Wingding Token        Cost: 2 Apocalypse tokens."_s);
 
-    ch->sendln(" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens.");
-    ch->sendln(" $B$38)$R Meatball Token        Cost: 2 Wingding tokens.");
-    ch->sendln(" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens.");
+    ch->sendln(u" $B$37)$R Meatball Token        Cost: 3 Cloverleaf tokens."_s);
+    ch->sendln(u" $B$38)$R Meatball Token        Cost: 2 Wingding tokens."_s);
+    ch->sendln(u" $B$39)$R Meatball Token        Cost: 2 Apocalypse tokens."_s);
 
-    ch->sendln("$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens.");
-    ch->sendln("$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens.");
+    ch->sendln(u"$B$310)$R Apocalypse Token      Cost: 2 Wingding tokens."_s);
+    ch->sendln(u"$B$311)$R Apocalypse Token      Cost: 2 Meatball tokens."_s);
 
-    ch->sendln("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.");
+    ch->sendln(u"$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens."_s);
     */
     return ReturnValue::eSUCCESS;
   }
@@ -1677,7 +1677,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
     if (*arg1 == 0)
     {
-      ch->sendln("Buy what?");
+      ch->sendln(u"Buy what?"_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -1721,7 +1721,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
 
       if (count < eddie[choice - 1].cost_qty)
       {
-        ch->sendln("You don't have enough to trade.");
+        ch->sendln(u"You don't have enough to trade."_s);
         return ReturnValue::eSUCCESS;
       }
 
@@ -1748,7 +1748,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
         }
         else
         {
-          ch->sendln("An error occured.");
+          ch->sendln(u"An error occured."_s);
           ch->save(cmd_t::SAVE_SILENTLY);
           return ReturnValue::eSUCCESS;
         }
@@ -1771,7 +1771,7 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       }
       else
       {
-        ch->sendln("An error occured.");
+        ch->sendln(u"An error occured."_s);
         ch->save(cmd_t::SAVE_SILENTLY);
         return ReturnValue::eSUCCESS;
       }
@@ -1912,7 +1912,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send(u"An error occurred. The object is missing.\r\n"_s);
       }
 
       obj = r.orig_obj;
@@ -1923,14 +1923,14 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         {
           owner->tell(ch, "Choice 1 is:");
           identify(ch, o);
-          ch->send("\r\n");
+          ch->send(u"\r\n"_s);
           r.choice1_obj = o;
         }
         else if (r.choice2_obj == nullptr)
         {
           owner->tell(ch, "Choice 2 is:");
           identify(ch, o);
-          ch->send("\r\n");
+          ch->send(u"\r\n"_s);
           r.choice2_obj = o;
         }
         r.state = reroll_t::reroll_states_t::REROLLED;
@@ -1965,7 +1965,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send(u"An error occurred. The object is missing.\r\n"_s);
       }
       obj_from(r.choice2_obj);
       obj_from(r.orig_obj);
@@ -1982,7 +1982,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send(u"An error occurred. The object is missing.\r\n"_s);
       }
 
       obj_from(r.choice1_obj);
@@ -2000,7 +2000,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send(u"An error occurred. The object is missing.\r\n"_s);
       }
       obj_from(r.choice1_obj);
       obj_from(r.choice2_obj);
@@ -2028,7 +2028,7 @@ qint32 reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
     }
     else
     {
-      ch->send("An error occurred. The object is missing.\r\n");
+      ch->send(u"An error occurred. The object is missing.\r\n"_s);
     }
     reroll_sessions.erase(qPrintable(ch->name()));
     break;
@@ -2149,7 +2149,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           return ReturnValue::eSUCCESS;
         }
 
-        ch->do_identify(u"v%1"_s.arg(dc_->obj_index[obj->item_number].vnum()).split(' '));
+        ch->do_identify(u"v%1"_s.arg(dc_->obj_index_[obj->item_number].vnum()).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);

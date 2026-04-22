@@ -8,7 +8,7 @@
 QQueue<QString> imm_history;
 QQueue<QString> imp_history;
 
-command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 {
   if (!isImmortalPlayer())
   {
@@ -83,19 +83,19 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
     test_buffer.append("\r\n");
   }
 
-  sendln("Commands based on your level:");
+  sendln(u"Commands based on your level:"_s);
   sendln(buffer);
   sendln();
-  sendln("Bestowed commands:");
+  sendln(u"Bestowed commands:"_s);
   sendln(bestow_buffer);
   sendln();
-  sendln("Test commands:");
+  sendln(u"Test commands:"_s);
   sendln(test_buffer);
   sendln();
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
 {
   qint32 loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
@@ -112,7 +112,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    send("You must supply a room number, a name or zone <zone number>.\r\n");
+    send(u"You must supply a room number, a name or zone <zone number>.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -123,7 +123,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
     if (arguments.size() < 2)
     {
-      send("No zone number specified.\r\n");
+      send(u"No zone number specified.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
     QString arg2 = arguments.at(1);
@@ -157,7 +157,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
     if (loc_nr > dc_->top_of_world || loc_nr < 0)
     {
-      send("No room exists with that number.\r\n");
+      send(u"No room exists with that number.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -171,14 +171,14 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       {
         if (dc_->create_one_room(this, loc_nr))
         {
-          sendln("You form order out of chaos.");
+          sendln(u"You form order out of chaos."_s);
           location = loc_nr;
         }
       }
     }
     if (location == -1)
     {
-      send("No room exists with that number.\r\n");
+      send(u"No room exists with that number.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -206,13 +206,13 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         }
         else
         {
-          send("The object is not available.\r\n");
+          send(u"The object is not available.\r\n"_s);
           return ReturnValue::eFAILURE;
         }
       }
       else
       {
-        send("No such creature or object around.\r\n");
+        send(u"No such creature or object around.\r\n"_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -220,7 +220,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     {
       if (loc_nr > dc_->top_of_world || loc_nr < 0)
       {
-        send("No room exists with that number.\r\n");
+        send(u"No room exists with that number.\r\n"_s);
         return ReturnValue::eFAILURE;
       }
 
@@ -232,7 +232,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         {
           if (dc_->create_one_room(this, loc_nr))
           {
-            sendln("You form order out of chaos.");
+            sendln(u"You form order out of chaos."_s);
             location = loc_nr;
           }
         }
@@ -244,7 +244,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       }
       if (location == -1)
       {
-        send("No room exists with that number.\r\n");
+        send(u"No room exists with that number.\r\n"_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -254,7 +254,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   if (isSet(dc_->world[location].room_flags, IMP_ONLY) &&
       level_ < OVERSEER)
   {
-    send("That room is for implementers only.\r\n");
+    send(u"That room is for implementers only.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -262,7 +262,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   if (isSet(dc_->world[location].room_flags, CLAN_ROOM) &&
       level_ < DEITY)
   {
-    send("For your protection, 104-'s may not be in clanhalls.\r\n");
+    send(u"For your protection, 104-'s may not be in clanhalls.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -274,12 +274,12 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       ;
     if (i > 1)
     {
-      send("There's a private conversation going on in that room.\r\n");
+      send(u"There's a private conversation going on in that room.\r\n"_s);
       return ReturnValue::eFAILURE;
     }
   }
 
-  send("\r\n");
+  send(u"\r\n"_s);
 
   if (!isNonPlayer())
     for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
@@ -289,14 +289,14 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
         tmp_ch->send(player->poofout);
-        tmp_ch->sendln("");
+        tmp_ch->sendln(u""_s);
         ansi_color(NTEXT, tmp_ch);
       }
       else if (tmp_ch != this && !player->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        tmp_ch->sendln("Someone disappears in a puff of smoke.");
+        tmp_ch->sendln(u"Someone disappears in a puff of smoke."_s);
         ansi_color(NTEXT, tmp_ch);
       }
     }
@@ -312,14 +312,14 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
         tmp_ch->send(player->poofin);
-        tmp_ch->sendln("");
+        tmp_ch->sendln(u""_s);
         ansi_color(NTEXT, tmp_ch);
       }
       else if (tmp_ch != this && !player->stealth)
       {
         ansi_color(RED, tmp_ch);
         ansi_color(BOLD, tmp_ch);
-        tmp_ch->sendln("Someone appears with an ear-splitting bang!");
+        tmp_ch->sendln(u"Someone appears with an ear-splitting bang!"_s);
         ansi_color(NTEXT, tmp_ch);
       }
     }
@@ -340,7 +340,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString inout, buf;
   qint32 ctr, nope;
@@ -348,7 +348,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (ch->isNonPlayer())
   {
-    ch->sendln("Mobs can't poof.");
+    ch->sendln(u"Mobs can't poof."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -356,31 +356,31 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 
   if (inout.isEmpty())
   {
-    ch->sendln("Usage:\r\npoof [i|o] <QString>");
-    ch->sendln("\r\nCurrent poof in is:");
+    ch->sendln(u"Usage:\r\npoof [i|o] <QString>"_s);
+    ch->sendln(u"\r\nCurrent poof in is:"_s);
     ch->send(ch->player->poofin);
-    ch->sendln("");
-    ch->sendln("\r\nCurrent poof out is:");
+    ch->sendln(u""_s);
+    ch->sendln(u"\r\nCurrent poof out is:"_s);
     ch->send(ch->player->poofout);
-    ch->sendln("");
+    ch->sendln(u""_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
-    ch->sendln("Usage:\r\npoof [i|o] <QString>");
+    ch->sendln(u"Usage:\r\npoof [i|o] <QString>"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (arg.isEmpty())
   {
-    ch->sendln("A poof type message was expected.");
+    ch->sendln(u"A poof type message was expected."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (dc_strlen(arg) > 72)
   {
-    ch->sendln("Poof message too long, must be under 72 characters long.");
+    ch->sendln(u"Poof message too long, must be under 72 characters long."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -394,7 +394,7 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
         nope = 1;
       else if (nope == 1)
       {
-        ch->sendln("You can only include one % in your poofin ;)");
+        ch->sendln(u"You can only include one % in your poofin ;)"_s);
         return ReturnValue::eFAILURE;
       }
     }
@@ -438,11 +438,11 @@ command_return_t do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->player->poofout = buf;
   }
 
-  ch->sendln("Ok.");
+  ch->sendln(u"Ok."_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString command, loc_str;
   qint32 loc_nr, location, original_loc;
@@ -455,7 +455,7 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   half_chop(argument, loc_str, command);
   if (loc.isEmpty() _str)
   {
-    ch->sendln("You must supply a room number or a name.");
+    ch->sendln(u"You must supply a room number or a name."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -465,7 +465,7 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
     if ((loc_nr == 0 && *loc_str != '0') ||
         ((location = real_room(loc_nr)) < 0))
     {
-      ch->sendln("No room exists with that number.");
+      ch->sendln(u"No room exists with that number."_s);
       return ReturnValue::eFAILURE;
     }
   }
@@ -476,19 +476,19 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
       location = target_obj->in_room;
     else
     {
-      ch->sendln("The object is not available.");
+      ch->sendln(u"The object is not available."_s);
       return ReturnValue::eFAILURE;
     }
   else
   {
-    ch->sendln("No such creature or object around.");
+    ch->sendln(u"No such creature or object around."_s);
     return ReturnValue::eFAILURE;
   }
 
   /* a location has been found. */
   if (isSet(dc_->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
-    ch->sendln("No.");
+    ch->sendln(u"No."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -496,7 +496,7 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   if (isSet(dc_->world[location].room_flags, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
-    ch->sendln("For your protection, 104-'s may not be in clanhalls.");
+    ch->sendln(u"For your protection, 104-'s may not be in clanhalls."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -514,7 +514,7 @@ command_return_t do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString buf;
@@ -525,13 +525,13 @@ command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
   one_argument(argument, buf);
   if (buf.isEmpty())
   {
-    ch->sendln("Who do you wish to high-five? ");
+    ch->sendln(u"Who do you wish to high-five? "_s);
     return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_vis(ch, buf)))
   {
-    ch->sendln("No-one by that name in the world.");
+    ch->sendln(u"No-one by that name in the world."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -548,30 +548,30 @@ command_return_t do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
   if (argument[0] != '\0')
   {
-    ch->sendln("HOLYLITE doesn't take any arguments; arg ignored.");
+    ch->sendln(u"HOLYLITE doesn't take any arguments; arg ignored."_s);
   } /* if */
 
   if (ch->player->holyLite)
   {
     ch->player->holyLite = false;
-    ch->sendln("Holy light mode off.");
+    ch->sendln(u"Holy light mode off."_s);
   }
   else
   {
     ch->player->holyLite = true;
-    ch->sendln("Holy light mode on.");
+    ch->sendln(u"Holy light mode on."_s);
   } /* if */
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
 
@@ -608,7 +608,7 @@ command_return_t do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -616,19 +616,19 @@ command_return_t do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
   if (isSet(ch->player->toggles, Player::PLR_NOHASSLE))
   {
     REMOVE_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
-    ch->sendln("Mobiles can bother you again.");
+    ch->sendln(u"Mobiles can bother you again."_s);
   }
   else
   {
     SET_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
-    ch->sendln("Those pesky mobiles will leave you alone now.");
+    ch->sendln(u"Those pesky mobiles will leave you alone now."_s);
   }
   return ReturnValue::eSUCCESS;
 }
 
 // cmd == cmd_t::DEFAULT - imm
 // cmd == 8 - /
-command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1 = {};
   ConnectionPtr i = {};
@@ -640,7 +640,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (cmd == cmd_t::IMPCHAN && !ch->has_skill(COMMAND_IMP_CHAN))
   {
-    ch->sendln("Huh?");
+    ch->sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -653,16 +653,16 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
     if (cmd == cmd_t::IMMORT)
     {
       tmp = imm_history;
-      ch->sendln("Here are the last 10 imm messages:");
+      ch->sendln(u"Here are the last 10 imm messages:"_s);
     }
     else if (cmd == cmd_t::IMPCHAN)
     {
       tmp = imp_history;
-      ch->sendln("Here are the last 10 imp messages:");
+      ch->sendln(u"Here are the last 10 imp messages:"_s);
     }
     else
     {
-      ch->sendln("What? How did you get here?? Contact a coder.");
+      ch->sendln(u"What? How did you get here?? Contact a coder."_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -718,7 +718,7 @@ command_return_t do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
   {
@@ -773,7 +773,7 @@ command_return_t do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   argument = one_argument(argument, arg);
@@ -781,7 +781,7 @@ command_return_t do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if ((vict = get_char_vis(ch, arg)) == nullptr)
   {
-    ch->sendln("Target not found.");
+    ch->sendln(u"Target not found."_s);
     return ReturnValue::eFAILURE;
   }
   QString buf;
@@ -794,7 +794,7 @@ command_return_t do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (buf[0] == '\0')
   {
-    ch->sendln("No temporary variables found.");
+    ch->sendln(u"No temporary variables found."_s);
   }
   return ReturnValue::eSUCCESS;
 }

@@ -65,7 +65,7 @@ void DC::save_corpses(void)
   ObjectPtr i, next;
   qint32 location = {};
   QString buf1;
-  extern command_return_t do_not_save_corpses;
+  extern ReturnValue do_not_save_corpses;
 
   if (do_not_save_corpses == 1)
     return;

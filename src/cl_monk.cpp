@@ -9,7 +9,7 @@
 /************************************************************************
 | OFFENSIVE commands.
 */
-command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -39,7 +39,7 @@ command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (hands > 1)
   {
-    ch->sendln("You need a free hand to eagleclaw someone.");
+    ch->sendln(u"You need a free hand to eagleclaw someone."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -51,20 +51,20 @@ command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
       victim = ch->fighting;
     else
     {
-      ch->sendln("You raise your hand in a claw and make strange bird noises.");
+      ch->sendln(u"You raise your hand in a claw and make strange bird noises."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (victim == ch)
   {
-    ch->sendln("You lower your claw-shaped hand and scratch yourself gently.");
+    ch->sendln(u"You lower your claw-shaped hand and scratch yourself gently."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Clawing a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Clawing a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -104,7 +104,7 @@ command_return_t do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-command_return_t do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValue do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
 
   affected_type af;
@@ -136,7 +136,7 @@ command_return_t do_quivering_palm(CharacterPtr ch, const QString argument, cmd_
 
   if (hands > 1)
   {
-    ch->sendln("You need at least one hand free to perform this!");
+    ch->sendln(u"You need at least one hand free to perform this!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -148,32 +148,32 @@ command_return_t do_quivering_palm(CharacterPtr ch, const QString argument, cmd_
       victim = ch->fighting;
     else
     {
-      ch->sendln("Quivering palm whom?");
+      ch->sendln(u"Quivering palm whom?"_s);
       return ReturnValue::eFAILURE;
     }
   }
 
   if (victim == ch)
   {
-    ch->sendln("Masturbate on your own time.");
+    ch->sendln(u"Masturbate on your own time."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Palming a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Palming a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(dc_->world[ch->in_room].room_flags, NO_KI))
   {
-    ch->sendln("You find yourself unable to focus your energy here.");
+    ch->sendln(u"You find yourself unable to focus your energy here."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (GET_KI(ch) < 40 && ch->getLevel() < ARCHANGEL)
   {
-    ch->sendln("You don't possess enough ki!");
+    ch->sendln(u"You don't possess enough ki!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -211,7 +211,7 @@ command_return_t do_quivering_palm(CharacterPtr ch, const QString argument, cmd_
   return retval;
 }
 
-command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -223,7 +223,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   if (ch->getHP() < 25)
   {
-    ch->sendln("You can't muster the energy for such an attack.");
+    ch->sendln(u"You can't muster the energy for such an attack."_s);
     return ReturnValue::eFAILURE;
   }
   one_argument(argument, name);
@@ -235,19 +235,19 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim == nullptr)
   {
-    ch->sendln("Stun whom?");
+    ch->sendln(u"Stun whom?"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
-    ch->sendln("Aren't we funny today...");
+    ch->sendln(u"Aren't we funny today..."_s);
     return ReturnValue::eFAILURE;
   }
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
-    ch->sendln("Stunning a bladeshielded opponent would be suicide!");
+    ch->sendln(u"Stunning a bladeshielded opponent would be suicide!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -293,19 +293,19 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (victim->getLevel() == IMPLEMENTER)
   {
-    ch->sendln("You gotta be kidding!");
+    ch->sendln(u"You gotta be kidding!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
   {
-    ch->sendln("You cannot stun something that HUGE!");
+    ch->sendln(u"You cannot stun something that HUGE!"_s);
     return ReturnValue::eFAILURE;
   }
 
   if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
-    ch->sendln("You cannot pick just one of them to stun!");
+    ch->sendln(u"You cannot pick just one of them to stun!"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -370,7 +370,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (ch->has_skill(SKILL_STUN) > 35 && !number(0, 7))
     {
-      ch->sendln("Your advanced knowledge of stun helps you to recover faster.");
+      ch->sendln(u"Your advanced knowledge of stun helps you to recover faster."_s);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     }
     else
@@ -408,7 +408,7 @@ command_return_t do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (ch->dc_->number(0, 1))
       {
-        victim->sendln("The hit knocks the sense back into you!");
+        victim->sendln(u"The hit knocks the sense back into you!"_s);
         act_return ar = act_to_room("The hit knocks the sense back into $N and $E is no longer stunned!", ch, 0, victim, NOTVICT);
         retval = ar.retval;
         if (isSet(retval, ReturnValue::eVICT_DIED) || isSet(retval, ReturnValue::eCH_DIED))

@@ -16,7 +16,7 @@
 
 extern bool MOBtrigger;
 
-command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_report(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString report;
@@ -30,7 +30,7 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (isSet(ch->dc_->world[ch->in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -40,9 +40,9 @@ command_return_t do_report(CharacterPtr ch, QString argument, cmd_t cmd)
     std::tie(arg1, remainder_args) = half_chop(QString(argument));
     if (arg1 == "help")
     {
-      ch->sendln("report       - Reports hps, mana, moves and ki. (default)");
-      ch->sendln("report xp    - Reports current xp, xp till next level and levels to be gained.");
-      ch->sendln("report help  - Shows different ways report can be used.");
+      ch->sendln(u"report       - Reports hps, mana, moves and ki. (default)"_s);
+      ch->sendln(u"report xp    - Reports current xp, xp till next level and levels to be gained."_s);
+      ch->sendln(u"report help  - Shows different ways report can be used."_s);
       return ReturnValue::eFAILURE;
     }
 
@@ -202,7 +202,7 @@ qint32 DC::send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   return (1);
 }
 
-command_return_t do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValue do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
   qint32 y = {};
@@ -250,7 +250,7 @@ command_return_t do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
     arg = one_argument(arg, buf);
   else
   {
-    //    ch->sendln("");
+    //    ch->sendln(u""_s);
 
     if (ch->isMortalPlayer())
     {
@@ -310,7 +310,7 @@ command_return_t do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (x == 27)
     {
-      ch->sendln("That type was not found.");
+      ch->sendln(u"That type was not found."_s);
       return ReturnValue::eSUCCESS;
     }
     if (is_abbrev(buf, types[x]))
@@ -320,12 +320,12 @@ command_return_t do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
   if (ch->isMortalPlayer() &&
       (x < 7 || (x > 14 && x < 22)))
   {
-    ch->sendln("That type was not found.");
+    ch->sendln(u"That type was not found."_s);
     return ReturnValue::eSUCCESS;
   }
   if (x > 19 && ch->getLevel() != 110 && x < 22)
   {
-    ch->sendln("That type was not found.");
+    ch->sendln(u"That type was not found."_s);
     return ReturnValue::eSUCCESS;
   }
   if (isSet(ch->misc, (1 << x)))
@@ -343,7 +343,7 @@ command_return_t do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValue do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -352,7 +352,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
 
   if (ch->isNonPlayer())
   {
-    ch->send("You're a mob! You can't ignore people.\r\n");
+    ch->send(u"You're a mob! You can't ignore people.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -360,7 +360,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
   {
     if (ch->player->ignoring.isEmpty())
     {
-      ch->send("Ignore who?\r\n");
+      ch->send(u"Ignore who?\r\n"_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -389,7 +389,7 @@ command_return_t do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
   std::tie(arg1, remainder_args) = half_chop(args);
   if (arg1.isEmpty())
   {
-    ch->send("Ignore who?\r\n");
+    ch->send(u"Ignore who?\r\n"_s);
     return ReturnValue::eFAILURE;
   }
   arg1[0] = arg1[0].toUpper();
@@ -444,7 +444,7 @@ bool is_ignoring(CharacterPtr ch, CharacterPtr victim)
 
 constexpr auto MAX_NOTE_LENGTH = 1000; /* arbitrary */
 
-command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr paper = 0, pen = {};
   QString papername, penname, buf;
@@ -455,13 +455,13 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   if (ch->getLevel() < 5)
   {
-    ch->sendln("You need to be at least level 5 to write on the board.");
+    ch->sendln(u"You need to be at least level 5 to write on the board."_s);
     return ReturnValue::eSUCCESS;
   }
 
   if (papername.isEmpty()) /* nothing was delivered */
   {
-    ch->sendln("Write? with what? ON what? what are you trying to do??");
+    ch->sendln(u"Write? with what? ON what? what are you trying to do??"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -495,7 +495,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     else if (paper->flags_.type_flag != ITEM_NOTE)
     {
-      ch->sendln("That thing has nothing to do with writing.");
+      ch->sendln(u"That thing has nothing to do with writing."_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -508,7 +508,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (!CAN_SEE_OBJ(ch, ch->equipment[WEAR_HOLD]))
     {
-      ch->sendln("The stuff in your hand is invisible! Yeech!!");
+      ch->sendln(u"The stuff in your hand is invisible! Yeech!!"_s);
       return ReturnValue::eSUCCESS;
     }
 
@@ -529,12 +529,12 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (!paper->ActionDescription().isEmpty())
     /*    else if (paper->item_number != real_object(1205) )  */
-    ch->sendln("There's something written on it already.");
+    ch->sendln(u"There's something written on it already."_s);
   else
   {
     /* we can write - hooray! */
 
-    ch->sendln("Ok.. go ahead and write.. end the note with a \\@.");
+    ch->sendln(u"Ok.. go ahead and write.. end the note with a \\@."_s);
     act_to_room("$n begins to jot down a note.", ch, 0, 0, INVIS_NULL);
     // TODO BROKEN
     // ch->conn_->strnew = &paper->ActionDescription();
@@ -543,7 +543,7 @@ command_return_t do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -555,7 +555,7 @@ command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (!(victim = ch->get_char_room_vis(arg)))
     {
-      ch->sendln("Can't hear you!");
+      ch->sendln(u"Can't hear you!"_s);
     }
     else
     {
@@ -590,23 +590,23 @@ command_return_t do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       { /* ch == victim */
-        ch->sendln("You feel insulted.");
+        ch->sendln(u"You feel insulted."_s);
       }
     }
   }
   else
-    ch->sendln("Insult who?");
+    ch->sendln(u"Insult who?"_s);
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_emote(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_emote(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOEMOTE))
   {
-    ch->sendln("You can't show your emotions!!");
+    ch->sendln(u"You can't show your emotions!!"_s);
     return ReturnValue::eSUCCESS;
   }
 
@@ -615,7 +615,7 @@ command_return_t do_emote(CharacterPtr ch, QString argument, cmd_t cmd)
   auto arg2 = arguments.value(1);
 
   if (arguments.isEmpty())
-    ch->sendln("Yes.. But what?");
+    ch->sendln(u"Yes.. But what?"_s);
   else
   {
     dc_sprintf(buf, "$n %s", qPrintable(arg1));

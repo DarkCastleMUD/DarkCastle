@@ -21,14 +21,14 @@ qint32 max_who = {};
 
 void page_string(ConnectionPtr conn, const QString str, qint32 keep_internal);
 
-command_return_t do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
 
   if (ch->isNonPlayer())
   {
-    ch->sendln("You ain't nothin' but a hound-dog.");
+    ch->sendln(u"You ain't nothin' but a hound-dog."_s);
     return ReturnValue::eSUCCESS;
   }
 

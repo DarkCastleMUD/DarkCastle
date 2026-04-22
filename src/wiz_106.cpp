@@ -3,7 +3,7 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValue do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i;
   ConnectionPtr conn;
@@ -17,8 +17,8 @@ command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
   else
     minamt = 1;
 
-  ch->sendln("          Plats - Player");
-  ch->sendln("          --------------");
+  ch->sendln(u"          Plats - Player"_s);
+  ch->sendln(u"          --------------"_s);
 
   for (const auto &d : dc_->connections_)
   {
@@ -39,7 +39,7 @@ command_return_t do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_force(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
   {
@@ -48,7 +48,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
 
   if (!has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
-    sendln("Huh?");
+    sendln(u"Huh?"_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -58,24 +58,24 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
 
   if (name.isEmpty() || to_force.isEmpty())
   {
-    sendln("Who do you wish to force to do what?");
+    sendln(u"Who do you wish to force to do what?"_s);
     return ReturnValue::eFAILURE;
   }
   else if (name != "all")
   {
     if (!vict)
-      sendln("No one by that name here..");
+      sendln(u"No one by that name here.."_s);
     else
     {
       if (getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
-        sendln("Now doing that would just tick off the IMPS!");
+        sendln(u"Now doing that would just tick off the IMPS!"_s);
         dc_->logentry(u"%1 just tried to force %2 to %3"_s.arg(name()).arg(vict->name()).arg(to_force), OVERSEER, DC::LogChannel::LOG_GOD);
         return ReturnValue::eSUCCESS;
       }
       if ((getLevel() <= vict->getLevel()) && vict->isPlayer())
       {
-        sendln("Why be forceful?");
+        sendln(u"Why be forceful?"_s);
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);
         act_to_victim(buf, ch, 0, vict, 0);
       }
@@ -85,7 +85,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
         {
           buf = fmt::format("$n has forced you to '{}'.", to_force);
           act_to_victim(buf, ch, 0, vict, 0);
-          sendln("Ok.");
+          sendln(u"Ok."_s);
         }
         buf = fmt::format("{} just forced %s to %s.", qPrintable(name()),
                           qPrintable(vict->name()), to_force);
@@ -99,7 +99,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
   { /* force all */
     if (getLevel() < OVERSEER)
     {
-      sendln("Not gonna happen.");
+      sendln(u"Not gonna happen."_s);
       return ReturnValue::eFAILURE;
     }
     for (i = dc_->connections_; i; i = next_i)
@@ -121,21 +121,21 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    sendln("Ok.");
+    sendln(u"Ok."_s);
     buf = fmt::format("{} just forced all to {}.", qPrintable(name()), to_force);
     dc_->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t run_all_events(CharacterPtr ch = {})
+ReturnValue run_all_events(CharacterPtr ch = {})
 {
   quint64 counter = {};
   while (timer_list != nullptr && counter++ < 1000)
   {
     if (ch)
     {
-      ch->send("Running check_timer()\r\n");
+      ch->send(u"Running check_timer()\r\n"_s);
       ch->conn_->process_output();
     }
     check_timer();
@@ -148,7 +148,7 @@ command_return_t run_all_events(CharacterPtr ch = {})
   return ReturnValue::eSUCCESS;
 }
 
-QString rc_to_qstring(const command_return_t &rc)
+QString rc_to_qstring(const ReturnValue &rc)
 {
   QStringList strings;
   if (isSet(rc, ReturnValue::eFAILURE))
@@ -191,9 +191,9 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-void run_check(CharacterPtr ch, command_return_t *rc, auto *function, QString arguments = {}, cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, ReturnValue *rc, auto *function, QString arguments = {}, cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc = {};
+  ReturnValue new_rc = {};
   if (ch)
   {
     if (function)
@@ -213,9 +213,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, auto *function, QString ar
   }
 }
 
-void run_check(CharacterPtr ch, command_return_t *rc, command_gen2_t function, QString arguments = QString(), cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, ReturnValue *rc, command_gen2_t function, QString arguments = QString(), cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc = {};
+  ReturnValue new_rc = {};
   if (ch)
   {
     if (function)
@@ -235,9 +235,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_gen2_t function, Q
   }
 }
 
-void run_check(CharacterPtr ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, ReturnValue *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc = {};
+  ReturnValue new_rc = {};
   if (ch)
   {
     if (function)
@@ -257,9 +257,9 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_gen3_t function, Q
   }
 }
 
-void run_check(CharacterPtr ch, command_return_t *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, ReturnValue *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
 {
-  command_return_t new_rc = {};
+  ReturnValue new_rc = {};
   if (ch)
   {
     if (function)
@@ -279,7 +279,7 @@ void run_check(CharacterPtr ch, command_return_t *rc, command_special_t function
   }
 }
 
-command_return_t test_casino(CharacterPtr ch)
+ReturnValue test_casino(CharacterPtr ch)
 {
   if (!ch || !ch->player)
   {
@@ -381,14 +381,14 @@ command_return_t test_casino(CharacterPtr ch)
 
 tests_t tests = {{"casino", Test("casino", test_casino)}};
 
-command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
+ReturnValue Character::do_test(QStringList arguments, cmd_t cmd)
 {
   QString arg1 = arguments.value(0);
 
   if (arg1.isEmpty() || arg1 == "help")
   {
-    send("Usage: test [help] [test name]\r\n");
-    send("Test names:\r\n");
+    send(u"Usage: test [help] [test name]\r\n"_s);
+    send(u"Test names:\r\n"_s);
     for (auto const &test : tests)
     {
       send(test.getName() + "\r\n");
@@ -397,8 +397,8 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
   }
   else if (arg1 == "all")
   {
-    sendln("Running all tests.");
-    command_return_t rc = {};
+    sendln(u"Running all tests."_s);
+    ReturnValue rc = {};
     for (auto &test : tests)
     {
       send(u"Running %1.."_s.arg(test.getName()));
