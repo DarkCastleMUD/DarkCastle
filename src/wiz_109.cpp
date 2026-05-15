@@ -4,7 +4,7 @@
 **********************/
 #include "DC/DC.h"
 
-ReturnValue Character::do_linkload(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_linkload(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr new_new;
 
@@ -51,9 +51,9 @@ ReturnValue Character::do_linkload(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  FILE *stream;
+  QTextStream stream;
   QString tmp;
   QString buf;
 
@@ -86,7 +86,7 @@ ReturnValue do_processes(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_guide(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_guide(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim = {};
   QString name = arguments.value(0);
@@ -123,7 +123,7 @@ ReturnValue Character::do_guide(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name, level, buf, passwd;
@@ -234,7 +234,7 @@ ReturnValue do_advance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_zap(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_zap(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim = {};
   qint32 room = {};
@@ -315,7 +315,7 @@ ReturnValue Character::do_zap(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_global(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_global(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
@@ -339,11 +339,11 @@ ReturnValue do_global(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_shutdown(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_shutdown(QStringList arguments, cmd_t cmd)
 {
   extern qint32 _shutdown;
   extern qint32 try_to_hotboot_on_crash;
-  extern ReturnValue do_not_save_corpses;
+  extern ReturnValues do_not_save_corpses;
   QString *new_argv = {};
 
   if (isNonPlayer())
@@ -431,7 +431,7 @@ ReturnValue Character::do_shutdown(QStringList arguments, cmd_t cmd)
   {
     // let's crash the mud!
     CharacterPtr crashus = {};
-    if (crashus->in_room == DC::NOWHERE)
+    if (crashus->in_room == INVALID_ROOM)
     {
       return ReturnValue::eFAILURE; // this should never be reached
     }
@@ -448,7 +448,7 @@ ReturnValue Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
     // let's crash the mud!
     CharacterPtr crashus = {};
-    if (crashus->in_room == DC::NOWHERE)
+    if (crashus->in_room == INVALID_ROOM)
     {
       return ReturnValue::eFAILURE; // this should never be reached
     }
@@ -482,7 +482,7 @@ ReturnValue Character::do_shutdown(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_shutdow(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_shutdow(QStringList arguments, cmd_t cmd)
 {
   if (!has_skill(COMMAND_SHUTDOWN))
   {
@@ -494,7 +494,7 @@ ReturnValue Character::do_shutdow(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 errnosave = {};
   static pid_t child = {};
@@ -547,7 +547,7 @@ ReturnValue do_testport(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -625,13 +625,13 @@ ReturnValue do_testuser(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_bandwidth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->send(u"Bytes sent in %ld seconds: %ld\r\n"_s.arg(get_bandwidth_start()).arg(get_bandwidth_amount()));
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_skilledit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;

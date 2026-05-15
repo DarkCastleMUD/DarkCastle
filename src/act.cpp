@@ -7,47 +7,39 @@
 
 extern bool MOBtrigger;
 
-constexpr auto TO_ROOM = 0;           // Everyone in ch's room except ch
-constexpr auto TO_VICT = 1;           // Just vict_obj
-constexpr auto TO_CHAR = 2;           // Just ch
-constexpr auto TO_ZONE = 3;           // Everyone in ch's zone except ch
-constexpr auto TO_WORLD = 4;          // Everyone in the world except ch
-constexpr auto TO_GROUP = 5;          // Everyone in the ch's group except ch
-constexpr auto TO_ROOM_NOT_GROUP = 6; // Everyone in ch's room except ch's group or ch
-
 act_return act_to_room(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_ROOM, flags);
+  return act(str, ch, obj, vict_obj, TO_ROOM, flags);
 }
 
 act_return act_to_victim(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_VICT, flags);
+  return act(str, ch, obj, vict_obj, TO_VICT, flags);
 }
 
 act_return act_to_character(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_CHAR, flags);
+  return act(str, ch, obj, vict_obj, TO_CHAR, flags);
 }
 
 act_return act_to_zone(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_ZONE, flags);
+  return act(str, ch, obj, vict_obj, TO_ZONE, flags);
 }
 
 act_return act_to_world(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_WORLD, flags);
+  return act(str, ch, obj, vict_obj, TO_WORLD, flags);
 }
 
 act_return act_to_group(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_GROUP, flags);
+  return act(str, ch, obj, vict_obj, TO_GROUP, flags);
 }
 
 act_return act_to_room_not_group(QString str, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint16 flags)
 {
-  return act_to_room(str, ch, obj, vict_obj, TO_ROOM_NOT_GROUP, flags);
+  return act(str, ch, obj, vict_obj, TO_ROOM_NOT_GROUP, flags);
 }
 
 act_return act(
@@ -59,7 +51,7 @@ act_return act(
     qint16 flags)
 {
   ConnectionPtr i;
-  qint32 retval = {};
+  ReturnValues retval = {};
 
   send_tokens_return st_return;
   st_return.str = QString();
@@ -106,7 +98,7 @@ act_return act(
   {
     if (ch->in_room >= 1)
     {
-      for (const auto &tmp_char : ch->dc_->world[ch->in_room].people_)
+      for (const auto &tmp_char : ch->dc_->world[ch->in_room]->people_)
       {
         // If they're not really playing, and no force flag, don't send
         if (tmp_char == ch)
@@ -144,9 +136,9 @@ act_return act(
       // Dropped link or they're not really playing and no force flag, don't send.
       if (!conn->character || conn->character == ch)
         continue;
-      if (conn->character->in_room == DC::NOWHERE || ch->in_room == DC::NOWHERE)
+      if (conn->character->in_room == INVALID_ROOM || ch->in_room == INVALID_ROOM)
         continue;
-      if ((destination == TO_ZONE) && ch->dc_->world[conn->character->in_room].zone != ch->dc_->world[ch->in_room].zone)
+      if ((destination == TO_ZONE) && ch->dc_->world[conn->character->in_room]->zone != ch->dc_->world[ch->in_room]->zone)
         continue;
       st_return = send_tokens(tokens, ch, obj, vict_obj, flags, conn->character);
       retval |= st_return.retval;
@@ -180,7 +172,7 @@ void send_message(QString str, CharacterPtr to)
 
 send_tokens_return send_tokens(TokenList &tokens, CharacterPtr ch, ObjectPtr obj, auto vict_obj, qint32 flags, CharacterPtr to)
 {
-  qint32 retval = {};
+  ReturnValues retval = {};
   QString buf = tokens.Interpret(ch, obj, vict_obj, to, flags);
 
   // Uppercase first letter of sentence.

@@ -31,8 +31,8 @@ bool is_r_denied(CharacterPtr ch, qint32 room)
 {
   if (ch->isPlayer())
     return false;
-  for (auto d = ch->dc_->world[room].denied; d; d = conn->next)
-    if (dc_->mob_index_[ch->mobdata->nr].vnum() == conn->vnum)
+  for (auto vnum = ch->dc_->world[room].denied_mobile_vnums; d; d = d->next)
+    if (ch->dc_->mob_index_[ch->mobdata->nr]->vnum() == conn->vnum)
       return true;
   return false;
 }
@@ -44,7 +44,7 @@ void DC::mobile_activity(void)
   qint32 door, max;
   qint32 done;
   qint32 tmp_race, tmp_bitv;
-  qint32 retval;
+  ReturnValues retval;
   extern qint32 mprog_cur_result;
 
   /* Examine all mobs. */
@@ -117,7 +117,7 @@ void DC::mobile_activity(void)
     // Only activate mprog random triggers if someone is in the zone
     try
     {
-      if (dc_->zones.value(dc_->world[ch->in_room].zone).players)
+      if (dc_->zones.value(dc_->world[ch->in_room]->zone).players)
       {
         retval = mprog_random_trigger(ch);
         if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
@@ -223,7 +223,7 @@ void DC::mobile_activity(void)
           continue;
         }
         Room room_past_door = dc_->world[room_nr_past_door];
-        if (!isSet(room_past_door.room_flags, NO_MOB) && !isSet(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !isSet(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == dc_->world[ch->in_room].zone))
+        if (!isSet(room_past_door->room_flags_, NO_MOB) && !isSet(room_past_door->room_flags_, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !isSet(room_past_door->room_flags_, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == dc_->world[ch->in_room]->zone))
         {
           if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
             ch->mobdata->last_direction = -1;
@@ -251,7 +251,7 @@ void DC::mobile_activity(void)
       //      CharacterPtr temp = get_char(get_random_hate(ch));
       done = {};
 
-      for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = next_blah)
+      for (tmp_ch = dc_->world[ch->in_room]->people_; tmp_ch; tmp_ch = next_blah)
       {
         next_blah = tmp_ch->next_in_room;
 
@@ -262,7 +262,7 @@ void DC::mobile_activity(void)
         act_to_character("Checking $N", ch, 0, tmp_ch, 0);
         if (isexact(qPrintable(tmp_ch->name()), ch->mobdata->hated)) // use isname since hated is a list
         {
-          if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+          if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
           {
             act_to_character("You growl at $N.", ch, 0, tmp_ch, 0);
             act_to_victim("$n growls at YOU!.", ch, 0, tmp_ch, 0);
@@ -310,7 +310,7 @@ void DC::mobile_activity(void)
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
       if (ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
-          !isSet(dc_->world[ch->in_room].room_flags, SAFE))
+          !isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
       {
         CharacterPtr next_aggro;
         qint32 targets = 1;
@@ -326,7 +326,7 @@ void DC::mobile_activity(void)
         while (!done && targets)
         {
           targets = {};
-          for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = next_aggro)
+          for (tmp_ch = dc_->world[ch->in_room]->people_; tmp_ch; tmp_ch = next_aggro)
           {
             if (!tmp_ch || !ch)
             {
@@ -390,7 +390,7 @@ void DC::mobile_activity(void)
           ISSET(ch->mobdata->actflags, ACT_AGGR_EVIL) ||
           ISSET(ch->mobdata->actflags, ACT_AGGR_NEUT) ||
           ISSET(ch->mobdata->actflags, ACT_AGGR_GOOD))
-        for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = pch)
+        for (tmp_ch = dc_->world[ch->in_room]->people_; tmp_ch; tmp_ch = pch)
         {
           pch = tmp_ch->next_in_room;
 
@@ -434,7 +434,7 @@ void DC::mobile_activity(void)
           //           continue;
 
           if ((tmp_ch->isPlayer() && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
-               !isSet(dc_->world[ch->in_room].room_flags, SAFE) &&
+               !isSet(dc_->world[ch->in_room]->room_flags_, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
               (tmp_ch->isNonPlayer() && tmp_ch->conn_ && tmp_ch->conn_->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->conn_->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
                ))
@@ -660,7 +660,7 @@ void scavenge(CharacterPtr ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (dc_->obj_index_[obj->item_number].vnum() == CHAMPION_ITEM)
+    if (dc_->obj_index_[obj->item_number]->vnum() == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();

@@ -22,17 +22,17 @@
 #include "DC/DC.h"
 qint32 load_debug = {};
 
-Room &World::operator[](room_t room_key)
+RoomPtr World::operator[](room_t room_number)
 {
   static Room generic_room = {};
 
-  if (room_key > top_of_world || room_key == DC::NOWHERE || !rooms.contains(room_key))
+  if (room_number > top_of_world || room_number == INVALID_ROOM || !rooms.contains(room_number))
   {
     generic_room = {};
     return generic_room;
   }
 
-  return rooms[room_key];
+  return dc_->rooms[room_number];
 }
 
 message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
@@ -68,8 +68,8 @@ void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const QString str, QString arg1, QString arg2);
-world_file_list_item *new_mob_file_item(QString filename, qint32 room_number);
-world_file_list_item *new_obj_file_item(QString filename, qint32 room_number);
+world_file_list_itemPtr new_mob_file_item(QString filename, qint32 room_number);
+world_file_list_itemPtr new_obj_file_item(QString filename, qint32 room_number);
 
 QString read_next_worldfile_name(auto &streamflWorldIndex);
 
@@ -127,6 +127,7 @@ void Room::AddTrackItem(TracksPtr newTrack)
   }
 }
 
+/*
 bool operator==(const Deny &dd1, const Deny &dd2)
 {
   QList<decltype(dd1.vnum)> denies1;
@@ -145,6 +146,7 @@ bool operator==(const Deny &dd1, const Deny &dd2)
 
   return denies1 == denies2;
 }
+*/
 
 bool operator==(ExtraDescription &edd1, ExtraDescription &edd2)
 {
@@ -193,15 +195,15 @@ bool operator==(const Room &r1, const Room &r2)
       return false;
     }
   }
-  return (r1.number == r2.number &&
+  return (r1.number_ == r2.number_ &&
           r1.zone == r2.zone &&
           r1.zonePtr == r2.zonePtr &&
           r1.sector_type == r2.sector_type &&
-          r1.denied == r2.denied &&
+          r1.denied_mobile_vnums == r2.denied_mobile_vnums &&
           r1.name_ == r2.name_ &&
           r1.description_ == r2.description_ &&
           r1.ex_description == r2.ex_description &&
-          r1.room_flags == r2.room_flags &&
+          r1.room_flags_ == r2.room_flags_ &&
           r1.temp_room_flags == r2.temp_room_flags &&
           r1.light == r2.light &&
           r1.funct == r2.funct &&
@@ -211,20 +213,12 @@ bool operator==(const Room &r1, const Room &r2)
           // r1.tracks == r2.tracks &&
           // r1.iFlags == r2.iFlags &&
           // ((r1.paths == r2.paths) || (r1.paths && r2.paths && *r1.paths == *r2.paths)) &&
-          !memcmp(r1.allow_class, r2.allow_class, sizeof(r1.allow_class)));
+          r1.allow_class == r2.allow_class);
 }
 
 TracksPtr Room::TrackItem(qint32 nIndex)
 {
-  qint32 nr;
-  TracksPtr pScent;
-
-  for (pScent = tracks, nr = 1; pScent;
-       pScent = pScent->next, nr++)
-    if (nr == nIndex)
-      return pScent;
-
-  return 0;
+  return tracks_.value(nIndex);
 }
 
 void Character::add_to_bard_list(void)
@@ -232,40 +226,17 @@ void Character::add_to_bard_list(void)
   if (GET_CLASS(this) != CLASS_BARD)
     return;
 
-  auto curr = new Pulse;
-
-  curr->thechar = this;
-  curr->next = bard_list;
-  bard_list = curr;
+  dc_->bard_list_.push_back(this);
 }
 
 void Character::remove_from_bard_list(void)
 {
-  PulsePtr curr = {};
-  PulsePtr last = {};
-
-  if (!bard_list)
+  if (dc_->bard_list_.isEmpty())
     return;
 
-  if (bard_list->thechar == this)
+  if (dc_->bard_list_.contains(this))
   {
-    curr = bard_list;
-    bard_list = bard_list->next;
-    curr = {};
-  }
-  else
-  {
-    last = bard_list;
-    for (curr = bard_list->next; curr; curr = curr->next)
-    {
-      if (curr->thechar == this)
-      {
-        last->next = curr->next;
-        curr = {};
-        break;
-      }
-      last = curr;
-    }
+    dc_->bard_list_.remove(dc_->bard_list_.indexOf(this)))
   }
 }
 
@@ -354,7 +325,7 @@ const QStringList funnybootmessages =
         "User Error: Replace user.\r\n",
         "Windows found. Delete? (Y/N)\r\n"};
 
-void funny_boot_message()
+void DC::funny_boot_message(void)
 {
   ConnectionPtr conn;
 
@@ -375,10 +346,10 @@ void funny_boot_message()
  It checks if ch exists everywhere it is used,
  so this can be called from other places without
  a character attached. */
-ReturnValue do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_write_skillquest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   skill_quest *curr;
-  FILE *stream;
+  QTextStream stream;
 
   if (!(stream = fopen(SKILL_QUEST_FILE, "w")))
   {
@@ -402,7 +373,7 @@ void load_skillquests()
   skill_quest *newsq, *last = {};
   skill_list = {};
   qint32 i;
-  FILE *stream;
+  QTextStream stream;
 
   if (!(stream = fopen(SKILL_QUEST_FILE, "r")))
   {
@@ -607,7 +578,7 @@ void DC::boot_db(void)
 }
 
 /*
- ReturnValue do_motdload(CharacterPtr ch, QString argument, cmd_t cmd)
+ ReturnValues do_motdload(CharacterPtr ch, QString argument, cmd_t cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -727,7 +698,7 @@ void DC::update_wizlist(CharacterPtr ch)
   write_wizlist(ssbuffer.str().c_str());
 }
 
-ReturnValue do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_wizlist(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, lines, space;
   qint32 x{}, z{1};
@@ -899,11 +870,11 @@ MobileIndexPtr DC::generate_mob_indices(qint32 *top, MobileIndexPtr index)
   qint32 i = {};
   QString buf;
   QString log_buf;
-  FILE *flMobIndex;
-  FILE *stream;
+  QTextStream flMobIndex;
+  QTextStream stream;
   QString temp;
   QString endfile;
-  world_file_list_item *pItem = {};
+  world_file_list_itemPtr pItem = {};
   //  extern short code_testing_mode;
 
   logverbose(u"Opening mobile file index."_s);
@@ -962,18 +933,18 @@ MobileIndexPtr DC::generate_mob_indices(qint32 *top, MobileIndexPtr index)
           }
           vnum_t vnum = {};
           sscanf(buf, "#%ld", &vnum);
-          index[i].vnum(vnum);
+          index[i]->vnum(vnum);
           index[i].qty = {};
           index[i].non_combat_func = {};
           index[i].combat_func = {};
           index[i]->programs_ = {};
           index[i].class_programs_ = {};
           index[i]->progtypes_ = {};
-          currentVNUM(index[i].vnum());
+          currentVNUM(index[i]->vnum());
           if (!(index[i]->item = (CharacterPtr)read_mobile(i, stream)))
           {
 
-            dc_sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[i].vnum());
+            dc_sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[i]->vnum());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
           }
           i++;
@@ -1208,11 +1179,11 @@ ObjectIndexPtr DC::generate_obj_indices(qint32 *top, ObjectIndexPtr index)
   qint32 i = {};
   QString buf;
   QString log_buf;
-  FILE *stream;
-  FILE *flObjIndex;
+  QTextStream stream;
+  QTextStream flObjIndex;
   QString temp;
   QString endfile;
-  world_file_list_item *pItem = {};
+  world_file_list_itemPtr pItem = {};
 
   //  if (!bport) {
 
@@ -1262,14 +1233,14 @@ ObjectIndexPtr DC::generate_obj_indices(qint32 *top, ObjectIndexPtr index)
           }
           vnum_t vnum = {};
           sscanf(buf, "#%ld", &vnum);
-          index[i].vnum(vnum);
+          index[i]->vnum(vnum);
           index[i].qty = {};
           index[i].non_combat_func = {};
           index[i].combat_func = {};
           index[i]->progtypes_ = {};
           if (!(index[i]->item = read_object(i, stream, false)))
           {
-            dc_sprintf(log_buf, "Unable to load object %lu!\r\n", index[i].vnum());
+            dc_sprintf(log_buf, "Unable to load object %lu!\r\n", index[i]->vnum());
             logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
           }
           i++;
@@ -1294,21 +1265,21 @@ ObjectIndexPtr DC::generate_obj_indices(qint32 *top, ObjectIndexPtr index)
 
 void write_one_room(LegacyFile &lf, qint32 a)
 {
-  FILE *f = lf.file_handle_;
+  QTextStream f = lf.file_handle_;
   ExtraDescriptionPtr extra;
 
   if (!rooms.contains(a))
     return;
 
-  dc_fprintf(f, "#%d\n", world[a].number);
+  dc_fprintf(f, "#%d\n", world[a]->number_);
   string_to_file(f, world[a].name);
   string_to_file(f, world[a].description);
 
   if (world[a].iFlags)
-    REMOVE_BIT(world[a].room_flags, world[a].iFlags);
-  dc_fprintf(f, "%lu %d %d\n", world[a].zone, world[a].room_flags, world[a].sector_type);
+    REMOVE_BIT(world[a]->room_flags_, world[a].iFlags);
+  dc_fprintf(f, "%lu %d %d\n", world[a].zone, world[a]->room_flags_, world[a].sector_type);
   if (world[a].iFlags)
-    SET_BIT(world[a].room_flags, world[a].iFlags);
+    SET_BIT(world[a]->room_flags_, world[a].iFlags);
 
   /* exits */
   for (qint32 b = {}; b <= 5; b++)
@@ -1354,7 +1325,7 @@ void write_one_room(LegacyFile &lf, qint32 a)
       dc_fprintf(f, "~\n"); // print blank
   } /* extra descriptions */
 
-  for (auto deni = world[a].denied; deni; deni = deni->next)
+  for (auto deni = world[a].denied_mobile_vnums; deni; deni = deni->next)
     dc_fprintf(f, "B\n%d\n", deni->vnum);
 
   // Write out allowed classes if any
@@ -1410,7 +1381,7 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_number)
       rooms[room_number] = {};
 
       world[room_number].paths = {};
-      world[room_number].number = room_number;
+      world[room_number]->number_ = room_number;
       world[room_number].name = temp;
     }
     QString description = fread_string(stream);
@@ -1420,7 +1391,7 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_number)
       world[room_number].tracks_.size() = {};
       world[room_number].tracks = {};
       world[room_number].last_track = {};
-      world[room_number].denied = {};
+      world[room_number].denied_mobile_vnums = {};
       total_rooms++;
     }
     // Ignore recorded zone number since it may not longer be valid
@@ -1428,14 +1399,14 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_number)
 
     if (room_number)
     {
-      // Go through the zone table until world[room_number].number is
+      // Go through the zone table until world[room_number]->number_ is
       // in the current zone.
 
       bool found = false;
       zone_t zone_nr = {};
       for (auto [zone_key, zone] : zones.asKeyValueRange())
       {
-        if (zone.getBottom() <= world[room_number].number && zone.getTop() >= world[room_number].number)
+        if (zone.getBottom() <= world[room_number]->number_ && zone.getTop() >= world[room_number]->number_)
         {
           found = true;
           zone_nr = zone_key;
@@ -1470,9 +1441,9 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_number)
 
     if (room_number)
     {
-      world[room_number].room_flags = room_flags;
-      if (isSet(world[room_number].room_flags, NO_ASTRAL))
-        REMOVE_BIT(world[room_number].room_flags, NO_ASTRAL);
+      world[room_number]->room_flags_ = room_flags;
+      if (isSet(world[room_number]->room_flags_, NO_ASTRAL))
+        REMOVE_BIT(world[room_number]->room_flags_, NO_ASTRAL);
 
       // This bitvector is for runtime and not stored in the files, so just initialize it to 0
       world[room_number].temp_room_flags = {};
@@ -1486,13 +1457,13 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_number)
 
       if (load_debug)
       {
-        printf("Flags are %lu %d %d\n", zone_nr, world[room_number].room_flags, world[room_number].sector_type);
+        printf("Flags are %lu %d %d\n", zone_nr, world[room_number]->room_flags_, world[room_number].sector_type);
         fflush(stdout);
       }
 
       world[room_number].funct = {};
       world[room_number].contents = {};
-      world[room_number].people_ = {};
+      world[room_number]->people_ = {};
       world[room_number].light = {}; /* Zero light sources */
 
       for (size_t tmp = {}; tmp <= 5; tmp++)
@@ -1538,8 +1509,8 @@ qint32 DC::read_one_room(auto &stream, qint32 &room_number)
 
         if (room_number)
         {
-          deni->next = world[room_number].denied;
-          world[room_number].denied = deni;
+          deni->next = world[room_number].denied_mobile_vnums;
+          world[room_number].denied_mobile_vnums = deni;
         }
         else
         {
@@ -1658,9 +1629,9 @@ void DC::set_zone_modified_zone(qint32 room)
   setZoneModified(world[room].zone);
 }
 
-auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>
+auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_itemPtr, search_error>
 {
-  world_file_list_item *world_entry = {};
+  world_file_list_itemPtr world_entry = {};
 
   for (quint8 i = 1; i < 4; ++i)
   {
@@ -1671,9 +1642,9 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_ite
   return std::unexpected(search_error::not_found);
 }
 
-void DC::set_zone_modified(qint32 modnum, world_file_list_item *list)
+void DC::set_zone_modified(qint32 modnum, world_file_list_itemPtr list)
 {
-  world_file_list_item *curr = list;
+  world_file_list_itemPtr curr = list;
 
   while (curr)
     if (modnum >= curr->firstnum && modnum <= curr->lastnum)
@@ -1711,9 +1682,9 @@ void DC::set_zone_modified_obj(qint32 obj)
   set_zone_modified(obj, obj_file_list);
 }
 
-void DC::set_zone_saved(qint32 modnum, world_file_list_item *list)
+void DC::set_zone_saved(qint32 modnum, world_file_list_itemPtr list)
 {
-  world_file_list_item *curr = list;
+  world_file_list_itemPtr curr = list;
 
   while (curr)
     if (modnum >= curr->firstnum && modnum <= curr->lastnum)
@@ -1752,7 +1723,7 @@ void DC::set_zone_saved_obj(qint32 obj)
 void DC::free_world_from_memory(void)
 {
   ExtraDescriptionPtr curr_extra = {};
-  world_file_list_item *curr_wfli = {};
+  world_file_list_itemPtr curr_wfli = {};
 
   for (qint32 i = {}; i <= top_of_world; i++)
   {
@@ -1822,7 +1793,7 @@ void DC::free_objs_from_memory(void)
     }
 }
 
-world_file_list_item *one_new_world_file_item(QString filename, qint32 room_number)
+world_file_list_itemPtr one_new_world_file_item(QString filename, qint32 room_number)
 {
   auto curr = new world_file_list_item;
   curr->filename = filename;
@@ -1833,9 +1804,9 @@ world_file_list_item *one_new_world_file_item(QString filename, qint32 room_numb
   return curr;
 }
 
-world_file_list_item *new_w_file_item(QString filename, qint32 room_number, world_file_list_item *&list)
+world_file_list_itemPtr new_w_file_item(QString filename, qint32 room_number, world_file_list_itemPtr &list)
 {
-  world_file_list_item *curr = list;
+  world_file_list_itemPtr curr = list;
 
   if (!list)
   {
@@ -1850,17 +1821,17 @@ world_file_list_item *new_w_file_item(QString filename, qint32 room_number, worl
   return curr->next;
 }
 
-world_file_list_item *new_world_file_item(QString filename, qint32 room_number)
+world_file_list_itemPtr new_world_file_item(QString filename, qint32 room_number)
 {
   return new_w_file_item(filename, room_number, world_file_list);
 }
 
-world_file_list_item *new_mob_file_item(QString filename, qint32 room_number)
+world_file_list_itemPtr new_mob_file_item(QString filename, qint32 room_number)
 {
   return new_w_file_item(filename, room_number, mob_file_list);
 }
 
-world_file_list_item *new_obj_file_item(QString filename, qint32 room_number)
+world_file_list_itemPtr new_obj_file_item(QString filename, qint32 room_number)
 {
   return new_w_file_item(filename, room_number, obj_file_list);
 }
@@ -1868,12 +1839,12 @@ world_file_list_item *new_obj_file_item(QString filename, qint32 room_number)
 /* load the rooms */
 void DC::boot_world(void)
 {
-  FILE *stream;
-  FILE *flWorldIndex;
+  QTextStream stream;
+  QTextStream flWorldIndex;
   qint32 room_number = {};
   QString temp;
   QString endfile;
-  world_file_list_item *pItem = {};
+  world_file_list_itemPtr pItem = {};
 
   object_list = {};
 
@@ -1950,7 +1921,7 @@ void setup_dir(auto &stream, qint32 room, qint32 dir)
   if (room && world[room].dir_option[dir])
   {
     QString buf;
-    dc_sprintf(buf, "Room %d attemped to created two exits in the same direction.", world[room].number);
+    dc_sprintf(buf, "Room %d attemped to created two exits in the same direction.", world[room]->number_);
     logentry(buf, 0, DC::LogChannel::LOG_WORLD);
     if (world[room].dir_option[dir]->general_description)
       world[room].dir_option[dir]->general_description = {};
@@ -1987,7 +1958,7 @@ void setup_dir(auto &stream, qint32 room, qint32 dir)
     world[room].dir_option[dir]->key = key;
   }
 
-  qint16 to_room = DC::NOWHERE;
+  qint16 to_room = INVALID_ROOM;
   try
   {
     to_room = fread_int(stream, 0, 62000);
@@ -2031,7 +2002,7 @@ qint32 DC::create_one_room(CharacterPtr ch, qint32 vnum)
   rp->zone = getRoomZone(rp->number);
 
   rp->sector_type = {};
-  rp->room_flags = {};
+  rp->room_flags_ = {};
   rp->temp_room_flags = {};
   rp->ex_description = {};
   for (x = {}; x <= 5; x++)
@@ -2056,7 +2027,7 @@ void renum_world(void)
     for (door = {}; door <= 5; door++)
       if (rooms.contains(room))
         if (world[room].dir_option[door])
-          if (world[room].dir_option[door]->to_room != DC::NOWHERE)
+          if (world[room].dir_option[door]->to_room != INVALID_ROOM)
             world[room].dir_option[door]->to_room =
                 real_room(world[room].dir_option[door]->to_room);
 }
@@ -2099,7 +2070,7 @@ void renum_zone_table(void)
         else
           zone.cmd[comm]->active = {};
 
-        //            if (zone.cmd[comm]->arg3 != DC::NOWHERE)
+        //            if (zone.cmd[comm]->arg3 != INVALID_ROOM)
         //          zone.cmd[comm]->arg3 =
         //        real_room(zone.cmd[comm]->arg3);
         break;
@@ -2192,7 +2163,7 @@ void Zone::write(auto &stream)
       dc_fprintf(stream, "K %2d %5d %3d %5d%s\n", cmd[i]->if_flag, cmd[i]->arg1, cmd[i]->arg2, cmd[i]->arg3, qPrintable(cmd[i]->comment) ? qPrintable(cmd[i]->comment) : "");
     else if (cmd[i]->command == 'M')
     {
-      qint32 virt = cmd[i]->active ? mob_index_[cmd[i]->arg1].vnum() : cmd[i]->arg1;
+      qint32 virt = cmd[i]->active ? mob_index_[cmd[i]->arg1]->vnum() : cmd[i]->arg1;
       dc_fprintf(stream, "M %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
@@ -2201,8 +2172,8 @@ void Zone::write(auto &stream)
     }
     else if (cmd[i]->command == 'P')
     {
-      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1].vnum() : cmd[i]->arg1;
-      qint32 virt2 = cmd[i]->active ? obj_index_[cmd[i]->arg3].vnum() : cmd[i]->arg3;
+      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1]->vnum() : cmd[i]->arg1;
+      qint32 virt2 = cmd[i]->active ? obj_index_[cmd[i]->arg3]->vnum() : cmd[i]->arg3;
       dc_fprintf(stream, "P %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
@@ -2211,7 +2182,7 @@ void Zone::write(auto &stream)
     }
     else if (cmd[i]->command == 'G')
     {
-      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1].vnum() : cmd[i]->arg1;
+      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1]->vnum() : cmd[i]->arg1;
 
       dc_fprintf(stream, "G %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
@@ -2221,7 +2192,7 @@ void Zone::write(auto &stream)
     }
     else if (cmd[i]->command == 'O')
     {
-      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1].vnum() : cmd[i]->arg1;
+      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1]->vnum() : cmd[i]->arg1;
       dc_fprintf(stream, "O %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
@@ -2230,7 +2201,7 @@ void Zone::write(auto &stream)
     }
     else if (cmd[i]->command == 'E')
     {
-      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1].vnum() : cmd[i]->arg1;
+      qint32 virt = cmd[i]->active ? obj_index_[cmd[i]->arg1]->vnum() : cmd[i]->arg1;
       dc_fprintf(stream, "E %2d %5d %3d %5d %s\n", cmd[i]->if_flag,
                  virt,
                  cmd[i]->arg2,
@@ -2415,8 +2386,8 @@ zone_t DC::read_one_zone(auto &stream)
 /* load the zone table and command tables */
 void DC::boot_zones(void)
 {
-  FILE *stream;
-  FILE *flZoneIndex;
+  QTextStream stream;
+  QTextStream flZoneIndex;
   QString temp;
   QString endfile;
 
@@ -2474,7 +2445,7 @@ void DC::boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-CharacterPtr DC::read_mobile(qint32 nr, FILE *stream)
+CharacterPtr DC::read_mobile(qint32 nr, QTextStream stream)
 {
   QString buf;
   qint32 i, j;
@@ -2686,10 +2657,10 @@ CharacterPtr DC::read_mobile(qint32 nr, FILE *stream)
 //
 void write_mobile(LegacyFile &lf, CharacterPtr mob)
 {
-  FILE *stream = lf.file_handle_;
+  QTextStream stream = lf.file_handle_;
   qint32 i = {};
 
-  dc_fprintf(stream, "#%lu\n", mob_index_[mob->mobdata->nr].vnum());
+  dc_fprintf(stream, "#%lu\n", mob_index_[mob->mobdata->nr]->vnum());
   string_to_file(stream, mob->name());
   string_to_file(stream, qPrintable(mob->short_description()));
   string_to_file(stream, qPrintable(mob->long_description()));
@@ -3209,10 +3180,10 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
   // yes, i could check if the last item is smaller and then do a binary
   // search to do this faster but if everything in life was optimized I wouldn't
   // be playing solitaire at work on a windows machine. -pir
-  while (obj_index_[cur_index].vnum() < nr && cur_index < top_of_objt + 1)
+  while (obj_index_[cur_index]->vnum() < nr && cur_index < top_of_objt + 1)
     cur_index++;
 
-  if (obj_index_[cur_index].vnum() == nr) // item already exists
+  if (obj_index_[cur_index]->vnum() == nr) // item already exists
     return std::unexpected(create_error::entry_exists);
 
   // theoretically if top_of_objt+1 wasn't initialized properly it could
@@ -3221,12 +3192,11 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
   // create
 
   auto obj = ObjectPtr(new Object(this));
-  clear_object(obj);
   obj->name(u"empty obj"_s);
   obj->short_description("An empty obj");
   obj->long_description("An empty obj sits here dejectedly.");
   obj->ActionDescription("Fixed.");
-  obj->in_room = DC::NOWHERE;
+  obj->in_room = INVALID_ROOM;
   obj->next_content = {};
   obj->next_skill = {};
   obj->table = {};
@@ -3241,7 +3211,7 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
   top_of_objt++;
 
   // insert
-  obj_index_[cur_index].vnum(nr);
+  obj_index_[cur_index]->vnum(nr);
   obj_index_[cur_index].qty = {};
   obj_index_[cur_index].non_combat_func = {};
   obj_index_[cur_index].combat_func = {};
@@ -3257,7 +3227,7 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
     (obj_index_[i]->item)->item_number++;
 
   // update obj file indices
-  world_file_list_item *wcurr = {};
+  world_file_list_itemPtr wcurr = {};
 
   wcurr = obj_file_list;
   while (wcurr)
@@ -3295,10 +3265,10 @@ qint32 DC::create_blank_mobile(qint32 nr)
   // yes, i could check if the last mobile is smaller and then do a binary
   // search to do this faster but if everything in life was optimized I wouldn't
   // be playing solitaire at work on a windows machine. -pir
-  while (mob_index_[cur_index].vnum() < nr && cur_index < top_of_mobt + 1)
+  while (mob_index_[cur_index]->vnum() < nr && cur_index < top_of_mobt + 1)
     cur_index++;
 
-  if (mob_index_[cur_index].vnum() == nr) // item already exists
+  if (mob_index_[cur_index]->vnum() == nr) // item already exists
     return -1;
 
   // theoretically if top_of_objt+1 wasn't initialized properly it could
@@ -3346,7 +3316,7 @@ qint32 DC::create_blank_mobile(qint32 nr)
   top_of_mobt++;
 
   // insert
-  mob_index_[cur_index].vnum(nr);
+  mob_index_[cur_index]->vnum(nr);
   mob_index_[cur_index].qty = {};
   if (mob_non_combat_functions.contains(nr))
   {
@@ -3387,7 +3357,7 @@ qint32 DC::create_blank_mobile(qint32 nr)
     ((CharacterPtr)mob_index_[i]->item)->mobdata->nr++;
 
   // update obj file indices
-  world_file_list_item *wcurr = {};
+  world_file_list_itemPtr wcurr = {};
 
   wcurr = mob_file_list;
   while (wcurr)
@@ -3451,7 +3421,7 @@ void delete_mob_from_index(qint32 nr)
     ((CharacterPtr)mob_index_[i]->item)->mobdata->nr--;
 
   // update mob file indices - these store rnums
-  world_file_list_item *wcurr = {};
+  world_file_list_itemPtr wcurr = {};
 
   wcurr = mob_file_list;
 
@@ -3526,7 +3496,7 @@ void delete_item_from_index(qint32 nr)
     (obj_index_[i]->item)->item_number--;
 
   // update obj file indices - these store rnums
-  world_file_list_item *wcurr = {};
+  world_file_list_itemPtr wcurr = {};
 
   wcurr = obj_file_list;
 
@@ -3569,10 +3539,10 @@ void delete_item_from_index(qint32 nr)
 //
 void write_object(LegacyFile &lf, ObjectPtr obj)
 {
-  FILE *stream = lf.file_handle_;
+  QTextStream stream = lf.file_handle_;
   ExtraDescriptionPtr currdesc;
 
-  dc_fprintf(stream, "#%lu\n", obj_index_[obj->item_number].vnum());
+  dc_fprintf(stream, "#%lu\n", obj_index_[obj->item_number]->vnum());
   string_to_file(stream, obj->name());
   string_to_file(stream, obj->short_description());
   string_to_file(stream, obj->long_description());
@@ -3708,7 +3678,7 @@ void write_object_csv(ObjectPtr obj, std::ofstream &fout)
 {
   try
   {
-    fout << obj_index_[obj->item_number].vnum() << ",";
+    fout << obj_index_[obj->item_number]->vnum() << ",";
     fout << "\"" << obj->name().toStdString() << "\",";
     fout << "\"" << quotequotes(obj->short_description()) << "\",";
     fout << "\"" << quotequotes(obj->long_description()) << "\",";
@@ -3765,13 +3735,12 @@ bool has_random(ObjectPtr obj)
 ObjectPtr clone_object(qint32 nr)
 {
   ObjectPtr obj, old;
-  ExtraDescriptionPtr new_new_descr, *descr;
+  ExtraDescriptionPtr new_new_descr, descr;
 
   if (nr < 0)
     return 0;
 
   obj = new Object;
-  clear_object(obj);
   old = (obj_index_[nr]->item); /* cast the void pointer */
 
   if (old != 0)
@@ -4017,9 +3986,9 @@ void DC::zone_update(void)
 quint64 countMobsInRoom(quint64 vnum, room_t room_number)
 {
   quint64 count = {};
-  for (auto ch = world[room_number].people_; ch != nullptr; ch = ch->next_in_room)
+  for (auto ch = world[room_number]->people_; ch != nullptr; ch = ch->next_in_room)
   {
-    if (ch->mobdata && mob_index_[ch->mobdata->nr].vnum() == vnum)
+    if (ch->mobdata && mob_index_[ch->mobdata->nr]->vnum() == vnum)
     {
       count++;
     }
@@ -4032,7 +4001,7 @@ quint64 countMobsInWorld(quint64 vnum)
   quint64 count = {};
   for (const auto ch : character_list)
   {
-    if (ch->mobdata && mob_index_[ch->mobdata->nr].vnum() == vnum && ch->in_room != DC::NOWHERE)
+    if (ch->mobdata && mob_index_[ch->mobdata->nr]->vnum() == vnum && ch->in_room != INVALID_ROOM)
     {
       count++;
     }
@@ -4102,12 +4071,12 @@ void Zone::reset(ResetType reset_type)
       {
 
       case 'M': /* read a mobile */
-        if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(mob_index_[cmd[reset_cmd_index]->arg1].vnum()) < cmd[reset_cmd_index]->arg2 && (mob = clone_mobile(cmd[reset_cmd_index]->arg1)))
+        if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(mob_index_[cmd[reset_cmd_index]->arg1]->vnum()) < cmd[reset_cmd_index]->arg2 && (mob = clone_mobile(cmd[reset_cmd_index]->arg1)))
         {
           char_to_room(mob, cmd[reset_cmd_index]->arg3);
           cmd[reset_cmd_index]->lastPop = mob;
           mob->mobdata->reset = cmd[reset_cmd_index];
-          mob->hometown = world[cmd[reset_cmd_index]->arg3].number;
+          mob->hometown = world[cmd[reset_cmd_index]->arg3]->number_;
           num_mob_on_repop++;
           last_cmd = 1;
           last_mob = 1;
@@ -4153,7 +4122,7 @@ void Zone::reset(ResetType reset_type)
 
             if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
             {
-              dc_sprintf(buf, "Obj %lu loaded to DC::NOWHERE. Zone %lu Cmd %d", obj_index_[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
+              dc_sprintf(buf, "Obj %lu loaded to INVALID_ROOM. Zone %lu Cmd %d", obj_index_[cmd[reset_cmd_index]->arg1]->vnum(), id_, reset_cmd_index);
               logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
             last_cmd = {};
@@ -4336,7 +4305,7 @@ void Zone::reset(ResetType reset_type)
           dc_sprintf(
               log_buf,
               "Attempt to reset direction %d on room %d that doesn't exist Z: %lu cmd %d",
-              cmd[reset_cmd_index]->arg2, world[cmd[reset_cmd_index]->arg1].number, id_, reset_cmd_index);
+              cmd[reset_cmd_index]->arg2, world[cmd[reset_cmd_index]->arg1]->number_, id_, reset_cmd_index);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
@@ -4466,11 +4435,11 @@ void Zone::reset(ResetType reset_type)
     const auto &character_list = character_list;
     for (const auto &tmp_victim : character_list)
     {
-      if (tmp_victim->in_room == DC::NOWHERE)
+      if (tmp_victim->in_room == INVALID_ROOM)
       {
         continue;
       }
-      if (tmp_victim->isNonPlayer() && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room].zone == id_)
+      if (tmp_victim->isNonPlayer() && !ISSET(tmp_victim->mobdata->actflags, ACT_NO_GOLD_BONUS) && world[tmp_victim->in_room]->zone == id_)
       {
         tmp_victim->multiplyGold(1.10);
         tmp_victim->exp *= 1.10;
@@ -4484,7 +4453,7 @@ bool Zone::isEmpty(void)
   ConnectionPtr i;
 
   for (auto &i : connections_)
-    if (i->connected == Connection::states::PLAYING && i->character && world[i->character->in_room].zone == id_)
+    if (i->connected == Connection::states::PLAYING && i->character && world[i->character->in_room]->zone == id_)
       return false;
 
   return true;
@@ -4581,7 +4550,7 @@ void free_char(CharacterPtr ch)
 /* release memory allocated for an obj  */
 void free_obj(ObjectPtr obj)
 {
-  ExtraDescriptionPtr ths, *next_one;
+  ExtraDescriptionPtr ths, next_one;
 
   for (ths = obj->ex_description; ths; ths = next_one)
   {
@@ -4595,7 +4564,7 @@ void free_obj(ObjectPtr obj)
 /* read contents of a text file, and place in buf */
 qint32 file_to_string(const QString name, QString buf)
 {
-  FILE *stream;
+  QTextStream stream;
   QString tmp;
 
   if (!(stream = fopen(name, "r")))
@@ -4737,44 +4706,10 @@ void clear_char(CharacterPtr ch)
   }
 
   *ch = Character(ch->dc_);
-  ch->in_room = DC::NOWHERE;
+  ch->in_room = INVALID_ROOM;
   ch->setStanding();
   ch->hometown = START_ROOM;
   GET_AC(ch) = 100; /* Basic Armor */
-}
-
-void clear_object(ObjectPtr obj)
-{
-  if (!obj)
-    return;
-  *obj = {};
-  obj->item_number = -1;
-  obj->in_room = DC::NOWHERE;
-  obj->vroom = {};
-  obj->flags = {};
-  obj->num_affects = {};
-  obj->affected = {};
-
-  obj->name({});
-  obj->long_description({});
-  obj->short_description({});
-  obj->ActionDescription({});
-  obj->ex_description = {};
-  obj->carried_by = {};
-  obj->equipped_by = {};
-
-  obj->in_obj = {};
-  obj->contains = {};
-
-  obj->next_content = {};
-  obj->next = {};
-  obj->next_skill = {};
-  ;
-  obj->table = {};
-  obj->slot = {};
-  obj->wheel = {};
-  obj->save_expiration = {};
-  obj->no_sell_expiration = {};
 }
 
 // Roll up the random modifiers to saving throw for new character
@@ -4889,7 +4824,7 @@ room_t real_room(room_t virt)
 {
   if (virt < 0 || virt > top_of_world)
   {
-    return DC::NOWHERE;
+    return INVALID_ROOM;
   }
 
   if (rooms.contains(virt))
@@ -4897,7 +4832,7 @@ room_t real_room(room_t virt)
     return virt;
   }
 
-  return DC::NOWHERE;
+  return INVALID_ROOM;
 }
 
 /* returns the real number of the monster with given virt number */
@@ -5062,7 +4997,7 @@ qint32 MobileProgram::name_to_type(QString name)
 void mprog_file_read(QString f, qint32 i)
 {
   MobileProgramPtr mprog = {};
-  FILE *stream = {};
+  QTextStream stream = {};
   QChar letter = {};
   QString name = {};
   qint32 type = {};
@@ -5136,7 +5071,7 @@ void DC::find_unordered_objects(void)
 
   for (qint32 rnum = {}; rnum <= top_of_objt; rnum++, last_vnum = cur_vnum)
   {
-    cur_vnum = obj_index_[rnum].vnum();
+    cur_vnum = obj_index_[rnum]->vnum();
 
     if (cur_vnum < last_vnum)
     {
@@ -5151,7 +5086,7 @@ void find_unordered_mobiles(void)
 
   for (qint32 rnum = {}; rnum <= top_of_mobt; rnum++, last_vnum = cur_vnum)
   {
-    cur_vnum = mob_index_[rnum].vnum();
+    cur_vnum = mob_index_[rnum]->vnum();
 
     if (cur_vnum < last_vnum)
     {
@@ -5410,7 +5345,7 @@ LegacyFile::~LegacyFile()
   }
 }
 
-FILE *LegacyFile::openFile(void)
+QTextStream LegacyFile::openFile(void)
 {
   if (file_handle_)
   {

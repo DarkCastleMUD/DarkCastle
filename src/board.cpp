@@ -754,7 +754,7 @@ QString remove_slashr(QString unformatted)
 void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
 {
 
-  FILE *the_file;
+  QTextStream the_file;
   QString write_me;
   quint32 ind;
 
@@ -787,7 +787,7 @@ void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
 void board_load_board()
 {
 
-  FILE *the_file;
+  QTextStream the_file;
   qint32 ind;
   message curr_msg;
   qint32 number;
@@ -997,7 +997,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   return ReturnValue::eSUCCESS;
 }
 
-qint32 fwrite_string(QString buf, FILE *stream)
+qint32 fwrite_string(QString buf, QTextStream stream)
 {
   return (dc_fprintf(stream, "%s~\n", qPrintable(buf)));
 }

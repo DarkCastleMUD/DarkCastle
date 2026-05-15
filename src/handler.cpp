@@ -15,11 +15,12 @@
 /* $Id: handler.cpp,v 1.208 2013/03/27 03:32:58 jhhudso Exp $ */
 
 #include "DC/DC.h"
+#include <qtypes.h>
 
 void huntclear_item(ObjectPtr obj);
 
 /* External procedures */
-ReturnValue do_fall(CharacterPtr ch, short dir);
+ReturnValues do_fall(CharacterPtr ch, short dir);
 
 // TIMERS
 
@@ -228,15 +229,10 @@ qint32 get_max_stat(CharacterPtr ch, attribute_t stat)
 
 bool still_affected_by_poison(CharacterPtr ch)
 {
-  affected_typePtr af = ch->affected;
-
-  while (af)
-  {
-    if (isSet(af->bitvector, AFF_POISON))
-      return 1;
-    af = af->next;
-  }
-  return 0;
+  for (const auto &af : ch->affected)
+    if (af && isSet(af->bitvector, AFF_POISON))
+      return true;
+  return false;
 }
 
 const QList<set_data> DC::set_list = {
@@ -344,7 +340,7 @@ const QList<set_data> DC::set_list = {
 void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
 {
   // obj has just been worn
-  qint32 obj_vnum = dc_->obj_index_[obj->item_number].vnum();
+  qint32 obj_vnum = ch->dc_->obj_index_[obj->item_number]->vnum();
   qint32 i;
   qint32 z = 0, y;
   // Quadruple nested for. Annoying, but it's gotta be done.
@@ -364,7 +360,7 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
           bool found = false, doublea = false;
           for (i = {}; i < MAX_WEAR; i++)
           {
-            if (ch->equipment[i] && dc_->obj_index_[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
+            if (ch->equipment[i] && ch->dc_->obj_index_[ch->equipment[i]->item_number]->vnum() == sl.vnum[y])
             {
               if (y > 0 && !doublea && sl.vnum[y] == sl.vnum[y - 1])
               {
@@ -615,7 +611,7 @@ void add_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag, qint32 pos)
 void remove_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag)
 {
   // obj has just been removed
-  qint32 obj_vnum = dc_->obj_index_[obj->item_number].vnum();
+  qint32 obj_vnum = ch->dc_->obj_index_[obj->item_number]->vnum();
   qint32 i;
   qint32 z = 0, y;
   // Quadruply nested for. Annoying, but it's gotta be done.
@@ -633,7 +629,7 @@ void remove_set_stats(CharacterPtr ch, ObjectPtr obj, qint32 flag)
           bool found = false, doublea = false;
           for (i = {}; i < MAX_WEAR; i++)
           {
-            if (ch->equipment[i] && dc_->obj_index_[ch->equipment[i]->item_number].vnum() == sl.vnum[y])
+            if (ch->equipment[i] && ch->dc_->obj_index_[ch->equipment[i]->item_number]->vnum() == sl.vnum[y])
             {
               if (y > 0 && !doublea && sl.vnum[y] == sl.vnum[y - 1])
               {
@@ -1408,7 +1404,7 @@ void affect_modify(CharacterPtr ch, qint32 loc, qint32 mod, qint32 bitv, bool ad
     dc_sprintf(log_buf, "Unknown apply adjust attempt: %d. (handler.c, "
                         "affect_modify.)",
                loc);
-    dc_->logentry(log_buf, 0, DC::LogChannel::LOG_BUG);
+    ch->dc_->logentry(log_buf, 0, DC::LogChannel::LOG_BUG);
     break;
 
   } /* switch */
@@ -1436,11 +1432,10 @@ void affect_total(CharacterPtr ch)
         affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, false);
   }
   remove_totem_stats(ch);
-  for (af = ch->affected; af; af = tmp_af)
+  for (auto &af : ch->affected)
   {
-    //        bool secFix = false;
-    tmp_af = af->next;
-    affect_modify(ch, af->location, af->modifier, af->bitvector, false);
+    if (af)
+      affect_modify(ch, af->location, af->modifier, af->bitvector, false);
   }
 
   // add everything back
@@ -1450,10 +1445,10 @@ void affect_total(CharacterPtr ch)
       for (j = {}; j < ch->equipment[i]->num_affects; j++)
         affect_modify(ch, ch->equipment[i]->affected[j].location, ch->equipment[i]->affected[j].modifier, -1, true);
   }
-  for (af = ch->affected; af; af = af->next)
+  for (auto &af : ch->affected)
   {
-    //      bool secFix = false;
-    affect_modify(ch, af->location, af->modifier, af->bitvector, true);
+    if (af)
+      affect_modify(ch, af->location, af->modifier, af->bitvector, true);
   }
   add_totem_stats(ch);
   if (!already)
@@ -1491,7 +1486,7 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
   QString buf;
   short dir;
   bool char_died = false;
-  follow_type *f, *next_f;
+  CharacterPtr *f, *next_f;
 
   if (!ch->affected)
     return;
@@ -1543,7 +1538,7 @@ void affect_remove(CharacterPtr ch, affected_typePtr af, qint32 flags)
     break;
   case SPELL_FLY:
     /* Fly wears off...you fall :) */
-    if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0))))
+    if (((flags & SUPPRESS_CONSEQUENCES) == 0) && ((isSet(dc_->world[ch->in_room]->room_flags_, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_SOUTH) && (dir = 2)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_NORTH) && (dir = 0))))
     {
       if (do_fall(ch, dir) & ReturnValue::eCH_DIED)
         char_died = true;
@@ -1979,16 +1974,7 @@ void affect_from_char(CharacterPtr ch, qint32 skill, qint32 flags)
  */
 affected_typePtr Character::affected_by_spell(quint32 skill)
 {
-  affected_typePtr curr;
-
-  if (skill < 0) // all affect types are quint32
-    return {};
-
-  for (curr = affected; curr; curr = curr->next)
-    if (curr->type == skill)
-      return curr;
-
-  return {};
+  return affected.value(skill);
 }
 
 affected_typePtr affected_by_spell(CharacterPtr ch, quint32 skill)
@@ -1998,25 +1984,10 @@ affected_typePtr affected_by_spell(CharacterPtr ch, quint32 skill)
 
 affected_typePtr affected_by_random(CharacterPtr ch)
 {
-  if (ch->affected == 0)
-    return 0;
+  if (ch->affected.isEmpty())
+    return {};
 
-  // Count number of affects
-  qint32 aff_cnt = {};
-  for (affected_typePtr curr = ch->affected; curr; curr = curr->next)
-    aff_cnt++;
-
-  qint32 j = 1;
-  qint32 pick = dc_->number(1, aff_cnt);
-  for (affected_typePtr curr = ch->affected; curr; curr = curr->next)
-  {
-    if (j == pick)
-      return curr;
-    else
-      j++;
-  }
-
-  return 0;
+  return ch->affected.value(ch->dc_->number<qsizetype>(1, ch->affected.count()));
 }
 
 void affect_join(CharacterPtr ch, affected_typePtr af, bool avg_dur, bool avg_mod)
@@ -2057,7 +2028,7 @@ qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting)
   CharacterPtr i, fighter, next_char;
   bool Other = false, More = false, kimore = false;
 
-  if (ch->in_room == DC::NOWHERE)
+  if (ch->in_room == INVALID_ROOM)
   {
     return {};
   }
@@ -2079,19 +2050,19 @@ qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting)
 
   dc_->world[ch->in_room].light -= ch->glow_factor;
 
-  if (ch == dc_->world[ch->in_room].people_) /* head of list */
-    dc_->world[ch->in_room].people_ = ch->next_in_room;
+  if (ch == dc_->world[ch->in_room]->people_) /* head of list */
+    dc_->world[ch->in_room]->people_ = ch->next_in_room;
 
   /* locate the previous element */
   else
-    for (i = dc_->world[ch->in_room].people_; i; i = i->next_in_room)
+    for (i = dc_->world[ch->in_room]->people_; i; i = i->next_in_room)
     {
       if (i->next_in_room == ch)
         i->next_in_room = ch->next_in_room;
     }
   //  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_NOMAGIC))
   //	debugpoint();
-  for (i = dc_->world[ch->in_room].people_; i; i = i->next_in_room)
+  for (i = dc_->world[ch->in_room]->people_; i; i = i->next_in_room)
   {
     if (i->isNonPlayer() && ISSET(i->mobdata->actflags, ACT_NOMAGIC))
       Other = true;
@@ -2101,28 +2072,28 @@ qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting)
       kimore = true;
   }
   if (ch->isPlayer()) // player
-    dc_->zones.value(dc_->world[ch->in_room].zone).decrementPlayers();
+    dc_->zones.value(dc_->world[ch->in_room]->zone).decrementPlayers();
   if (ch->isNonPlayer())
     ch->mobdata->last_room = ch->in_room;
   if (ch->isNonPlayer())
     if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !More && isSet(dc_->world[ch->in_room].iFlags, NO_TRACK))
     {
       REMOVE_BIT(dc_->world[ch->in_room].iFlags, NO_TRACK);
-      REMOVE_BIT(dc_->world[ch->in_room].room_flags, NO_TRACK);
+      REMOVE_BIT(dc_->world[ch->in_room]->room_flags_, NO_TRACK);
     }
   if (ch->isNonPlayer())
     if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !kimore && isSet(dc_->world[ch->in_room].iFlags, NO_KI))
     {
       REMOVE_BIT(dc_->world[ch->in_room].iFlags, NO_KI);
-      REMOVE_BIT(dc_->world[ch->in_room].room_flags, NO_KI);
+      REMOVE_BIT(dc_->world[ch->in_room]->room_flags_, NO_KI);
     }
   if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !Other && isSet(dc_->world[ch->in_room].iFlags, NO_MAGIC))
   {
     REMOVE_BIT(dc_->world[ch->in_room].iFlags, NO_MAGIC);
-    REMOVE_BIT(dc_->world[ch->in_room].room_flags, NO_MAGIC);
+    REMOVE_BIT(dc_->world[ch->in_room]->room_flags_, NO_MAGIC);
   }
 
-  ch->in_room = DC::NOWHERE;
+  ch->in_room = INVALID_ROOM;
   ch->next_in_room = {};
 
   /* success */
@@ -2151,17 +2122,17 @@ bool is_hiding(CharacterPtr ch, CharacterPtr vict)
 qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
 {
   CharacterPtr temp;
-  if (room == DC::NOWHERE)
+  if (room == INVALID_ROOM)
     return {};
 
-  if (dc_->world[room].people_ == ch)
+  if (dc_->world[room]->people_ == ch)
   {
-    dc_->logentry(u"Error: dc_->world[room].people_ == ch in char_to_room()."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Error: dc_->world[room]->people_ == ch in char_to_room()."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
   }
 
-  ch->next_in_room = dc_->world[room].people_;
-  dc_->world[room].people_ = ch;
+  ch->next_in_room = dc_->world[room]->people_;
+  dc_->world[room]->people_ = ch;
   ch->in_room = room;
 
   dc_->world[room].light += ch->glow_factor;
@@ -2211,24 +2182,24 @@ qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
     dc_->zones.value(dc_->world[room].zone).incrementPlayers();
   if (ch->isNonPlayer())
   {
-    if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !isSet(dc_->world[room].room_flags, NO_MAGIC))
+    if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !isSet(dc_->world[room]->room_flags_, NO_MAGIC))
     {
       SET_BIT(dc_->world[room].iFlags, NO_MAGIC);
-      SET_BIT(dc_->world[room].room_flags, NO_MAGIC);
+      SET_BIT(dc_->world[room]->room_flags_, NO_MAGIC);
     }
-    if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !isSet(dc_->world[room].room_flags, NO_KI))
+    if (ISSET(ch->mobdata->actflags, ACT_NOKI) && !isSet(dc_->world[room]->room_flags_, NO_KI))
     {
       SET_BIT(dc_->world[room].iFlags, NO_KI);
-      SET_BIT(dc_->world[room].room_flags, NO_KI);
+      SET_BIT(dc_->world[room]->room_flags_, NO_KI);
     }
-    if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !isSet(dc_->world[room].room_flags, NO_TRACK))
+    if (ISSET(ch->mobdata->actflags, ACT_NOTRACK) && !isSet(dc_->world[room]->room_flags_, NO_TRACK))
     {
       SET_BIT(dc_->world[room].iFlags, NO_TRACK);
-      SET_BIT(dc_->world[room].room_flags, NO_TRACK);
+      SET_BIT(dc_->world[room]->room_flags_, NO_TRACK);
     }
   }
 
-  if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && isSet(dc_->world[ch->in_room].room_flags, NO_KI) && !(ch->songs.isEmpty()))
+  if (stop_all_fighting && (GET_CLASS(ch) == CLASS_BARD) && isSet(dc_->world[ch->in_room]->room_flags_, NO_KI) && !(ch->songs.isEmpty()))
   {
     do_sing(ch, "stop");
   }
@@ -2292,7 +2263,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     return 0;
   }
 
-  if (obj->in_room != DC::NOWHERE)
+  if (obj->in_room != INVALID_ROOM)
   {
     dc_->logentry(u"EQUIP: Obj is in_room when equip."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return 0;
@@ -2311,7 +2282,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
       }
       return 1;
     }
-    if (in_room != DC::NOWHERE)
+    if (in_room != INVALID_ROOM)
     {
       act_to_character("You are zapped by $p and instantly drop it.", this, obj, 0, 0);
       act_to_room("$n is zapped by $p and instantly drops it.", this, obj, 0, 0);
@@ -2325,28 +2296,28 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
     }
     else
     {
-      dc_->logentry(u"in_room = DC::NOWHERE when equipping character."_s, 0, DC::LogChannel::LOG_BUG);
+      dc_->logentry(u"in_room = INVALID_ROOM when equipping character."_s, 0, DC::LogChannel::LOG_BUG);
     }
   }
 
-  if (dc_->obj_index_[obj->item_number].vnum() == 30010 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30010 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("$p binds to your skin and won't let go. It hurts!", this, obj, 0, 0);
     act_to_room("$p binds to $n's skin!", this, obj, 0, 0);
     obj->flags_.timer = {};
   }
-  if (dc_->obj_index_[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("As you grasp the staff, raw magical energy surges through you.  You can barely control it!", this, obj, 0, 0);
     obj->flags_.timer = {};
   }
-  if (dc_->obj_index_[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The Chaos Blade begins to pulse with a dull red light, your life force is being drained!", this, obj, 0, 0);
     obj->flags_.timer = {};
   }
 
-  if (dc_->obj_index_[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("Upon grasping Lyvenia the Song Staff, you feel more lively!", this, obj, 0, 0);
     obj->flags_.timer = 5;
@@ -2368,7 +2339,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
   if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
   {
     glow_factor++;
-    if (in_room > DC::NOWHERE)
+    if (in_room > INVALID_ROOM)
       dc_->world[in_room].light++;
     //  this crashes in a reconnect cause player isn't around yet
     //  rather than fixing it, i'm leaving it out because it's annoying anyway cause
@@ -2380,7 +2351,7 @@ bool Character::equip_char(ObjectPtr obj, qint32 pos, bool flag)
   if (obj->flags_.type_flag == ITEM_LIGHT && obj->flags_.value[2])
   {
     glow_factor++;
-    if (in_room > DC::NOWHERE)
+    if (in_room > INVALID_ROOM)
       dc_->world[in_room].light++;
   }
 
@@ -2409,17 +2380,17 @@ ObjectPtr Character::unequip_char(qint32 pos, bool flag)
 
   obj = equipment[pos];
 
-  if (dc_->obj_index_[obj->item_number].vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30036 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("With great effort, you are able to separate the Staff of Eternity from your own magical aura, but it comes at a great cost...", this, obj, 0, 0);
     GET_MANA(this) = GET_MANA(this) / 2;
   }
-  if (dc_->obj_index_[obj->item_number].vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30033 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The effort required to separate the Chaos Blade from your own life force is immense! The Blade exacts a toll...", this, obj, 0, 0);
     setHP(getHP() / 2);
   }
-  if (dc_->obj_index_[obj->item_number].vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
+  if (dc_->obj_index_[obj->item_number]->vnum() == 30008 && !ISSET(affected_by, AFF_IGNORE_WEAPON_WEIGHT))
   {
     act_to_character("The spring in your step has subsided.", this, obj, 0, 0);
     obj->flags_.timer = {};
@@ -2472,7 +2443,7 @@ b: // ew
   if (isSet(obj->flags_.extra_flags, ITEM_GLOW))
   {
     glow_factor--;
-    if (in_room > DC::NOWHERE)
+    if (in_room > INVALID_ROOM)
       dc_->world[in_room].light--;
     // this is just annoying cause it tells you every time you save
     // TODO - make it not be annoying
@@ -2482,7 +2453,7 @@ b: // ew
   if (obj->flags_.type_flag == ITEM_LIGHT && obj->flags_.value[2])
   {
     glow_factor--;
-    if (in_room > DC::NOWHERE)
+    if (in_room > INVALID_ROOM)
       dc_->world[in_room].light--;
   }
 
@@ -2657,13 +2628,13 @@ CharacterPtr get_char_room(const QString name, room_t room, bool careful)
   if ((number = get_number(&tmp)) < 0)
     return {};
 
-  for (i = dc_->world[room].people_, j = {}; i && (j <= number); i = i->next_in_room)
+  for (i = dc_->world[room]->people_, j = {}; i && (j <= number); i = i->next_in_room)
   {
     if (number == 0 && i->isNonPlayer())
       continue;
     if (number == 1 || number == 0)
     {
-      if (isexact(tmp, qPrintable(i->name())) && !(careful && i->isNonPlayer() && dc_->mob_index_[i->mobdata->nr].vnum() == 12))
+      if (isexact(tmp, qPrintable(i->name())) && !(careful && i->isNonPlayer() && dc_->mob_index_[i->mobdata->nr]->vnum() == 12))
         return (i);
       else if (isprefix(tmp, qPrintable(i->name())))
       {
@@ -2785,7 +2756,7 @@ CharacterPtr get_char_num(qint32 nr)
 // specified by dest.
 qint32 move_obj(ObjectPtr obj, qint32 dest)
 {
-  qint32 obj_in_room = DC::NOWHERE;
+  qint32 obj_in_room = INVALID_ROOM;
   ObjectPtr contained_by = {};
   CharacterPtr carried_by = {};
 
@@ -2800,12 +2771,12 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
     qFatal("%s", qUtf8Printable(u"FATAL: Object move_obj() while equipped: %1.\n"_s.arg(obj->name())));
   }
 
-  if ((obj_in_room = obj->in_room) != DC::NOWHERE)
+  if ((obj_in_room = obj->in_room) != INVALID_ROOM)
   {
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), dc_->world[obj_in_room].number);
+      dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), dc_->world[obj_in_room]->number_);
       return 0;
     }
   }
@@ -2842,7 +2813,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
   {
     // Couldn't move obj to dest...where to put it now?
 
-    if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
+    if ((obj_in_room != INVALID_ROOM) && (obj_to_room(obj, obj_in_room) == 0))
     {
       // Now we have real problems
       qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in NOWHERE (1): %1.\n"_s.arg(obj->name())));
@@ -2858,7 +2829,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
       qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in NOWHERE (3) : %1.\n"_s.arg(obj->name())));
     }
 
-    dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", qPrintable(obj->name()), dc_->world[dest].number);
+    dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to destination: %d", qPrintable(obj->name()), dc_->world[dest]->number_);
     return 0;
   }
 
@@ -2870,7 +2841,7 @@ qint32 move_obj(ObjectPtr obj, qint32 dest)
 // specified by dest_obj.
 qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
 {
-  qint32 obj_in_room = DC::NOWHERE;
+  qint32 obj_in_room = INVALID_ROOM;
   ObjectPtr contained_by = {};
   CharacterPtr carried_by = {};
 
@@ -2885,12 +2856,12 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
     qFatal("%s", qUtf8Printable(u"FATAL: Object move_obj() while equipped: %1.\n"_s.arg(obj->name())));
   }
 
-  if ((obj_in_room = obj->in_room) != DC::NOWHERE)
+  if ((obj_in_room = obj->in_room) != INVALID_ROOM)
   {
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), dc_->world[obj_in_room].number);
+      dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), dc_->world[obj_in_room]->number_);
       return 0;
     }
   }
@@ -2923,20 +2894,20 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
   {
     // Couldn't move obj to dest_obj...where to put it now?
 
-    if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
+    if ((obj_in_room != INVALID_ROOM) && (obj_to_room(obj, obj_in_room) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (4): %1.\n"_s.arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in INVALID_ROOM (4): %1.\n"_s.arg(obj->name())));
     }
     else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (5) : %1.\n"_s.arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in INVALID_ROOM (5) : %1.\n"_s.arg(obj->name())));
     }
     else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (6) : %1.\n"_s.arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in INVALID_ROOM (6) : %1.\n"_s.arg(obj->name())));
     }
 
     dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to container: %s", qPrintable(obj->name()), qPrintable(dest_obj->name()));
@@ -2951,7 +2922,7 @@ qint32 move_obj(ObjectPtr obj, ObjectPtr dest_obj)
 // character specified by ch.
 qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
 {
-  qint32 obj_in_room = DC::NOWHERE;
+  qint32 obj_in_room = INVALID_ROOM;
   ObjectPtr contained_by = {};
   CharacterPtr carried_by = {};
 
@@ -2968,12 +2939,12 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
     qFatal("%s", qUtf8Printable(u"FATAL: Object move_obj() while equipped: %1.\n"_s.arg(obj->name())));
   }
 
-  if ((obj_in_room = obj->in_room) != DC::NOWHERE)
+  if ((obj_in_room = obj->in_room) != INVALID_ROOM)
   {
     if (obj_from_room(obj) == 0)
     {
       // Couldn't move obj from the room
-      dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), dc_->world[obj_in_room].number);
+      dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Couldn't move %s from room %d.", qPrintable(obj->name()), dc_->world[obj_in_room]->number_);
       return 0;
     }
   }
@@ -3022,20 +2993,20 @@ qint32 move_obj(ObjectPtr obj, CharacterPtr ch)
   {
     // Couldn't move obj to ch...where to put it now?
 
-    if ((obj_in_room != DC::NOWHERE) && (obj_to_room(obj, obj_in_room) == 0))
+    if ((obj_in_room != INVALID_ROOM) && (obj_to_room(obj, obj_in_room) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (7): %1.\n"_s.arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in INVALID_ROOM (7): %1.\n"_s.arg(obj->name())));
     }
     else if ((carried_by) && (obj_to_char(obj, carried_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (8) : %1.\n"_s.arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in INVALID_ROOM (8) : %1.\n"_s.arg(obj->name())));
     }
     else if ((contained_by) && (obj_to_obj(obj, contained_by) == 0))
     {
       // Now we have real problems
-      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in DC::NOWHERE (9) : %1.\n"_s.arg(obj->name())));
+      qFatal("%s", qUtf8Printable(u"FATAL: Object stuck in INVALID_ROOM (9) : %1.\n"_s.arg(obj->name())));
     }
 
     dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Could not move %s to character: %s", qPrintable(obj->name()), qPrintable(ch->name()));
@@ -3060,7 +3031,7 @@ qint32 obj_to_char(ObjectPtr object, CharacterPtr ch)
   ch->carrying = object;
   object->carried_by = ch;
   object->equipped_by = {};
-  object->in_room = DC::NOWHERE;
+  object->in_room = INVALID_ROOM;
   IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
   IS_CARRYING_N(ch)
   ++;
@@ -3086,7 +3057,7 @@ qint32 obj_to_char(ObjectPtr object, CharacterPtr ch)
    obj->next_content    = object;
    object->carried_by   = ch;
    object->equipped_by  = {};
-   object->in_room      = DC::NOWHERE;
+   object->in_room      = INVALID_ROOM;
 
    IS_CARRYING_W(ch)   += GET_OBJ_WEIGHT(object);
    IS_CARRYING_N(ch)++;
@@ -3224,7 +3195,7 @@ qint32 obj_from_room(ObjectPtr object)
 {
   ObjectPtr i;
 
-  if (object->in_room == DC::NOWHERE)
+  if (object->in_room == INVALID_ROOM)
   {
     dc_->logentry(u"obj_from_room called on an object that isn't in a room!"_s, OVERSEER,
                   DC::LogChannel::LOG_BUG);
@@ -3252,7 +3223,7 @@ qint32 obj_from_room(ObjectPtr object)
     }
   }
 
-  object->in_room = DC::NOWHERE;
+  object->in_room = INVALID_ROOM;
   object->next_content = {};
 
   save_corpses();
@@ -3287,7 +3258,7 @@ qint32 obj_to_obj(ObjectPtr obj, ObjectPtr obj_to)
 
   // recursively upwards add the weight.  Since we only have 1 layer of containers,
   // this loop only happens once, but it's good to leave later in case we change our mind
-  if (dc_->obj_index_[obj_to->item_number].vnum() != 536)
+  if (dc_->obj_index_[obj_to->item_number]->vnum() != 536)
   {
     for (tobj = obj->in_obj; tobj;
          GET_OBJ_WEIGHT(tobj) += GET_OBJ_WEIGHT(obj), tobj = tobj->in_obj)
@@ -3331,7 +3302,7 @@ qint32 obj_from_obj(ObjectPtr obj)
 
   // Subtract weight from containers container
 
-  if (!obj_from || dc_->obj_index_[obj_from->item_number].vnum() != 536)
+  if (!obj_from || dc_->obj_index_[obj_from->item_number]->vnum() != 536)
   {
     for (tmp = obj->in_obj; tmp->in_obj; tmp = tmp->in_obj)
       GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
@@ -3389,7 +3360,7 @@ void extract_obj(ObjectPtr obj)
       }
   }
 
-  if (obj->in_room != DC::NOWHERE)
+  if (obj->in_room != INVALID_ROOM)
     obj_from_room(obj);
   else if (obj->carried_by)
     obj_from_char(obj);
@@ -3454,7 +3425,7 @@ void extract_obj(ObjectPtr obj)
 
 void update_object(ObjectPtr obj, qint32 use)
 {
-  if (obj->flags_.timer > 0 && (dc_->obj_index_[obj->item_number].vnum() != 30010 && dc_->obj_index_[obj->item_number].vnum() != 30036 && dc_->obj_index_[obj->item_number].vnum() != 30033 && dc_->obj_index_[obj->item_number].vnum() != 30097 && dc_->obj_index_[obj->item_number].vnum() != 30019))
+  if (obj->flags_.timer > 0 && (dc_->obj_index_[obj->item_number]->vnum() != 30010 && dc_->obj_index_[obj->item_number]->vnum() != 30036 && dc_->obj_index_[obj->item_number]->vnum() != 30033 && dc_->obj_index_[obj->item_number]->vnum() != 30097 && dc_->obj_index_[obj->item_number]->vnum() != 30019))
     obj->flags_.timer -= use;
   if (obj->contains)
     update_object(obj->contains, use);
@@ -3475,7 +3446,7 @@ void update_char_objects(CharacterPtr ch)
         {
           ch->sendln(u"Your light flickers out and dies."_s);
           ch->glow_factor--;
-          if (ch->in_room > DC::NOWHERE)
+          if (ch->in_room > INVALID_ROOM)
             dc_->world[ch->in_room].light--;
         }
       }
@@ -3484,7 +3455,7 @@ void update_char_objects(CharacterPtr ch)
   {
     if (ch->equipment[i])
     {
-      if (dc_->obj_index_[ch->equipment[i]->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+      if (dc_->obj_index_[ch->equipment[i]->item_number]->vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
       {
         update_object(ch->equipment[i], 1);
 
@@ -3526,9 +3497,9 @@ void extract_char(CharacterPtr ch, bool pull)
   { // already taken care of
     return;
   }
-  if (ch->in_room == DC::NOWHERE)
+  if (ch->in_room == INVALID_ROOM)
   {
-    dc_->logentry(u"Extract_char: DC::NOWHERE"_s, ANGEL, DC::LogChannel::LOG_BUG);
+    dc_->logentry(u"Extract_char: INVALID_ROOM"_s, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -3547,7 +3518,7 @@ void extract_char(CharacterPtr ch, bool pull)
       extract_char(ch->player->golem, false);
     }
   }
-  if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr]->vnum() == 8)
   {
     isGolem = true;
     if (pull)
@@ -3588,7 +3559,7 @@ void extract_char(CharacterPtr ch, bool pull)
   char_from_room(ch);
   if (!pull && !isGolem)
   {
-    if (dc_->world[was_in].number == START_ROOM)
+    if (dc_->world[was_in]->number_ == START_ROOM)
       char_to_room(ch, real_room(SECOND_START_ROOM));
     else if (dc_->zones.value(dc_->world[ch->hometown].zone).continent == FAR_REACH || dc_->zones.value(dc_->world[ch->hometown].zone).continent == UNDERDARK)
       char_to_room(ch, real_room(FARREACH_START_ROOM));
@@ -3729,7 +3700,7 @@ CharacterPtr Character::get_rand_other_char_room_vis(void)
   qint32 count = {};
 
   // Count the number of players in room
-  for (vict = dc_->world[in_room].people_; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[in_room]->people_; vict; vict = vict->next_in_room)
     if (CAN_SEE(this, vict) && this != vict)
       count++;
 
@@ -3740,7 +3711,7 @@ CharacterPtr Character::get_rand_other_char_room_vis(void)
   count = dc_->number(1, count);
 
   // Find the "count" player and return them
-  for (vict = dc_->world[in_room].people_; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[in_room]->people_; vict; vict = vict->next_in_room)
   {
     if (CAN_SEE(this, vict) && this != vict)
     {
@@ -3838,7 +3809,7 @@ CharacterPtr Character::get_char_room_vis(QString name)
     name = name.split('.').value(1).trimmed();
   }
 
-  for (i = dc_->world[in_room].people_, j = {}; i && (j <= number); i = i->next_in_room)
+  for (i = dc_->world[in_room]->people_, j = {}; i && (j <= number); i = i->next_in_room)
   {
     if (number == 0 && i->isNonPlayer())
       continue;
@@ -3897,7 +3868,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
   if ((number = get_number(&tmp)) < 0)
     return {};
 
-  for (i = dc_->world[ch->in_room].people_, j = 1; i && (j <= number); i = i->next_in_room)
+  for (i = dc_->world[ch->in_room]->people_, j = 1; i && (j <= number); i = i->next_in_room)
   {
     if (!i->isNonPlayer())
       continue;
@@ -3932,7 +3903,7 @@ CharacterPtr get_mob_room_vis(CharacterPtr ch, const QString name)
 
 CharacterPtr get_pc_room_vis_exact(CharacterPtr ch, QString name)
 {
-  for (auto i = dc_->world[ch->in_room].people_; i; i = i->next_in_room)
+  for (auto i = dc_->world[ch->in_room]->people_; i; i = i->next_in_room)
   {
     if (isexact(name, qPrintable(i->name())) && CAN_SEE(ch, i) && i->isPlayer())
       return (i);
@@ -4103,7 +4074,7 @@ CharacterPtr get_char_vis(CharacterPtr ch, QString name)
   const auto &character_list = dc_->character_list;
   auto result = std::find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](CharacterPtr const &i)
                              {
-		if (i->in_room == DC::NOWHERE)
+		if (i->in_room == INVALID_ROOM)
 		{
 			return false;
 		}
@@ -4459,9 +4430,6 @@ ObjectPtr create_money(qint32 amount)
 
   obj = new Object;
   new_new_descr = new ExtraDescription;
-
-  clear_object(obj);
-
   if (amount == 1)
   {
     obj->name(u"coin gold"_s);
@@ -4776,7 +4744,7 @@ void room_mobs_only_hate(CharacterPtr ch)
   std::for_each(character_list.begin(), character_list.end(), [&ch](CharacterPtr vict)
                 {
 		if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
-				(vict != ch) && !isSet(dc_->world[ch->in_room].room_flags, SAFE)) {
+				(vict != ch) && !isSet(dc_->world[ch->in_room]->room_flags_, SAFE)) {
 			remove_memory(vict, 'h');
 			vict->add_memory( qPrintable(ch->name()), 'h');
 		} });

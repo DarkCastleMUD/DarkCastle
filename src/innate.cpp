@@ -59,7 +59,7 @@ const QStringList innate_skills =
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-ReturnValue do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   auto &arena = dc_->arena_;
   if (ch && ch->in_room > 0 &&
@@ -95,7 +95,7 @@ ReturnValue do_innate(CharacterPtr ch, QString arg, cmd_t cmd)
           ch->sendln(u"In your dreams, or what?"_s);
           return ReturnValue::eFAILURE;
         }
-        qint32 retval = (*(innates[i].func))(ch, arg, cmd);
+        ReturnValues retval = (*(innates[i].func))(ch, arg, cmd);
         if (retval & ReturnValue::eSUCCESS)
         {
           affected_type af;

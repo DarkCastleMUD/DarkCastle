@@ -1181,7 +1181,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     {
       CharacterPtr tmpch;
       qint32 i = {};
-      for (tmpch = dc_->world[ch->in_room].people_; tmpch;
+      for (tmpch = dc_->world[ch->in_room]->people_; tmpch;
            tmpch = tmpch->next_in_room)
         if (tmpch->isPlayer())
           i++;
@@ -1195,7 +1195,7 @@ qint32 blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     {
       CharacterPtr tmpch;
       qint32 i = {};
-      for (tmpch = dc_->world[ch->in_room].people_; tmpch;
+      for (tmpch = dc_->world[ch->in_room]->people_; tmpch;
            tmpch = tmpch->next_in_room)
         if (tmpch->isPlayer())
           i++;
@@ -1755,7 +1755,7 @@ qint32 handcompare(qint32 hand1[5], qint32 hand2[5])
   return -1;
 }
 
-ReturnValue do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_testhand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   one_argument(argument, arg);
@@ -1952,7 +1952,7 @@ void save_slot_machines()
     return;
   }
 
-  world_file_list_item *curr;
+  world_file_list_itemPtr curr;
   QString buf;
   QString buf2;
 

@@ -23,7 +23,7 @@ qint32 count_rooms(qint32 start, qint32 end)
   return count;
 }
 
-ReturnValue do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
@@ -71,7 +71,7 @@ ReturnValue do_thunder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -91,7 +91,7 @@ ReturnValue do_incognito(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_load(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString type;
   QString name;
@@ -136,7 +136,7 @@ ReturnValue do_load(CharacterPtr ch, QString arg, cmd_t cmd)
 
     ch->sendln(u"[#  ] [OBJ #] OBJECT'S DESCRIPTION\n"_s);
 
-    for (x = {}; (x < dc_->obj_index_[top_of_objt].vnum()); x++)
+    for (x = {}; (x < dc_->obj_index_[top_of_objt]->vnum()); x++)
     {
       if ((num = real_object(x)) < 0)
         continue;
@@ -302,7 +302,7 @@ ReturnValue do_load(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict, next_v;
   ObjectPtr obj, next_o;
@@ -366,7 +366,7 @@ ReturnValue do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
                  "flames!\r\n",
                  ch);
 
-    for (vict = dc_->world[ch->in_room].people_; vict; vict = next_v)
+    for (vict = dc_->world[ch->in_room]->people_; vict; vict = next_v)
     {
       next_v = vict->next_in_room;
       if (vict->isNonPlayer())
@@ -557,7 +557,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
     switch (zone.cmd[j]->command)
     {
     case 'M':
-      virt = ZCMD->active ? dc_->mob_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->mob_index_[ZCMD->arg1]->vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $B$1Load mob  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) in room ");
@@ -568,28 +568,28 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
       dc_sprintf(buf, "%s\r\n", buf);
       break;
     case 'O':
-      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1]->vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $BLoad obj  [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) in room ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
       //      dc_sprintf(buf, "%s[%5d].$R\r\n", buf,
-      // dc_->world[zone.cmd[j]->arg3].number);
+      // dc_->world[zone.cmd[j]->arg3]->number_);
       dc_sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
       break;
     case 'P':
-      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1]->vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $5Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) in objt ");
       else
         dc_sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
-      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg3].vnum() : ZCMD->arg3;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg3]->vnum() : ZCMD->arg3;
       dc_sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
       break;
     case 'G':
-      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1]->vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) on last mob loaded.$R\r\n");
@@ -597,7 +597,7 @@ qint32 show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quin
         dc_sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
       break;
     case 'E':
-      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1].vnum() : ZCMD->arg1;
+      virt = ZCMD->active ? dc_->obj_index_[ZCMD->arg1]->vnum() : ZCMD->arg1;
       dc_sprintf(buf, "%s $2Equip obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
         dc_strcat(buf, "(  always ) on last mob on ");
@@ -723,19 +723,19 @@ qint32 show_zone_commands(CharacterPtr ch, zone_t zone_key, quint64 start, quint
   return show_zone_commands(ch, zone, start, num_to_show, stats);
 }
 
-qint32 find_file(world_file_list_item *itm, qint32 high)
+qint32 find_file(world_file_list_itemPtr itm, qint32 high)
 {
   qint32 i;
-  world_file_list_item *tmp;
+  world_file_list_itemPtr tmp;
   for (i = 0, tmp = itm; tmp; tmp = tmp->next, i++)
     if (tmp->lastnum / 100 == high / 100)
       return i;
   return -1;
 }
 
-void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
+void show_legacy_files(CharacterPtr ch, world_file_list_itemPtr head)
 {
-  world_file_list_item *curr = head;
+  world_file_list_itemPtr curr = head;
   quint64 i = {};
 
   ch->send(u"ID ) Filename                       Begin  End\r\n"
@@ -769,13 +769,13 @@ void show_legacy_files(CharacterPtr ch, world_file_list_item *head)
   }
 }
 
-ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name, buf;
   QString beginrange;
   QString endrange;
   QString type;
-  world_file_list_item *curr = {};
+  world_file_list_itemPtr curr = {};
   qint32 i;
   qint32 nr;
   qint32 count = {};
@@ -859,7 +859,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        for (i = begin; i <= dc_->mob_index_[top_of_mobt].vnum() && i <= end;
+        for (i = begin; i <= dc_->mob_index_[top_of_mobt]->vnum() && i <= end;
              i++)
         {
           if ((nr = real_mobile(i)) < 0)
@@ -884,7 +884,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
       ch->sendln(u"[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n"_s);
 
-      for (i = {}; (i <= dc_->mob_index_[top_of_mobt].vnum()); i++)
+      for (i = {}; (i <= dc_->mob_index_[top_of_mobt]->vnum()); i++)
       {
         if ((nr = real_mobile(i)) < 0)
           continue;
@@ -961,7 +961,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       }
       else
       {
-        for (i = begin; i <= dc_->obj_index_[top_of_objt].vnum() && i <= end;
+        for (i = begin; i <= dc_->obj_index_[top_of_objt]->vnum() && i <= end;
              i++)
         {
           if ((nr = real_object(i)) < 0)
@@ -986,7 +986,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
 
       ch->sendln(u"[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n"_s);
 
-      for (i = {}; (i <= dc_->obj_index_[top_of_objt].vnum()); i++)
+      for (i = {}; (i <= dc_->obj_index_[top_of_objt]->vnum()); i++)
       {
         if ((nr = real_object(i)) < 0)
           continue;
@@ -1167,7 +1167,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       if (!dc_->rooms.contains(i))
         continue;
       if (bits)
-        if (!isSet(dc_->world[i].room_flags, bits))
+        if (!isSet(dc_->world[i]->room_flags_, bits))
           continue;
       if (sector)
         if (dc_->world[i].sector_type != sector)
@@ -1323,7 +1323,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"No valid search supplied."_s);
       return ReturnValue::eFAILURE;
     }
-    for (c = {}; c < dc_->mob_index_[top_of_mobt].vnum(); c++)
+    for (c = {}; c < dc_->mob_index_[top_of_mobt]->vnum(); c++)
     {
       if ((nr = real_mobile(c)) < 0)
         continue;
@@ -1600,7 +1600,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    for (c = {}; c < dc_->obj_index_[top_of_objt].vnum(); c++)
+    for (c = {}; c < dc_->obj_index_[top_of_objt]->vnum(); c++)
     {
       found = false;
       if ((nr = real_object(c)) < 0)
@@ -1738,7 +1738,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
                     EX_ISDOOR) &&
               dc_->rooms[i].dir_option[nr]->key == count)
           {
-            ch->send(u" $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n"_s.arg(dc_->rooms[i].number).arg(dirs[nr]).arg(dc_->rooms[i].dir_option[nr]->key));
+            ch->send(u" $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n"_s.arg(dc_->rooms[i]->number_).arg(dirs[nr]).arg(dc_->rooms[i].dir_option[nr]->key));
           }
         }
   }
@@ -1747,7 +1747,7 @@ ReturnValue do_show(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
+ReturnValues do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
 {
   if (ch->isNonPlayer() || ch == nullptr)
   {
@@ -1781,7 +1781,7 @@ ReturnValue do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
       if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
       {
         act_to_room("$n disappears in a mushroom cloud.", victim, 0, 0, 0);
-        ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->name()), dc_->world[source_room].number, dc_->world[destination_room].number));
+        ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->name()), dc_->world[source_room]->number_, dc_->world[destination_room]->number_));
         move_char(victim, destination_room);
         act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
         act_to_victim("$n has transferred you!", ch, 0, victim, 0);
@@ -1801,14 +1801,14 @@ ReturnValue do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
   }
   source_room = victim->in_room;
 
-  if (dc_->world[destination_room].number == IMM_PIRAHNA_ROOM && !isexact(qPrintable(ch->name()), "Pirahna"))
+  if (dc_->world[destination_room]->number_ == IMM_PIRAHNA_ROOM && !isexact(qPrintable(ch->name()), "Pirahna"))
   {
     ch->sendln(u"Damn! That is rude! This ain't your place. :P"_s);
     return ReturnValue::eFAILURE;
   }
 
   act_to_room("$n disappears in a mushroom cloud.", victim, 0, 0, 0);
-  ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->name()), dc_->world[source_room].number, dc_->world[destination_room].number));
+  ch->send(fmt::format("Moving {} from {} to {}.\r\n", qPrintable(victim->name()), dc_->world[source_room]->number_, dc_->world[destination_room]->number_));
   move_char(victim, destination_room);
   act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
   act_to_victim("$n has transferred you!", ch, 0, victim, 0);
@@ -1818,7 +1818,7 @@ ReturnValue do_transfer(CharacterPtr ch, QString arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim, target_mob, pers;
   QString person, room;
@@ -1857,7 +1857,7 @@ ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     //      for (loop = {}; loop <= dc_->top_of_world; loop++) {
-    //         if (dc_->world[loop].number == target) {
+    //         if (dc_->world[loop]->number_ == target) {
     //            target = (qint16)loop;
     //            break;
     //      } else if (loop == dc_->top_of_world) {
@@ -1876,9 +1876,9 @@ ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   } /* if */
 
-  if (isSet(dc_->world[target].room_flags, PRIVATE))
+  if (isSet(dc_->world[target]->room_flags_, PRIVATE))
   {
-    for (loop = 0, pers = dc_->world[target].people_; pers;
+    for (loop = 0, pers = dc_->world[target]->people_; pers;
          pers = pers->next_in_room, loop++)
       ;
     if (loop > 1)
@@ -1888,13 +1888,13 @@ ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
     } /* if */
   } /* if */
 
-  if (isSet(dc_->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+  if (isSet(dc_->world[target]->room_flags_, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln(u"No."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[target].room_flags, CLAN_ROOM) &&
+  if (isSet(dc_->world[target]->room_flags_, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
     ch->sendln(u"No."_s);
@@ -1902,7 +1902,7 @@ ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   act_to_room("$n disappears in a puff of smoke.", victim, 0, 0, 0);
-  ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(victim->name())).arg(dc_->world[victim->in_room].number).arg(dc_->world[target].number));
+  ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(victim->name())).arg(dc_->world[victim->in_room]->number_).arg(dc_->world[target]->number_));
   move_char(victim, target);
   act_to_room("$n arrives from a puff of smoke.", victim, 0, 0, 0);
   act_to_victim("$n has teleported you!", ch, 0, victim, 0);
@@ -1912,13 +1912,13 @@ ReturnValue do_teleport(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 } /* do_teleport */
 
-ReturnValue do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  ConnectionPtr i;
   CharacterPtr victim;
   QString buf;
   qint32 target;
-  follow_type *k, *next_dude;
+  CharacterPtr *k, *next_dude;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -1940,7 +1940,7 @@ ReturnValue do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
     act("$n disappears in a mushroom cloud.",
         victim, 0, 0, TO_ROOM, 0);
     target = ch->in_room;
-    ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(victim->name())).arg(dc_->world[victim->in_room].number).arg(dc_->world[target].number));
+    ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(victim->name())).arg(dc_->world[victim->in_room]->number_).arg(dc_->world[target]->number_));
     move_char(victim, target);
     act("$n arrives from a puff of smoke.",
         victim, 0, 0, TO_ROOM, 0);
@@ -1956,7 +1956,7 @@ ReturnValue do_gtrans(CharacterPtr ch, QString argument, cmd_t cmd)
           act("$n disappears in a mushroom cloud.",
               victim, 0, 0, TO_ROOM, 0);
           target = ch->in_room;
-          ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(k->follower->name())).arg(dc_->world[k->follower->in_room].number).arg(dc_->world[target].number));
+          ch->send(u"Moving %s from %d to %d.\r\n"_s.arg(qPrintable(k->follower->name())).arg(dc_->world[k->follower->in_room]->number_).arg(dc_->world[target]->number_));
           move_char(k->follower, target);
           act("$n arrives from a puff of smoke.",
               k->follower, 0, 0, TO_ROOM, 0);
@@ -2039,7 +2039,7 @@ void opstat(CharacterPtr ch, qint32 vnum)
   }
 }
 
-ReturnValue do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_opstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 vnum = -1;
@@ -2081,7 +2081,7 @@ void update_objprog_bits(qint32 num)
   }
 }
 
-ReturnValue do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 num = -1, vnum = -1, i = -1, a = -1;
   QString arg;
@@ -2337,7 +2337,7 @@ ReturnValue do_opedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
@@ -2365,7 +2365,7 @@ ReturnValue do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   if (r2 < 0)
   {
     QString buf = u"new %1"_s.arg(v2);
-    qint32 retval = ch->do_oedit(buf.split(' '));
+    ReturnValues retval = ch->do_oedit(buf.split(' '));
     if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
     r1 = real_object(v1);
@@ -2399,7 +2399,7 @@ ReturnValue do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->obj_index_[r2]->item = (void *)obj;
   dc_->obj_index_[r2].non_combat_func = {};
   dc_->obj_index_[r2].qty = {};
-  dc_->obj_index_[r2].vnum(v2);
+  dc_->obj_index_[r2]->vnum(v2);
   dc_->obj_index_[r2]->programs_ = {};
   dc_->obj_index_[r2].combat_func = {};
   dc_->obj_index_[r2].mobspec = {};
@@ -2411,7 +2411,7 @@ ReturnValue do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
@@ -2440,7 +2440,7 @@ ReturnValue do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     QString buf;
     dc_sprintf(buf, "new %d", vdst);
-    qint32 retval = do_medit(ch, buf);
+    ReturnValues retval = do_medit(ch, buf);
     if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
     dst = real_mobile(vdst);
@@ -2490,7 +2490,7 @@ ReturnValue do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
   dc_->mob_index_[dst]->programs_ = {};
   dc_->mob_index_[dst].mobspec = {};
   dc_->mob_index_[dst]->progtypes_ = {};
-  dc_->mob_index_[dst].vnum(vdst);
+  dc_->mob_index_[dst]->vnum(vdst);
 
   add_mobspec(dst);
 

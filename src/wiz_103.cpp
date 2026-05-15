@@ -4,7 +4,7 @@
 **********************/
 #include "DC/DC.h"
 
-ReturnValue do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name, type, buf;
@@ -142,7 +142,7 @@ ReturnValue do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString buf;
@@ -185,7 +185,7 @@ ReturnValue do_disconnect(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString name = {}, buf = {};
@@ -222,7 +222,7 @@ ReturnValue do_fsave(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   const qint32 CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
   CharacterPtr i;
@@ -265,7 +265,7 @@ ReturnValue do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
                 qPrintable(i->name()), ch_clan_name,
                 qPrintable(i->fighting->name()), victim_clan_name,
-                dc_->world[i->in_room].number);
+                dc_->world[i->in_room]->number_);
     ch->send(buf);
   }
 
@@ -279,11 +279,11 @@ ReturnValue do_fighting(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr rch;
 
-  for (rch = dc_->world[ch->in_room].people_; rch != nullptr; rch = rch->next_in_room)
+  for (rch = dc_->world[ch->in_room]->people_; rch != nullptr; rch = rch->next_in_room)
   {
     if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
@@ -295,7 +295,7 @@ ReturnValue do_peace(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_matrixinfo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i = {};
@@ -356,7 +356,7 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
 
   qint32 room = dc_atoi(str);
 
-  if (room == DC::NOWHERE || room > dc_->top_of_world || !dc_->rooms.contains(room))
+  if (room == INVALID_ROOM || room > dc_->top_of_world || !dc_->rooms.contains(room))
   {
     if (ch)
     {
@@ -369,7 +369,7 @@ qint32 lookupRoom(CharacterPtr ch, QString str)
   return room;
 }
 
-ReturnValue do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 c_class = 0, room = 0, old_room = {};
   QString arg1;
@@ -398,7 +398,7 @@ ReturnValue do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       // guild <room #>
       room = lookupRoom(ch, arg1);
-      if (room == DC::NOWHERE)
+      if (room == INVALID_ROOM)
       {
         return ReturnValue::eFAILURE;
       }
@@ -475,7 +475,7 @@ ReturnValue do_guild(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   room = lookupRoom(ch, arg2);
-  if (room == DC::NOWHERE)
+  if (room == INVALID_ROOM)
   {
     return ReturnValue::eFAILURE;
   }

@@ -1,7 +1,7 @@
 #include "DC/DC.h"
 
 void set_golem(CharacterPtr golem, qint32 golemtype);
-ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
+ObjectPtr obj_store_to_char(CharacterPtr ch, QTextStream fpsave, ObjectPtr last_cont);
 
 char_file_u4::char_file_u4()
 {
@@ -222,7 +222,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return false;
   }
 
-  FILE *fpfile = {};
+  QTextStream fpfile = {};
 
   if (isNonPlayer() || level_ < IMMORTAL)
   {
@@ -592,7 +592,7 @@ const QList<Toggle> Player::togglables = {
     {"damage", PLR_DAMAGE_BIT, &Character::do_damage_toggle},
     {"nodupekeys", PLR_NODUPEKEYS_BIT, &Character::do_nodupekeys_toggle}};
 
-Toggle::Toggle(QString name, quint64 shift, ReturnValue (Character::*function)(QStringList arguments, cmd_t cmd), quint64 dependency_shift, QString on_message, QString off_message)
+Toggle::Toggle(QString name, quint64 shift, ReturnValues (Character::*function)(QStringList arguments, cmd_t cmd), quint64 dependency_shift, QString on_message, QString off_message)
     : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
 {
 }

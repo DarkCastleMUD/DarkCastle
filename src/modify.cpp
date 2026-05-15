@@ -82,14 +82,14 @@ void quad_arg(QString arg, qint32 *type, QString name, qint32 *field, QString st
     return;
 }
 
-ReturnValue do_string(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_string(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString name, string;
   QString message;
   qint32 field, type, ctr;
   CharacterPtr mob = {};
   ObjectPtr obj;
-  ExtraDescriptionPtr ed, *tmp;
+  ExtraDescriptionPtr ed, tmp;
 
   if (ch->isNonPlayer())
     return 1;

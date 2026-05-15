@@ -641,7 +641,7 @@ const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 
 qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr owner)
 {
 
-  qint32 mobvnum = ch->dc_->mob_index_[owner->mobdata->nr].vnum();
+  qint32 mobvnum = ch->dc_->mob_index_[owner->mobdata->nr]->vnum();
   qint32 o;
   QString buf;
   //  return ReturnValue::eFAILURE; //disabled for now
@@ -653,10 +653,10 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       return ReturnValue::eSUCCESS;
     }
 
-    for (o = {}; platsmith_list[o].vnum != 0; o++)
-      if (mobvnum == platsmith_list[o].vnum)
+    for (o = {}; platsmith_list[o]->vnum != 0; o++)
+      if (mobvnum == platsmith_list[o]->vnum)
         break;
-    if (platsmith_list[o].vnum == 0)
+    if (platsmith_list[o]->vnum == 0)
     {
       owner->do_tell(u"%1 Sorry, I don't seem to be working correctly. Do tell someone."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;
@@ -678,12 +678,12 @@ qint32 godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
       return ReturnValue::eSUCCESS;
     }
 
-    for (o = {}; platsmith_list[o].vnum != 0; o++)
-      if (mobvnum == platsmith_list[o].vnum)
+    for (o = {}; platsmith_list[o]->vnum != 0; o++)
+      if (mobvnum == platsmith_list[o]->vnum)
         break;
     QString buf, arg2;
     one_argument(arg, arg2);
-    if (platsmith_list[o].vnum == 0)
+    if (platsmith_list[o]->vnum == 0)
     {
       owner->do_tell(u"%1 Sorry, I don't seem to be working correctly. Do tell someone."_s.arg(qPrintable(ch->name())).split(' '));
       return ReturnValue::eSUCCESS;

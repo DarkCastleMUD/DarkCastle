@@ -14,7 +14,7 @@
 void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
 {
 
-  if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
+  if (GET_OBJ_RNUM(obj) == INVALID_ROOM)
     return;
 
   if (!decay)
@@ -35,12 +35,12 @@ void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
   }
 }
 
-ReturnValue do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj;
   QString name;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -91,7 +91,7 @@ ReturnValue do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->obj_index_[obj->item_number].vnum() == CHAMPION_ITEM)
+  if (dc_->obj_index_[obj->item_number]->vnum() == CHAMPION_ITEM)
   {
     ch->sendln(u"In soviet russia, champion flag sacrifice YOU!"_s);
     return ReturnValue::eFAILURE;
@@ -125,7 +125,7 @@ ReturnValue do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
@@ -146,7 +146,7 @@ ReturnValue do_visible(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr obj = {};
   QString name;
@@ -155,7 +155,7 @@ ReturnValue do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   qint32 room = 3099;
   qint32 origin = {};
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -192,7 +192,7 @@ ReturnValue do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   // Handle yielding the champion flag
   if (GET_OBJ_VNUM(obj) == 45)
   {
-    if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+    if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
     {
       if (IS_AFFECTED(ch, AFF_CHAMPION))
       {
@@ -282,12 +282,12 @@ ReturnValue do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
   if (obj->flags_.type_flag != ITEM_MONEY)
   {
     QString log_buf = {};
-    dc_sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), dc_->obj_index_[obj->item_number].vnum());
+    dc_sprintf(log_buf, "%s donates %s[%d]", qPrintable(ch->name()), qPrintable(obj->name()), dc_->obj_index_[obj->item_number]->vnum());
     dc_->logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description()),
                 qPrintable(loop_obj->short_description()),
-                dc_->obj_index_[loop_obj->item_number].vnum());
+                dc_->obj_index_[loop_obj->item_number]->vnum());
   }
 
   location = real_room(room);
@@ -313,7 +313,7 @@ auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> ReturnValue
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_title(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_title(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 ctr;
@@ -364,7 +364,7 @@ ReturnValue do_title(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
   {
@@ -425,7 +425,7 @@ ReturnValue Character::do_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 Character::do_config(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_config(QStringList arguments, cmd_t cmd)
 {
   if (player->config == nullptr)
   {
@@ -660,7 +660,7 @@ qint32 Character::do_config(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue Character::do_brief(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_brief(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -678,7 +678,7 @@ ReturnValue Character::do_brief(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_ansi(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_ansi(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -696,7 +696,7 @@ ReturnValue Character::do_ansi(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_vt100(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_vt100(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -714,7 +714,7 @@ ReturnValue Character::do_vt100(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_compact(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_compact(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -732,7 +732,7 @@ ReturnValue Character::do_compact(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -752,7 +752,7 @@ ReturnValue Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -770,7 +770,7 @@ ReturnValue Character::do_lfg_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -794,7 +794,7 @@ ReturnValue Character::do_guide_toggle(QStringList arguments, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-ReturnValue Character::do_news_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_news_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -813,7 +813,7 @@ ReturnValue Character::do_news_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -832,7 +832,7 @@ ReturnValue Character::do_ascii_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -851,7 +851,7 @@ ReturnValue Character::do_damage_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -870,7 +870,7 @@ ReturnValue Character::do_notax_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -889,7 +889,7 @@ ReturnValue Character::do_charmiejoin_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_autoeat(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_autoeat(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -907,7 +907,7 @@ ReturnValue Character::do_autoeat(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_anonymous(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_anonymous(QStringList arguments, cmd_t cmd)
 {
   if (level_ < 40)
   {
@@ -927,7 +927,7 @@ ReturnValue Character::do_anonymous(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_wimpy(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_wimpy(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_WIMPY))
   {
@@ -943,7 +943,7 @@ ReturnValue Character::do_wimpy(QStringList arguments, cmd_t cmd)
 
 // Remember that his is "no-pager".  So if it's set, we don't page
 // If it's not set, we do.
-ReturnValue Character::do_pager(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_pager(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_PAGER))
   {
@@ -957,7 +957,7 @@ ReturnValue Character::do_pager(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_BARD_SONG))
   {
@@ -971,7 +971,7 @@ ReturnValue Character::do_bard_song_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
 {
   if (isSet(player->toggles, Player::PLR_NODUPEKEYS))
   {
@@ -985,7 +985,7 @@ ReturnValue Character::do_nodupekeys_toggle(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_beep_set(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_beep_set(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -1002,7 +1002,7 @@ ReturnValue Character::do_beep_set(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1054,10 +1054,10 @@ ReturnValue do_stand(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -1108,10 +1108,10 @@ ReturnValue do_sit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -1160,10 +1160,10 @@ ReturnValue do_rest(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_typePtr paf;
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -1173,7 +1173,7 @@ ReturnValue do_sleep(CharacterPtr ch, QString argument, cmd_t cmd)
     ch->sendln(u"You are far too alert for that."_s);
     return ReturnValue::eFAILURE;
   }
-  if (!isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (!isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
     if (!check_make_camp(ch->in_room))
     {
       ch->sendln(u"Be careful sleeping out here!  This isn't a safe room, so people can steal your equipment while you sleep!"_s);
@@ -1249,7 +1249,7 @@ ReturnValue Character::wake(CharacterPtr victim)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_wake(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_wake(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr tmp_char = {};
   QString arg1 = arguments.value(0);
@@ -1341,7 +1341,7 @@ ReturnValue Character::do_wake(QStringList arguments, cmd_t cmd)
 // global tag var
 CharacterPtr tagged_person;
 
-ReturnValue do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_tag(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr victim;
@@ -1536,7 +1536,7 @@ void CVoteData::Reset(CharacterPtr ch)
 void CVoteData::OutToFile()
 {
 
-  FILE *the_file;
+  QTextStream the_file;
 
   the_file = fopen("vote_data", "w");
 
@@ -1592,7 +1592,7 @@ CVoteData::CVoteData()
     : active(false), total_votes(0)
 {
   QString buf;
-  FILE *the_file = {};
+  QTextStream the_file = {};
   ;
   qint32 num = {};
   bool is_active = {};
@@ -1687,7 +1687,7 @@ CVoteData::~CVoteData()
 {
 }
 
-ReturnValue do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   qint32 vote;
@@ -1723,12 +1723,12 @@ ReturnValue do_vote(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_random(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_random(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i = {};
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;

@@ -14,13 +14,13 @@
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-ReturnValue do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   // CharacterPtr tmp_ch;
   QString victim_name;
   affected_type af;
-  qint32 retval = ReturnValue::eSUCCESS, dam;
+  ReturnValues retval = ReturnValue::eSUCCESS, dam;
 
   one_argument(argument, victim_name);
 
@@ -108,7 +108,7 @@ ReturnValue do_harmtouch(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-ReturnValue do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   // CharacterPtr tmp_ch;
@@ -184,12 +184,12 @@ ReturnValue do_layhands(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;
   qint32 chance = {};
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   QString buf;
   CharacterPtr vict;
 
@@ -271,7 +271,7 @@ ReturnValue do_behead(CharacterPtr ch, QString argument, cmd_t cmd)
   if ((ch->dc_->number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {
     if ((
-            (vict->equipment[WEAR_NECK_1] && dc_->obj_index_[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && dc_->obj_index_[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
+            (vict->equipment[WEAR_NECK_1] && dc_->obj_index_[vict->equipment[WEAR_NECK_1]->item_number]->vnum() == 518) || (vict->equipment[WEAR_NECK_2] && dc_->obj_index_[vict->equipment[WEAR_NECK_2]->item_number]->vnum() == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
       act_to_character("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, 0);

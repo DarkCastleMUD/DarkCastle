@@ -53,7 +53,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
   MobileProgramPtr mprg = {};
   qint32 i;
 
-  buf = QString::asprintf("$3Name$R: %s  $3Vnum$R: %llu.\r\n", qPrintable(victim->name()), dc_->mob_index_[victim->mobdata->nr].vnum());
+  buf = QString::asprintf("$3Name$R: %s  $3Vnum$R: %llu.\r\n", qPrintable(victim->name()), dc_->mob_index_[victim->mobdata->nr]->vnum());
   ch->send(buf);
 
   buf = QString::asprintf("$3Short description$R: %s\r\n$3Long  description$R: %s\r\n", qPrintable(victim->short_description()), qPrintable(victim->long_description()));
@@ -79,7 +79,7 @@ void mpstat(CharacterPtr ch, CharacterPtr victim)
 
 /* prints the argument to all the rooms aroud the mobile */
 
-ReturnValue do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   qint32 was_in_room;
@@ -118,7 +118,7 @@ ReturnValue do_mpasound(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* lets the mobile kill any player or mobile without murder*/
 
-ReturnValue do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -164,7 +164,7 @@ ReturnValue do_mpkill(CharacterPtr ch, QString argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-ReturnValue do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -210,7 +210,7 @@ ReturnValue do_mphit(CharacterPtr ch, QString argument, cmd_t cmd)
   return one_hit(ch, victim, TYPE_UNDEFINED, WEAR_WIELD);
 }
 
-ReturnValue do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString arg1;
@@ -249,7 +249,7 @@ ReturnValue do_mpaddlag(CharacterPtr ch, QString argument, cmd_t cmd)
    it can also destroy a worn object and it can destroy
    just plain everything  */
 
-ReturnValue do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   ObjectPtr obj;
@@ -307,7 +307,7 @@ ReturnValue do_mpjunk(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* prints the message to everyone in the room other than the mob and victim */
 
-ReturnValue do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -336,7 +336,7 @@ ReturnValue do_mpechoaround(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg1;
   CharacterPtr victim, victim2;
@@ -373,7 +373,7 @@ ReturnValue do_mpechoaroundnotbad(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* prints the message to only the victim */
 
-ReturnValue do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -404,7 +404,7 @@ ReturnValue do_mpechoat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* prints the message to the room at large */
 
-ReturnValue do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -426,7 +426,7 @@ ReturnValue do_mpecho(CharacterPtr ch, QString argument, cmd_t cmd)
 are loaded into inventory.  you can specify a level with
 the load object portion as well. */
 
-ReturnValue do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   qint32 realnum;
@@ -453,14 +453,14 @@ ReturnValue do_mpmload(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   victim = ch->dc_->clone_mobile(realnum);
-  victim->hometown = ch->dc_->world[ch->in_room].number;
+  victim->hometown = ch->dc_->world[ch->in_room]->number_;
   char_to_room(victim, ch->in_room);
   mprog_load_trigger(victim); // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
 
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto &arena = dc_->arena_;
   QString arg1;
@@ -490,7 +490,7 @@ ReturnValue do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   obj = clone_object(realnum);
 
-  if (dc_->obj_index_[obj->item_number].vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
+  if (dc_->obj_index_[obj->item_number]->vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
     return ReturnValue::eFAILURE;
   }
@@ -517,7 +517,7 @@ ReturnValue do_mpoload(CharacterPtr ch, QString argument, cmd_t cmd)
    itself, but this had best be the last command in the MOBprogram
    otherwise ugly stuff will happen */
 
-ReturnValue do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -537,7 +537,7 @@ ReturnValue do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
     CharacterPtr vnext;
     ObjectPtr obj_next;
 
-    for (victim = dc_->world[ch->in_room].people_; victim != nullptr; victim = vnext)
+    for (victim = dc_->world[ch->in_room]->people_; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
       if (victim->isNonPlayer() && victim != ch)
@@ -602,7 +602,7 @@ ReturnValue do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* lets the mobile goto any location it wishes that is not private */
 
-ReturnValue do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   qint32 location = -1;
@@ -687,7 +687,7 @@ ReturnValue do_mpgoto(CharacterPtr ch, QString argument, cmd_t cmd)
 
 /* lets the mobile do a command at another location. Very useful */
 
-ReturnValue do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   qint32 location;
@@ -753,7 +753,7 @@ ReturnValue do_mpat(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // Reward the player with some XP
 // Also works with -xp to penalize
-ReturnValue do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString buf;
@@ -796,7 +796,7 @@ ReturnValue do_mpxpreward(CharacterPtr ch, QString argument, cmd_t cmd)
 /* lets the mobile transfer people.  the all argument transfers
    everyone in the current room to the specified location */
 
-ReturnValue do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString arg2;
@@ -850,7 +850,7 @@ ReturnValue do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
-    if (isSet(dc_->world[location].room_flags, PRIVATE))
+    if (isSet(dc_->world[location]->room_flags_, PRIVATE))
     {
       ch->prog_error(u"Mptransfer - Private room."_s);
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -863,7 +863,7 @@ ReturnValue do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if (victim->in_room == DC::NOWHERE)
+  if (victim->in_room == INVALID_ROOM)
   {
     ch->prog_error(u"Mptransfer - Victim in Limbo."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
@@ -881,7 +881,7 @@ ReturnValue do_mptransfer(CharacterPtr ch, QString argument, cmd_t cmd)
 /* lets the mobile force someone to do something.  must be mortal level
    and the all argument only affects those in the room with the mobile */
 
-ReturnValue do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
 
@@ -904,7 +904,7 @@ ReturnValue do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!str_cmp(arg, "all"))
   {
-    for (auto tch : dc_->world[ch->in_room].people_)
+    for (auto tch : dc_->world[ch->in_room]->people_)
     {
       if (!tch->isImmortalPlayer() && CAN_SEE(ch, tch))
       {
@@ -944,7 +944,7 @@ ReturnValue do_mpforce(CharacterPtr ch, QString argument, cmd_t cmd)
 // "Throw" a message to another mob.  Right now, it's only an qint32 specifying which
 // 'catch' should handle it
 // argument should be <mob> <catchnum> <delay>
-ReturnValue do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 mob_num;
   qint32 catch_num;
@@ -1020,7 +1020,7 @@ ReturnValue do_mpthrow(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpteachskill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString skill;
@@ -1120,7 +1120,7 @@ QString Character::getTemp(QString name)
   return {};
 }
 
-ReturnValue Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim;
   QString arg = arguments.value(0);
@@ -1131,7 +1131,7 @@ ReturnValue Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   {
     if (isNonPlayer())
     {
-      qint32 num = dc_->mob_index_[mobdata->nr].vnum();
+      qint32 num = dc_->mob_index_[mobdata->nr]->vnum();
 
       dc_->logentry(u"Mob %1 lacking argument for mpsettemp."_s.arg(num));
     }
@@ -1152,7 +1152,7 @@ ReturnValue Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   if (!victim && type == 0)
     return ReturnValue::eFAILURE;
   if (!victim)
-    victim = dc_->world[in_room].people_;
+    victim = dc_->world[in_room]->people_;
 
   for (; victim; victim = victim->next_in_room)
   {
@@ -1190,7 +1190,7 @@ ReturnValue Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpsetalign(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString arg, align;
@@ -1256,7 +1256,7 @@ void add_dmg(CharacterPtr ch, qint32 dmg)
   dmg_list = c;
 }
 
-ReturnValue do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString temp;
@@ -1292,7 +1292,7 @@ ReturnValue do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE; // not an error, just couldn't get valid vict
   }
 
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   while (1)
   {
     argument = one_argument(argument, damroll);
@@ -1406,7 +1406,7 @@ ReturnValue do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     CharacterPtr next_vict;
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_vict)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
       if ((victim->isPlayer() && victim->getLevel() > MORTAL) || victim == ch)
@@ -1468,7 +1468,7 @@ ReturnValue do_mpdamage(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpothrow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 mob_num;
   qint32 catch_num;
@@ -1551,7 +1551,7 @@ qint32 skill_aff[] =
         SPELL_KNOW_ALIGNMENT, 0, SPELL_WATER_BREATHING, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-ReturnValue do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg1, arg2,
       arg3;
@@ -1582,7 +1582,7 @@ ReturnValue do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
     owner = (CharacterPtr)ch->beacon;
 
   if (!victim)
-    victim = dc_->world[ch->in_room].people_;
+    victim = dc_->world[ch->in_room]->people_;
   qint32 z = {};
   for (; victim;)
   {
@@ -1642,7 +1642,7 @@ ReturnValue do_mpbestow(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // simulate a pause in proc execution
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
-ReturnValue do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1685,7 +1685,7 @@ ReturnValue do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isNonPlayer())
   {
-    throwitem->target_mob_num = dc_->mob_index_[ch->mobdata->nr].vnum();
+    throwitem->target_mob_num = dc_->mob_index_[ch->mobdata->nr]->vnum();
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -1726,7 +1726,7 @@ ReturnValue do_mppause(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS | ReturnValue::eDELAYED_EXEC;
 }
 
-ReturnValue do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString person, type, buf;
@@ -1755,7 +1755,7 @@ ReturnValue do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  if (isSet(dc_->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (isSet(dc_->world[victim->in_room]->room_flags_, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     ch->sendln(u"You find yourself unable to."_s);
@@ -1767,7 +1767,7 @@ ReturnValue do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  qint32 i = dc_->world[ch->in_room].zone,
+  qint32 i = dc_->world[ch->in_room]->zone,
          low = dc_->zones.value(i).getRealBottom(),
          high = dc_->zones.value(i).getRealTop(),
          attempts = {};
@@ -1790,14 +1790,14 @@ ReturnValue do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
       to_room = number<room_t>(1, dc_->top_of_world);
     }
   } while (!dc_->rooms.contains(to_room) ||
-           isSet(dc_->world[to_room].room_flags, PRIVATE) ||
-           isSet(dc_->world[to_room].room_flags, IMP_ONLY) ||
-           isSet(dc_->world[to_room].room_flags, NO_TELEPORT) ||
-           isSet(dc_->world[to_room].room_flags, ARENA) ||
+           isSet(dc_->world[to_room]->room_flags_, PRIVATE) ||
+           isSet(dc_->world[to_room]->room_flags_, IMP_ONLY) ||
+           isSet(dc_->world[to_room]->room_flags_, NO_TELEPORT) ||
+           isSet(dc_->world[to_room]->room_flags_, ARENA) ||
            (dc_->world[to_room].sector_type == SECT_UNDERWATER && victim->race != RACE_FISH) ||
            dc_->zones.value(dc_->world[to_room].zone).isNoTeleport() ||
            ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones.value(dc_->world[to_room].zone).isTown()) : false) ||
-           (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room].room_flags, CLAN_ROOM) ||
+           (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room]->room_flags_, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
   act_to_room("$n slowly fades out of existence.", victim, 0, 0, 0);
@@ -1808,7 +1808,7 @@ ReturnValue do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1834,7 +1834,7 @@ ReturnValue do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
       stop_fighting(vict);
     return ReturnValue::eSUCCESS;
   }
-  for (rch = dc_->world[ch->in_room].people_; rch != nullptr; rch = rch->next_in_room)
+  for (rch = dc_->world[ch->in_room]->people_; rch != nullptr; rch = rch->next_in_room)
   {
     if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
@@ -1844,7 +1844,7 @@ ReturnValue do_mppeace(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1859,7 +1859,7 @@ ReturnValue do_mpretval(CharacterPtr ch, QString argument, cmd_t cmd)
           "\n"};
   QString arg;
   one_argument(argument, arg);
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
 
   for (qint32 i = {}; retvals[i][0] != '\n'; i++)
     if (!str_cmp(arg, retvals[i]))
@@ -2038,7 +2038,7 @@ QString expand_data(CharacterPtr ch, QString orig)
 const QStringList allowedData = {
     "hitpoints", "mana", "move", nullptr};
 
-ReturnValue do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -2128,19 +2128,19 @@ ReturnValue do_mpsetmath(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     *lvali = i;
     //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
-    //  r, i, dc_->mob_index_[ch->mobdata->nr].vnum() );
+    //  r, i, dc_->mob_index_[ch->mobdata->nr]->vnum() );
   }
   if (lvalb)
   {
     *lvalb = (qint8)i;
     //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
-    //  r, i, dc_->mob_index_[ch->mobdata->nr].vnum() );
+    //  r, i, dc_->mob_index_[ch->mobdata->nr]->vnum() );
   }
   if (lvalui)
   {
     *lvalui = (quint32)i;
     //  ch->prog_error( u"Mpsetmath - %1 set to %2."_s);
-    //  r, i, dc_->mob_index_[ch->mobdata->nr].vnum() );
+    //  r, i, dc_->mob_index_[ch->mobdata->nr]->vnum() );
   }
 
   /*  vict->sendln(u"%d\r\n%d\r\n%d\r\n%d\r\n"_s,
@@ -2157,11 +2157,11 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(u"Obj %1, com %2, line %3: %4"_s.arg(dc_->obj_index_[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(u"Obj %1, com %2, line %3: %4"_s.arg(dc_->obj_index_[objdata->item_number]->vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else if (isNonPlayer())
   {
-    logworld(u"Mob %1, com %2, line %3: %4"_s.arg(dc_->mob_index_[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(u"Mob %1, com %2, line %3: %4"_s.arg(dc_->mob_index_[mobdata->nr]->vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else
   {

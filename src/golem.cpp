@@ -4,12 +4,14 @@
    magic.cpp, etc) to have all the golem code in one place.
 */
 #include "DC/DC.h"
+#include <qdebug.h>
+#include <qiodevicebase.h>
 // Locals
 void advance_golem_level(CharacterPtr golem);
 
 // save.cpp
-qint32 store_worn_eq(CharacterPtr ch, FILE *fpsave);
-ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
+qint32 store_worn_eq(CharacterPtr ch, QTextStream fpsave);
+ObjectPtr obj_store_to_char(CharacterPtr ch, QTextStream fpsave, ObjectPtr last_cont);
 
 class golem_data
 { // This is how a golem looks.
@@ -62,9 +64,9 @@ void golem_gain_exp(CharacterPtr ch)
   }
 }
 
-qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
+ReturnValue verify_existing_components(CharacterPtr ch, qint32 golemtype)
 {
-  qint32 retval = {};
+  ReturnValue retval = {};
 
   // OVERSEERS or higher don't need components
   if (ch->getLevel() >= OVERSEER)
@@ -76,7 +78,6 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
 
   // check_components didn't suit me.
   qint32 i;
-  ObjectPtr curr, next_content;
   QString buf;
   SET_BIT(retval, ReturnValue::eSUCCESS);
   for (i = {}; i < 5; i++)
@@ -84,10 +85,9 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
     if (golem_list[golemtype].components[i] == 0)
       continue;
     bool found = false;
-    for (curr = ch->carrying; curr; curr = next_content)
+    for (auto &curr : ch->carrying)
     {
-      next_content = curr->next_content;
-      qint32 vnum = dc_->obj_index_[curr->item_number].vnum();
+      qint32 vnum = ch->dc_->obj_index_[curr->item_number]->vnum();
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
@@ -102,10 +102,9 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
   }
   for (i = {}; i < 5; i++)
   {
-    for (curr = ch->carrying; curr; curr = next_content)
+    for (auto &curr : ch->carrying)
     {
-      next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == dc_->obj_index_[curr->item_number].vnum())
+      if (golem_list[golemtype].components[i] == ch->dc_->obj_index_[curr->item_number]->vnum())
       {
         if (ch->dc_->number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
@@ -130,21 +129,22 @@ qint32 verify_existing_components(CharacterPtr ch, qint32 golemtype)
 void save_golem_data(CharacterPtr ch)
 {
   QString file;
-  FILE *fpfile = {};
   qint32 golemtype = {};
   if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
   golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
-  dc_sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, qPrintable(ch->name())[0], qPrintable(ch->name()), golemtype);
-  if (!(fpfile = fopen(file, "w")))
+  dc_sprintf(file, "%s/%c/%s.%d", qPrintable(FAMILIAR_DIR), qPrintable(ch->name())[0], qPrintable(ch->name()), golemtype);
+  QFile golem_file(file);
+  if (!golem_file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    dc_->logentry(u"Error while opening file in save_golem_data[golem.cpp]."_s, ANGEL, DC::LogChannel::LOG_BUG);
+    ch->dc_->logentry(u"Error while opening file in save_golem_data[golem.cpp]."_s, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
+  QTextStream fpfile(&golem_file);
   CharacterPtr golem = ch->player->golem; // Just to make the code below cleaner.
   quint8 legacy_level = (quint8)golem->getLevel();
-  fwrite(&legacy_level, 1, 1, fpfile);
-  fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
+  fpfile << legacy_level;
+  fpfile << golem->exp;
   // Use previously defined functions after this.
   obj_to_store(golem->carrying, golem, fpfile, -1);
   store_worn_eq(golem, fpfile);
@@ -153,17 +153,15 @@ void save_golem_data(CharacterPtr ch)
 void save_charmie_data(CharacterPtr ch)
 {
   QString file;
-  FILE *fpfile = {};
+  QTextStream fpfile = {};
 
   if (ch->isNonPlayer() || ch->followers == nullptr)
   {
     return;
   }
 
-  for (follow_type *followers = ch->followers; followers != nullptr; followers = followers->next)
+  for (auto &follower : ch->followers)
   {
-    CharacterPtr follower = followers->follower;
-
     if (follower == nullptr || follower->isPlayer() || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
     {
       continue;
@@ -236,7 +234,7 @@ void set_golem(CharacterPtr golem, qint32 golemtype)
 void Character::load_golem_data(qint32 golemtype)
 {
   QString file;
-  FILE *fpfile = {};
+  QTextStream fpfile = {};
   CharacterPtr golem;
   if (isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && getLevel() < OVERSEER) || player->golem)
     return;
@@ -271,7 +269,7 @@ void Character::load_golem_data(qint32 golemtype)
   }
 }
 
-qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr golem;
   qint32 i;
@@ -294,7 +292,7 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
     ch->sendln(u"You cannot create any such golem."_s);
     return ReturnValue::eFAILURE;
   }
-  qint32 retval = verify_existing_components(ch, i);
+  ReturnValues retval = verify_existing_components(ch, i);
   if (isSet(retval, ReturnValue::eFAILURE))
   {
     ch->sendln(u"Since you do not have the required spell components, the magic fades into nothingness."_s);
@@ -324,7 +322,7 @@ qint32 cast_create_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 extern QString frills;
 
-ReturnValue do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
 { /* Pretty much a rip of score */
   QString race;
   QString buf, scratch;
@@ -348,7 +346,7 @@ ReturnValue do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (cmd == cmd_t::FSCORE)
   {
-    follow_type *folnext;
+    CharacterPtr *folnext;
     quint8 charmies_found = {};
     for (auto fol = ch->followers; fol; fol = folnext)
     {
@@ -540,19 +538,19 @@ ReturnValue do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
     ++level == 4 ? level = 0 : level;
   }
 
-  if ((aff = ch->affected))
+  if (!ch->affected.isEmpty())
   {
-    for (; aff; aff = aff->next)
+    for (const auto &aff : ch->affected)
     {
       scratch = frills[level];
       // figure out the name of the affect (if any)
       QString aff_name = get_skill_name(aff->type);
       switch (aff->type)
       {
-      case Character::PLAYER_CANTQUIT:
+      case PLAYER_CANTQUIT:
         aff_name = u"Can't Quit"_s;
         break;
-      case Character::PLAYER_OBJECT_THIEF:
+      case PLAYER_OBJECT_THIEF:
         aff_name = u"DIRTY_DIRTY_THIEF"_s;
         break;
       case SKILL_HARM_TOUCH:
@@ -580,19 +578,19 @@ ReturnValue do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       if (aff_name.isEmpty()) // not one we want displayed
         continue;
 
-      if (aff->type == Character::PLAYER_CANTQUIT)
+      if (aff->type == PLAYER_CANTQUIT)
       {
         dc_sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\r\n",
-                   scratch, qPrintable(aff_name),
+                   qPrintable(scratch), qPrintable(aff_name),
                    ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                   apply_types[(qint32)aff->location], aff->caster.c_str());
+                   qPrintable(apply_types[(qint32)aff->location]), qPrintable(aff->caster));
       }
       else
       {
         dc_sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\r\n",
-                   scratch, qPrintable(aff_name),
+                   qPrintable(scratch), qPrintable(aff_name),
                    ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
-                   apply_types[(qint32)aff->location], scratch);
+                   qPrintable(apply_types[(qint32)aff->location]), scratch);
       }
       master->send(buf);
       if (++level == 4)
@@ -605,14 +603,16 @@ ReturnValue do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  follow_type *fol;
-  for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && dc_->mob_index_[fol->follower->mobdata->nr].vnum() == 8)
+  if (!ch)
+    return ReturnValue::eFAILURE;
+
+  for (auto &follower : ch->followers)
+    if (follower && follower->isNonPlayer() && ch->dc_->mob_index_[follower->mobdata->nr]->vnum() == 8)
     {
-      release_message(fol->follower);
-      extract_char(fol->follower, false);
+      release_message(follower);
+      extract_char(follower, false);
       return ReturnValue::eSUCCESS;
     }
   ch->sendln(u"You don't have a golem."_s);

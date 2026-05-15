@@ -114,7 +114,7 @@ void DC::process_portals(void)
 */
 bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qint32 timer)
 {
-  if (real_room(from_room) == DC::NOWHERE)
+  if (real_room(from_room) == INVALID_ROOM)
   {
     QString log_buf;
     dc_sprintf(log_buf, "Cannot create portal: room %d doesn't exist.", from_room);
@@ -163,7 +163,7 @@ bool DC::make_room_portal(qint32 from_room, qint32 to_room, qint32 duplicate, qi
 
   from_portal->flags_.timer = timer;
 
-  from_portal->in_room = DC::NOWHERE;
+  from_portal->in_room = INVALID_ROOM;
 
   /* The room that it goes to */
   from_portal->setPortalDestinationRoom(to_room);
@@ -201,7 +201,7 @@ void find_and_remove_player_portal(CharacterPtr ch)
       continue;
 
     // at this point, the portal belongs to the person that quit
-    if (k->in_room < dc_->top_of_world && k->in_room > DC::NOWHERE && dc_->rooms.contains(k->in_room))
+    if (k->in_room < dc_->top_of_world && k->in_room > INVALID_ROOM && dc_->rooms.contains(k->in_room))
     {
       send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
     }

@@ -155,9 +155,9 @@ room_t Zone::getBottom(void)
   return bottom;
 }
 
-void Zone::setBottom(qint32 room_key)
+void Zone::setBottom(qint32 room_number)
 {
-  bottom = room_key;
+  bottom = room_number;
 }
 
 qint32 Zone::getTop(void)
@@ -165,9 +165,9 @@ qint32 Zone::getTop(void)
   return top;
 }
 
-void Zone::setTop(qint32 room_key)
+void Zone::setTop(qint32 room_number)
 {
-  top = room_key;
+  top = room_number;
 }
 
 room_t Zone::getRealBottom(void)
@@ -175,9 +175,9 @@ room_t Zone::getRealBottom(void)
   return bottom_rnum;
 }
 
-void Zone::setRealBottom(qint32 room_key)
+void Zone::setRealBottom(qint32 room_number)
 {
-  bottom_rnum = room_key;
+  bottom_rnum = room_number;
 }
 
 qint32 Zone::getRealTop(void)
@@ -185,9 +185,9 @@ qint32 Zone::getRealTop(void)
   return top_rnum;
 }
 
-void Zone::setRealTop(qint32 room_key)
+void Zone::setRealTop(qint32 room_number)
 {
-  top_rnum = room_key;
+  top_rnum = room_number;
 }
 
 bool operator==(ResetCommand a, ResetCommand b)

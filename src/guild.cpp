@@ -7,7 +7,7 @@
 
 extern QList<profession> professions;
 
-ReturnValue do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   /* Call "guild" with a null QString for an argument.
      This displays the character's skills. */
@@ -23,7 +23,7 @@ ReturnValue do_practice(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_profession(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValues do_profession(CharacterPtr ch, QString args, cmd_t cmd)
 {
   // Command is enabled by giving someone the profession skill
   if (!ch->has_skill(SKILL_PROFESSION))
@@ -1252,12 +1252,12 @@ void Character::skill_increase_check(qint32 skill, qint32 learned, qint32 diffic
     return;
   }
 
-  if (isSet(dc_->world[in_room].room_flags, NOLEARN))
+  if (isSet(dc_->world[in_room]->room_flags_, NOLEARN))
   {
     return;
   }
 
-  if (isSet(dc_->world[in_room].room_flags, SAFE))
+  if (isSet(dc_->world[in_room]->room_flags_, SAFE))
   {
     return;
   }

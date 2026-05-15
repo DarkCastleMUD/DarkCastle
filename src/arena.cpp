@@ -51,11 +51,11 @@ auto Character::do_arena(QStringList arguments, cmd_t cmd) -> ReturnValue
   return ReturnValue::eSUCCESS;
 }
 
-auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
+ReturnValues do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
-  qint32 send_to = DC::NOWHERE;
-  affected_typePtr af, *next_af;
+  qint32 send_to = INVALID_ROOM;
+  affected_typePtr af, next_af;
   qint32 pot_low = 6362;
   qint32 pot_hi = 6379;
 
@@ -79,7 +79,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
     ch->sendln(u"Only clan members may join this arena."_s);
     return ReturnValue::eFAILURE;
   }
-  if (ch->room().isArena())
+  if (ch->room()->isArena())
   {
     ch->sendln(u"You are already there!"_s);
     return ReturnValue::eFAILURE;
@@ -107,10 +107,10 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   }
 
   ch->dc_->arena_.IncrementCurrentNumber();
-  for (af = ch->affected; af; af = next_af)
+  for (auto &af : ch->affected)
   {
     next_af = af->next;
-    if (af->type != Character::PLAYER_CANTQUIT)
+    if (af->type != PLAYER_CANTQUIT)
       affect_remove(ch, af, SUPPRESS_ALL);
   }
 
@@ -123,7 +123,7 @@ auto do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd) -> qint32
   GET_KI(ch) = GET_MAX_KI(ch);
 
   act_to_room("$n disappears in a glorious flash of heroism.", ch, 0, 0, 0);
-  while (send_to == DC::NOWHERE)
+  while (send_to == INVALID_ROOM)
   {
     if (ch->dc_->arena_.isPotato())
     { // potato arena

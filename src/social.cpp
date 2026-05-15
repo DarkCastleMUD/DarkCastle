@@ -46,7 +46,7 @@ ReturnValue Character::check_social(QString pcomm)
     break;
   }
 
-  if (isSet(dc_->world[in_room].room_flags, QUIET))
+  if (isSet(dc_->world[in_room]->room_flags_, QUIET))
   {
     sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return SOCIAL_TRUE;
@@ -230,7 +230,7 @@ void DC::clean_socials_from_memory()
   soc_mess_list.clear();
 }
 
-ReturnValue do_social(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_social(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 i{};

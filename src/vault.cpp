@@ -228,7 +228,7 @@ const QString vault_usage = "Syntax: vault <list | balance> [vault owner]\r\n"
 
 const QString imm_vault_usage = "        vault <stats> [name]\r\n";
 
-ReturnValue do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg{}, arg1{}, arg2 = {};
 
@@ -342,7 +342,7 @@ ReturnValue do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     // putting this here so that anything below it requires you to be in a safe room.
   }
-  else if (!isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  else if (!isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You don't feel safe enough to manage your valuables."_s);
     return ReturnValue::eSUCCESS;
@@ -943,7 +943,7 @@ void DC::load_vaults(void)
   vault_items_dataPtr items;
   ObjectPtr obj = {};
   struct stat statbuf = {};
-  FILE *stream = {}, *index = {};
+  QTextStream stream = {}, *index = {};
   qint32 vnum = 0, full = 0, count = {};
   quint64 gold = {};
   QString value = {}, line[128] = {}, buf = {}, filename = {}, type[128] = {}, tmp[10] = {};
@@ -1017,7 +1017,7 @@ void DC::load_vaults(void)
         if (vault->size > 2000) {
             dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
-            FILE *oldfl;
+            QTextStream oldfl;
             QString oldfname, oldtype;
 
             dc_sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
@@ -2140,7 +2140,7 @@ void Character::vault_list(QString owner)
 
     if (getLevel() > IMMORTAL && obj->item_number > 0)
     {
-      send(u" [%1]"_s.arg(dc_->obj_index_[obj->item_number].vnum()));
+      send(u" [%1]"_s.arg(dc_->obj_index_[obj->item_number]->vnum()));
     }
     send(u"\r\n"_s);
   }
@@ -2148,7 +2148,7 @@ void Character::vault_list(QString owner)
 
 void add_new_vault(const QString name, qint32 indexonly)
 {
-  FILE *vfl, *tvfl, *pvfl;
+  QTextStream vfl, *tvfl, *pvfl;
   VaultPtr vault;
   QString filename, line, buf;
   if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
@@ -2272,7 +2272,7 @@ void logvault(QString message, QString name)
 {
   tm *tm = {};
   time_t ct;
-  FILE *ofile, *nfile;
+  QTextStream ofile, *nfile;
   QString buf, line;
   QString fname, nfname;
   qint32 lines = 1;
@@ -2705,7 +2705,7 @@ qint32 vault_search(CharacterPtr ch, const QString args)
 
         if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
         {
-          ch->send(fmt::format(" [{}]", dc_->obj_index_[obj->item_number].vnum()));
+          ch->send(fmt::format(" [{}]", dc_->obj_index_[obj->item_number]->vnum()));
         }
         ch->send(u"\r\n"_s);
       } // for loop of objects

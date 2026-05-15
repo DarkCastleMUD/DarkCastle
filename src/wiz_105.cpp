@@ -4,7 +4,7 @@
 **********************/
 #include "DC/DC.h"
 
-ReturnValue do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool found = false;
   QString buf;
@@ -49,7 +49,7 @@ ReturnValue do_clearaff(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   dc_->free_help_from_memory();
   QFile help_keyword_file(HELP_KWRD_FILE);
@@ -65,7 +65,7 @@ ReturnValue do_reloadhelp(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_log(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_log(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   ObjectPtr dummy;
@@ -107,7 +107,7 @@ ReturnValue do_log(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString person;
   CharacterPtr victim;
@@ -214,7 +214,7 @@ ReturnValue do_showbits(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_debug(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValues do_debug(CharacterPtr ch, QString args, cmd_t cmd)
 {
   QString arg1, arg2, arg3;
   QString remainder;
@@ -323,7 +323,7 @@ ReturnValue do_debug(CharacterPtr ch, QString args, cmd_t cmd)
         bool first_npc_debug_state = false;
         for (const auto &c : dc_->character_list)
         {
-          if (c->isNonPlayer() && c->mobdata && dc_->mob_index_[c->mobdata->nr].vnum() == vnum)
+          if (c->isNonPlayer() && c->mobdata && dc_->mob_index_[c->mobdata->nr]->vnum() == vnum)
           {
             if (!first_npc_found)
             {
@@ -356,7 +356,7 @@ ReturnValue do_debug(CharacterPtr ch, QString args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString person;
   QString flag;
@@ -421,7 +421,7 @@ ReturnValue do_pardon(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_dmg_eq(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr obj_object;
@@ -483,7 +483,7 @@ skill_quest *find_sq(qint32 sq)
   return {};
 }
 
-ReturnValue do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_sqedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString command;
   argument = one_argument(argument, command);
@@ -719,7 +719,7 @@ qint32 wear_bitv[MAX_WEAR] = {
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-ReturnValue do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   QString arg;
@@ -788,7 +788,7 @@ ReturnValue do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = dc_->obj_index_[obj->item_number].vnum();
+              last_vnum[0][o] = dc_->obj_index_[obj->item_number]->vnum();
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -802,7 +802,7 @@ ReturnValue do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
               for (v = {}; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = dc_->obj_index_[obj->item_number].vnum();
+                  last_vnum[v][o] = dc_->obj_index_[obj->item_number]->vnum();
                   break;
                 }
             }
@@ -836,7 +836,7 @@ ReturnValue do_eqmax(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern QString motd;
   extern QString imotd;
@@ -914,7 +914,7 @@ ReturnValue do_reload(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_listproc(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg1, arg2;
   qint32 start, i, end, tot;

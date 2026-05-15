@@ -49,7 +49,7 @@ qint32 get_max_stat_bonus(CharacterPtr ch, qint32 attrs)
 }
 
 // List skill maxes.
-ReturnValue do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg, arg2;
   CharacterClassSkill *classskill;
@@ -101,7 +101,7 @@ ReturnValue do_maxes(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // give a command to a god
-ReturnValue Character::do_bestow(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_bestow(QStringList arguments, cmd_t cmd)
 {
   QString victim_name = arguments.value(0);
   QString command = arguments.value(1);
@@ -174,7 +174,7 @@ ReturnValue Character::do_bestow(QStringList arguments, cmd_t cmd)
 }
 
 // take away a command from a god
-ReturnValue do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString buf;
@@ -245,7 +245,7 @@ ReturnValue do_revoke(CharacterPtr ch, QString arg, cmd_t cmd)
 
 /* Thunder is currently in wiz_104.c */
 
-ReturnValue do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   wizlock = !wizlock;
 
@@ -273,7 +273,7 @@ ReturnValue do_wizlock(CharacterPtr ch, QString argument, cmd_t cmd)
 | Side effects: None
 | Returns: None
 */
-ReturnValue do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name, buf;
@@ -311,7 +311,7 @@ ReturnValue do_chpwd(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString command;
   QString lev_str;
@@ -342,7 +342,7 @@ ReturnValue do_fakelog(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_rename_char(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_rename_char(QStringList arguments, cmd_t cmd)
 {
   if (arguments.size() < 2)
   {
@@ -559,7 +559,7 @@ ReturnValue Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-ReturnValue do_install(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_install(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf, type, arg1, err, arg2;
   qint32 range = 0, type_ok = 0, numrooms = {};
@@ -660,7 +660,7 @@ ReturnValue do_install(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_range(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_range(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->has_skill(COMMAND_RANGE))
   {
@@ -746,7 +746,7 @@ ReturnValue do_range(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -792,7 +792,7 @@ ReturnValue do_metastat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   argument = one_argument(argument, arg);
@@ -828,7 +828,7 @@ ReturnValue do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
     dc_sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
-               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), dc_->obj_index_[r].vnum(), ac);
+               o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description()), dc_->obj_index_[r]->vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -840,7 +840,7 @@ ReturnValue do_acfinder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_testhit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2, arg3;
   argument = one_argument(argument, arg1);
@@ -899,10 +899,10 @@ void write_array_csv(QStringList names, std::ofstream &fout)
   }
 }
 
-ReturnValue do_export(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValues do_export(CharacterPtr ch, QString args, cmd_t cmd)
 {
   QString export_type, filename;
-  world_file_list_item *curr = dc_->obj_file_list;
+  world_file_list_itemPtr curr = dc_->obj_file_list;
 
   args = one_argument(args, export_type);
   one_argument(args, filename);
@@ -953,7 +953,7 @@ ReturnValue do_export(CharacterPtr ch, QString args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_world(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValues do_world(CharacterPtr ch, QString args, cmd_t cmd)
 {
 
   if (args == "rename")

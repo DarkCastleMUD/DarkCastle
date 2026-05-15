@@ -987,7 +987,7 @@ void Leaderboard::check_offline(void)
 
 void Leaderboard::read_file(void)
 {
-  FILE *stream;
+  QTextStream stream;
   qint32 i, j;
 
   if (!(stream = fopen(LEADERBOARD_FILE, "r")))
@@ -1147,7 +1147,7 @@ void Leaderboard::write_file(QString filename)
     return;
   }
 
-  FILE *stream;
+  QTextStream stream;
   qint32 i, j;
 
   if (!(stream = fopen(qPrintable(filename), "w")))
@@ -1199,10 +1199,10 @@ qint32 Leaderboard::pdscore(CharacterPtr ch)
  things, otherwise renames will crash the server hard.
  */
 
-ReturnValue do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ConnectionPtr conn;
-  FILE *stream;
+  QTextStream stream;
   QString buf, buf2;
   qint32 i, j, k, validclass = {};
   QStringList hponlinename, mnonlinename, kionlinename, pkonlinename, pdonlinename, rdonlinename, mvonlinename;
@@ -1836,7 +1836,7 @@ ReturnValue do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void Leaderboard::rename(QString oldname, QString newname)
 {
-  FILE *stream = {};
+  QTextStream stream = {};
   // lines is the number of lines rewritten back to leaderboard file
   // after a rename.. must sync up with # of outputs
 

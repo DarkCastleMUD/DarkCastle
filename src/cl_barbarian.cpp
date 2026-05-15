@@ -8,7 +8,7 @@
 
 extern qint32 rev_dir[];
 
-ReturnValue do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
@@ -121,7 +121,7 @@ ReturnValue do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       REMOVE_BIT(exit->exit_info, EX_CLOSED); // break this side of door
       SET_BIT(exit->exit_info, EX_BROKEN);
 
-      if ((other_room = exit->to_room) != DC::NOWHERE)
+      if ((other_room = exit->to_room) != INVALID_ROOM)
         if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
@@ -172,7 +172,7 @@ ReturnValue do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         if (CAN_GO(ch, door) &&
-            !isSet(dc_->world[EXIT(ch, door)->to_room].room_flags, IMP_ONLY) &&
+            !isSet(dc_->world[EXIT(ch, door)->to_room]->room_flags_, IMP_ONLY) &&
             (!IS_AFFECTED(ch, AFF_CHAMPION) || champion_can_go(EXIT(ch, door)->to_room)) &&
             class_can_go(GET_CLASS(ch), EXIT(ch, door)->to_room) &&
             !others_clan_room(ch, &dc_->world[EXIT(ch, door)->to_room]))
@@ -200,7 +200,7 @@ ReturnValue do_batter(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 door, other_room;
   RoomDirectionPtr back, *exit;
@@ -299,7 +299,7 @@ ReturnValue do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
       act_to_room("The passage now appears firmly blocked.", ch, 0, exit->keyword, 0);
       exit->bracee = ch;
       ch->brace_at = exit;
-      if ((other_room = exit->to_room) != DC::NOWHERE)
+      if ((other_room = exit->to_room) != INVALID_ROOM)
         if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
           if (back->to_room == ch->in_room)
           {
@@ -315,7 +315,7 @@ ReturnValue do_brace(CharacterPtr ch, const QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue Character::do_rage(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_rage(QStringList arguments, cmd_t cmd)
 {
   if (getHP() == 1)
   {
@@ -362,7 +362,7 @@ ReturnValue Character::do_rage(QStringList arguments, cmd_t cmd)
   if (!charge_moves(SKILL_RAGE))
     return ReturnValue::eSUCCESS;
 
-  qint32 retval = {};
+  ReturnValues retval = {};
   if (!skill_success(victim, SKILL_RAGE))
   {
     act("You start advancing towards $N, but trip over your own feet!",
@@ -407,9 +407,9 @@ ReturnValue Character::do_rage(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  follow_type *f = {};
+  CharacterPtr *f = {};
 
   if (!ch->canPerform(SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n"))
   {
@@ -479,12 +479,12 @@ ReturnValue do_battlecry(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
   qint32 bSuccess = {};
-  qint32 retval = {};
+  ReturnValues retval = {};
 
   if (!ch->canPerform(SKILL_BERSERK, "You aren't crazy enough for that yet... try rage maybe...\r\n"))
   {
@@ -602,11 +602,11 @@ ReturnValue do_berserk(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
-  qint32 retval = {};
+  ReturnValues retval = {};
 
   if (!ch->canPerform(SKILL_HEADBUTT,
                       "You'd bonk yourself silly without proper training.\r\n"))
@@ -733,7 +733,7 @@ ReturnValue do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && dc_->obj_index_[ch->equipment[WEAR_HEAD]->item_number].vnum() == 508)
+          ch->equipment[WEAR_HEAD] && dc_->obj_index_[ch->equipment[WEAR_HEAD]->item_number]->vnum() == 508)
       {
         act_to_room("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, NOTVICT);
         act_to_victim("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, 0);
@@ -748,7 +748,7 @@ ReturnValue do_headbutt(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   qreal modifier;
@@ -802,7 +802,7 @@ ReturnValue do_bloodfury(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   qint32 duration = 20;
@@ -855,12 +855,12 @@ void rush_reset(varg_t arg1, void *arg2, void *arg3)
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
 
-ReturnValue do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString direction;
   QString who;
   qint32 dir = {};
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr victim;
 
   if (ch->getHP() == 1)
@@ -964,7 +964,7 @@ ReturnValue do_bullrush(CharacterPtr ch, QString argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-ReturnValue do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -984,7 +984,7 @@ ReturnValue do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1013,7 +1013,7 @@ ReturnValue do_ferocity(CharacterPtr ch, QString argument, cmd_t cmd)
     af.modifier = {};
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1050,12 +1050,12 @@ void barb_magic_resist(CharacterPtr ch, qint32 old, qint32 nw)
       ch->saves[i] += bonus;
 }
 
-ReturnValue do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString buf, where, who;
   qint32 dir = {};
-  qint32 retval, dam, dampercent, learned;
+  ReturnValues retval, dam, dampercent, learned;
 
   if (ch->getHP() == 1)
   {
@@ -1211,8 +1211,8 @@ ReturnValue do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   else if (CAN_GO(victim, dir) &&
            !victim->affected_by_spell(SPELL_IRON_ROOTS) &&
-           !isSet(dc_->world[EXIT(victim, dir)->to_room].room_flags, IMP_ONLY) &&
-           !isSet(dc_->world[EXIT(victim, dir)->to_room].room_flags, NO_TRACK) &&
+           !isSet(dc_->world[EXIT(victim, dir)->to_room]->room_flags_, IMP_ONLY) &&
+           !isSet(dc_->world[EXIT(victim, dir)->to_room]->room_flags_, NO_TRACK) &&
            (!IS_AFFECTED(victim, AFF_CHAMPION) || champion_can_go(EXIT(victim, dir)->to_room)) &&
            class_can_go(GET_CLASS(victim), EXIT(victim, dir)->to_room))
   {
@@ -1255,7 +1255,7 @@ ReturnValue do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         CharacterPtr tmp;
-        for (tmp = dc_->world[ch->in_room].people_; tmp; tmp = tmp->next_in_room)
+        for (tmp = dc_->world[ch->in_room]->people_; tmp; tmp = tmp->next_in_room)
           if (tmp->fighting == victim)
             stop_fighting(tmp);
         stop_fighting(victim);
@@ -1294,7 +1294,7 @@ ReturnValue do_knockback(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1361,7 +1361,7 @@ ReturnValue do_primalfury(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_pursue(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_pursue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (!ch->has_skill(SKILL_PURSUIT))
   {

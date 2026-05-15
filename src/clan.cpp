@@ -197,7 +197,7 @@ void DC::boot_clans(void)
 
 void save_clans(void)
 {
-  FILE *stream;
+  QTextStream stream;
   ClanPtr pclan = {};
   ClanMemberPtr pmember = {};
 
@@ -295,8 +295,8 @@ void DC::assign_clan_rooms(void)
   for (clan = dc_->clan_list; clan; clan = clan->next)
     for (room = clan->rooms; room; room = room->next)
       if (-1 != real_room(room->room_number))
-        if (!isSet(dc_->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
-          SET_BIT(dc_->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
+        if (!isSet(dc_->world[real_room(room->room_number)]->room_flags_, CLAN_ROOM))
+          SET_BIT(dc_->world[real_room(room->room_number)]->room_flags_, CLAN_ROOM);
 }
 
 ClanMember &get_member(QString name, clan_id_t clan_id)
@@ -450,9 +450,9 @@ void delete_clan(Clan &clan)
   {
     room = dead_clan->rooms;
     nextroom = room->next;
-    if (real_room(room->room_number) != DC::NOWHERE)
-      if (isSet(dc_->world[real_room(room->room_number)].room_flags, CLAN_ROOM))
-        REMOVE_BIT(dc_->world[real_room(room->room_number)].room_flags, CLAN_ROOM);
+    if (real_room(room->room_number) != INVALID_ROOM)
+      if (isSet(dc_->world[real_room(room->room_number)]->room_flags_, CLAN_ROOM))
+        REMOVE_BIT(dc_->world[real_room(room->room_number)]->room_flags_, CLAN_ROOM);
   }
         */
 }
@@ -694,7 +694,7 @@ void clan_logout(CharacterPtr ch)
   message_to_clan(ch, buf);
 }
 
-ReturnValue do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   ClanPtr clan;
@@ -756,7 +756,7 @@ ReturnValue do_accept(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_outcast(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_outcast(QStringList arguments, cmd_t cmd)
 {
   ClanPtr clanPtr = get_clan(this);
   if (!clanPtr)
@@ -855,7 +855,7 @@ ReturnValue Character::do_outcast(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_cpromote(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_cpromote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   ClanPtr clan;
@@ -1237,7 +1237,7 @@ qint32 clan_email(CharacterPtr ch, QString arg)
   return 1;
 }
 
-ReturnValue do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr pch;
   ConnectionPtr connesc;
@@ -1251,7 +1251,7 @@ ReturnValue do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1309,7 +1309,7 @@ ReturnValue do_ctell(CharacterPtr ch, QString arg, cmd_t cmd)
       continue;
 
     for (tmp_obj = dc_->world[pch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+      if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
       {
         yes = true;
         break;
@@ -1712,7 +1712,7 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       return;
     }
 
-    SET_BIT(dc_->world[real_room(skill)].room_flags, CLAN_ROOM);
+    SET_BIT(dc_->world[real_room(skill)]->room_flags_, CLAN_ROOM);
     tarclan->rooms.insert(skill);
     ch->sendln(u"Room added."_s);
     break;
@@ -1798,8 +1798,8 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
     if (tarclan->rooms->room_number == skill)
     {
       if (-1 != real_room(skill))
-        if (isSet(dc_->world[real_room(skill)].room_flags, CLAN_ROOM))
-          REMOVE_BIT(dc_->world[real_room(skill)].room_flags, CLAN_ROOM);
+        if (isSet(dc_->world[real_room(skill)]->room_flags_, CLAN_ROOM))
+          REMOVE_BIT(dc_->world[real_room(skill)]->room_flags_, CLAN_ROOM);
       lastroom = tarclan->rooms;
       tarclan->rooms = tarclan->rooms->next;
       lastroom = {};
@@ -1812,8 +1812,8 @@ void do_god_clans(CharacterPtr ch, QString arg, cmd_t cmd)
       if (newroom->room_number == skill)
       {
         if (-1 != real_room(skill))
-          if (isSet(dc_->world[real_room(skill)].room_flags, CLAN_ROOM))
-            REMOVE_BIT(dc_->world[real_room(skill)].room_flags, CLAN_ROOM);
+          if (isSet(dc_->world[real_room(skill)]->room_flags_, CLAN_ROOM))
+            REMOVE_BIT(dc_->world[real_room(skill)]->room_flags_, CLAN_ROOM);
         lastroom->next = newroom->next;
         newroom = {};
         ch->sendln(u"Deleted."_s);
@@ -2314,7 +2314,7 @@ qint32 needs_clan_command(CharacterPtr ch)
   return 0;
 }
 
-ReturnValue do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ClanPtr clan = {};
   QString tmparg;
@@ -2366,7 +2366,7 @@ ReturnValue do_clans(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ClanPtr clan;
   qint32 nClan;
@@ -2423,7 +2423,7 @@ ReturnValue do_cinfo(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ClanPtr clan;
   ConnectionPtr connesc;
@@ -2470,7 +2470,7 @@ ReturnValue do_whoclan(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ClanPtr clan;
 
@@ -2490,7 +2490,7 @@ ReturnValue do_cmotd(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_ctax(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_ctax(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString arg1;
   if (!ch->clan)
@@ -2523,7 +2523,7 @@ ReturnValue do_ctax(CharacterPtr ch, QString arg, cmd_t cmd)
 }
 
 // This command deposits gold into a clan bank account
-ReturnValue Character::do_cdeposit(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_cdeposit(QStringList arguments, cmd_t cmd)
 {
   QString arg1;
 
@@ -2539,7 +2539,7 @@ ReturnValue Character::do_cdeposit(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->world[in_room].number != DC::SORPIGAL_BANK_ROOM)
+  if (dc_->world[in_room]->number_ != DC::SORPIGAL_BANK_ROOM)
   {
     send(u"This can only be done at the Sorpigal bank.\r\n"_s);
     return ReturnValue::eFAILURE;
@@ -2589,7 +2589,7 @@ ReturnValue Character::do_cdeposit(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString arg1;
   if (!ch->clan)
@@ -2602,7 +2602,7 @@ ReturnValue do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln(u"You don't have the right to withdraw $B$5gold$R from your clan's account."_s);
     return ReturnValue::eFAILURE;
   }
-  if (dc_->world[ch->in_room].number != DC::SORPIGAL_BANK_ROOM)
+  if (dc_->world[ch->in_room]->number_ != DC::SORPIGAL_BANK_ROOM)
   {
     ch->sendln(u"This can only be done at the Sorpigal bank."_s);
     return ReturnValue::eFAILURE;
@@ -2651,14 +2651,14 @@ ReturnValue do_cwithdraw(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_cbalance(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_cbalance(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (!ch->clan)
   {
     ch->sendln(u"You not a member of a clan."_s);
     return ReturnValue::eFAILURE;
   }
-  if (dc_->world[ch->in_room].number != DC::SORPIGAL_BANK_ROOM)
+  if (dc_->world[ch->in_room]->number_ != DC::SORPIGAL_BANK_ROOM)
   {
     ch->sendln(u"This can only be done at the Sorpigal bank."_s);
     return ReturnValue::eFAILURE;
@@ -2778,7 +2778,7 @@ qint32 count_plrs(qint32 zone, qint32 clan)
 
   qint32 i = std::count_if(character_list.begin(), character_list.end(), [&zone, &clan](CharacterPtr const &tmpch)
                            {
-      if (tmpch->isPlayer() && dc_->world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
+      if (tmpch->isPlayer() && dc_->world[tmpch->in_room]->zone == zone && clan == tmpch->clan &&
 	  tmpch->getLevel() < 100 && tmpch->getLevel() > 10)
       return true;
       else
@@ -3003,9 +3003,9 @@ void pk_check(CharacterPtr ch, CharacterPtr victim)
   for (plc = pulse_list; plc; plc = pln)
   {
     pln = plc->next;
-    if (plc->clan1 == ch->clan && plc->clan2 == victim->clan && dc_->world[ch->in_room].zone == plc->zone)
+    if (plc->clan1 == ch->clan && plc->clan2 == victim->clan && dc_->world[ch->in_room]->zone == plc->zone)
       plc->clan1points += 2;
-    else if (plc->clan1 == victim->clan && plc->clan2 == ch->clan && dc_->world[ch->in_room].zone == plc->zone)
+    else if (plc->clan1 == victim->clan && plc->clan2 == ch->clan && dc_->world[ch->in_room]->zone == plc->zone)
       plc->clan2points += 2;
     check_victory(plc);
   }
@@ -3017,7 +3017,7 @@ bool can_lose(takeover_pulse_data *take)
 
   auto result = std::find_if(character_list.begin(), character_list.end(), [&take](CharacterPtr const &ch)
                              {
-		if (ch->isPlayer() && dc_->world[ch->in_room].zone == take->zone
+		if (ch->isPlayer() && dc_->world[ch->in_room]->zone == take->zone
 				&& (take->clan1 == ch->clan || take->clan2 == ch->clan)) {
 			return true;
 		} else {
@@ -3070,7 +3070,7 @@ void DC::pulse_takeover(void)
   }
 }
 
-ReturnValue Character::do_clanarea(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_clanarea(QStringList arguments, cmd_t cmd)
 {
   bool clanless_challenge = false;
 
@@ -3335,7 +3335,7 @@ bool others_clan_room(CharacterPtr ch, Room *room)
   }
 
   // room is not a clan room
-  if (isSet(room->room_flags, CLAN_ROOM) == false)
+  if (isSet(room->room_flags_, CLAN_ROOM) == false)
   {
     return false;
   }

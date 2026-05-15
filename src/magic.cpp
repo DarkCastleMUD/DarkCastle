@@ -21,14 +21,7 @@
 //    - Apoc.
 
 #include "DC/DC.h"
-
-constexpr auto BEACON_OBJ_NUMBER = 405;
-
-qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type);
-
-void update_pos(CharacterPtr victim);
-bool many_charms(CharacterPtr ch);
-bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
+#include <qtypes.h>
 
 bool player_resist_reallocation(CharacterPtr victim, qint32 skill)
 {
@@ -112,10 +105,10 @@ bool can_heal(CharacterPtr ch, CharacterPtr victim, qint32 spellnum)
 
   // You cannot heal an elemental from "conjure elemental"
   if (victim->isNonPlayer() &&
-      (dc_->mob_index_[victim->mobdata->nr].vnum() == 88 ||
-       dc_->mob_index_[victim->mobdata->nr].vnum() == 89 ||
-       dc_->mob_index_[victim->mobdata->nr].vnum() == 90 ||
-       dc_->mob_index_[victim->mobdata->nr].vnum() == 91))
+      (dc_->mob_index_[victim->mobdata->nr]->vnum() == 88 ||
+       dc_->mob_index_[victim->mobdata->nr]->vnum() == 89 ||
+       dc_->mob_index_[victim->mobdata->nr]->vnum() == 90 ||
+       dc_->mob_index_[victim->mobdata->nr]->vnum() == 91))
   {
     ch->sendln(u"The heavy magics surrounding this being prevent healing."_s);
     return false;
@@ -172,11 +165,11 @@ bool resist_spell(CharacterPtr ch, qint32 skill)
 
 /* MAGIC MISSILE */
 
-qint32 spell_magic_missile(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_magic_missile(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 count = 1;
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
 
   set_cantquit(ch, victim);
@@ -201,13 +194,13 @@ qint32 spell_magic_missile(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* CHILL TOUCH */
 
-qint32 spell_chill_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_chill_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   qint32 dam = 300;
   qint32 save;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
-  qint32 retval;
+  ReturnValues retval;
 
   if (level > 200)
     retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_CHILL_TOUCH, weap_spell);
@@ -249,7 +242,7 @@ qint32 spell_chill_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* BURNING HANDS */
 
-qint32 spell_burning_hands(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_burning_hands(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   set_cantquit(ch, victim);
@@ -262,7 +255,7 @@ qint32 spell_burning_hands(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* SHOCKING GRASP */
 
-qint32 spell_shocking_grasp(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_shocking_grasp(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   dam = 130;
@@ -271,7 +264,7 @@ qint32 spell_shocking_grasp(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* LIGHTNING BOLT */
 
-qint32 spell_lightning_bolt(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_lightning_bolt(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -285,8 +278,8 @@ qint32 spell_lightning_bolt(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* COLOUR SPRAY */
 
-qint32 spell_colour_spray(quint8 level, CharacterPtr ch, CharacterPtr victim,
-                          ObjectPtr obj, qint32 skill)
+ReturnValues spell_colour_spray(quint8 level, CharacterPtr ch, CharacterPtr victim,
+                                ObjectPtr obj, qint32 skill)
 {
   bool victim_dazzled = false;
   qint32 dam;
@@ -300,8 +293,8 @@ qint32 spell_colour_spray(quint8 level, CharacterPtr ch, CharacterPtr victim,
     victim_dazzled = true;
   }
 
-  qint32 retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY,
-                         weap_spell);
+  ReturnValues retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY,
+                               weap_spell);
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -327,7 +320,7 @@ qint32 spell_colour_spray(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
 /* DROWN */
 
-qint32 spell_drown(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_drown(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam, retval;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -362,11 +355,11 @@ qint32 spell_drown(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 /* ENERGY DRAIN */
 // Drains XP, MANA, HP - caster gains HP and MANA -- Currently MOB ONLY
 
-qint32 spell_energy_drain(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_energy_drain(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 mult = victim->exp / 20;
   mult = MIN(10000, mult);
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
     return ReturnValue::eFAILURE;
 
   set_cantquit(ch, victim);
@@ -383,12 +376,12 @@ qint32 spell_energy_drain(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 /* SOULDRAIN */
 // Drains MANA - caster gains MANA
 
-qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 mana;
   set_cantquit(ch, victim);
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You cannot do this in a safe room!"_s);
     return ReturnValue::eFAILURE;
@@ -407,7 +400,7 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
     act_to_character("$N resists your attempt to souldrain $M!", ch, nullptr, victim, 0);
     act_to_room("$N resists $n's attempt to souldrain $M!", ch, nullptr, victim, NOTVICT);
     act_to_victim("You resist $n's attempt to souldrain you!", ch, nullptr, victim, 0);
-    qint32 retval;
+    ReturnValues retval;
     if (victim->isNonPlayer() && !victim->fighting)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
@@ -429,7 +422,7 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   if (GET_MANA(ch) > GET_MAX_MANA(ch))
     GET_MANA(ch) = GET_MAX_MANA(ch);
 
-  qint32 retval;
+  ReturnValues retval;
   if (victim->isNonPlayer() && !victim->fighting)
   {
     retval = attack(victim, ch, TYPE_UNDEFINED, WEAR_WIELD);
@@ -442,7 +435,7 @@ qint32 spell_souldrain(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* VAMPIRIC TOUCH */
 
-qint32 spell_vampiric_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_vampiric_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -451,7 +444,7 @@ qint32 spell_vampiric_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   qint32 adam = dam_percent(skill, 225); // Actual damage, for drainy purposes.
 
   qint32 i = victim->getHP();
-  qint32 retval = damage(ch, victim, dam, TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
+  ReturnValues retval = damage(ch, victim, dam, TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
   if (!SOMEONE_DIED(retval) && victim->getHP() >= i)
     return retval;
 
@@ -469,13 +462,13 @@ qint32 spell_vampiric_touch(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* METEOR SWARM */
 
-qint32 spell_meteor_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_meteor_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 600;
-  qint32 retval;
+  ReturnValues retval;
 
   if (level > 200)
     retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_METEOR_SWARM, weap_spell);
@@ -498,13 +491,13 @@ qint32 spell_meteor_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* FIREBALL */
 
-qint32 spell_fireball(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_fireball(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 340;
-  qint32 retval;
+  ReturnValues retval;
 
   if (level > 200)
     retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIREBALL, weap_spell);
@@ -533,7 +526,7 @@ qint32 spell_fireball(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* SPARKS */
 
-qint32 spell_sparks(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_sparks(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -544,10 +537,10 @@ qint32 spell_sparks(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
 /* HOWL */
 
-qint32 spell_howl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_howl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   CharacterPtr tmp_char;
-  qint32 retval;
+  ReturnValues retval;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
 
@@ -565,7 +558,7 @@ qint32 spell_howl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
   if (isSet(retval, ReturnValue::eEXTRA_VALUE))
     return retval;
 
-  for (tmp_char = dc_->world[ch->in_room].people_; tmp_char;
+  for (tmp_char = dc_->world[ch->in_room]->people_; tmp_char;
        tmp_char = tmp_char->next_in_room)
   {
 
@@ -599,7 +592,7 @@ qint32 spell_howl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
 /* HOLY AEGIS/UNHOLY AEGIS*/
 
-qint32 spell_aegis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_aegis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   qint32 spl = GET_CLASS(ch) == CLASS_ANTI_PAL ? SPELL_U_AEGIS : SPELL_AEGIS;
@@ -627,7 +620,7 @@ qint32 spell_aegis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
 /* ARMOUR */
 
-qint32 spell_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (victim->affected_by_spell(SPELL_ARMOR))
@@ -651,7 +644,7 @@ qint32 spell_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
 /* STONE SHIELD */
 
-qint32 spell_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   QString buf;
@@ -682,7 +675,7 @@ qint32 spell_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -718,21 +711,21 @@ qint32 cast_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -790,7 +783,7 @@ qint32 cast_iridescent_aura(quint8 level, CharacterPtr ch, QString arg, qint32 t
 
 /* GREATER STONE SHIELD */
 
-qint32 spell_greater_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_greater_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   QString buf;
@@ -821,7 +814,7 @@ qint32 spell_greater_stone_shield(quint8 level, CharacterPtr ch, CharacterPtr vi
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_greater_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_greater_stone_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -859,7 +852,7 @@ qint32 cast_greater_stone_shield(quint8 level, CharacterPtr ch, QString arg, qin
 
 /* EARTHQUAKE */
 
-qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   bool capsize = false, underwater = false;
   qint32 dam = 0, retval = ReturnValue::eSUCCESS, weap_spell = obj ? WEAR_WIELD : 0, ch_zone = 0, tmp_vict_zone = {};
@@ -899,15 +892,15 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
       break;
     }
 
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
 
     try
     {
-      ch_zone = dc_->world[ch->in_room].zone;
-      tmp_vict_zone = dc_->world[tmp_victim->in_room].zone;
+      ch_zone = dc_->world[ch->in_room]->zone;
+      tmp_vict_zone = dc_->world[tmp_victim->in_room]->zone;
     }
     catch (...)
     {
@@ -953,7 +946,7 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
       if (dam > 0)
       {
-        qint32 retval2 = {};
+        ReturnValues retval2 = {};
         retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
         if (isSet(retval2, ReturnValue::eVICT_DIED))
@@ -980,16 +973,16 @@ qint32 spell_earthquake(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* LIFE LEECH */
 
-qint32 spell_life_leech(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_life_leech(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam, retval = ReturnValue::eSUCCESS;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
   CharacterPtr tmp_victim, temp;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
     return ReturnValue::eFAILURE;
   /*  double o = 0.0, m = 0.0, avglevel = 0.0;
-   for (tmp_victim = dc_->world[ch->in_room].people_;tmp_victim;tmp_victim = tmp_victim->next_in_room)
+   for (tmp_victim = dc_->world[ch->in_room]->people_;tmp_victim;tmp_victim = tmp_victim->next_in_room)
    if (!ARE_GROUPED(ch, tmp_victim) && ch != tmp_victim)
    { o++; m++; avglevel *= o-1; avglevel += tmp_victim->getLevel(); avglevel /= o;}
    else m++;
@@ -1001,7 +994,7 @@ qint32 spell_life_leech(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
    qint32 max = (qint32)(o * 50 * ( m / pow(m, powmod*m)));
    max += dc_->number(-10,10);
    */
-  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room]->people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) && (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
@@ -1063,11 +1056,11 @@ void do_solar_blind(CharacterPtr ch, CharacterPtr tmp_victim, qint32 skill)
 
 /* SOLAR GATE */
 
-qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 i;
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr tmp_victim, temp;
   qint32 orig_room;
 
@@ -1101,7 +1094,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   // we also now use .people_ instead of the character_list -pir 12/26
 
-  for (tmp_victim = dc_->world[orig_room].people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
+  for (tmp_victim = dc_->world[orig_room]->people_; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((orig_room == tmp_victim->in_room) && (tmp_victim != ch) &&
@@ -1125,12 +1118,12 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   {
     if (CAN_GO(ch, i))
     {
-      for (tmp_victim = dc_->world[dc_->world[orig_room].dir_option[i]->to_room].people_;
+      for (tmp_victim = dc_->world[dc_->world[orig_room].dir_option[i]->to_room]->people_;
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
-        if (tmp_victim->isNonPlayer() && dc_->mob_index_[tmp_victim->mobdata->nr].vnum() >= 2300 &&
-            dc_->mob_index_[tmp_victim->mobdata->nr].vnum() <= 2399)
+        if (tmp_victim->isNonPlayer() && dc_->mob_index_[tmp_victim->mobdata->nr]->vnum() >= 2300 &&
+            dc_->mob_index_[tmp_victim->mobdata->nr]->vnum() <= 2399)
         {
           ch->sendln(u"The clan hall's enchantments absorbs part of your spell."_s);
           continue;
@@ -1197,7 +1190,7 @@ qint32 spell_solar_gate(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* GROUP RECALL */
 
-qint32 spell_group_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_group_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 chance = {};
 
@@ -1225,7 +1218,7 @@ qint32 spell_group_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -1253,13 +1246,13 @@ qint32 spell_group_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* GROUP FLY */
 
-qint32 spell_group_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_group_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
 
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -1280,7 +1273,7 @@ qint32 spell_group_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* HEROES FEAST */
 
-qint32 spell_heroes_feast(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_heroes_feast(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 result = 15 + skill / 6;
 
@@ -1293,7 +1286,7 @@ qint32 spell_heroes_feast(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -1314,13 +1307,13 @@ qint32 spell_heroes_feast(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* GROUP SANCTUARY */
 
-qint32 spell_group_sanc(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_group_sanc(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
 
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -1340,13 +1333,13 @@ qint32 spell_group_sanc(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* HEAL SPRAY */
 
-qint32 spell_heal_spray(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_heal_spray(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
 
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -1362,17 +1355,17 @@ qint32 spell_heal_spray(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* FIRESTORM */
 
-qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam = {};
-  qint32 retval = ReturnValue::eSUCCESS;
-  qint32 retval2 = {};
+  ReturnValues retval = ReturnValue::eSUCCESS;
+  ReturnValues retval2 = {};
   CharacterPtr next_victim = {};
 
   ch->sendln(u"$B$4Fire$R falls from the heavens!"_s);
   act_to_room("$n makes $B$4fire$R fall from the heavens!", ch, 0, 0, 0);
 
-  for (auto victim = dc_->world[ch->in_room].people_; victim; victim = next_victim)
+  for (auto victim = dc_->world[ch->in_room]->people_; victim; victim = next_victim)
   {
     next_victim = victim->next_in_room;
 
@@ -1410,7 +1403,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -1425,7 +1418,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
     try
     {
-      if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
+      if (dc_->world[ch->in_room]->zone == dc_->world[tmp_victim->in_room]->zone)
       {
         tmp_victim->sendln(u"You feel a HOT blast of air."_s);
       }
@@ -1442,7 +1435,7 @@ qint32 spell_firestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* DISPEL EVIL */
 
-qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (obj && obj->in_room && obj->flags_.value[0] == SPELL_DESECRATE)
   { // desecrate object
@@ -1456,7 +1449,7 @@ qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
         victim = pal;
       }
       else
-        pal->send(u"You sense your desecration of %s has been destroyed!"_s.arg(dc_->world[obj->in_room].name));
+        pal->send(u"You sense your desecration of %s has been destroyed!"_s.arg(dc_->world[obj->in_room]->name_));
     }
     ch->sendln(u"The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!"_s);
     act_to_room("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, NOTVICT);
@@ -1491,7 +1484,7 @@ qint32 spell_dispel_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* DISPEL GOOD */
 
-qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (obj && obj->in_room && obj->flags_.value[0] == SPELL_CONSECRATE)
   { // consecrate object
@@ -1505,7 +1498,7 @@ qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
         victim = pal;
       }
       else
-        pal->send(u"You sense your consecration of %s has been destroyed!"_s.arg(dc_->world[obj->in_room].name));
+        pal->send(u"You sense your consecration of %s has been destroyed!"_s.arg(dc_->world[obj->in_room]->name_));
     }
     ch->sendln(u"Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!"_s);
     act_to_room("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, NOTVICT);
@@ -1540,7 +1533,7 @@ qint32 spell_dispel_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* CALL LIGHTNING */
 
-qint32 spell_call_lightning(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_call_lightning(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   extern weather_data weather_info;
@@ -1556,7 +1549,7 @@ qint32 spell_call_lightning(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* HARM */
 
-qint32 spell_harm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_harm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -1568,7 +1561,7 @@ qint32 spell_harm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
 /* POWER HARM */
 
-qint32 spell_power_harm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_power_harm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -1586,7 +1579,7 @@ qint32 spell_power_harm(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* DIVINE FURY */
 
-qint32 spell_divine_fury(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_divine_fury(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   set_cantquit(ch, victim);
@@ -1603,7 +1596,7 @@ qint32 spell_divine_fury(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 /* TELEPORT */
 
 // TODO - make this spell have an effect based on skill level
-qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   auto &arena = dc_->arena_;
   room_t to_room;
@@ -1627,7 +1620,7 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[victim->in_room].room_flags, TELEPORT_BLOCK) ||
+  if (isSet(dc_->world[victim->in_room]->room_flags_, TELEPORT_BLOCK) ||
       IS_AFFECTED(victim, AFF_SOLIDITY))
   {
     ch->sendln(u"You find yourself unable to."_s);
@@ -1649,14 +1642,14 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     else
     {
       // Find a valid room in whatever arena area the ch is in
-      qint32 cur_zone = dc_->world[ch->in_room].zone;
+      qint32 cur_zone = dc_->world[ch->in_room]->zone;
       qint32 cur_zone_bottom = dc_->zones.value(cur_zone).getRealBottom();
       qint32 cur_zone_top = dc_->zones.value(cur_zone).getRealTop();
 
       do
       {
         to_room = dc_->number(cur_zone_bottom, cur_zone_top);
-      } while (real_room(to_room) == DC::NOWHERE);
+      } while (real_room(to_room) == INVALID_ROOM);
     }
   }
   else
@@ -1665,18 +1658,18 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     {
       to_room = number<room_t>(1, dc_->top_of_world);
     } while (!dc_->rooms.contains(to_room) ||
-             isSet(dc_->world[to_room].room_flags, PRIVATE) ||
-             isSet(dc_->world[to_room].room_flags, IMP_ONLY) ||
-             isSet(dc_->world[to_room].room_flags, NO_TELEPORT) ||
-             isSet(dc_->world[to_room].room_flags, ARENA) ||
+             isSet(dc_->world[to_room]->room_flags_, PRIVATE) ||
+             isSet(dc_->world[to_room]->room_flags_, IMP_ONLY) ||
+             isSet(dc_->world[to_room]->room_flags_, NO_TELEPORT) ||
+             isSet(dc_->world[to_room]->room_flags_, ARENA) ||
              dc_->world[to_room].sector_type == SECT_UNDERWATER ||
              dc_->zones.value(dc_->world[to_room].zone).isNoTeleport() ||
              ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones.value(dc_->world[to_room].zone).isTown()) : false) ||
-             (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room].room_flags, CLAN_ROOM) ||
+             (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room]->room_flags_, CLAN_ROOM) ||
                                                     (to_room >= 1900 && to_room <= 1999))) ||
              // NPCs can only teleport within the same continent
              (victim->isNonPlayer() &&
-              dc_->zones.value(dc_->world[victim->in_room].zone).continent != dc_->zones.value(dc_->world[to_room].zone).continent));
+              dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[to_room].zone).continent));
   }
 
   if ((victim->isNonPlayer()) && (!ch->isNonPlayer()))
@@ -1692,7 +1685,7 @@ qint32 spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* BLESS */
 
-qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (!ch && (!victim || !obj))
@@ -1736,11 +1729,11 @@ qint32 spell_bless(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
 /* PARALYZE */
 
-qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
 
   set_cantquit(ch, victim);
   if (victim->affected_by_spell(SPELL_PARALYZE))
@@ -1756,7 +1749,7 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   {
     if (ch->dc_->number(1, 6) < 5)
     {
-      qint32 retval = {};
+      ReturnValues retval = {};
       if (ch->dc_->number(0, 1))
       {
         ch->sendln(u"The combined magics fizzle!"_s);
@@ -1880,10 +1873,10 @@ qint32 spell_paralyze(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* BLINDNESS */
 
-qint32 spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  qint32 retval;
+  ReturnValues retval;
   set_cantquit(ch, victim);
 
   if (victim->affected_by_spell(SPELL_VILLAINY) && victim->affected_by_spell(SPELL_VILLAINY)->modifier >= 90)
@@ -1946,7 +1939,7 @@ qint32 spell_blindness(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* CREATE FOOD */
 
-qint32 spell_create_food(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_create_food(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ObjectPtr tmp_obj;
 
@@ -1966,7 +1959,7 @@ qint32 spell_create_food(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* CREATE WATER */
 
-qint32 spell_create_water(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_create_water(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 water;
   if (!ch || !obj)
@@ -2001,7 +1994,7 @@ qint32 spell_create_water(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* REMOVE PARALYSIS */
 
-qint32 spell_remove_paralysis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_remove_paralysis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (!victim)
   {
@@ -2024,7 +2017,7 @@ qint32 spell_remove_paralysis(quint8 level, CharacterPtr ch, CharacterPtr victim
 
 /* REMOVE BLIND */
 
-qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (!victim)
   {
@@ -2073,7 +2066,7 @@ qint32 spell_remove_blind(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* CURE CRITIC */
 
-qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healpoints;
   QString buf, dammsg;
@@ -2143,7 +2136,7 @@ qint32 spell_cure_critic(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* CURE LIGHT */
 
-qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healpoints;
   QString buf, dammsg;
@@ -2209,11 +2202,11 @@ qint32 spell_cure_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* CURSE */
 
-qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   auto &arena = dc_->arena_;
   affected_type af;
-  qint32 retval;
+  ReturnValues retval;
 
   if (obj && obj != ch->equipment[WEAR_WIELD] && obj != ch->equipment[WEAR_SECOND_WIELD])
   { // hack for weapon spells
@@ -2338,7 +2331,7 @@ qint32 spell_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
 /* DETECT EVIL */
 
-qint32 spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2371,7 +2364,7 @@ qint32 spell_detect_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* DETECT GOOD */
 
-qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2404,7 +2397,7 @@ qint32 spell_detect_good(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* true SIGHT */
 
-qint32 spell_TRUE_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_TRUE_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2433,7 +2426,7 @@ qint32 spell_TRUE_sight(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* DETECT INVISIBILITY */
 
-qint32 spell_detect_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_detect_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2464,7 +2457,7 @@ qint32 spell_detect_invisibility(quint8 level, CharacterPtr ch, CharacterPtr vic
 
 /* INFRAVISION */
 
-qint32 spell_infravision(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_infravision(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2496,7 +2489,7 @@ qint32 spell_infravision(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* DETECT MAGIC */
 
-qint32 spell_detect_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_detect_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2524,7 +2517,7 @@ qint32 spell_detect_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* HASTE */
 
-qint32 spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -2554,7 +2547,7 @@ qint32 spell_haste(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 /* DETECT POISON */
 
 // TODO - make this use skill for addtional effects
-qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (!ch && (!victim || !obj))
   {
@@ -2598,7 +2591,7 @@ qint32 spell_detect_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* ENCHANT ARMOR - CURRENTLY INACTIVE */
 
-qint32 spell_enchant_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_enchant_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   /*qint32 i;*/
 
@@ -2633,7 +2626,7 @@ qint32 spell_enchant_armor(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* ENCHANT WEAPON - CURRENTLY INACTIVE */
 
-qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (!ch || !obj)
   {
@@ -2689,7 +2682,7 @@ qint32 spell_enchant_weapon(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* MANA - Potion & Immortal Only */
 
-qint32 spell_mana(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_mana(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 mana;
 
@@ -2711,7 +2704,7 @@ qint32 spell_mana(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
 /* HEAL */
 
-qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healy;
   QString buf, dammsg;
@@ -2783,7 +2776,7 @@ qint32 spell_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr 
 
 /* POWER HEAL */
 
-qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healy;
   QString buf, dammsg;
@@ -2849,7 +2842,7 @@ qint32 spell_power_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* FULL HEAL */
 
-qint32 spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   assert(victim);
   qint32 healamount = {};
@@ -2916,7 +2909,7 @@ qint32 spell_full_heal(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* INVISIBILITY */
 
-qint32 spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   assert((ch && obj) || victim);
@@ -2961,7 +2954,7 @@ qint32 spell_invisibility(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* LOCATE OBJECT */
 
-qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_locate_object(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ObjectPtr i;
   QString name;
@@ -3069,10 +3062,10 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
         dc_sprintf(buf, "%s is in %s.\r\n", i->short_description,
                    i->in_obj->short_description);
       }
-      else if (i->in_room != DC::NOWHERE)
+      else if (i->in_room != INVALID_ROOM)
       {
         dc_sprintf(buf, "%s is in %s.\r\n", i->short_description,
-                   dc_->world[i->in_room].name);
+                   dc_->world[i->in_room]->name_);
       }
       else if (i->equipped_by != nullptr)
       {
@@ -3105,7 +3098,7 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
 
   if (ch->isImmortalPlayer())
   {
-    ch->send(fmt::format("Skipped god:{} other:{} nolocate:{} nosee:{} DC::NOWHERE:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
+    ch->send(fmt::format("Skipped god:{} other:{} nolocate:{} nosee:{} INVALID_ROOM:{}\r\n", skipped_god, skipped_other, skipped_nolocate, skipped_nosee, skipped_nowhere));
   }
 
   return ReturnValue::eSUCCESS;
@@ -3113,10 +3106,10 @@ qint32 spell_locate_object(quint8 level, CharacterPtr ch, QString arg, Character
 
 /* POISON */
 
-qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   bool endy = false;
 
   if (victim)
@@ -3181,7 +3174,7 @@ qint32 spell_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
 /* PROTECTION FROM EVIL */
 
-qint32 spell_protection_from_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_protection_from_evil(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   assert(victim);
@@ -3221,7 +3214,7 @@ qint32 spell_protection_from_evil(quint8 level, CharacterPtr ch, CharacterPtr vi
 
 /* PROTECTION FROM GOOD */
 
-qint32 spell_protection_from_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_protection_from_good(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   assert(victim);
@@ -3254,7 +3247,7 @@ qint32 spell_protection_from_good(quint8 level, CharacterPtr ch, CharacterPtr vi
 
 /* REMOVE CURSE */
 
-qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, quint64 mana_cost)
+ReturnValues spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, quint64 mana_cost)
 {
   qint32 j;
   assert(ch && (victim || obj));
@@ -3265,7 +3258,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     {
       act_to_character("$p briefly glows $3blue$R.", ch, obj, 0, 0);
       REMOVE_BIT(obj->flags_.extra_flags, ITEM_NODROP);
-      if (dc_->obj_index_[obj->item_number].vnum() == 514)
+      if (dc_->obj_index_[obj->item_number]->vnum() == 514)
       {
         qint32 i = {};
         for (i = {}; i < obj->num_affects; i++)
@@ -3316,7 +3309,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
       {
         if (curses_removed++)
           GET_MANA(victim) -= mana_cost;
-        if (skill > 70 && dc_->obj_index_[obj->item_number].vnum() == 514)
+        if (skill > 70 && dc_->obj_index_[obj->item_number]->vnum() == 514)
         {
           qint32 i = {};
           for (i = {}; i < obj->num_affects; i++)
@@ -3347,7 +3340,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
           GET_MANA(victim) -= mana_cost;
         act_to_room("$p carried by $n briefly glows $3blue$R.", victim, obj, 0, 0);
         act_to_character("$p briefly glows $3blue$R.", victim, obj, 0, 0);
-        if (skill > 70 && dc_->obj_index_[obj->item_number].vnum() == 514)
+        if (skill > 70 && dc_->obj_index_[obj->item_number]->vnum() == 514)
         {
           qint32 i = {};
           for (i = {}; i < obj->num_affects; i++)
@@ -3384,7 +3377,7 @@ qint32 spell_remove_curse(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* REMOVE POISON */
 
-qint32 spell_remove_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_remove_poison(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   assert(ch && (victim || obj));
 
@@ -3464,7 +3457,7 @@ bool find_spell_shield(CharacterPtr ch, CharacterPtr victim)
 
 /* FIRESHIELD */
 
-qint32 spell_fireshield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_fireshield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -3488,13 +3481,13 @@ qint32 spell_fireshield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* MEND GOLEM */
 
-qint32 spell_mend_golem(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_mend_golem(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 heal;
   QString dammsg;
-  follow_type *fol;
+  CharacterPtr *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && dc_->mob_index_[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && dc_->mob_index_[fol->follower->mobdata->nr]->vnum() == 8)
     {
       heal = (qint32)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = dc_->number(heal - (heal / 10), heal + (heal / 10));
@@ -3520,8 +3513,8 @@ qint32 spell_mend_golem(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* CAMOUFLAGE (for items) */
 
-qint32 cast_camouflague(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_camouflague(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -3544,7 +3537,7 @@ qint32 cast_camouflague(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_camouflague(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_camouflague(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3558,8 +3551,8 @@ qint32 cast_camouflague(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* FARSIGHT (for items) */
 
-qint32 cast_farsight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_farsight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -3582,7 +3575,7 @@ qint32 cast_farsight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_farsight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_farsight(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3596,8 +3589,8 @@ qint32 cast_farsight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* FREEFLOAT (for items) */
 
-qint32 cast_freefloat(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_freefloat(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -3620,7 +3613,7 @@ qint32 cast_freefloat(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_freefloat(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       ;
     spell_freefloat(level, ch, tar_ch, 0, skill);
@@ -3635,8 +3628,8 @@ qint32 cast_freefloat(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* INSOMNIA (for items) */
 
-qint32 cast_insomnia(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_insomnia(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -3658,7 +3651,7 @@ qint32 cast_insomnia(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_insomnia(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_insomnia(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3672,8 +3665,8 @@ qint32 cast_insomnia(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* SHADOWSLIP (for items) */
 
-qint32 cast_shadowslip(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_shadowslip(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -3696,7 +3689,7 @@ qint32 cast_shadowslip(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_shadowslip(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_shadowslip(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3710,8 +3703,8 @@ qint32 cast_shadowslip(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* SANCTUARY (for items) */
 
-qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -3728,14 +3721,14 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     }
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -3782,7 +3775,7 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_sanctuary(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch;
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch;
          tar_ch = tar_ch->next_in_room)
       spell_sanctuary(level, ch, tar_ch, 0, skill);
     return ReturnValue::eSUCCESS;
@@ -3797,7 +3790,7 @@ qint32 cast_sanctuary(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 /* CAMOUFLAGE */
 
 // TODO - make this have effects based on skill
-qint32 spell_camouflague(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_camouflague(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (victim->affected_by_spell(SPELL_CAMOUFLAGE))
@@ -3821,7 +3814,7 @@ qint32 spell_camouflague(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 /* FARSIGHT */
 
 // TODO - make this gain effects based on skill
-qint32 spell_farsight(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_farsight(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   affected_type af;
   if (victim->affected_by_spell(SPELL_FARSIGHT))
@@ -3844,7 +3837,7 @@ qint32 spell_farsight(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 /* FREEFLOAT */
 
 // TODO - make this gain effects based on skill
-qint32 spell_freefloat(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_freefloat(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   affected_type af;
   if (victim->affected_by_spell(SPELL_FREEFLOAT))
@@ -3867,7 +3860,7 @@ qint32 spell_freefloat(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 /* INSOMNIA */
 
 // TODO - make this use skill
-qint32 spell_insomnia(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_insomnia(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   affected_type af;
 
@@ -3891,7 +3884,7 @@ qint32 spell_insomnia(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 /* SHADOWSLIP */
 
 // TODO - make this use skill
-qint32 spell_shadowslip(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_shadowslip(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   affected_type af;
   if (victim->affected_by_spell(SPELL_SHADOWSLIP))
@@ -3913,7 +3906,7 @@ qint32 spell_shadowslip(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* SANCTUARY */
 
-qint32 spell_sanctuary(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_sanctuary(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -3944,11 +3937,11 @@ qint32 spell_sanctuary(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* SLEEP */
 
-qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
 
   set_cantquit(ch, victim);
 
@@ -4056,7 +4049,7 @@ qint32 spell_sleep(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr
 
 /* STRENGTH */
 
-qint32 spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   affected_typePtr cur_af;
@@ -4112,7 +4105,7 @@ qint32 spell_strength(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* VENTRILOQUATE */
 
-qint32 spell_ventriloquate(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_ventriloquate(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   /* Actual spell resides in cast_ventriloquate */
   return ReturnValue::eSUCCESS;
@@ -4120,7 +4113,7 @@ qint32 spell_ventriloquate(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* WORD OF RECALL */
 
-qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 location;
   QString buf;
@@ -4185,7 +4178,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
       location = real_room(victim->hometown);
 
     // make sure they aren't recalling into someone's chall
-    if (isSet(dc_->world[location].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -4215,7 +4208,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[location].room_flags, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln(u"No recalling into a clan hall whilst Champion, go to the Tavern!"_s);
     location = real_room(START_ROOM);
@@ -4226,7 +4219,7 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     location = real_room(START_ROOM);
   }
 
-  if (dc_->zones.value(dc_->world[victim->in_room].zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
+  if (dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
   {
     if (GET_MANA(victim) < use_mana(victim, skill))
     {
@@ -4272,13 +4265,13 @@ qint32 spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* WIZARD EYE */
 
-qint32 spell_wizard_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_wizard_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 target;
   qint32 original_loc;
   assert(ch && victim);
 
-  if (isSet(dc_->world[victim->in_room].room_flags, NO_MAGIC) ||
+  if (isSet(dc_->world[victim->in_room]->room_flags_, NO_MAGIC) ||
       (victim->isImmortalPlayer() && !ch->isImmortalPlayer()))
   {
     ch->sendln(u"Your vision is too clouded to make out anything."_s);
@@ -4319,7 +4312,7 @@ qint32 spell_wizard_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* EAGLE EYE */
 
-qint32 spell_eagle_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_eagle_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 target;
   qint32 original_loc;
@@ -4368,13 +4361,13 @@ qint32 spell_eagle_eye(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* SUMMON */
 
-qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   quint32 target;
-  qint32 retval;
+  ReturnValues retval;
   assert(ch && victim);
 
-  if (isSet(dc_->world[victim->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[victim->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"That person is in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -4397,8 +4390,8 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
     return ReturnValue::eFAILURE;
 
   if ((victim->isNonPlayer() && ch->getLevel() < IMPLEMENTER) ||
-      isSet(dc_->world[victim->in_room].room_flags, PRIVATE) ||
-      isSet(dc_->world[victim->in_room].room_flags, NO_SUMMON))
+      isSet(dc_->world[victim->in_room]->room_flags_, PRIVATE) ||
+      isSet(dc_->world[victim->in_room]->room_flags_, NO_SUMMON))
   {
     ch->sendln(u"You have failed to summon your target!"_s);
     return ReturnValue::eFAILURE;
@@ -4424,13 +4417,13 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
+  if (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM) || (ch->in_room >= 1900 && ch->in_room <= 1999)))
   {
     ch->sendln(u"You cannot summon a Champion here."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->zones.value(dc_->world[ch->in_room].zone).continent != dc_->zones.value(dc_->world[victim->in_room].zone).continent)
+  if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[victim->in_room]->zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -4471,7 +4464,7 @@ qint32 spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
 /* CHARM PERSON - no longer operational */
 
-qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   ObjectPtr tempobj;
@@ -4554,7 +4547,7 @@ qint32 spell_charm_person(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* SENSE LIFE */
 
-qint32 spell_sense_life(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_sense_life(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   assert(victim);
@@ -4583,7 +4576,7 @@ void show_obj_class_size_mini(ObjectPtr obj, CharacterPtr ch)
 /* IDENFITY */
 
 // TODO - make this use skill to affect amount of information provided
-qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   QString buf, buf2;
   qint32 i;
@@ -4594,7 +4587,7 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
   if (obj)
   {
-    if (obj->in_room > DC::NOWHERE)
+    if (obj->in_room > INVALID_ROOM)
     {
       // it's an obj in a room.  If it's not a corpse, don't id it
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->flags_.value[3] != 1)
@@ -4808,11 +4801,11 @@ qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
  *                      NPC Spells (Breath Weapons)                          *
  * ************************************************************************* */
 
-qint32 spell_frost_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_frost_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 hpch;
-  qint32 retval;
+  ReturnValues retval;
   /*ObjectPtr frozen;*/
 
   set_cantquit(ch, victim);
@@ -4858,11 +4851,11 @@ qint32 spell_frost_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   return ReturnValue::eSUCCESS;
 }
 
-qint32 spell_acid_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_acid_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 hpch;
-  qint32 retval;
+  ReturnValues retval;
 
   qint32 apply_ac(CharacterPtr ch, qint32 eq_pos);
 
@@ -4909,17 +4902,17 @@ qint32 spell_acid_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   return ReturnValue::eSUCCESS;
 }
 
-qint32 spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
 
   act_to_room("$B$4You are $IENVELOPED$I$B$4 in scorching $B$4flames$R!$R", ch, 0, 0, 0);
 
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -4943,16 +4936,16 @@ qint32 spell_fire_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
       if (SOMEONE_DIED(retval))
         return retval;
     }
-    else if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
+    else if (dc_->world[ch->in_room]->zone == dc_->world[tmp_victim->in_room]->zone)
       tmp_victim->sendln(u"You feel a HOT blast of air."_s);
   }
   return ReturnValue::eSUCCESS;
 }
 
-qint32 spell_gas_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_gas_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
 
   act("You CHOKE on the gas fumes!",
       ch, 0, 0, TO_ROOM, 0);
@@ -4960,7 +4953,7 @@ qint32 spell_gas_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -4978,13 +4971,13 @@ qint32 spell_gas_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
-    else if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
+    else if (dc_->world[ch->in_room]->zone == dc_->world[tmp_victim->in_room]->zone)
       tmp_victim->sendln(u"You wanna choke on the smell in the air."_s);
   }
   return ReturnValue::eSUCCESS;
 }
 
-qint32 spell_lightning_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_lightning_breath(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 hpch;
@@ -5008,8 +5001,8 @@ qint32 spell_lightning_breath(quint8 level, CharacterPtr ch, CharacterPtr victim
 /* FEAR */
 
 // TODO - make this use skill
-qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
-                  ObjectPtr obj, qint32 skill)
+ReturnValues spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
+                        ObjectPtr obj, qint32 skill)
 {
   if (!victim || !ch)
     return ReturnValue::eFAILURE;
@@ -5059,7 +5052,7 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
     return ReturnValue::eFAILURE;
   }
 
-  qint32 retval = {};
+  ReturnValues retval = {};
 
   if (malediction_res(ch, victim, SPELL_FEAR))
   {
@@ -5102,7 +5095,7 @@ qint32 spell_fear(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
 /* REFRESH */
 
-qint32 spell_refresh(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_refresh(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   if (!ch || !victim)
@@ -5132,7 +5125,7 @@ qint32 spell_refresh(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
 
 /* FLY */
 
-qint32 spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   affected_typePtr cur_af;
@@ -5166,7 +5159,7 @@ qint32 spell_fly(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr o
 /* CONTINUAL LIGHT */
 // TODO - make this use skill for multiple effects
 
-qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ObjectPtr tmp_obj;
 
@@ -5211,7 +5204,7 @@ qint32 spell_cont_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 /* ANIMATE DEAD */
 // TODO - make skill level have an affect on this
 
-qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr corpse, qint32 skill)
+ReturnValues spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr corpse, qint32 skill)
 {
   CharacterPtr mob;
   ObjectPtr obj_object, next_obj;
@@ -5341,7 +5334,7 @@ qint32 spell_animate_dead(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* KNOW ALIGNMENT */
 
-qint32 spell_know_alignment(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_know_alignment(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 duration = {};
   affected_type af, *cur_af;
@@ -5381,11 +5374,11 @@ qint32 spell_know_alignment(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* DISPEL MINOR */
 
-qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 rots = {};
   qint32 done = false;
-  qint32 retval;
+  ReturnValues retval;
 
   if (obj && (quint64)obj > 100) /* Trying to dispel_minor an obj */
   {                              // Heh, it passes spell cast through obj now too. Less than 100 = not
@@ -5676,11 +5669,11 @@ qint32 spell_dispel_minor(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* DISPEL MAGIC */
 
-qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, qint32 spell)
+ReturnValues spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, qint32 spell)
 {
   qint32 rots = {};
   qint32 done = false;
-  qint32 retval;
+  ReturnValues retval;
 
   if (!ch || !victim)
   {
@@ -5915,7 +5908,7 @@ qint32 spell_dispel_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* CURE SERIOUS */
 
-qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 healpoints;
   QString buf, dammsg;
@@ -5984,7 +5977,7 @@ qint32 spell_cure_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* CAUSE LIGHT */
 
-qint32 spell_cause_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cause_light(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -6002,7 +5995,7 @@ qint32 spell_cause_light(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* CAUSE CRITICAL */
 
-qint32 spell_cause_critical(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cause_critical(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -6022,7 +6015,7 @@ qint32 spell_cause_critical(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* CAUSE SERIOUS */
 
-qint32 spell_cause_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_cause_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   if (!ch || !victim)
@@ -6040,7 +6033,7 @@ qint32 spell_cause_serious(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* FLAMESTRIKE */
 
-qint32 spell_flamestrike(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_flamestrike(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam, retval;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -6082,7 +6075,7 @@ qint32 spell_flamestrike(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 }
 
 /* IRIDESCENT AURA */
-qint32 spell_iridescent_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_iridescent_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6106,7 +6099,7 @@ qint32 spell_iridescent_aura(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
 /* RESIST COLD */
 
-qint32 spell_resist_cold(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_resist_cold(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (GET_CLASS(ch) == CLASS_PALADIN && ch != victim)
@@ -6135,7 +6128,7 @@ qint32 spell_resist_cold(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* RESIST FIRE */
 
-qint32 spell_resist_fire(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_resist_fire(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6164,7 +6157,7 @@ qint32 spell_resist_fire(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* RESIST MAGIC */
 
-qint32 spell_resist_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_resist_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6193,7 +6186,7 @@ qint32 spell_resist_magic(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* STAUNCHBLOOD */
 
-qint32 spell_staunchblood(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_staunchblood(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6221,7 +6214,7 @@ qint32 spell_staunchblood(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* RESIST ENERGY */
 
-qint32 spell_resist_energy(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_resist_energy(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6249,7 +6242,7 @@ qint32 spell_resist_energy(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* STONE SKIN */
 
-qint32 spell_stone_skin(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_stone_skin(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6281,7 +6274,7 @@ qint32 spell_stone_skin(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* SHIELD */
 
-qint32 spell_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -6317,11 +6310,11 @@ qint32 spell_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
 /* WEAKEN */
 
-qint32 spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   affected_typePtr cur_af;
-  qint32 retval;
+  ReturnValues retval;
   qint32 duration = 0, str = 0, con = {};
   void check_weapon_weights(CharacterPtr ch);
 
@@ -6442,7 +6435,7 @@ qint32 spell_weaken(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 /* MASS INVISIBILITY */
 
 // TODO - make this use skill
-qint32 spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   CharacterPtr tmp_victim;
   affected_type af;
@@ -6453,7 +6446,7 @@ qint32 spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
     return ReturnValue::eFAILURE;
   }
 
-  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim;
+  for (tmp_victim = dc_->world[ch->in_room]->people_; tmp_victim;
        tmp_victim = tmp_victim->next_in_room)
   {
     if (ch->in_room == tmp_victim->in_room)
@@ -6477,7 +6470,7 @@ qint32 spell_mass_invis(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* ACID BLAST */
 
-qint32 spell_acid_blast(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_acid_blast(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 weap_spell = obj ? WEAR_WIELD : 0;
@@ -6488,7 +6481,7 @@ qint32 spell_acid_blast(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* HELLSTREAM */
 
-qint32 spell_hellstream(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_hellstream(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
 
@@ -6514,13 +6507,10 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
   ch_portal = new Object;
   vict_portal = new Object;
 
-  clear_object(ch_portal);
-  clear_object(vict_portal);
-
   ch_portal->item_number = -1;
   vict_portal->item_number = -1;
-  ch_portal->in_room = DC::NOWHERE;
-  vict_portal->in_room = DC::NOWHERE;
+  ch_portal->in_room = INVALID_ROOM;
+  vict_portal->in_room = INVALID_ROOM;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)
     dc_sprintf(buf, "pcportal portal cleric %s", qPrintable(ch->name()));
@@ -6552,12 +6542,12 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
     {
       destination = number<room_t>(1, dc_->top_of_world);
       if (!dc_->rooms.contains(destination) ||
-          isSet(dc_->world[destination].room_flags, ARENA) ||
-          isSet(dc_->world[destination].room_flags, IMP_ONLY) ||
-          isSet(dc_->world[destination].room_flags, PRIVATE) ||
-          isSet(dc_->world[destination].room_flags, CLAN_ROOM) ||
-          isSet(dc_->world[destination].room_flags, NO_PORTAL) ||
-          isSet(dc_->world[destination].room_flags, NO_TELEPORT) ||
+          isSet(dc_->world[destination]->room_flags_, ARENA) ||
+          isSet(dc_->world[destination]->room_flags_, IMP_ONLY) ||
+          isSet(dc_->world[destination]->room_flags_, PRIVATE) ||
+          isSet(dc_->world[destination]->room_flags_, CLAN_ROOM) ||
+          isSet(dc_->world[destination]->room_flags_, NO_PORTAL) ||
+          isSet(dc_->world[destination]->room_flags_, NO_TELEPORT) ||
           dc_->zones.value(dc_->world[destination].zone).isNoTeleport())
       {
         good_destination = false;
@@ -6599,11 +6589,11 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
 /* PORTAL (Actual spell) */
 // TODO - make this use skill
 
-qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
-  if (isSet(dc_->world[victim->in_room].room_flags, PRIVATE) ||
-      isSet(dc_->world[victim->in_room].room_flags, IMP_ONLY) ||
-      isSet(dc_->world[victim->in_room].room_flags, NO_PORTAL))
+  if (isSet(dc_->world[victim->in_room]->room_flags_, PRIVATE) ||
+      isSet(dc_->world[victim->in_room]->room_flags_, IMP_ONLY) ||
+      isSet(dc_->world[victim->in_room]->room_flags_, NO_PORTAL))
   {
     ch->sendln(u"You can't seem to find a path."_s);
     return ReturnValue::eFAILURE;
@@ -6619,14 +6609,14 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
     ch->sendln(u"You can't seem to find a definite path."_s);
     return ReturnValue::eFAILURE;
   }
-  if (dc_->zones.value(dc_->world[victim->in_room].zone).isNoTeleport())
+  if (dc_->zones.value(dc_->world[victim->in_room]->zone).isNoTeleport())
   {
     ch->sendln(u"A portal shimmers into view but is unstable and immediately fades to nothing."_s);
     act_to_room("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->zones.value(dc_->world[ch->in_room].zone).continent != dc_->zones.value(dc_->world[victim->in_room].zone).continent)
+  if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[victim->in_room]->zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -6666,7 +6656,7 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
   CharacterPtr tmpch;
 
   bool found_hunt_or_quest_item = false;
-  for (tmpch = dc_->world[victim->in_room].people_; tmpch; tmpch = tmpch->next_in_room)
+  for (tmpch = dc_->world[victim->in_room]->people_; tmpch; tmpch = tmpch->next_in_room)
   {
     if (search_char_for_item(tmpch, real_object(76), false) || search_char_for_item(tmpch, real_object(51), false))
     {
@@ -6688,10 +6678,10 @@ qint32 spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPt
 
 /* BURNING HANDS (scroll, wand) */
 
-qint32 cast_burning_hands(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_burning_hands(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   QString arg1;
   arg1[0] = '\0';
   switch (type)
@@ -6728,11 +6718,11 @@ qint32 cast_burning_hands(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
 /* CALL LIGHTNING (potion, scroll, staff) */
 
-qint32 cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   extern weather_data weather_info;
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -6759,7 +6749,7 @@ qint32 cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   case SPELL_TYPE_STAFF:
     if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
     {
-      for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+      for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
       {
         next_v = victim->next_in_room;
 
@@ -6782,8 +6772,8 @@ qint32 cast_call_lightning(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* CHILL TOUCH (scroll, wand) */
 
-qint32 cast_chill_touch(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_chill_touch(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
 
   switch (type)
@@ -6810,8 +6800,8 @@ qint32 cast_chill_touch(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* SHOCKING GRASP (scroll, wand) */
 
-qint32 cast_shocking_grasp(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_shocking_grasp(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6837,7 +6827,7 @@ qint32 cast_shocking_grasp(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* COLOUR SPRAY (scroll, wand) */
 
-qint32 cast_colour_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_colour_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6863,8 +6853,8 @@ qint32 cast_colour_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* DROWN (scroll, potion, wand) */
 
-qint32 cast_drown(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_drown(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6892,8 +6882,8 @@ qint32 cast_drown(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* EARTHQUAKE (scroll, staff) */
 
-qint32 cast_earthquake(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_earthquake(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6911,8 +6901,8 @@ qint32 cast_earthquake(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* LIFE LEECH (scroll, staff) */
 
-qint32 cast_life_leech(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_life_leech(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6930,8 +6920,8 @@ qint32 cast_life_leech(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* HEROES FEAST (staff, scroll, potion, wand) */
 
-qint32 cast_heroes_feast(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_heroes_feast(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6951,8 +6941,8 @@ qint32 cast_heroes_feast(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* HEAL SPRAY (scroll, staff) */
 
-qint32 cast_heal_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_heal_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6970,8 +6960,8 @@ qint32 cast_heal_spray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* GROUP SANCTUARY (scroll, staff) */
 
-qint32 cast_group_sanc(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_group_sanc(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -6989,8 +6979,8 @@ qint32 cast_group_sanc(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* GROUP RECALL (scroll, staff) */
 
-qint32 cast_group_recall(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_group_recall(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7008,8 +6998,8 @@ qint32 cast_group_recall(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* GROUP FLY (scroll, staff) */
 
-qint32 cast_group_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_group_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7027,8 +7017,8 @@ qint32 cast_group_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* FIRESTORM (scroll, staff) */
 
-qint32 cast_firestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_firestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7046,8 +7036,8 @@ qint32 cast_firestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* SOLAR GATE (scroll, staff) */
 
-qint32 cast_solar_gate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_solar_gate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7065,11 +7055,11 @@ qint32 cast_solar_gate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* ENERGY DRAIN (potion, scroll, wand, staff) */
 
-qint32 cast_energy_drain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_energy_drain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -7090,7 +7080,7 @@ qint32 cast_energy_drain(quint8 level, CharacterPtr ch, QString arg, qint32 type
       return spell_energy_drain(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7112,10 +7102,10 @@ qint32 cast_energy_drain(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* SOULDRAIN (potion, scroll, wand, staff) */
 
-qint32 cast_souldrain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_souldrain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -7137,7 +7127,7 @@ qint32 cast_souldrain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_souldrain(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7159,8 +7149,8 @@ qint32 cast_souldrain(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* VAMPIRIC TOUCH (scroll, wand) */
 
-qint32 cast_vampiric_touch(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_vampiric_touch(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7186,8 +7176,8 @@ qint32 cast_vampiric_touch(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* METEOR SWARM (scroll, wand) */
 
-qint32 cast_meteor_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_meteor_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7213,8 +7203,8 @@ qint32 cast_meteor_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* FIREBALL (scroll, wand) */
 
-qint32 cast_fireball(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_fireball(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7240,8 +7230,8 @@ qint32 cast_fireball(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* SPARKS (scroll, wand) */
 
-qint32 cast_sparks(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                   CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_sparks(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                        CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7267,8 +7257,8 @@ qint32 cast_sparks(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* HOWL (scroll, wand) */
 
-qint32 cast_howl(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                 CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_howl(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7294,10 +7284,10 @@ qint32 cast_howl(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* HARM (potion, staff, scroll) */
 
-qint32 cast_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                 CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -7315,7 +7305,7 @@ qint32 cast_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_harm(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7337,10 +7327,10 @@ qint32 cast_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* POWER HARM (potion, wand, staff) */
 
-qint32 cast_power_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_power_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -7363,7 +7353,7 @@ qint32 cast_power_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_power_harm(level, ch, victim, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7385,10 +7375,10 @@ qint32 cast_power_harm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* DIVINE FURY (potion, staff) */
 
-qint32 cast_divine_fury(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_divine_fury(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -7400,7 +7390,7 @@ qint32 cast_divine_fury(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_divine_fury(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
     {
       next_v = victim->next_in_room;
 
@@ -7422,8 +7412,8 @@ qint32 cast_divine_fury(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* LIGHTNING BOLT (scroll, wand) */
 
-qint32 cast_lightning_bolt(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_lightning_bolt(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7449,8 +7439,8 @@ qint32 cast_lightning_bolt(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* MAGIC MISSILE (scroll, wand) */
 
-qint32 cast_magic_missile(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_magic_missile(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7476,22 +7466,22 @@ qint32 cast_magic_missile(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
 /* ARMOR (potion, scroll, wand) */
 
-qint32 cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -7560,8 +7550,8 @@ qint32 cast_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* HOLY AEGIS/UNHOLY AEGIS (potion, scroll, wand) */
 
-qint32 cast_aegis(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_aegis(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -7609,8 +7599,8 @@ qint32 targetted_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
 /* TELEPORT (potion, scroll, wand, staff) */
 
-qint32 cast_teleport(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_teleport(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
 
@@ -7631,7 +7621,7 @@ qint32 cast_teleport(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     break;
 
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       // must do it this way to insure staff continues in THIS room
       next_v = tar_ch->next_in_room;
@@ -7649,8 +7639,8 @@ qint32 cast_teleport(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* BLESS (potion, scroll, wand) */
 
-qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
 
   switch (type)
@@ -7670,14 +7660,14 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
       if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
       {
-        qint32 retval = ReturnValue::eFAILURE;
+        ReturnValues retval = ReturnValue::eFAILURE;
         CharacterPtr leader;
         if (ch->master)
           leader = ch->master;
         else
           leader = ch;
 
-        follow_type *k;
+        CharacterPtr *k;
         for (k = leader->followers; k; k = k->next)
         {
           tar_ch = k->follower;
@@ -7781,12 +7771,12 @@ qint32 cast_bless(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* PARALYZE (potion, scroll, wand, staff) */
 
-qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You can not paralyze anyone in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -7825,7 +7815,7 @@ qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_paralyze(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       if (tar_ch->isNonPlayer())
         if (!(IS_AFFECTED(tar_ch, AFF_PARALYSIS)))
@@ -7845,13 +7835,13 @@ qint32 cast_paralyze(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* BLINDNESS (potion, scroll, wand, staff) */
 
-qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You can not blind anyone in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -7891,7 +7881,7 @@ qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_blindness(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -7913,8 +7903,8 @@ qint32 cast_blindness(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* CONTROL WEATHER */
 
-qint32 cast_control_weather(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_control_weather(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   QString buffer;
   extern weather_data weather_info;
@@ -7953,8 +7943,8 @@ qint32 cast_control_weather(quint8 level, CharacterPtr ch, QString arg, qint32 t
 
 /* CREATE FOOD (wand, staff, scroll) */
 
-qint32 cast_create_food(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_create_food(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
 
   switch (type)
@@ -7984,8 +7974,8 @@ qint32 cast_create_food(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* CREATE WATER (wand, scroll) */
 
-qint32 cast_create_water(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_create_water(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8019,10 +8009,10 @@ qint32 cast_create_water(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* REMOVE PARALYSIS (potion, wand, scroll, staff) */
 
-qint32 cast_remove_paralysis(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_remove_paralysis(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -8045,7 +8035,7 @@ qint32 cast_remove_paralysis(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_remove_paralysis(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
     {
       retval = spell_remove_paralysis(level, ch, tar_ch, 0, skill);
       if (isSet(retval, ReturnValue::eCH_DIED))
@@ -8061,8 +8051,8 @@ qint32 cast_remove_paralysis(quint8 level, CharacterPtr ch, QString arg, qint32 
 
 /* REMOVE BLIND (potion, scroll, staff) */
 
-qint32 cast_remove_blind(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_remove_blind(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8080,7 +8070,7 @@ qint32 cast_remove_blind(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_remove_blind(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_blind(level, ch, tar_ch, 0, skill);
@@ -8094,22 +8084,22 @@ qint32 cast_remove_blind(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* EDITING ENDS HERE */
 
-qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8153,7 +8143,7 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_critic(level, ch, tar_ch, 0, skill);
     break;
@@ -8164,22 +8154,22 @@ qint32 cast_cure_critic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8227,7 +8217,7 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_light(level, ch, tar_ch, 0, skill);
     break;
@@ -8238,12 +8228,12 @@ qint32 cast_cure_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) && tar_ch)
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE) && tar_ch)
   {
     ch->sendln(u"You cannot curse someone in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -8282,7 +8272,7 @@ qint32 cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
       return spell_curse(level, ch, tar_ch, 0, skill);
     }
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       if (tar_ch->isNonPlayer())
       {
@@ -8298,8 +8288,8 @@ qint32 cast_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8317,7 +8307,7 @@ qint32 cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_detect_evil(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_detect_evil(level, ch, tar_ch, 0, skill);
@@ -8329,8 +8319,8 @@ qint32 cast_detect_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_TRUE_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_TRUE_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8352,7 +8342,7 @@ qint32 cast_TRUE_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_TRUE_sight(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_TRUE_sight(level, ch, tar_ch, 0, skill);
     break;
@@ -8363,8 +8353,8 @@ qint32 cast_TRUE_sight(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_detect_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_detect_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8382,7 +8372,7 @@ qint32 cast_detect_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_detect_good(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_detect_good(level, ch, tar_ch, 0, skill);
@@ -8394,22 +8384,22 @@ qint32 cast_detect_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                                CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8456,7 +8446,7 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
     return spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_detect_invisibility(level, ch, tar_ch, 0, skill);
     break;
@@ -8467,22 +8457,22 @@ qint32 cast_detect_invisibility(quint8 level, CharacterPtr ch, QString arg, qint
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8526,7 +8516,7 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_detect_magic(level, ch, tar_ch, 0, skill);
     break;
@@ -8537,8 +8527,8 @@ qint32 cast_detect_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_haste(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_haste(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8563,7 +8553,7 @@ qint32 cast_haste(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_haste(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       if (!(IS_AFFECTED(tar_ch, SPELL_HASTE)))
@@ -8576,22 +8566,22 @@ qint32 cast_haste(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -8642,10 +8632,10 @@ qint32 cast_detect_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
   ObjectPtr next_o;
 
@@ -8670,7 +8660,7 @@ qint32 cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_dispel_evil(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8699,10 +8689,10 @@ qint32 cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
   ObjectPtr next_o;
 
@@ -8727,7 +8717,7 @@ qint32 cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_dispel_good(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -8755,8 +8745,8 @@ qint32 cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_enchant_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_enchant_armor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8776,8 +8766,8 @@ qint32 cast_enchant_armor(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_enchant_weapon(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_enchant_weapon(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8797,8 +8787,8 @@ qint32 cast_enchant_weapon(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_mana(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_mana(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
 
   switch (type)
@@ -8816,7 +8806,7 @@ qint32 cast_mana(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_mana(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_mana(level, ch, tar_ch, 0, skill);
     break;
@@ -8827,8 +8817,8 @@ qint32 cast_mana(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8851,7 +8841,7 @@ qint32 cast_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_heal(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8862,8 +8852,8 @@ qint32 cast_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_power_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_power_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8886,7 +8876,7 @@ qint32 cast_power_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_power_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8897,8 +8887,8 @@ qint32 cast_power_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_full_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_full_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8914,7 +8904,7 @@ qint32 cast_full_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_full_heal(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_full_heal(level, ch, tar_ch, 0, skill);
     break;
@@ -8925,8 +8915,8 @@ qint32 cast_full_heal(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -8972,7 +8962,7 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
     }
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_invisibility(level, ch, tar_ch, 0, skill);
     break;
@@ -8983,8 +8973,8 @@ qint32 cast_invisibility(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_locate_object(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_locate_object(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9003,10 +8993,10 @@ qint32 cast_locate_object(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                   CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -9016,7 +9006,7 @@ qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_poison(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_SPELL:
-    if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+    if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
     {
       ch->sendln(u"You can not poison someone in a safe area!"_s);
       return ReturnValue::eFAILURE;
@@ -9027,7 +9017,7 @@ qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_poison(level, ch, ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9048,8 +9038,8 @@ qint32 cast_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9070,14 +9060,14 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
 
       if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
       {
-        qint32 retval = ReturnValue::eFAILURE;
+        ReturnValues retval = ReturnValue::eFAILURE;
         CharacterPtr leader;
         if (ch->master)
           leader = ch->master;
         else
           leader = ch;
 
-        follow_type *k;
+        CharacterPtr *k;
         for (k = leader->followers; k; k = k->next)
         {
           tar_ch = k->follower;
@@ -9127,7 +9117,7 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
     return spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_protection_from_evil(level, ch, tar_ch, 0, 0);
     break;
   default:
@@ -9137,8 +9127,8 @@ qint32 cast_protection_from_evil(quint8 level, CharacterPtr ch, QString arg, qin
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9158,14 +9148,14 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
     {
       if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
       {
-        qint32 retval = ReturnValue::eFAILURE;
+        ReturnValues retval = ReturnValue::eFAILURE;
         CharacterPtr leader;
         if (ch->master)
           leader = ch->master;
         else
           leader = ch;
 
-        follow_type *k;
+        CharacterPtr *k;
         for (k = leader->followers; k; k = k->next)
         {
           tar_ch = k->follower;
@@ -9215,7 +9205,7 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
     return spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_protection_from_good(level, ch, tar_ch, 0, 0);
     break;
   default:
@@ -9225,7 +9215,7 @@ qint32 cast_protection_from_good(quint8 level, CharacterPtr ch, QString arg, qin
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_remove_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill, quint64 mana_cost)
+ReturnValue cast_remove_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill, quint64 mana_cost)
 {
   switch (type)
   {
@@ -9254,7 +9244,7 @@ qint32 cast_remove_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_remove_curse(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_curse(level, ch, tar_ch, 0, skill);
@@ -9266,16 +9256,16 @@ qint32 cast_remove_curse(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
-      for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char;
+      ReturnValues retval = ReturnValue::eFAILURE;
+      for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char;
            tmp_char = tmp_char->next_in_room)
       {
         if (!ARE_GROUPED(ch, tmp_char))
@@ -9313,7 +9303,7 @@ qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     break;
 
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_remove_poison(level, ch, tar_ch, 0, skill);
@@ -9326,8 +9316,8 @@ qint32 cast_remove_poison(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_fireshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_fireshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9346,7 +9336,7 @@ qint32 cast_fireshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_fireshield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_fireshield(level, ch, tar_ch, 0, skill);
@@ -9358,13 +9348,13 @@ qint32 cast_fireshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You can not sleep someone in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -9390,7 +9380,7 @@ qint32 cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_sleep(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9410,8 +9400,8 @@ qint32 cast_sleep(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_strength(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_strength(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9430,7 +9420,7 @@ qint32 cast_strength(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_strength(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_strength(level, ch, tar_ch, 0, skill);
@@ -9442,8 +9432,8 @@ qint32 cast_strength(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_ventriloquate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_ventriloquate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr tmp_ch;
   QString buf1;
@@ -9471,7 +9461,7 @@ qint32 cast_ventriloquate(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   dc_sprintf(buf3, "Someone says, '%s'\r\n", arg);
 
-  for (tmp_ch = dc_->world[ch->in_room].people_; tmp_ch;
+  for (tmp_ch = dc_->world[ch->in_room]->people_; tmp_ch;
        tmp_ch = tmp_ch->next_in_room)
   {
 
@@ -9506,8 +9496,8 @@ qint32 targetted_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr vict
 }
 
 /* WORD OF RECALL (spell, potion, wand, staff, scroll)*/
-qint32 cast_word_of_recall(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_word_of_recall(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr tar_ch_next;
 
@@ -9527,7 +9517,7 @@ qint32 cast_word_of_recall(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return targetted_word_of_recall(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch_next)
     {
       tar_ch_next = tar_ch->next_in_room;
@@ -9542,8 +9532,8 @@ qint32 cast_word_of_recall(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_wizard_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_wizard_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9557,8 +9547,8 @@ qint32 cast_wizard_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_eagle_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_eagle_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9573,8 +9563,8 @@ qint32 cast_eagle_eye(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_summon(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                   CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_summon(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9588,10 +9578,10 @@ qint32 cast_summon(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_charm_person(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_charm_person(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -9605,7 +9595,7 @@ qint32 cast_charm_person(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_charm_person(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9626,8 +9616,8 @@ qint32 cast_charm_person(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_sense_life(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_sense_life(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9644,7 +9634,7 @@ qint32 cast_sense_life(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_sense_life(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_sense_life(level, ch, tar_ch, 0, skill);
@@ -9656,8 +9646,8 @@ qint32 cast_sense_life(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_identify(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_identify(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9674,8 +9664,8 @@ qint32 cast_identify(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_frost_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_frost_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9689,8 +9679,8 @@ qint32 cast_frost_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_acid_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_acid_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9704,8 +9694,8 @@ qint32 cast_acid_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_fire_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_fire_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9720,8 +9710,8 @@ qint32 cast_fire_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_gas_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_gas_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9736,8 +9726,8 @@ qint32 cast_gas_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_lightning_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_lightning_breath(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                  CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9751,13 +9741,13 @@ qint32 cast_lightning_breath(quint8 level, CharacterPtr ch, QString arg, qint32 
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You can not fear someone in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -9781,7 +9771,7 @@ qint32 cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_fear(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -9801,22 +9791,22 @@ qint32 cast_fear(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                    CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -9866,7 +9856,7 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_refresh(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_refresh(level, ch, tar_ch, 0, skill);
@@ -9878,22 +9868,22 @@ qint32 cast_refresh(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                     CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -9943,7 +9933,7 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_fly(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_fly(level, ch, tar_ch, 0, skill);
@@ -9955,8 +9945,8 @@ qint32 cast_fly(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_cont_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cont_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9973,8 +9963,8 @@ qint32 cast_cont_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_know_alignment(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_know_alignment(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -9999,7 +9989,7 @@ qint32 cast_know_alignment(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_know_alignment(level, ch, tar_ch, 0, skill);
     break;
@@ -10015,8 +10005,8 @@ QStringList dispel_magic_spells =
         "", "sanctuary", "protection_from_evil", "haste", "stone_shield", "greater_stone_shield",
         "frost_shield", "lightning_shield", "fire_shield", "acid_shield", "protection_from_good", "\n"};
 
-qint32 cast_dispel_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_dispel_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   qint32 spell = {};
   QString buffer;
@@ -10059,7 +10049,7 @@ qint32 cast_dispel_magic(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dispel_magic(level, ch, tar_ch, 0, skill);
     break;
@@ -10079,8 +10069,8 @@ QStringList dispel_minor_spells =
 
 };
 
-qint32 cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   qint32 spell = {};
   QString buffer;
@@ -10118,7 +10108,7 @@ qint32 cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_dispel_minor(level, ch, tar_ch, tar_obj, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dispel_minor(level, ch, tar_ch, 0, skill);
     break;
@@ -10132,7 +10122,7 @@ qint32 cast_dispel_minor(quint8 level, CharacterPtr ch, QString arg, qint32 type
 qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch)
 {
   CharacterPtr mst = ch->master ? ch->master : ch;
-  follow_type *f, *t;
+  CharacterPtr *f, *t;
   bool fire, ice, earth, energy;
   fire = ice = earth = energy = false;
   for (f = mst->followers; f; f = f->next)
@@ -10140,7 +10130,7 @@ qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch)
     // if (f->follower->isNonPlayer() && f->follower->height == 77)
     if (f->follower->isNonPlayer() && f->follower->mobdata->mob_flags.value[3] == 77)
     {
-      switch (dc_->mob_index_[f->follower->mobdata->nr].vnum())
+      switch (dc_->mob_index_[f->follower->mobdata->nr]->vnum())
       {
       case 88:
         fire = true;
@@ -10164,7 +10154,7 @@ qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch)
         // if (t->follower->isNonPlayer() && t->follower->height == 77)
         if (t->follower->isNonPlayer() && t->follower->mobdata->mob_flags.value[3] == 77)
         {
-          switch (dc_->mob_index_[t->follower->mobdata->nr].vnum())
+          switch (dc_->mob_index_[t->follower->mobdata->nr]->vnum())
           {
           case 88:
             fire = true;
@@ -10236,7 +10226,7 @@ qint32 elemental_damage_bonus(qint32 spell, CharacterPtr ch)
 bool elemental_score(CharacterPtr ch, qint32 level)
 {
   CharacterPtr mst = ch->master ? ch->master : ch;
-  follow_type *f, *t;
+  CharacterPtr *f, *t;
   bool fire, ice, earth, energy;
   fire = ice = earth = energy = false;
   // reuse of elemental damage function
@@ -10246,7 +10236,7 @@ bool elemental_score(CharacterPtr ch, qint32 level)
     {
       // if (f->follower->height == 77) // improved
       if (f->follower->mobdata->mob_flags.value[3] == 77)
-        switch (dc_->mob_index_[f->follower->mobdata->nr].vnum())
+        switch (dc_->mob_index_[f->follower->mobdata->nr]->vnum())
         {
         case 88:
           fire = true;
@@ -10272,7 +10262,7 @@ bool elemental_score(CharacterPtr ch, qint32 level)
         {
           if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
-            switch (dc_->mob_index_[t->follower->mobdata->nr].vnum())
+            switch (dc_->mob_index_[t->follower->mobdata->nr]->vnum())
             {
             case 88:
               fire = true;
@@ -10331,29 +10321,29 @@ bool elemental_score(CharacterPtr ch, qint32 level)
   return (fire || earth || energy || ice);
 }
 
-qint32 cast_conjure_elemental(quint8 level, CharacterPtr ch,
-                              QString arg, qint32 type,
-                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_conjure_elemental(quint8 level, CharacterPtr ch,
+                                   QString arg, qint32 type,
+                                   CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   return spell_conjure_elemental(level, ch, arg, 0, tar_obj, skill);
 }
 
-qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -10400,7 +10390,7 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
     return spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_cure_serious(level, ch, tar_ch, 0, skill);
     break;
@@ -10414,11 +10404,11 @@ qint32 cast_cure_serious(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_cause_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cause_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -10440,7 +10430,7 @@ qint32 cast_cause_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_cause_light(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10464,12 +10454,12 @@ qint32 cast_cause_light(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_cause_critical(quint8 level, CharacterPtr ch, QString arg,
-                           qint32 type, CharacterPtr tar_ch,
-                           ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cause_critical(quint8 level, CharacterPtr ch, QString arg,
+                                qint32 type, CharacterPtr tar_ch,
+                                ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -10491,7 +10481,7 @@ qint32 cast_cause_critical(quint8 level, CharacterPtr ch, QString arg,
     return spell_cause_critical(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10514,12 +10504,12 @@ qint32 cast_cause_critical(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_cause_serious(quint8 level, CharacterPtr ch, QString arg,
-                          qint32 type, CharacterPtr tar_ch,
-                          ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_cause_serious(quint8 level, CharacterPtr ch, QString arg,
+                               qint32 type, CharacterPtr tar_ch,
+                               ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -10541,7 +10531,7 @@ qint32 cast_cause_serious(quint8 level, CharacterPtr ch, QString arg,
     return spell_cause_serious(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10564,12 +10554,12 @@ qint32 cast_cause_serious(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_flamestrike(quint8 level, CharacterPtr ch, QString arg,
-                        qint32 type, CharacterPtr tar_ch,
-                        ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_flamestrike(quint8 level, CharacterPtr ch, QString arg,
+                             qint32 type, CharacterPtr tar_ch,
+                             ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -10591,7 +10581,7 @@ qint32 cast_flamestrike(quint8 level, CharacterPtr ch, QString arg,
     return spell_flamestrike(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10611,9 +10601,9 @@ qint32 cast_flamestrike(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_resist_cold(quint8 level, CharacterPtr ch, QString arg,
-                        qint32 type, CharacterPtr tar_ch,
-                        ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_resist_cold(quint8 level, CharacterPtr ch, QString arg,
+                             qint32 type, CharacterPtr tar_ch,
+                             ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10637,8 +10627,8 @@ qint32 cast_resist_cold(quint8 level, CharacterPtr ch, QString arg,
   }
   return ReturnValue::eFAILURE;
 }
-qint32 cast_staunchblood(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_staunchblood(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10665,8 +10655,8 @@ qint32 cast_staunchblood(quint8 level, CharacterPtr ch, QString arg, qint32 type
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_resist_energy(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                          CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_resist_energy(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                               CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10691,9 +10681,9 @@ qint32 cast_resist_energy(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_resist_fire(quint8 level, CharacterPtr ch, QString arg,
-                        qint32 type, CharacterPtr tar_ch,
-                        ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_resist_fire(quint8 level, CharacterPtr ch, QString arg,
+                             qint32 type, CharacterPtr tar_ch,
+                             ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10718,23 +10708,23 @@ qint32 cast_resist_fire(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
-                         qint32 type, CharacterPtr tar_ch,
-                         ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
+                              qint32 type, CharacterPtr tar_ch,
+                              ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
   case SPELL_TYPE_SPELL:
     if (arg == u"communegroupspell"_s && ch->has_skill(SKILL_COMMUNE))
     {
-      qint32 retval = ReturnValue::eFAILURE;
+      ReturnValues retval = ReturnValue::eFAILURE;
       CharacterPtr leader;
       if (ch->master)
         leader = ch->master;
       else
         leader = ch;
 
-      follow_type *k;
+      CharacterPtr *k;
       for (k = leader->followers; k; k = k->next)
       {
         tar_ch = k->follower;
@@ -10784,9 +10774,9 @@ qint32 cast_resist_magic(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_stone_skin(quint8 level, CharacterPtr ch, QString arg,
-                       qint32 type, CharacterPtr tar_ch,
-                       ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_stone_skin(quint8 level, CharacterPtr ch, QString arg,
+                            qint32 type, CharacterPtr tar_ch,
+                            ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10811,9 +10801,9 @@ qint32 cast_stone_skin(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_shield(quint8 level, CharacterPtr ch, QString arg,
-                   qint32 type, CharacterPtr tar_ch,
-                   ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_shield(quint8 level, CharacterPtr ch, QString arg,
+                        qint32 type, CharacterPtr tar_ch,
+                        ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10838,7 +10828,7 @@ qint32 cast_shield(quint8 level, CharacterPtr ch, QString arg,
     return spell_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
       spell_shield(level, ch, tar_ch, 0, skill);
     break;
@@ -10849,14 +10839,14 @@ qint32 cast_shield(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_weaken(quint8 level, CharacterPtr ch, QString arg,
-                   qint32 type, CharacterPtr tar_ch,
-                   ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_weaken(quint8 level, CharacterPtr ch, QString arg,
+                        qint32 type, CharacterPtr tar_ch,
+                        ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You can not weaken anyone in a safe area!"_s);
     return ReturnValue::eFAILURE;
@@ -10889,7 +10879,7 @@ qint32 cast_weaken(quint8 level, CharacterPtr ch, QString arg,
     return spell_weaken(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10909,9 +10899,9 @@ qint32 cast_weaken(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_mass_invis(quint8 level, CharacterPtr ch, QString arg,
-                       qint32 type, CharacterPtr tar_ch,
-                       ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_mass_invis(quint8 level, CharacterPtr ch, QString arg,
+                            qint32 type, CharacterPtr tar_ch,
+                            ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -10933,12 +10923,12 @@ qint32 cast_mass_invis(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_acid_blast(quint8 level, CharacterPtr ch, QString arg,
-                       qint32 type, CharacterPtr tar_ch,
-                       ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_acid_blast(quint8 level, CharacterPtr ch, QString arg,
+                            qint32 type, CharacterPtr tar_ch,
+                            ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -10968,7 +10958,7 @@ qint32 cast_acid_blast(quint8 level, CharacterPtr ch, QString arg,
     return spell_acid_blast(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -10988,12 +10978,12 @@ qint32 cast_acid_blast(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_hellstream(quint8 level, CharacterPtr ch, QString arg,
-                       qint32 type, CharacterPtr tar_ch,
-                       ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_hellstream(quint8 level, CharacterPtr ch, QString arg,
+                            qint32 type, CharacterPtr tar_ch,
+                            ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -11017,7 +11007,7 @@ qint32 cast_hellstream(quint8 level, CharacterPtr ch, QString arg,
     return spell_hellstream(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -11037,9 +11027,9 @@ qint32 cast_hellstream(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_portal(quint8 level, CharacterPtr ch, QString arg,
-                   qint32 type, CharacterPtr tar_ch,
-                   ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_portal(quint8 level, CharacterPtr ch, QString arg,
+                        qint32 type, CharacterPtr tar_ch,
+                        ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11067,9 +11057,9 @@ qint32 cast_portal(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_infravision(quint8 level, CharacterPtr ch, QString arg,
-                        qint32 type, CharacterPtr tar_ch,
-                        ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_infravision(quint8 level, CharacterPtr ch, QString arg,
+                             qint32 type, CharacterPtr tar_ch,
+                             ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11094,7 +11084,7 @@ qint32 cast_infravision(quint8 level, CharacterPtr ch, QString arg,
     return spell_infravision(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_;
+    for (tar_ch = dc_->world[ch->in_room]->people_;
          tar_ch; tar_ch = tar_ch->next_in_room)
 
       spell_infravision(level, ch, tar_ch, 0, skill);
@@ -11106,8 +11096,8 @@ qint32 cast_infravision(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_animate_dead(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_animate_dead(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11129,10 +11119,10 @@ qint32 cast_animate_dead(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* BEE STING */
 
-qint32 spell_bee_sting(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_bee_sting(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
   qint32 bees = 1 + (ch->getLevel() / 15) + (ch->getLevel() == 60);
   affected_type af;
   qint32 i;
@@ -11166,8 +11156,8 @@ qint32 spell_bee_sting(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_bee_sting(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_bee_sting(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11195,8 +11185,8 @@ qint32 cast_bee_sting(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 }
 
 /* BEE SWARM */
-qint32 cast_bee_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_bee_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11225,10 +11215,10 @@ qint32 cast_bee_swarm(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
 
   dam = 175;
 
@@ -11237,7 +11227,7 @@ qint32 spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -11252,7 +11242,7 @@ qint32 spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
-    else if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
+    else if (dc_->world[ch->in_room]->zone == dc_->world[tmp_victim->in_room]->zone)
     {
       tmp_victim->sendln(u"You hear the buzzing of hundreds of bees."_s);
     }
@@ -11262,10 +11252,10 @@ qint32 spell_bee_swarm(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* CREEPING DEATH */
 
-qint32 cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
   affected_type af;
   qint32 bingo = 0, poison = {};
 
@@ -11372,8 +11362,8 @@ qint32 cast_creeping_death(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 }
 
 /* BARKSKIN */
-qint32 cast_barkskin(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_barkskin(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11402,7 +11392,7 @@ qint32 cast_barkskin(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -11429,7 +11419,7 @@ qint32 spell_barkskin(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* HERB LORE */
 
-qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   qint32 healamount;
   QString buf, dammsg;
@@ -11505,7 +11495,7 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
       ch->sendln(u"You don't seem to be carrying any such root."_s);
       return ReturnValue::eFAILURE;
     }
-    qint32 virt = dc_->obj_index_[obj->item_number].vnum();
+    qint32 virt = dc_->obj_index_[obj->item_number]->vnum();
     qint32 aff = 0, spl = {};
     switch (virt)
     {
@@ -11671,9 +11661,9 @@ qint32 cast_herb_lore(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
 /* CALL FOLLOWER */
 
-qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
-  if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM))
   {
     ch->sendln(u"I don't think your fellow clan members would appreciate the wildlife."_s);
     GET_MANA(ch) += 75;
@@ -11683,7 +11673,7 @@ qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
   victim = {};
 
-  for (follow_type *k = ch->followers; k; k = k->next)
+  for (CharacterPtr *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
         k->follower->in_room != ch->in_room)
     {
@@ -11718,8 +11708,8 @@ qint32 cast_call_follower(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 }
 
 /* ENTANGLE */
-qint32 cast_entangle(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                     CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_entangle(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                          CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11742,7 +11732,7 @@ qint32 cast_entangle(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_entangle(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_entangle(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
 
   if (!OUTSIDE(ch))
@@ -11775,8 +11765,8 @@ qint32 spell_entangle(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 }
 
 /* EYES OF THE OWL */
-qint32 cast_eyes_of_the_owl(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_eyes_of_the_owl(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                 CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11806,7 +11796,7 @@ qint32 cast_eyes_of_the_owl(quint8 level, CharacterPtr ch, QString arg, qint32 t
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_eyes_of_the_owl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_eyes_of_the_owl(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -11831,8 +11821,8 @@ qint32 spell_eyes_of_the_owl(quint8 level, CharacterPtr ch, CharacterPtr victim,
 }
 
 /* FELINE AGILITY */
-qint32 cast_feline_agility(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                           CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_feline_agility(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11860,7 +11850,7 @@ qint32 cast_feline_agility(quint8 level, CharacterPtr ch, QString arg, qint32 ty
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_feline_agility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_feline_agility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -11890,8 +11880,8 @@ qint32 spell_feline_agility(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 }
 
 /* OAKEN FORTITUDE */
-qint32 cast_oaken_fortitude(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                            CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_oaken_fortitude(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                 CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -11920,7 +11910,7 @@ qint32 cast_oaken_fortitude(quint8 level, CharacterPtr ch, QString arg, qint32 t
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_oaken_fortitude(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_oaken_fortitude(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 { // Feline agility rip
   affected_type af;
 
@@ -11951,7 +11941,7 @@ qint32 spell_oaken_fortitude(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
 /* CLARITY */
 
-qint32 cast_clarity(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_clarity(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 { // Feline agility rip
   affected_type af;
 
@@ -11978,7 +11968,7 @@ qint32 cast_clarity(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
 
 /* FOREST MELD */
 
-qint32 cast_forest_meld(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_forest_meld(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   if (!(dc_->world[ch->in_room].sector_type == SECT_FOREST || dc_->world[ch->in_room].sector_type == SECT_SWAMP))
   {
@@ -12015,7 +12005,7 @@ qint32 cast_forest_meld(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* COMPANION (disabled) */
 
-qint32 cast_companion(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_companion(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr mob;
   affected_type af;
@@ -12202,11 +12192,11 @@ qint32 check_components(CharacterPtr ch, qint32 destroy, qint32 item_one = 0,
 
 /* CREATE GOLEM */
 
-qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   QString buf;
   CharacterPtr mob;
-  follow_type *k;
+  CharacterPtr *k;
 
   affected_type af;
 
@@ -12378,7 +12368,7 @@ qint32 spell_create_golem(qint32 level, CharacterPtr ch, CharacterPtr victim, Ob
 /* OLD CREATE/RELEASE GOLEM (unused) */
 
 /*
-qint32 cast_create_golem( quint8 level, CharacterPtr ch, QString arg, qint32 type,
+ReturnValue cast_create_golem( quint8 level, CharacterPtr ch, QString arg, qint32 type,
   CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill )
 {
   switch (type) {
@@ -12393,10 +12383,10 @@ qint32 cast_create_golem( quint8 level, CharacterPtr ch, QString arg, qint32 typ
 }*/
 
 /*
-qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr  tar_obj, qint32 skill)
+ReturnValues spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr  tar_obj, qint32 skill)
 {
    // CharacterPtr tmp_vict;
-   follow_type * temp;
+   CharacterPtr * temp;
    qint32 done = {};
 
    temp = ch->followers;
@@ -12424,7 +12414,7 @@ qint32 spell_release_golem(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* BEACON */
 
-qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   //   qint32 to_room = {};
 
@@ -12469,14 +12459,14 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(dc_->world[ch->beacon->in_room].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[ch->beacon->in_room]->room_flags_, CLAN_ROOM))
     {
       ch->sendln(u"You cannot beacon into a clan hall whilst Champion."_s);
       return ReturnValue::eFAILURE;
     }
   }
 
-  if (dc_->zones.value(dc_->world[ch->in_room].zone).continent != dc_->zones.value(dc_->world[ch->beacon->in_room].zone).continent)
+  if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[ch->beacon->in_room]->zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -12524,7 +12514,7 @@ qint32 spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr new_obj = {};
   if (ch->isNonPlayer())
@@ -12541,13 +12531,13 @@ ReturnValue do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, NOLEARN))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE) || isSet(dc_->world[ch->in_room]->room_flags_, NOLEARN))
   {
     ch->sendln(u"You may not place your beacon in an area protected by the gods."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (IS_AFFECTED(ch, AFF_CHAMPION) && isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM))
+  if (IS_AFFECTED(ch, AFF_CHAMPION) && isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM))
   {
     ch->sendln(u"You cannot set a beacon in a clan hall whilst Champion."_s);
     return ReturnValue::eFAILURE;
@@ -12578,13 +12568,13 @@ ReturnValue do_beacon(CharacterPtr ch, QString argument, cmd_t cmd)
   obj_to_room(new_obj, ch->in_room);
   ch->beacon = new_obj;
 
-  //   ch->beacon = dc_->world[ch->in_room].number;
+  //   ch->beacon = dc_->world[ch->in_room]->number_;
   return ReturnValue::eSUCCESS;
 }
 
 /* REFLECT (non-castable atm) */
 
-qint32 spell_reflect(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_reflect(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   ch->sendln(u"Tell an immortal what you just did."_s);
   return ReturnValue::eFAILURE;
@@ -12704,12 +12694,12 @@ void familiar_creation_message(CharacterPtr ch, qint32 fam_type)
   }
 }
 
-qint32 spell_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr mob = {};
   qint32 r_num;
   affected_type af;
-  follow_type *k = {};
+  CharacterPtr *k = {};
   qint32 fam_type;
 
   fam_type = choose_familiar(ch, arg);
@@ -12753,8 +12743,8 @@ qint32 spell_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                                 CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -12782,7 +12772,7 @@ qint32 cast_summon_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 t
 
 /* LIGHTED PATH */
 
-qint32 spell_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValues spell_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   TracksPtr ptrack;
   QString buf;
@@ -12813,8 +12803,8 @@ qint32 spell_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 typ
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                         CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                              CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -12849,7 +12839,7 @@ qint32 cast_lighted_path(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* RESIST ACID */
 
-qint32 spell_resist_acid(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_resist_acid(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (GET_CLASS(ch) == CLASS_ANTI_PAL && ch != victim)
@@ -12876,8 +12866,8 @@ qint32 spell_resist_acid(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_resist_acid(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                        CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_resist_acid(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                             CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -12906,7 +12896,7 @@ qint32 cast_resist_acid(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* SUN RAY */
 
-qint32 spell_sun_ray(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_sun_ray(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   extern weather_data weather_info;
@@ -12929,11 +12919,11 @@ qint32 spell_sun_ray(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                    CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                         CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   extern weather_data weather_info;
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr next_v;
 
   switch (type)
@@ -12960,7 +12950,7 @@ qint32 cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   case SPELL_TYPE_STAFF:
     if (OUTSIDE(ch) && (weather_info.sky <= SKY_CLOUDY))
     {
-      for (victim = dc_->world[ch->in_room].people_; victim; victim = next_v)
+      for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_v)
       {
         next_v = victim->next_in_room;
 
@@ -12984,7 +12974,7 @@ qint32 cast_sun_ray(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* RAPID MEND */
 
-qint32 spell_rapid_mend(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_rapid_mend(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   qint32 regen = 0, duration = {};
@@ -13033,8 +13023,8 @@ qint32 spell_rapid_mend(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_rapid_mend(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_rapid_mend(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13061,7 +13051,7 @@ qint32 cast_rapid_mend(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* IRON ROOTS */
 
-qint32 spell_iron_roots(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_iron_roots(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -13091,8 +13081,8 @@ qint32 spell_iron_roots(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
 /* IRON ROOTS (potion, scroll, staff, wand) */
 
-qint32 cast_iron_roots(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_iron_roots(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13125,7 +13115,7 @@ qint32 cast_iron_roots(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* ACID SHIELD */
 
-qint32 spell_acid_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_acid_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -13149,7 +13139,7 @@ qint32 spell_acid_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obj
 
 /* ACID SHIELD (potion, scroll, wand, staves) */
 
-qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13176,7 +13166,7 @@ qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
     return spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_acid_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13188,7 +13178,7 @@ qint32 cast_acid_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* WATER BREATHING */
 
-qint32 spell_water_breathing(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_water_breathing(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   affected_typePtr cur_af;
@@ -13211,7 +13201,7 @@ qint32 spell_water_breathing(quint8 level, CharacterPtr ch, CharacterPtr victim,
 
 /* WATERBREATHING (potions, scrolls, staves, wands) */
 
-qint32 cast_water_breathing(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_water_breathing(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13230,7 +13220,7 @@ qint32 cast_water_breathing(quint8 level, CharacterPtr ch, QString arg, qint32 t
     return spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_water_breathing(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13242,7 +13232,7 @@ qint32 cast_water_breathing(quint8 level, CharacterPtr ch, QString arg, qint32 t
 
 /* GLOBE OF DARKNESS */
 
-qint32 spell_globe_of_darkness(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_globe_of_darkness(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ObjectPtr globe;
   qint32 dur = 0, mod = {};
@@ -13305,7 +13295,7 @@ qint32 spell_globe_of_darkness(quint8 level, CharacterPtr ch, CharacterPtr victi
 
 /* GLOBE OF DARKNESS (potions, scrolls, staves, wands) */
 
-qint32 cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13323,7 +13313,7 @@ qint32 cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32
     return spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_globe_of_darkness(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13335,13 +13325,13 @@ qint32 cast_globe_of_darkness(quint8 level, CharacterPtr ch, QString arg, qint32
 
 /* EYES OF THE EAGLE (disabled) */
 
-qint32 spell_eyes_of_the_eagle(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_eyes_of_the_eagle(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ch->sendln(u"This spell doesn't do anything right now."_s);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_eyes_of_the_eagle(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_eyes_of_the_eagle(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13363,11 +13353,11 @@ qint32 cast_eyes_of_the_eagle(quint8 level, CharacterPtr ch, QString arg, qint32
 
 /* ICESTORM */
 
-qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
-  qint32 retval = ReturnValue::eSUCCESS;
-  qint32 retval2;
+  ReturnValues retval = ReturnValue::eSUCCESS;
+  ReturnValues retval2;
   affected_type af;
   QString buf;
 
@@ -13389,7 +13379,7 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   const auto &character_list = dc_->character_list;
   for (const auto &tmp_victim : character_list)
   {
-    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == DC::NOWHERE)
+    if (GET_POS(tmp_victim) == position_t::DEAD || tmp_victim->in_room == INVALID_ROOM)
     {
       continue;
     }
@@ -13423,7 +13413,7 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
     }
     else
     {
-      if (dc_->world[ch->in_room].zone == dc_->world[tmp_victim->in_room].zone)
+      if (dc_->world[ch->in_room]->zone == dc_->world[tmp_victim->in_room]->zone)
         tmp_victim->sendln(u"You feel a BLAST of $B$3cold$R air."_s);
     }
   }
@@ -13433,10 +13423,10 @@ qint32 spell_icestorm(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* ICESTORM (potions, scrolls, wands, staves) */
 
-qint32 cast_icestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_icestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -13454,7 +13444,7 @@ qint32 cast_icestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return spell_icestorm(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13476,7 +13466,7 @@ qint32 cast_icestorm(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
 
 /* LIGHTNING SHIELD */
 
-qint32 spell_lightning_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_lightning_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -13500,7 +13490,7 @@ qint32 spell_lightning_shield(quint8 level, CharacterPtr ch, CharacterPtr victim
 
 /* LIGHTNING SHIELD (potion, scroll, wand, staves) */
 
-qint32 cast_lightning_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_lightning_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13519,7 +13509,7 @@ qint32 cast_lightning_shield(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_lightning_shield(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -13531,11 +13521,11 @@ qint32 cast_lightning_shield(quint8 level, CharacterPtr ch, QString arg, qint32 
 
 /* BLUE BIRD */
 
-qint32 spell_blue_bird(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_blue_bird(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 dam;
   qint32 count;
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   qint32 ch_level = ch->getLevel();
   if (ch_level < 5)
     ch_level = 5;
@@ -13588,10 +13578,10 @@ qint32 spell_blue_bird(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* BLUE BIRD (scrolls, wands, staves) */
 
-qint32 cast_blue_bird(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_blue_bird(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -13606,7 +13596,7 @@ qint32 cast_blue_bird(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return spell_blue_bird(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13628,10 +13618,10 @@ qint32 cast_blue_bird(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
 /* DEBILITY */
 
-qint32 spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  qint32 retval = ReturnValue::eSUCCESS, duration = {};
+  ReturnValues retval = ReturnValue::eSUCCESS, duration = {};
   double percent = {};
 
   if (victim->affected_by_spell(SPELL_DEBILITY))
@@ -13707,10 +13697,10 @@ qint32 spell_debility(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
 
 /* DEBILITY (scrolls, wands, staves) */
 
-qint32 cast_debility(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_debility(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -13729,7 +13719,7 @@ qint32 cast_debility(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
     return spell_debility(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13751,10 +13741,10 @@ qint32 cast_debility(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
 
 /* ATTRITION */
 
-qint32 spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   qint32 acmod = 0, tohit = 0, duration = {};
 
   if (victim->affected_by_spell(SPELL_ATTRITION))
@@ -13829,10 +13819,10 @@ qint32 spell_attrition(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
 
 /* ATTRITION (scrolls, wands, staves) */
 
-qint32 cast_attrition(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_attrition(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   CharacterPtr next_v;
-  qint32 retval;
+  ReturnValues retval;
 
   switch (type)
   {
@@ -13851,7 +13841,7 @@ qint32 cast_attrition(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
     return spell_attrition(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = next_v)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = next_v)
     {
       next_v = tar_ch->next_in_room;
 
@@ -13873,7 +13863,7 @@ qint32 cast_attrition(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
 /* VAMPIRIC AURA */
 
-qint32 spell_vampiric_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_vampiric_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   /*
@@ -13907,7 +13897,7 @@ qint32 spell_vampiric_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, O
 
 /* VAMPIRIC AURA */
 
-qint32 cast_vampiric_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_vampiric_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -13928,7 +13918,7 @@ qint32 cast_vampiric_aura(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
 /* HOLY AURA */
 
-qint32 spell_holy_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_holy_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -13958,7 +13948,7 @@ qint32 spell_holy_aura(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
 
   affected_type af;
@@ -14022,11 +14012,11 @@ qint32 cast_holy_aura(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
 /* DISMISS FAMILIAR */
 
-qint32 spell_dismiss_familiar(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_dismiss_familiar(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   victim = {};
 
-  for (follow_type *k = ch->followers; k; k = k->next)
+  for (CharacterPtr *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
@@ -14051,7 +14041,7 @@ qint32 spell_dismiss_familiar(quint8 level, CharacterPtr ch, CharacterPtr victim
 
 /* DISMISS FAMILIAR (potions, wands, scrolls, staves) */
 
-qint32 cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14069,7 +14059,7 @@ qint32 cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
     return spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dismiss_familiar(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14081,13 +14071,13 @@ qint32 cast_dismiss_familiar(quint8 level, CharacterPtr ch, QString arg, qint32 
 
 /* DISMISS CORPSE */
 
-qint32 spell_dismiss_corpse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_dismiss_corpse(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   victim = {};
   // ch->sendln(u"Disabled."_s);
   // return ReturnValue::eFAILURE;
 
-  for (follow_type *k = ch->followers; k; k = k->next)
+  for (CharacterPtr *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON))
     {
       victim = k->follower;
@@ -14108,7 +14098,7 @@ qint32 spell_dismiss_corpse(quint8 level, CharacterPtr ch, CharacterPtr victim, 
 
 /* DISMISS CORPSE (wands, scrolls, potions, staves) */
 
-qint32 cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14126,7 +14116,7 @@ qint32 cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 ty
     return spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_dismiss_corpse(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14138,13 +14128,13 @@ qint32 cast_dismiss_corpse(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* RELEASE ELEMENTAL */
 
-qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   victim = {};
   // ch->sendln(u"Disabled."_s);
   // return ReturnValue::eFAILURE;
 
-  for (follow_type *k = ch->followers; k; k = k->next)
+  for (CharacterPtr *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM))
     {
       victim = k->follower;
@@ -14157,7 +14147,7 @@ qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victi
     return ReturnValue::eFAILURE;
   }
 
-  switch (dc_->mob_index_[victim->mobdata->nr].vnum())
+  switch (dc_->mob_index_[victim->mobdata->nr]->vnum())
   {
   case FIRE_ELEMENTAL:
     act_to_room("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, INVIS_NULL);
@@ -14183,7 +14173,7 @@ qint32 spell_release_elemental(quint8 level, CharacterPtr ch, CharacterPtr victi
 
 /* RELEASE ELEMENTAL (wands, scrolls, potions, staves) */
 
-qint32 cast_release_elemental(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_release_elemental(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14201,7 +14191,7 @@ qint32 cast_release_elemental(quint8 level, CharacterPtr ch, QString arg, qint32
     return spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_release_elemental(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -14213,7 +14203,7 @@ qint32 cast_release_elemental(quint8 level, CharacterPtr ch, QString arg, qint32
 
 /* VISAGE OF HATE */
 
-qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -14223,7 +14213,7 @@ qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     return ReturnValue::eFAILURE;
   }
 
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -14248,7 +14238,7 @@ qint32 spell_visage_of_hate(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_visage_of_hate(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_visage_of_hate(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14264,7 +14254,7 @@ qint32 cast_visage_of_hate(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* BLESSED HALO */
 
-qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -14274,7 +14264,7 @@ qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     return ReturnValue::eFAILURE;
   }
 
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -14299,7 +14289,7 @@ qint32 spell_blessed_halo(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_blessed_halo(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_blessed_halo(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14315,7 +14305,7 @@ qint32 cast_blessed_halo(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* SPIRIT WALK (GHOST WALK) */
 
-qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   if (!ch)
     return ReturnValue::eFAILURE;
@@ -14387,7 +14377,7 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
 
   CharacterPtr mob;
   mob = ch->dc_->clone_mobile(mobile);
-  mob->hometown = ch->dc_->world[ch->in_room].number;
+  mob->hometown = ch->dc_->world[ch->in_room]->number_;
   char_to_room(mob, ch->in_room);
 
   ch->sendln(u"You call upon the spirits of this area, shifting into a trance-state."_s);
@@ -14400,7 +14390,7 @@ qint32 spell_ghost_walk(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_ghost_walk(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_ghost_walk(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14416,7 +14406,7 @@ qint32 cast_ghost_walk(quint8 level, CharacterPtr ch, QString arg, qint32 type, 
 
 /* CONJURE ELEMENTAL */
 
-qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, ObjectPtr component, qint32 skill)
+ReturnValues spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, CharacterPtr victim, ObjectPtr component, qint32 skill)
 {
   if (!ch)
     return ReturnValue::eFAILURE;
@@ -14531,7 +14521,7 @@ qint32 spell_conjure_elemental(quint8 level, CharacterPtr ch, QString arg, Chara
 
 /* MEND GOLEM */
 
-qint32 cast_mend_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_mend_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14550,7 +14540,7 @@ qint32 cast_mend_golem(quint8 level, CharacterPtr ch, QString arg, qint32 type, 
 
 /* DIVINE INTERVENTION */
 
-qint32 spell_divine_intervention(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_divine_intervention(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -14579,7 +14569,7 @@ qint32 spell_divine_intervention(quint8 level, CharacterPtr ch, CharacterPtr vic
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_divine_intervention(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_divine_intervention(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14598,20 +14588,20 @@ qint32 cast_divine_intervention(quint8 level, CharacterPtr ch, QString arg, qint
 
 /* WRATH OF GOD */
 
-qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 castcost = 0, dam = {};
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   QString buf;
   CharacterPtr next_vict;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You cannot cast this here."_s);
     return ReturnValue::eFAILURE;
   }
 
-  for (victim = dc_->world[ch->in_room].people_; victim; victim = victim->next_in_room)
+  for (victim = dc_->world[ch->in_room]->people_; victim; victim = victim->next_in_room)
     castcost += 75;
 
   castcost -= 75; // the initial 75 to cast the spell
@@ -14627,7 +14617,7 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   ch->sendln(u"You call forth the fury of the gods to consume the area in a holy tempest!"_s);
   act_to_room("$n calls forth the fury of the gods to consume the area in a holy tempest!", ch, 0, 0, 0);
 
-  for (victim = dc_->world[ch->in_room].people_; victim; victim = next_vict)
+  for (victim = dc_->world[ch->in_room]->people_; victim; victim = next_vict)
   {
     next_vict = victim->next_in_room;
 
@@ -14651,7 +14641,7 @@ qint32 spell_wrath_of_god(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   return retval;
 }
 
-qint32 cast_wrath_of_god(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_wrath_of_god(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14670,7 +14660,7 @@ qint32 cast_wrath_of_god(quint8 level, CharacterPtr ch, QString arg, qint32 type
 
 /* ATONEMENT */
 
-qint32 spell_atonement(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_atonement(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   qint32 heal = GET_MAX_MANA(ch) - GET_MANA(ch);
   heal = heal / 1000 + 1;
@@ -14697,7 +14687,7 @@ qint32 spell_atonement(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_atonement(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_atonement(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14716,11 +14706,11 @@ qint32 cast_atonement(quint8 level, CharacterPtr ch, QString arg, qint32 type, C
 
 /* SILENCE */
 
-qint32 spell_silence(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_silence(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ObjectPtr silence_obj = {};
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You cannot silence this room."_s);
     return ReturnValue::eFAILURE;
@@ -14742,7 +14732,7 @@ qint32 spell_silence(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_silence(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_silence(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14761,7 +14751,7 @@ qint32 cast_silence(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
 
 /* IMMUNITY */
 
-qint32 spell_immunity(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, qint32 spl = 0)
+ReturnValues spell_immunity(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, qint32 spl = 0)
 {
   affected_type af;
 
@@ -14797,7 +14787,7 @@ qint32 spell_immunity(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_immunity(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_immunity(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14816,7 +14806,7 @@ qint32 cast_immunity(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
 
 /* BONESHIELD */
 
-qint32 spell_boneshield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_boneshield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -14839,7 +14829,7 @@ qint32 spell_boneshield(quint8 level, CharacterPtr ch, CharacterPtr victim, Obje
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_boneshield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_boneshield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14858,7 +14848,7 @@ qint32 cast_boneshield(quint8 level, CharacterPtr ch, QString arg, qint32 type, 
 
 /* CHANNEL */
 
-qint32 spell_channel(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, qint32 heal = 0)
+ReturnValues spell_channel(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill, qint32 heal = 0)
 {
   QString buf;
 
@@ -14880,7 +14870,7 @@ qint32 spell_channel(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_channel(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_channel(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -14988,9 +14978,9 @@ SPELL_POINTER get_wild_magic_offensive(quint8 level, CharacterPtr ch, CharacterP
   return spell_to_cast;
 }
 
-qint32 cast_solidity(quint8 level, CharacterPtr ch, QString arg,
-                     qint32 type, CharacterPtr tar_ch,
-                     ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_solidity(quint8 level, CharacterPtr ch, QString arg,
+                          qint32 type, CharacterPtr tar_ch,
+                          ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15011,7 +15001,7 @@ qint32 cast_solidity(quint8 level, CharacterPtr ch, QString arg,
     return spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   case SPELL_TYPE_STAFF:
-    for (tar_ch = dc_->world[ch->in_room].people_; tar_ch; tar_ch = tar_ch->next_in_room)
+    for (tar_ch = dc_->world[ch->in_room]->people_; tar_ch; tar_ch = tar_ch->next_in_room)
       spell_solidity(level, ch, tar_ch, 0, skill);
     break;
   default:
@@ -15021,7 +15011,7 @@ qint32 cast_solidity(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_solidity(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_solidity(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (IS_AFFECTED(victim, AFF_SOLIDITY))
@@ -15046,9 +15036,9 @@ qint32 spell_solidity(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_stability(quint8 level, CharacterPtr ch, QString arg,
-                      qint32 type, CharacterPtr tar_ch,
-                      ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_stability(quint8 level, CharacterPtr ch, QString arg,
+                           qint32 type, CharacterPtr tar_ch,
+                           ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15072,7 +15062,7 @@ qint32 cast_stability(quint8 level, CharacterPtr ch, QString arg,
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_stability(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_stability(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   if (IS_AFFECTED(victim, AFF_STABILITY))
@@ -15096,7 +15086,7 @@ qint32 spell_stability(quint8 level, CharacterPtr ch, CharacterPtr victim, Objec
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_frostshield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_frostshield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15121,7 +15111,7 @@ qint32 cast_frostshield(quint8 level, CharacterPtr ch, QString arg, qint32 type,
   return ReturnValue::eFAILURE;
 }
 
-qint32 spell_frostshield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_frostshield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -15309,9 +15299,9 @@ SPELL_POINTER get_wild_magic_defensive(quint8 level, CharacterPtr ch, CharacterP
   return spell_to_cast;
 }
 
-qint32 cast_wild_magic(quint8 level, CharacterPtr ch, QString arg,
-                       qint32 type, CharacterPtr tar_ch,
-                       ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_wild_magic(quint8 level, CharacterPtr ch, QString arg,
+                            qint32 type, CharacterPtr tar_ch,
+                            ObjectPtr tar_obj, qint32 skill)
 {
   QString off_def;
   SPELL_POINTER spell_to_cast = {};
@@ -15337,7 +15327,7 @@ qint32 cast_wild_magic(quint8 level, CharacterPtr ch, QString arg,
 
 /* SPIRIT SHIELD */
 
-qint32 spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ObjectPtr ssobj = {};
 
@@ -15373,7 +15363,7 @@ qint32 spell_spirit_shield(quint8 level, CharacterPtr ch, CharacterPtr victim, O
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_spirit_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_spirit_shield(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr victim, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15392,7 +15382,7 @@ qint32 cast_spirit_shield(quint8 level, CharacterPtr ch, QString arg, qint32 typ
 
 /* VILLAINY */
 
-qint32 spell_villainy(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_villainy(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -15412,7 +15402,7 @@ qint32 spell_villainy(quint8 level, CharacterPtr ch, CharacterPtr victim, Object
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_villainy(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_villainy(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15445,7 +15435,7 @@ qint32 cast_villainy(quint8 level, CharacterPtr ch, QString arg, qint32 type, Ch
 
 /* HEROISM */
 
-qint32 spell_heroism(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_heroism(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
 
@@ -15465,7 +15455,7 @@ qint32 spell_heroism(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectP
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_heroism(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_heroism(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15498,8 +15488,8 @@ qint32 cast_heroism(quint8 level, CharacterPtr ch, QString arg, qint32 type, Cha
 
 /* CONSERATE */
 
-qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
-                        ObjectPtr obj, qint32 skill)
+ReturnValues spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
+                              ObjectPtr obj, qint32 skill)
 {
   qint32 spl = SPELL_CONSECRATE;
   qint32 compNum = CONSECRATE_COMP_OBJ_NUMBER;
@@ -15510,10 +15500,10 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[WEAR_HOLD];
-      if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
+      if ((component == 0) || (compNum != dc_->obj_index_[component->item_number]->vnum()))
       {
         component = ch->equipment[WEAR_HOLD2];
-        if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
+        if ((component == 0) || (compNum != dc_->obj_index_[component->item_number]->vnum()))
         {
           ch->sendln(u"You do not have the required components."_s);
           return ReturnValue::eFAILURE;
@@ -15542,9 +15532,9 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     ch->send(u"You manifest the missing components.\r\n"_s);
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) ||
-      isSet(dc_->world[ch->in_room].room_flags, SAFE) ||
-      isSet(dc_->world[ch->in_room].room_flags, NOLEARN))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, SAFE) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, NOLEARN))
   {
     if (IS_MORTAL(ch))
     {
@@ -15623,8 +15613,8 @@ qint32 spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_consecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                       CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_consecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                            CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15654,8 +15644,8 @@ qint32 cast_consecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* DESECRATE */
 
-qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
-                       ObjectPtr obj, qint32 skill)
+ReturnValues spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
+                             ObjectPtr obj, qint32 skill)
 {
   qint32 spl = SPELL_DESECRATE;
   qint32 compNum = DESECRATE_COMP_OBJ_NUMBER;
@@ -15667,10 +15657,10 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     if (!(component = get_obj_in_list_vis(ch, compNum, ch->carrying)))
     {
       component = ch->equipment[WEAR_HOLD];
-      if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
+      if ((component == 0) || (compNum != dc_->obj_index_[component->item_number]->vnum()))
       {
         component = ch->equipment[WEAR_HOLD2];
-        if ((component == 0) || (compNum != dc_->obj_index_[component->item_number].vnum()))
+        if ((component == 0) || (compNum != dc_->obj_index_[component->item_number]->vnum()))
         {
           ch->sendln(u"You do not have the required components."_s);
           return ReturnValue::eFAILURE;
@@ -15701,9 +15691,9 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
     ch->send(u"You manifest the missing components.\r\n"_s);
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) ||
-      isSet(dc_->world[ch->in_room].room_flags, SAFE) ||
-      isSet(dc_->world[ch->in_room].room_flags, NOLEARN))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, SAFE) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, NOLEARN))
   {
     if (IS_MORTAL(ch))
     {
@@ -15784,8 +15774,8 @@ qint32 spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_desecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
-                      CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_desecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
+                           CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15815,13 +15805,13 @@ qint32 cast_desecrate(quint8 level, CharacterPtr ch, QString arg, qint32 type,
 
 /* ELEMENTAL_WALL */
 
-qint32 spell_elemental_wall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_elemental_wall(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   ch->sendln(u"Pirahna is still working on this."_s);
   return ReturnValue::eFAILURE;
 }
 
-qint32 cast_elemental_wall(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_elemental_wall(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {
@@ -15840,7 +15830,7 @@ qint32 cast_elemental_wall(quint8 level, CharacterPtr ch, QString arg, qint32 ty
 
 /* ETHEREAL FOCUS */
 
-qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
+ReturnValues spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill)
 {
   affected_type af;
   CharacterPtr ally, next_ally;
@@ -15860,7 +15850,7 @@ qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   ch->sendln(u"You focus the minds of your allies to react to the slightest movement..."_s);
   act_to_room("$n's magic attempts to focus $s allies minds into a unified supernatural focus...", ch, 0, 0, INVIS_NULL);
   // loop through group members in room
-  for (ally = dc_->world[ch->in_room].people_; ally; ally = next_ally)
+  for (ally = dc_->world[ch->in_room]->people_; ally; ally = next_ally)
   {
     next_ally = ally->next_in_room;
 
@@ -15882,7 +15872,7 @@ qint32 spell_ethereal_focus(quint8 level, CharacterPtr ch, CharacterPtr victim, 
   return ReturnValue::eSUCCESS;
 }
 
-qint32 cast_ethereal_focus(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
+ReturnValue cast_ethereal_focus(quint8 level, CharacterPtr ch, QString arg, qint32 type, CharacterPtr tar_ch, ObjectPtr tar_obj, qint32 skill)
 {
   switch (type)
   {

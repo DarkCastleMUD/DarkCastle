@@ -23,6 +23,7 @@
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
 #include "DC/DC.h"
+#include <qtypes.h>
 
 // Global data
 
@@ -1033,7 +1034,7 @@ void isr_set(CharacterPtr ch)
 
 bool many_charms(CharacterPtr ch)
 {
-  follow_type *k;
+  CharacterPtr *k;
   for (k = ch->followers; k; k = k->next)
   {
     if (IS_AFFECTED(k->follower, AFF_CHARM))
@@ -1046,7 +1047,7 @@ bool many_charms(CharacterPtr ch)
 void extractFamiliar(CharacterPtr ch)
 {
   CharacterPtr victim = {};
-  for (follow_type *k = ch->followers; k; k = k->next)
+  for (CharacterPtr *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
@@ -1064,7 +1065,7 @@ bool any_charms(CharacterPtr ch)
 {
   return many_charms(ch);
   /*
-    follow_type *k;
+    CharacterPtr *k;
     qint32 counter = {};
 
     for(k = ch->followers; k; k = k->next) {
@@ -1098,7 +1099,7 @@ bool circle_follow(CharacterPtr ch, CharacterPtr victim)
 // This will NOT do if a character quits/dies!!
 void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 {
-  follow_type *j, *k;
+  CharacterPtr *j, *k;
 
   if (ch->master == nullptr)
   {
@@ -1197,7 +1198,7 @@ void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 /* Called when a character that follows/is followed dies */
 void die_follower(CharacterPtr ch)
 {
-  follow_type *j, *k;
+  CharacterPtr *j, *k;
   CharacterPtr zombie;
 
   if (ch->master)
@@ -1231,7 +1232,7 @@ void die_follower(CharacterPtr ch)
 /* will arise. CH will follow leader                               */
 void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reason)
 {
-  follow_type *k;
+  CharacterPtr *k;
 
   if (reason != follower_reasons_t::CHANGE_LEADER)
     REMBIT(ch->affected_by, AFF_GROUP);
@@ -1240,7 +1241,7 @@ void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reaso
 
   ch->master = leader;
 
-  auto k = new follow_type;
+  auto k = new CharacterPtr;
 
   k->follower = ch;
   k->next = leader->followers;
@@ -1348,11 +1349,11 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
   CharacterPtr people;
   if (room > 0)
   {
-    people = dc_->world[room].people_;
+    people = dc_->world[room]->people_;
   }
   else
   {
-    people = dc_->world[ch->in_room].people_;
+    people = dc_->world[ch->in_room]->people_;
   }
 
   for (temp_char = people;
@@ -1384,7 +1385,7 @@ qint32 say_spell(CharacterPtr ch, qint32 si, qint32 room)
 // returns 0 or positive if saving throw is made. The more, the higher it was made.
 // return -number of failure.   The lower, the more it was failed.
 //
-qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type)
+qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, ReturnValues spell_base, qint16 save_type)
 {
   double save = {};
 
@@ -1446,7 +1447,7 @@ QString skip_spaces(QString s)
 /*
     Release command.
 */
-ReturnValue do_release(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_release(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_typePtr aff, *aff_next;
   bool printed = false;
@@ -1764,7 +1765,7 @@ bool check_conc_loss(CharacterPtr ch, qint32 spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr tar_obj;
   CharacterPtr tar_char;
@@ -1790,7 +1791,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from casting!"_s);
       return ReturnValue::eFAILURE;
@@ -1839,7 +1840,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(u"Stick to singing bucko."_s);
       return ReturnValue::eFAILURE;
     }
-    if (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC))
+    if (isSet(dc_->world[ch->in_room]->room_flags_, NO_MAGIC))
     {
       ch->sendln(u"You find yourself unable to weave magic here."_s);
       return ReturnValue::eFAILURE;
@@ -1982,7 +1983,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
           qint32 new_room = dc_->world[ch->in_room].dir_option[dir]->to_room;
-          if (isSet(dc_->world[new_room].room_flags, SAFE) || isSet(dc_->world[new_room].room_flags, NO_MAGIC))
+          if (isSet(dc_->world[new_room]->room_flags_, SAFE) || isSet(dc_->world[new_room]->room_flags_, NO_MAGIC))
           {
             ch->sendln(u"That room is protected from this harmful magic."_s);
             return ReturnValue::eFAILURE;
@@ -2013,8 +2014,8 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
 
-          if (tar_char->isNonPlayer() && dc_->mob_index_[tar_char->mobdata->nr].vnum() >= 2300 &&
-              dc_->mob_index_[tar_char->mobdata->nr].vnum() <= 2399)
+          if (tar_char->isNonPlayer() && dc_->mob_index_[tar_char->mobdata->nr]->vnum() >= 2300 &&
+              dc_->mob_index_[tar_char->mobdata->nr]->vnum() <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
@@ -2327,7 +2328,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         }
       }
 
-      qint32 retval = {};
+      ReturnValues retval = {};
       if (spl != SPELL_VENTRILOQUATE)
       { /* :-) */
         retval = say_spell(ch, spl, oldroom);
@@ -2381,7 +2382,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         if (IS_AFFECTED(ch, AFF_CRIPPLE) && ch->affected_by_spell(SKILL_CRIPPLE))
           chance -= 1 + ch->affected_by_spell(SKILL_CRIPPLE)->modifier / 10;
 
-        if (!ch->isImmortalPlayer() && dc_->number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(dc_->world[ch->in_room].room_flags, SAFE))
+        if (!ch->isImmortalPlayer() && dc_->number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
         {
           set_conc_loss(ch, spl);
           ch->send(u"You lost your concentration and are unable to cast %s!\r\n"_s.arg(spells[spl - 1]));
@@ -2417,7 +2418,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
           else
             leader = ch;
 
-          follow_type *k;
+          CharacterPtr *k;
           qint32 counter = {};
 
           for (k = leader->followers; k; k = k->next)
@@ -2611,9 +2612,9 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
         }
 
         if (spell_info[spl].spell_pointer())
-          qint32 retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
+          ReturnValues retval = ((*spell_info[spl].spell_pointer())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned));
         else if (spell_info[spl].spell_pointer2())
-          qint32 retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
+          ReturnValues retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
         if (argument_ptr != nullptr)
         {
           free(argument_ptr);
@@ -2666,7 +2667,7 @@ ReturnValue do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   QString buf2, buf3;
@@ -2887,7 +2888,7 @@ ReturnValue do_skills(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
 
@@ -2914,7 +2915,7 @@ ReturnValue do_songs(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_spells(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   QString buf2, buf3;

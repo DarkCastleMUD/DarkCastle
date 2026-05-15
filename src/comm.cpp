@@ -25,7 +25,7 @@ public:
 extern bool MOBtrigger;
 
 // This is turned on right before we call game_loop
-ReturnValue do_not_save_corpses = 1;
+ReturnValues do_not_save_corpses = 1;
 qint32 try_to_hotboot_on_crash = {};
 qint32 was_hotboot = {};
 qint32 died_from_sigsegv = {};
@@ -248,7 +248,7 @@ vnum_t DC::getObjectVNUM(ObjectPtr obj, bool *ok)
     {
       *ok = true;
     }
-    return obj_index_[obj->item_number].vnum();
+    return obj_index_[obj->item_number]->vnum();
   }
 
   if (ok)
@@ -266,7 +266,7 @@ vnum_t DC::getObjectVNUM(legacy_rnum_t nr, bool *ok)
     {
       *ok = true;
     }
-    return obj_index_[nr].vnum();
+    return obj_index_[nr]->vnum();
   }
 
   if (ok)
@@ -278,13 +278,13 @@ vnum_t DC::getObjectVNUM(legacy_rnum_t nr, bool *ok)
 
 vnum_t DC::getObjectVNUM(rnum_t nr, bool *ok)
 {
-  if (nr != DC::INVALID_RNUM && nr <= top_of_objt && obj_index)
+  if (nr != INVALID_RNUM && nr <= top_of_objt && obj_index)
   {
     if (ok)
     {
       *ok = true;
     }
-    return obj_index_[nr].vnum();
+    return obj_index_[nr]->vnum();
   }
 
   if (ok)
@@ -857,7 +857,7 @@ void DC::game_loop_init(void)
 
                  auto future = QtConcurrent::run([]() {});
 
-                 ReturnValue do_not_save_corpses = 1;
+                 ReturnValues do_not_save_corpses = 1;
 
                  QString buf = u"Hot reboot by %1.\r\n"_s.arg("HTTP /shutdown/");
                  send_to_all(buf);
@@ -1196,7 +1196,7 @@ void telnet_ga(ConnectionPtr conn)
   write_to_output(QByteArray(go_ahead), d);
 }
 
-ReturnValue do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->getLastPrompt().isEmpty())
     ch->sendln(u"Last prompt: unset"_s);
@@ -1206,7 +1206,7 @@ ReturnValue do_lastprompt(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_prompt(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1391,9 +1391,9 @@ CharacterPtr get_charmie(CharacterPtr ch)
   if (!ch)
     return 0;
 
-  follow_type *k;
+  CharacterPtr *k;
   if (ch->followers)
-    for (k = ch->followers; k && k != (follow_type *)0x95959595; k = k->next)
+    for (k = ch->followers; k && k != (CharacterPtr *)0x95959595; k = k->next)
       if (IS_AFFECTED(k->follower, AFF_CHARM))
         return k->follower;
 
@@ -2143,11 +2143,11 @@ qint32 close_socket(ConnectionPtr conn)
 
       if (IS_AFFECTED(conn->character, AFF_CANTQUIT))
       {
-        logsocket(u"%1@%2 has disconnected from room %3 with CANTQUIT."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(world[conn->character->in_room].number));
+        logsocket(u"%1@%2 has disconnected from room %3 with CANTQUIT."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(world[conn->character->in_room]->number_));
       }
       else
       {
-        logsocket(u"%1@%2 has disconnected from room %3."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(world[conn->character->in_room].number));
+        logsocket(u"%1@%2 has disconnected from room %3."_s.arg(conn->character->name()).arg(conn->getPeerFullAddressString()).arg(world[conn->character->in_room]->number_));
       }
       conn->character->conn_ = {};
     }
@@ -2377,7 +2377,7 @@ void signal_handler(qint32 signal, siginfo_t *si, void *)
   if (signal == SIGHUP)
   {
     QString *new_argv = {};
-    extern ReturnValue do_not_save_corpses;
+    extern ReturnValues do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(u"Hot reboot by SIGHUP.\r\n"_s);
     logentry(u"Hot reboot by SIGHUP.\r\n"_s, ANGEL, DC::LogChannel::LOG_GOD);
@@ -2471,7 +2471,7 @@ void record_msg(QString messg, CharacterPtr ch)
   }
 }
 
-ReturnValue do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_awaymsgs(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 lines = {};
   QString tmp;
@@ -2629,7 +2629,7 @@ void send_to_zone(const QString messg, qint32 zone)
   {
     for (auto &i : connections_)
     {
-      if (!i->connected && !is_busy(i->character) && i->character->in_room != DC::NOWHERE && world[i->character->in_room].zone == zone)
+      if (!i->connected && !is_busy(i->character) && i->character->in_room != INVALID_ROOM && world[i->character->in_room]->zone == zone)
       {
         write_to_output(messg, i);
       }
@@ -2642,15 +2642,15 @@ void send_to_room(QString messg, qint32 room, bool awakeonly, CharacterPtr nta)
   CharacterPtr i = {};
 
   // If a megaphone goes off when in someone's inventory this happens
-  if (room == DC::NOWHERE)
+  if (room == INVALID_ROOM)
     return;
 
-  if (!rooms.contains(room) || !world[room].people_)
+  if (!rooms.contains(room) || !world[room]->people_)
   {
     return;
   }
   if (!messg.isEmpty())
-    for (i = world[room].people_; i; i = i->next_in_room)
+    for (i = world[room]->people_; i; i = i->next_in_room)
       if (i->conn_ && !is_busy(i) && nta != i)
         if (!awakeonly || GET_POS(i) > position_t::SLEEPING)
           write_to_output(messg, i->conn_);
@@ -2747,7 +2747,7 @@ void warn_if_duplicate_ip(CharacterPtr ch)
   }
 }
 
-ReturnValue do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_editor(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   if (argument == 0)

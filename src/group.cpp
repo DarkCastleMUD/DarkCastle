@@ -5,12 +5,12 @@
 */
 #include "DC/DC.h"
 
-ReturnValue do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr k;
   QString buf;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -55,14 +55,14 @@ ReturnValue do_abandon(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_found(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_found(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -111,12 +111,12 @@ ReturnValue do_found(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_split(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_split(QStringList arguments, cmd_t cmd)
 {
   quint64 share = 0, extra = {};
   quint64 no_members = {};
   CharacterPtr k = {};
-  follow_type *f = {};
+  CharacterPtr *f = {};
 
   if (arguments.isEmpty())
   {
@@ -290,12 +290,12 @@ void setup_group_buf(QString report, CharacterPtr j, CharacterPtr i)
   }
 }
 
-ReturnValue do_group(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_group(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   QString buf, report;
   CharacterPtr victim, k, j;
-  follow_type *f;
+  CharacterPtr *f;
   bool found;
 
   one_argument(argument, name);
@@ -333,7 +333,7 @@ ReturnValue do_group(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -406,12 +406,12 @@ ReturnValue do_group(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   QString buf;
   CharacterPtr new_new_leader, k;
-  follow_type *f, *next_f;
+  CharacterPtr *f, *next_f;
 
   one_argument(argument, name);
 
@@ -511,14 +511,14 @@ ReturnValue do_promote(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   QString buf;
   CharacterPtr adios, k;
-  follow_type *f, *next_f;
+  CharacterPtr *f, *next_f;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -615,12 +615,12 @@ ReturnValue do_disband(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr leader;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -702,7 +702,7 @@ ReturnValue do_follow(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
+ReturnValues do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
 {
   if (ch->player == nullptr)
   {
@@ -747,7 +747,7 @@ ReturnValue do_autojoin(CharacterPtr ch, QString str_arguments, cmd_t cmd)
 QList<CharacterPtr> Character::getFollowers(void)
 {
   QList<CharacterPtr> followers = {};
-  follow_type *f = {};
+  CharacterPtr *f = {};
   CharacterPtr leader = {};
 
   if (!IS_AFFECTED(this, AFF_GROUP))

@@ -3,7 +3,7 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-ReturnValue do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr victim;
@@ -40,7 +40,7 @@ ReturnValue do_archive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   argument = one_argument(argument, name);
@@ -49,7 +49,7 @@ ReturnValue do_unarchive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_pview(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_pview(QStringList arguments, cmd_t cmd)
 {
   auto name = arguments.value(0);
   auto victim = get_pc_vis(this, name);
@@ -70,7 +70,7 @@ ReturnValue Character::do_pview(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_snoop(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim;
 
@@ -158,7 +158,7 @@ ReturnValue Character::do_snoop(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -181,7 +181,7 @@ ReturnValue do_stealth(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_send(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_send(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   CharacterPtr vict;

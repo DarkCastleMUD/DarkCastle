@@ -660,7 +660,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
   }
 }
 
-ReturnValue Character::do_botcheck(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_botcheck(QStringList arguments, cmd_t cmd)
 {
   QString name = arguments.value(0);
   if (name.isEmpty())
@@ -744,7 +744,7 @@ ReturnValue Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
     if (nr >= 0)
     {
-      send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index_[nr].vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description())));
+      send(u"[%4dms] [%5d] [%s]\r\n"_s.arg(ms).arg(dc_->mob_index_[nr]->vnum()).arg(qPrintable(((CharacterPtr)(dc_->mob_index_[nr]->item))->short_description())));
     }
   }
 
@@ -950,7 +950,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   const ObjectPtr vobj = {};
   if (obj->item_number >= 0)
   {
-    const qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
+    const qint32 vnum = dc_->obj_index_[obj->item_number]->vnum();
     if (vnum >= 0)
     {
       const qint32 rn_of_vnum = real_object(vnum);
@@ -1132,7 +1132,7 @@ bool identify(CharacterPtr ch, ObjectPtr obj)
   return true;
 }
 
-ReturnValue Character::do_identify(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_identify(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
@@ -1184,7 +1184,7 @@ ReturnValue Character::do_identify(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buffer;
   QString arg1;
@@ -1226,7 +1226,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
   else if (IS_DARK(ch->in_room) && (!ch->isNonPlayer() && !ch->player->holyLite))
   {
     ch->sendln(u"It is pitch black..."_s);
-    ch->list_char_to_char(dc_->world[ch->in_room].people_, 0);
+    ch->list_char_to_char(dc_->world[ch->in_room]->people_, 0);
     ch->send(u"$R"_s);
     // TODO - if have blindfighting, list some of the room exits sometimes
   }
@@ -1321,7 +1321,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               {
                 dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                           "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                          dc_->obj_index_[tmp_object->item_number].vnum(),
+                          dc_->obj_index_[tmp_object->item_number]->vnum(),
                           tmp_object->flags_.value[1],
                           tmp_object->flags_.value[0]);
                 tmp_object->flags_.value[1] =
@@ -1357,7 +1357,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
               {
 
                 qint32 weight_in(ObjectPtr obj);
-                if (dc_->obj_index_[tmp_object->item_number].vnum() == 536)
+                if (dc_->obj_index_[tmp_object->item_number]->vnum() == 536)
                   temp = (3 * weight_in(tmp_object)) / tmp_object->flags_.value[0];
                 else
                   temp = ((tmp_object->flags_.weight * 3) / tmp_object->flags_.value[0]);
@@ -1376,7 +1376,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 temp = 3;
                 dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                           "Bug in object %d. Weight: %d v1: %d",
-                          dc_->obj_index_[tmp_object->item_number].vnum(),
+                          dc_->obj_index_[tmp_object->item_number]->vnum(),
                           tmp_object->flags_.weight,
                           tmp_object->flags_.value[0]);
               }
@@ -1557,7 +1557,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       for (tmp_object = dc_->object_list; tmp_object;
            tmp_object = tmp_object->next)
       {
-        if (tmp_object->isPortal() && tmp_object->getPortalDestinationRoom() == ch->in_room && tmp_object->in_room != DC::NOWHERE && tmp_object->isPortalTypePermanent())
+        if (tmp_object->isPortal() && tmp_object->getPortalDestinationRoom() == ch->in_room && tmp_object->in_room != INVALID_ROOM && tmp_object->isPortalTypePermanent())
         {
           ch->in_room = tmp_object->in_room;
           found = true;
@@ -1587,7 +1587,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 ch->send(tmpbuf);
                 return ReturnValue::eFAILURE;
               }
-              if ((ch->in_room = real_room(tmp_object->getPortalDestinationRoom())) == DC::NOWHERE)
+              if ((ch->in_room = real_room(tmp_object->getPortalDestinationRoom())) == INVALID_ROOM)
                 ch->in_room = original_loc;
               else
                 found = true;
@@ -1617,7 +1617,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
       ansi_color(GREY, ch);
       ansi_color(BOLD, ch);
-      send_to_char(dc_->world[ch->in_room].name, ch);
+      send_to_char(dc_->world[ch->in_room]->name_, ch);
       ansi_color(NTEXT, ch);
       ansi_color(GREY, ch);
 
@@ -1626,7 +1626,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       {
         sprinttype(dc_->world[ch->in_room].sector_type, sector_types,
                    sector_buf);
-        sprintbit((qint32)dc_->world[ch->in_room].room_flags, room_bits,
+        sprintbit((qint32)dc_->world[ch->in_room]->room_flags_, room_bits,
                   rflag_buf);
         ch->send(u"\r\nLight[%d] <%s> [ %s]"_s.arg(DARK_AMOUNT(ch->in_room)).arg(sector_buf).arg(rflag_buf));
         if (dc_->world[ch->in_room].temp_room_flags)
@@ -1645,7 +1645,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
       ansi_color(BLUE, ch);
       ansi_color(BOLD, ch);
       ch->list_obj_to_char(dc_->world[ch->in_room].contents, 0, false);
-      ch->list_char_to_char(dc_->world[ch->in_room].people_, 0);
+      ch->list_char_to_char(dc_->world[ch->in_room]->people_, 0);
 
       dc_strcpy(buffer, "");
       *buffer = '\0';
@@ -1663,7 +1663,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         else
           door = doorj;
 
-        if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
+        if (!EXIT(ch, door) || EXIT(ch, door)->to_room == INVALID_ROOM)
           continue;
         is_closed = isSet(EXIT(ch, door)->exit_info, EX_CLOSED);
         is_hidden = isSet(EXIT(ch, door)->exit_info, EX_HIDDEN);
@@ -1708,7 +1708,7 @@ ReturnValue do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
 /* end of look */
 
-ReturnValue do_read(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_read(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
 
@@ -1720,7 +1720,7 @@ ReturnValue do_read(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name, buf;
   CharacterPtr tmp_char;
@@ -1751,7 +1751,7 @@ ReturnValue do_examine(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door;
   QString buf;
@@ -1768,13 +1768,13 @@ ReturnValue do_exits(CharacterPtr ch, QString argument, cmd_t cmd)
 
   for (door = {}; door <= 5; door++)
   {
-    if (!EXIT(ch, door) || EXIT(ch, door)->to_room == DC::NOWHERE)
+    if (!EXIT(ch, door) || EXIT(ch, door)->to_room == INVALID_ROOM)
       continue;
 
     if (!ch->isNonPlayer() && ch->player->holyLite)
       dc_sprintf(buf + dc_strlen(buf), "%s - %s [%d]\r\n", exits[door],
                  dc_->world[EXIT(ch, door)->to_room].name,
-                 dc_->world[EXIT(ch, door)->to_room].number);
+                 dc_->world[EXIT(ch, door)->to_room]->number_);
     else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
       if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
@@ -1805,7 +1805,7 @@ QList<QChar> frills = {
     '~',
     '\\'};
 
-ReturnValue do_score(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_score(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString race;
   QString buf, scratch;
@@ -2177,7 +2177,7 @@ ReturnValue do_score(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_time(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_time(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString suf;
@@ -2261,7 +2261,7 @@ ReturnValue do_time(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern weather_data weather_info;
   QString buf;
@@ -2289,9 +2289,9 @@ ReturnValue do_weather(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  extern FILE *help_fl;
+  extern QTextStream help_fl;
   extern QString help;
 
   qint32 chk, bot, top, mid;
@@ -2351,7 +2351,7 @@ ReturnValue do_help(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_count(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_count(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   ConnectionPtr conn;
   CharacterPtr i;
@@ -2388,14 +2388,14 @@ ReturnValue do_count(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_inventory(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_inventory(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln(u"You are carrying:"_s);
   ch->list_obj_to_char(ch->carrying, 1, true);
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 j;
   bool found;
@@ -2431,33 +2431,33 @@ ReturnValue do_equipment(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_credits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->conn_, credits, 0);
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_story(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_story(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->conn_, story, 0);
   return ReturnValue::eSUCCESS;
 }
 /*
-ReturnValue do_news(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
    page_string(ch->conn_, news, 0);
    return ReturnValue::eSUCCESS;
 }
 
 */
-ReturnValue do_info(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_info(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   page_string(ch->conn_, info, 0);
   return ReturnValue::eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
-ReturnValue do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
+ReturnValues do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
   QString buf, buf2;
   ObjectPtr k;
@@ -2493,44 +2493,44 @@ ReturnValue do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 
     if (k->in_obj)
     {
-      if (k->in_obj->in_room > DC::NOWHERE)
-        in_room = dc_->world[k->in_obj->in_room].number;
+      if (k->in_obj->in_room > INVALID_ROOM)
+        in_room = dc_->world[k->in_obj->in_room]->number_;
       else if (k->in_obj->carried_by)
       {
         if (!CAN_SEE(ch, k->in_obj->carried_by))
           continue;
-        in_room = dc_->world[k->in_obj->carried_by->in_room].number;
+        in_room = dc_->world[k->in_obj->carried_by->in_room]->number_;
       }
       else if (k->in_obj->equipped_by)
       {
         if (!CAN_SEE(ch, k->in_obj->equipped_by))
           continue;
-        in_room = dc_->world[k->in_obj->equipped_by->in_room].number;
+        in_room = dc_->world[k->in_obj->equipped_by->in_room]->number_;
       }
     }
     else if (k->carried_by)
     {
       if (!CAN_SEE(ch, k->carried_by))
         continue;
-      in_room = dc_->world[k->carried_by->in_room].number;
+      in_room = dc_->world[k->carried_by->in_room]->number_;
     }
     else if (k->equipped_by)
     {
       if (!CAN_SEE(ch, k->equipped_by))
         continue;
-      in_room = dc_->world[k->equipped_by->in_room].number;
+      in_room = dc_->world[k->equipped_by->in_room]->number_;
     }
     else if (k->in_room > 0)
-      in_room = dc_->world[k->in_room].number;
+      in_room = dc_->world[k->in_room]->number_;
     else
       in_room = {};
 
     count++;
 
-    if (in_room != DC::NOWHERE)
+    if (in_room != INVALID_ROOM)
       dc_sprintf(buf, "[%2d] %-26s %d", count, qPrintable(k->short_description()), in_room);
     else
-      dc_sprintf(buf, "[%2d] %-26s %s", count, qPrintable(k->short_description()), "(Item at DC::NOWHERE.)");
+      dc_sprintf(buf, "[%2d] %-26s %s", count, qPrintable(k->short_description()), "(Item at INVALID_ROOM.)");
 
     if (k->in_obj)
     {
@@ -2576,7 +2576,7 @@ ReturnValue do_olocate(CharacterPtr ch, QString name, cmd_t cmd)
 
 /* -----------------   MOB LOCATE FUNCTION ---------------------------- */
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
-ReturnValue do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
+ReturnValues do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 {
   QString buf, buf2;
   qint32 count = {};
@@ -2609,14 +2609,14 @@ ReturnValue do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
     else if (!(isexact(name, i->name())))
       continue;
 
-    if (i->in_room == DC::NOWHERE)
+    if (i->in_room == INVALID_ROOM)
     {
       continue;
     }
 
     count++;
 
-    dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), dc_->world[i->in_room].number);
+    dc_sprintf(buf, "[%2d] %-26s %d\r\n", count, qPrintable(i->short_description()), dc_->world[i->in_room]->number_);
     if (dc_strlen(buf) + dc_strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
       ch->sendln(u"LIST TRUNCATED...TOO LONG"_s);
@@ -2633,7 +2633,7 @@ ReturnValue do_mlocate(CharacterPtr ch, QString name, cmd_t cmd)
 }
 /* --------------------- End of Mob locate function -------------------- */
 
-ReturnValue do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -3016,7 +3016,7 @@ ReturnValue do_consider(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
-ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   CharacterPtr vict;
@@ -3039,10 +3039,10 @@ ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  act("$n carefully searches the surroundings...", ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
+  act_to_room(u"$n carefully searches the surroundings..."_s, 0, 0, INVIS_NULL | STAYHIDE);
   ch->sendln(u"You carefully search the surroundings...\r\n"_s);
 
-  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room]->people_; vict; vict = vict->next_in_room)
   {
     if (CAN_SEE(ch, vict) && ch != vict)
     {
@@ -3057,7 +3057,7 @@ ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
       room = &dc_->world[dc_->world[ch->in_room].dir_option[i]->to_room];
       if (room == &dc_->world[ch->in_room])
         continue;
-      if (isSet(room->room_flags, NO_SCAN))
+      if (isSet(room->room_flags_, NO_SCAN))
       {
         ch->send(u"%35s -- a little bit %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
       }
@@ -3087,7 +3087,7 @@ ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
       if (CAN_GO(ch, i))
       {
         room = &dc_->world[dc_->world[ch->in_room].dir_option[i]->to_room];
-        if (isSet(room->room_flags, NO_SCAN))
+        if (isSet(room->room_flags_, NO_SCAN))
         {
           ch->send(u"%35s -- a ways off %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
         }
@@ -3115,7 +3115,7 @@ ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
           if (CAN_GO(ch, i))
           {
             room = &dc_->world[dc_->world[ch->in_room].dir_option[i]->to_room];
-            if (isSet(room->room_flags, NO_SCAN))
+            if (isSet(room->room_flags_, NO_SCAN))
             {
               ch->send(u"%35s -- extremely far off %s\r\n", "It's too hard to see!"_s.arg(possibilities[i]));
             }
@@ -3146,12 +3146,12 @@ ReturnValue do_scan(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 ntick;
   QString buf;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return 1;
@@ -3187,7 +3187,7 @@ ReturnValue do_tick(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_experience(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_experience(QStringList arguments, cmd_t cmd)
 {
   if (level_ >= IMMORTAL)
   {
@@ -3284,7 +3284,7 @@ void check_champion_and_website_who_list()
   flwo.close();
 }
 
-ReturnValue do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString art = "a";
 
@@ -3307,7 +3307,7 @@ ReturnValue do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_version(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_version(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch)
   {
@@ -3651,7 +3651,7 @@ bool search_object(ObjectPtr obj, QList<Search> sl)
   return matches;
 }
 
-ReturnValue Character::do_search(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_search(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
@@ -4243,7 +4243,7 @@ ReturnValue Character::do_search(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    for (qint32 vnum = {}; vnum < dc_->obj_index_[top_of_objt].vnum(); ++vnum)
+    for (qint32 vnum = {}; vnum < dc_->obj_index_[top_of_objt]->vnum(); ++vnum)
     {
       qint32 rnum = {};
       // real_object returns -1 for missing VNUMs
@@ -4451,7 +4451,7 @@ ReturnValue Character::do_search(QStringList arguments, cmd_t cmd)
     const ObjectPtr vobj = {};
     if (obj->item_number >= 0)
     {
-      const qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
+      const qint32 vnum = dc_->obj_index_[obj->item_number]->vnum();
       if (vnum >= 0)
       {
         const qint32 rn_of_vnum = real_object(vnum);

@@ -67,7 +67,7 @@ void rebuild_rnum_references(qint32 startAt, qint32 type)
   }
 }
 
-ReturnValue do_check(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_check(CharacterPtr ch, QString arg, cmd_t cmd)
 {
 
   auto arguments = QString(arg).trimmed().split(' ');
@@ -80,7 +80,6 @@ ReturnValue do_check(CharacterPtr ch, QString arg, cmd_t cmd)
 
   auto name = arguments.value(0).toLower();
   name[0] = name[0].toUpper();
-  Connection d;
   auto vict = get_pc_vis_exact(ch, name);
   bool connected = true;
   if (!vict)
@@ -112,9 +111,9 @@ ReturnValue do_check(CharacterPtr ch, QString arg, cmd_t cmd)
 
   ch->sendln(u"$3Short Desc$R: %1"_s.arg(vict->shortdesc_or_name()));
 
-  auto race = races[(qint32)(vict->race)].singular_name;
+  auto race = ch->dc_->races[(qint32)(vict->race)].singular_name;
   auto ch_class = pc_clss_types[(qint32)(GET_CLASS(vict))];
-  auto room = dc_->world[vict->in_room].number;
+  auto room = dc_->world[vict->in_room]->number_;
   ch->send(u"$3Race$R: %1 $3Class$R: %2 $3Level$R: %3 $3"_s.arg(race, -9).arg(ch_class, -9).arg(vict->getLevel(), -8));
 
   if (connected)
@@ -160,7 +159,7 @@ ReturnValue do_check(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_find(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_find(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString type;
   QString name;
@@ -223,11 +222,11 @@ ReturnValue do_find(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(u"%1 -- %2 [%3]"_s.arg(vict->shortdesc_or_name(), 30).arg(dc_->world[vict->in_room].name_).arg(dc_->world[vict->in_room].number));
+  ch->send(u"%1 -- %2 [%3]"_s.arg(vict->shortdesc_or_name(), 30).arg(dc_->world[vict->in_room].name_).arg(dc_->world[vict->in_room]->number_));
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   const QStringList types = {
       "mobile",
@@ -324,7 +323,7 @@ ReturnValue do_stat(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr vict;
   QString name;
@@ -378,7 +377,7 @@ ReturnValue do_mpstat(CharacterPtr ch, QString arg, cmd_t cmd)
   /*
     if(!has_range)
     {
-      if(!can_modify_mobile(ch, dc_->mob_index_[x].vnum())) {
+      if(!can_modify_mobile(ch, dc_->mob_index_[x]->vnum())) {
         ch->sendln(u"You are unable to work creation outside of your range."_s);
         return ReturnValue::eFAILURE;
       }
@@ -638,14 +637,14 @@ ReturnValue zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
         {
         case 'M':
           j = real_mobile(i);
-          original_value = dc_->mob_index_[zone.cmd[cmd]->arg1].vnum();
+          original_value = dc_->mob_index_[zone.cmd[cmd]->arg1]->vnum();
           break;
         case 'P':
         case 'G':
         case 'O':
         case 'E':
           j = real_object(i);
-          original_value = dc_->obj_index_[zone.cmd[cmd]->arg1].vnum();
+          original_value = dc_->obj_index_[zone.cmd[cmd]->arg1]->vnum();
           break;
         case 'X':
         case 'K':
@@ -903,7 +902,7 @@ ReturnValue zedit_help(CharacterPtr ch)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, text, arg;
   quint64 i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = {};
@@ -937,7 +936,7 @@ ReturnValue do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
   zone_t zone_key = select.toULongLong(&ok);
   if (!ok)
   {
-    zone_key = dc_->world[ch->in_room].zone;
+    zone_key = dc_->world[ch->in_room]->zone;
   }
   else
   {
@@ -1277,7 +1276,7 @@ ReturnValue do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString select;
@@ -1754,7 +1753,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     }
     if (!obj->affected)
     {
-      dc_sprintf(buf, "Object %d has no affects to delete.\r\n", dc_->obj_index_[item_num].vnum());
+      dc_sprintf(buf, "Object %d has no affects to delete.\r\n", dc_->obj_index_[item_num]->vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1815,7 +1814,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     }
     if (!obj->affected)
     {
-      dc_sprintf(buf, "Object %d has no affects to modify.\r\n", dc_->obj_index_[item_num].vnum());
+      dc_sprintf(buf, "Object %d has no affects to modify.\r\n", dc_->obj_index_[item_num]->vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1853,7 +1852,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     if (!obj->affected)
     {
       dc_sprintf(buf, "Object %d has no affects to modify.\r\n",
-                 dc_->obj_index_[item_num].vnum());
+                 dc_->obj_index_[item_num]->vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1894,7 +1893,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
     if (!obj->affected)
     {
       dc_sprintf(buf, "Object %d has no affects to modify.\r\n",
-                 dc_->obj_index_[item_num].vnum());
+                 dc_->obj_index_[item_num]->vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1919,7 +1918,7 @@ qint32 oedit_affects(CharacterPtr ch, qint32 item_num, QString buf)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_oedit(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_oedit(QStringList arguments, cmd_t cmd)
 {
   QString buf = {};
   QString buf2 = {};
@@ -2559,7 +2558,7 @@ void update_mobprog_bits(qint32 mob_num)
   }
 }
 
-ReturnValue do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf = {};
   QString buf2 = {};
@@ -2632,7 +2631,7 @@ ReturnValue do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
 
   // a this point, mob_num is the index
   if (mobvnum == -1)
-    mobvnum = dc_->mob_index_[mob_num].vnum();
+    mobvnum = dc_->mob_index_[mob_num]->vnum();
 
   if (!can_modify_mobile(ch, mobvnum))
   {
@@ -2947,7 +2946,7 @@ ReturnValue do_procedit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 mob_num = -1;
@@ -2976,7 +2975,7 @@ ReturnValue do_mscore(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (!ch || !argument)
   {
@@ -3032,7 +3031,7 @@ ReturnValue do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
     mob_num = atoll(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
     mobvnum = mob_num;
     mob_num = real_mobile(mobvnum);
-    if (mobvnum == DC::INVALID_VNUM || mob_num == DC::INVALID_VNUM)
+    if (mobvnum == INVALID_VNUM || mob_num == INVALID_VNUM)
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", buf));
       return ReturnValue::eFAILURE;
@@ -3063,7 +3062,7 @@ ReturnValue do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   if (mobvnum == -1)
-    mobvnum = dc_->mob_index_[mob_num].vnum();
+    mobvnum = dc_->mob_index_[mob_num]->vnum();
   // MOVED
   for (x = {};; x++)
   {
@@ -3429,7 +3428,7 @@ ReturnValue do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
       quint64 NPCs_changed = {};
       for (auto const &c : dc_->character_list)
       {
-        if (c->isNonPlayer() && c->mobdata && dc_->mob_index_[c->mobdata->nr].vnum() == mobvnum)
+        if (c->isNonPlayer() && c->mobdata && dc_->mob_index_[c->mobdata->nr]->vnum() == mobvnum)
         {
           c->mobdata->actflags[0] = new_actflags[0];
           c->mobdata->actflags[1] = new_actflags[1];
@@ -4029,7 +4028,7 @@ ReturnValue do_medit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, remainder_args;
   qint32 x, a, b, c, d = {};
@@ -4110,8 +4109,8 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"$3Syntax$R: redit name <Room Name>"_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->world[ch->in_room].name = {};
-    dc_->world[ch->in_room].name = (remainder_args.c_str());
+    dc_->world[ch->in_room]->name_ = {};
+    dc_->world[ch->in_room]->name_ = (remainder_args.c_str());
     ch->sendln(u"Ok."_s);
   }
   break;
@@ -4331,7 +4330,7 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       else
       {
         buf = fmt::format("{} redit exit {} {} {} {} {}", d,
-                          return_directions[x], dc_->world[ch->in_room].number,
+                          return_directions[x], dc_->world[ch->in_room]->number_,
                           a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
         SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
         QString tmp = strdup(buf.c_str());
@@ -4525,7 +4524,7 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"\r\n"_s);
       return ReturnValue::eFAILURE;
     }
-    parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (dc_->world[ch->in_room].room_flags));
+    parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (dc_->world[ch->in_room]->room_flags_));
   }
   break;
 
@@ -4571,7 +4570,7 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   case 7: // denymob
     if (remainder_args.isEmpty() || !is_number(remainder_args.c_str()))
     {
-      ch->sendln(u"Syntax: redit denymob <vnum>\r\nDoing this on an already denied mob will allow it once more."_s);
+      ch->sendln(u"Syntax: redit denymob <vnum>\r\nDoing this on an already denied_mobile_vnums mob will allow it once more."_s);
       return ReturnValue::eFAILURE;
     }
     bool done = false;
@@ -4585,14 +4584,14 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       mob = {};
     }
     DenyPtr nd, *pd = {};
-    for (nd = dc_->world[ch->in_room].denied; nd; nd = nd->next)
+    for (nd = dc_->world[ch->in_room].denied_mobile_vnums; nd; nd = nd->next)
     {
       if (nd->vnum == mob)
       {
         if (pd)
           pd->next = nd->next;
         else
-          dc_->world[ch->in_room].denied = nd->next;
+          dc_->world[ch->in_room].denied_mobile_vnums = nd->next;
         nd = {};
         ch->send(u"Mobile %1 ALLOWED entrance.\r\n"_s.arg(mob));
         done = true;
@@ -4603,7 +4602,7 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     if (done)
       break;
     auto nd = new Deny;
-    nd->next = dc_->world[ch->in_room].denied;
+    nd->next = dc_->world[ch->in_room].denied_mobile_vnums;
     try
     {
       nd->vnum = stoi(remainder_args);
@@ -4613,7 +4612,7 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       nd->vnum = {};
     }
 
-    dc_->world[ch->in_room].denied = nd;
+    dc_->world[ch->in_room].denied_mobile_vnums = nd;
     ch->send(u"Mobile %1 DENIED entrance.\r\n"_s.arg(mob));
     break;
   }
@@ -4621,11 +4620,11 @@ ReturnValue do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
   QString buf, buf2;
-  ExtraDescriptionPtr i, *extra;
+  ExtraDescriptionPtr i, extra;
 
   half_chop(arg, buf, buf2);
 
@@ -4746,7 +4745,7 @@ ReturnValue do_rdelete(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_oneway(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_oneway(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -4766,7 +4765,7 @@ ReturnValue do_oneway(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_zsave(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_zsave(QStringList arguments, cmd_t cmd)
 {
   zone_t zone_key = {};
   auto &zones = dc_->zones;
@@ -4814,7 +4813,7 @@ ReturnValue Character::do_zsave(QStringList arguments, cmd_t cmd)
   QString command = u"cp %1 %1.last"_s.arg(filename);
   system(qPrintable(command));
 
-  FILE *f = {};
+  QTextStream f = {};
   if ((f = fopen(qPrintable(filename), "w")) == nullptr)
   {
     logbug(u"do_zsave: couldn't open zone save file '%1' for '%2'."_s.arg(filename).arg(name()));
@@ -4828,9 +4827,9 @@ ReturnValue Character::do_zsave(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  world_file_list_item *curr;
+  world_file_list_itemPtr curr;
 
   if (!can_modify_room(ch, ch->in_room))
   {
@@ -4871,9 +4870,9 @@ ReturnValue do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_msave(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_msave(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  world_file_list_item *curr;
+  world_file_list_itemPtr curr;
   QString buf;
   QString buf2;
 
@@ -4926,9 +4925,9 @@ ReturnValue do_msave(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  world_file_list_item *curr;
+  world_file_list_itemPtr curr;
   QString buf;
   QString buf2;
 
@@ -4978,9 +4977,9 @@ ReturnValue do_osave(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  FILE *stream;
+  QTextStream stream;
   QString buf, bufl /*,buf2,buf3*/;
   qint32 room = 1, x, door /*,direction*/;
   qint32 pos;
@@ -5010,7 +5009,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == DC::NOWHERE)
+    if (room == INVALID_ROOM)
       continue;
     found_room = true;
     break;
@@ -5034,7 +5033,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == DC::NOWHERE)
+    if (room == INVALID_ROOM)
       continue;
     break;
   }
@@ -5050,7 +5049,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == DC::NOWHERE)
+    if (room == INVALID_ROOM)
       continue;
 
     for (door = {}; door <= 5; door++)
@@ -5073,7 +5072,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
           value = {};
         }
 
-        dc_fprintf(stream, "D 0 %d %d %d\n", dc_->world[room].number, dc_->world[dc_->world[room].dir_option[door]->to_room].number, value);
+        dc_fprintf(stream, "D 0 %d %d %d\n", dc_->world[room]->number_, dc_->world[dc_->world[room].dir_option[door]->to_room]->number_, value);
       }
     }
   } /*  Ok.. all door state info written...  */
@@ -5083,7 +5082,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == DC::NOWHERE)
+    if (room == INVALID_ROOM)
       continue;
 
     if (dc_->world[room].contents)
@@ -5104,8 +5103,8 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
         if (!obj->in_obj)
         {
           dc_fprintf(stream, "O 0 %d %d %d",
-                     dc_->obj_index_[obj->item_number].vnum(), count,
-                     dc_->world[room].number);
+                     dc_->obj_index_[obj->item_number]->vnum(), count,
+                     dc_->world[room]->number_);
           dc_sprintf(buf, "           %s\n", qPrintable(obj->short_description()));
           string_to_file(stream, buf);
 
@@ -5124,8 +5123,8 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
               }
 
               dc_fprintf(stream, "P 1 %d %d %d",
-                         dc_->obj_index_[tmp_obj->item_number].vnum(), count,
-                         dc_->obj_index_[obj->item_number].vnum());
+                         dc_->obj_index_[tmp_obj->item_number]->vnum(), count,
+                         dc_->obj_index_[obj->item_number]->vnum());
               dc_sprintf(buf, "     %s placed inside %s\n",
                          tmp_obj->short_description,
                          qPrintable(obj->short_description()));
@@ -5146,13 +5145,13 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   for (x = low; x <= high; x++)
   {
     room = real_room(x);
-    if (room == DC::NOWHERE)
+    if (room == INVALID_ROOM)
       continue;
 
-    if (dc_->world[room].people_)
+    if (dc_->world[room]->people_)
     {
 
-      for (mob = dc_->world[room].people_; mob; mob = mob->next_in_room)
+      for (mob = dc_->world[room]->people_; mob; mob = mob->next_in_room)
       {
         if (mob->isPlayer())
           continue;
@@ -5166,8 +5165,8 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
             count++;
         }
 
-        dc_fprintf(stream, "M 0 %d %d %d", dc_->mob_index_[mob->mobdata->nr].vnum(),
-                   count, dc_->world[room].number);
+        dc_fprintf(stream, "M 0 %d %d %d", dc_->mob_index_[mob->mobdata->nr]->vnum(),
+                   count, dc_->world[room]->number_);
         dc_sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(stream, buf);
 
@@ -5189,7 +5188,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
             if (!obj->in_obj)
             {
               dc_fprintf(stream, "E 1 %d %d %d",
-                         dc_->obj_index_[obj->item_number].vnum(), count,
+                         dc_->obj_index_[obj->item_number]->vnum(), count,
                          pos);
               dc_sprintf(buf, "      Equip %s with %s\n",
                          mob->short_desc, qPrintable(obj->short_description()));
@@ -5210,9 +5209,9 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                   }
 
                   dc_fprintf(stream, "P 1 %d %d %d",
-                             dc_->obj_index_[tmp_obj->item_number].vnum(),
+                             dc_->obj_index_[tmp_obj->item_number]->vnum(),
                              count,
-                             dc_->obj_index_[obj->item_number].vnum());
+                             dc_->obj_index_[obj->item_number]->vnum());
                   dc_sprintf(buf, "     %s placed inside %s\n",
                              tmp_obj->short_description,
                              qPrintable(obj->short_description()));
@@ -5240,7 +5239,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
             if (!obj->in_obj)
             {
               dc_fprintf(stream, "G 1 %d %d",
-                         dc_->obj_index_[obj->item_number].vnum(), count);
+                         dc_->obj_index_[obj->item_number]->vnum(), count);
               dc_sprintf(buf, "      Give %s %s\n", mob->short_desc,
                          qPrintable(obj->short_description()));
               string_to_file(stream, buf);
@@ -5260,9 +5259,9 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
                   }
 
                   dc_fprintf(stream, "P 1 %d %d %d",
-                             dc_->obj_index_[tmp_obj->item_number].vnum(),
+                             dc_->obj_index_[tmp_obj->item_number]->vnum(),
                              count,
-                             dc_->obj_index_[obj->item_number].vnum());
+                             dc_->obj_index_[obj->item_number]->vnum());
                   dc_sprintf(buf, "     %s placed inside %s\n",
                              tmp_obj->short_description,
                              qPrintable(obj->short_description()));
@@ -5282,7 +5281,7 @@ ReturnValue do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   QString buf;
@@ -5307,14 +5306,14 @@ ReturnValue do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     x = dc_atoi(arg1);
-    if (x < 0 || (loc = real_room(x)) == DC::NOWHERE)
+    if (x < 0 || (loc = real_room(x)) == INVALID_ROOM)
     {
       ch->sendln(u"No such room exists."_s);
       return ReturnValue::eFAILURE;
     }
     rm = &dc_->world[loc];
   }
-  if (isSet(rm->room_flags, CLAN_ROOM) && ch->getLevel() < PATRON)
+  if (isSet(rm->room_flags_, CLAN_ROOM) && ch->getLevel() < PATRON)
   {
     ch->sendln(u"And you are rstating a clan room because?"_s);
     dc_sprintf(buf, "%s just rstat'd clan room %d.", qPrintable(ch->name()), rm->number);
@@ -5334,8 +5333,8 @@ ReturnValue do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->send(buf);
 
   ch->send(u"Room flags: "_s);
-  sprintbit((qint32)rm->room_flags, room_bits, buf);
-  QString buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags);
+  sprintbit((qint32)rm->room_flags_, room_bits, buf);
+  QString buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags_);
   send_to_char(buffer.c_str(), ch);
 
   ch->sendln(u"Description:"_s);
@@ -5360,7 +5359,7 @@ ReturnValue do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   DenyPtr d;
   qint32 a = {};
-  for (d = rm->denied; d; d = conn->next)
+  for (d = rm->denied_mobile_vnums; d; d = conn->next)
   {
     if (a == 0)
       ch->send(u"Mobiles Denied: "_s);
@@ -5420,7 +5419,7 @@ ReturnValue do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -5490,7 +5489,7 @@ ReturnValue do_possess(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_return(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_return(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   //    if(ch->isNonPlayer())
@@ -5514,8 +5513,8 @@ ReturnValue do_return(CharacterPtr ch, QString argument, cmd_t cmd)
 
     ch->conn_->character->conn_ = ch->conn_;
     ch->conn_ = {};
-    if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr].vnum() > 90 &&
-        dc_->mob_index_[ch->mobdata->nr].vnum() < 100 &&
+    if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr]->vnum() > 90 &&
+        dc_->mob_index_[ch->mobdata->nr]->vnum() < 100 &&
         cmd != cmd_t::LOOK)
     {
       act_to_room("$n evaporates.", ch, 0, 0, 0);
@@ -5526,7 +5525,7 @@ ReturnValue do_return(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_sockets(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_sockets(QStringList arguments, cmd_t cmd)
 {
   QString searchkey;
   if (!arguments.isEmpty())
@@ -5560,7 +5559,7 @@ ReturnValue Character::do_sockets(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   QString buf2;
@@ -5618,7 +5617,7 @@ ReturnValue do_setvote(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_punish(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString name, buf;
   CharacterPtr vict;
@@ -5902,7 +5901,7 @@ void display_punishes(CharacterPtr ch, CharacterPtr vict)
   ch->sendln(u""_s);
 }
 
-ReturnValue do_colors(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_colors(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
 

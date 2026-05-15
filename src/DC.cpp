@@ -6,6 +6,7 @@
  *      Based on http://www.cplusplus.com/forum/beginner/152735/#msg792909
  */
 #include "DC/DC.h"
+#include <qcontainerfwd.h>
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";
@@ -30,7 +31,7 @@ void DC::setup(void)
   QCoreApplication::setApplicationName("DarkCastle");
   if (cf.sql)
   {
-    database_ = Database(this, "dcastle");
+    database_ = new Database(this, "dcastle");
   }
   findLibrary();
   QLocale::setDefault(QLocale::English);
@@ -87,7 +88,7 @@ void DC::handleShooting(void)
   for (auto i = shooting_list_.cbegin(), end = shooting_list_.cend(); i != end; ++i)
   {
     auto &ch = *i;
-    if (ch->in_room == DC::NOWHERE || !ch->shotsthisround)
+    if (ch->in_room == INVALID_ROOM || !ch->shotsthisround)
       shooting_list_.erase(i);
     else
       ch->shotsthisround--;
@@ -151,26 +152,26 @@ void DC::setZoneClanGold(zone_t zone_key, gold_t gold)
   }
 }
 
-void DC::setZoneTopRoom(zone_t zone_key, room_t room_key)
+void DC::setZoneTopRoom(zone_t zone_key, room_t room_number)
 {
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones_.contains(zone_key))
     {
-      dc->zones_[zone_key].setRealTop(room_key);
+      dc->zones_[zone_key].setRealTop(room_number);
     }
   }
 }
 
-void DC::setZoneBottomRoom(zone_t zone_key, room_t room_key)
+void DC::setZoneBottomRoom(zone_t zone_key, room_t room_number)
 {
   DCPtr dc = getInstance();
   if (dc != nullptr)
   {
     if (dc->zones_.contains(zone_key))
     {
-      dc->zones_[zone_key].setRealBottom(room_key);
+      dc->zones_[zone_key].setRealBottom(room_number);
     }
   }
 }
@@ -289,14 +290,6 @@ void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, Charact
   if (cf.verbose_mode)
   {
     logentry(str, god_level, type, vict);
-  }
-}
-
-void close_file(std::FILE *stream)
-{
-  if (stream)
-  {
-    std::
   }
 }
 
@@ -423,10 +416,10 @@ void Character::setLastPrompt(QString prompt)
 
 bool Character::isNowhere(void)
 {
-  return in_room == DC::NOWHERE;
+  return in_room == INVALID_ROOM;
 }
 
-ReturnValue Character::do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd)
 {
   sendln(u"$3%1$R: %2"_s.arg(desc).arg(value));
 
@@ -474,9 +467,11 @@ qint32 dc_fprintf(auto &stream, const QString format, ...)
 {
   va_list ap;
   va_start(ap, format);
-  auto print_count = fprintf(stream, "%s", qPrintable(QString::vasprintf(qPrintable(format), ap)));
+  auto buffer = QString::vasprintf(qPrintable(format), ap);
   va_end(ap);
-  return print_count;
+
+  stream << buffer;
+  return buffer.length();
 }
 
 LegacyFileWorld::~LegacyFileWorld()
@@ -540,7 +535,7 @@ cDeck::cDeck(QObject *parent)
 {
 }
 
-const QStringList cond_colorcodes = {
+const QByteArrayList DC::cond_colorcodes = {
     BOLD + GREEN,
     GREEN,
     BOLD + YELLOW,
@@ -548,3 +543,215 @@ const QStringList cond_colorcodes = {
     RED,
     BOLD + RED,
     BOLD + GREY};
+
+vnum_t GET_OBJ_RNUM(ObjectPtr obj)
+{
+  if (obj)
+    return obj->item_number;
+  return INVALID_RNUM;
+}
+vnum_t GET_OBJ_VNUM(ObjectPtr obj)
+{
+  if (obj && GET_OBJ_RNUM(obj) != INVALID_RNUM)
+    return obj->dc_->obj_index_[GET_OBJ_RNUM(obj)]->vnum();
+  return INVALID_VNUM;
+}
+
+const QStringList DC::obj_types = {
+    "act_prog",
+    "speech_prog",
+    "rand_prog",
+    "all_greet_prog",
+    "catch_prog",
+    "arand_prog",
+    "load_prog",
+    "command_prog",
+    "weapon_prog",
+    "armour_prog",
+    "can_see_prog"};
+
+QTextStream &operator>>(QTextStream &stream, RoomPtr room)
+{
+  if (!room)
+    return stream;
+  room_t room_number{};
+  QString temp{};
+  qint32 dir{};
+  ExtraDescriptionPtr new_new_descr{};
+  zone_t zone_nr{};
+
+  auto c = fread_char(stream);
+
+  if (c != '$')
+  {
+    room_number = fread_int<room_t>(stream, 0, 1000000);
+    temp = fread_string(stream, 0);
+
+    if (room_number)
+    {
+      /*
+      dc_->currentVNUM(room_number);
+      dc_->currentType("Room");
+      dc_->currentName(temp);
+
+      if (room_number >= dc_->top_of_world_alloc)
+      {
+        dc_->top_of_world_alloc = room_number + 200;
+      }
+
+      if (dc_->top_of_world < room_number)
+        dc_->top_of_world = room_number;
+      */
+
+      // room->paths_{};
+      room->number_ = room_number;
+      room->name_ = temp;
+    }
+    QString description = fread_string(stream, 0);
+    if (room_number)
+    {
+      room->description_ = description;
+      room->tracks_ = {};
+      room->denied_mobile_vnums = {};
+      // dc_->total_rooms++;
+    }
+    // Ignore recorded zone number since it may not longer be valid
+    fread_int<quint64>(stream, -1, 64000); // zone nr
+
+    if (room_number)
+    {
+      // Go through the zone table until room->number is
+      // in the current zone.
+
+      bool found = false;
+      zone_t zone_nr{};
+      for (auto [zone_key, zone] : room->dc_->zones_.asKeyValueRange())
+      {
+        if (zone.getBottom() <= room->number_ && zone.getTop() >= room->number_)
+        {
+          found = true;
+          zone_nr = zone_key;
+          break;
+        }
+      }
+      if (!found)
+      {
+        // QString error = u"Room %1 is outside of any zone."_s.arg(room_number);
+        // dc_->logentry(error);
+        // dc_->logentry(u"Room outside of ANY zone.  ERROR"_s, IMMORTAL, DC::LogChannel::LOG_BUG);
+      }
+      else
+      {
+        auto &zone = room->dc_->zones_[zone_nr];
+        if (room_number >= zone.getBottom() && room_number <= zone.getTop())
+        {
+          if (room_number < zone.getRealBottom() || zone.getRealBottom() == 0)
+          {
+            zone.setRealBottom(room_number);
+          }
+          if (room_number > zone.getRealTop() || zone.getRealTop() == 0)
+          {
+            zone.setRealTop(room_number);
+          }
+        }
+        room->zone = zone_nr;
+      }
+    }
+
+    quint32 room_flags = fread_uint<quint32>(stream);
+
+    if (room_number)
+    {
+      room->room_flags_ = room_flags;
+      if (isSet(room->room_flags_, NO_ASTRAL))
+      {
+        REMOVE_BIT(room->room_flags_, NO_ASTRAL);
+      }
+
+      // This bitvector is for runtime and not stored in the files, so just initialize it to 0
+      room->temp_room_flags = {};
+    }
+
+    qint32 sector_type = fread_int<qint32>(stream, -1, 64000);
+
+    if (room_number)
+    {
+      room->sector_type = sector_type;
+      room->funct = {};
+      room->contents_ = {};
+      room->people_ = {};
+      room->light = {}; /* Zero light sources */
+
+      for (size_t tmp{}; tmp <= 5; tmp++)
+        room->dir_option[tmp] = {};
+
+      room->ex_description = {};
+    }
+
+    for (;;)
+    {
+      c = fread_char(stream); /* dir field */
+
+      /* direction field */
+      if (c == 'D')
+      {
+        dir = fread_int(stream, 0, 5);
+        setup_dir(stream, room_number, dir);
+      }
+      /* extra description field */
+      else if (c == 'E')
+      {
+        // strip off the \n after the E
+        if (fread_char(stream) != '\n')
+        {
+          // fseek(stream, -1, SEEK_CUR);
+          stream.seek(-1);
+        }
+
+        new_new_descr = new ExtraDescription;
+        new_new_descr->keyword_ = fread_string(stream, 0);
+        new_new_descr->description_ = fread_string(stream, 0);
+
+        if (room_number)
+        {
+          new_new_descr->next = room->ex_description;
+          room->ex_description = new_new_descr;
+        }
+        else
+        {
+          new_new_descr = {};
+        }
+      }
+      else if (c == 'B')
+      {
+        auto vnum = fread_int(stream, -1, 2147483467);
+        if (room_number)
+          room->denied_mobile_vnums.push_back(vnum);
+        else
+          vnum = {};
+      }
+      else if (c == 'S') /* end of current room */
+        break;
+      else if (c == 'C')
+      {
+        qint32 c_class = fread_int(stream, 0, CLASS_MAX);
+        if (room_number)
+        {
+          room->allow_class[c_class] = true;
+        }
+      }
+    } // of for (;;) (get directions and extra descs)
+  } // if == $
+
+  return stream;
+}
+
+affected_type::affected_type(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+Player::Player(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}

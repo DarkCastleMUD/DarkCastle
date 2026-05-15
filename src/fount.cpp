@@ -37,7 +37,7 @@ qint32 FOUNTAINisPresent(CharacterPtr ch)
  *  Fill skins and any other drink containers.                           *
  ************************************************************************/
 
-ReturnValue do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_fill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr to_obj;

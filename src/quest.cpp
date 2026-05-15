@@ -25,7 +25,7 @@ const QStringList valid_fields = {
 
 qint32 load_quests(void)
 {
-  FILE *stream;
+  QTextStream stream;
   quest_infoPtr quest;
 
   if (!(stream = fopen(QUEST_FILE, "r")))
@@ -64,7 +64,7 @@ qint32 load_quests(void)
 
 qint32 save_quests(void)
 {
-  FILE *stream;
+  QTextStream stream;
   quest_infoPtr quest;
 
   if (!(stream = fopen(QUEST_FILE, "w")))
@@ -135,7 +135,7 @@ quest_infoPtr get_quest_(QString name)
   return 0;
 }
 
-ReturnValue do_add_quest(CharacterPtr ch, QString name)
+ReturnValues do_add_quest(CharacterPtr ch, QString name)
 {
   auto quest = new quest_info;
 
@@ -500,7 +500,7 @@ qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
     while (++dontwannabeinthisforever < 100)
     {
       mob = get_mob_vnum(ch->dc_->number(1, 34000));
-      if (mob && (mob->getLevel() < 90) && dc_->zones.value(dc_->world[mob->in_room].zone).isNoHunt() == false && (mob->description().length() > 80))
+      if (mob && (mob->getLevel() < 90) && dc_->zones.value(dc_->world[mob->in_room]->zone).isNoHunt() == false && (mob->description().length() > 80))
         break;
     }
     quest->hint1 = mob->description();
@@ -668,7 +668,7 @@ qint32 stop_all_quests(CharacterPtr ch)
     return ReturnValue::eFAILURE;
   }
 
-  qint32 retval = {};
+  ReturnValues retval = {};
 
   for (qint32 i = {}; i < QUEST_MAX; i++)
   {
@@ -733,7 +733,7 @@ void quest_update()
 
 qint32 quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, QString name)
 {
-  qint32 retval = {};
+  ReturnValues retval = {};
   QString buf;
   quest_infoPtr quest;
 
@@ -888,9 +888,9 @@ qint32 quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
 {
-  qint32 retval = {};
+  ReturnValues retval = {};
   QString name;
   QString new_arg = " ";
   CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
@@ -1035,7 +1035,7 @@ ReturnValue do_quest(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_qedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   QString field;

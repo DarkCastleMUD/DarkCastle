@@ -49,7 +49,7 @@ void addnews(news_data *newnews)
 
 void savenews()
 {
-  FILE *stream;
+  QTextStream stream;
   if (!(stream = fopen("news.data", "w")))
   {
     dc_->logentry(u"Cannot open news file 'news.data'"_s, 0, DC::LogChannel::LOG_MISC);
@@ -121,7 +121,7 @@ const QString newsify(QString string)
   //  return (tmp);
 }
 
-ReturnValue do_news(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_news(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   bool up;
   if (ch->isNonPlayer())
@@ -172,7 +172,7 @@ ReturnValue do_news(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_addnews(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   if (!ch->has_skill(COMMAND_ADDNEWS))

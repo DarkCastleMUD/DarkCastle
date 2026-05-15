@@ -284,7 +284,7 @@ ObjectPtr Character::clan_altar(void)
       {
         for (auto room = c->rooms; room; room = room->next)
         {
-          if (real_room(room->room_number) == DC::NOWHERE)
+          if (real_room(room->room_number) == INVALID_ROOM)
             continue;
           ObjectPtr t = dc_->world[real_room(room->room_number)].contents;
           for (; t; t = t->next_content)
@@ -1925,7 +1925,7 @@ bool DC::_parse_name(QString arg, QString name)
 // Check for denial of service.
 bool check_deny(ConnectionPtr conn, QString name)
 {
-  FILE *fpdeny = {};
+  QTextStream fpdeny = {};
   QString strdeny;
   QString bufdeny;
 
@@ -2133,7 +2133,7 @@ void update_characters()
     if (i->isPlayer() && i->isMortalPlayer() && dc_->world[i->in_room].sector_type == SECT_UNDERWATER && !(i->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(i, AFF_WATER_BREATHING) || i->affected_by_spell(SKILL_SONG_SUBMARINERS_ANTHEM)))
     {
       tmp = GET_MAX_HIT(i) / 5;
-      dc_sprintf(log_msg, "%s drowned in room %d.", qPrintable(i->name()), dc_->world[i->in_room].number);
+      dc_sprintf(log_msg, "%s drowned in room %d.", qPrintable(i->name()), dc_->world[i->in_room]->number_);
       retval = noncombat_damage(i, tmp, "You gasp your last breath and everything goes dark...", "$n stops struggling as $e runs out of oxygen.", log_msg, KILL_DROWN);
       if (SOMEONE_DIED(retval))
         continue;
@@ -2185,7 +2185,7 @@ void check_silence_beacons(void)
   for (obj = dc_->object_list; obj; obj = tmp_obj)
   {
     tmp_obj = obj->next;
-    if (dc_->obj_index_[obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       if (obj->flags_.value[0] == 0)
         extract_obj(obj);
@@ -2207,7 +2207,7 @@ void DC::checkConsecrate(qint32 pulseType)
     for (obj = dc_->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (dc_->obj_index_[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (dc_->obj_index_[obj->item_number]->vnum() == CONSECRATE_OBJ_NUMBER)
       {
         spl = obj->flags_.value[0];
         obj->flags_.value[1]--;
@@ -2221,20 +2221,20 @@ void DC::checkConsecrate(qint32 pulseType)
               if (spl == SPELL_CONSECRATE)
               {
                 if (ch->in_room != obj->in_room)
-                  ch->send(u"You sense your consecration of %s has ended.\r\n"_s.arg(dc_->world[obj->in_room].name));
+                  ch->send(u"You sense your consecration of %s has ended.\r\n"_s.arg(dc_->world[obj->in_room]->name_));
                 else
                   ch->sendln(u"Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended."_s);
               }
               else
               {
                 if (ch->in_room != obj->in_room)
-                  ch->send(u"You sense your desecration of %s has ended.\r\n"_s.arg(dc_->world[obj->in_room].name));
+                  ch->send(u"You sense your desecration of %s has ended.\r\n"_s.arg(dc_->world[obj->in_room]->name_));
                 else
                   ch->sendln(u"The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended."_s);
               }
             }
           }
-          for (tmp_ch = dc_->world[obj->in_room].people_; tmp_ch; tmp_ch = next_ch)
+          for (tmp_ch = dc_->world[obj->in_room]->people_; tmp_ch; tmp_ch = next_ch)
           {
             next_ch = tmp_ch->next_in_room;
             if (tmp_ch == ch)
@@ -2272,14 +2272,14 @@ void DC::checkConsecrate(qint32 pulseType)
     for (obj = dc_->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (dc_->obj_index_[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (dc_->obj_index_[obj->item_number]->vnum() == CONSECRATE_OBJ_NUMBER)
       {
         spl = obj->flags_.value[0];
         if (charExists(obj->flags_.origin))
         {
           ch = obj->flags_.origin;
         }
-        for (tmp_ch = dc_->world[obj->in_room].people_; tmp_ch; tmp_ch = next_ch)
+        for (tmp_ch = dc_->world[obj->in_room]->people_; tmp_ch; tmp_ch = next_ch)
         {
           next_ch = tmp_ch->next_in_room;
           if (tmp_ch->isImmortalPlayer())
@@ -2409,7 +2409,7 @@ void DC::checkConsecrate(qint32 pulseType)
 /* check name to see if it is listed in the file of forbidden player names */
 bool DC::on_forbidden_name_list(QString name)
 {
-  FILE *nameList;
+  QTextStream nameList;
   QString buf;
   bool found = false;
   qint32 i;

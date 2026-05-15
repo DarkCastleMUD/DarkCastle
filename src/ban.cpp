@@ -80,7 +80,7 @@ void Bans::save(void) const
   }
 }
 
-ReturnValue Character::do_ban(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_ban(QStringList arguments, cmd_t cmd)
 {
   if (arguments.isEmpty())
   {
@@ -146,7 +146,7 @@ ReturnValue Character::do_ban(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_unban(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_unban(QStringList arguments, cmd_t cmd)
 {
   auto site = arguments.value(0);
   if (site.isEmpty())

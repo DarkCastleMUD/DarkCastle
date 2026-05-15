@@ -8,11 +8,11 @@
 
 #include "DC/DC.h"
 
-ReturnValue do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE; // just in case
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"This place is too peaceful for that."_s);
     return ReturnValue::eFAILURE;
@@ -61,7 +61,7 @@ ReturnValue do_suicide(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // TODO - check differences between hit, murder, and kill....I think we can
 // just pull out alot of the code into a function.
-ReturnValue Character::do_hit(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_hit(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim, k, next_char;
   qint32 count = {};
@@ -122,7 +122,7 @@ ReturnValue Character::do_hit(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   CharacterPtr victim;
@@ -172,7 +172,7 @@ ReturnValue do_murder(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -231,7 +231,7 @@ ReturnValue do_slay(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
-ReturnValue do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -302,7 +302,7 @@ ReturnValue do_kill(CharacterPtr ch, QString argument, cmd_t cmd)
 // if you send do_join a number as the argument, ch will attempt to
 // join a mob of that number.  Only works if ch is mob.
 //
-ReturnValue Character::do_join(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_join(QStringList arguments, cmd_t cmd)
 {
   if (fighting)
   {
@@ -314,7 +314,7 @@ ReturnValue Character::do_join(QStringList arguments, cmd_t cmd)
   QString victim_name = arguments.value(0);
   if (victim_name == "follower")
   {
-    for (follow_type *j = followers; j; j = j->next)
+    for (CharacterPtr *j = followers; j; j = j->next)
     {
       if (in_room == j->follower->in_room && j->follower->fighting)
       {
@@ -339,10 +339,10 @@ ReturnValue Character::do_join(QStringList arguments, cmd_t cmd)
     vnum_t victim_vnum = victim_name.toULongLong(&ok);
     if (ok)
     {
-      CharacterPtr possible_victim = dc_->world[in_room].people_;
+      CharacterPtr possible_victim = dc_->world[in_room]->people_;
       for (; possible_victim; possible_victim = possible_victim->next_in_room)
       {
-        if (possible_victim->isNonPlayer() && dc_->mob_index_[victim->mobdata->nr].vnum() == victim_vnum)
+        if (possible_victim->isNonPlayer() && dc_->mob_index_[victim->mobdata->nr]->vnum() == victim_vnum)
         {
           victim = possible_victim;
           break;

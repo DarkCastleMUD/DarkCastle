@@ -249,7 +249,7 @@ bool Character::isTank(void)
 {
   if (!in_room)
     return false;
-  for (auto victim = dc_->world[in_room].people_; victim; victim = victim->next_in_room)
+  for (auto victim = dc_->world[in_room]->people_; victim; victim = victim->next_in_room)
     if (victim->fighting == this && victim != this)
       return true;
   return false;
@@ -328,7 +328,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
     auto result = std::find_if(character_list.begin(), character_list.end(),
                                [&target, &left, &mob](CharacterPtr const &tmp)
                                {
-                                 if (tmp->in_room != DC::NOWHERE && dc_->world[mob->in_room].zone == dc_->world[tmp->in_room].zone && isexact(left, qPrintable(tmp->name())))
+                                 if (tmp->in_room != INVALID_ROOM && dc_->world[mob->in_room]->zone == dc_->world[tmp->in_room]->zone && isexact(left, qPrintable(tmp->name())))
                                  {
                                    target = tmp;
                                    return true;
@@ -343,7 +343,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   {
     left += 6;
     CharacterPtr tmp;
-    for (tmp = dc_->world[mob->in_room].people_; tmp; tmp = tmp->next_in_room)
+    for (tmp = dc_->world[mob->in_room]->people_; tmp; tmp = tmp->next_in_room)
     {
       if (isexact(left, qPrintable(tmp->name())))
       {
@@ -369,11 +369,11 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   {
     left += 6;
     ObjectPtr otmp;
-    qint32 z = dc_->world[mob->in_room].zone;
+    qint32 z = dc_->world[mob->in_room]->zone;
     for (otmp = dc_->object_list; otmp; otmp = otmp->next)
     {
       ObjectPtr cmp = otmp->in_obj ? otmp->in_obj : otmp;
-      if ((cmp->in_room != DC::NOWHERE && dc_->world[cmp->in_room].zone == z) || (cmp->carried_by && dc_->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && dc_->world[cmp->equipped_by->in_room].zone == z))
+      if ((cmp->in_room != INVALID_ROOM && dc_->world[cmp->in_room]->zone == z) || (cmp->carried_by && dc_->world[cmp->carried_by->in_room]->zone == z) || (cmp->equipped_by && dc_->world[cmp->equipped_by->in_room]->zone == z))
         if (isexact(left, otmp->name()))
         {
           otarget = otmp;
@@ -389,7 +389,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   }
   else if (!str_prefix("zone_", left))
   {
-    ztarget = dc_->world[mob->in_room].zone;
+    ztarget = dc_->world[mob->in_room]->zone;
     left += 5;
   }
   else if (*left == '$')
@@ -495,7 +495,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       }
       else
       {
-        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", dc_->mob_index_[mob->mobdata->nr].vnum());
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: Mob: %d invalid target in mobprog", dc_->mob_index_[mob->mobdata->nr]->vnum());
       }
     }
     return;
@@ -782,7 +782,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       if (!rtarget)
         tError = true;
       else
-        uintval = &dc_->world[rtarget].room_flags;
+        uintval = &dc_->world[rtarget]->room_flags_;
     }
     break;
   case 'g':
@@ -813,7 +813,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
         {
           dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                     "translate_value: Mob: %d invalid skillnumber in hasskill",
-                    dc_->mob_index_[mob->mobdata->nr].vnum());
+                    dc_->mob_index_[mob->mobdata->nr]->vnum());
           tError = true;
         }
         qint16 sklint = target->has_skill(skl);
@@ -1313,7 +1313,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
       }
       else
       {
-        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", dc_->mob_index_[mob->mobdata->nr].vnum());
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "translate_value: Mob: %d tried to access non-existent field of target", dc_->mob_index_[mob->mobdata->nr]->vnum());
       }
     }
     return;
@@ -1414,7 +1414,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   if (*point == '\0')
   {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: null ifchck: '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
     return -1;
   }
   /* skip leading spaces */
@@ -1441,7 +1441,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     else if (*point == '\0')
     {
       mob->prog_error(u"ifchck syntax error"_s);
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     else if (*point == ' ')
@@ -1463,7 +1463,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     }
     else if (*point == '\0')
     {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck syntax error: '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     else if (*point == ' ')
@@ -1489,7 +1489,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     while ((*point != ' ') && (!isalnum(*point)))
       if (*point == '\0')
       {
-        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: ifchck operator without value: '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
         return -1;
       }
       else
@@ -1564,11 +1564,11 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     CharacterPtr te;
     qint32 vnum = dc_atoi(arg);
-    for (te = dc_->world[mob->in_room].people_; te; te = te->next)
+    for (te = dc_->world[mob->in_room]->people_; te; te = te->next)
     {
       if (te->isPlayer())
         continue;
-      if (dc_->mob_index_[te->mobdata->nr].vnum() == vnum)
+      if (dc_->mob_index_[te->mobdata->nr]->vnum() == vnum)
       {
         fvict = te;
         break;
@@ -1668,7 +1668,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     CharacterPtr p;
     qint32 count = {};
-    for (p = dc_->world[mob->in_room].people_; p; p = p->next_in_room)
+    for (p = dc_->world[mob->in_room]->people_; p; p = p->next_in_room)
       if (p->isPlayer())
         count++;
     return mprog_veval(count, opr, dc_atoi(val));
@@ -1684,7 +1684,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     count = std::count_if(character_list.begin(), character_list.end(),
                           [&target](CharacterPtr vch)
                           {
-                            if (vch->isNonPlayer() && vch->in_room != DC::NOWHERE && dc_->mob_index_[vch->mobdata->nr].vnum() == target)
+                            if (vch->isNonPlayer() && vch->in_room != INVALID_ROOM && dc_->mob_index_[vch->mobdata->nr]->vnum() == target)
                             {
                               return true;
                             }
@@ -1705,7 +1705,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     ObjectPtr p;
     for (p = dc_->object_list; p; p = p->next)
     {
-      if (dc_->obj_index_[p->item_number].vnum() == target)
+      if (dc_->obj_index_[p->item_number]->vnum() == target)
       {
         count++;
       }
@@ -1720,8 +1720,8 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     qint32 target = dc_atoi(arg);
     CharacterPtr p;
     qint32 count = {};
-    for (p = dc_->world[mob->in_room].people_; p; p = p->next_in_room)
-      if (p->isNonPlayer() && dc_->mob_index_[p->mobdata->nr].vnum() == target)
+    for (p = dc_->world[mob->in_room]->people_; p; p = p->next_in_room)
+      if (p->isNonPlayer() && dc_->mob_index_[p->mobdata->nr]->vnum() == target)
         count++;
 
     return mprog_veval(count, opr, dc_atoi(val));
@@ -1768,7 +1768,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return 0;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'ispc'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'ispc'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -1814,7 +1814,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return 0;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'iswielding'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -1852,7 +1852,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return 0;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isweappri'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -1890,7 +1890,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return 0;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isweapsec'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -1926,7 +1926,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return false;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isnpc(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return false;
     }
     break;
@@ -1962,7 +1962,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     break;
@@ -1998,7 +1998,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     break;
@@ -2034,7 +2034,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isgood(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     break;
@@ -2075,7 +2075,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isword(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
   }
@@ -2112,7 +2112,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isfight(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     break;
@@ -2148,7 +2148,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to istank(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     break;
@@ -2184,7 +2184,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", dc_->mob_index_[mob->mobdata->nr].vnum(), mob->mobdata->nr, ifchck);
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d r%d: bad argument to isimmort(): '%s'", dc_->mob_index_[mob->mobdata->nr]->vnum(), mob->mobdata->nr, ifchck);
       return -1;
     }
     break;
@@ -2222,7 +2222,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         return -1;
     default:
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'ischarmed'",
-                dc_->mob_index_[mob->mobdata->nr].vnum());
+                dc_->mob_index_[mob->mobdata->nr]->vnum());
 
       return -1;
     }
@@ -2258,7 +2258,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isfollow'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -2311,7 +2311,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         break;
       default:
         dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
-                  dc_->mob_index_[mob->mobdata->nr].vnum());
+                  dc_->mob_index_[mob->mobdata->nr]->vnum());
         return -1;
       }
     }
@@ -2356,7 +2356,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         return 0;
     default:
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isspelled'",
-                dc_->mob_index_[mob->mobdata->nr].vnum());
+                dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
   }
@@ -2395,7 +2395,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         return -1;
     default:
       dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isaffected'",
-                dc_->mob_index_[mob->mobdata->nr].vnum());
+                dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -2455,7 +2455,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'hitprcnt'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
   }
@@ -2507,7 +2507,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         take = rndm;
         break;
       default:
-        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'carries'", dc_->mob_index_[mob->mobdata->nr].vnum());
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'carries'", dc_->mob_index_[mob->mobdata->nr]->vnum());
         return -1;
       }
     }
@@ -2577,7 +2577,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
         take = rndm;
         break;
       default:
-        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'carries'", dc_->mob_index_[mob->mobdata->nr].vnum());
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'carries'", dc_->mob_index_[mob->mobdata->nr]->vnum());
         return -1;
       }
     }
@@ -2609,7 +2609,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     {
       if (fvict->isPlayer())
         return 0;
-      lhsvl = dc_->mob_index_[fvict->mobdata->nr].vnum();
+      lhsvl = dc_->mob_index_[fvict->mobdata->nr]->vnum();
       rhsvl = dc_atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     }
@@ -2619,7 +2619,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      lhsvl = dc_->mob_index_[mob->mobdata->nr].vnum();
+      lhsvl = dc_->mob_index_[mob->mobdata->nr]->vnum();
       rhsvl = dc_atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     case 'z':
@@ -2627,7 +2627,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       {
         if (((CharacterPtr)mob->beacon)->isNonPlayer())
         {
-          lhsvl = dc_->mob_index_[((CharacterPtr)mob->beacon)->mobdata->nr].vnum();
+          lhsvl = dc_->mob_index_[((CharacterPtr)mob->beacon)->mobdata->nr]->vnum();
           rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
@@ -2642,7 +2642,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       {
         if (actor->isNonPlayer())
         {
-          lhsvl = dc_->mob_index_[actor->mobdata->nr].vnum();
+          lhsvl = dc_->mob_index_[actor->mobdata->nr]->vnum();
           rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
@@ -2654,7 +2654,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       {
         if (actor->isNonPlayer())
         {
-          lhsvl = dc_->mob_index_[vict->mobdata->nr].vnum();
+          lhsvl = dc_->mob_index_[vict->mobdata->nr]->vnum();
           rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
@@ -2666,7 +2666,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       {
         if (actor->isNonPlayer())
         {
-          lhsvl = dc_->mob_index_[rndm->mobdata->nr].vnum();
+          lhsvl = dc_->mob_index_[rndm->mobdata->nr]->vnum();
           rhsvl = dc_atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
@@ -2676,7 +2676,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     case 'o':
       if (obj)
       {
-        lhsvl = dc_->obj_index_[obj->item_number].vnum();
+        lhsvl = dc_->obj_index_[obj->item_number]->vnum();
         rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
@@ -2685,14 +2685,14 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     case 'p':
       if (v_obj)
       {
-        lhsvl = dc_->obj_index_[v_obj->item_number].vnum();
+        lhsvl = dc_->obj_index_[v_obj->item_number]->vnum();
         rhsvl = dc_atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'number'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'number'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
   }
@@ -2703,7 +2703,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     QString buf4, *buf4pt;
     if (arg[2] != '[')
     {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d badtarget  to 'tempvar'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     buf4pt = &arg[3];
@@ -2713,7 +2713,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       buf4pt++;
     if (*buf4pt == '\0')
     {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad target to 'tempvar'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad target to 'tempvar'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     *buf4pt = '\0';
@@ -2755,7 +2755,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     case 'p':
       return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'tempvar'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
   }
@@ -2766,13 +2766,13 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     qint32 target = dc_atoi(arg);
 
-    for (CharacterPtr vch = dc_->world[mob->in_room].people_;
+    for (CharacterPtr vch = dc_->world[mob->in_room]->people_;
          vch;
          vch = vch->next_in_room)
     {
       if (vch->isNonPlayer() &&
           vch != mob &&
-          dc_->mob_index_[vch->mobdata->nr].vnum() == target)
+          dc_->mob_index_[vch->mobdata->nr]->vnum() == target)
         return 1;
     }
     return 0;
@@ -2788,7 +2788,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
          obj;
          obj = obj->next_content)
     {
-      if (dc_->obj_index_[obj->item_number].vnum() == target)
+      if (dc_->obj_index_[obj->item_number]->vnum() == target)
         return 1;
     }
     return 0;
@@ -2822,16 +2822,16 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'isnpc'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
 
   case eINSAMEZONE:
     if (fvict)
-      return (dc_->world[(fvict)->in_room].zone == dc_->world[(mob)->in_room].zone);
+      return (dc_->world[(fvict)->in_room]->zone == dc_->world[(mob)->in_room]->zone);
     else if ((fvict = get_pc(arg)) != nullptr)
-      return (dc_->world[(fvict)->in_room].zone == dc_->world[(mob)->in_room].zone);
+      return (dc_->world[(fvict)->in_room]->zone == dc_->world[(mob)->in_room]->zone);
 
     switch (arg[1])
     {
@@ -2839,17 +2839,17 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       return 1; // always in the same zone as itself
     case 'n':
       if (actor)
-        return (dc_->world[(actor)->in_room].zone == dc_->world[(mob)->in_room].zone);
+        return (dc_->world[(actor)->in_room]->zone == dc_->world[(mob)->in_room]->zone);
       else
         return -1;
     case 'r':
     case 't':
       if (vict)
-        return (dc_->world[(vict)->in_room].zone == dc_->world[(mob)->in_room].zone);
+        return (dc_->world[(vict)->in_room]->zone == dc_->world[(mob)->in_room]->zone);
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'insamezone'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -2873,7 +2873,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
       else
         return -1;
     default:
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'clan'", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad argument to 'clan'", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return -1;
     }
     break;
@@ -2895,7 +2895,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
      * odd happened.  So report the bug and abort the MOBprogram (return error)
      */
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d unknown ifchck  \"%s\" value %d",
-              dc_->mob_index_[mob->mobdata->nr].vnum(), buf, ifcheck[buf]);
+              dc_->mob_index_[mob->mobdata->nr]->vnum(), buf, ifcheck[buf]);
     return -1;
   }
 }
@@ -2972,7 +2972,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
       cmnd++;
     if (*cmnd == '\0')
     {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d no commands after IF/OR", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d no commands after IF/OR", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return null;
     }
     morebuf = one_argument(cmnd, buf);
@@ -3044,7 +3044,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
           if (*cmnd == '\0')
           {
             dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif after else",
-                      dc_->mob_index_[mob->mobdata->nr].vnum());
+                      dc_->mob_index_[mob->mobdata->nr]->vnum());
             return null;
           }
           morebuf = one_argument(cmnd, buf);
@@ -3064,7 +3064,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
         cmnd++;
       if (*cmnd == '\0')
       {
-        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing else or endif", dc_->mob_index_[mob->mobdata->nr].vnum());
+        dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing else or endif", dc_->mob_index_[mob->mobdata->nr]->vnum());
         return null;
       }
       morebuf = one_argument(cmnd, buf);
@@ -3093,7 +3093,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
       if (*cmnd == '\0')
       {
         dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing an else or endif",
-                  dc_->mob_index_[mob->mobdata->nr].vnum());
+                  dc_->mob_index_[mob->mobdata->nr]->vnum());
         return null;
       }
       morebuf = one_argument(cmnd, buf);
@@ -3108,7 +3108,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
       cmnd++;
     if (*cmnd == '\0')
     {
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif", dc_->mob_index_[mob->mobdata->nr]->vnum());
       return null;
     }
     morebuf = one_argument(cmnd, buf);
@@ -3133,7 +3133,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
       if (!str_cmp(buf, "else"))
       {
         dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d found else in an else section",
-                  dc_->mob_index_[mob->mobdata->nr].vnum());
+                  dc_->mob_index_[mob->mobdata->nr]->vnum());
         return null;
       }
       if (!str_cmp(buf, "break"))
@@ -3154,7 +3154,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
       if (*cmnd == '\0')
       {
         dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d missing endif in else section",
-                  dc_->mob_index_[mob->mobdata->nr].vnum());
+                  dc_->mob_index_[mob->mobdata->nr]->vnum());
         return null;
       }
       morebuf = one_argument(cmnd, buf);
@@ -3229,7 +3229,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
         *t = UPPER(*t);
     }
     else
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ n in MOBProg.", dc_->mob_index_[mob->mobdata->nr]->vnum());
     break;
 
   case 'N':
@@ -3246,7 +3246,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       else
         dc_strcpy(t, "someone");
     else
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ N in MOBProg.", dc_->mob_index_[mob->mobdata->nr]->vnum());
     break;
 
   case 't':
@@ -3258,7 +3258,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
         *t = UPPER(*t);
     }
     else
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $ t in MOBProg.", dc_->mob_index_[mob->mobdata->nr]->vnum());
     break;
 
   case 'T':
@@ -3275,7 +3275,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
       else
         dc_strcpy(t, "someone");
     else
-      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", dc_->mob_index_[mob->mobdata->nr].vnum());
+      dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob %d trying illegal $T in MOBProg.", dc_->mob_index_[mob->mobdata->nr]->vnum());
     break;
 
   case 'f':
@@ -3398,7 +3398,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
     break;
   case 'q':
     QString buf;
-    dc_sprintf(buf, "%d", dc_->mob_index_[mob->mobdata->nr].vnum());
+    dc_sprintf(buf, "%d", dc_->mob_index_[mob->mobdata->nr]->vnum());
     dc_strcpy(t, buf);
     break;
   case 'j':
@@ -3492,7 +3492,7 @@ void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr act
     break;
 
   default:
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad $$var : %c", dc_->mob_index_[mob->mobdata->nr].vnum(), ch);
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d bad $$var : %c", dc_->mob_index_[mob->mobdata->nr]->vnum(), ch);
     break;
   }
 }
@@ -3744,7 +3744,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
   activeProgs++;
   if (activeProgs > 20)
   {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", dc_->mob_index_[mob->mobdata->nr].vnum());
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %d : Too many active mobprograms : LOOP", dc_->mob_index_[mob->mobdata->nr]->vnum());
     activeProgs--;
     return;
   }
@@ -3777,7 +3777,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
   // count valid random victs in room
   if (mob->in_room > 0)
   {
-    for (vch = dc_->world[mob->in_room].people_; vch; vch = vch->next_in_room)
+    for (vch = dc_->world[mob->in_room]->people_; vch; vch = vch->next_in_room)
       if (CAN_SEE(mob, vch, true) && vch->isPlayer())
         count++;
 
@@ -3786,7 +3786,7 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
 
     if (!rndm && count)
     {
-      for (vch = dc_->world[mob->in_room].people_; vch && count;)
+      for (vch = dc_->world[mob->in_room]->people_; vch && count;)
       {
         if (CAN_SEE(mob, vch, true) && vch->isPlayer())
           count--;
@@ -3874,7 +3874,7 @@ qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
   QString dupl = {};
   QString end = {};
   qint32 i = {};
-  qint32 retval = {};
+  ReturnValues retval = {};
   bool done = {};
   //  for ( mprg = dc_->mob_index_[mob->mobdata->nr]->programs_; mprg != nullptr; mprg
   //= next )
@@ -3972,7 +3972,7 @@ void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
     mprg = dc_->mob_index_[mob->mobdata->nr].mobspec;
   }
 
-  if (dc_->mob_index_[mob->mobdata->nr].vnum() == 30013)
+  if (dc_->mob_index_[mob->mobdata->nr]->vnum() == 30013)
   {
     debugpoint();
   }
@@ -4205,7 +4205,7 @@ qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 qint32 Character::mprog_greet_trigger(void)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
-  for (auto vmob = dc_->world[in_room].people_; vmob != nullptr; vmob = vmob->next_in_room)
+  for (auto vmob = dc_->world[in_room]->people_; vmob != nullptr; vmob = vmob->next_in_room)
     if (vmob->isNonPlayer() && (vmob->fighting == nullptr) && AWAKE(vmob))
     {
       if (this != vmob && CAN_SEE(vmob, this) && (dc_->mob_index_[vmob->mobdata->nr]->progtypes_ & GREET_PROG) && isPaused(vmob) == false)
@@ -4324,7 +4324,7 @@ qint32 Character::mprog_speech_trigger(const QString txt)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
-  for (vmob = dc_->world[in_room].people_; vmob != nullptr; vmob = vmob->next_in_room)
+  for (vmob = dc_->world[in_room]->people_; vmob != nullptr; vmob = vmob->next_in_room)
     if (vmob->isNonPlayer() && (dc_->mob_index_[vmob->mobdata->nr]->progtypes_ & SPEECH_PROG) && isPaused(vmob) == false)
     {
       if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
@@ -4366,7 +4366,7 @@ qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint
         if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
         {
           dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d",
-                    dc_->mob_index_[mob->mobdata->nr].vnum());
+                    dc_->mob_index_[mob->mobdata->nr]->vnum());
           return ReturnValue::eFAILURE;
         }
         if (curr_catch == catch_num)
@@ -4655,7 +4655,7 @@ qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qin
       {
         if (!check_range_valid_and_convert(curr_catch, mprg->arglist, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
         {
-          dc_->logf(IMMORTAL, LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d", obj_index_[obj->item_number].vnum());
+          dc_->logf(IMMORTAL, LogChannel::LOG_WORLD, "Invalid catch argument: vnum %d", obj_index_[obj->item_number]->vnum());
           return ReturnValue::eFAILURE;
         }
         if (curr_catch == catch_num)
@@ -4697,7 +4697,7 @@ qint32 Character::oprog_act_trigger(QString txt)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
-  if (in_room == DC::NOWHERE)
+  if (in_room == INVALID_ROOM)
     return mprog_cur_result;
 
   for (item = dc_->world[in_room].contents; item; item = item->next_content)

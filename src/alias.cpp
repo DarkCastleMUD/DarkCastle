@@ -5,7 +5,7 @@
 */
 #include "DC/DC.h"
 
-ReturnValue Character::do_alias(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_alias(QStringList arguments, cmd_t cmd)
 {
   if (!player)
   {
@@ -142,7 +142,7 @@ QString pet_info(CharacterPtr ch, QString type, quint32 victim_count)
       .arg((victim_count ? "$B$5*$R" : ""));
 }
 
-ReturnValue Character::do_pets(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_pets(QStringList arguments, cmd_t cmd)
 {
   QString arg1 = arguments.value(0);
   bool arg1_level_ok = false;
@@ -155,7 +155,7 @@ ReturnValue Character::do_pets(QStringList arguments, cmd_t cmd)
   extern qint32 top_of_mobt;
   QMultiMap<level_t, QString> results;
 
-  for (vnum_t vnum = {}; (vnum <= dc_->mob_index_[top_of_mobt].vnum()); ++vnum)
+  for (vnum_t vnum = {}; (vnum <= dc_->mob_index_[top_of_mobt]->vnum()); ++vnum)
   {
     auto nr = real_mobile(vnum);
     if (nr < 0)

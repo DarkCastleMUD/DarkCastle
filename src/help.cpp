@@ -17,7 +17,7 @@ void show_help_header(CharacterPtr ch);
 void show_help_bar(CharacterPtr ch);
 
 // da functions
-ReturnValue do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_mortal_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   extern QString new_help;
   ch->send(new_help);
@@ -67,7 +67,7 @@ qint32 levenshtein(const QString s, const QString t)
   return d[m][n];
 }
 
-ReturnValue do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_new_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   extern QString new_help;
@@ -351,7 +351,7 @@ qint32 load_new_help(auto &stream, qint32 reload, CharacterPtr ch)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   dc_strcpy(arg, "areas");
   return do_new_help(ch, arg, cmd);
@@ -359,7 +359,7 @@ ReturnValue do_areas(CharacterPtr ch, QString arg, cmd_t cmd)
 
 QString help_buf;
 
-ReturnValue do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i, minlen, count = {};
   QString arg;
@@ -495,7 +495,7 @@ ReturnValue do_hindex(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_index(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_index(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i, minlen, count = {};
   QString arg;
@@ -624,10 +624,10 @@ qint32 strn_cmp(QString arg1, QString arg2, qint32 n)
   return {};
 }
 
-ReturnValue do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
-  FILE *new_help_fl;
+  QTextStream new_help_fl;
   qint32 help_rec_count = 0, ret = {};
 
   // ch->sendln(u"Command disabled!"_s);
@@ -661,7 +661,7 @@ ReturnValue do_reload_help(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_hedit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf, buf2, field, buf3, value;
   help_index_element_new new_help;

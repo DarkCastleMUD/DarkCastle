@@ -10,13 +10,6 @@
 
 #include "DC/DC.h"
 
-extern qint32 rev_dir[];
-
-qint32 saves_spell(CharacterPtr ch, CharacterPtr vict, qint32 spell_base, qint16 save_type);
-void check_eq(CharacterPtr ch);
-
-qint32 get_difficulty(qint32);
-
 qint32 charm_space(qint32 level)
 {
   if (level >= 50)
@@ -36,19 +29,18 @@ qint32 charm_levels(CharacterPtr ch)
 {
   qint32 i = ch->getLevel() / 5;
   qint32 z = 3;
-  follow_type *f;
-  for (f = ch->followers; f; f = f->next)
-    if (IS_AFFECTED(f->follower, AFF_CHARM))
+  for (auto &f : ch->followers)
+    if (IS_AFFECTED(f, AFF_CHARM))
     {
       z--;
-      i -= charm_space(f->follower->getLevel());
+      i -= charm_space(f->getLevel());
     }
   if (z <= 0)
     return -1;
   return i;
 }
 
-ReturnValue do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim = {};
   QString buf;
@@ -61,10 +53,10 @@ ReturnValue do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
 
   arg = one_argument(arg, buf);
 
-  for (follow_type *k = ch->followers; k; k = k->next)
-    if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, qPrintable(k->follower->name())))
+  for (auto &k : ch->followers)
+    if (k->isNonPlayer() && ISSET(k->affected_by, AFF_CHARM) && isexact(buf, qPrintable(k->name())))
     {
-      victim = k->follower;
+      victim = k;
       break;
     }
 
@@ -96,14 +88,13 @@ ReturnValue do_free_animal(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   affected_type af;
   CharacterPtr victim;
   QString buf;
 
-  while (*arg == ' ')
-    arg++;
+  arg = arg.trimmed();
 
   if (arg.isEmpty())
   {
@@ -154,10 +145,10 @@ ReturnValue do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln(u"How you plan on controlling so many followers?"_s);
     return ReturnValue::eFAILURE;
     /*   CharacterPtr  vict = {};
-       for(follow_type *k = ch->followers; k; k = k->next)
-         if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
+       for(CharacterPtr *k = ch->followers; k; k = k->next)
+         if(k->isNonPlayer() &&k->affected_by_spell( SPELL_CHARM_PERSON))
          {
-            vict = k->follower;
+            vict = k;
             break;
          }
          if (vict) {
@@ -218,10 +209,10 @@ ReturnValue do_tame(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_track(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_track(QStringList arguments, cmd_t cmd)
 {
   qint32 x, y;
-  qint32 retval, how_deep, learned;
+  ReturnValues retval, how_deep, learned;
   QString buf;
   QString race;
   QString sex;
@@ -335,7 +326,7 @@ ReturnValue Character::do_track(QStringList arguments, cmd_t cmd)
         if (isNonPlayer())
         {
           // temp disable tracking mobs into town
-          if (dc_->zones.value(dc_->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(dc_->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
+          if (dc_->zones.value(dc_->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(dc_->world[EXIT(this, y)->to_room]->room_flags_, NO_TRACK))
           {
             mobdata->last_direction = y;
             auto cmd_dir = getCommandFromDirection(y);
@@ -371,7 +362,7 @@ ReturnValue Character::do_track(QStringList arguments, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
 
-          if (!isSet(dc_->world[in_room].room_flags, SAFE))
+          if (!isSet(dc_->world[in_room]->room_flags_, SAFE))
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                 this, 0, 0, TO_ROOM, 0);
@@ -482,7 +473,7 @@ ReturnValue Character::do_track(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_ambush(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_ambush(QStringList arguments, cmd_t cmd)
 {
   if (!canPerform(SKILL_AMBUSH))
   {
@@ -678,7 +669,7 @@ forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-ReturnValue do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 learned;
   ObjectPtr new_obj = {};
@@ -726,9 +717,9 @@ ReturnValue do_forage(CharacterPtr ch, QString arg, cmd_t cmd)
   qint32 cur_sector = dc_->world[ch->in_room].sector_type;
 
   // If in a clan or safe room, set sector to inside so we fail forage
-  if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) ||
-      isSet(dc_->world[ch->in_room].room_flags, SAFE) ||
-      isSet(dc_->world[ch->in_room].room_flags, INDOORS))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, SAFE) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, INDOORS))
   {
     cur_sector = SECT_INSIDE;
   }
@@ -899,7 +890,7 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
                           qint32 dir)
 {
   qint32 dir2 = {};
-  qint32 retval;
+  ReturnValues retval;
 
   /* this will make IS_STUPID mobs alot easier to kill with arrows,
      but then again, they _are_ 'stupid'.  Keeps people from tracking
@@ -939,7 +930,7 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
         {
           if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
                 dc_->zones.value(dc_->world[EXIT(victim, dir2)->to_room].zone).isTown()) &&
-              !isSet(dc_->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
+              !isSet(dc_->world[EXIT(victim, dir2)->to_room]->room_flags_, NO_TRACK))
           /* send 1-6 since attempt move --cmd's it */
           {
             auto cmd_dir = getCommandFromDirection(dir2);
@@ -965,7 +956,7 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
       if (CAN_GO(ch, dir2))
         if (!(ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN) &&
               dc_->zones.value(dc_->world[EXIT(victim, dir2)->to_room].zone).isTown()))
-          if (!isSet(dc_->world[EXIT(victim, dir2)->to_room].room_flags, NO_TRACK))
+          if (!isSet(dc_->world[EXIT(victim, dir2)->to_room]->room_flags_, NO_TRACK))
           {
             /* dir+1 it since attempt_move will --cmd it */
             auto cmd_dir = getCommandFromDirection(dir2);
@@ -996,12 +987,12 @@ qint32 mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
 }
 
 /* no need anymore
-ReturnValue do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
+ReturnValues do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
                      qint32 dir, qint32 dam, qint32 artype,
                      ObjectPtr found)
 {
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
 
   void inform_victim(CharacterPtr , CharacterPtr , qint32);
 
@@ -1083,7 +1074,7 @@ ReturnValue do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
 }
 */
 
-ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   CharacterPtr victim;
   qint32 dam, dir = -1, artype, cost, retval, victroom;
@@ -1149,7 +1140,7 @@ ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   target[MAX_STRING_LENGTH - 1] = '\0';
 
   /* make safe rooms checks */
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"You can't shoot arrows if yer in a safe room silly."_s);
     return ReturnValue::eFAILURE;
@@ -1249,10 +1240,10 @@ ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     {
       if (dir >= 0)
       {
-        if (dc_->world[cur_room].dir_option[dir] && !(dc_->world[cur_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(dc_->world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (dc_->world[cur_room].dir_option[dir] && !(dc_->world[cur_room].dir_option[dir]->to_room == INVALID_ROOM) && !isSet(dc_->world[cur_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = dc_->world[cur_room].dir_option[dir]->to_room;
-          if (isSet(dc_->world[new_room].room_flags, SAFE))
+          if (isSet(dc_->world[new_room]->room_flags_, SAFE))
           {
             ch->sendln(u"Don't shoot into a safe room!  You might hit someone!"_s);
             return ReturnValue::eFAILURE;
@@ -1271,11 +1262,11 @@ ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
       if (!victim && new_room && artype == 3 && dir >= 0)
       {
-        if (dc_->world[new_room].dir_option[dir] && !(dc_->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(dc_->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (dc_->world[new_room].dir_option[dir] && !(dc_->world[new_room].dir_option[dir]->to_room == INVALID_ROOM) && !isSet(dc_->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = dc_->world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
-          if (isSet(dc_->world[new_room].room_flags, SAFE))
+          if (isSet(dc_->world[new_room]->room_flags_, SAFE))
           {
             ch->sendln(u"Don't shoot into a safe room!  You might hit someone!"_s);
             char_to_room(ch, cur_room);
@@ -1294,11 +1285,11 @@ ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
 
       if (!victim && new_room && artype == 3 && ch->affected_by_spell(SPELL_FARSIGHT) && dir >= 0)
       {
-        if (dc_->world[new_room].dir_option[dir] && !(dc_->world[new_room].dir_option[dir]->to_room == DC::NOWHERE) && !isSet(dc_->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
+        if (dc_->world[new_room].dir_option[dir] && !(dc_->world[new_room].dir_option[dir]->to_room == INVALID_ROOM) && !isSet(dc_->world[new_room].dir_option[dir]->exit_info, EX_CLOSED))
         {
           new_room = dc_->world[new_room].dir_option[dir]->to_room;
           char_from_room(ch, false);
-          if (isSet(dc_->world[new_room].room_flags, SAFE))
+          if (isSet(dc_->world[new_room]->room_flags_, SAFE))
           {
             ch->sendln(u"Don't shoot into a safe room!  You might hit someone!"_s);
             char_to_room(ch, cur_room);
@@ -1387,7 +1378,7 @@ ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (victim->isNonPlayer() && dc_->mob_index_[victim->mobdata->nr].vnum() >= 2300 && dc_->mob_index_[victim->mobdata->nr].vnum() <= 2399)
+  if (victim->isNonPlayer() && dc_->mob_index_[victim->mobdata->nr]->vnum() >= 2300 && dc_->mob_index_[victim->mobdata->nr]->vnum() <= 2399)
   {
     ch->sendln(u"Your arrow is disintegrated by the fortress' enchantments."_s);
     extract_obj(found);
@@ -1674,7 +1665,7 @@ ReturnValue do_fire(CharacterPtr ch, QString arg, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_mind_delve(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   CharacterPtr target = {};
@@ -1740,11 +1731,11 @@ void check_eq(CharacterPtr ch)
   }
 }
 
-ReturnValue do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_natural_selection(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 i;
   QString buf;
-  affected_type af, *cur;
+  affected_typePtr af, cur;
 
   one_argument(arg, buf);
 

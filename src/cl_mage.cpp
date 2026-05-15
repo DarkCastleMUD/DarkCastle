@@ -75,7 +75,7 @@ qint32 spellcraft(CharacterPtr ch, qint32 spell)
   return false;
 }
 
-ReturnValue do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   // quint8 percent;
   affected_type af;
@@ -122,7 +122,7 @@ ReturnValue do_focused_repelance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   qint32 lvl = ch->has_skill(SKILL_IMBUE);
@@ -150,7 +150,7 @@ ReturnValue do_imbue(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->in_room && (isSet(dc_->world[ch->in_room].room_flags, NO_MAGIC) || isSet(dc_->world[ch->in_room].room_flags, SAFE)))
+  if (ch->in_room && (isSet(dc_->world[ch->in_room]->room_flags_, NO_MAGIC) || isSet(dc_->world[ch->in_room]->room_flags_, SAFE)))
   {
     ch->sendln(u"Something about this room prohibits your magical imbuement."_s);
     return ReturnValue::eFAILURE;
@@ -275,7 +275,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
 {
   CharacterPtr i, next_i, ally, next_ally;
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
 
   // Moving, and act() calls both happen a lot, so we want to get out of here as fast as possible if
   // we can.  We do this by checking if the room has a flag or not
@@ -285,7 +285,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
 
   // loop through the room to find the caster. It should only be possible for a single
   // caster in a room to have this running (as long as no imms are being stupid)
-  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
+  for (i = dc_->world[ch->in_room]->people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -309,7 +309,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     if (GET_POS(i) <= position_t::RESTING ||
         GET_POS(i) == position_t::FIGHTING || i->fighting ||
         IS_AFFECTED(i, AFF_PARALYSIS) ||
-        (isSet(dc_->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
+        (isSet(dc_->world[i->in_room]->room_flags_, SAFE) && !ch->isPlayerCantQuit()))
     {
       dc_sprintf(buf, "I see you %s but I can't do anything about it!", qPrintable(ch->shortdesc_or_name()));
       do_say(i, buf);
@@ -337,7 +337,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
 
     // Loop through allies and attack
-    for (ally = dc_->world[ch->in_room].people_; ally; ally = next_ally)
+    for (ally = dc_->world[ch->in_room]->people_; ally; ally = next_ally)
     {
       next_ally = ally->next_in_room;
 

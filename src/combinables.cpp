@@ -89,7 +89,7 @@ thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-ReturnValue do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_TRADE_POISON);
 
@@ -165,7 +165,7 @@ ReturnValue do_poisonmaking(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
@@ -207,7 +207,7 @@ ReturnValue do_poisonweapon(CharacterPtr ch, QString argument, cmd_t cmd)
 
   qint32 found = -1;
   for (qint32 i = {}; poison_vial_data[i].result != -1; i++)
-    if (poison_vial_data[i].result == dc_->obj_index_[vial->item_number].vnum())
+    if (poison_vial_data[i].result == dc_->obj_index_[vial->item_number]->vnum())
     {
       found = i;
       break;
@@ -255,7 +255,7 @@ qint32 valid_trade_skill_combine(ObjectPtr container, trade_data_type *data, Cha
   // take all the items in our container and put them in an array by vnum
   for (ObjectPtr j = container->contains; j; j = j->next_content)
     if (j->item_number >= 0)
-      current.push_back(dc_->obj_index_[j->item_number].vnum());
+      current.push_back(dc_->obj_index_[j->item_number]->vnum());
     else
       return -1; // only valid object ingrediants will match
 
@@ -312,7 +312,7 @@ void determine_trade_skill_increase(CharacterPtr ch, qint32 skillnum, qint32 lea
 
 qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 type)
 {
-  qint32 retval = ReturnValue::eSUCCESS;
+  ReturnValues retval = ReturnValue::eSUCCESS;
   // unused   qint32 dam;
 
   if (!ch->equipment[WEAR_WIELD])
@@ -369,10 +369,10 @@ qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 
   return retval;
 }
 
-ReturnValue do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, liquid, container, buffer;
-  ObjectPtr herbobj, *liquidobj, containerobj;
+  ObjectPtr herbobj, liquidobj, containerobj;
   affected_type af;
   Brew b;
 
@@ -408,13 +408,13 @@ ReturnValue do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
     if (!str_cmp(arg1, "load"))
     {
       b.load();
-      dc_->logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d brew recipes.", b.size());
+      ch->dc_->logf(108, DC::LogChannel::LOG_WORLD, "Loaded %d brew recipes.", b.size());
       return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "save"))
     {
       b.save();
-      dc_->logf(108, DC::LogChannel::LOG_WORLD, "Saved %d brew recipes.", b.size());
+      ch->dc_->logf(108, DC::LogChannel::LOG_WORLD, "Saved %d brew recipes.", b.size());
       return ReturnValue::eSUCCESS;
     }
     else if (!str_cmp(arg1, "list"))
@@ -522,7 +522,7 @@ ReturnValue do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
 
   const QString potion_color;
   // Determine color to use in message based on herb used
-  switch (dc_->obj_index_[herbobj->item_number].vnum())
+  switch (dc_->obj_index_[herbobj->item_number]->vnum())
   {
   case 6301:
     potion_color = "$B$2green$R and $B$4red$R";
@@ -566,15 +566,15 @@ ReturnValue do_brew(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // Search for the current combination as a recipe
-  Brew::recipe r = {dc_->obj_index_[herbobj->item_number].vnum(),
+  Brew::recipe r = {dc_->obj_index_[herbobj->item_number]->vnum(),
                     liquidobj->flags_.value[2],
-                    dc_->obj_index_[containerobj->item_number].vnum()};
+                    dc_->obj_index_[containerobj->item_number]->vnum()};
   qint32 spell = b.find(r);
 
   //  ch->sendln(u"Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n"_s,
-  //	 dc_->obj_index_[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
+  //	 dc_->obj_index_[herbobj->item_number]->vnum(), GET_OBJ_SHORT(herbobj),
   //	 liquidobj->flags_.value[2], GET_OBJ_SHORT(liquidobj),
-  //	 dc_->obj_index_[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
+  //	 dc_->obj_index_[containerobj->item_number]->vnum(), GET_OBJ_SHORT(containerobj), spell);
 
   if (spell == 0)
   {
@@ -873,7 +873,7 @@ qint32 Brew::find(Brew::recipe r)
   return spell;
 }
 
-ReturnValue do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, dust, pen, paper;
   ObjectPtr inkobj, *dustobj, *penobj, paperobj;
@@ -1033,10 +1033,10 @@ ReturnValue do_scribe(CharacterPtr ch, QString argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   // Search for the current combination as a recipe
-  Scribe::recipe r = {dc_->obj_index_[inkobj->item_number].vnum(),
-                      dc_->obj_index_[dustobj->item_number].vnum(),
-                      dc_->obj_index_[penobj->item_number].vnum(),
-                      dc_->obj_index_[paperobj->item_number].vnum()};
+  Scribe::recipe r = {dc_->obj_index_[inkobj->item_number]->vnum(),
+                      dc_->obj_index_[dustobj->item_number]->vnum(),
+                      dc_->obj_index_[penobj->item_number]->vnum(),
+                      dc_->obj_index_[paperobj->item_number]->vnum()};
   qint32 spell = s.find(r);
 
   act_to_character("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, 0);

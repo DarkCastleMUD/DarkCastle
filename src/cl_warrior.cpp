@@ -11,7 +11,7 @@
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.
 */
-ReturnValue Character::do_kick(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_kick(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim{}, next_victim = {};
   QString name;
@@ -130,12 +130,12 @@ ReturnValue Character::do_kick(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
   qint32 dam, attacktype;
-  qint32 retval;
+  ReturnValues retval;
   qint32 failchance = 25;
 
   if (!ch->canPerform(SKILL_DEATHSTROKE))
@@ -246,12 +246,12 @@ ReturnValue do_deathstroke(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 attempt;
   QString buf;
   // Azrack -- retval should be initialized to something
-  qint32 retval = {};
+  ReturnValues retval = {};
   CharacterPtr chTemp, loop_ch;
 
   bool is_stunned(CharacterPtr ch);
@@ -313,7 +313,7 @@ ReturnValue do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
 
   //   if (CAN_GO(ch, attempt))
   {
-    act("$n tries to beat a hasty retreat.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n tries to beat a hasty retreat."_s, 0, 0, INVIS_NULL);
     ch->sendln(u"You try to beat a hasty retreat...."_s);
 
     // check for any spec procs
@@ -349,7 +349,7 @@ ReturnValue do_retreat(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isPlayer() && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
@@ -399,7 +399,7 @@ ReturnValue do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
     std::for_each(character_list.begin(), character_list.end(), [&ch](CharacterPtr vict)
                   {
 			if (vict && vict != (CharacterPtr ) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
-				qint32 retval = one_hit(ch, vict, TYPE_UNDEFINED, WEAR_WIELD);
+				ReturnValues retval = one_hit(ch, vict, TYPE_UNDEFINED, WEAR_WIELD);
 				if (isSet(retval, ReturnValue::eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
 					return false;
@@ -411,11 +411,11 @@ ReturnValue do_hitall(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
-  qint32 retval;
+  ReturnValues retval;
   qint32 hit = {};
 
   one_argument(argument, name);
@@ -595,7 +595,7 @@ ReturnValue do_bash(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -660,14 +660,14 @@ ReturnValue do_redirect(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   ObjectPtr wielded;
 
   QString name;
   ObjectPtr obj;
-  qint32 retval = {};
+  ReturnValues retval = {};
 
   bool is_fighting_mob(CharacterPtr ch);
 
@@ -721,7 +721,7 @@ ReturnValue do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"You can't seem to work it loose."_s);
       return ReturnValue::eFAILURE;
     }
-    if (dc_->obj_index_[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
+    if (dc_->obj_index_[ch->equipment[WEAR_WIELD]->item_number]->vnum() == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
       return ReturnValue::eSUCCESS;
@@ -756,8 +756,8 @@ ReturnValue do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (((isSet(wielded->flags_.extra_flags, ITEM_NODROP) || isSet(wielded->flags_.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
-        (victim->isPlayer() || dc_->mob_index_[victim->mobdata->nr].vnum() > 2400 ||
-         dc_->mob_index_[victim->mobdata->nr].vnum() < 2300))
+        (victim->isPlayer() || dc_->mob_index_[victim->mobdata->nr]->vnum() > 2400 ||
+         dc_->mob_index_[victim->mobdata->nr]->vnum() < 2300))
       ch->sendln(u"You can't seem to work it loose."_s);
     else
       disarm(ch, victim);
@@ -787,7 +787,7 @@ ReturnValue do_disarm(CharacterPtr ch, QString argument, cmd_t cmd)
 | NON-OFFENSIVE commands.  Below here are commands that should -not-
 |   require the victim to retaliate.
 */
-qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_rescue(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim{}, tmp_ch = {};
   QString victim_name = arguments.value(0);
@@ -828,8 +828,8 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (tmp_ch = dc_->world[in_room].people_; tmp_ch &&
-                                             (tmp_ch->fighting != victim);
+  for (tmp_ch = dc_->world[in_room]->people_; tmp_ch &&
+                                              (tmp_ch->fighting != victim);
        tmp_ch = tmp_ch->next_in_room)
     ;
 
@@ -876,7 +876,7 @@ qint32 Character::do_rescue(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_bladeshield(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
   qint32 duration = 12;
@@ -941,9 +941,9 @@ qint32 handle_any_guard(CharacterPtr ch)
   CharacterPtr guard = {};
 
   // search the room for my guard
-  for (follow_type *curr = ch->guarded_by; curr;)
+  for (CharacterPtr *curr = ch->guarded_by; curr;)
   {
-    for (auto vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
+    for (auto vict = dc_->world[ch->in_room]->people_; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
         curr = {};
@@ -970,7 +970,7 @@ qint32 handle_any_guard(CharacterPtr ch)
 
 CharacterPtr is_guarding_me(CharacterPtr ch, CharacterPtr guard)
 {
-  follow_type *curr = ch->guarded_by;
+  CharacterPtr *curr = ch->guarded_by;
 
   while (curr)
   {
@@ -988,8 +988,8 @@ void stop_guarding(CharacterPtr guard)
     return;
 
   CharacterPtr victim = guard->guarding;
-  follow_type *curr = victim->guarded_by;
-  follow_type *last = {};
+  CharacterPtr *curr = victim->guarded_by;
+  CharacterPtr *last = {};
 
   while (curr)
   {
@@ -1012,7 +1012,7 @@ void stop_guarding(CharacterPtr guard)
 
 void start_guarding(CharacterPtr guard, CharacterPtr victim)
 {
-  auto curr = new follow_type;
+  auto curr = new CharacterPtr;
   curr->follower = guard;
   curr->next = victim->guarded_by;
   victim->guarded_by = curr;
@@ -1022,8 +1022,8 @@ void start_guarding(CharacterPtr guard, CharacterPtr victim)
 void stop_guarding_me(CharacterPtr victim)
 {
   QString buf;
-  follow_type *curr = victim->guarded_by;
-  follow_type *last;
+  CharacterPtr *curr = victim->guarded_by;
+  CharacterPtr *last;
 
   while (curr)
   {
@@ -1040,7 +1040,7 @@ void stop_guarding_me(CharacterPtr victim)
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-ReturnValue do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr victim = {};
@@ -1090,7 +1090,7 @@ ReturnValue do_guard(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1112,7 +1112,7 @@ ReturnValue do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1141,7 +1141,7 @@ ReturnValue do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1167,7 +1167,7 @@ ReturnValue do_tactics(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i, next_i;
   qint32 learned = ch->has_skill(SKILL_MAKE_CAMP);
@@ -1179,17 +1179,17 @@ ReturnValue do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, UNSTABLE) ||
-      isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) || isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) ||
-      isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) || isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) ||
-      isSet(dc_->world[ch->in_room].room_flags, FALL_UP) || isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) ||
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE) || isSet(dc_->world[ch->in_room]->room_flags_, UNSTABLE) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, FALL_NORTH) || isSet(dc_->world[ch->in_room]->room_flags_, FALL_SOUTH) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, FALL_EAST) || isSet(dc_->world[ch->in_room]->room_flags_, FALL_WEST) ||
+      isSet(dc_->world[ch->in_room]->room_flags_, FALL_UP) || isSet(dc_->world[ch->in_room]->room_flags_, FALL_DOWN) ||
       dc_->world[ch->in_room].sector_type == SECT_CITY || dc_->world[ch->in_room].sector_type == SECT_PAVED_ROAD)
   {
     ch->sendln(u"Something about this area inherently prohibits a rugged camp."_s);
     return ReturnValue::eFAILURE;
   }
 
-  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
+  for (i = dc_->world[ch->in_room]->people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1212,7 +1212,7 @@ ReturnValue do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
+  for (i = dc_->world[ch->in_room]->people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1252,7 +1252,7 @@ ReturnValue do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
 
     affect_to_char(ch, &af);
 
-    for (i = dc_->world[ch->in_room].people_; i; i = next_i)
+    for (i = dc_->world[ch->in_room]->people_; i; i = next_i)
     {
       next_i = i->next_in_room;
 
@@ -1272,7 +1272,7 @@ ReturnValue do_make_camp(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_TRIAGE);
   affected_type af;
@@ -1329,7 +1329,7 @@ ReturnValue do_triage(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_BATTLESENSE);
   affected_type af;
@@ -1369,7 +1369,7 @@ ReturnValue do_battlesense(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString name;
@@ -1455,7 +1455,7 @@ ReturnValue do_smite(CharacterPtr ch, QString argument, cmd_t cmd)
   return ch->fighting ? ReturnValue::eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
-ReturnValue do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_LEADERSHIP);
   affected_type af;
@@ -1472,7 +1472,7 @@ ReturnValue do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE) || isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE) || isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"Stop trying to show off."_s);
     return ReturnValue::eFAILURE;
@@ -1514,7 +1514,7 @@ ReturnValue do_leadership(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_PERSEVERANCE);
   affected_type af;
@@ -1554,7 +1554,7 @@ ReturnValue do_perseverance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict = {};
   qint32 learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
@@ -1599,7 +1599,7 @@ ReturnValue do_defenders_stance(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_onslaught(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 learned = ch->has_skill(SKILL_ONSLAUGHT);
   affected_type af;

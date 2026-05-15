@@ -168,7 +168,7 @@ void AuctionHouse::DoModify(CharacterPtr ch, quint32 ticket, quint32 new_price)
 
   ch->send(u"The new price of ticket %u (%s) is now %u.\r\n"_s.arg(ticket).arg(qPrintable(Item_it->item_name)).arg(new_price));
 
-  for (auto &vch : dc_->world[ch->in_room].people_)
+  for (auto &vch : dc_->world[ch->in_room]->people_)
   {
     if (vch != ch)
     {
@@ -328,7 +328,7 @@ Identify an item.
 */
 void AuctionHouse::Identify(CharacterPtr ch, quint32 ticket)
 {
-  qint32 spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill);
+  ReturnValues spell_identify(quint8 level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, qint32 skill);
   auto Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
@@ -771,9 +771,10 @@ void AuctionHouse::Save()
   out << UncollectedGold;
 }
 
-AuctionHouse::AuctionHouse(QString filename, QObject *parent)
-    : filename_(filename), dc_(qobject_cast<DC *>(parent))
+AuctionHouse::AuctionHouse(QObject *parent, QString filename)
+    : QObject(parent), dc_(qobject_cast<DC *>(parent)), filename_(filename)
 {
+  Q_ASSERT(dc_ != nullptr);
 }
 
 /*
@@ -984,7 +985,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, quint32 ticket)
 
   ch->send(u"You have purchased %s for %u coins.\r\n"_s.arg(qPrintable(obj->short_description())).arg(Item_it->price));
 
-  for (auto &vch : dc_->world[ch->in_room].people_)
+  for (auto &vch : dc_->world[ch->in_room]->people_)
     if (vch != ch)
       vch->send(u"%s just purchased %s's %s\r\n"_s.arg(qPrintable(ch->name())).arg(qPrintable(Item_it->seller)).arg(qPrintable(obj->short_description())));
 
@@ -1400,7 +1401,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
     advertise = true;
   }
 
-  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), dc_->obj_index_[obj->item_number].vnum()))
+  if (isSet(obj->flags_.more_flags, ITEM_UNIQUE) && IsExist(ch->name(), dc_->obj_index_[obj->item_number]->vnum()))
   {
     ch->send(u"You're selling %1 already and it's unique!\r\n"_s.arg(obj->short_description()));
     return;
@@ -1441,7 +1442,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   ItemsActive += 1;
 
   AuctionTicket NewTicket;
-  NewTicket.vitem = dc_->obj_index_[obj->item_number].vnum();
+  NewTicket.vitem = dc_->obj_index_[obj->item_number]->vnum();
   NewTicket.price = price;
   NewTicket.state = AUC_FOR_SALE;
   NewTicket.end_time = time(0) + auction_duration;
@@ -1516,7 +1517,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, quint32 price, QStrin
   ch->save();
 }
 
-ReturnValue do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_vend(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr obj;

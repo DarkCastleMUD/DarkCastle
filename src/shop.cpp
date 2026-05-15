@@ -23,7 +23,7 @@ extern time_info_data time_info;
 qint32 max_shop;
 
 // extern function
-qint32 fwrite_string(const QString buf, FILE *stream);
+qint32 fwrite_string(const QString buf, QTextStream stream);
 
 QMap<QString, reroll_t> reroll_sessions = {};
 
@@ -301,9 +301,9 @@ void shopping_sell(const QString arg, CharacterPtr ch,
     return;
   }
 
-  qint32 virt = dc_->obj_index_[obj->item_number].vnum();
+  qint32 virt = dc_->obj_index_[obj->item_number]->vnum();
   if (virt >= 13400 && virt <= 13707 &&
-      dc_->mob_index_[keeper->mobdata->nr].vnum() != 13416)
+      dc_->mob_index_[keeper->mobdata->nr]->vnum() != 13416)
   {
     keeper->do_tell(u"%1 There is only one merchant in the land that deals with such fine jewels."_s.arg(qPrintable(ch->name())).split(' '));
     return;
@@ -375,7 +375,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     }
   }
 
-  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3003)
+  if (dc_->mob_index_[keeper->mobdata->nr]->vnum() == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -424,7 +424,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.");
   }
-  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3004)
+  if (dc_->mob_index_[keeper->mobdata->nr]->vnum() == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -468,7 +468,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
     else
       do_say(keeper, "I deal with armor exclusively.");
   }
-  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3000)
+  if (dc_->mob_index_[keeper->mobdata->nr]->vnum() == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -525,7 +525,7 @@ void shopping_value(const QString arg, CharacterPtr ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
-  if (dc_->mob_index_[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
+  if (dc_->mob_index_[keeper->mobdata->nr]->vnum() == 3010 && keeperhas)
   { // if the leather worker in town
     act_to_character("The Leather Worker holds up $p for you to examine.", ch, obj, 0, 0);
     act_to_room("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, 0);
@@ -608,7 +608,7 @@ void shopping_list(const QString arg, CharacterPtr ch,
 
     cost = (qint32)(obj->flags_.cost * dc_->shop_index[shop_nr].profit_buy);
 
-    qint32 vnum = dc_->obj_index_[obj->item_number].vnum();
+    qint32 vnum = dc_->obj_index_[obj->item_number]->vnum();
     bool loop = false;
     for (a = {}; a < i; a++)
       if (done[a] == vnum)
@@ -616,12 +616,12 @@ void shopping_list(const QString arg, CharacterPtr ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = dc_->obj_index_[obj->item_number].vnum();
+      done[i++] = dc_->obj_index_[obj->item_number]->vnum();
     else
       break;
     a = {};
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (dc_->obj_index_[tobj->item_number].vnum() == dc_->obj_index_[obj->item_number].vnum())
+      if (dc_->obj_index_[tobj->item_number]->vnum() == dc_->obj_index_[obj->item_number]->vnum())
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->flags_.value[1] )
             {
@@ -633,13 +633,13 @@ void shopping_list(const QString arg, CharacterPtr ch,
             {*/
 
     //        }
-    if (!first_vnum || first_vnum == DC::INVALID_VNUM)
+    if (!first_vnum || first_vnum == INVALID_VNUM)
     {
       first_vnum = dc_->getObjectVNUM(obj);
     }
     ch->sendln(u"[%1] [%2] [%3] %4."_s.arg(QString::number(a), 3).arg(QString::number(cost), 7).arg(QString::number(dc_->getObjectVNUM(obj)), 6).arg(obj->short_description()));
   }
-  if (first_vnum && first_vnum != DC::INVALID_VNUM)
+  if (first_vnum && first_vnum != INVALID_VNUM)
   {
     ch->sendln(u"Type 'identify vVNUM' for details about a specific object. Example: identify v%1"_s.arg(QString::number(first_vnum)));
   }
@@ -658,7 +658,7 @@ qint32 shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
   /*
    * Find a shop keeper in the room.
    */
-  //    for ( keeper = dc_->world[ch->in_room].people_;
+  //    for ( keeper = dc_->world[ch->in_room]->people_;
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
@@ -795,7 +795,7 @@ void DC::boot_the_shops(void)
 
     dc_->shop_index[max_shop].inventory = {};
 
-    if (real_room(temp) == DC::NOWHERE)
+    if (real_room(temp) == INVALID_ROOM)
     {
       QString log_buf = {};
       dc_sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
@@ -825,7 +825,7 @@ void DC::fix_shopkeepers_inventory(void)
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
   for (shop_nr = {}; shop_nr < max_shop; shop_nr++)
-    for (keeper = dc_->world[dc_->shop_index[shop_nr].in_room].people_; keeper != nullptr;
+    for (keeper = dc_->world[dc_->shop_index[shop_nr].in_room]->people_; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
       if (keeper->isNonPlayer() && dc_->mob_index_[keeper->mobdata->nr].non_combat_func == shop_keeper)
@@ -952,7 +952,7 @@ void save_shop_list()
 
 void save_player_shop_world_range()
 {
-  world_file_list_item *curr;
+  world_file_list_itemPtr curr;
   QString buf;
 
   curr = dc_->world_file_list;
@@ -980,7 +980,7 @@ void save_player_shop_world_range()
 void DC::boot_player_shops(void)
 {
   QTextStream stream;
-  FILE *shopfp;
+  QTextStream shopfp;
   player_shop *shop;
   QString filename;
   QString buf;
@@ -1090,7 +1090,7 @@ void player_shopping_stock(const QString arg, CharacterPtr ch, CharacterPtr keep
 
   // add it to list
   auto newitem = new player_shop_item;
-  newitem->item_vnum = dc_->obj_index_[obj->item_number].vnum();
+  newitem->item_vnum = dc_->obj_index_[obj->item_number]->vnum();
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -1407,7 +1407,7 @@ qint32 player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg
   return ReturnValue::eSUCCESS;
 }
 /*
-ReturnValue do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
+ReturnValues do_pshopedit(CharacterPtr  ch, QString arg, cmd_t cmd)
 {
   QString buf;
   QString select;
@@ -2149,7 +2149,7 @@ qint32 redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           return ReturnValue::eSUCCESS;
         }
 
-        ch->do_identify(u"v%1"_s.arg(dc_->obj_index_[obj->item_number].vnum()).split(' '));
+        ch->do_identify(u"v%1"_s.arg(dc_->obj_index_[obj->item_number]->vnum()).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);

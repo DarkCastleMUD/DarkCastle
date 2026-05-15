@@ -14,7 +14,7 @@ qint32 check_ethereal_focus(CharacterPtr ch, qint32 trigger_type); // class/cl_m
 
 qint32 move_player(CharacterPtr ch, qint32 room)
 {
-  qint32 retval;
+  ReturnValues retval;
 
   retval = move_char(ch, room);
 
@@ -39,12 +39,12 @@ void move_player_home(CharacterPtr victim)
     victim->hometown = START_ROOM;
 
   // next four lines ping-pong people from meta to tavern to help lessen spam
-  if (dc_->world[was_in].number == victim->hometown && victim->hometown == START_ROOM)
+  if (dc_->world[was_in]->number_ == victim->hometown && victim->hometown == START_ROOM)
     move_player(victim, real_room(SECOND_START_ROOM));
-  else if (dc_->world[was_in].number == victim->hometown || IS_AFFECTED(victim, AFF_CHAMPION))
+  else if (dc_->world[was_in]->number_ == victim->hometown || IS_AFFECTED(victim, AFF_CHAMPION))
     move_player(victim, real_room(START_ROOM));
   // recalling into a clan room
-  else if (!isSet(dc_->world[real_room(victim->hometown)].room_flags, CLAN_ROOM))
+  else if (!isSet(dc_->world[real_room(victim->hometown)]->room_flags_, CLAN_ROOM))
     move_player(victim, real_room(victim->hometown));
   // Clanroom else
   else
@@ -95,7 +95,7 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
   if (dc_->world[ch->in_room].sector_type == SECT_WATER_SWIM || dc_->world[ch->in_room].sector_type == SECT_WATER_NOSWIM)
     return;
 
-  auto newScent = TracksPtr::create();
+  auto newScent = TracksPtr(new Tracks(dc_->world[ch->in_room]));
   auto valid_dir = getDirectionFromCommand(cmd);
   if (valid_dir)
     newScent->direction = *valid_dir;
@@ -129,10 +129,10 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
 //   }
 //}
 
-ReturnValue do_unstable(CharacterPtr ch)
+ReturnValues do_unstable(CharacterPtr ch)
 {
   QString death_log;
-  qint32 retval;
+  ReturnValues retval;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -153,7 +153,7 @@ ReturnValue do_unstable(CharacterPtr ch)
   act_to_character("You fall flat on your ass.", ch, 0, 0, 0);
   ch->setSitting();
 
-  dc_sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), dc_->world[ch->in_room].number);
+  dc_sprintf(death_log, "%s slipped to death in room %d.", qPrintable(ch->name()), dc_->world[ch->in_room]->number_);
   retval = noncombat_damage(ch, GET_MAX_HIT(ch) / 12, "You feel your back snap painfully and all goes dark...",
                             "$n's frail body snaps in half as $e is buffeted about the room.", death_log, KILL_FALL);
 
@@ -163,11 +163,11 @@ ReturnValue do_unstable(CharacterPtr ch)
     return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_fall(CharacterPtr ch, short dir)
+ReturnValues do_fall(CharacterPtr ch, short dir)
 {
   qint32 target;
   QString damage;
-  qint32 retval;
+  ReturnValues retval;
   qint32 dam = dc_->number(50, 100);
 
   if (IS_AFFECTED(ch, AFF_FLYING))
@@ -204,14 +204,14 @@ ReturnValue do_fall(CharacterPtr ch, short dir)
 
   target = dc_->world[ch->in_room].dir_option[dir]->to_room;
 
-  if (isSet(dc_->world[target].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+  if (isSet(dc_->world[target]->room_flags_, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
     return ReturnValue::eFAILURE;
 
-  if (isSet(dc_->world[target].room_flags, TUNNEL))
+  if (isSet(dc_->world[target]->room_flags_, TUNNEL))
   {
     qint32 ppl = {};
     CharacterPtr k;
-    for (k = dc_->world[target].people_; k; k = k->next_in_room)
+    for (k = dc_->world[target]->people_; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
     if (ppl > 2)
@@ -221,11 +221,11 @@ ReturnValue do_fall(CharacterPtr ch, short dir)
     }
   }
 
-  if (isSet(dc_->world[target].room_flags, PRIVATE))
+  if (isSet(dc_->world[target]->room_flags_, PRIVATE))
   {
     qint32 ppl = {};
     CharacterPtr k;
-    for (k = dc_->world[target].people_; k; k = k->next_in_room)
+    for (k = dc_->world[target]->people_; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
     if (ppl > 4)
@@ -276,7 +276,7 @@ ReturnValue do_fall(CharacterPtr ch, short dir)
 
   do_look(ch, "\0");
 
-  dc_sprintf(damage, "%s's fall from %d was lethal and it killed them.", qPrintable(ch->name()), dc_->world[ch->in_room].number);
+  dc_sprintf(damage, "%s's fall from %d was lethal and it killed them.", qPrintable(ch->name()), dc_->world[ch->in_room]->number_);
   retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\r\n", "$n plummets into the room and hits the ground with a wet-sounding splat!",
                             damage, KILL_FALL);
 
@@ -288,7 +288,7 @@ ReturnValue do_fall(CharacterPtr ch, short dir)
     act_to_room("$n plummets into the room and hits the floor HARD.", ch, 0, 0, 0);
   }
 
-  if ((isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)))
+  if ((isSet(dc_->world[ch->in_room]->room_flags_, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_SOUTH) && (dir = 2)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_NORTH) && (dir = 0)))
   {
     return do_fall(ch, dir);
   }
@@ -300,12 +300,12 @@ ReturnValue do_fall(CharacterPtr ch, short dir)
 // Assumes
 // 1. No master and no followers.
 // 2. That the direction exists.
-ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
+ReturnValues do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 {
   QString tmp;
   qint32 was_in;
   qint32 need_movement, learned, mvinroom = 0, mvtoroom = {};
-  qint32 retval;
+  ReturnValues retval;
   ObjectPtr obj;
   bool has_boat;
 
@@ -471,12 +471,12 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     // it's OK to go east into a "fall north" room though
     // not ok, if room we're going to is AIR though
     auto cmd_to_dir = getDirectionFromCommand(cmd);
-    if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == cmd_t::NORTH && isSet(dc_->world[dc_->world[ch->in_room].dir_option[NORTH]->to_room].room_flags, FALL_SOUTH)) ||
-                                         (cmd == cmd_t::EAST && isSet(dc_->world[dc_->world[ch->in_room].dir_option[EAST]->to_room].room_flags, FALL_WEST)) ||
-                                         (cmd == cmd_t::SOUTH && isSet(dc_->world[dc_->world[ch->in_room].dir_option[SOUTH]->to_room].room_flags, FALL_NORTH)) ||
-                                         (cmd == cmd_t::WEST && isSet(dc_->world[dc_->world[ch->in_room].dir_option[WEST]->to_room].room_flags, FALL_EAST)) ||
-                                         (cmd == cmd_t::UP && isSet(dc_->world[dc_->world[ch->in_room].dir_option[UP]->to_room].room_flags, FALL_DOWN)) ||
-                                         (cmd == cmd_t::DOWN && isSet(dc_->world[dc_->world[ch->in_room].dir_option[DOWN]->to_room].room_flags, FALL_UP)) ||
+    if (!IS_AFFECTED(ch, AFF_FLYING) && ((cmd == cmd_t::NORTH && isSet(dc_->world[dc_->world[ch->in_room].dir_option[NORTH]->to_room]->room_flags_, FALL_SOUTH)) ||
+                                         (cmd == cmd_t::EAST && isSet(dc_->world[dc_->world[ch->in_room].dir_option[EAST]->to_room]->room_flags_, FALL_WEST)) ||
+                                         (cmd == cmd_t::SOUTH && isSet(dc_->world[dc_->world[ch->in_room].dir_option[SOUTH]->to_room]->room_flags_, FALL_NORTH)) ||
+                                         (cmd == cmd_t::WEST && isSet(dc_->world[dc_->world[ch->in_room].dir_option[WEST]->to_room]->room_flags_, FALL_EAST)) ||
+                                         (cmd == cmd_t::UP && isSet(dc_->world[dc_->world[ch->in_room].dir_option[UP]->to_room]->room_flags_, FALL_DOWN)) ||
+                                         (cmd == cmd_t::DOWN && isSet(dc_->world[dc_->world[ch->in_room].dir_option[DOWN]->to_room]->room_flags_, FALL_UP)) ||
                                          cmd_to_dir && dc_->world[dc_->world[ch->in_room].dir_option[*cmd_to_dir]->to_room].sector_type == SECT_AIR))
     {
       ch->sendln(u"You would need to fly to go there!"_s);
@@ -517,7 +517,7 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     }
   } // else if !FLYING
 
-  if (isSet(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].room_flags, IMP_ONLY) &&
+  if (isSet(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room]->room_flags_, IMP_ONLY) &&
       ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln(u"No."_s);
@@ -538,7 +538,7 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     }
   }
 
-  if (isSet(rm->room_flags, TUNNEL))
+  if (isSet(rm->room_flags_, TUNNEL))
   {
     qint32 ppl = {};
     CharacterPtr k;
@@ -574,7 +574,7 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
     }
   }
 
-  if (isSet(rm->room_flags, PRIVATE))
+  if (isSet(rm->room_flags_, PRIVATE))
   {
     qint32 ppl = {};
     CharacterPtr k;
@@ -687,11 +687,11 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln(u"The sounds around you fade to nothing as the silence takes hold..."_s);
 
   for (tmp_obj = dc_->world[was_in].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln(u"The noise around you returns as you leave the silenced area!"_s);
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
@@ -749,7 +749,7 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   // Elemental stuff goes HERE
   if (ch->isNonPlayer())
   {
-    qint32 a = dc_->mob_index_[ch->mobdata->nr].vnum();
+    qint32 a = dc_->mob_index_[ch->mobdata->nr]->vnum();
     // code a bit repeaty, but whatever ;)
     if (a == 88 && dc_->world[ch->in_room].sector_type == SECT_UNDERWATER)
     {
@@ -778,14 +778,14 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
   // Elemental stuff ends HERE
 
-  if ((isSet(dc_->world[ch->in_room].room_flags, FALL_NORTH) && (dir = 0)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room].room_flags, FALL_SOUTH) && (dir = 2)))
+  if ((isSet(dc_->world[ch->in_room]->room_flags_, FALL_NORTH) && (dir = 0)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_DOWN) && (dir = 5)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_UP) && (dir = 4)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_EAST) && (dir = 1)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_WEST) && (dir = 3)) || (isSet(dc_->world[ch->in_room]->room_flags_, FALL_SOUTH) && (dir = 2)))
   {
     retval = do_fall(ch, dir);
     if (SOMEONE_DIED(retval))
       return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, UNSTABLE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, UNSTABLE))
   {
     retval = do_unstable(ch);
     if (SOMEONE_DIED(retval))
@@ -799,7 +799,7 @@ ReturnValue do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
    }
    */
   if ((GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
-    for (CharacterPtr tmp_ch = dc_->world[ch->in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (CharacterPtr tmp_ch = dc_->world[ch->in_room]->people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if (tmp_ch->isPlayer())
         continue;
@@ -843,7 +843,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
   QString tmp;
   qint32 return_val;
   qint32 was_in = ch->in_room;
-  follow_type *k, *next_dude;
+  CharacterPtr *k, *next_dude;
 
   if (ch->brace_at)
   {
@@ -876,7 +876,7 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
     return ReturnValue::eFAILURE;
   }
 
-  if (EXIT(ch, dir)->to_room == DC::NOWHERE)
+  if (EXIT(ch, dir)->to_room == INVALID_ROOM)
   {
     ch->sendln(u"Alas, you can't go that way."_s);
     return ReturnValue::eFAILURE;
@@ -1007,16 +1007,16 @@ qint32 attempt_move(CharacterPtr ch, cmd_t cmd, bool is_retreat)
 //   1 : If success.
 //   0 : If fail
 //  -1 : If dead.
-ReturnValue do_move(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_move(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   return attempt_move(ch, cmd);
 }
 
-ReturnValue do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
+ReturnValues do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
 {
   ObjectPtr k;
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
 
   for (k = dc_->object_list; k; k = k->next)
   {
@@ -1024,13 +1024,13 @@ ReturnValue do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
     {
       if (k->getPortalType() == Object::portal_types_t::Permanent || k->getPortalType() == Object::portal_types_t::Temp)
       {
-        if (k->in_room != DC::NOWHERE && !k->hasPortalFlagNoLeave())
+        if (k->in_room != INVALID_ROOM && !k->hasPortalFlagNoLeave())
         {
-          if (k->getPortalDestinationRoom() == dc_->world[ch->in_room].number || k->flags_.value[2] == dc_->world[ch->in_room].zone)
+          if (k->getPortalDestinationRoom() == dc_->world[ch->in_room]->number_ || k->flags_.value[2] == dc_->world[ch->in_room]->zone)
           {
             ch->sendln(u"You exit the area."_s);
             act_to_room("$n has left the area.", ch, 0, 0, INVIS_NULL | STAYHIDE);
-            retval = move_char(ch, real_room(dc_->world[k->in_room].number));
+            retval = move_char(ch, real_room(dc_->world[k->in_room]->number_));
             if (!isSet(retval, ReturnValue::eSUCCESS))
             {
               ch->sendln(u"You attempt to leave, but the door slams in your face!"_s);
@@ -1052,15 +1052,15 @@ ReturnValue do_leave(CharacterPtr ch, QString arguement, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
 
   CharacterPtr sesame;
   ObjectPtr portal = {};
 
-  if ((ch->in_room != DC::NOWHERE) || (ch->in_room))
+  if ((ch->in_room != INVALID_ROOM) || (ch->in_room))
   {
     one_argument(argument, buf);
   }
@@ -1083,7 +1083,7 @@ ReturnValue do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
+  if (real_room(portal->getPortalDestinationRoom()) == INVALID_ROOM)
   {
     dc_sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
     dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
@@ -1097,16 +1097,16 @@ ReturnValue do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(dc_->world[real_room(portal->getPortalDestinationRoom())].room_flags, CLAN_ROOM))
+  if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(dc_->world[real_room(portal->getPortalDestinationRoom())]->room_flags_, CLAN_ROOM))
   {
     ch->sendln(u"You may not enter a clanhall at your level."_s);
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isNonPlayer() && ch->master && dc_->mob_index_[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && ch->master && dc_->mob_index_[ch->mobdata->nr]->vnum() == 8)
   {
     sesame = ch->master;
-    if (isSet(dc_->world[real_room(portal->flags_.value[0])].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[real_room(portal->flags_.value[0])]->room_flags_, CLAN_ROOM))
     {
       // Is golem's master not a member of this clan
       if (others_clan_room(sesame, &dc_->world[real_room(portal->flags_.value[0])]) == true)
@@ -1138,7 +1138,7 @@ ReturnValue do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(dc_->world[real_room(portal->flags_.value[0])].room_flags, CLAN_ROOM) || (portal->flags_.value[0] >= 1900 && portal->flags_.value[0] <= 1999 && !portal->flags_.value[1])))
+  if (!ch->isNonPlayer() && (ch->isPlayerObjectThief() || ch->isPlayerGoldThief() || IS_AFFECTED(ch, AFF_CHAMPION)) && (isSet(dc_->world[real_room(portal->flags_.value[0])]->room_flags_, CLAN_ROOM) || (portal->flags_.value[0] >= 1900 && portal->flags_.value[0] <= 1999 && !portal->flags_.value[1])))
   {
     ch->sendln(u"The portal's destination rebels against you."_s);
     act_to_room("$n finds $mself unable to enter!", ch, 0, 0, 0);
@@ -1217,12 +1217,12 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
 
   qint32 origination = ch->in_room;
 
-  if (ch->in_room != DC::NOWHERE)
+  if (ch->in_room != INVALID_ROOM)
   {
     // Couldn't move character from the room
     if (char_from_room(ch, stop_all_fighting) == 0)
     {
-      dc_->logentry(u"Error in move_char(), character not DC::NOWHERE, but couldn't be moved."_s,
+      dc_->logentry(u"Error in move_char(), character not INVALID_ROOM, but couldn't be moved."_s,
                     OVERSEER, DC::LogChannel::LOG_BUG);
       return ReturnValue::eINTERNAL_ERROR;
     }
@@ -1234,9 +1234,9 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
     // Now we have real problems
     if (char_to_room(ch, origination) == 0)
     {
-      qFatal("%s", qUtf8Printable(u"Error in move_char(), character stuck in DC::NOWHERE: %1.\n"_s.arg(qPrintable(ch->name()))));
+      qFatal("%s", qUtf8Printable(u"Error in move_char(), character stuck in INVALID_ROOM: %1.\n"_s.arg(qPrintable(ch->name()))));
     }
-    dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), dc_->world[dest].number);
+    dc_->logf(OVERSEER, DC::LogChannel::LOG_BUG, "Error in move_char(), could not move %s to %d.", qPrintable(ch->name()), dc_->world[dest]->number_);
     return ReturnValue::eINTERNAL_ERROR;
   }
 
@@ -1244,7 +1244,7 @@ qint32 move_char(CharacterPtr ch, qint32 dest, bool stop_all_fighting)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   ObjectPtr obj = {};
@@ -1273,7 +1273,7 @@ ReturnValue do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (real_room(dest) < 0)
   {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", dc_->obj_index_[obj->item_number].vnum());
+    dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", dc_->obj_index_[obj->item_number]->vnum());
     ch->sendln(u"You can't climb that."_s);
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
@@ -1281,7 +1281,7 @@ ReturnValue do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_room("$n carefully climbs $p.", ch, obj, 0, INVIS_NULL);
   dc_sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
-  qint32 retval = move_char(ch, real_room(dest));
+  ReturnValues retval = move_char(ch, real_room(dest));
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -1297,9 +1297,9 @@ ReturnValue do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 qint32 ambush(CharacterPtr ch)
 {
   CharacterPtr i, next_i;
-  qint32 retval;
+  ReturnValues retval;
 
-  for (i = dc_->world[ch->in_room].people_; i; i = next_i)
+  for (i = dc_->world[ch->in_room]->people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -1309,7 +1309,7 @@ qint32 ambush(CharacterPtr ch)
     if (GET_POS(i) <= position_t::RESTING ||
         GET_POS(i) == position_t::FIGHTING ||
         IS_AFFECTED(i, AFF_PARALYSIS) ||
-        (isSet(dc_->world[i->in_room].room_flags, SAFE) &&
+        (isSet(dc_->world[i->in_room]->room_flags_, SAFE) &&
          !IS_AFFECTED(ch, AFF_CANTQUIT)))
       continue;
     if (!i->isNonPlayer() && !i->conn_) // don't work if I'm linkdead

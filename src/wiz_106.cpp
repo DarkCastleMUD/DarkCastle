@@ -3,7 +3,7 @@
 | 11/20/95 -- Azrack
 **********************/
 #include "DC/DC.h"
-ReturnValue do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr i;
   ConnectionPtr conn;
@@ -39,7 +39,7 @@ ReturnValue do_plats(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_force(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_force(QStringList arguments, cmd_t cmd)
 {
   if (isNonPlayer())
   {
@@ -381,7 +381,7 @@ ReturnValue test_casino(CharacterPtr ch)
 
 tests_t tests = {{"casino", Test("casino", test_casino)}};
 
-ReturnValue Character::do_test(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_test(QStringList arguments, cmd_t cmd)
 {
   QString arg1 = arguments.value(0);
 

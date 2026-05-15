@@ -16,19 +16,19 @@
 
 extern bool MOBtrigger;
 
-ReturnValue do_report(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_report(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString report;
 
   assert(ch != 0);
-  if (ch->in_room == DC::NOWHERE)
+  if (ch->in_room == INVALID_ROOM)
   {
     ch->dc_->logentry(u"NOWHERE sent to do_report!"_s, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(ch->dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
@@ -202,7 +202,7 @@ qint32 DC::send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   return (1);
 }
 
-ReturnValue do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   qint32 x;
   qint32 y = {};
@@ -343,7 +343,7 @@ ReturnValue do_channel(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
+ReturnValues do_ignore(CharacterPtr ch, QString args, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -444,7 +444,7 @@ bool is_ignoring(CharacterPtr ch, CharacterPtr victim)
 
 constexpr auto MAX_NOTE_LENGTH = 1000; /* arbitrary */
 
-ReturnValue do_write(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ObjectPtr paper = 0, pen = {};
   QString papername, penname, buf;
@@ -543,7 +543,7 @@ ReturnValue do_write(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-ReturnValue do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;
@@ -599,7 +599,7 @@ ReturnValue do_insult(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_emote(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_emote(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;

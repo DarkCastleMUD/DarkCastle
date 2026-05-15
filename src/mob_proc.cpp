@@ -40,7 +40,7 @@ qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
     return false;
 
   // Any friends in the room?  Call for help!   qint32 friends = {};
-  for (auto &ally : ch->dc_->world[ch->in_room].people_)
+  for (auto &ally : ch->dc_->world[ch->in_room]->people_)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -78,13 +78,13 @@ qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
 qint32 protect(CharacterPtr ch, qint32 iFriendId)
 {
   CharacterPtr tmp_ch = {};
-  qint32 retval;
+  ReturnValues retval;
 
   if (!ch)
     return ReturnValue::eFAILURE;
 
   // Any one I need to protect in the room?
-  for (auto &ally : ch->dc_->world[ch->in_room].people_)
+  for (auto &ally : ch->dc_->world[ch->in_room]->people_)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -136,7 +136,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
   qint32 count = {};
 
   // Count the number of players in room
-  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room]->people_; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
       count++;
 
@@ -147,7 +147,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
   count = dc_->number(1, count);
 
   // Find the "count" player and return them
-  for (vict = dc_->world[ch->in_room].people_; vict; vict = vict->next_in_room)
+  for (vict = dc_->world[ch->in_room]->people_; vict; vict = vict->next_in_room)
     if (vict->isPlayer())
     {
       if (count > 1)
@@ -169,7 +169,7 @@ void damage_all_players_in_room(CharacterPtr ch, qint32 damage)
   CharacterPtr next_vict = {};
   void inform_victim(CharacterPtr ch, CharacterPtr vict, qint32 dam);
 
-  for (vict = dc_->world[ch->in_room].people_; vict; vict = next_vict)
+  for (vict = dc_->world[ch->in_room]->people_; vict; vict = next_vict)
   {
     // we need this here in case fight_kill moves our victim
     next_vict = vict->next_in_room;
@@ -224,7 +224,7 @@ CharacterPtr find_mob_in_room(CharacterPtr ch, qint32 iFriendId)
     return {};
 
   // Is my friend in the room?
-  for (auto &ally : ch->dc_->world[ch->in_room].people_)
+  for (auto &ally : ch->dc_->world[ch->in_room]->people_)
   {
     if (!ally->isNonPlayer())
       continue;
@@ -350,24 +350,24 @@ qint32 active_tarrasque(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
           (IS_AFFECTED(vict, AFF_HASTE)))
       {
 
-        act("$n utters the words 'Instant Magic Remover(tm)'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+        act_to_room(u"$n utters the words 'Instant Magic Remover(tm)'."_s, 0, 0, INVIS_NULL);
         return cast_dispel_magic(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
       }
     }
 
   if (ch->getLevel() > 40 && dc_->number(0, 2) == 0)
   {
-    act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'Burn in hell'."_s, 0, 0, INVIS_NULL);
     return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   if (ch->getLevel() > 40 && dc_->number(0, 1) == 0)
   {
-    act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'Go away pest'."_s, 0, 0, INVIS_NULL);
     return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
-  act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room(u"$n utters the words 'I love Acid!'."_s, 0, 0, INVIS_NULL);
   return cast_acid_blast(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
@@ -402,24 +402,24 @@ qint32 active_grandmaster(CharacterPtr ch, ObjectPtr obj, cmd_t command, const Q
 
   if (ch->getLevel() > 40 && dc_->number(0, 2) == 0)
   {
-    act("$n utters the words 'Burn them suckers'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'Burn them suckers'."_s, 0, 0, INVIS_NULL);
     return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   if (ch->getLevel() > 40 && dc_->number(0, 2) == 0)
   {
-    act("$n utters the words 'Burn in hell'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'Burn in hell'."_s, 0, 0, INVIS_NULL);
     return cast_hellstream(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
   }
 
   if (!IS_AFFECTED(vict, AFF_PARALYSIS))
     if (ch->getLevel() > 40 && dc_->number(0, 1) == 0)
     {
-      act("$n utters the words 'Go away pest'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+      act_to_room(u"$n utters the words 'Go away pest'."_s, 0, 0, INVIS_NULL);
       return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
     }
 
-  act("$n utters the words 'I love Acid!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+  act_to_room(u"$n utters the words 'I love Acid!'."_s, 0, 0, INVIS_NULL);
   return cast_acid_blast(
       ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
@@ -609,7 +609,7 @@ qint32 backstabber(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
     return ReturnValue::eSUCCESS;
   }
 
-  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room]->people_; tch; tch = tch->next_in_room)
   {
 
     if (tch->isPlayer())
@@ -643,7 +643,7 @@ qint32 backstabber(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Chara
           if (tch->fighting)
           {
 
-            act("$n circles around $s target....\r\n", ch, 0, 0, TO_ROOM, INVIS_NULL);
+            act_to_room(u"$n circles around $s target....\r\n"_s, 0, 0, INVIS_NULL);
             SET_BIT(ch->combat, COMBAT_CIRCLE);
           }
 
@@ -795,7 +795,7 @@ qint32 francis_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 {
   if (cmd != cmd_t::NORTH)
     return ReturnValue::eFAILURE;
-  if (dc_->world[ch->in_room].number == 7077)
+  if (dc_->world[ch->in_room]->number_ == 7077)
   {
     do_say(owner, "Oh no you don't!", cmd_t::DEFAULT);
     attack(owner, ch, 0);
@@ -820,7 +820,7 @@ qint32 guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   // 3 = south, 2 = east, 5 = up
   // 1 = north, 4  = west, 6 = down
 
-  switch (dc_->world[ch->in_room].number)
+  switch (dc_->world[ch->in_room]->number_)
   {
   case 1978:
     dir_cmd = cmd_t::UP;
@@ -1008,7 +1008,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   qint32 clan_num = ch->clan;
   if (ch->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM))
   {
-    qint32 b = dc_->mob_index_[ch->mobdata->nr].vnum();
+    qint32 b = dc_->mob_index_[ch->mobdata->nr]->vnum();
     switch (b)
     {
     case 8:     // golem
@@ -1943,7 +1943,7 @@ qint32 janitor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     if (isSet(i->flags_.wear_flags, TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !isSet(i->flags_.extra_flags, ITEM_SPECIAL) &&
-        dc_->obj_index_[i->item_number].vnum() != CHAMPION_ITEM)
+        dc_->obj_index_[i->item_number]->vnum() != CHAMPION_ITEM)
     {
       act_to_room("$n picks up some trash.", ch, 0, 0, 0);
       move_obj(i, ch);
@@ -1959,7 +1959,7 @@ qint32 mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QSt
   CharacterPtr temp, tmp_victim;
   affected_type af;
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -1974,7 +1974,7 @@ qint32 mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QSt
     return ReturnValue::eFAILURE;
 
   // TODO - make this Crydragon proc into something better
-  for (tmp_victim = dc_->world[ch->in_room].people_; tmp_victim; tmp_victim = temp)
+  for (tmp_victim = dc_->world[ch->in_room]->people_; tmp_victim; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((tmp_victim->isNonPlayer() || ch->isNonPlayer()) && (tmp_victim != ch))
@@ -2012,7 +2012,7 @@ qint32 adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
     return ReturnValue::eFAILURE;
 
-  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room]->people_; tch; tch = tch->next_in_room)
     if (tch->isPlayer() && dc_->number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
@@ -2057,7 +2057,7 @@ qint32 mud_school_adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   if (!AWAKE(ch))
     return ReturnValue::eFAILURE;
 
-  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room]->people_; tch; tch = tch->next_in_room)
     if (tch->isPlayer() && dc_->number(0, 2) == 1 && CAN_SEE(ch, tch))
       break;
 
@@ -2189,7 +2189,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
   if (cmd == cmd_t::LIST)
   { /* List */
     ch->sendln(u"Available pets are:"_s);
-    for (pet = dc_->world[pet_room].people_; pet; pet = pet->next_in_room)
+    for (pet = dc_->world[pet_room]->people_; pet; pet = pet->next_in_room)
     {
       dc_sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
       ch->send(buf);
@@ -2319,7 +2319,7 @@ qint32 hellstreamer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
-    act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'I see said the blind!'."_s, 0, 0, INVIS_NULL);
     cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return ReturnValue::eSUCCESS;
   }
@@ -2360,7 +2360,7 @@ qint32 humaneater(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     return ReturnValue::eSUCCESS;
   }
 
-  for (tch = dc_->world[ch->in_room].people_; tch; tch = tch->next_in_room)
+  for (tch = dc_->world[ch->in_room]->people_; tch; tch = tch->next_in_room)
   {
 
     if (tch->isPlayer())
@@ -2464,7 +2464,7 @@ qint32 clutchdrone_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStri
   // ObjectPtr wielded;
   CharacterPtr vict;
   // qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2662,7 +2662,7 @@ qint32 bounder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
-    act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'I see said the blind!'."_s, 0, 0, INVIS_NULL);
     cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return ReturnValue::eSUCCESS;
   }
@@ -2690,7 +2690,7 @@ qint32 dispelguy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
-    act("$n utters the words 'I see said the blind!'.", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act_to_room(u"$n utters the words 'I see said the blind!'."_s, 0, 0, INVIS_NULL);
     cast_remove_blind(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch, 0, ch->getLevel());
     return ReturnValue::eSUCCESS;
   }
@@ -2825,7 +2825,7 @@ qint32 iasenko_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
 {
   CharacterPtr vict = {};
   qint32 dam = {};
-  qint32 retval;
+  ReturnValues retval;
   // QString buf;
 
   if (cmd != cmd_t::UNDEFINED)
@@ -2973,7 +2973,7 @@ qint32 kogiro_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 {
   CharacterPtr vict = {};
   qint32 dam = {};
-  qint32 retval;
+  ReturnValues retval;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3015,7 +3015,7 @@ qint32 kogiro_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 qint32 takahashi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                         CharacterPtr owner)
 {
-  qint32 retval;
+  ReturnValues retval;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3050,7 +3050,7 @@ qint32 askari_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
                      CharacterPtr owner)
 {
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3136,7 +3136,7 @@ qint32 hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
 
   case 3:
     act_to_room("$n leaps back and readies a wand...", ch, 0, 0, INVIS_NULL);
-    for (victim = dc_->world[ch->in_room].people_; victim; victim = victim->next_in_room)
+    for (victim = dc_->world[ch->in_room]->people_; victim; victim = victim->next_in_room)
     {
       if (victim->isNonPlayer())
         continue;
@@ -3153,7 +3153,7 @@ qint32 hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
 qint32 izumi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
                     CharacterPtr owner)
 {
-  qint32 retval;
+  ReturnValues retval;
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
@@ -3559,7 +3559,7 @@ qint32 bodyguard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (dc_->mob_index_[ch->mobdata->nr].vnum())
+  switch (dc_->mob_index_[ch->mobdata->nr]->vnum())
   {
   case 9511:                  // sura mutant
     return protect(ch, 9510); // laiger

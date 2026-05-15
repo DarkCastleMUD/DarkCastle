@@ -176,22 +176,22 @@ bool str_n_nosp_equal(QString arg1, QString arg2, qsizetype pos)
 }
 
 // TODO - Declare these in a more appropriate place
-FILE *bug_log = {};
-FILE *god_log = {};
-FILE *mortal_log = {};
-FILE *socket_log = {};
-FILE *player_log = {};
-FILE *world_log = {};
-FILE *arena_log = {};
-FILE *clan_log = {};
-FILE *objects_log = {};
-FILE *quest_log = {};
-FILE *vault_log = {};
+QTextStream bug_log = {};
+QTextStream god_log = {};
+QTextStream mortal_log = {};
+QTextStream socket_log = {};
+QTextStream player_log = {};
+QTextStream world_log = {};
+QTextStream arena_log = {};
+QTextStream clan_log = {};
+QTextStream objects_log = {};
+QTextStream quest_log = {};
+QTextStream vault_log = {};
 
 // writes a QString to the log
 void dc_->logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
-  FILE **f = {};
+  QTextStream *f = {};
   qint32 stream = 1;
   std::stringstream logpath;
   // DCPtr dc = dynamic_cast<DCPtr >(DC::instance());
@@ -897,10 +897,10 @@ qint32 DARK_AMOUNT(qint32 room)
       dc_->world[room].sector_type == SECT_CITY)
     glow += 3;
 
-  if (isSet(dc_->world[room].room_flags, DARK))
+  if (isSet(dc_->world[room]->room_flags_, DARK))
     glow -= 2;
 
-  if (isSet(dc_->world[room].room_flags, LIGHT_ROOM))
+  if (isSet(dc_->world[room]->room_flags_, LIGHT_ROOM))
     glow += 2;
 
   if (weather_info.sunlight == SUN_DARK)
@@ -925,7 +925,7 @@ bool IS_DARK(qint32 room)
 
 bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj)
 {
-  follow_type *f;
+  CharacterPtr *f;
   CharacterPtr k;
 
   if (obj == sub)
@@ -1025,7 +1025,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
   if (IS_AFFECTED(obj, AFF_GLITTER_DUST) && obj->isMortalPlayer())
     return true;
 
-  if (obj->in_room == DC::NOWHERE)
+  if (obj->in_room == INVALID_ROOM)
   {
     return false;
   }
@@ -1161,19 +1161,19 @@ bool check_blind(CharacterPtr ch)
   return false;
 }
 
-ReturnValue do_order(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_order(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name, message;
   QString buf;
   bool found = false;
   qint32 org_room;
-  qint32 retval;
+  ReturnValues retval;
   CharacterPtr victim;
-  follow_type *k;
+  CharacterPtr *k;
 
   half_chop(argument, name, message);
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eFAILURE;
@@ -1217,7 +1217,7 @@ ReturnValue do_order(CharacterPtr ch, QString argument, cmd_t cmd)
       org_room = ch->in_room;
 
       if (ch->followers)
-        for (k = ch->followers; k && k != (follow_type *)0x95959595;
+        for (k = ch->followers; k && k != (CharacterPtr *)0x95959595;
              k = k->next)
         {
           if (org_room == k->follower->in_room)
@@ -1239,9 +1239,9 @@ ReturnValue do_order(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  FILE *stream;
+  QTextStream stream;
   QString str;
 
   if (ch->isNonPlayer())
@@ -1267,16 +1267,16 @@ ReturnValue do_idea(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room]->number_, argument);
   fputs(str, stream);
 
   ch->sendln(u"Ok.  Thanks."_s);
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  FILE *stream;
+  QTextStream stream;
   QString str;
 
   if (ch->isNonPlayer())
@@ -1303,16 +1303,16 @@ ReturnValue do_typo(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   dc_sprintf(str, "**%s[%d]: %s\n",
-             qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
+             qPrintable(ch->name()), dc_->world[ch->in_room]->number_, argument);
   fputs(str, stream);
 
   ch->sendln(u"Ok.  Thanks."_s);
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  FILE *stream;
+  QTextStream stream;
   QString str;
 
   if (ch->isNonPlayer())
@@ -1338,14 +1338,14 @@ ReturnValue do_bug(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room].number, argument);
+  dc_sprintf(str, "**%s[%d]: %s\n", qPrintable(ch->name()), dc_->world[ch->in_room]->number_, argument);
   fputs(str, stream);
 
   ch->sendln(u"Ok."_s);
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
 {
   qint32 location = {}, level = {}, cost = {}, x = {};
   CharacterPtr victim = {};
@@ -1354,7 +1354,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
   QString name;
   ClanPtr clan = {};
   qint32 found = {};
-  qint32 retval = {};
+  ReturnValues retval = {};
   bool is_mob = {};
 
   act_to_room("$n prays to $s God for transportation!", this, 0, 0, INVIS_NULL);
@@ -1368,7 +1368,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[in_room].room_flags, NO_MAGIC))
+  if (isSet(dc_->world[in_room]->room_flags_, NO_MAGIC))
   {
     sendln(u"You can't use magic here."_s);
     return ReturnValue::eFAILURE;
@@ -1413,7 +1413,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
 
     // Additional 5% chance of failure when recalling across continents
     location = victim->hometown;
-    if (location > 0 && dc_->zones.value(dc_->world[victim->in_room].zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
+    if (location > 0 && dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
     {
       percent += 5;
     }
@@ -1458,7 +1458,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(dc_->world[location].room_flags, NOHOME))
+    if (isSet(dc_->world[location]->room_flags_, NOHOME))
     {
       victim->sendln(u"The gods reset your home."_s);
       location = real_room(START_ROOM);
@@ -1467,7 +1467,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
 
     // make sure they arne't recalling into someone's chall
 
-    if (isSet(dc_->world[location].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM))
     {
       if (!victim->clan || !(clan = get_clan(victim)))
       {
@@ -1497,7 +1497,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((isSet(dc_->world[location].room_flags, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if ((isSet(dc_->world[location]->room_flags_, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln(u"No recalling into a clan hall whilst Champion, go to the Tavern!."_s);
     location = real_room(START_ROOM);
@@ -1515,7 +1515,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
     cf = 1 + ((level - 11) * .347f);
     cost = (qint32)(3440 * cf);
 
-    if (dc_->zones.value(dc_->world[victim->in_room].zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
+    if (dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
     {
       // Cross-continent recalling costs twice as much
       cost *= 2;
@@ -1541,7 +1541,7 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (loop_ch = dc_->world[victim->in_room].people_; loop_ch; loop_ch = loop_ch->next_in_room)
+  for (loop_ch = dc_->world[victim->in_room]->people_; loop_ch; loop_ch = loop_ch->next_in_room)
     if (loop_ch == victim || loop_ch->fighting == victim)
       stop_fighting(loop_ch);
 
@@ -1557,16 +1557,16 @@ ReturnValue Character::do_recall(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_qui(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_qui(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln(u"You have to write quit - no less, to quit!"_s);
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   qint32 iWear;
-  follow_type *k;
+  CharacterPtr *k;
   ClanPtr clan;
   qint32 found = {};
   QString buf;
@@ -1586,7 +1586,7 @@ ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  if (!isSet(dc_->world[ch->in_room].room_flags, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
+  if (!isSet(dc_->world[ch->in_room]->room_flags_, SAFE) && cmd != cmd_t::SAVE_SILENTLY && !ch->isImmortalPlayer())
   {
     ch->sendln(u"This room doesn't feel...SAFE enough to do that."_s);
     return ReturnValue::eFAILURE;
@@ -1609,7 +1609,7 @@ ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
     }
 
-    if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+    if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
     {
       ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
       return ReturnValue::eFAILURE;
@@ -1635,7 +1635,7 @@ ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(dc_->world[ch->in_room].room_flags, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
+    if (isSet(dc_->world[ch->in_room]->room_flags_, NO_QUIT) && cmd != cmd_t::SAVE_SILENTLY)
     {
       ch->sendln(u"Something about this room makes it seem like a bad place to quit."_s);
       return ReturnValue::eFAILURE;
@@ -1647,7 +1647,7 @@ ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
+    if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1673,13 +1673,13 @@ ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
     do_sing(ch, "stop");
 
   extractFamiliar(ch);
-  follow_type *fol, *fol_next;
+  CharacterPtr *fol, *fol_next;
 
   for (fol = ch->followers; fol; fol = fol_next)
   {
     fol_next = fol->next;
     if (fol->follower->isNonPlayer() &&
-        dc_->mob_index_[fol->follower->mobdata->nr].vnum() == 8)
+        dc_->mob_index_[fol->follower->mobdata->nr]->vnum() == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false, u"do_quit/followers"_s);
@@ -1701,7 +1701,7 @@ ReturnValue do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
     for (obj = dc_->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (dc_->obj_index_[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (dc_->obj_index_[obj->item_number]->vnum() == CONSECRATE_OBJ_NUMBER)
         if (ch == (CharacterPtr)(obj->flags_.origin))
           extract_obj(obj);
     }
@@ -1800,7 +1800,7 @@ ReturnValue Character::save(cmd_t cmd)
 //        that save after every other kill don't actually do it, but it
 //        pretends that it does.  That way we can start reducing the amount
 //        of writing we're doing.
-ReturnValue Character::do_save(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_save(QStringList arguments, cmd_t cmd)
 {
   if (IS_IMMORTAL(this))
   {
@@ -1818,14 +1818,14 @@ ReturnValue Character::do_save(QStringList arguments, cmd_t cmd)
   return save(cmd);
 }
 
-ReturnValue do_home(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_home(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ClanPtr clan;
   qint32 found = {};
 
   if (!ch->isImmortalPlayer())
   {
-    if (!isSet(dc_->world[ch->in_room].room_flags, SAFE) ||
+    if (!isSet(dc_->world[ch->in_room]->room_flags_, SAFE) ||
         ch->room().isArena())
     {
       send_to_char("This place doesn't sit right with you...not enough "
@@ -1834,7 +1834,7 @@ ReturnValue do_home(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(dc_->world[ch->in_room].room_flags, NOHOME))
+    if (isSet(dc_->world[ch->in_room]->room_flags_, NOHOME))
     {
       ch->sendln(u"Something prevents it."_s);
       return ReturnValue::eFAILURE;
@@ -1847,7 +1847,7 @@ ReturnValue do_home(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (isSet(dc_->world[ch->in_room].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM))
     {
       if (!ch->clan || !(clan = get_clan(ch)))
       {
@@ -1868,7 +1868,7 @@ ReturnValue do_home(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ch->sendln(u"You now consider this place to be your home."_s);
-  ch->hometown = dc_->world[ch->in_room].number;
+  ch->hometown = dc_->world[ch->in_room]->number_;
   return ReturnValue::eSUCCESS;
 }
 
@@ -1890,7 +1890,7 @@ ReturnValue Character::generic_command(QStringList argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-ReturnValue do_beep(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_beep(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   ch->sendln(u"Beep!\a"_s);
   return ReturnValue::eSUCCESS;
@@ -2414,7 +2414,7 @@ bool check_make_camp(qint32 room)
   CharacterPtr i, next_i;
   bool campok = false;
 
-  for (i = dc_->world[room].people_; i; i = next_i)
+  for (i = dc_->world[room]->people_; i; i = next_i)
   {
     next_i = i->next_in_room;
 
@@ -2432,7 +2432,7 @@ bool check_make_camp(qint32 room)
 qint32 get_leadership_bonus(CharacterPtr ch)
 {
   CharacterPtr leader;
-  follow_type *f, *next_f;
+  CharacterPtr *f, *next_f;
   qint32 highlevel = 0, bonus = {};
 
   if (ch->master)
@@ -2499,7 +2499,7 @@ void DC::update_make_camp_and_leadership(void)
                       affect_from_char(i, SKILL_BATTLESENSE);
                   }
 
-                  if (i->in_room != DC::NOWHERE)
+                  if (i->in_room != INVALID_ROOM)
                   {
                     if (!check_make_camp(i->in_room))
                     {
@@ -2580,8 +2580,8 @@ void unique_scan(CharacterPtr victim)
     {
       if (isSet(victim->equipment[k]->flags_.more_flags, ITEM_UNIQUE))
       {
-        if (virtnums.end() == virtnums.find(dc_->obj_index_[victim->equipment[k]->item_number].vnum()))
-          virtnums[dc_->obj_index_[victim->equipment[k]->item_number].vnum()] = 1;
+        if (virtnums.end() == virtnums.find(dc_->obj_index_[victim->equipment[k]->item_number]->vnum()))
+          virtnums[dc_->obj_index_[victim->equipment[k]->item_number]->vnum()] = 1;
         else
           found_items.push(victim->equipment[k]);
       }
@@ -2591,8 +2591,8 @@ void unique_scan(CharacterPtr victim)
         {
           if (isSet(j->flags_.more_flags, ITEM_UNIQUE))
           {
-            if (virtnums.end() == virtnums.find(dc_->obj_index_[j->item_number].vnum()))
-              virtnums[dc_->obj_index_[j->item_number].vnum()] = 1;
+            if (virtnums.end() == virtnums.find(dc_->obj_index_[j->item_number]->vnum()))
+              virtnums[dc_->obj_index_[j->item_number]->vnum()] = 1;
             else
               found_items.push(j);
           }
@@ -2605,8 +2605,8 @@ void unique_scan(CharacterPtr victim)
   {
     if (isSet(i->flags_.more_flags, ITEM_UNIQUE))
     {
-      if (virtnums.end() == virtnums.find(dc_->obj_index_[i->item_number].vnum()))
-        virtnums[dc_->obj_index_[i->item_number].vnum()] = 1;
+      if (virtnums.end() == virtnums.find(dc_->obj_index_[i->item_number]->vnum()))
+        virtnums[dc_->obj_index_[i->item_number]->vnum()] = 1;
       else
         found_items.push(i);
     }
@@ -2618,8 +2618,8 @@ void unique_scan(CharacterPtr victim)
       {
         if (isSet(j->flags_.more_flags, ITEM_UNIQUE))
         {
-          if (virtnums.end() == virtnums.find(dc_->obj_index_[j->item_number].vnum()))
-            virtnums[dc_->obj_index_[j->item_number].vnum()] = 1;
+          if (virtnums.end() == virtnums.find(dc_->obj_index_[j->item_number]->vnum()))
+            virtnums[dc_->obj_index_[j->item_number]->vnum()] = 1;
           else
             found_items.push(j);
         }
@@ -2718,7 +2718,7 @@ bool champion_can_go(qint32 room)
     }
 
     // Champions can't enter clan rooms
-    if (isSet(dc_->world[room].room_flags, CLAN_ROOM))
+    if (isSet(dc_->world[room]->room_flags_, CLAN_ROOM))
     {
       return false;
     }

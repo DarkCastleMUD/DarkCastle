@@ -1977,7 +1977,7 @@ public:
 };
 */
 
-QList<race_data> races =
+const QList<race_data> DC::races =
     {
         // Name,        Lowercase    Plural,       Playable Parts, Immun,    Res,  Sus,  Hates/Fears,  Frnd, MinWt, MaxWt, MinHt, MaxHt,    Str      Dex         Con      Int    Wis,   Mob Affects, UnarmedHitType
         {"NPC", "npc", "NPC", false, 63, 0, 0, 0, 0, 0, 150, 150, 72, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "hit"},

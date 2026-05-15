@@ -74,7 +74,7 @@ bool Path::findRoom(qint32 from, qint32 to, qint32 steps, qint32 leastSteps, QSt
   {
     if (!dc_->world[from].dir_option[i])
       continue;
-    if (dc_->world[from].dir_option[i]->to_room == DC::NOWHERE)
+    if (dc_->world[from].dir_option[i]->to_room == INVALID_ROOM)
       continue;
     if (!isRoomPathed(dc_->world[from].dir_option[i]->to_room))
       continue;
@@ -105,7 +105,7 @@ qint32 Path::leastSteps(qint32 from, qint32 to, qint32 val, qint32 *bestval)
   {
     if (!dc_->world[from].dir_option[i])
       continue;
-    if (dc_->world[from].dir_option[i]->to_room == DC::NOWHERE)
+    if (dc_->world[from].dir_option[i]->to_room == INVALID_ROOM)
       continue;
     if (!isRoomPathed(dc_->world[from].dir_option[i]->to_room))
       continue;
@@ -203,7 +203,7 @@ void Path::addRoom(CharacterPtr ch, qint32 room, bool IgnoreConnectingIssues)
     ch->sendln(u"Room successfully added to path."_s);
 }
 
-ReturnValue do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   argument = one_argument(argument, arg1);
@@ -229,10 +229,10 @@ ReturnValue do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   auto &zones = dc_->zones;
-  qint32 i = dc_->world[ch->in_room].zone;
+  qint32 i = dc_->world[ch->in_room]->zone;
   if (zones.contains(i) == false)
   {
     return ReturnValue::eFAILURE;
@@ -260,7 +260,7 @@ ReturnValue do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   PathPtr p;
   bool found = false;
@@ -278,7 +278,7 @@ ReturnValue do_listAllPaths(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   argument = one_argument(argument, arg1);
@@ -300,7 +300,7 @@ ReturnValue do_addRoom(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_findPath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1;
   argument = one_argument(argument, arg1);
@@ -391,7 +391,7 @@ bool determinePath(PathPtr goal, PathPtr at, qint32 beststeps, qint32 steps, Pat
   return false;
 }
 
-ReturnValue do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_pathpath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg1, arg2;
   argument = one_argument(argument, arg1);
@@ -451,7 +451,7 @@ qint32 find_closest_path(qint32 from, qint32 steps, QString buf, QMap<qint32, qi
   {
     if (!dc_->world[from].dir_option[i])
       continue;
-    if (dc_->world[from].dir_option[i]->to_room == DC::NOWHERE)
+    if (dc_->world[from].dir_option[i]->to_room == INVALID_ROOM)
       continue;
     if (z[dc_->world[from].dir_option[i]->to_room] <= steps && z[dc_->world[from].dir_option[i]->to_room] != 0)
       continue;
@@ -557,7 +557,7 @@ QString findPath(qint32 from, qint32 to, CharacterPtr ch = {})
   return &endbuf[0];
 }
 
-ReturnValue do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_findpath(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   PathPtr p;
   for (p = mPathList; p; p = p->next)

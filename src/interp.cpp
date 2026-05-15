@@ -32,7 +32,7 @@ const QStringList fillwords =
         "at",
         "to"};
 
-ReturnValue do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   extern QString motd;
 
@@ -40,7 +40,7 @@ ReturnValue do_motd(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_imotd(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_imotd(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   extern QString imotd;
 
@@ -105,7 +105,7 @@ ReturnValue Character::command_interpreter(QString pcomm, bool procced)
     return logcmd.setReturn(ReturnValue::eFAILURE, "cstack exceeded");
   }
 
-  qint32 retval = {};
+  ReturnValues retval = {};
   QString buf;
 
   // Implement freeze command.
@@ -445,7 +445,7 @@ qsizetype search_list(QString arg, const QStringList list)
   return -1;
 }
 
-ReturnValue do_boss(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_boss(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
   qint32 x;
@@ -635,7 +635,7 @@ QString one_argumentnolow(QString argument, QString first_arg)
 
 void automail(QString name)
 {
-  FILE *blah;
+  QTextStream blah;
   QString buf;
 
   blah = fopen("../lib/whassup.txt", "w");
@@ -851,7 +851,7 @@ ReturnValue Character::special(QString arguments, cmd_t cmd)
   ObjectPtr i;
   CharacterPtr k;
   qint32 j;
-  qint32 retval;
+  ReturnValues retval;
 
   /* special in room? */
   if (dc_->world[in_room].funct)
@@ -881,7 +881,7 @@ ReturnValue Character::special(QString arguments, cmd_t cmd)
       }
 
   /* special in mobile present? */
-  for (k = dc_->world[in_room].people_; k; k = k->next_in_room)
+  for (k = dc_->world[in_room]->people_; k; k = k->next_in_room)
   {
     if (k->isNonPlayer())
     {

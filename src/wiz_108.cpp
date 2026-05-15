@@ -6,14 +6,14 @@
 
 qint32 get_number(QString *name);
 
-ReturnValue do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  try
   // {
   QString buf;
   QString output = "";
   RoomDirectionPtr curExits;
-  qint32 curZone = dc_->world[(ch)->in_room].zone;
+  qint32 curZone = dc_->world[(ch)->in_room]->zone;
   qint32 curRoom = ch->in_room;
   ObjectPtr portal;
   qint32 i, dir;
@@ -91,7 +91,7 @@ ReturnValue do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (portal->isPortal() && !portal->hasPortalFlagNoEnter() && (portal->isPortalTypePermanent() || portal->isPortalTypeTemp()))
       {
-        if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
+        if (real_room(portal->getPortalDestinationRoom()) == INVALID_ROOM)
         {
           dc_sprintf(buf, "Room %5d - enter to Room %5lu (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
 
@@ -108,9 +108,9 @@ ReturnValue do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 
     for (portal = dc_->object_list; portal; portal = portal->next)
     {
-      if ((portal->isPortal()) && (portal->isPortalTypePermanent() || (portal->isPortalTypeTemp())) && (portal->in_room != DC::NOWHERE) && !portal->hasPortalFlagNoLeave())
+      if ((portal->isPortal()) && (portal->isPortalTypePermanent() || (portal->isPortalTypeTemp())) && (portal->in_room != INVALID_ROOM) && !portal->hasPortalFlagNoLeave())
       {
-        if ((portal->flags_.value[0] == dc_->world[i].number) || (portal->flags_.value[2] == dc_->world[i].zone))
+        if ((portal->flags_.value[0] == dc_->world[i]->number_) || (portal->flags_.value[2] == dc_->world[i].zone))
         {
           if (dc_->world[real_room(portal->in_room)].zone != curZone)
           {
@@ -135,7 +135,7 @@ ReturnValue do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString bufName, *pBuf;
   ObjectPtr k;
@@ -246,7 +246,7 @@ ReturnValue do_purloin(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_set(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //   renamed the command "setup" so don't need this anymore
   //    void do_mortal_set(CharacterPtr ch, QString argument, cmd_t cmd);

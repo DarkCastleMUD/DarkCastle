@@ -16,9 +16,10 @@
 /* $Id: save.cpp,v 1.76 2015/06/15 01:06:10 pirahna Exp $ */
 
 #include "DC/DC.h"
+#include <qdebug.h>
 
-ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont);
-bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos);
+ObjectPtr obj_store_to_char(CharacterPtr ch, QTextStream fpsave, ObjectPtr last_cont);
+bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, QTextStream fpsave, qint32 wear_pos);
 void restore_weight(ObjectPtr obj);
 void store_to_char(char_file_u4 *st, CharacterPtr ch);
 QString fread_alias_string(auto &streamfpsave);
@@ -96,7 +97,7 @@ QString fread_alias_string(auto &streamfpsave)
   return QString();
 }
 
-void fwrite_var_string(const QString str, FILE *fpsave)
+void fwrite_var_string(const QString str, QTextStream fpsave)
 {
   quint16 tmp_size = {};
 
@@ -113,7 +114,7 @@ void fwrite_var_string(const QString str, FILE *fpsave)
   }
 }
 
-void fwrite_var_string(QString str, FILE *fpsave)
+void fwrite_var_string(QString str, QTextStream fpsave)
 {
   fwrite_var_string(qPrintable(str), fpsave);
 }
@@ -572,7 +573,7 @@ bool Character::save_pc_or_mob_data(auto &streamfpsave, Time tmpage)
   return false;
 }
 
-bool read_pc_or_mob_data(CharacterPtr ch, FILE *fpsave, QString filename)
+bool read_pc_or_mob_data(CharacterPtr ch, QTextStream fpsave, QString filename)
 {
   if (ch->isNonPlayer())
   {
@@ -595,7 +596,7 @@ bool read_pc_or_mob_data(CharacterPtr ch, FILE *fpsave, QString filename)
 
 // return 1 on success
 // return 0 on failure
-qint32 store_worn_eq(CharacterPtr ch, FILE *fpsave)
+qint32 store_worn_eq(CharacterPtr ch, QTextStream fpsave)
 {
   qint32 wear_pos = -1;
   qint32 iWear = {};
@@ -673,7 +674,7 @@ qint32 Character::char_to_store_variable_data(auto &streamfpsave)
   return 1;
 }
 
-void read_skill(CharacterPtr ch, FILE *fpsave)
+void read_skill(CharacterPtr ch, QTextStream fpsave)
 {
   char_skill_data curr = {};
 
@@ -795,8 +796,8 @@ void save_char_obj_db(CharacterPtr ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (isSet(dc_->world[in_room].room_flags, SAFE))
-    uchar.load_room = dc_->world[in_room].number;
+  if (isSet(dc_->world[in_room]->room_flags_, SAFE))
+    uchar.load_room = dc_->world[in_room]->number_;
   else
     uchar.load_room = real_room(ch->hometown);
 
@@ -846,7 +847,7 @@ void Character::save_char_obj(void)
 {
   char_file_u4 uchar = {};
   Time tmpage;
-  FILE *fpsave = {};
+  QTextStream fpsave = {};
   QString strsave;
   QString name;
 
@@ -898,8 +899,8 @@ void Character::save_char_obj(void)
   }
   else
   {
-    if (isSet(dc_->world[in_room].room_flags, SAFE))
-      uchar.load_room = dc_->world[in_room].number;
+    if (isSet(dc_->world[in_room]->room_flags_, SAFE))
+      uchar.load_room = dc_->world[in_room]->number_;
     else
       uchar.load_room = real_room(hometown);
   }
@@ -948,7 +949,7 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
   if (!conn || name.isEmpty())
     return load_status_t::bad_input;
 
-  FILE *fpsave = {};
+  QTextStream fpsave = {};
   QString strsave;
   char_file_u4 uchar;
   ObjectPtr last_cont = {};
@@ -1024,11 +1025,11 @@ load_status_t DC::load_char_obj(ConnectionPtr conn, QString name)
 }
 
 // read data from file for an item.
-ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
+ObjectPtr obj_store_to_char(CharacterPtr ch, QTextStream fpsave, ObjectPtr last_cont)
 {
   ObjectPtr obj;
   //  ExtraDescriptionPtr new_new_descr;
-  //  ExtraDescriptionPtr ed, *next_ed;
+  //  ExtraDescriptionPtr ed, next_ed;
 
   qint32 j;
   qint32 nr;
@@ -1217,7 +1218,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && dc_->obj_index_[last_cont->item_number].vnum() != 536)
+      if (!last_cont->equipped_by && dc_->obj_index_[last_cont->item_number]->vnum() != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1240,7 +1241,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILE *fpsave, ObjectPtr last_cont)
   return last_cont;
 }
 
-bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos)
+bool obj_to_store(ObjectPtr obj, CharacterPtr ch, QTextStream &stream, qint32 wear_pos)
 {
   // ObjectPtr tmp;
 
@@ -1248,15 +1249,15 @@ bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos)
     return true;
 
   // recurse down next item in list
-  if (!obj_to_store(obj->next_content, ch, fpsave, -1))
+  if (!obj_to_store(obj->next_content, ch, stream, -1))
     return false;
 
   // store myself
-  if (!put_obj_in_store(obj, ch, fpsave, wear_pos))
+  if (!put_obj_in_store(obj, ch, stream, wear_pos))
     return false;
 
   // store anything IN myself.  That way they get put back in on read
-  if (!obj_to_store(obj->contains, ch, fpsave, -1))
+  if (!obj_to_store(obj->contains, ch, stream, -1))
     return false;
 
   return true;
@@ -1265,7 +1266,7 @@ bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos)
 // return true on success
 // return false on error
 // write one object to file
-bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_pos)
+bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, QTextStream fpsave, qint32 wear_pos)
 {
   obj_file_elem object;
   ObjectPtr standard_obj = {};
@@ -1300,7 +1301,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.item_number = dc_->obj_index_[obj->item_number].vnum();
+  object.item_number = dc_->obj_index_[obj->item_number]->vnum();
   object.timer = obj->flags_.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1397,7 +1398,7 @@ bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILE *fpsave, qint32 wear_
 
     tmp_weight = obj->flags_.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
-    && dc_->obj_index_[obj->item->number].vnum() != 536)
+    && dc_->obj_index_[obj->item->number]->vnum() != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
     if(tmp_weight      != standard_obj->flags_.weight)
@@ -1515,7 +1516,7 @@ void restore_weight(ObjectPtr obj)
 
   if (obj == nullptr)
     return;
-  if (dc_->obj_index_[obj->item_number].vnum() == 536)
+  if (dc_->obj_index_[obj->item_number]->vnum() == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);
@@ -1597,7 +1598,7 @@ void store_to_char(char_file_u4 *st, CharacterPtr ch)
   // make the actual call to "char_to_room" using this data later
   ch->in_room = real_room(st->load_room);
 
-  if (ch->in_room == DC::NOWHERE)
+  if (ch->in_room == INVALID_ROOM)
   {
     if (ch->isImmortalPlayer())
       ch->in_room = real_room(17);
@@ -1658,7 +1659,7 @@ void Character::char_to_store(char_file_u4 *st, Time &tmpage)
   st->hometown = hometown;
 
   //  gets set outside
-  //  st->load_room = dc_->world[in_room].number;
+  //  st->load_room = dc_->world[in_room]->number_;
 
   //  st->gold      = getGold();
   st->gold = {}; // Moved

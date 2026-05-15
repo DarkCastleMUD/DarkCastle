@@ -9,12 +9,12 @@
 /************************************************************************
 | OFFENSIVE commands.
 */
-ReturnValue do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
   qint32 dam;
-  qint32 retval;
+  ReturnValues retval;
   time_t time_raw_format;
   struct tm *ptr_time;
 
@@ -104,7 +104,7 @@ ReturnValue do_eagle_claw(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
 
   affected_type af;
@@ -165,7 +165,7 @@ ReturnValue do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, NO_KI))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, NO_KI))
   {
     ch->sendln(u"You find yourself unable to focus your energy here."_s);
     return ReturnValue::eFAILURE;
@@ -211,11 +211,11 @@ ReturnValue do_quivering_palm(CharacterPtr ch, const QString argument, cmd_t cmd
   return retval;
 }
 
-ReturnValue do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_stun(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
-  qint32 retval;
+  ReturnValues retval;
 
   if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\r\n"))
   {

@@ -21,7 +21,7 @@ qint32 max_who = {};
 
 void page_string(ConnectionPtr conn, const QString str, qint32 keep_internal);
 
-ReturnValue do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_levels(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;

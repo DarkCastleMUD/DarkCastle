@@ -590,7 +590,7 @@ private slots:
     testfile.write("\n");
     testfile.close();
 
-    FILE *stream = fopen(qPrintable(testfile.fileName()), "r");
+    QTextStream stream = fopen(qPrintable(testfile.fileName()), "r");
     QVERIFY(stream);
     QCOMPARE(ftell(stream), 0);
 
@@ -720,7 +720,7 @@ private slots:
     QCOMPARE(fstream_checksum.toHex(), original_checksum.toHex());
 
     {
-      FILE *stream = fopen(qPrintable(legacyfile_filename), "r");
+      QTextStream stream = fopen(qPrintable(legacyfile_filename), "r");
       QVERIFY(stream);
 
       QFile qf(qfile_filename);
@@ -1042,22 +1042,22 @@ private slots:
     DC dc(cf);
     dc.boot_db();
     auto obj = reinterpret_cast<ObjectPtr>(dc_->obj_index_[0]->item);
-    QCOMPARE(dc_->getObjectVNUM(obj), dc_->obj_index_[0].vnum());
-    QCOMPARE(dc_->getObjectVNUM(obj->item_number), dc_->obj_index_[obj->item_number].vnum());
-    QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
+    QCOMPARE(dc_->getObjectVNUM(obj), dc_->obj_index_[0]->vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number), dc_->obj_index_[obj->item_number]->vnum());
+    QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)INVALID_RNUM), INVALID_VNUM);
 
     bool ok = false;
     dc_->getObjectVNUM(obj, &ok);
     QCOMPARE(ok, true);
     ok = false;
-    QCOMPARE(dc_->getObjectVNUM(obj->item_number, &ok), dc_->obj_index_[obj->item_number].vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number, &ok), dc_->obj_index_[obj->item_number]->vnum());
     QCOMPARE(ok, true);
-    QCOMPARE(dc_->getObjectVNUM(DC::INVALID_RNUM, &ok), DC::INVALID_VNUM);
+    QCOMPARE(dc_->getObjectVNUM(INVALID_RNUM, &ok), INVALID_VNUM);
     QCOMPARE(ok, false);
 
-    QCOMPARE(dc_->getObjectVNUM(obj, nullptr), dc_->obj_index_[0].vnum());
-    QCOMPARE(dc_->getObjectVNUM(obj->item_number, nullptr), dc_->obj_index_[obj->item_number].vnum());
-    QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
+    QCOMPARE(dc_->getObjectVNUM(obj, nullptr), dc_->obj_index_[0]->vnum());
+    QCOMPARE(dc_->getObjectVNUM(obj->item_number, nullptr), dc_->obj_index_[obj->item_number]->vnum());
+    QCOMPARE(dc_->getObjectVNUM((legacy_rnum_t)INVALID_RNUM, nullptr), INVALID_VNUM);
   }
   void test_blackjack()
   {
@@ -1609,11 +1609,11 @@ private slots:
     QCOMPARE(get_obj_vnum(u"v1"_s), nullptr);
     QCOMPARE_NE(get_obj_vnum(u"v99"_s), nullptr);
 
-    QCOMPARE(dc_->obj_index_[get_obj_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(dc_->obj_index_[get_obj_vnum(u"v99"_s)->item_number]->vnum(), 99);
     QCOMPARE(get_obj_vnum(u"v99"_s)->carried_by, nullptr);
-    QCOMPARE(dc_->obj_index_[get_objindex_vnum(u"v1"_s)->item_number].vnum(), 1);
+    QCOMPARE(dc_->obj_index_[get_objindex_vnum(u"v1"_s)->item_number]->vnum(), 1);
     QCOMPARE(get_objindex_vnum(u"v1"_s)->carried_by, nullptr);
-    QCOMPARE(dc_->obj_index_[get_objindex_vnum(u"v99"_s)->item_number].vnum(), 99);
+    QCOMPARE(dc_->obj_index_[get_objindex_vnum(u"v99"_s)->item_number]->vnum(), 99);
     QCOMPARE(get_objindex_vnum(u"v99"_s)->carried_by, nullptr);
   }
 

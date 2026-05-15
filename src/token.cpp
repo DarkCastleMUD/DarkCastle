@@ -142,7 +142,7 @@ QString TokenList::Interpret(CharacterPtr from, ObjectPtr obj, auto vict_obj, Ch
   }
   if (send_to->conn_ && send_to->conn_->connected != Connection::states::PLAYING && !(flags & FLAG_FORCE))
     return "";
-  if (isSet(dc_->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
+  if (isSet(dc_->world[send_to->in_room]->room_flags_, QUIET) && !(flags & FLAG_FORCE))
     return "";
   if ((send_to == (CharacterPtr)vict_obj) && (flags & NOTVICT))
     return "";

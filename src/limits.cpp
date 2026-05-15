@@ -139,7 +139,7 @@ qint32 Character::mana_gain_lookup(void)
   if (mana_regen > 0)
     gain += mana_regen;
   if (in_room >= 0)
-    if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
+    if (isSet(dc_->world[in_room]->room_flags_, SAFE) || check_make_camp(in_room))
       gain = (qint32)(gain * 1.25);
 
   if (mana_regen < 0)
@@ -225,7 +225,7 @@ qint32 Character::hit_gain(position_t position, bool improve)
     gain = (qint32)((qreal)gain * (2.0 - (qreal)getLevel() / 50.0));
 
   if (in_room >= 0)
-    if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
+    if (isSet(dc_->world[in_room]->room_flags_, SAFE) || check_make_camp(in_room))
       gain = (qint32)(gain * 1.5);
   if (hit_regen < 0)
     gain += hit_regen;
@@ -290,7 +290,7 @@ qint32 Character::move_gain_lookup(qint32 extra)
     gain = (qint32)((qreal)gain * (2.0 - (qreal)getLevel() / 50.0));
 
   if (in_room >= 0)
-    if (isSet(dc_->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
+    if (isSet(dc_->world[in_room]->room_flags_, SAFE) || check_make_camp(in_room))
       gain = (qint32)(gain * 1.5);
   if (move_regen < 0)
     gain += move_regen;
@@ -609,7 +609,7 @@ void gain_exp(CharacterPtr ch, qint64 gain)
   if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
 
-  if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr].vnum() == 8) // it's a golem
+  if (ch->isNonPlayer() && dc_->mob_index_[ch->mobdata->nr]->vnum() == 8) // it's a golem
     golem_gain_exp(ch);
 
   if (ch->isNonPlayer())
@@ -701,7 +701,7 @@ void DC::food_update(void)
     if (i->affected_by_spell(SPELL_PARALYZE))
       continue;
     qint32 amt = -1;
-    if (i->equipment[WEAR_FACE] && dc_->obj_index_[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
+    if (i->equipment[WEAR_FACE] && dc_->obj_index_[i->equipment[WEAR_FACE]->item_number]->vnum() == 536)
       amt = -3;
     gain_condition(i, FULL, amt);
     if (!GET_COND(i, FULL) && i->getLevel() < 60)
@@ -746,7 +746,7 @@ void DC::point_update(void)
   const auto &character_list = dc_->character_list;
   for (const auto &i : character_list)
   {
-    if (i->in_room == DC::NOWHERE)
+    if (i->in_room == INVALID_ROOM)
       continue;
     if (i->affected_by_spell(SPELL_POISON))
       continue;
@@ -759,7 +759,7 @@ void DC::point_update(void)
       for (o = {}; o < MAX_HIDE; o++)
         i->player->hiding_from[o] = {};
       o = {};
-      for (temp = dc_->world[i->in_room].people_; temp; temp = temp->next_in_room)
+      for (temp = dc_->world[i->in_room]->people_; temp; temp = temp->next_in_room)
       {
         if (i == temp)
           continue;
@@ -819,13 +819,13 @@ void DC::update_corpses_and_portals(void)
         (j->flags_.timer)--;
       if (!(j->flags_.timer))
       {
-        if (j->in_room != DC::NOWHERE)
+        if (j->in_room != INVALID_ROOM)
         {
           auto str = u"%1 shimmers brightly and then fades away.\r\n"_s.arg(GET_OBJ_SHORT(j));
           str[0] = str[0].toUpper();
           send_to_room(str, j->in_room);
         }
-        else if (j->in_obj && j->in_obj->in_room != DC::NOWHERE)
+        else if (j->in_obj && j->in_obj->in_room != INVALID_ROOM)
         {
           auto str = u"%1 shimmers brightly for a moment.\r\n"_s.arg(GET_OBJ_SHORT(j->in_obj));
           str[0] = str[0].toUpper();
@@ -863,10 +863,10 @@ void DC::update_corpses_and_portals(void)
       {
         if (j->carried_by)
           act_to_character("$p decays in your hands.", j->carried_by, j, 0, 0);
-        else if ((j->in_room != DC::NOWHERE) && (dc_->world[j->in_room].people_))
+        else if ((j->in_room != INVALID_ROOM) && (dc_->world[j->in_room]->people_))
         {
-          act_to_room("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people_, j, 0, INVIS_NULL);
-          act_to_character("A quivering horde of maggots consumes $p.", dc_->world[j->in_room].people_, j, 0, 0);
+          act_to_room("A quivering horde of maggots consumes $p.", dc_->world[j->in_room]->people_, j, 0, INVIS_NULL);
+          act_to_character("A quivering horde of maggots consumes $p.", dc_->world[j->in_room]->people_, j, 0, 0);
         }
         bool corpse_contained = j->contains != nullptr;
         for (jj = j->contains; jj; jj = next_thing2)
@@ -905,7 +905,7 @@ void DC::update_corpses_and_portals(void)
 
             move_obj(jj, j->carried_by);
           }
-          else if (j->in_room != DC::NOWHERE)
+          else if (j->in_room != INVALID_ROOM)
           {
             if (isSet(jj->flags_.more_flags, ITEM_NO_TRADE))
             {

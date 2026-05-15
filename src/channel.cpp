@@ -10,11 +10,11 @@ QQueue<QString> auction_history;
 QQueue<QString> newbie_history;
 QQueue<QString> trivia_history;
 
-ReturnValue do_say(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_say(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 i;
   QString buf;
-  qint32 retval;
+  ReturnValues retval;
   extern bool MOBtrigger;
 
   if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
@@ -23,7 +23,7 @@ ReturnValue do_say(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
@@ -31,7 +31,7 @@ ReturnValue do_say(CharacterPtr ch, QString argument, cmd_t cmd)
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -80,7 +80,7 @@ ReturnValue do_say(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-ReturnValue do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString vict = {}, message = {}, buf = {};
   CharacterPtr victim = {};
@@ -92,7 +92,7 @@ ReturnValue do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
@@ -100,7 +100,7 @@ ReturnValue do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 
   ObjectPtr tmp_obj = {};
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (tmp_obj && tmp_obj->item_number >= 0 && dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (tmp_obj && tmp_obj->item_number >= 0 && dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -151,7 +151,7 @@ ReturnValue do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf1;
   ConnectionPtr i;
@@ -204,21 +204,21 @@ ReturnValue do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buf2;
   ConnectionPtr i;
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -300,7 +300,7 @@ ReturnValue do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
       {
         for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
         {
-          if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
@@ -317,20 +317,20 @@ ReturnValue do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_auction(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_auction(QStringList arguments, cmd_t cmd)
 {
   ConnectionPtr i = {};
   ObjectPtr tmp_obj = {};
   bool silence = false;
 
-  if (isSet(dc_->world[in_room].room_flags, QUIET))
+  if (isSet(dc_->world[in_room]->room_flags_, QUIET))
   {
     send(u"SHHHHHH!! Can't you see people are trying to read?\r\n"_s);
     return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = dc_->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       send(u"The magical silence prevents you from speaking!\r\n"_s);
       return ReturnValue::eFAILURE;
@@ -400,7 +400,7 @@ ReturnValue Character::do_auction(QStringList arguments, cmd_t cmd)
           !is_ignoring(conn->character, this))
       {
         for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-          if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
@@ -412,7 +412,7 @@ ReturnValue Character::do_auction(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
@@ -420,14 +420,14 @@ ReturnValue do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -472,12 +472,12 @@ ReturnValue do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 
     for (auto &i : dc_->connections_)
       if (conn->character != ch && !conn->connected &&
-          (dc_->world[conn->character->in_room].zone == dc_->world[ch->in_room].zone) &&
+          (dc_->world[conn->character->in_room]->zone == dc_->world[ch->in_room]->zone) &&
           (conn->character->isNonPlayer() || isSet(conn->character->misc, DC::LogChannel::CHANNEL_SHOUT)) &&
           !is_ignoring(conn->character, ch))
       {
         for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-          if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
@@ -489,7 +489,7 @@ ReturnValue do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
@@ -497,14 +497,14 @@ ReturnValue do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -579,7 +579,7 @@ ReturnValue do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
         !is_ignoring(conn->character, ch))
     {
       for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-        if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+        if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
         {
           silence = true;
           break;
@@ -591,7 +591,7 @@ ReturnValue do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
@@ -665,7 +665,7 @@ ReturnValue do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_tellhistory(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_tellhistory(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -701,7 +701,7 @@ ReturnValue do_tellhistory(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_tell(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_tell(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr vict = {};
   QString name = {}, message = {}, buf = {}, log_buf = {};
@@ -714,7 +714,7 @@ ReturnValue Character::do_tell(QStringList arguments, cmd_t cmd)
   }
 
   for (tmp_obj = dc_->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -811,12 +811,12 @@ ReturnValue Character::do_tell(QStringList arguments, cmd_t cmd)
   }
   if (this == vict)
     sendln(u"You try to tell yourself something."_s);
-  else if ((GET_POS(vict) == position_t::SLEEPING || isSet(dc_->world[vict->in_room].room_flags, QUIET)) && level_ < IMMORTAL)
+  else if ((GET_POS(vict) == position_t::SLEEPING || isSet(dc_->world[vict->in_room]->room_flags_, QUIET)) && level_ < IMMORTAL)
     act_to_character("Sorry, $E cannot hear you.", this, 0, vict, STAYHIDE);
   else
   {
     for (tmp_obj = dc_->world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+      if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
       {
         act_to_character("$E cannot hear you right now.", this, 0, vict, STAYHIDE);
         return ReturnValue::eSUCCESS;
@@ -924,7 +924,7 @@ ReturnValue Character::do_tell(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf = {};
   CharacterPtr vict = {};
@@ -937,7 +937,7 @@ ReturnValue do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -965,14 +965,14 @@ ReturnValue do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   QString name, message, buf;
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1008,14 +1008,14 @@ ReturnValue do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   QString name, message, buf;
 
   ObjectPtr tmp_obj;
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1051,11 +1051,11 @@ ReturnValue do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   CharacterPtr k;
-  follow_type *f;
+  CharacterPtr *f;
   ObjectPtr tmp_obj;
   bool silence = false;
 
@@ -1082,7 +1082,7 @@ ReturnValue do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1128,7 +1128,7 @@ ReturnValue do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       for (tmp_obj = dc_->world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
       {
-        if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+        if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
         {
           silence = true;
           break;
@@ -1147,7 +1147,7 @@ ReturnValue do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
@@ -1155,14 +1155,14 @@ ReturnValue do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room].room_flags, QUIET))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1222,7 +1222,7 @@ ReturnValue do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
           (isSet(conn->character->misc, DC::LogChannel::CHANNEL_NEWBIE)))
       {
         for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-          if (dc_->obj_index_[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;

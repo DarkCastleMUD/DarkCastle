@@ -13,7 +13,7 @@ qint32 get_weapon_damage_type(ObjectPtr wielded);
 qint32 check_autojoiners(CharacterPtr ch, qint32 skill = 0);
 qint32 check_joincharmie(CharacterPtr ch, qint32 skill = 0);
 
-ReturnValue do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString name;
@@ -58,7 +58,7 @@ ReturnValue do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
   if (!charge_moves(ch, SKILL_EYEGOUGE))
     return ReturnValue::eSUCCESS;
 
-  qint32 retval = {};
+  ReturnValues retval = {};
   if (!skill_success(ch, victim, SKILL_EYEGOUGE))
   {
     retval = damage(ch, victim, 0, TYPE_PIERCE, SKILL_EYEGOUGE);
@@ -93,12 +93,12 @@ ReturnValue do_eyegouge(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval | ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_backstab(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_backstab(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr victim;
 
   qint32 was_in = {};
-  qint32 retval;
+  ReturnValues retval;
 
   QString name = arguments.value(0);
 
@@ -279,7 +279,7 @@ ReturnValue Character::do_backstab(QStringList arguments, cmd_t cmd)
   }
 
   // If we're intended to have a dual backstab AND we still can
-  if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && GET_POS(victim) != position_t::DEAD && victim->in_room != DC::NOWHERE)
+  if (perform_dual_backstab == true && charge_moves(SKILL_BACKSTAB) && GET_POS(victim) != position_t::DEAD && victim->in_room != INVALID_ROOM)
   {
     if (was_in == in_room)
     {
@@ -314,10 +314,10 @@ ReturnValue Character::do_backstab(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  qint32 retval;
+  ReturnValues retval;
 
   if (!ch->canPerform(SKILL_CIRCLE))
   {
@@ -478,11 +478,11 @@ ReturnValue do_circle(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
   QString name;
-  qint32 retval;
+  ReturnValues retval;
 
   if (!ch->canPerform(SKILL_TRIP))
   {
@@ -589,7 +589,7 @@ ReturnValue do_trip(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
 {
 
   auto &arena = dc_->arena_;
@@ -636,7 +636,7 @@ ReturnValue do_sneak(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString name;
   CharacterPtr leader;
@@ -696,7 +696,7 @@ ReturnValue do_stalk(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
+ReturnValues do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   auto &arena = dc_->arena_;
   if (!ch->canPerform(SKILL_HIDE))
@@ -713,7 +713,7 @@ ReturnValue do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (auto curr = dc_->world[ch->in_room].people_; curr; curr = curr->next_in_room)
+  for (auto curr = dc_->world[ch->in_room]->people_; curr; curr = curr->next_in_room)
   {
     if (curr->fighting == ch)
     {
@@ -738,7 +738,7 @@ ReturnValue do_hide(CharacterPtr ch, const QString argument, cmd_t cmd)
     for (i = {}; i < MAX_HIDE; i++)
       ch->player->hiding_from[i] = {};
     i = {};
-    for (temp = dc_->world[ch->in_room].people_; temp; temp = temp->next_in_room)
+    for (temp = dc_->world[ch->in_room]->people_; temp; temp = temp->next_in_room)
     {
       if (ch == temp)
         continue;
@@ -772,17 +772,17 @@ qint32 max_level(CharacterPtr ch)
 }
 
 // steal an ITEM... not gold
-ReturnValue do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  ObjectPtr obj, *loop_obj, next_obj;
-  affected_type pthiefaf, *paf;
+  ObjectPtr obj, loop_obj, next_obj;
+  affected_type pthiefaf, paf;
   QString victim_name;
   QString obj_name;
   QString buf;
   qint32 eq_pos;
   qint32 _exp;
-  qint32 retval;
+  ReturnValues retval;
   ObjectPtr has_item = {};
   bool ohoh = false;
   qint32 chance = GET_HITROLL(ch) + ch->has_skill(SKILL_STEAL) / 4;
@@ -830,7 +830,7 @@ ReturnValue do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"No stealing permitted in safe areas!"_s);
     return ReturnValue::eFAILURE;
@@ -887,7 +887,7 @@ ReturnValue do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"That piece of equipment is protected by the powerful magics of the MUD-school elders."_s);
       return ReturnValue::eFAILURE;
     }
-    if (dc_->obj_index_[obj->item_number].vnum() == CHAMPION_ITEM)
+    if (dc_->obj_index_[obj->item_number]->vnum() == CHAMPION_ITEM)
     {
       ch->send(u"You must earn that flag, no stealing allowed!"_s);
       return ReturnValue::eFAILURE;
@@ -982,12 +982,12 @@ ReturnValue do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             QString log_buf = {};
-            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), dc_->obj_index_[obj->item_number].vnum(), qPrintable(victim->name()));
+            dc_sprintf(log_buf, "%s stole %s[%lu] from %s", qPrintable(ch->name()), qPrintable(obj->short_description()), dc_->obj_index_[obj->item_number]->vnum(), qPrintable(victim->name()));
             dc_->logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), dc_->obj_index_[loop_obj->item_number].vnum());
+              dc_->logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]", qPrintable(obj->short_description()), qPrintable(loop_obj->short_description()), dc_->obj_index_[loop_obj->item_number]->vnum());
           }
-          if (dc_->obj_index_[obj->item_number].vnum() != 76)
+          if (dc_->obj_index_[obj->item_number]->vnum() != 76)
           {
             obj_from_char(obj);
             has_item = search_char_for_item(ch, obj->item_number, false);
@@ -1234,7 +1234,7 @@ ReturnValue do_steal(CharacterPtr ch, QString argument, cmd_t cmd)
 }
 
 // Steal gold
-ReturnValue do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   affected_type pthiefaf;
@@ -1242,7 +1242,7 @@ ReturnValue do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   qint32 gold;
   qint32 _exp;
-  qint32 retval;
+  ReturnValues retval;
   bool ohoh = false;
 
   one_argument(argument, victim_name);
@@ -1282,7 +1282,7 @@ ReturnValue do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (isSet(dc_->world[ch->in_room].room_flags, SAFE))
+  if (isSet(dc_->world[ch->in_room]->room_flags_, SAFE))
   {
     ch->sendln(u"No stealing permitted in safe areas!"_s);
     return ReturnValue::eFAILURE;
@@ -1417,7 +1417,7 @@ ReturnValue do_pocket(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   qint32 door, other_room, j;
   QString type, dir;
@@ -1439,7 +1439,7 @@ ReturnValue do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   //      has_lockpicks = true;
 
   for (j = {}; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->flags_.type_flag == ITEM_LOCKPICK || dc_->obj_index_[ch->equipment[j]->item_number].vnum() == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->flags_.type_flag == ITEM_LOCKPICK || dc_->obj_index_[ch->equipment[j]->item_number]->vnum() == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1536,7 +1536,7 @@ ReturnValue do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"The lock quickly yields to your skills."_s);
 
       /* now for unlocking the other side, too */
-      if ((other_room = EXIT(ch, door)->to_room) != DC::NOWHERE)
+      if ((other_room = EXIT(ch, door)->to_room) != INVALID_ROOM)
       {
         if ((back = dc_->world[other_room].dir_option[rev_dir[door]]) != 0)
         {
@@ -1565,7 +1565,7 @@ ReturnValue do_pick(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString obj_name, vict_name, buf;
   QString arg;
@@ -1761,7 +1761,7 @@ ReturnValue do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
     }
     if (((container->flags_.weight + obj->flags_.weight) >=
          container->flags_.value[0]) &&
-        (dc_->obj_index_[container->item_number].vnum() != 536 ||
+        (dc_->obj_index_[container->item_number]->vnum() != 536 ||
          weight_in(container) + obj->flags_.weight >= 200))
     {
       ch->sendln(u"It won't fit...cheater."_s);
@@ -1776,7 +1776,7 @@ ReturnValue do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
       act_to_room("$n slips $p in $P.", ch, obj, container, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (dc_->obj_index_[container->item_number].vnum() != 536)
+    if (dc_->obj_index_[container->item_number]->vnum() != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act_to_character("You slip $p in $P.", ch, obj, container, 0);
@@ -1833,7 +1833,7 @@ ReturnValue do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (dc_->obj_index_[obj->item_number].vnum() == 393)
+    if (dc_->obj_index_[obj->item_number]->vnum() == 393)
     {
       ch->sendln(u"Whoa, you almost dropped your hot potato!"_s);
       return ReturnValue::eFAILURE;
@@ -1876,7 +1876,7 @@ ReturnValue do_slip(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1935,7 +1935,7 @@ ReturnValue do_vitalstrike(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1957,7 +1957,7 @@ ReturnValue do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 grpsize = {};
-  for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1986,7 +1986,7 @@ ReturnValue do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (CharacterPtr tmp_char = dc_->world[ch->in_room].people_; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = dc_->world[ch->in_room]->people_; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -2015,9 +2015,9 @@ ReturnValue do_deceit(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  qint32 retval = ReturnValue::eFAILURE, learned;
+  ReturnValues retval = ReturnValue::eFAILURE, learned;
 
   if (ch->affected_by_spell(SKILL_JAB) && !ch->isImmortalPlayer())
   {
@@ -2165,7 +2165,7 @@ ReturnValue do_jab(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 }
 
-ReturnValue do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
   ObjectPtr obj = {};
@@ -2308,7 +2308,7 @@ ReturnValue do_appraise(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_cripple(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr vict;
   QString name;

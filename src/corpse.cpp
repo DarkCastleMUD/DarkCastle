@@ -15,7 +15,7 @@
 #include "DC/DC.h"
 #include <qiodevicebase.h>
 
-qint32 corpse_save(ObjectPtr obj, FILE *stream, qint32 location, bool recurse_this_tree)
+qint32 corpse_save(ObjectPtr obj, QTextStream stream, qint32 location, bool recurse_this_tree)
 {
   /* This function basically is responsible for taking the    */
   /* supplied obj and figuring out if it has any contents. If */
@@ -65,7 +65,7 @@ void DC::save_corpses(void)
   ObjectPtr i, next;
   qint32 location = {};
   QString buf1;
-  extern ReturnValue do_not_save_corpses;
+  extern ReturnValues do_not_save_corpses;
 
   if (do_not_save_corpses == 1)
     return;
@@ -438,10 +438,9 @@ qint32 get_line_new(auto &stream, QString buf)
 ObjectPtr DC::create_obj_new(void)
 {
   auto obj = ObjectPtr(new Object(this));
-  clear_object(obj);
   object_list_.push_back(obj);
   /* Corpse saving stuff */
-  GET_OBJ_VROOM(obj) = DC::NOWHERE;
+  GET_OBJ_VROOM(obj) = INVALID_ROOM;
   GET_OBJ_TIMER(obj) = {};
   obj->save_expiration = {};
   obj->no_sell_expiration = {};

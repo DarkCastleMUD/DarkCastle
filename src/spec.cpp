@@ -20,7 +20,7 @@ const spec_data spec_list[] =
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
-ReturnValue do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_spec(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
   QString arg;

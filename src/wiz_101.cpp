@@ -8,7 +8,7 @@
 QQueue<QString> imm_history;
 QQueue<QString> imp_history;
 
-ReturnValue Character::do_wizhelp(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 {
   if (!isImmortalPlayer())
   {
@@ -95,13 +95,13 @@ ReturnValue Character::do_wizhelp(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
+ReturnValues Character::do_goto(QStringList arguments, cmd_t cmd)
 {
   qint32 loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
   CharacterPtr target_mob = {}, pers = {};
   CharacterPtr tmp_ch = {};
-  follow_type *k = {}, *next_dude = {};
+  CharacterPtr *k = {}, *next_dude = {};
   ObjectPtr target_obj = {};
 
   if (isNonPlayer())
@@ -199,7 +199,7 @@ ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
       }
       else if ((target_obj = getVisibleObject(arg1)))
       {
-        if (target_obj->in_room != DC::NOWHERE)
+        if (target_obj->in_room != INVALID_ROOM)
         {
           location = target_obj->in_room;
           send(u"Going to object %1 in room %2.\r\n"_s.arg(target_obj->name()).arg(location));
@@ -251,7 +251,7 @@ ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
   }
 
   /* a location has been found. */
-  if (isSet(dc_->world[location].room_flags, IMP_ONLY) &&
+  if (isSet(dc_->world[location]->room_flags_, IMP_ONLY) &&
       level_ < OVERSEER)
   {
     send(u"That room is for implementers only.\r\n"_s);
@@ -259,17 +259,17 @@ ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (isSet(dc_->world[location].room_flags, CLAN_ROOM) &&
+  if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM) &&
       level_ < DEITY)
   {
     send(u"For your protection, 104-'s may not be in clanhalls.\r\n"_s);
     return ReturnValue::eFAILURE;
   }
 
-  if ((isSet(dc_->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
+  if ((isSet(dc_->world[location]->room_flags_, PRIVATE)) && (level_ < OVERSEER))
   {
 
-    for (i = 0, pers = dc_->world[location].people_; pers;
+    for (i = 0, pers = dc_->world[location]->people_; pers;
          pers = pers->next_in_room, i++)
       ;
     if (i > 1)
@@ -282,7 +282,7 @@ ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
   send(u"\r\n"_s);
 
   if (!isNonPlayer())
-    for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = dc_->world[in_room]->people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
@@ -304,7 +304,7 @@ ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
   move_char(this, location);
 
   if (!isNonPlayer())
-    for (tmp_ch = dc_->world[in_room].people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (tmp_ch = dc_->world[in_room]->people_; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
       {
@@ -340,7 +340,7 @@ ReturnValue Character::do_goto(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
+ReturnValues do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString inout, buf;
   qint32 ctr, nope;
@@ -442,7 +442,7 @@ ReturnValue do_poof(CharacterPtr ch, QString arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_at(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString command, loc_str;
   qint32 loc_nr, location, original_loc;
@@ -472,7 +472,7 @@ ReturnValue do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   else if ((target_mob = get_char_vis(ch, loc_str)) != nullptr)
     location = target_mob->in_room;
   else if ((target_obj = get_obj_vis(ch, loc_str)) != nullptr)
-    if (target_obj->in_room != DC::NOWHERE)
+    if (target_obj->in_room != INVALID_ROOM)
       location = target_obj->in_room;
     else
     {
@@ -486,14 +486,14 @@ ReturnValue do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   /* a location has been found. */
-  if (isSet(dc_->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
+  if (isSet(dc_->world[location]->room_flags_, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln(u"No."_s);
     return ReturnValue::eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
-  if (isSet(dc_->world[location].room_flags, CLAN_ROOM) &&
+  if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM) &&
       ch->getLevel() < DEITY)
   {
     ch->sendln(u"For your protection, 104-'s may not be in clanhalls."_s);
@@ -502,11 +502,11 @@ ReturnValue do_at(CharacterPtr ch, QString argument, cmd_t cmd)
 
   original_loc = ch->in_room;
   move_char(ch, location, false);
-  qint32 retval = ch->command_interpreter(command);
+  ReturnValues retval = ch->command_interpreter(command);
 
   /* check if the guy's still there */
-  for (target_mob = dc_->world[location].people_; target_mob; target_mob =
-                                                                  target_mob->next_in_room)
+  for (target_mob = dc_->world[location]->people_; target_mob; target_mob =
+                                                                   target_mob->next_in_room)
     if (ch == target_mob)
     {
       move_char(ch, original_loc);
@@ -514,7 +514,7 @@ ReturnValue do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   return retval;
 }
 
-ReturnValue do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   CharacterPtr victim;
   QString buf;
@@ -548,7 +548,7 @@ ReturnValue do_highfive(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -571,7 +571,7 @@ ReturnValue do_holylite(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf;
 
@@ -608,7 +608,7 @@ ReturnValue do_wizinvis(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -628,7 +628,7 @@ ReturnValue do_nohassle(CharacterPtr ch, QString argument, cmd_t cmd)
 
 // cmd == cmd_t::DEFAULT - imm
 // cmd == 8 - /
-ReturnValue do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf1 = {};
   ConnectionPtr i = {};
@@ -718,7 +718,7 @@ ReturnValue do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
   {
@@ -773,7 +773,7 @@ ReturnValue do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValue do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
+ReturnValues do_varstat(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString arg;
   argument = one_argument(argument, arg);
