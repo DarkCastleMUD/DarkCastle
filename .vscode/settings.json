@@ -135,4 +135,5 @@
         "--pch-storage=memory",
         "--background-index"
     ],
+    "chat.disableAIFeatures": true,
 }
