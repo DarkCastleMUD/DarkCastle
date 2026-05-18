@@ -278,22 +278,21 @@ void Character::do_inate_race_abilities(void)
 
 ObjectPtr Character::clan_altar(void)
 {
-  if (clan)
-    for (auto c = dc_->clan_list; c; c = c->next)
-      if (c->number == clan)
+  if (dc_->clan_id__list_.contains(clan_id_))
+  {
+    const auto &clan = dc_->clan_id__list_[clan_id_];
+    for (const auto &room : clan.rooms_)
+    {
+      if (room == INVALID_ROOM)
+        continue;
+      ObjectPtr t = dc_->world[room]->contents_;
+      for (; t; t = t->next_content)
       {
-        for (auto room = c->rooms; room; room = room->next)
-        {
-          if (real_room(room->room_number) == INVALID_ROOM)
-            continue;
-          ObjectPtr t = dc_->world[real_room(room->room_number)].contents;
-          for (; t; t = t->next_content)
-          {
-            if (t->flags_.type_flag == ITEM_ALTAR)
-              return t;
-          }
-        }
+        if (t->flags_.type_flag == ITEM_ALTAR)
+          return t;
       }
+    }
+  }
   return {};
 }
 
@@ -378,13 +377,13 @@ void Character::do_on_login_stuff(void)
   }
   add_totem_stats(this);
   if (getLevel() < 5 && GET_AGE(this) < 21)
-    char_to_room(this, real_room(200));
+    char_to_room(this, 200);
   else if (in_room >= 2)
     char_to_room(this, in_room);
   else if (getLevel() >= IMMORTAL)
-    char_to_room(this, real_room(17));
+    char_to_room(this, 17);
   else
-    char_to_room(this, real_room(START_ROOM));
+    char_to_room(this, START_ROOM);
 
   curLeadBonus = {};
   changeLeadBonus = false;
@@ -996,10 +995,10 @@ void DC::nanny(ConnectionPtr conn, QString arg)
       conn->character->send(imotd);
 
     ClanPtr clan;
-    if ((clan = get_clan(ch->clan)) && clan->clanmotd)
+    if ((clan = get_clan(ch->clan_id_)) && clan->clan_id_motd)
     {
       ch->sendln(u"$B----------------------------------------------------------------------$R"_s);
-      ch->send(clan->clanmotd);
+      ch->send(clan->clan_id_motd);
       ch->sendln(u"$B----------------------------------------------------------------------$R"_s);
     }
 
@@ -1799,9 +1798,9 @@ void DC::nanny(ConnectionPtr conn, QString arg)
       // To remove the vault from memory
       remove_familiars(conn->character->name(), SELFDELETED);
       dc_->vaults_.remove_vault(conn->character->name(), SELFDELETED);
-      if (conn->character->clan)
+      if (conn->character->clan_id_)
       {
-        remove_clan_member(conn->character->clan, conn->character);
+        remove_clan_member(conn->character->clan_id_, conn->character);
       }
       remove_character(conn->character->name(), SELFDELETED);
 

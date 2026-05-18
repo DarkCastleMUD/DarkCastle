@@ -85,27 +85,27 @@ qint32 ifpos;
 
 // This 2 variables keep track of what command and line number a mprog script
 // is on for error logging purposes.
-qint32 mprog_command_num = {};
-qint32 mprog_line_num = {};
+ReturnValues mprog_command_num = {};
+ReturnValues mprog_line_num = {};
 
 /*
  * Local function prototypes
  */
 
-qint32 mprog_veval(qint64 lhs, QString opr, qint64 rhs);
-qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob,
-                       CharacterPtr actor, ObjectPtr obj,
-                       void *vo, CharacterPtr rndm);
+ReturnValues mprog_veval(qint64 lhs, QString opr, qint64 rhs);
+ReturnValues mprog_do_ifchck(QString ifchck, CharacterPtr mob,
+                             CharacterPtr actor, ObjectPtr obj,
+                             void *vo, CharacterPtr rndm);
 QString mprog_process_if(QString ifchck, QString com_list,
                          CharacterPtr mob, CharacterPtr actor,
                          ObjectPtr obj, void *vo,
                          CharacterPtr rndm, mprog_throw_type *thrw = {});
-void mprog_translate(character ch, QString t, CharacterPtr mob,
+void mprog_translate(CharacterPtr ch, QString t, CharacterPtr mob,
                      CharacterPtr actor, ObjectPtr obj,
                      void *vo, CharacterPtr rndm);
-qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob,
-                          CharacterPtr actor, ObjectPtr obj,
-                          void *vo, CharacterPtr rndm);
+ReturnValues mprog_process_cmnd(QString cmnd, CharacterPtr mob,
+                                CharacterPtr actor, ObjectPtr obj,
+                                void *vo, CharacterPtr rndm);
 
 /***************************************************************************
  * Local function code and brief comments.
@@ -171,7 +171,7 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
 }
 
 /*
-qint32 mprog_veval( qint32 lhs, QString opr, qint32 rhs )
+ReturnValues mprog_veval( qint32 lhs, QString opr, qint32 rhs )
 {
 
   if ( !str_cmp( opr, "==" ) )
@@ -196,7 +196,7 @@ qint32 mprog_veval( qint32 lhs, QString opr, qint32 rhs )
 
 }
 */
-qint32 mprog_veval(qint64 lhs, QString opr, qint64 rhs)
+ReturnValues mprog_veval(qint64 lhs, QString opr, qint64 rhs)
 {
 
   if (!str_cmp(opr, "=="))
@@ -220,7 +220,7 @@ qint32 mprog_veval(qint64 lhs, QString opr, qint64 rhs)
   return 0;
 }
 /*
-qint32 mprog_veval( quint64 lhs, QString opr, quint64 rhs )
+ReturnValues mprog_veval( quint64 lhs, QString opr, quint64 rhs )
 {
   if ( !str_cmp( opr, "==" ) )
         return ( lhs == rhs );
@@ -356,7 +356,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   {
     left += 5;
     if (is_number(left))
-      rtarget = real_room(dc_atoi(left));
+      rtarget = dc_atoi(left);
     else
       rtarget = mob->in_room;
   }
@@ -385,7 +385,7 @@ void translate_value(QString leftptr, QString rightptr, qint16 **vali,
   else if (!str_prefix("oroom_", left))
   {
     left += 6;
-    otarget = get_obj_in_list(left, dc_->world[mob->in_room].contents);
+    otarget = get_obj_in_list(left, dc_->world[mob->in_room]->contents_);
   }
   else if (!str_prefix("zone_", left))
   {
@@ -1394,8 +1394,8 @@ QMap<QString, mprog_ifs> load_ifchecks()
 
 QMap<QString, mprog_ifs> ifcheck = load_ifchecks();
 
-qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
-                       ObjectPtr obj, void *vo, CharacterPtr rndm)
+ReturnValues mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
+                             ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
 
   QString buf;
@@ -1661,7 +1661,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
     break;
 
   case eAMTITEMS:
-    return mprog_veval(dc_->obj_index_[real_object(dc_atoi(arg))].qty, opr, dc_atoi(val));
+    return mprog_veval(dc_->obj_index_[real_object(dc_atoi(arg))]->qty, opr, dc_atoi(val));
     break;
 
   case eNUMPCS:
@@ -2784,7 +2784,7 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
   {
     qint32 target = dc_atoi(arg);
 
-    for (ObjectPtr obj = dc_->world[mob->in_room].contents;
+    for (ObjectPtr obj = dc_->world[mob->in_room]->contents_;
          obj;
          obj = obj->next_content)
     {
@@ -2856,20 +2856,20 @@ qint32 mprog_do_ifchck(QString ifchck, CharacterPtr mob, CharacterPtr actor,
 
   case eCLAN:
     if (fvict)
-      return fvict->clan;
+      return fvict->clan_id_;
     switch (arg[1])
     {
     case 'i':
-      return mob->clan; // always in the same zone as itself
+      return mob->clan_id_; // always in the same zone as itself
     case 'n':
       if (actor)
-        return actor->clan;
+        return actor->clan_id_;
       else
         return -1;
     case 'r':
     case 't':
       if (vict)
-        return vict->clan;
+        return vict->clan_id_;
       else
         return -1;
     default:
@@ -2918,7 +2918,7 @@ QString null;
 // It will hold ReturnValue::eCH_DIED if the mob died doing it's proc.  We need to
 // make sure this is not true when returning from an if check or the
 // mob's pointer is no longer valid
-qint32 mprog_cur_result;
+ReturnValues mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
 QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
@@ -3175,7 +3175,7 @@ QString mprog_process_if(QString ifchck, QString com_list, CharacterPtr mob,
  * would be to change act() so that vo becomes vict & v_obj.
  * but this would require a lot of small changes all over the code.
  */
-void mprog_translate(character ch, QString t, CharacterPtr mob, CharacterPtr actor,
+void mprog_translate(CharacterPtr ch, QString t, CharacterPtr mob, CharacterPtr actor,
                      ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   static const QStringList he_she = {"it", "he", "she"};
@@ -3555,8 +3555,8 @@ void debugpoint() {};
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-qint32 mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
-                          ObjectPtr obj, void *vo, CharacterPtr rndm)
+ReturnValues mprog_process_cmnd(QString cmnd, CharacterPtr mob, CharacterPtr actor,
+                                ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   QString buf;
   QString tmp;
@@ -3859,8 +3859,8 @@ void mprog_driver(QString com_list, CharacterPtr mob, CharacterPtr actor, Object
  */
 // Returns true if match
 // false if no match
-qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
-                            ObjectPtr obj, void *vo, qint32 type, bool reverse)
+ReturnValues mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor,
+                                  ObjectPtr obj, void *vo, qint32 type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE WEAR_WIELD WORD
 {
 
@@ -4006,8 +4006,8 @@ void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
-                         ObjectPtr obj, void *vo)
+ReturnValues mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
+                               ObjectPtr obj, void *vo)
 {
 
   //  mob_prog_act_list * tmp_act;
@@ -4024,7 +4024,7 @@ qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
   return mprog_cur_result;
 }
 
-qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
+ReturnValues mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 {
 
   MobileProgramPtr mprg = {};
@@ -4068,7 +4068,7 @@ qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
   return mprog_cur_result;
 }
 
-qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
+ReturnValues mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
 {
 
   MobileProgramPtr mprg = {};
@@ -4109,7 +4109,7 @@ qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount)
   return mprog_cur_result;
 }
 
-qint32 mprog_death_trigger(CharacterPtr mob, CharacterPtr killer)
+ReturnValues mprog_death_trigger(CharacterPtr mob, CharacterPtr killer)
 {
 
   if (mob->isNonPlayer() && (dc_->mob_index_[mob->mobdata->nr]->progtypes_ & DEATH_PROG) && isPaused(mob) == false)
@@ -4121,7 +4121,7 @@ qint32 mprog_death_trigger(CharacterPtr mob, CharacterPtr killer)
   return mprog_cur_result;
 }
 
-qint32 mprog_entry_trigger(CharacterPtr mob)
+ReturnValues mprog_entry_trigger(CharacterPtr mob)
 {
 
   if (mob->isNonPlayer() && (dc_->mob_index_[mob->mobdata->nr]->progtypes_ & ENTRY_PROG) && isPaused(mob) == false)
@@ -4130,7 +4130,7 @@ qint32 mprog_entry_trigger(CharacterPtr mob)
   return mprog_cur_result;
 }
 
-qint32 mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch)
+ReturnValues mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch)
 {
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (dc_->mob_index_[mob->mobdata->nr]->progtypes_ & FIGHT_PROG) && isPaused(mob) == false)
@@ -4139,7 +4139,7 @@ qint32 mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch)
   return mprog_cur_result;
 }
 
-qint32 mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
+ReturnValues mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
 {
 
   if (mob->isNonPlayer() && (dc_->mob_index_[mob->mobdata->nr]->progtypes_ & ATTACK_PROG) && isPaused(mob) == false)
@@ -4148,7 +4148,7 @@ qint32 mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
   return mprog_cur_result;
 }
 
-qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
+ReturnValues mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 {
 
   QString buf;
@@ -4219,7 +4219,7 @@ qint32 Character::mprog_greet_trigger(void)
   return mprog_cur_result;
 }
 
-qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
+ReturnValues mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
 {
   MobileProgramPtr mprg = {};
   MobileProgramPtr next = {};
@@ -4259,7 +4259,7 @@ qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
   return mprog_cur_result;
 }
 
-qint32 mprog_random_trigger(CharacterPtr mob)
+ReturnValues mprog_random_trigger(CharacterPtr mob)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4269,7 +4269,7 @@ qint32 mprog_random_trigger(CharacterPtr mob)
   return mprog_cur_result;
 }
 
-qint32 mprog_load_trigger(CharacterPtr mob)
+ReturnValues mprog_load_trigger(CharacterPtr mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4282,7 +4282,7 @@ qint32 mprog_load_trigger(CharacterPtr mob)
   return mprog_cur_result;
 }
 
-qint32 mprog_arandom_trigger(CharacterPtr mob)
+ReturnValues mprog_arandom_trigger(CharacterPtr mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4334,7 +4334,7 @@ qint32 Character::mprog_speech_trigger(const QString txt)
   return mprog_cur_result;
 }
 
-qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
+ReturnValues mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4599,7 +4599,7 @@ qint32 Character::oprog_speech_trigger(const QString txt)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
-  for (item = dc_->world[in_room].contents; item; item = item->next_content)
+  for (item = dc_->world[in_room]->contents_; item; item = item->next_content)
     if (dc_->obj_index_[item->item_number]->progtypes_ & SPEECH_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
@@ -4685,7 +4685,7 @@ qint32 DC::oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qin
   return mprog_cur_result;
 }
 
-qint32 Character::oprog_act_trigger(QString txt)
+ReturnValues Character::oprog_act_trigger(QString txt)
 {
   if (isDead() || isNowhere())
   {
@@ -4700,7 +4700,7 @@ qint32 Character::oprog_act_trigger(QString txt)
   if (in_room == INVALID_ROOM)
     return mprog_cur_result;
 
-  for (item = dc_->world[in_room].contents; item; item = item->next_content)
+  for (item = dc_->world[in_room]->contents_; item; item = item->next_content)
     if (dc_->obj_index_[item->item_number]->progtypes_ & ACT_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
@@ -4747,7 +4747,7 @@ qint32 Character::oprog_greet_trigger(void)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
-  for (auto item = dc_->world[in_room].contents; item; item = item->next_content)
+  for (auto item = dc_->world[in_room]->contents_; item; item = item->next_content)
     if (dc_->obj_index_[item->item_number]->progtypes_ & ALL_GREET_PROG)
     {
       auto vmob = dc_->initiate_oproc(this, item);
@@ -4805,7 +4805,7 @@ qint32 Character::oprog_load_trigger(void)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
-  for (item = dc_->world[in_room].contents; item; item = item->next_content)
+  for (item = dc_->world[in_room]->contents_; item; item = item->next_content)
     if (dc_->obj_index_[item->item_number]->progtypes_ & LOAD_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
@@ -4891,7 +4891,7 @@ ReturnValue Character::oprog_command_trigger(QString command, QString arguments)
   QString buf;
   if (in_room >= 0)
   {
-    for (item = dc_->world[in_room].contents; item; item = item->next_content)
+    for (item = dc_->world[in_room]->contents_; item; item = item->next_content)
     {
       if (dc_->obj_index_[item->item_number]->progtypes_ & COMMAND_PROG)
       {

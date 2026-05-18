@@ -779,7 +779,7 @@ void DC::boot_the_shops(void)
 
     fscanf(stream, "%d \n", &temp);
 
-    qint32 room_number = real_room(temp);
+    qint32 room_number = temp;
     if (room_number < 0 || room_number > dc_->top_of_world)
     {
       dc_->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_number);
@@ -795,7 +795,7 @@ void DC::boot_the_shops(void)
 
     dc_->shop_index[max_shop].inventory = {};
 
-    if (real_room(temp) == INVALID_ROOM)
+    if (temp == INVALID_ROOM)
     {
       QString log_buf = {};
       dc_sprintf(log_buf, "BAD SHOP IN missing ROOM %d -- FIX THIS!", temp);
@@ -1022,7 +1022,7 @@ player_shop *find_player_shop(CharacterPtr keeper)
   player_shop *shop = g_playershops;
 
   for (; shop; shop = shop->next)
-    if (real_room(shop->room_num) == keeper->in_room)
+    if (shop->room_num == keeper->in_room)
       break;
 
   return shop;

@@ -500,7 +500,7 @@ qint32 start_quest(CharacterPtr ch, quest_infoPtr quest)
     while (++dontwannabeinthisforever < 100)
     {
       mob = get_mob_vnum(ch->dc_->number(1, 34000));
-      if (mob && (mob->getLevel() < 90) && dc_->zones.value(dc_->world[mob->in_room]->zone).isNoHunt() == false && (mob->description().length() > 80))
+      if (mob && (mob->getLevel() < 90) && dc_->zones_.value(dc_->world[mob->in_room]->zone).isNoHunt() == false && (mob->description().length() > 80))
         break;
     }
     quest->hint1 = mob->description();

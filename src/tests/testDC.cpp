@@ -667,7 +667,7 @@ private slots:
     QString fstream_filename = u"world/%1.fstream"_s.arg(filename);
     quint64 rooms_written = {};
     {
-      LegacyFileWorld lfw(u"%1.legacyfile"_s.arg(filename));
+      LegacyFileWorld lfw(&dc, u"%1.legacyfile"_s.arg(filename));
       QFile qf(qfile_filename);
       QSaveFile qsf(qsavefile_filename);
       std::fstream fstream_world_file;
@@ -1400,7 +1400,7 @@ private slots:
     }
 
     QList<QChar> prompt_variables;
-    for (character c = ' '; c <= '~'; ++c)
+    for (auto c = ' '; c <= '~'; ++c)
       prompt_variables.append(c);
 
     QMap<QString, QString> parsed_prompt_variables;

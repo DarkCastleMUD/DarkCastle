@@ -38,8 +38,8 @@ extern CharacterPtr activeRndm;
 extern CharacterPtr activeTarget;
 extern ObjectPtr activeObj;
 extern void *activeVo;
-extern qint32 mprog_line_num;    // From mob_prog.cpp
-extern qint32 mprog_command_num; // From mob_prog.cpp
+extern ReturnValues mprog_line_num;    // From mob_prog.cpp
+extern ReturnValues mprog_command_num; // From mob_prog.cpp
 
 /* A trivial rehack of do_mstat.  This doesnt show all the data, but just
  * enough to identify the mob and give its basic condition.  It does however,
@@ -546,7 +546,7 @@ ReturnValues do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
       }
     }
 
-    for (obj = dc_->world[ch->in_room].contents; obj != nullptr; obj = obj_next)
+    for (obj = dc_->world[ch->in_room]->contents_; obj != nullptr; obj = obj_next)
     {
       obj_next = obj->next_content;
       extract_obj(obj);
@@ -557,7 +557,7 @@ ReturnValues do_mppurge(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(victim = get_char_room(arg, ch->in_room)))
   {
-    if ((obj = get_obj_in_list(arg, dc_->world[ch->in_room].contents)) ||
+    if ((obj = get_obj_in_list(arg, dc_->world[ch->in_room]->contents_)) ||
         (obj = get_obj_in_list(arg, ch->carrying)))
     {
       extract_obj(obj);
@@ -1768,8 +1768,8 @@ ReturnValues do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   qint32 i = dc_->world[ch->in_room]->zone,
-         low = dc_->zones.value(i).getRealBottom(),
-         high = dc_->zones.value(i).getRealTop(),
+         low = dc_->zones_.value(i).getRealBottom(),
+         high = dc_->zones_.value(i).getRealTop(),
          attempts = {};
 
   do
@@ -1795,8 +1795,8 @@ ReturnValues do_mpteleport(CharacterPtr ch, QString argument, cmd_t cmd)
            isSet(dc_->world[to_room]->room_flags_, NO_TELEPORT) ||
            isSet(dc_->world[to_room]->room_flags_, ARENA) ||
            (dc_->world[to_room].sector_type == SECT_UNDERWATER && victim->race != RACE_FISH) ||
-           dc_->zones.value(dc_->world[to_room].zone).isNoTeleport() ||
-           ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones.value(dc_->world[to_room].zone).isTown()) : false) ||
+           dc_->zones_.value(dc_->world[to_room].zone).isNoTeleport() ||
+           ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones_.value(dc_->world[to_room].zone).isTown()) : false) ||
            (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room]->room_flags_, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 

@@ -340,7 +340,7 @@ ReturnValues do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
       extract_char(vict, true);
     }
     else if ((obj = get_obj_in_list_vis(ch, name,
-                                        dc_->world[ch->in_room].contents)) != nullptr)
+                                        dc_->world[ch->in_room]->contents_)) != nullptr)
     {
       act_to_room("$n purges $p.", ch, obj, 0, 0);
       act_to_character("You purge $p.", ch, obj, 0, 0);
@@ -373,7 +373,7 @@ ReturnValues do_purge(CharacterPtr ch, QString argument, cmd_t cmd)
         extract_char(vict, true);
     }
 
-    for (obj = dc_->world[ch->in_room].contents; obj; obj = next_o)
+    for (obj = dc_->world[ch->in_room]->contents_; obj; obj = next_o)
     {
       next_o = obj->next_content;
       extract_obj(obj);
@@ -719,7 +719,7 @@ qint32 show_zone_commands(CharacterPtr ch, zone_t zone_key, quint64 start, quint
     return ReturnValue::eFAILURE;
   }
 
-  auto &zone = dc_->zones[zone_key];
+  auto &zone = dc_->zones_[zone_key];
   return show_zone_commands(ch, zone, start, num_to_show, stats);
 }
 
@@ -1090,7 +1090,7 @@ ReturnValues do_show(CharacterPtr ch, QString argument, cmd_t cmd)
           //	 174  31900-32100  32001-32079   78   the Battle of Troy
           "---  -----------  -----------  -----  ----------------------\r\n",
           ch);
-      for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
+      for (auto [zone_key, zone] : dc_->zones_.asKeyValueRange())
       {
         room_t range_start = zone.getBottom();
         room_t range_end = zone.getTop();
@@ -1107,7 +1107,7 @@ ReturnValues do_show(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       return ReturnValue::eFAILURE;
     }
-    dc_->zones.value(zone_key).show_info(ch);
+    dc_->zones_.value(zone_key).show_info(ch);
   } // zone
   else if (is_abbrev(type, "rsearch") && has_range)
   {
@@ -1153,7 +1153,7 @@ ReturnValues do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"Syntax: show rsearch <zone number> <flags/sector type"_s);
       return ReturnValue::eSUCCESS;
     }
-    room_t last_room = dc_->zones.lastKey();
+    room_t last_room = dc_->zones_.lastKey();
     if (zon > last_room)
     {
 
@@ -1161,7 +1161,7 @@ ReturnValues do_show(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     QString buf;
-    for (i = dc_->zones.value(zon).getRealBottom(); i < dc_->zones.value(zon).getRealTop();
+    for (i = dc_->zones_.value(zon).getRealBottom(); i < dc_->zones_.value(zon).getRealTop();
          i++)
     {
       if (!dc_->rooms.contains(i))
@@ -2398,7 +2398,7 @@ ReturnValues do_oclone(CharacterPtr ch, QString argument, cmd_t cmd)
   obj->item_number = r2;
   dc_->obj_index_[r2]->item = (void *)obj;
   dc_->obj_index_[r2].non_combat_func = {};
-  dc_->obj_index_[r2].qty = {};
+  dc_->obj_index_[r2]->qty = {};
   dc_->obj_index_[r2]->vnum(v2);
   dc_->obj_index_[r2]->programs_ = {};
   dc_->obj_index_[r2].combat_func = {};
@@ -2460,7 +2460,7 @@ ReturnValues do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 
   // clone_mobile assigns the start of character_list to be mob
   // This undos the change
-  dc_->mob_index_[src].qty--;
+  dc_->mob_index_[src]->qty--;
 
   auto &character_list = dc_->character_list;
   character_list.erase(mob);
@@ -2484,7 +2484,7 @@ ReturnValues do_mclone(CharacterPtr ch, QString argument, cmd_t cmd)
 
   // Overwrite old mob with new mob
   dc_->mob_index_[dst]->item = (void *)mob;
-  dc_->mob_index_[dst].qty = {};
+  dc_->mob_index_[dst]->qty = {};
   dc_->mob_index_[dst].non_combat_func = {};
   dc_->mob_index_[dst].combat_func = {};
   dc_->mob_index_[dst]->programs_ = {};

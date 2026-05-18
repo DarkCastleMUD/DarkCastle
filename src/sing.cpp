@@ -404,7 +404,7 @@ ReturnValues do_sing(CharacterPtr ch, QString arg, cmd_t cmd)
 
         if (!target_ok && isSet(song_info[spl].targets(), TAR_OBJ_ROOM))
         {
-          tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room].contents);
+          tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room]->contents_);
           if (tar_obj != nullptr)
             target_ok = true;
         }
@@ -1270,7 +1270,7 @@ qint32 execute_song_note_of_knowledge(quint8 level, CharacterPtr ch, QString arg
 
   obj = get_obj_in_list((*i).song_data, ch->carrying);
   vict = ch->get_char_room_vis((*i).song_data);
-  corpse = get_obj_in_list_vis(ch, (*i).song_data, dc_->world[ch->in_room].contents);
+  corpse = get_obj_in_list_vis(ch, (*i).song_data, dc_->world[ch->in_room]->contents_);
   if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->flags_.value[3] != 1))
     corpse = {};
 
@@ -1725,7 +1725,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
     status = ReturnValue::eFAILURE;
   }
   else if (isSet(dc_->world[victim->in_room]->room_flags_, NO_PORTAL) ||
-           dc_->zones.value(dc_->world[victim->in_room]->zone).isNoTeleport() ||
+           dc_->zones_.value(dc_->world[victim->in_room]->zone).isNoTeleport() ||
            victim->room().isArena())
   {
     ch->sendln(u"A mystical force seems to be keeping you out."_s);
@@ -1747,7 +1747,7 @@ qint32 execute_song_astral_chanty(quint8 level, CharacterPtr ch, QString arg, Ch
     if (status != ReturnValue::eFAILURE)
     {
       // Additional costs for astral chanty across continents
-      if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[victim->in_room]->zone).continent)
+      if (dc_->zones_.value(dc_->world[ch->in_room]->zone).continent != dc_->zones_.value(dc_->world[victim->in_room]->zone).continent)
       {
         if (GET_KI(ch) < use_song(ch, SKILL_SONG_ASTRAL_CHANTY - SKILL_SONG_BASE))
         {
@@ -1908,7 +1908,7 @@ qint32 execute_song_shattering_resonance(quint8 level, CharacterPtr ch, QString 
       break;
   }
 
-  if (!(obj = get_obj_in_list((*i).song_data, dc_->world[ch->in_room].contents)))
+  if (!(obj = get_obj_in_list((*i).song_data, dc_->world[ch->in_room]->contents_)))
   {
     ch->sendln(u"You don't see that object here."_s);
     (*i).song_data = {};
@@ -2645,7 +2645,7 @@ qint32 execute_song_glitter_dust(quint8 level, CharacterPtr ch, QString arg, Cha
   }
 
   ObjectPtr item;
-  for (item = dc_->world[ch->in_room].contents; item; item = item->next_content)
+  for (item = dc_->world[ch->in_room]->contents_; item; item = item->next_content)
   {
     if (GET_ITEM_TYPE(item) == ITEM_BEACON && isSet(item->flags_.extra_flags, ITEM_INVISIBLE))
     {

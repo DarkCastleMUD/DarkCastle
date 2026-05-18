@@ -248,8 +248,8 @@ ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!str_cmp(arg1, "clan") && ch->clan)
-    dc_strcpy(arg1, qPrintable(clanVName(ch->clan)));
+  if (!str_cmp(arg1, "clan") && ch->clan_id_)
+    dc_strcpy(arg1, qPrintable(clanVName(ch->clan_id_)));
 
   // show the contents of your or someone elses vault
   if (!strncmp(arg, "list", dc_strlen(arg)))
@@ -288,7 +288,7 @@ ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (*arg1)
     {
-      if (!strcasecmp(arg1, qPrintable(clanVName(ch->clan))))
+      if (!strcasecmp(arg1, qPrintable(clanVName(ch->clan_id_))))
       {
         ClanPtr clan = get_clan(ch);
         if (clan == nullptr)
@@ -353,9 +353,9 @@ ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (arg2[0])
     {
-      if (!str_cmp(arg2, "clan") && ch->clan)
+      if (!str_cmp(arg2, "clan") && ch->clan_id_)
       {
-        dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
+        dc_strcpy(arg2, qPrintable(clanVName(ch->clan_id_)));
       }
       else if (arg.isEmpty() 2)
       {
@@ -377,9 +377,9 @@ ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (arg2[0])
     {
-      if (!str_cmp(arg2, "clan") && ch->clan)
+      if (!str_cmp(arg2, "clan") && ch->clan_id_)
       {
-        dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
+        dc_strcpy(arg2, qPrintable(clanVName(ch->clan_id_)));
       }
       else if (arg.isEmpty() 2)
       {
@@ -398,8 +398,8 @@ ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (!strncmp(arg, "put", dc_strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
-    if (!str_cmp(arg2, "clan") && ch->clan)
-      dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
+    if (!str_cmp(arg2, "clan") && ch->clan_id_)
+      dc_strcpy(arg2, qPrintable(clanVName(ch->clan_id_)));
     if (argument.isEmpty())
     {
       ch->sendln(u"What item would you like to place in the vault?"_s);
@@ -414,8 +414,8 @@ ReturnValues do_vault(CharacterPtr ch, QString argument, cmd_t cmd)
   else if (!strncmp(arg, "get", dc_strlen(arg)))
   {
     half_chop(arg1, argument, arg2);
-    if (!str_cmp(arg2, "clan") && ch->clan)
-      dc_strcpy(arg2, qPrintable(clanVName(ch->clan)));
+    if (!str_cmp(arg2, "clan") && ch->clan_id_)
+      dc_strcpy(arg2, qPrintable(clanVName(ch->clan_id_)));
 
     if (argument.isEmpty())
     {
@@ -1240,7 +1240,7 @@ bool DC::has_vault_access(CharacterPtr ch, VaultPtr vault)
     return true;
   }
 
-  if (ch->clan && get_clan(ch->clan) && vault->owner == clanVName(ch->clan) && has_right(ch, CLAN_RIGHTS_VAULT))
+  if (ch->clan_id_ && get_clan(ch->clan_id_) && vault->owner == clanVName(ch->clan_id_) && has_right(ch, CLAN_RIGHTS_VAULT))
   {
     return true;
   }
@@ -2247,7 +2247,7 @@ void vault_log(CharacterPtr ch, QString owner)
   QString buf;
   QString fname;
 
-  if (!dc_strcmp(owner, qPrintable(clanVName(ch->clan))))
+  if (!dc_strcmp(owner, qPrintable(clanVName(ch->clan_id_))))
   {
     dc_strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
   }
@@ -2364,7 +2364,7 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
   arg = one_argument(arg, arg1);
 
   VaultPtr vault = has_vault(qPrintable(ch->name()));
-  VaultPtr cvault = ch->clan ? has_vault(qPrintable(clanVName(ch->clan))) : 0;
+  VaultPtr cvault = ch->clan_id_ ? has_vault(qPrintable(clanVName(ch->clan_id_))) : 0;
   if (cmd == cmd_t::LIST)
   {
     if (!vault)
@@ -2381,13 +2381,13 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
     ch->send(buf);
 
     dc_sprintf(buf, "$B2)$R Purchase a clan vault: %s\r\n",
-               ch->clan ? cvault ? "Your clan already has a vault" : has_right(ch, CLAN_RIGHTS_VAULT) ? "1000 platinum coins."
-                                                                                                      : "You are not authorized to make this purchase."
-                        : "You are not a member of any clan.");
+               ch->clan_id_ ? cvault ? "Your clan already has a vault" : has_right(ch, CLAN_RIGHTS_VAULT) ? "1000 platinum coins."
+                                                                                                          : "You are not authorized to make this purchase."
+                            : "You are not a member of any clan.");
     ch->send(buf);
 
     if (!cvault)
-      dc_sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan ? "Your clan has no vault." : "You're not in a clan.");
+      dc_sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", ch->clan_id_ ? "Your clan has no vault." : "You're not in a clan.");
     else if (cvault->size < VAULT_MAX_SIZE)
       dc_sprintf(buf, "$B3)$R Increase the size of your clan vault by 10 lbs: %s\r\n", has_right(ch, CLAN_RIGHTS_VAULT) ? "200 platinum coins." : "You are not authorized to make this purchase.");
     else
@@ -2428,7 +2428,7 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
         ch->sendln(u"Your clan already has a vault."_s);
         return ReturnValue::eSUCCESS;
       }
-      if (!ch->clan)
+      if (!ch->clan_id_)
       {
         ch->sendln(u"You're not a member of any clan."_s);
         return ReturnValue::eSUCCESS;
@@ -2444,11 +2444,11 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
         return ReturnValue::eSUCCESS;
       }
       GET_PLATINUM(ch) -= 1000;
-      add_new_vault(qPrintable(clanVName(ch->clan)), 0);
+      add_new_vault(qPrintable(clanVName(ch->clan_id_)), 0);
       ch->save_char_obj();
-      cvault = has_vault(clanVName(ch->clan));
+      cvault = has_vault(clanVName(ch->clan_id_));
       cvault->size = 500;
-      save_vault(clanVName(ch->clan));
+      save_vault(clanVName(ch->clan_id_));
       ch->sendln(u"You have purchased a vault for your clan's perusal."_s);
       return ReturnValue::eSUCCESS;
     case 3:
@@ -2475,7 +2475,7 @@ qint32 sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString
       GET_PLATINUM(ch) -= 200;
       cvault->size += 10;
       ch->save_char_obj();
-      save_vault(clanVName(ch->clan));
+      save_vault(clanVName(ch->clan_id_));
       ch->sendln(u"You have added 10 lbs capacity to your clan's vault."_s);
       return ReturnValue::eSUCCESS;
     }

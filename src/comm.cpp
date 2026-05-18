@@ -9,6 +9,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 #include "DC/DC.h"
+#include <qiodevicebase.h>
 
 #ifdef TRACY
 #include <tracy/Tracy.hpp>
@@ -25,7 +26,7 @@ public:
 extern bool MOBtrigger;
 
 // This is turned on right before we call game_loop
-ReturnValues do_not_save_corpses = 1;
+bool do_not_save_corpses = true;
 qint32 try_to_hotboot_on_crash = {};
 qint32 was_hotboot = {};
 qint32 died_from_sigsegv = {};
@@ -86,16 +87,17 @@ void string_hash_add(ConnectionPtr conn, QString str);
 // a reboot
 qint32 DC::write_hotboot_file(void)
 {
-  QTextStream stream;
-  ConnectionPtr sd;
-  if ((stream = fopen("hotboot", "w")) == nullptr)
+  QFile file(u"hotboot"_s);
+  if (file.open(QIODeviceBase::WriteOnly | QIODeviceBase::Text))
   {
     logmisc(u"Hotboot failed, unable to open hotboot file."_s);
     return 0;
   }
+  QTextStream stream(&file);
+  ConnectionPtr sd;
   // std::for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [stream](server_descriptor_list_i i)
   std::for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&stream](const qint32 &fd)
-                { dc_fprintf(stream, "%d\n", fd); });
+                { stream << fd << Qt::endl; });
 
   for (auto &conn : connections_)
   {
@@ -103,7 +105,7 @@ qint32 DC::write_hotboot_file(void)
     {
       // Kick out anyone not currently playing in the game.
       write_to_descriptor(conn->descriptor, "We are rebooting, come back in a minute.");
-      close_socket(d);
+      close_socket(conn);
     }
     else
     {

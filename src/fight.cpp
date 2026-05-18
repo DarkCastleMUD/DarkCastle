@@ -468,7 +468,7 @@ bool gets_dual_wield_attack(CharacterPtr ch)
 
 // qint32 attack(...) FUNCTION SHOULD BE CALLED *INSTEAD* OF HIT IN ALL CASES!
 // standard retvals
-qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
+ReturnValues attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 weapon)
 {
   qint32 result = {};
   qint32 chance;
@@ -5491,9 +5491,9 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
         do_quit(victim, "", cmd_t::SAVE_SILENTLY);
         remove_familiars(name, CONDEATH);
         dc_->vaults_.remove_vault(name, CONDEATH);
-        if (victim->clan)
+        if (victim->clan_id_)
         {
-          remove_clan_member(victim->clan, victim);
+          remove_clan_member(victim->clan_id_, victim);
         }
         remove_character(name, CONDEATH);
 
@@ -5537,9 +5537,9 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
         remove_familiars(name, CONDEATH);
         dc_->vaults_.remove_vault(name, CONDEATH);
-        if (victim->clan)
+        if (victim->clan_id_)
         {
-          remove_clan_member(victim->clan, victim);
+          remove_clan_member(victim->clan_id_, victim);
         }
         remove_character(name, CONDEATH);
 
@@ -5563,9 +5563,9 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
         remove_familiars(name, CONDEATH);
         dc_->vaults_.remove_vault(name, CONDEATH);
-        if (victim->clan)
+        if (victim->clan_id_)
         {
-          remove_clan_member(victim->clan, victim);
+          remove_clan_member(victim->clan_id_, victim);
         }
         remove_character(name, CONDEATH);
 
@@ -5596,9 +5596,9 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
         remove_familiars(name, CONDEATH);
         dc_->vaults_.remove_vault(name, CONDEATH);
-        if (victim->clan)
+        if (victim->clan_id_)
         {
-          remove_clan_member(victim->clan, victim);
+          remove_clan_member(victim->clan_id_, victim);
         }
         remove_character(name, CONDEATH);
 
@@ -5639,9 +5639,9 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
 
         remove_familiars(name, CONDEATH);
         dc_->vaults_.remove_vault(name, CONDEATH);
-        if (victim->clan)
+        if (victim->clan_id_)
         {
-          remove_clan_member(victim->clan, victim);
+          remove_clan_member(victim->clan_id_, victim);
         }
         remove_character(name, CONDEATH);
 
@@ -6374,10 +6374,10 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     else if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
       dc_sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's charmie!\r\n",
                  qPrintable(victim->name()), qPrintable(ch->master->name()));
-    else if (ch->in_room == real_room(START_ROOM))
+    else if (ch->in_room == START_ROOM)
       dc_sprintf(killer_message, "\r\n##%s was just PINGED by %s!\r\n",
                  qPrintable(victim->name()), qPrintable(ch->name()));
-    else if (ch->in_room == real_room(SECOND_START_ROOM))
+    else if (ch->in_room == SECOND_START_ROOM)
       dc_sprintf(killer_message, "\r\n##%s was just PONGED by %s!\r\n",
                  qPrintable(victim->name()), qPrintable(ch->name()));
     else if (IS_ANONYMOUS(ch))
@@ -6450,7 +6450,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     // now with tav/meta pkilling not adding to your score
     if (!ch->isNonPlayer()
         // && victim->getLevel() > PKILL_COUNT_LIMIT
-        && victim->conn_ && ch != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+        && victim->conn_ && ch != victim && ch->in_room != START_ROOM && ch->in_room != SECOND_START_ROOM)
     {
       level_spread = ch->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
@@ -6486,7 +6486,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
 
     if (IS_AFFECTED(ch, AFF_CHARM) && ch->master
         //  && victim->getLevel() > PKILL_COUNT_LIMIT
-        && victim->conn_ && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+        && victim->conn_ && ch->master != victim && ch->in_room != START_ROOM && ch->in_room != SECOND_START_ROOM)
     {
       level_spread = ch->master->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
@@ -6524,7 +6524,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, qint32 type, bool vict_is_at
     }
     if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master
         // && victim->getLevel() > PKILL_COUNT_LIMIT
-        && victim->conn_ && ch->master != victim && ch->in_room != real_room(START_ROOM) && ch->in_room != real_room(SECOND_START_ROOM))
+        && victim->conn_ && ch->master != victim && ch->in_room != START_ROOM && ch->in_room != SECOND_START_ROOM)
     {
       level_spread = ch->master->getLevel() - victim->getLevel();
       if (level_spread > 20 && !(IS_AFFECTED(victim, AFF_CANTQUIT) || IS_AFFECTED(victim, AFF_CHAMPION)) && !vict_is_attacker)
@@ -6656,9 +6656,9 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
   auto &arena = dc_->arena_;
   if (ch && arena.isChaos())
   {
-    if (ch && ch->clan && ch->isMortalPlayer())
+    if (ch && ch->clan_id_ && ch->isMortalPlayer())
       ch_clan = get_clan(ch);
-    if (victim->clan && victim->isMortalPlayer())
+    if (victim->clan_id_ && victim->isMortalPlayer())
       victim_clan = get_clan(victim);
 
     if (type == KILL_BINGO)
@@ -6717,7 +6717,7 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, qint32 type)
     {
 
       if (tmp->room().isArena())
-        if (victim->clan == tmp->clan && victim != tmp && tmp->isMortalPlayer())
+        if (victim->clan_id_ == tmp->clan_id_ && victim != tmp && tmp->isMortalPlayer())
           eliminated = {};
     }
     if (eliminated)

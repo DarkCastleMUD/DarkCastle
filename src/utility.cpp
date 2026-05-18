@@ -882,7 +882,7 @@ bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj)
   // make sure we're clanned, and the person we're looking at is in same clan
   // (have to check if we're clanned, cause otherwise two non-clanned people
   // would count as being in "same clan")
-  if (!sub->clan || sub->clan != obj->clan)
+  if (!sub->clan_id_ || sub->clan_id_ != obj->clan_id_)
     return false;
 
   return true;
@@ -1413,7 +1413,7 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
 
     // Additional 5% chance of failure when recalling across continents
     location = victim->hometown;
-    if (location > 0 && dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
+    if (location > 0 && dc_->zones_.value(dc_->world[victim->in_room]->zone).continent != dc_->zones_.value(dc_->world[location].zone).continent)
     {
       percent += 5;
     }
@@ -1439,17 +1439,17 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
 
   if (isNonPlayer())
   {
-    location = real_room(hometown);
+    location = hometown;
   }
   else
   {
     if (victim->hometown == 0 || victim->getLevel() < 11 || IS_AFFECTED(victim, AFF_CANTQUIT))
     {
-      location = real_room(START_ROOM);
+      location = START_ROOM;
     }
     else
     {
-      location = real_room(victim->hometown);
+      location = victim->hometown;
     }
 
     if (location < 0)
@@ -1461,7 +1461,7 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
     if (isSet(dc_->world[location]->room_flags_, NOHOME))
     {
       victim->sendln(u"The gods reset your home."_s);
-      location = real_room(START_ROOM);
+      location = START_ROOM;
       victim->hometown = START_ROOM;
     }
 
@@ -1469,10 +1469,10 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM))
     {
-      if (!victim->clan || !(clan = get_clan(victim)))
+      if (!victim->clan_id_ || !(clan = get_clan(victim)))
       {
         sendln(u"The gods frown on you, and reset your home."_s);
-        location = real_room(START_ROOM);
+        location = START_ROOM;
         victim->hometown = START_ROOM;
       }
       else
@@ -1484,7 +1484,7 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
         if (!found)
         {
           sendln(u"The gods frown on you, and reset your home."_s);
-          location = real_room(START_ROOM);
+          location = START_ROOM;
           victim->hometown = START_ROOM;
         }
       }
@@ -1497,15 +1497,15 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((isSet(dc_->world[location]->room_flags_, CLAN_ROOM) || location == real_room(2354) || location == real_room(2355)) && IS_AFFECTED(victim, AFF_CHAMPION))
+  if ((isSet(dc_->world[location]->room_flags_, CLAN_ROOM) || location == 2354 || location == 2355) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln(u"No recalling into a clan hall whilst Champion, go to the Tavern!."_s);
-    location = real_room(START_ROOM);
+    location = START_ROOM;
   }
   if (location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln(u"No recalling into a guild hall whilst Champion, go to the Tavern!."_s);
-    location = real_room(START_ROOM);
+    location = START_ROOM;
   }
 
   // calculate the gold needed
@@ -1515,7 +1515,7 @@ ReturnValues Character::do_recall(QStringList arguments, cmd_t cmd)
     cf = 1 + ((level - 11) * .347f);
     cost = (qint32)(3440 * cf);
 
-    if (dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
+    if (dc_->zones_.value(dc_->world[victim->in_room]->zone).continent != dc_->zones_.value(dc_->world[location].zone).continent)
     {
       // Cross-continent recalling costs twice as much
       cost *= 2;
@@ -1649,14 +1649,14 @@ ReturnValues do_quit(CharacterPtr ch, const QString argument, cmd_t cmd)
 
     if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM) && cmd != cmd_t::SAVE_SILENTLY)
     {
-      if (!ch->clan || !(clan = get_clan(ch)))
+      if (!ch->clan_id_ || !(clan = get_clan(ch)))
       {
         ch->sendln(u"This is a clan room dork.  Try joining one first."_s);
         return ReturnValue::eFAILURE;
       }
 
       for (room = clan->rooms; room; room = room->next)
-        if (ch->in_room == real_room(room->room_number))
+        if (ch->in_room == room->room_number)
           found = 1;
 
       if (!found)
@@ -1849,14 +1849,14 @@ ReturnValues do_home(CharacterPtr ch, QString argument, cmd_t cmd)
 
     if (isSet(dc_->world[ch->in_room]->room_flags_, CLAN_ROOM))
     {
-      if (!ch->clan || !(clan = get_clan(ch)))
+      if (!ch->clan_id_ || !(clan = get_clan(ch)))
       {
         ch->sendln(u"This is a clan room dork.  Try joining one first."_s);
         return ReturnValue::eFAILURE;
       }
 
       for (room = clan->rooms; room; room = room->next)
-        if (ch->in_room == real_room(room->room_number))
+        if (ch->in_room == room->room_number)
           found = 1;
 
       if (!found)
@@ -2924,7 +2924,7 @@ bool file_exists(QString filename)
 
 bool char_file_exists(QString name)
 {
-  if (all_of(name.begin(), name.end(), [](character i)
+  if (all_of(name.begin(), name.end(), [](CharacterPtr i)
              { return isalpha(i); }) == 0)
   {
     return false;

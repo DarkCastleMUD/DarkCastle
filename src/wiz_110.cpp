@@ -548,7 +548,7 @@ ReturnValues Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (clan)
   {
     ClanPtr tc = get_clan(clan);
-    victim->clan = clan;
+    victim->clan_id_ = clan;
     add_clan_member(tc, victim);
     if ((pmember = get_member(victim->name(), clan)))
       pmember->rights(rights);

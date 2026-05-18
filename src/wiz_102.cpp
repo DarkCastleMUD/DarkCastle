@@ -24,7 +24,7 @@ ReturnValue zedit_list(CharacterPtr ch, QStringList arguments, const Zone &zone,
 // Saving zones after this SHOULD not be required, as the old savefiles contain vnums, which should remain correct.
 void rebuild_rnum_references(qint32 startAt, qint32 type)
 {
-  for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
+  for (auto [zone_key, zone] : dc_->zones_.asKeyValueRange())
   {
     for (qsizetype comm = {}; !zone.cmd.isEmpty() && comm < zone.cmd.size(); comm++)
     {
@@ -698,7 +698,7 @@ ReturnValue zedit_edit(CharacterPtr ch, QStringList arguments, Zone &zone)
         case 'O': // Load object on ground
           change_type = "room ID";
           vnum = i;
-          i = real_room(i);
+          i = i;
           break;
         case '%': // Cause next command to occur x times out of y
         case 'K': // skip the next number of specified zone commands
@@ -983,7 +983,7 @@ ReturnValues do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  Zone &zone = dc_->zones[zone_key];
+  Zone &zone = dc_->zones_[zone_key];
 
   last_cmd = zone_get_last_command(zone);
 
@@ -1081,7 +1081,7 @@ ReturnValues do_zedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(u"Searching for Mobile rnum %1 with vnum %2\r\n"_s.arg(rmob).arg(j));
     }
 
-    for (const auto [z_key, zone] : dc_->zones.asKeyValueRange())
+    for (const auto [z_key, zone] : dc_->zones_.asKeyValueRange())
     {
       for (i = {}; i < zone.cmd.size(); i++)
       {
@@ -4238,7 +4238,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       d = {};
     }
-    c = real_room(d);
+    c = d;
 
     if (!remainder_args.isEmpty())
     {
@@ -4285,7 +4285,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (dc_->create_one_room(ch, d))
       {
-        c = real_room(d);
+        c = d;
         ch->send(u"Creating room %1.\r\n"_s.arg(d));
       }
     }
@@ -4768,7 +4768,7 @@ ReturnValues do_oneway(CharacterPtr ch, QString arg, cmd_t cmd)
 ReturnValues Character::do_zsave(QStringList arguments, cmd_t cmd)
 {
   zone_t zone_key = {};
-  auto &zones = dc_->zones;
+  auto &zones = dc_->zones_;
 
   if (arguments.isEmpty())
   {
@@ -4856,7 +4856,7 @@ ReturnValues do_rsave(CharacterPtr ch, QString arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  LegacyFileWorld lfw(curr->filename);
+  LegacyFileWorld lfw(ch->dc_, curr->filename);
   if (lfw.isOpen())
   {
     for (qint32 x = curr->firstnum; x <= curr->lastnum; x++)
@@ -5008,7 +5008,7 @@ ReturnValues do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (x = low; x <= high; x++)
   {
-    room = real_room(x);
+    room = x;
     if (room == INVALID_ROOM)
       continue;
     found_room = true;
@@ -5032,7 +5032,7 @@ ReturnValues do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (x = low; x <= high; x++)
   {
-    room = real_room(x);
+    room = x;
     if (room == INVALID_ROOM)
       continue;
     break;
@@ -5048,7 +5048,7 @@ ReturnValues do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (x = low; x <= high; x++)
   {
-    room = real_room(x);
+    room = x;
     if (room == INVALID_ROOM)
       continue;
 
@@ -5081,14 +5081,14 @@ ReturnValues do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (x = low; x <= high; x++)
   {
-    room = real_room(x);
+    room = x;
     if (room == INVALID_ROOM)
       continue;
 
-    if (dc_->world[room].contents)
+    if (dc_->world[room]->contents_)
     {
 
-      for (obj = dc_->world[room].contents; obj; obj = obj->next_content)
+      for (obj = dc_->world[room]->contents_; obj; obj = obj->next_content)
       {
 
         count = {};
@@ -5144,7 +5144,7 @@ ReturnValues do_instazone(CharacterPtr ch, QString arg, cmd_t cmd)
 
   for (x = low; x <= high; x++)
   {
-    room = real_room(x);
+    room = x;
     if (room == INVALID_ROOM)
       continue;
 
@@ -5306,7 +5306,7 @@ ReturnValues do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   else
   {
     x = dc_atoi(arg1);
-    if (x < 0 || (loc = real_room(x)) == INVALID_ROOM)
+    if (x < 0 || (loc = x) == INVALID_ROOM)
     {
       ch->sendln(u"No such room exists."_s);
       return ReturnValue::eFAILURE;

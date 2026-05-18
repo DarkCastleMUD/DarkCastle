@@ -839,7 +839,7 @@ ReturnValues Character::do_drink(QStringList arguments, cmd_t cmd)
   }
 
   auto arg1 = arguments.value(0);
-  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[in_room].contents)) && temp->flags_.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
+  if ((temp = get_obj_in_list_vis(this, arg1, dc_->world[in_room]->contents_)) && temp->flags_.type_flag == ITEM_FOUNTAIN && CAN_SEE_OBJ(this, temp))
   {
     act_to_character("You drink from $p.", this, temp, 0, 0);
     act_to_room("$n drinks from $p.", this, temp, 0, INVIS_NULL);

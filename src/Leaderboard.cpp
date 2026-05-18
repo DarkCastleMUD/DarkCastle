@@ -6,9 +6,11 @@
  */
 
 #include "DC/DC.h"
+#include <qdebug.h>
+#include <qiodevicebase.h>
 
-Leaderboard::Leaderboard(QObject *parent)
-    : QObject(parent), dc_(qobject_cast<DC *>(parent))
+Leaderboard::Leaderboard(DCPtr dc)
+    : dc_(dc), QObject(dc)
 {
 }
 
@@ -23,9 +25,9 @@ void Leaderboard::check(void)
 
   read_file();
 
-  for (auto &d : dc_->connections_)
+  for (auto &conn : dc_->connections_)
   {
-    if (!conn->character || conn->character->getLevel() >= IMMORTAL || conn->character->isNonPlayer())
+    if (!conn || !conn->character || conn->character->getLevel() >= IMMORTAL || conn->character->isNonPlayer())
       continue;
     if (!conn->connected == Connection::states::PLAYING)
       continue;
@@ -987,155 +989,144 @@ void Leaderboard::check_offline(void)
 
 void Leaderboard::read_file(void)
 {
-  QTextStream stream;
+  QFile file(LEADERBOARD_FILE);
   qint32 i, j;
 
-  if (!(stream = fopen(LEADERBOARD_FILE, "r")))
+  if (!file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
-    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+    logbug(u"Cannot open leaderboard file '%1'"_s.arg(LEADERBOARD_FILE));
+    return;
   }
-  else
+
+  QTextStream stream(&file);
+  for (i = {}; i < 5; i++)
   {
-    try
+    hpactivename[i] = fread_string(stream);
+    hpactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(hpactivename[i]) == false)
     {
-      for (i = {}; i < 5; i++)
+      hpactivename[i] = u"UNKNOWN"_s;
+      hpactive[i] = {};
+    }
+  }
+  for (i = {}; i < 5; i++)
+  {
+    mnactivename[i] = fread_string(stream);
+    mnactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(mnactivename[i]) == false)
+    {
+      mnactivename[i] = u"UNKNOWN"_s;
+    }
+  }
+  for (i = {}; i < 5; i++)
+  {
+    kiactivename[i] = fread_string(stream);
+    kiactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(kiactivename[i]) == false)
+    {
+      kiactivename[i] = u"UNKNOWN"_s;
+    }
+  }
+  for (i = {}; i < 5; i++)
+  {
+    pkactivename[i] = fread_string(stream);
+    pkactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(pkactivename[i]) == false)
+    {
+      pkactivename[i] = u"UNKNOWN"_s;
+    }
+  }
+  for (i = {}; i < 5; i++)
+  {
+    pdactivename[i] = fread_string(stream);
+    pdactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(pdactivename[i]) == false)
+    {
+      pdactivename[i] = u"UNKNOWN"_s;
+    }
+  }
+  for (i = {}; i < 5; i++)
+  {
+    rdactivename[i] = fread_string(stream);
+    rdactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(rdactivename[i]) == false)
+    {
+      rdactivename[i] = u"UNKNOWN"_s;
+    }
+  }
+  for (i = {}; i < 5; i++)
+  {
+    mvactivename[i] = fread_string(stream);
+    mvactive[i] = fread_int(stream, 0, 2147483467);
+    if (char_file_exists(mvactivename[i]) == false)
+    {
+      mvactivename[i] = u"UNKNOWN"_s;
+    }
+  }
+  for (j = {}; j < CLASS_MAX - 2; j++)
+  {
+    for (i = {}; i < 5; i++)
+    {
+      hpactiveclassname[j][i] = fread_string(stream);
+      hpactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(hpactiveclassname[j][i]) == false)
       {
-        hpactivename[i] = fread_string(stream);
-        hpactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(hpactivename[i]) == false)
-        {
-          hpactivename[i] = u"UNKNOWN"_s;
-          hpactive[i] = {};
-        }
-      }
-      for (i = {}; i < 5; i++)
-      {
-        mnactivename[i] = fread_string(stream);
-        mnactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(mnactivename[i]) == false)
-        {
-          mnactivename[i] = u"UNKNOWN"_s;
-        }
-      }
-      for (i = {}; i < 5; i++)
-      {
-        kiactivename[i] = fread_string(stream);
-        kiactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(kiactivename[i]) == false)
-        {
-          kiactivename[i] = u"UNKNOWN"_s;
-        }
-      }
-      for (i = {}; i < 5; i++)
-      {
-        pkactivename[i] = fread_string(stream);
-        pkactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(pkactivename[i]) == false)
-        {
-          pkactivename[i] = u"UNKNOWN"_s;
-        }
-      }
-      for (i = {}; i < 5; i++)
-      {
-        pdactivename[i] = fread_string(stream);
-        pdactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(pdactivename[i]) == false)
-        {
-          pdactivename[i] = u"UNKNOWN"_s;
-        }
-      }
-      for (i = {}; i < 5; i++)
-      {
-        rdactivename[i] = fread_string(stream);
-        rdactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(rdactivename[i]) == false)
-        {
-          rdactivename[i] = u"UNKNOWN"_s;
-        }
-      }
-      for (i = {}; i < 5; i++)
-      {
-        mvactivename[i] = fread_string(stream);
-        mvactive[i] = fread_int(stream, 0, 2147483467);
-        if (char_file_exists(mvactivename[i]) == false)
-        {
-          mvactivename[i] = u"UNKNOWN"_s;
-        }
-      }
-      for (j = {}; j < CLASS_MAX - 2; j++)
-      {
-        for (i = {}; i < 5; i++)
-        {
-          hpactiveclassname[j][i] = fread_string(stream);
-          hpactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(hpactiveclassname[j][i]) == false)
-          {
-            hpactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
-        for (i = {}; i < 5; i++)
-        {
-          mnactiveclassname[j][i] = fread_string(stream);
-          mnactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(mnactiveclassname[j][i]) == false)
-          {
-            mnactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
-        for (i = {}; i < 5; i++)
-        {
-          kiactiveclassname[j][i] = fread_string(stream);
-          kiactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(kiactiveclassname[j][i]) == false)
-          {
-            kiactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
-        for (i = {}; i < 5; i++)
-        {
-          pkactiveclassname[j][i] = fread_string(stream);
-          pkactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(pkactiveclassname[j][i]) == false)
-          {
-            pkactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
-        for (i = {}; i < 5; i++)
-        {
-          pdactiveclassname[j][i] = fread_string(stream);
-          pdactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(pdactiveclassname[j][i]) == false)
-          {
-            pdactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
-        for (i = {}; i < 5; i++)
-        {
-          rdactiveclassname[j][i] = fread_string(stream);
-          rdactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(rdactiveclassname[j][i]) == false)
-          {
-            rdactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
-        for (i = {}; i < 5; i++)
-        {
-          mvactiveclassname[j][i] = fread_string(stream);
-          mvactiveclass[j][i] = fread_int(stream, 0, 2147483467);
-          if (char_file_exists(mvactiveclassname[j][i]) == false)
-          {
-            mvactiveclassname[j][i] = u"UNKNOWN"_s;
-          }
-        }
+        hpactiveclassname[j][i] = u"UNKNOWN"_s;
       }
     }
-    catch (error_eof &)
+    for (i = {}; i < 5; i++)
     {
-      dc_->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': eof reached prematurely", LEADERBOARD_FILE);
+      mnactiveclassname[j][i] = fread_string(stream);
+      mnactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(mnactiveclassname[j][i]) == false)
+      {
+        mnactiveclassname[j][i] = u"UNKNOWN"_s;
+      }
     }
-    catch (error_negative_int &)
+    for (i = {}; i < 5; i++)
     {
-      dc_->logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative qint32 found where positive expected", LEADERBOARD_FILE);
+      kiactiveclassname[j][i] = fread_string(stream);
+      kiactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(kiactiveclassname[j][i]) == false)
+      {
+        kiactiveclassname[j][i] = u"UNKNOWN"_s;
+      }
+    }
+    for (i = {}; i < 5; i++)
+    {
+      pkactiveclassname[j][i] = fread_string(stream);
+      pkactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(pkactiveclassname[j][i]) == false)
+      {
+        pkactiveclassname[j][i] = u"UNKNOWN"_s;
+      }
+    }
+    for (i = {}; i < 5; i++)
+    {
+      pdactiveclassname[j][i] = fread_string(stream);
+      pdactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(pdactiveclassname[j][i]) == false)
+      {
+        pdactiveclassname[j][i] = u"UNKNOWN"_s;
+      }
+    }
+    for (i = {}; i < 5; i++)
+    {
+      rdactiveclassname[j][i] = fread_string(stream);
+      rdactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(rdactiveclassname[j][i]) == false)
+      {
+        rdactiveclassname[j][i] = u"UNKNOWN"_s;
+      }
+    }
+    for (i = {}; i < 5; i++)
+    {
+      mvactiveclassname[j][i] = fread_string(stream);
+      mvactiveclass[j][i] = fread_int(stream, 0, 2147483467);
+      if (char_file_exists(mvactiveclassname[j][i]) == false)
+      {
+        mvactiveclassname[j][i] = u"UNKNOWN"_s;
+      }
     }
   }
 }
@@ -1147,14 +1138,15 @@ void Leaderboard::write_file(QString filename)
     return;
   }
 
-  QTextStream stream;
   qint32 i, j;
-
-  if (!(stream = fopen(qPrintable(filename), "w")))
+  QFile file(filename);
+  if (file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
+    logbug(u"Cannot open leaderboard file '%1'"_s.arg(filename));
     return;
   }
+  QTextStream stream(&file);
+
   for (i = {}; i < 5; i++)
     dc_fprintf(stream, "%s~ %d\n", qPrintable(hpactivename[i]), hpactive[i]);
   for (i = {}; i < 5; i++)
@@ -1222,30 +1214,30 @@ ReturnValues do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
     std::tie(arg1, remainder) = half_chop(argument);
     if (arg1 == "suspend")
     {
-      if (dc_->cf.leaderboard_check == "suspend")
+      if (ch->dc_->cf.leaderboard_check == "suspend")
       {
         ch->sendln(u"Leaderboard writes already suspended."_s);
       }
       else
       {
-        dc_->cf.leaderboard_check = "suspend";
+        ch->dc_->cf.leaderboard_check = "suspend";
         ch->sendln(u"Leaderboard writes suspended."_s);
-        dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
+        ch->dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes suspended by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
     }
     else if (arg1 == "resume")
     {
-      if (dc_->cf.leaderboard_check == "")
+      if (ch->dc_->cf.leaderboard_check == "")
       {
         ch->sendln(u"Leaderboard writes already resumed."_s);
       }
       else
       {
-        dc_->cf.leaderboard_check = "";
+        ch->dc_->cf.leaderboard_check = "";
         ch->sendln(u"Leaderboard writes resumed."_s);
-        dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
+        ch->dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "Leaderboard writes resumed by %s.", qPrintable(ch->name()));
       }
 
       return ReturnValue::eSUCCESS;
@@ -1287,7 +1279,7 @@ ReturnValues do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (!(stream = fopen(LEADERBOARD_FILE, "r")))
   {
-    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
+    ch->dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
     return ReturnValue::eFAILURE;
   }
   for (i = {}; i < 5; i++)
@@ -1403,7 +1395,7 @@ ReturnValues do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   // top 5 online
-  for (d = dc_->connections_; d; d = conn->next)
+  for (d = ch->dc_->connections_; d; d = conn->next)
   {
 
     if (!conn->character || conn->character->getLevel() >= IMMORTAL)
@@ -1836,31 +1828,27 @@ ReturnValues do_leaderboard(CharacterPtr ch, QString argument, cmd_t cmd)
 
 void Leaderboard::rename(QString oldname, QString newname)
 {
-  QTextStream stream = {};
-  // lines is the number of lines rewritten back to leaderboard file
-  // after a rename.. must sync up with # of outputs
-
   if (dc_->cf.bport)
   {
     return;
   }
-
-  if (!(stream = fopen(LEADERBOARD_FILE, "r")))
+  QFile file(LEADERBOARD_FILE);
+  if (!file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
   {
-    dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+    logbug(u"Cannot open leaderboard file: %1"_s.arg(LEADERBOARD_FILE));
     abort();
   }
-
+  QTextStream stream(&file);
   QList<qint32> value;
   QList<QString> name;
   auto lines = 35 * (CLASS_MAX - 1);
-  for (auto i = {}; i < lines; i++)
+  for (auto i = 0; i < lines; i++)
   {
     name.insert(i, fread_string(stream));
     value.insert(i, fread_int(stream, 0, 2147483467));
   }
 
-  for (auto i = {}; i < lines; i++)
+  for (auto i = 0; i < lines; i++)
   {
     if (name[i] == oldname)
     {
@@ -1870,17 +1858,17 @@ void Leaderboard::rename(QString oldname, QString newname)
 
   if (dc_->cf.leaderboard_check == "suspend")
   {
-    dc_->logf(IMMORTAL, DC::LogChannel::LOG_GOD, "Leaderboard rename of %s to %s failed because writes are suspended.", qPrintable(oldname), qPrintable(newname));
+    loggod(u"Leaderboard rename of %1 to %2 failed because writes are suspended."_s.arg(oldname).arg(newname));
   }
   else
   {
-    if (!(stream = fopen(LEADERBOARD_FILE, "w")))
+    if (!file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
     {
-      dc_->logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
+      logbug(u"Cannot open leaderboard file: %1"_s.arg(LEADERBOARD_FILE));
       abort();
     }
 
-    for (auto i = {}; i < lines; i++)
+    for (auto i = 0; i < lines; i++)
     {
       dc_fprintf(stream, "%s~ %d\n", qPrintable(name[i]), value[i]);
     }
@@ -1890,7 +1878,7 @@ void Leaderboard::rename(QString oldname, QString newname)
 void Leaderboard::setHP(quint32 placement, QString name, qint32 value)
 {
   hpactive[placement] = value;
-  hpactivename[placement] = name.data();
+  hpactivename[placement] = name;
 }
 
 qint32 Leaderboard::scan(CharacterPtr ch)
@@ -1899,5 +1887,3 @@ qint32 Leaderboard::scan(CharacterPtr ch)
 
   return ReturnValue::eSUCCESS;
 }
-
-Leaderboard leaderboard;

@@ -2072,7 +2072,7 @@ qint32 char_from_room(CharacterPtr ch, bool stop_all_fighting)
       kimore = true;
   }
   if (ch->isPlayer()) // player
-    dc_->zones.value(dc_->world[ch->in_room]->zone).decrementPlayers();
+    dc_->zones_.value(dc_->world[ch->in_room]->zone).decrementPlayers();
   if (ch->isNonPlayer())
     ch->mobdata->last_room = ch->in_room;
   if (ch->isNonPlayer())
@@ -2179,7 +2179,7 @@ qint32 char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
       }
   }
   if (ch->isPlayer()) // player
-    dc_->zones.value(dc_->world[room].zone).incrementPlayers();
+    dc_->zones_.value(dc_->world[room].zone).incrementPlayers();
   if (ch->isNonPlayer())
   {
     if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !isSet(dc_->world[room]->room_flags_, NO_MAGIC))
@@ -2485,58 +2485,6 @@ qint32 get_number(QString &name)
 
   name = namelist.at(1);
   return number;
-}
-
-qint32 get_number(QString &name)
-{
-  size_t pos = name.find(".");
-  if (pos == name.npos)
-  {
-    return 1;
-  }
-
-  QString number_str = name.substr(0, pos);
-
-  try
-  {
-    QString str_str = name.substr(pos + 1);
-    name = str_str;
-    return stoi(number_str);
-  }
-  catch (...)
-  {
-    return 1;
-  }
-}
-
-qint32 get_number(QString *name)
-{
-  quint32 i;
-  QString ppos = {};
-  QString number;
-  QString buffer;
-
-  if ((ppos = index(*name, '.')) != nullptr)
-  {
-    *ppos++ = '\0';
-    // at this point, ppos points to the name only, and there is a
-    // \0 between the number and the name as they appear in the QString.
-    dc_strcpy(number, *name);
-    // now number contains the number as a QString
-    dc_strncpy(buffer, ppos, MAX_INPUT_LENGTH - 1);
-
-    dc_strcpy(*name, buffer);
-    // now the pointer that was passed into the function
-    // points to the name only.
-
-    for (i = {}; *(number + i); i++)
-      if (!isdigit(*(number + i)))
-        return (-1);
-
-    return (dc_atoi(number));
-  }
-
-  return (1);
 }
 
 /* Search a given list for an object, and return a pointer to that object */
@@ -3128,7 +3076,7 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
   // combine any cash amounts
   if (GET_ITEM_TYPE(object) == ITEM_MONEY)
   {
-    for (obj = dc_->world[room].contents; obj; obj = obj->next_content)
+    for (obj = dc_->world[room]->contents_; obj; obj = obj->next_content)
       if (GET_ITEM_TYPE(obj) == ITEM_MONEY)
       {
         object->flags_.value[0] += obj->flags_.value[0];
@@ -3139,7 +3087,7 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
   }
 
   // search through for the last object, or another object just like this one
-  for (obj = dc_->world[room].contents; obj && obj->next_content; obj = obj->next_content)
+  for (obj = dc_->world[room]->contents_; obj && obj->next_content; obj = obj->next_content)
   {
     if (obj->item_number == object->item_number)
       break;
@@ -3149,7 +3097,7 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
   if (!obj)
   {
     object->next_content = {};
-    dc_->world[room].contents = object;
+    dc_->world[room]->contents_ = object;
   }
   else
   {
@@ -3162,11 +3110,11 @@ qint32 obj_to_room(ObjectPtr object, qint32 room)
     object->equipped_by = {};
 
   /*
-   if(!(obj = dc_->world[room].contents) ||
+   if(!(obj = dc_->world[room]->contents_) ||
    (!obj->next_content && obj->item_number > object->item_number))
    {
-   object->next_content = dc_->world[room].contents;
-   dc_->world[room].contents = object;
+   object->next_content = dc_->world[room]->contents_;
+   dc_->world[room]->contents_ = object;
    object->in_room      = room;
    object->carried_by   = {};
 
@@ -3208,13 +3156,13 @@ qint32 obj_from_room(ObjectPtr object)
   }
 
   // head of list
-  if (object == dc_->world[object->in_room].contents)
-    dc_->world[object->in_room].contents = object->next_content;
+  if (object == dc_->world[object->in_room]->contents_)
+    dc_->world[object->in_room]->contents_ = object->next_content;
 
   // locate previous element in list
   else
   {
-    for (i = dc_->world[object->in_room].contents; i && (i->next_content != object); i = i->next_content)
+    for (i = dc_->world[object->in_room]->contents_; i && (i->next_content != object); i = i->next_content)
       ;
 
     if (i != nullptr)
@@ -3401,7 +3349,7 @@ void extract_obj(ObjectPtr obj)
 
   if (obj->item_number >= 0)
   {
-    (dc_->obj_index_[obj->item_number].qty)--;
+    (dc_->obj_index_[obj->item_number]->qty)--;
   }
 
   for (auto &r : reroll_sessions)
@@ -3560,13 +3508,13 @@ void extract_char(CharacterPtr ch, bool pull)
   if (!pull && !isGolem)
   {
     if (dc_->world[was_in]->number_ == START_ROOM)
-      char_to_room(ch, real_room(SECOND_START_ROOM));
-    else if (dc_->zones.value(dc_->world[ch->hometown].zone).continent == FAR_REACH || dc_->zones.value(dc_->world[ch->hometown].zone).continent == UNDERDARK)
-      char_to_room(ch, real_room(FARREACH_START_ROOM));
-    else if (dc_->zones.value(dc_->world[ch->hometown].zone).continent == DIAMOND_ISLE || dc_->zones.value(dc_->world[ch->hometown].zone).continent == FORBIDDEN_ISLAND)
-      char_to_room(ch, real_room(THALOS_START_ROOM));
+      char_to_room(ch, SECOND_START_ROOM);
+    else if (dc_->zones_.value(dc_->world[ch->hometown].zone).continent == FAR_REACH || dc_->zones_.value(dc_->world[ch->hometown].zone).continent == UNDERDARK)
+      char_to_room(ch, FARREACH_START_ROOM);
+    else if (dc_->zones_.value(dc_->world[ch->hometown].zone).continent == DIAMOND_ISLE || dc_->zones_.value(dc_->world[ch->hometown].zone).continent == FORBIDDEN_ISLAND)
+      char_to_room(ch, THALOS_START_ROOM);
     else
-      char_to_room(ch, real_room(START_ROOM));
+      char_to_room(ch, START_ROOM);
   }
 
   // make sure their ambush target is free'd
@@ -3674,7 +3622,7 @@ void extract_char(CharacterPtr ch, bool pull)
     do_return(ch, u""_s, cmd_t::LOOK);
 
   if (ch->isNonPlayer() && ch->mobdata->nr > -1)
-    dc_->mob_index_[ch->mobdata->nr].qty--;
+    dc_->mob_index_[ch->mobdata->nr]->qty--;
 
   if (pull || isGolem)
   {
@@ -4008,7 +3956,7 @@ ObjectPtr get_objindex_vnum(QString vnum_str)
 CharacterPtr get_random_mob_vnum(qint32 vnum)
 {
   qint32 num = real_mobile(vnum);
-  qint32 total = dc_->mob_index_[num].qty;
+  qint32 total = dc_->mob_index_[num]->qty;
   qint32 which = dc_->number(1, total);
 
   const auto &character_list = dc_->character_list;
@@ -4388,7 +4336,7 @@ ObjectPtr get_obj_vis(CharacterPtr ch, const QString name, bool loc)
     return (i);
 
   /* scan room */
-  if ((i = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room].contents)) != nullptr)
+  if ((i = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room]->contents_)) != nullptr)
     return (i);
 
   dc_strcpy(tmpname, name);
@@ -4614,7 +4562,7 @@ qint32 generic_find(const QString arg, qint32 bitvector, CharacterPtr ch, Charac
 
   if (isSet(bitvector, FIND_OBJ_ROOM))
   {
-    *tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room].contents);
+    *tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room]->contents_);
     if (*tar_obj)
     {
       if (verbose)

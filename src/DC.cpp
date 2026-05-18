@@ -17,7 +17,7 @@ DC::DC(qint32 &argc, char **argv)
   setup();
 }
 
-DC::DC(config c)
+DC::DC(Config c)
     : QCoreApplication(c.argc_, c.argv_), cf(c), ssh(this), shops_(this), random_(*QRandomGenerator::global())
 {
   setup();
@@ -752,6 +752,46 @@ affected_type::affected_type(DCPtr dc)
 }
 
 Player::Player(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+Mobile::Mobile(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+ObjectIndex::ObjectIndex(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+MobileIndex::MobileIndex(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+Program::Program(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+ExtraDescription::ExtraDescription(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+DC::Config::Config(int &argc, char **argv)
+    : argc_(argc), argv_(argv)
+{
+}
+
+LegacyFileWorld::LegacyFileWorld(DCPtr dc, QString filename)
+    : dc_(dc), LegacyFile(dc, "world", filename, "Unable to open world file '%1")
+{
+}
+
+Reservation ::Reservation(DCPtr dc)
     : dc_(dc), QObject(dc)
 {
 }

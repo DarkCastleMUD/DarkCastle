@@ -20,7 +20,7 @@ qint32 move_player(CharacterPtr ch, qint32 room)
 
   if (!isSet(retval, ReturnValue::eSUCCESS))
   {
-    retval = move_char(ch, real_room(START_ROOM));
+    retval = move_char(ch, START_ROOM);
     if (!isSet(retval, ReturnValue::eSUCCESS))
       dc_->logentry(u"Error in move_player(), Failure moving ch to start room. move_player_home_nofail"_s,
                     IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -40,20 +40,20 @@ void move_player_home(CharacterPtr victim)
 
   // next four lines ping-pong people from meta to tavern to help lessen spam
   if (dc_->world[was_in]->number_ == victim->hometown && victim->hometown == START_ROOM)
-    move_player(victim, real_room(SECOND_START_ROOM));
+    move_player(victim, SECOND_START_ROOM);
   else if (dc_->world[was_in]->number_ == victim->hometown || IS_AFFECTED(victim, AFF_CHAMPION))
-    move_player(victim, real_room(START_ROOM));
+    move_player(victim, START_ROOM);
   // recalling into a clan room
-  else if (!isSet(dc_->world[real_room(victim->hometown)]->room_flags_, CLAN_ROOM))
-    move_player(victim, real_room(victim->hometown));
+  else if (!isSet(dc_->world[victim->hometown]->room_flags_, CLAN_ROOM))
+    move_player(victim, victim->hometown);
   // Clanroom else
   else
   {
-    if (!victim->clan || !(clan = get_clan(victim)))
+    if (!victim->clan_id_ || !(clan = get_clan(victim)))
     {
       victim->sendln(u"The gods frown on you, and reset your home."_s);
       victim->hometown = START_ROOM;
-      move_player(victim, real_room(victim->hometown));
+      move_player(victim, victim->hometown);
     }
     else
     {
@@ -70,7 +70,7 @@ void move_player_home(CharacterPtr victim)
         victim->sendln(u"The gods frown on you, and reset your home."_s);
         victim->hometown = START_ROOM;
       }
-      move_player(victim, real_room(victim->hometown));
+      move_player(victim, victim->hometown);
     }
   }
 }
@@ -596,7 +596,7 @@ ReturnValues do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
 
   // if I'm STAY_NO_TOWN, don't enter a Zone::Flag::IS_TOWN zone no matter what
-  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && dc_->zones.value(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
+  if (ch->isNonPlayer() && ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) && dc_->zones_.value(dc_->world[dc_->world[ch->in_room].dir_option[dir]->to_room].zone).isTown())
     return ReturnValue::eFAILURE;
 
   qint32 a = {};
@@ -686,7 +686,7 @@ ReturnValues do_simple_move(CharacterPtr ch, cmd_t cmd, qint32 following)
   }
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln(u"The sounds around you fade to nothing as the silence takes hold..."_s);
 
@@ -1071,7 +1071,7 @@ ReturnValues do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if ((portal = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room].contents)) == nullptr)
+  if ((portal = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room]->contents_)) == nullptr)
   {
     ch->sendln(u"Nothing here by that name."_s);
     return ReturnValue::eFAILURE;
@@ -1083,7 +1083,7 @@ ReturnValues do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (real_room(portal->getPortalDestinationRoom()) == INVALID_ROOM)
+  if (portal->getPortalDestinationRoom() == INVALID_ROOM)
   {
     dc_sprintf(buf, "Error in do_enter(), value 0 on object %d < 0", portal->item_number);
     dc_->logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
@@ -1091,13 +1091,13 @@ ReturnValues do_enter(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->world[real_room(portal->getPortalDestinationRoom())].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
+  if (dc_->world[portal->getPortalDestinationRoom()].sector_type == SECT_UNDERWATER && !(ch->affected_by_spell(SPELL_WATER_BREATHING) || IS_AFFECTED(ch, AFF_WATER_BREATHING)))
   {
     ch->sendln(u"You bravely attempt to plunge through the portal - let's hope you have gills!"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(dc_->world[real_room(portal->getPortalDestinationRoom())]->room_flags_, CLAN_ROOM))
+  if (ch->getLevel() > IMMORTAL && ch->getLevel() < DEITY && isSet(dc_->world[portal->getPortalDestinationRoom()]->room_flags_, CLAN_ROOM))
   {
     ch->sendln(u"You may not enter a clanhall at your level."_s);
     return ReturnValue::eFAILURE;
@@ -1257,7 +1257,7 @@ ReturnValues do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!(obj = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room].contents)))
+  if (!(obj = get_obj_in_list_vis(ch, buf, dc_->world[ch->in_room]->contents_)))
   {
     ch->sendln(u"Climb what?"_s);
     return ReturnValue::eSUCCESS;
@@ -1271,7 +1271,7 @@ ReturnValues do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
 
   qint32 dest = obj->flags_.value[0];
 
-  if (real_room(dest) < 0)
+  if (dest < 0)
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in do_climb(), illegal destination in object %d.", dc_->obj_index_[obj->item_number]->vnum());
     ch->sendln(u"You can't climb that."_s);
@@ -1281,7 +1281,7 @@ ReturnValues do_climb(CharacterPtr ch, QString argument, cmd_t cmd)
   act_to_room("$n carefully climbs $p.", ch, obj, 0, INVIS_NULL);
   dc_sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description()));
   ch->send(buf);
-  ReturnValues retval = move_char(ch, real_room(dest));
+  ReturnValues retval = move_char(ch, dest);
 
   if (SOMEONE_DIED(retval))
     return retval;

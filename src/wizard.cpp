@@ -1813,11 +1813,11 @@ void begin_hunt(qint32 item, qint32 duration, qint32 amount, QString huntname)
         continue;
       }
 
-      if (dc_->mob_index_[mob].qty <= 0)
+      if (dc_->mob_index_[mob]->qty <= 0)
         continue;
       if (!(vict = get_random_mob_vnum(vnum)))
         continue;
-      if (dc_->zones.value(dc_->world[vict->in_room]->zone).isNoHunt())
+      if (dc_->zones_.value(dc_->world[vict->in_room]->zone).isNoHunt())
         continue;
 
       if (dc_strlen(vict->short_desc) > 34)

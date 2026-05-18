@@ -60,7 +60,7 @@ ReturnValues do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
         foundtarget = 1;
 
       // First, if they're not anonymous
-      if ((!ch->isNonPlayer() && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
+      if ((!ch->isNonPlayer() && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan_id_ == ch->clan_id_ && ch->clan_id_)))
       {
         tempbuffer += u"   $B%1 %2 %3   Level %4      $1($7Leader$1)$R \r\n"_s
                           .arg(k->name(), -18)
@@ -83,7 +83,7 @@ ReturnValues do_whogroup(CharacterPtr ch, QString argument, cmd_t cmd)
             if (is_abbrev(target, qPrintable(f->follower->name())))
               foundtarget = 1;
             // First if they're not anonymous
-            if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
+            if (!IS_ANONYMOUS(f->follower) || (f->follower->clan_id_ == ch->clan_id_ && ch->clan_id_))
               tempbuffer += u"   %1 %2 %3   Level %4\r\n"_s
                                 .arg(f->follower->name(), -18)
                                 .arg(races[(qint32)f->follower->race].singular_name, -10)
@@ -149,7 +149,7 @@ ReturnValues do_whosolo(CharacterPtr ch, QString argument, cmd_t cmd)
     if (i->getLevel() <= MORTAL)
       if (!IS_AFFECTED(i, AFF_GROUP))
       {
-        if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
+        if (!IS_ANONYMOUS(i) || (i->clan_id_ && i->clan_id_ == ch->clan_id_))
           tempbuffer += u"   %1 %2 %3 %4     %5%6%7\r\n"_s
                             .arg(i->name(), -15)
                             .arg(races[(qint32)i->race].singular_name, -9)
@@ -324,7 +324,7 @@ ReturnValues Character::do_who(QStringList arguments, cmd_t cmd)
       continue;
     }
 
-    if (!class_found.isEmpty() && !hasholylight && (!i->clan || i->clan != clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
+    if (!class_found.isEmpty() && !hasholylight && (!i->clan_id_ || i->clan_id_ != clan) && IS_ANONYMOUS(i) && i->getLevel() < MIN_GOD)
     {
       continue;
     }
@@ -415,7 +415,7 @@ ReturnValues Character::do_who(QStringList arguments, cmd_t cmd)
     }
     else
     {
-      if (!IS_ANONYMOUS(i) || (clan && clan == i->clan) || hasholylight)
+      if (!IS_ANONYMOUS(i) || (clan && clan == i->clan_id_) || hasholylight)
       {
         infoBuf = u" $B$5%1$7-$1%2  $2%3$R$7 "_s.arg(i->getLevel(), 2).arg(pc_clss_abbrev[(qint32)GET_CLASS(i)]).arg(race_abbrev[(qint32)i->race]);
       }
@@ -447,7 +447,7 @@ ReturnValues Character::do_who(QStringList arguments, cmd_t cmd)
     }
 
     auto clanPtr = get_clan(i);
-    if (i->clan && clanPtr && i->getLevel() < OVERSEER)
+    if (i->clan_id_ && clanPtr && i->getLevel() < OVERSEER)
     {
       buf = u"[%1] %2$3%3 %4 "_s.arg(infoBuf).arg(preBuf).arg(qPrintable(i->shortdesc_or_name())).arg(i->title);
       buf += u"%5 $2[%6$R$2] %7$R\r\n"_s.arg(extraBuf).arg(clanPtr->name()).arg(tailBuf);
@@ -505,7 +505,7 @@ ReturnValues do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if (tmp->room().isArena() && !isSet(dc_->world[tmp->in_room]->room_flags_, NO_WHERE))
         {
-          if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
+          if ((tmp->clan_id_) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
             ch->send(u"%-20s - [%s$R]\r\n"_s.arg(qPrintable(tmp->name())).arg(qPrintable(clan->name())));
           else
             ch->send(u"%-20s\r\n"_s.arg(qPrintable(tmp->name())));
@@ -528,7 +528,7 @@ ReturnValues do_whoarena(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (tmp->room().isArena())
       {
-        if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
+        if ((tmp->clan_id_) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
           ch->send(u"%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n"_s.arg(qPrintable(tmp->name()), tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room).arg(qPrintable(clan->name())));
         else
           ch->send(u"%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n"_s.arg(qPrintable(tmp->name())).arg(tmp->getLevel()).arg(tmp->getHP()).arg(tmp->in_room));

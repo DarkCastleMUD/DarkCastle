@@ -163,25 +163,25 @@ void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_c
     }
     bool tax = false;
 
-    if (ch->dc_->zones.value(ch->dc_->world[ch->in_room]->zone).clanowner > 0 && ch->clan != ch->dc_->zones.value(ch->dc_->world[ch->in_room]->zone).clanowner)
+    if (ch->dc_->zones_.value(ch->dc_->world[ch->in_room]->zone).clanowner > 0 && ch->clan_id_ != ch->dc_->zones_.value(ch->dc_->world[ch->in_room]->zone).clanowner)
     {
       qint32 cgold = (qint32)((qreal)(obj_object->flags_.value[0]) * 0.1);
       obj_object->flags_.value[0] -= cgold;
-      dc_->zones.value(ch->dc_->world[ch->in_room]->zone).addGold(cgold);
+      dc_->zones_.value(ch->dc_->world[ch->in_room]->zone).addGold(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer += u"Bounty: %2"_s.arg(cgold);
-        dc_->zones.value(ch->dc_->world[ch->in_room]->zone).addGold(cgold);
+        dc_->zones_.value(ch->dc_->world[ch->in_room]->zone).addGold(cgold);
       }
       else
-        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(ch->dc_->zones.value(ch->dc_->world[ch->in_room]->zone).clanowner)->name()).arg(cgold).arg(obj_object->flags_.value[0]));
+        ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s.arg(get_clan(ch->dc_->zones_.value(ch->dc_->world[ch->in_room]->zone).clanowner)->name()).arg(cgold).arg(obj_object->flags_.value[0]));
     }
     //	if (sub_object && sub_object->flags_.value[3] == 1 &&
-    //           !isexact("pc",sub_object->name()) && ch->clan
+    //           !isexact("pc",sub_object->name()) && ch->clan_id_
     //            && get_clan(ch)->tax_ && !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     if (((sub_object && sub_object->flags_.value[3] == 1 && !isexact("pc", sub_object->name())) || !sub_object) &&
-        ch->clan &&
+        ch->clan_id_ &&
         get_clan(ch)->tax_ &&
         !isSet(GET_TOGGLES(ch), Player::PLR_NOTAX))
     {
@@ -349,7 +349,7 @@ ReturnValues do_get(CharacterPtr ch, QString argument, cmd_t cmd)
   /* get all */
   case 1:
   {
-    if (ch->in_room == real_room(3099))
+    if (ch->in_room == 3099)
     {
       ch->sendln(u"Not in the donation room."_s);
       return ReturnValue::eFAILURE;
@@ -357,7 +357,7 @@ ReturnValues do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     sub_object = {};
     found = false;
     fail = false;
-    for (obj_object = ch->dc_->world[ch->in_room].contents_;
+    for (obj_object = ch->dc_->world[ch->in_room]->contents__;
          obj_object;
          obj_object = next_obj)
     {
@@ -480,7 +480,7 @@ ReturnValues do_get(CharacterPtr ch, QString argument, cmd_t cmd)
     sub_object = {};
     found = false;
     fail = false;
-    obj_object = get_obj_in_list_vis(ch, arg1, ch->dc_->world[ch->in_room].contents_);
+    obj_object = get_obj_in_list_vis(ch, arg1, ch->dc_->world[ch->in_room]->contents__);
     if (obj_object)
     {
       if (obj_object->flags_.type_flag == ITEM_CONTAINER &&
@@ -529,7 +529,7 @@ ReturnValues do_get(CharacterPtr ch, QString argument, cmd_t cmd)
 
       else if (obj_object->flags_.eq_level > 19 && ch->getLevel() < 5)
       {
-        if (ch->in_room != real_room(3099))
+        if (ch->in_room != 3099)
         {
           ch->send(u"%1 is too powerful for you to possess.\r\n"_s.arg(obj_object->short_description()));
           fail = true;
@@ -577,7 +577,7 @@ ReturnValues do_get(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     found = false;
     fail = false;
-    sub_object = get_obj_in_list_vis(ch, arg2, ch->dc_->world[ch->in_room].contents_);
+    sub_object = get_obj_in_list_vis(ch, arg2, ch->dc_->world[ch->in_room]->contents__);
     if (!sub_object)
     {
       sub_object = get_obj_in_list_vis(ch, arg2, ch->carrying);
@@ -746,7 +746,7 @@ ReturnValues do_get(CharacterPtr ch, QString argument, cmd_t cmd)
   { // get ??? ???
     found = false;
     fail = false;
-    sub_object = get_obj_in_list_vis(ch, arg2, ch->dc_->world[ch->in_room].contents);
+    sub_object = get_obj_in_list_vis(ch, arg2, ch->dc_->world[ch->in_room]->contents_);
     if (!sub_object)
     {
       if (cmd == cmd_t::LOOT)
@@ -1289,7 +1289,7 @@ ReturnValues do_put(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (*arg2)
     {
-      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, dc_->world[ch->in_room].contents)))
+      if (!(get_obj_in_list_vis(ch, arg2, ch->carrying)) && !(get_obj_in_list_vis(ch, arg2, dc_->world[ch->in_room]->contents_)))
       {
         dc_sprintf(buffer, "You don't have a %s.\r\n", arg2);
         ch->send(buffer);
@@ -2677,13 +2677,13 @@ qint32 palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool ha
     dc_sprintf(buffer, "There was %d coins.\r\n",
                obj_object->flags_.value[0]);
     ch->send(buffer);
-    if (dc_->zones.value(dc_->world[ch->in_room]->zone).clanowner > 0 && ch->clan !=
-                                                                             dc_->zones.value(dc_->world[ch->in_room]->zone).clanowner)
+    if (dc_->zones_.value(dc_->world[ch->in_room]->zone).clanowner > 0 && ch->clan_id_ !=
+                                                                              dc_->zones_.value(dc_->world[ch->in_room]->zone).clanowner)
     {
       qint32 cgold = (qint32)((qreal)(obj_object->flags_.value[0]) * 0.1);
       obj_object->flags_.value[0] -= cgold;
-      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(dc_->zones.value(dc_->world[ch->in_room]->zone).clanowner)->name).arg(cgold).arg(obj_object->flags_.value[0]));
-      dc_->zones.value(dc_->world[ch->in_room]->zone).addGold(cgold);
+      ch->send(u"Clan %s collects %d bounty, leaving %d for you.\r\n"_s.arg(get_clan(dc_->zones_.value(dc_->world[ch->in_room]->zone).clanowner)->name).arg(cgold).arg(obj_object->flags_.value[0]));
+      dc_->zones_.value(dc_->world[ch->in_room]->zone).addGold(cgold);
     }
 
     ch->addGold(obj_object->flags_.value[0]);

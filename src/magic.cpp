@@ -1643,13 +1643,13 @@ ReturnValues spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, 
     {
       // Find a valid room in whatever arena area the ch is in
       qint32 cur_zone = dc_->world[ch->in_room]->zone;
-      qint32 cur_zone_bottom = dc_->zones.value(cur_zone).getRealBottom();
-      qint32 cur_zone_top = dc_->zones.value(cur_zone).getRealTop();
+      qint32 cur_zone_bottom = dc_->zones_.value(cur_zone).getRealBottom();
+      qint32 cur_zone_top = dc_->zones_.value(cur_zone).getRealTop();
 
       do
       {
         to_room = dc_->number(cur_zone_bottom, cur_zone_top);
-      } while (real_room(to_room) == INVALID_ROOM);
+      } while (to_room == INVALID_ROOM);
     }
   }
   else
@@ -1663,13 +1663,13 @@ ReturnValues spell_teleport(quint8 level, CharacterPtr ch, CharacterPtr victim, 
              isSet(dc_->world[to_room]->room_flags_, NO_TELEPORT) ||
              isSet(dc_->world[to_room]->room_flags_, ARENA) ||
              dc_->world[to_room].sector_type == SECT_UNDERWATER ||
-             dc_->zones.value(dc_->world[to_room].zone).isNoTeleport() ||
-             ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones.value(dc_->world[to_room].zone).isTown()) : false) ||
+             dc_->zones_.value(dc_->world[to_room].zone).isNoTeleport() ||
+             ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (dc_->zones_.value(dc_->world[to_room].zone).isTown()) : false) ||
              (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(dc_->world[to_room]->room_flags_, CLAN_ROOM) ||
                                                     (to_room >= 1900 && to_room <= 1999))) ||
              // NPCs can only teleport within the same continent
              (victim->isNonPlayer() &&
-              dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[to_room].zone).continent));
+              dc_->zones_.value(dc_->world[victim->in_room]->zone).continent != dc_->zones_.value(dc_->world[to_room].zone).continent));
   }
 
   if ((victim->isNonPlayer()) && (!ch->isNonPlayer()))
@@ -4164,26 +4164,26 @@ ReturnValues spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr vi
   }
 
   if (victim->isNonPlayer())
-    location = real_room(victim->hometown);
+    location = victim->hometown;
   else
   {
     if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF) || victim->isPlayerGoldThief())
-      location = real_room(START_ROOM);
+      location = START_ROOM;
     else
-      location = real_room(victim->hometown);
+      location = victim->hometown;
 
     if (IS_AFFECTED(victim, AFF_CANTQUIT))
-      location = real_room(START_ROOM);
+      location = START_ROOM;
     else
-      location = real_room(victim->hometown);
+      location = victim->hometown;
 
     // make sure they aren't recalling into someone's chall
     if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM))
     {
-      if (!victim->clan || !(clan = get_clan(victim)))
+      if (!victim->clan_id_ || !(clan = get_clan(victim)))
       {
         victim->sendln(u"The gods frown on you, and reset your home."_s);
-        location = real_room(START_ROOM);
+        location = START_ROOM;
         victim->hometown = START_ROOM;
       }
       else
@@ -4195,7 +4195,7 @@ ReturnValues spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr vi
         if (!found)
         {
           victim->sendln(u"The gods frown on you, and reset your home."_s);
-          location = real_room(START_ROOM);
+          location = START_ROOM;
           victim->hometown = START_ROOM;
         }
       }
@@ -4211,15 +4211,15 @@ ReturnValues spell_word_of_recall(quint8 level, CharacterPtr ch, CharacterPtr vi
   if (isSet(dc_->world[location]->room_flags_, CLAN_ROOM) && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln(u"No recalling into a clan hall whilst Champion, go to the Tavern!"_s);
-    location = real_room(START_ROOM);
+    location = START_ROOM;
   }
   if (location >= 1900 && location <= 1999 && IS_AFFECTED(victim, AFF_CHAMPION))
   {
     victim->sendln(u"No recalling into a guild hall whilst Champion, go to the Tavern!"_s);
-    location = real_room(START_ROOM);
+    location = START_ROOM;
   }
 
-  if (dc_->zones.value(dc_->world[victim->in_room]->zone).continent != dc_->zones.value(dc_->world[location].zone).continent)
+  if (dc_->zones_.value(dc_->world[victim->in_room]->zone).continent != dc_->zones_.value(dc_->world[location].zone).continent)
   {
     if (GET_MANA(victim) < use_mana(victim, skill))
     {
@@ -4423,7 +4423,7 @@ ReturnValues spell_summon(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[victim->in_room]->zone).continent)
+  if (dc_->zones_.value(dc_->world[ch->in_room]->zone).continent != dc_->zones_.value(dc_->world[victim->in_room]->zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -6548,7 +6548,7 @@ void make_portal(CharacterPtr ch, CharacterPtr vict)
           isSet(dc_->world[destination]->room_flags_, CLAN_ROOM) ||
           isSet(dc_->world[destination]->room_flags_, NO_PORTAL) ||
           isSet(dc_->world[destination]->room_flags_, NO_TELEPORT) ||
-          dc_->zones.value(dc_->world[destination].zone).isNoTeleport())
+          dc_->zones_.value(dc_->world[destination].zone).isNoTeleport())
       {
         good_destination = false;
       }
@@ -6609,14 +6609,14 @@ ReturnValues spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
     ch->sendln(u"You can't seem to find a definite path."_s);
     return ReturnValue::eFAILURE;
   }
-  if (dc_->zones.value(dc_->world[victim->in_room]->zone).isNoTeleport())
+  if (dc_->zones_.value(dc_->world[victim->in_room]->zone).isNoTeleport())
   {
     ch->sendln(u"A portal shimmers into view but is unstable and immediately fades to nothing."_s);
     act_to_room("A portal shimmers into view but is unstable and immediately fades to nothing.", ch, 0, 0, 0);
     return ReturnValue::eFAILURE;
   }
 
-  if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[victim->in_room]->zone).continent)
+  if (dc_->zones_.value(dc_->world[ch->in_room]->zone).continent != dc_->zones_.value(dc_->world[victim->in_room]->zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -6632,7 +6632,7 @@ ReturnValues spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
   }
 
   bool portal_found = false;
-  for (auto portal = dc_->world[ch->in_room].contents; portal; portal = portal->next_content)
+  for (auto portal = dc_->world[ch->in_room]->contents_; portal; portal = portal->next_content)
   {
     if (portal->isPortal())
     {
@@ -6643,7 +6643,7 @@ ReturnValues spell_portal(quint8 level, CharacterPtr ch, CharacterPtr victim, Ob
 
   if (!portal_found)
   {
-    for (auto portal = dc_->world[victim->in_room].contents; portal; portal = portal->next_content)
+    for (auto portal = dc_->world[victim->in_room]->contents_; portal; portal = portal->next_content)
     {
       if (portal->isPortal())
       {
@@ -8671,7 +8671,7 @@ ReturnValue cast_dispel_evil(quint8 level, CharacterPtr ch, QString arg, qint32 
           return retval;
       }
     }
-    for (tar_obj = dc_->world[ch->in_room].contents; tar_obj; tar_obj = next_o)
+    for (tar_obj = dc_->world[ch->in_room]->contents_; tar_obj; tar_obj = next_o)
     {
       next_o = tar_obj->next;
 
@@ -8728,7 +8728,7 @@ ReturnValue cast_dispel_good(quint8 level, CharacterPtr ch, QString arg, qint32 
           return retval;
       }
     }
-    for (tar_obj = dc_->world[ch->in_room].contents; tar_obj; tar_obj = next_o)
+    for (tar_obj = dc_->world[ch->in_room]->contents_; tar_obj; tar_obj = next_o)
     {
       next_o = tar_obj->next;
 
@@ -12466,7 +12466,7 @@ ReturnValues spell_beacon(quint8 level, CharacterPtr ch, QString arg, qint32 typ
     }
   }
 
-  if (dc_->zones.value(dc_->world[ch->in_room]->zone).continent != dc_->zones.value(dc_->world[ch->beacon->in_room]->zone).continent)
+  if (dc_->zones_.value(dc_->world[ch->in_room]->zone).continent != dc_->zones_.value(dc_->world[ch->beacon->in_room]->zone).continent)
   {
     if (GET_MANA(ch) < use_mana(ch, skill))
     {
@@ -15549,7 +15549,7 @@ ReturnValues spell_consecrate(quint8 level, CharacterPtr ch, CharacterPtr victim
 
   ObjectPtr cItem = {};
 
-  if ((cItem = get_obj_in_list("consecrateitem", dc_->world[ch->in_room].contents)))
+  if ((cItem = get_obj_in_list("consecrateitem", dc_->world[ch->in_room]->contents_)))
   {
     if (ch == ((CharacterPtr)(cItem->flags_.origin)) && spl == SPELL_CONSECRATE)
     {
@@ -15713,7 +15713,7 @@ ReturnValues spell_desecrate(quint8 level, CharacterPtr ch, CharacterPtr victim,
   }
 
   ObjectPtr cItem = {};
-  if ((cItem = get_obj_in_list("consecrateitem", dc_->world[ch->in_room].contents)))
+  if ((cItem = get_obj_in_list("consecrateitem", dc_->world[ch->in_room]->contents_)))
   {
     if (ch == ((CharacterPtr)(cItem->flags_.origin)))
     {

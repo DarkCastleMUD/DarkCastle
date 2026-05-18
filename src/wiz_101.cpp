@@ -129,7 +129,7 @@ ReturnValues Character::do_goto(QStringList arguments, cmd_t cmd)
     QString arg2 = arguments.at(1);
 
     zone_t zone_key = arg2.toULongLong(&ok);
-    auto &zones = dc_->zones;
+    auto &zones = dc_->zones_;
     if (ok == false || zones.contains(zone_key) == false)
     {
       if (zones.isEmpty())
@@ -153,7 +153,7 @@ ReturnValues Character::do_goto(QStringList arguments, cmd_t cmd)
       loc_nr = zone.getRealBottom();
     }
 
-    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(QString(dc_->zones.value(zone_key).name().toStdString()))));
+    send(fmt::format("Going to room {} in zone #{} [{}]\r\n", loc_nr, zone_key, ltrim(QString(dc_->zones_.value(zone_key).name().toStdString()))));
 
     if (loc_nr > dc_->top_of_world || loc_nr < 0)
     {
@@ -463,7 +463,7 @@ ReturnValues do_at(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     loc_nr = dc_atoi(loc_str);
     if ((loc_nr == 0 && *loc_str != '0') ||
-        ((location = real_room(loc_nr)) < 0))
+        ((location = loc_nr) < 0))
     {
       ch->sendln(u"No room exists with that number."_s);
       return ReturnValue::eFAILURE;
@@ -720,7 +720,7 @@ ReturnValues do_wiz(CharacterPtr ch, QString argument, cmd_t cmd)
 
 ReturnValues do_findfix(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
+  for (auto [zone_key, zone] : dc_->zones_.asKeyValueRange())
   {
     for (qsizetype j = {}; j < zone.cmd.size(); j++)
     {

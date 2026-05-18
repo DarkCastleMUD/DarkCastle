@@ -156,9 +156,9 @@ qint32 emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   ch = dc_->world[obj->in_room]->people_;
   for (index_cursor = &obj_emote_head; index_cursor; index_cursor = index_cursor->next)
   {
-    if (real_room(index_cursor->room_number) == obj->in_room)
+    if (index_cursor->room_number == obj->in_room)
     {
-      if (real_room(index_cursor->room_number) == INVALID_ROOM)
+      if (index_cursor->room_number == INVALID_ROOM)
       {
         return ReturnValue::eFAILURE;
       }
@@ -861,7 +861,7 @@ qint32 returner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (get_obj_in_list_num(real_object(2200), ch->carrying))
     return ReturnValue::eFAILURE;
 
-  if (move_char(ch, real_room(START_ROOM)) == 0)
+  if (move_char(ch, START_ROOM) == 0)
     return ReturnValue::eFAILURE;
 
   do_look(ch, "\0");
@@ -974,7 +974,7 @@ qint32 hellmouth_thing(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString 
   // "your nose recoils at the stench of sulphur, and all you can taste is\r\n"
   // "blood.\r\n",invoker);
   //  char_from_room(invoker);
-  //  char_to_room(invoker, real_room(4801));
+  //  char_to_room(invoker, 4801);
   GET_KI(invoker) -= 50;
   if (GET_KI(invoker) < 0)
     GET_KI(invoker) = {};
@@ -1223,7 +1223,7 @@ qint32 stupid_button(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
 
   ch->sendln(u"You couldn't help but push the $4$Bbutton$R, could you?"_s);
   ch->sendln(u"The floor drops out beneath you and you find yourself.. er.. somewhere."_s);
-  move_char(ch, real_room(49));
+  move_char(ch, 49);
   do_look(ch, "\0");
   return ReturnValue::eSUCCESS;
 }
@@ -1629,7 +1629,7 @@ qint32 carriage(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (move_char(ch, real_room(START_ROOM)) == 0)
+  if (move_char(ch, START_ROOM) == 0)
     return ReturnValue::eFAILURE;
 
   do_look(ch, "\0");
@@ -1686,7 +1686,7 @@ qint32 movingarenaporter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg,
     while (room == 17840)
       room = dc_->number(17800, 17849);
 
-    move_obj(obj, real_room(room));
+    move_obj(obj, room);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1813,7 +1813,7 @@ qint32 stupid_message(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   if (!obj || obj->in_room == INVALID_ROOM)
     return ReturnValue::eFAILURE;
 
-  if (!dc_->zones.value(dc_->world[obj->in_room]->zone).players)
+  if (!dc_->zones_.value(dc_->world[obj->in_room]->zone).players)
     return ReturnValue::eFAILURE;
 
   if (ch->dc_->number(1, 10) == 1)
@@ -1840,7 +1840,7 @@ qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   {
     // TODO - should probably check to make sure these are valid rooms before we
     // use them.  Proc isn't used yet though, so no biggy.
-    for (vict = dc_->world[real_room(i)]->people_; vict; vict = vict->next_in_room)
+    for (vict = dc_->world[i]->people_; vict; vict = vict->next_in_room)
       if (vict->isNonPlayer())
         found = {};
       else
@@ -1860,9 +1860,9 @@ qint32 pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString a
   for (qint32 j = 8695; j < 8699; j++)
     send_to_room("The weight of your body helps shift the balances.\r\n"
                  "You hear the poping of a magical barrier dissapating.\r\n\r\n",
-                 real_room(j));
+                 j);
 
-  REMOVE_BIT(dc_->world[real_room(8699)]->room_flags_, IMP_ONLY);
+  REMOVE_BIT(dc_->world[8699]->room_flags_, IMP_ONLY);
   return ReturnValue::eFAILURE;
 }
 
@@ -2352,7 +2352,7 @@ qint32 pull_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Charact
     send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
     break;
   case 29203:
-    if (dc_->obj_index_[real_object(29202)].qty > 0)
+    if (dc_->obj_index_[real_object(29202)]->qty > 0)
     {
       send_to_room("A compartment in the ceiling opens, but is it empty.\r\n", 29258, true);
       break;
@@ -2400,9 +2400,9 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         break;
       }
     }
-    if (first && real_room(30000) != INVALID_ROOM)
+    if (first && 30000 != INVALID_ROOM)
     {
-      qint32 zone = dc_->world[real_room(30000)].zone;
+      qint32 zone = dc_->world[30000].zone;
       const auto &character_list = dc_->character_list;
       for (const auto &tmp_victim : character_list)
       {
@@ -2436,7 +2436,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
         }
       }
 
-      DC::resetZone(dc_->world[real_room(30000)].zone);
+      DC::resetZone(dc_->world[30000].zone);
     }
   }
 
@@ -2466,7 +2466,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
           v->sendln(u"The Szrildor daypass crumbles into dust."_s);
           extract_obj(p); // extract handles all variations of obj_from_char etc
 
-          if (v->isPlayer() && v->in_room && real_room(30000) > 0 && dc_->world[v->in_room]->zone == dc_->world[real_room(30000)].zone && v->in_room != real_room(30000) && v->in_room != real_room(30096))
+          if (v->isPlayer() && v->in_room && 30000 > 0 && dc_->world[v->in_room]->zone == dc_->world[30000].zone && v->in_room != 30000 && v->in_room != 30096)
           {
             if (v->getLevel() >= IMMORTAL)
             {
@@ -2477,7 +2477,7 @@ qint32 szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Cha
             {
               act_to_character("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", v, 0, 0, 0);
               act_to_room("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", v, 0, 0, 0);
-              move_char(v, real_room(30000));
+              move_char(v, 30000);
               do_look(v, "");
 
               auto throwitem = new mprog_throw_type;
@@ -2517,13 +2517,13 @@ qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
       continue;
     if (!i->in_room)
       continue;
-    if (real_room(30000) > 0 && dc_->world[i->in_room]->zone != dc_->world[real_room(30000)].zone)
+    if (30000 > 0 && dc_->world[i->in_room]->zone != dc_->world[30000].zone)
       continue;
     if (i->getLevel() >= 100)
       continue;
-    if (i->in_room == real_room(30000))
+    if (i->in_room == 30000)
       continue;
-    if (i->in_room == real_room(30096))
+    if (i->in_room == 30096)
       continue;
 
     if (!search_char_for_item(i, real_object(30097), false) || (++count) > 4)
@@ -2540,7 +2540,7 @@ qint32 szrildor_pass_checks(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString a
       {
         act_to_character("As your pass expires and crumbles to dust, you begin to feel a bit fuzzy for a moment, then vanish into thin air", i, 0, 0, 0);
         act_to_room("$n begins to look blurry for a moment, then winks out of existence with a \"pop\"!", i, 0, 0, 0);
-        move_char(i, real_room(30000));
+        move_char(i, 30000);
         do_look(i, "");
       }
     }
@@ -2595,13 +2595,13 @@ qint32 moving_portals(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
         break;
       }
       bool portal = false;
-      if (real_room(room) == INVALID_ROOM)
+      if (room == INVALID_ROOM)
         continue;
       if (sector)
-        if (dc_->world[real_room(room)].sector_type != sector)
+        if (dc_->world[room].sector_type != sector)
           continue;
       ObjectPtr o;
-      for (o = dc_->world[real_room(room)].contents; o; o = o->next_content)
+      for (o = dc_->world[room]->contents_; o; o = o->next_content)
       {
         if (o->isPortal())
         {

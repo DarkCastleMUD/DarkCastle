@@ -231,14 +231,14 @@ ReturnValues do_newPath(CharacterPtr ch, QString argument, cmd_t cmd)
 
 ReturnValues do_listPathsByZone(CharacterPtr ch, QString argument, cmd_t cmd)
 {
-  auto &zones = dc_->zones;
+  auto &zones = dc_->zones_;
   qint32 i = dc_->world[ch->in_room]->zone;
   if (zones.contains(i) == false)
   {
     return ReturnValue::eFAILURE;
   }
 
-  auto &zone = dc_->zones[i];
+  auto &zone = dc_->zones_[i];
   qint32 low = zone.getRealBottom(), high = zone.getRealTop();
 
   PathPtr p;

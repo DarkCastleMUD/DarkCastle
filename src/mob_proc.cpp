@@ -75,7 +75,7 @@ qint32 call_for_help_in_room(CharacterPtr ch, qint32 iFriendId)
 // standard return values
 
 // Several procs use this
-qint32 protect(CharacterPtr ch, qint32 iFriendId)
+ReturnValues protect(CharacterPtr ch, qint32 iFriendId)
 {
   CharacterPtr tmp_ch = {};
   ReturnValues retval;
@@ -749,7 +749,7 @@ qint32 brass_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
 {
   CharacterPtr vict;
 
-  if (cmd == cmd_t::WEST && ch->in_room == real_room(5065))
+  if (cmd == cmd_t::WEST && ch->in_room == 5065)
   {
     act("The brass dragon says '$n isn't invited'",
         ch, 0, 0, TO_ROOM, 0);
@@ -975,37 +975,37 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     guard_direction = owner->mobdata->mob_flags.value[1];
     guard_clan = owner->mobdata->mob_flags.value[2];
 
-    if (in_room != real_room(guard_room) || cmd != static_cast<cmd_t>(guard_direction))
+    if (in_room != guard_room || cmd != static_cast<cmd_t>(guard_direction))
     {
       return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    if ((in_room == real_room(2300) && cmd != cmd_t::NORTH) || // up
-        (in_room == real_room(2310) && cmd != cmd_t::EAST) ||  // east
-        (in_room == real_room(2320) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2330) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2340) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2350) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2360) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2370) && cmd != cmd_t::DOWN) ||  // down
-        (in_room == real_room(2380) && cmd != cmd_t::NORTH) || // north
-        (in_room == real_room(2390) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2400) && cmd != cmd_t::WEST) ||  // west
-        (in_room == real_room(2410) && cmd != cmd_t::UP) ||    // up
-        (in_room == real_room(2420) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2430) && cmd != cmd_t::SOUTH) || // south
-        (in_room == real_room(2440) && cmd != cmd_t::NORTH) || // north
-        (in_room == real_room(2450) && cmd != cmd_t::WEST) ||  // west
-        (in_room == real_room(2460) && cmd != cmd_t::NORTH) || // north
-        (in_room == real_room(2470) && cmd != cmd_t::WEST) ||  // west
-        (in_room == real_room(2480) && cmd != cmd_t::NORTH) || // north
-        (in_room == real_room(2500) && cmd != cmd_t::NORTH))   // north
+    if ((in_room == 2300 && cmd != cmd_t::NORTH) || // up
+        (in_room == 2310 && cmd != cmd_t::EAST) ||  // east
+        (in_room == 2320 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2330 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2340 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2350 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2360 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2370 && cmd != cmd_t::DOWN) ||  // down
+        (in_room == 2380 && cmd != cmd_t::NORTH) || // north
+        (in_room == 2390 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2400 && cmd != cmd_t::WEST) ||  // west
+        (in_room == 2410 && cmd != cmd_t::UP) ||    // up
+        (in_room == 2420 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2430 && cmd != cmd_t::SOUTH) || // south
+        (in_room == 2440 && cmd != cmd_t::NORTH) || // north
+        (in_room == 2450 && cmd != cmd_t::WEST) ||  // west
+        (in_room == 2460 && cmd != cmd_t::NORTH) || // north
+        (in_room == 2470 && cmd != cmd_t::WEST) ||  // west
+        (in_room == 2480 && cmd != cmd_t::NORTH) || // north
+        (in_room == 2500 && cmd != cmd_t::NORTH))   // north
       return ReturnValue::eFAILURE;
   }
 
-  qint32 clan_num = ch->clan;
+  qint32 clan_num = ch->clan_id_;
   if (ch->isNonPlayer() && IS_AFFECTED(ch, AFF_CHARM))
   {
     qint32 b = dc_->mob_index_[ch->mobdata->nr]->vnum();
@@ -1027,7 +1027,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
     case 22397:
     case 22398:
       if (ch->master)
-        clan_num = ch->master->clan;
+        clan_num = ch->master->clan_id_;
       break;
     default:
       break;
@@ -1036,7 +1036,7 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
 
   if (owner->isNonPlayer() && owner->mobdata->mob_flags.type == mob_type_t::MOB_CLAN_GUARD)
   {
-    if (clan_num != guard_clan && in_room == real_room(guard_room))
+    if (clan_num != guard_clan && in_room == guard_room)
     {
       act_to_room("$n is turned away from the clan hall.", ch, 0, 0, 0);
       ch->sendln(u"The clan guard throws you out on your ass."_s);
@@ -1045,26 +1045,26 @@ qint32 clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   }
   else
   {
-    if ((clan_num != 14 && in_room == real_room(2300))    // moor
-        || (clan_num != 4 && in_room == real_room(2310))  // darkened
-        || (clan_num != 18 && in_room == real_room(2320)) // anarchist
-        || (clan_num != 1 && in_room == real_room(2330))  // uln'hyrr
-        || (clan_num != 10 && in_room == real_room(2340)) // black_axe
-        || (clan_num != 9 && in_room == real_room(2350))  // nazgul
-        || (clan_num != 3 && in_room == real_room(2360))  // arcana
-        || (clan_num != 17 && in_room == real_room(2370)) // the_horde
-        || (clan_num != 13 && in_room == real_room(2380)) // slackers
-        || (clan_num != 20 && in_room == real_room(2390)) // sindicate
-        || (clan_num != 8 && in_room == real_room(2400))  // merc
-        || (clan_num != 6 && in_room == real_room(2410))  // timewarp
-        || (clan_num != 19 && in_room == real_room(2420)) // solaris
-        || (clan_num != 10 && in_room == real_room(2430)) // black_axe #2
-        || (clan_num != 2 && in_room == real_room(2440))  // dark_tide
-        || (clan_num != 16 && in_room == real_room(2450)) // tel'mithrim
-        || (clan_num != 12 && in_room == real_room(2460)) // legion_of_ruin
-        || (clan_num != 7 && in_room == real_room(2470))  // the_resistance
-        || (clan_num != 15 && in_room == real_room(2480)) // sng
-        || (clan_num != 11 && in_room == real_room(2500)) // triad
+    if ((clan_num != 14 && in_room == 2300)    // moor
+        || (clan_num != 4 && in_room == 2310)  // darkened
+        || (clan_num != 18 && in_room == 2320) // anarchist
+        || (clan_num != 1 && in_room == 2330)  // uln'hyrr
+        || (clan_num != 10 && in_room == 2340) // black_axe
+        || (clan_num != 9 && in_room == 2350)  // nazgul
+        || (clan_num != 3 && in_room == 2360)  // arcana
+        || (clan_num != 17 && in_room == 2370) // the_horde
+        || (clan_num != 13 && in_room == 2380) // slackers
+        || (clan_num != 20 && in_room == 2390) // sindicate
+        || (clan_num != 8 && in_room == 2400)  // merc
+        || (clan_num != 6 && in_room == 2410)  // timewarp
+        || (clan_num != 19 && in_room == 2420) // solaris
+        || (clan_num != 10 && in_room == 2430) // black_axe #2
+        || (clan_num != 2 && in_room == 2440)  // dark_tide
+        || (clan_num != 16 && in_room == 2450) // tel'mithrim
+        || (clan_num != 12 && in_room == 2460) // legion_of_ruin
+        || (clan_num != 7 && in_room == 2470)  // the_resistance
+        || (clan_num != 15 && in_room == 2480) // sng
+        || (clan_num != 11 && in_room == 2500) // triad
     )
     {
       act_to_room("$n is turned away from the clan hall.", ch, 0, 0, 0);
@@ -1904,7 +1904,7 @@ qint32 fido(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr
   if (IS_AFFECTED(ch, AFF_CHARM))
     return ReturnValue::eFAILURE;
 
-  for (i = dc_->world[ch->in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[ch->in_room]->contents_; i; i = i->next_content)
   {
     if (GET_ITEM_TYPE(i) == ITEM_CONTAINER && i->flags_.value[3])
     {
@@ -1938,7 +1938,7 @@ qint32 janitor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg,
   if (IS_AFFECTED(ch, AFF_CHARM))
     return ReturnValue::eFAILURE;
 
-  for (i = dc_->world[ch->in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[ch->in_room]->contents_; i; i = i->next_content)
   {
     if (isSet(i->flags_.wear_flags, TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
@@ -2178,7 +2178,7 @@ qint32 apiary_worker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
  *  Special procedures for shops                                      *
  *********************************************************************/
 
-qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
+ReturnValues pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
 {
   QString buf, pet_name;
   qint32 pet_room;
@@ -2189,7 +2189,7 @@ qint32 pet_shops(CharacterPtr ch, cmd_t cmd, QString arg)
   if (cmd == cmd_t::LIST)
   { /* List */
     ch->sendln(u"Available pets are:"_s);
-    for (pet = dc_->world[pet_room]->people_; pet; pet = pet->next_in_room)
+    for (pet = ch->dc_->world[pet_room]->people_; pet; pet = pet->next_in_room)
     {
       dc_sprintf(buf, "%8ld - %s\r\n", 3 * pet->exp, qPrintable(pet->short_description()));
       ch->send(buf);
@@ -2265,22 +2265,22 @@ qint32 newbie_zone_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QStrin
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  if ((ch->getLevel() > 10                                      /* mud school */
-       && ch->in_room == real_room(257) && cmd == cmd_t::NORTH) /* north */
+  if ((ch->getLevel() > 10                           /* mud school */
+       && ch->in_room == 257 && cmd == cmd_t::NORTH) /* north */
       ||
-      (ch->getLevel() > 20                                      /* newbie caves */
-       && ch->in_room == real_room(6400) && cmd == cmd_t::DOWN) /* down */
+      (ch->getLevel() > 20                           /* newbie caves */
+       && ch->in_room == 6400 && cmd == cmd_t::DOWN) /* down */
   )
 
   {
-    if (ch->in_room == real_room(257)) /* mud school */
+    if (ch->in_room == 257) /* mud school */
     {
       act("The guard refuses $n entrance to this sacred school.",
           ch, 0, 0, TO_ROOM, 0);
       ch->sendln(u"The guard refuses you entrance to the school."_s);
       return ReturnValue::eSUCCESS;
     }
-    else if (ch->in_room == real_room(6400)) /* newbie caves */
+    else if (ch->in_room == 6400) /* newbie caves */
     {
       act("The guard stops $n from entering the caves.",
           ch, 0, 0, TO_ROOM, 0);
@@ -2513,7 +2513,7 @@ qint32 generic_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString ar
     return ReturnValue::eFAILURE;
 
   /* lathander's zone */
-  if ((ch->in_room == real_room(20700) && cmd == cmd_t::EAST))
+  if ((ch->in_room == 20700 && cmd == cmd_t::EAST))
   {
     act("A statue magically holds $n back.",
         ch, 0, 0, TO_ROOM, 0);
@@ -2535,7 +2535,7 @@ qint32 portal_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const QString arg
     return ReturnValue::eFAILURE;
 
   /* lathander's zone */
-  if ((ch->in_room == real_room(20720) && !str_cmp(buf, "door")))
+  if ((ch->in_room == 20720 && !str_cmp(buf, "door")))
   {
     act("Dense vegetation blocks $n's path through the door.",
         ch, 0, 0, TO_ROOM, 0);

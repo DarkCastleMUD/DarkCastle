@@ -11,46 +11,6 @@
 
 #include "DC/DC.h"
 
-auto Character::do_arena(QStringList arguments, cmd_t cmd) -> ReturnValue
-{
-  auto rufus = get_mob_room_vis(this, "rufus arena-keeper");
-  if (!isImmortalPlayer() && !rufus)
-  {
-    sendln(u"You must be in the same room as Rufus the Arena-keeper to use this command."_s);
-    return ReturnValue::eFAILURE;
-  }
-
-  QString arg1 = arguments.value(0);
-  if (arg1.isEmpty())
-  {
-    return do_arena_usage(arguments);
-  }
-  arguments.pop_front();
-
-  if (arg1 == "info")
-  {
-    return do_arena_info(arguments);
-  }
-  else if (arg1 == "start")
-  {
-    return do_arena_start(arguments);
-  }
-  else if (arg1 == "join")
-  {
-    return do_arena_join(arguments);
-  }
-  else if (arg1 == "cancel")
-  {
-    return do_arena_cancel(arguments);
-  }
-  else
-  {
-    return do_arena_usage(arguments);
-  }
-
-  return ReturnValue::eSUCCESS;
-}
-
 ReturnValues do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd)
 {
   QString buf;
@@ -74,7 +34,7 @@ ReturnValues do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd)
     ch->sendln(u"They don't allow criminals in the arena."_s);
     return ReturnValue::eFAILURE;
   }
-  if (ch->dc_->arena_.isChaos() && !ch->clan)
+  if (ch->dc_->arena_.isChaos() && !ch->clan_id_)
   {
     ch->sendln(u"Only clan members may join this arena."_s);
     return ReturnValue::eFAILURE;
@@ -109,7 +69,6 @@ ReturnValues do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd)
   ch->dc_->arena_.IncrementCurrentNumber();
   for (auto &af : ch->affected)
   {
-    next_af = af->next;
     if (af->type != PLAYER_CANTQUIT)
       affect_remove(ch, af, SUPPRESS_ALL);
   }
@@ -127,11 +86,11 @@ ReturnValues do_joinarena(CharacterPtr ch, QString arg, cmd_t cmd)
   {
     if (ch->dc_->arena_.isPotato())
     { // potato arena
-      send_to = real_room(ch->dc_->number(pot_low, pot_hi));
+      send_to = ch->dc_->number(pot_low, pot_hi);
     }
     else
     {
-      send_to = real_room(ch->dc_->number(Arena::ARENA_LOW, Arena::ARENA_HIGH - 1));
+      send_to = ch->dc_->number(Arena::ARENA_LOW, Arena::ARENA_HIGH - 1);
     }
   }
   if (move_char(ch, send_to) == 0)

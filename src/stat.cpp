@@ -41,12 +41,12 @@ void AreaData::SortAreaData(CharacterPtr ch, SortState state)
   case SORT_XP:
     std::sort(lAreaStats.begin(), lAreaStats.end(), CompareAreaXPStats);
     for (const auto &lit : lAreaStats)
-      ch->sendln(u"%1)%1 $5%2$R xps"_s.arg(++i).arg(dc_->zones.value(lit.area).name()).arg(lit.xps));
+      ch->sendln(u"%1)%1 $5%2$R xps"_s.arg(++i).arg(dc_->zones_.value(lit.area).name()).arg(lit.xps));
     break;
   case SORT_GOLD:
     std::sort(lAreaStats.begin(), lAreaStats.end(), CompareAreaGoldStats);
     for (const auto &lit : lAreaStats)
-      ch->sendln(u"%1)%1 $5%2$R gold"_s.arg(++i).arg(dc_->zones.value(lit.area).name()).arg(lit.gold));
+      ch->sendln(u"%1)%1 $5%2$R gold"_s.arg(++i).arg(dc_->zones_.value(lit.area).name()).arg(lit.gold));
     break;
   case SORT_MOB:
     break;
@@ -55,13 +55,13 @@ void AreaData::SortAreaData(CharacterPtr ch, SortState state)
 
 void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
 {
-  if (dc_->zones.contains(area) == false)
+  if (dc_->zones_.contains(area) == false)
   {
     ch->send(u"Area number is outside the limits\r\n"_s);
     return;
   }
 
-  ch->sendln(u"%1)%2 -- $5%3$R xps -- $5%4$R gold"_s.arg(area).arg(dc_->zones.value(area).name(), 30).arg(areaStats[area].xps, 12).arg(areaStats[area].gold, 12));
+  ch->sendln(u"%1)%2 -- $5%3$R xps -- $5%4$R gold"_s.arg(area).arg(dc_->zones_.value(area).name(), 30).arg(areaStats[area].xps, 12).arg(areaStats[area].gold, 12));
   ch->sendln(u"%1 %2"_s.arg("Mob Name", -30).arg("Killed", -5));
 
   for (auto mobs = areaStats[area].mobKills.begin(); mobs != areaStats[area].mobKills.end(); mobs++)
@@ -78,7 +78,7 @@ void AreaData::DisplaySingleArea(CharacterPtr ch, zone_t area)
 
 void AreaData::DisplayAreaData(CharacterPtr ch)
 {
-  for (auto [zone_key, zone] : dc_->zones.asKeyValueRange())
+  for (auto [zone_key, zone] : dc_->zones_.asKeyValueRange())
     if (areaStats[zone_key].xps)
       ch->sendln(u"%1)%2|$5%3$R xps|$5%4$R gold|"_.arg(zone_key).arg(zone.name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
 }

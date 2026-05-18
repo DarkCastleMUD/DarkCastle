@@ -799,7 +799,7 @@ void save_char_obj_db(CharacterPtr ch)
   if (isSet(dc_->world[in_room]->room_flags_, SAFE))
     uchar.load_room = dc_->world[in_room]->number_;
   else
-    uchar.load_room = real_room(ch->hometown);
+    uchar.load_room = ch->hometown;
 
   timeval start, finish;
 
@@ -902,7 +902,7 @@ void Character::save_char_obj(void)
     if (isSet(dc_->world[in_room]->room_flags_, SAFE))
       uchar.load_room = dc_->world[in_room]->number_;
     else
-      uchar.load_room = real_room(hometown);
+      uchar.load_room = hometown;
   }
 
   if ((fwrite(&uchar, sizeof(uchar), 1, fpsave)) &&
@@ -1530,7 +1530,7 @@ void store_to_char(char_file_u4 *st, CharacterPtr ch)
 {
   qint32 i;
 
-  ch->clan = st->clan;
+  ch->clan_id_ = st->clan_id_;
 
   GET_SEX(ch) = st->sex;
   GET_CLASS(ch) = st->c_class;
@@ -1596,14 +1596,14 @@ void store_to_char(char_file_u4 *st, CharacterPtr ch)
 
   // it's ok assigning the in_room directly since do_on_login_stuff() will
   // make the actual call to "char_to_room" using this data later
-  ch->in_room = real_room(st->load_room);
+  ch->in_room = st->load_room;
 
   if (ch->in_room == INVALID_ROOM)
   {
     if (ch->isImmortalPlayer())
-      ch->in_room = real_room(17);
+      ch->in_room = 17;
     else
-      ch->in_room = real_room(START_ROOM);
+      ch->in_room = START_ROOM;
   }
 }
 
@@ -1674,7 +1674,7 @@ void Character::char_to_store(char_file_u4 *st, Time &tmpage)
   st->hpmetas = GET_HP_METAS(this);
   st->manametas = GET_MANA_METAS(this);
   st->movemetas = GET_MOVE_METAS(this);
-  st->clan = clan;
+  st->clan_id_ = clan;
 
   // make sure rest of unused are set to 0
   for (x = {}; x < 3; x++)

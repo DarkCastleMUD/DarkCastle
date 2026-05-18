@@ -40,6 +40,8 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 */
 #include "DC/DC.h"
+#include <qdebug.h>
+#include <qiodevicebase.h>
 
 /*
 Function to populate the board_db with all of the current clan info
@@ -557,7 +559,7 @@ qint32 board(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPt
       return ReturnValue::eSUCCESS;
     }
     if (
-        ((obj->name() == u"board uruk"_s) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
+        ((obj->name() == u"board uruk"_s) && ch->clan_id_ != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
       ch->sendln(u"You can't erase posts from this board."_s);
       return ReturnValue::eSUCCESS;
@@ -578,7 +580,7 @@ and we can copy the QString to the board
 */
 void new_edit_board_unlock_board(CharacterPtr ch, qint32 abort)
 {
-  ReservationPtr reserve = wait_for_write[ch];
+  ReservationPtr reserve = ch->dc_->wait_for_write[ch];
   message new_msg;
 
   new_msg.text = reserve->buf;
@@ -599,7 +601,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 
   if (board->type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
-    if (ch->clan != board->owner)
+    if (ch->clan_id_ != board->owner)
     {
       ch->sendln(u"You aren't in the right clan bucko."_s);
       return;
@@ -662,7 +664,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
 
   reserve->buf = {};
   reserve->board = board;
-  wait_for_write[ch] = reserve;
+  ch->dc_->wait_for_write[ch] = reserve;
   ch->conn_->connected = Connection::states::WRITE_BOARD;
   ch->conn_->strnew = &reserve->buf;
 }
@@ -674,19 +676,19 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
 
   one_argument(arg, number);
 
-  if (number.isEmpty() || !isdigit(*number))
+  if (number.isEmpty() || !number[0].isDigit())
     return ReturnValue::eFAILURE;
 
   if (!(tmessage = dc_atoi(number)))
     return ReturnValue::eFAILURE;
 
-  if (board->second.msgs.isEmpty())
+  if (board.value().msgs.isEmpty())
   {
     ch->sendln(u"The board is empty!"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  if (tmessage == 0 || tmessage >= board->second.msgs.size())
+  if (tmessage == 0 || tmessage >= board.value().msgs.size())
   {
     ch->sendln(u"That message exists only in your imagination.."_s);
     return ReturnValue::eSUCCESS;
@@ -695,25 +697,25 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   ind = tmessage;
 
   // if clan board
-  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
+  if (board.value().type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
-    if (ch->clan != board->second.owner)
+    if (ch->clan_id_ != board.value().owner)
     {
       ch->sendln(u"You aren't in the right clan bucko."_s);
       return ReturnValue::eSUCCESS;
     }
-    if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(qPrintable(ch->name())))
+    if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board.value().msgs[ind].author.compare(qPrintable(ch->name())))
     {
       ch->sendln(u"You don't have the right!  Talk to your clan leader."_s);
       return ReturnValue::eSUCCESS;
     }
   }
-  else if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
+  else if (board.value().type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board.value().owner)
   {
     ch->sendln(u"You do not understand the writings written on this board."_s);
     return ReturnValue::eSUCCESS;
   }
-  else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(qPrintable(ch->name()))) && ch->getLevel() < OVERSEER)
+  else if ((ch->getLevel() < board.value().min_remove_level && board.value().msgs[ind].author.compare(qPrintable(ch->name()))) && ch->getLevel() < OVERSEER)
   {
     send_to_char("You try and grab one of the notes of the board but "
                  "get a nasty\r\nshock. Maybe you'd better leave it "
@@ -722,7 +724,7 @@ qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
     return ReturnValue::eSUCCESS;
   }
 
-  board->second.msgs.erase(board->second.msgs.begin() + ind);
+  board.value().msgs.erase(board.value().msgs.begin() + ind);
 
   ch->sendln(u"Message erased."_s);
   dc_sprintf(buf, "$n just erased message %d.", tmessage);
@@ -754,40 +756,30 @@ QString remove_slashr(QString unformatted)
 void board_save_board(QMap<QString, BOARD_INFO>::iterator board)
 {
 
-  QTextStream the_file;
   QString write_me;
   quint32 ind;
 
-  the_file = fopen(board->second.save_file.c_str(), "w");
+  QFile file(board.value().save_file);
 
-  if (!the_file)
+  if (!file.open(QIODeviceBase::Text | QIODeviceBase::WriteOnly))
   {
-    dc_->logentry(u"Unable to open/create save file for bulletin board"_s, ANGEL,
-                  DC::LogChannel::LOG_BUG);
+    logbug(u"Unable to open/create save file for bulletin board"_s);
     return;
   }
-
-  dc_fprintf(the_file, " %zu ", board->second.msgs.size());
-  for (ind = {}; ind < board->second.msgs.size(); ind++)
+  QTextStream stream(&file);
+  stream << board.value().msgs.size();
+  for (ind = {}; ind < board.value().msgs.size(); ind++)
   {
-    write_me = remove_slashr(board->second.msgs[ind].title);
-    fwrite_string(write_me.c_str(), the_file);
-
-    write_me = remove_slashr(board->second.msgs[ind].author);
-    fwrite_string(write_me.c_str(), the_file);
-
-    write_me = remove_slashr(board->second.msgs[ind].date);
-    fwrite_string(write_me.c_str(), the_file);
-
-    write_me = remove_slashr(board->second.msgs[ind].text);
-    fwrite_string(write_me.c_str(), the_file);
+    stream << remove_slashr(board.value().msgs[ind].title) << "~\n";
+    stream << remove_slashr(board.value().msgs[ind].author) << "~\n";
+    stream << remove_slashr(board.value().msgs[ind].date) << "~\n";
+    stream << remove_slashr(board.value().msgs[ind].text) << "~\n";
   }
 }
 
 void board_load_board()
 {
 
-  QTextStream the_file;
   qint32 ind;
   message curr_msg;
   qint32 number;
@@ -796,41 +788,41 @@ void board_load_board()
 
   for (map_it = board_db.begin(); map_it != board_db.end(); map_it++)
   {
-    map_it->second.lock = {};
-    map_it->second.locked_for = {};
+    map_it.value().lock = {};
+    map_it.value().locked_for = {};
 
-    the_file = fopen((*map_it).second.save_file.c_str(), "r");
-    if (!the_file)
+    auto file = QFile((*map_it).save_file);
+    if (!file.open(QIODeviceBase::Text | QIODeviceBase::ReadOnly))
       continue;
+    QTextStream stream(&file);
 
-    fscanf(the_file, " %d ", &number);
-    if (number < 0 || feof(the_file))
+    stream >> number;
+    if (number < 0 || stream.atEnd())
     {
-
       continue;
     }
 
     for (ind = {}; ind < number; ind++)
     {
 
-      curr_msg.title = fread_string(the_file, 27);
+      curr_msg.title = fread_string(stream);
       curr_msg.title = check_returns(curr_msg.title);
 
-      curr_msg.author = fread_string(the_file, 27);
+      curr_msg.author = fread_string(stream);
       curr_msg.author = check_returns(curr_msg.author);
 
-      curr_msg.date = fread_string(the_file, 27);
+      curr_msg.date = fread_string(stream);
       curr_msg.date = check_returns(curr_msg.date);
 
-      curr_msg.text = fread_string(the_file, 27);
+      curr_msg.text = fread_string(stream);
       curr_msg.text = check_returns(curr_msg.text);
 
-      map_it->second.msgs.push_back(curr_msg);
+      map_it.value().msgs.push_back(curr_msg);
     }
   }
 }
 
-ReturnValue board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
+ReturnValues board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
   QString buf, number;
   QString board_msg;
@@ -854,7 +846,7 @@ ReturnValue board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_
     }
   }
 
-  if (number.isEmpty() || !isdigit(*number))
+  if (number.isEmpty() || !number[0].isDigit())
   {
     ch->sendln(u"Read what?"_s);
     return ReturnValue::eFAILURE;
@@ -862,9 +854,9 @@ ReturnValue board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_
   if (!(tmessage = dc_atoi(number)))
     return ReturnValue::eFAILURE;
 
-  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
+  if (board.value().type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
-    if (ch->clan != board->second.owner)
+    if (ch->clan_id_ != board.value().owner)
     {
       ch->sendln(u"You aren't in the right clan bucko."_s);
       return ReturnValue::eSUCCESS;
@@ -875,13 +867,13 @@ ReturnValue board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_
       return ReturnValue::eSUCCESS;
     }
   }
-  if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
+  if (board.value().type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board.value().owner)
   {
     ch->sendln(u"You do not understand the writings written on this board."_s);
     return ReturnValue::eSUCCESS;
   }
 
-  if ((ch->getLevel() < board->second.min_read_level))
+  if ((ch->getLevel() < board.value().min_read_level))
   {
     send_to_char("You try and look at the messages on the board but"
                  " you\r\ncannot comprehend their meaning.\r\n\r\n",
@@ -891,13 +883,13 @@ ReturnValue board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_
     return ReturnValue::eSUCCESS;
   }
 
-  if (board->second.msgs.isEmpty())
+  if (board.value().msgs.isEmpty())
   {
     ch->sendln(u"The board is empty!"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  if (tmessage == 0 || tmessage >= board->second.msgs.size())
+  if (tmessage == 0 || tmessage >= board.value().msgs.size())
   {
     ch->sendln(u"That message doesn't exist, moron."_s);
     return ReturnValue::eSUCCESS;
@@ -906,24 +898,24 @@ ReturnValue board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_
   if (!ch->isNonPlayer())
     ch->player->last_mess_read = tmessage;
 
-  dc_sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
+  dc_sprintf(buf, "$n reads message %d titled: %s", tmessage, board.value().msgs[tmessage].title.c_str());
   act_to_room(buf, ch, 0, 0, INVIS_NULL);
 
   if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
   {
     dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
-                tmessage, board->second.msgs[tmessage].date.c_str(),
-                board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+                tmessage, board.value().msgs[tmessage].date.c_str(),
+                board.value().msgs[tmessage].author.c_str(), board.value().msgs[tmessage].title.c_str());
     board_msg += buf;
   }
   else
   {
-    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(),
-                board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board.value().msgs[tmessage].date.c_str(),
+                board.value().msgs[tmessage].author.c_str(), board.value().msgs[tmessage].title.c_str());
     board_msg += buf;
   }
 
-  dc_snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
+  dc_snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board.value().msgs[tmessage].text.c_str());
   board_msg += buf;
 
   page_string(ch->conn_, board_msg.c_str(), 1);
@@ -935,9 +927,9 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   qint32 i;
   QString board_msg;
   QString buf;
-  if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
+  if (board.value().type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
-    if (ch->clan != board->second.owner)
+    if (ch->clan_id_ != board.value().owner)
     {
       ch->sendln(u"You aren't in the right clan bucko."_s);
       return ReturnValue::eSUCCESS;
@@ -948,13 +940,13 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
       return ReturnValue::eSUCCESS;
     }
   }
-  if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
+  if (board.value().type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board.value().owner)
   {
     ch->sendln(u"You do not understand the writings written on this board."_s);
     return ReturnValue::eSUCCESS;
   }
 
-  if ((ch->getLevel() < board->second.min_read_level))
+  if ((ch->getLevel() < board.value().min_read_level))
   {
     send_to_char("You try and look at the messages on the board "
                  "but you\r\ncannot comprehend their meaning.\r\n",
@@ -967,17 +959,17 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
   act_to_room("$n studies the board.", ch, 0, 0, INVIS_NULL);
 
   ch->sendln(u"This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>"_s);
-  if (board->second.msgs.isEmpty())
+  if (board.value().msgs.isEmpty())
     ch->sendln(u"The board is empty."_s);
   else
   {
-    ch->send(u"There are %d messages on the board.\r\n"_s.arg(board->second.msgs.size()));
+    ch->send(u"There are %d messages on the board.\r\n"_s.arg(board.value().msgs.size()));
     ;
 
-    ch->send(u"Board Topic:\r\n%s------------\r\n"_s.arg(board->second.msgs[0].text.c_str()));
+    ch->send(u"Board Topic:\r\n%s------------\r\n"_s.arg(board.value().msgs[0].text.c_str()));
     QList<message>::reverse_iterator msg_it;
-    i = board->second.msgs.size() - 1;
-    for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
+    i = board.value().msgs.size() - 1;
+    for (msg_it = board.value().msgs.rbegin(); (i > 0) && (msg_it < board.value().msgs.rend()); ++msg_it)
       if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
       {
         dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",

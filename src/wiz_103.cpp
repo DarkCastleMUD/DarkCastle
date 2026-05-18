@@ -132,7 +132,7 @@ ReturnValues do_boot(CharacterPtr ch, QString arg, cmd_t cmd)
                    "                             \"~~~~~##################~~~\"\r\n",
                    victim);
     }
-    move_char(victim, real_room(START_ROOM));
+    move_char(victim, START_ROOM);
     do_quit(victim, "", cmd_t::SAVE_SILENTLY);
   }
 

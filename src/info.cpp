@@ -419,7 +419,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, qint32 mode)
           buffer.append("$B$7(Guide)$B$3 ");
 
         buffer.append(qPrintable(i->shortdesc_or_name()));
-        if ((i->getLevel() < OVERSEER) && i->clan && (clan = get_clan(i)))
+        if ((i->getLevel() < OVERSEER) && i->clan_id_ && (clan = get_clan(i)))
         {
           if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
           {
@@ -1513,7 +1513,7 @@ ReturnValues do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
         if (!found)
         {
-          for (tmp_object = dc_->world[ch->in_room].contents;
+          for (tmp_object = dc_->world[ch->in_room]->contents_;
                tmp_object && !found;
                tmp_object = tmp_object->next_content)
           {
@@ -1577,7 +1577,7 @@ ReturnValues do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
         if (*arg2)
         {
           if ((tmp_object = get_obj_in_list_vis(ch, arg2,
-                                                dc_->world[ch->in_room].contents)))
+                                                dc_->world[ch->in_room]->contents_)))
           {
             if (tmp_object->isPortal())
             {
@@ -1587,7 +1587,7 @@ ReturnValues do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
                 ch->send(tmpbuf);
                 return ReturnValue::eFAILURE;
               }
-              if ((ch->in_room = real_room(tmp_object->getPortalDestinationRoom())) == INVALID_ROOM)
+              if ((ch->in_room = tmp_object->getPortalDestinationRoom()) == INVALID_ROOM)
                 ch->in_room = original_loc;
               else
                 found = true;
@@ -1644,7 +1644,7 @@ ReturnValues do_look(CharacterPtr ch, const QString argument, cmd_t cmd)
 
       ansi_color(BLUE, ch);
       ansi_color(BOLD, ch);
-      ch->list_obj_to_char(dc_->world[ch->in_room].contents, 0, false);
+      ch->list_obj_to_char(dc_->world[ch->in_room]->contents_, 0, false);
       ch->list_char_to_char(dc_->world[ch->in_room]->people_, 0);
 
       dc_strcpy(buffer, "");
@@ -4064,7 +4064,7 @@ ReturnValues Character::do_search(QStringList arguments, cmd_t cmd)
     old_count = obj_results.size();
 
     // search room
-    for (auto obj = dc_->world[in_room].contents; obj; obj = obj->next_content)
+    for (auto obj = dc_->world[in_room]->contents_; obj; obj = obj->next_content)
     {
       if (CAN_SEE_OBJ(this, obj))
       {

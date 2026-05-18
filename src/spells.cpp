@@ -1790,7 +1790,7 @@ ReturnValues do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (tmp_obj = dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from casting!"_s);
@@ -2186,7 +2186,7 @@ ReturnValues do_cast(CharacterPtr ch, QString argument, cmd_t cmd)
 
           if (!target_ok && isSet(spell_info[spl].targets(), TAR_OBJ_ROOM))
           {
-            tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room].contents);
+            tar_obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room]->contents_);
             if (tar_obj != nullptr)
               target_ok = true;
           }

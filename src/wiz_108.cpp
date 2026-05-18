@@ -4,8 +4,6 @@
 **********************/
 #include "DC/DC.h"
 
-qint32 get_number(QString *name);
-
 ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   //  try
@@ -13,7 +11,7 @@ ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
   QString buf;
   QString output = "";
   RoomDirectionPtr curExits;
-  qint32 curZone = dc_->world[(ch)->in_room]->zone;
+  qint32 curZone = ch->dc_->world[(ch)->in_room]->zone;
   qint32 curRoom = ch->in_room;
   ObjectPtr portal;
   qint32 i, dir;
@@ -26,44 +24,44 @@ ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(u"Searching Zone: %1 - %2\r\n"_s.arg(curZone).arg(dc_->zones.value(dc_->world[curRoom].zone).Name()));
+  ch->send(u"Searching Zone: %1 - %2\r\n"_s.arg(curZone).arg(ch->dc_->zones_.value(ch->dc_->world[curRoom].zone).Name()));
   for (low = curRoom; low > 0; low--)
   {
-    if (!dc_->rooms.contains(low - 1))
+    if (!ch->dc_->rooms.contains(low - 1))
       continue;
     last_good = low;
-    if (dc_->world[low - 1].zone != curZone)
+    if (ch->dc_->world[low - 1].zone != curZone)
       break;
   }
   low = last_good;
   last_good = curRoom;
-  for (high = curRoom; high < dc_->top_of_world; high++)
+  for (high = curRoom; high < ch->dc_->top_of_world; high++)
   {
-    if (!dc_->rooms.contains(high + 1))
+    if (!ch->dc_->rooms.contains(high + 1))
       continue;
     last_good = high;
-    if (dc_->world[high + 1].zone != curZone)
+    if (ch->dc_->world[high + 1].zone != curZone)
       break;
   }
   high = last_good;
 
   for (i = low; i < high; i++)
   {
-    if (!dc_->rooms.contains(i))
+    if (!ch->dc_->rooms.contains(i))
       continue;
     for (dir = {}; dir < 6; dir++)
     {
-      if ((curExits = dc_->world[i].dir_option[dir]) != 0)
+      if ((curExits = ch->dc_->world[i].dir_option[dir]) != 0)
       {
-        if (curExits->to_room > 0 && dc_->world[curExits->to_room].zone != curZone)
+        if (curExits->to_room > 0 && ch->dc_->world[curExits->to_room].zone != curZone)
         {
-          dc_sprintf(buf, "Room %5d - %5s to Room %5d, zone %3lu (%s)\r\n", i, dirs[dir], curExits->to_room, dc_->world[curExits->to_room].zone, dc_->zones.value(dc_->world[curExits->to_room].zone).NameC());
+          dc_sprintf(buf, "Room %5d - %5s to Room %5d, zone %3lu (%s)\r\n", i, dirs[dir], curExits->to_room, ch->dc_->world[curExits->to_room].zone, ch->dc_->zones_.value(ch->dc_->world[curExits->to_room].zone).NameC());
 
           output += buf;
         }
       }
     }
-    for (portal = dc_->world[i].contents; portal; portal = portal->next_content)
+    for (portal = ch->dc_->world[i].contents; portal; portal = portal->next_content)
     {
       if (portal->flags_.type_flag == ITEM_CLIMBABLE)
       {
@@ -74,16 +72,16 @@ ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 
           output += buf;
         }
-        else if (!dc_->rooms.contains(portal->flags_.value[0]))
+        else if (!ch->dc_->rooms.contains(portal->flags_.value[0]))
         {
           dc_sprintf(buf, "Room %5d - climb to Room %5lu (DOES NOT EXIST)\r\n",
                      i, real_room(portal->flags_.value[0]));
 
           output += buf;
         }
-        else if (dc_->world[real_room(portal->flags_.value[0])].zone != curZone)
+        else if (ch->dc_->world[real_room(portal->flags_.value[0])].zone != curZone)
         {
-          dc_sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->flags_.value[0]), dc_->world[real_room(portal->flags_.value[0])].zone, dc_->zones.value(dc_->world[real_room(portal->flags_.value[0])].zone).NameC());
+          dc_sprintf(buf, "Room %5d - climb to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->flags_.value[0]), ch->dc_->world[real_room(portal->flags_.value[0])].zone, ch->dc_->zones_.value(dc_->world[real_room(portal->flags_.value[0])].zone).NameC());
 
           output += buf;
         }
@@ -91,15 +89,15 @@ ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
 
       if (portal->isPortal() && !portal->hasPortalFlagNoEnter() && (portal->isPortalTypePermanent() || portal->isPortalTypeTemp()))
       {
-        if (real_room(portal->getPortalDestinationRoom()) == INVALID_ROOM)
+        if (portal->getPortalDestinationRoom() == INVALID_ROOM)
         {
-          dc_sprintf(buf, "Room %5d - enter to Room %5lu (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
+          dc_sprintf(buf, "Room %5d - enter to Room %5lu (ERROR)\r\n", i, portal->getPortalDestinationRoom());
 
           output += buf;
         }
-        else if (dc_->world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
+        else if (dc_->world[portal->getPortalDestinationRoom()].zone != curZone)
         {
-          dc_sprintf(buf, "Room %5d - enter to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), dc_->world[real_room(portal->getPortalDestinationRoom())].zone, dc_->zones.value(dc_->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
+          dc_sprintf(buf, "Room %5d - enter to Room %5lu, zone %3lu (%s)\r\n", i, portal->getPortalDestinationRoom(), dc_->world[portal->getPortalDestinationRoom()].zone, dc_->zones_.value(dc_->world[portal->getPortalDestinationRoom()].zone).NameC());
 
           output += buf;
         }
@@ -112,9 +110,9 @@ ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         if ((portal->flags_.value[0] == dc_->world[i]->number_) || (portal->flags_.value[2] == dc_->world[i].zone))
         {
-          if (dc_->world[real_room(portal->in_room)].zone != curZone)
+          if (dc_->world[portal->in_room].zone != curZone)
           {
-            dc_sprintf(buf, "Room %5d - leave to Room %5lu, zone %3lu (%s)\r\n", i, real_room(portal->in_room), dc_->world[real_room(portal->in_room)].zone, dc_->zones.value(dc_->world[real_room(portal->in_room)].zone).NameC());
+            dc_sprintf(buf, "Room %5d - leave to Room %5lu, zone %3lu (%s)\r\n", i, portal->in_room, dc_->world[portal->in_room].zone, dc_->zones_.value(dc_->world[portal->in_room].zone).NameC());
 
             output += buf;
           }
@@ -361,7 +359,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"Sex must be 'm','f' or 'n'."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set sex of victim */
     switch (*buf)
     {
@@ -392,7 +390,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
                    ch);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set class of victim */
     switch (*buf)
     {
@@ -452,16 +450,16 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"That level is higher than you!"_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set level of victim */
     vict->setLevel(value);
-    dc_->update_wizlist(vict);
+    ch->dc_->update_wizlist(vict);
   }
   break;
   case 4: /* height */
   {
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set height of victim */
     vict->height = value;
   }
@@ -469,7 +467,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 5: /* weight */
   {
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set weight of victim */
     vict->weight = value;
   }
@@ -483,7 +481,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original strength of victim */
     vict->raw_str = value;
   }
@@ -502,7 +500,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original INT of victim */
     vict->raw_intel = value;
     redo_mana(vict);
@@ -518,7 +516,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original WIS of victim */
     vict->raw_wis = value;
   }
@@ -532,7 +530,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original DEX of victim */
     vict->raw_dex = value;
   }
@@ -546,7 +544,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 26."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original CON of victim */
     vict->raw_con = value;
     redo_hitpoints(vict);
@@ -555,7 +553,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 12: /* gold */
   {
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original gold of victim */
     vict->setGold(value);
   }
@@ -566,14 +564,14 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     val = atoll(buf);
     qint64 before_exp = vict->exp;
     vict->exp = val;
-    dc_->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
-              qPrintable(ch->name()), qPrintable(vict->name()), before_exp, vict->exp);
+    ch->dc_->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s sets %s's exp from %ld to %ld.",
+                  qPrintable(ch->name()), qPrintable(vict->name()), before_exp, vict->exp);
   }
   break;
   case 14: /* mana */
   {
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original mana of victim */
     vict->raw_mana = value;
     redo_mana(vict);
@@ -582,7 +580,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 15: /* hit */
   {
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original hit of victim */
     vict->raw_hit = value;
     redo_hitpoints(vict);
@@ -591,7 +589,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 16: /* move */
   {
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original move of victim */
     vict->raw_move = value;
   }
@@ -604,7 +602,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     value = dc_atoi(buf);
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original sessions of victim */
     vict->player->practices = value;
   }
@@ -618,7 +616,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 1000."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original alignment of victim */
     vict->alignment = value;
   }
@@ -632,7 +630,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 101."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original thirst of victim */
     vict->conditions[THIRST] = value;
   }
@@ -646,7 +644,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 101."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original drunk of victim */
     vict->conditions[DRUNK] = value;
   }
@@ -660,7 +658,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"and less than 101."_s);
       return ReturnValue::eFAILURE;
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
     /* set original full of victim */
     vict->conditions[FULL] = value;
   }
@@ -683,13 +681,13 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
         break;
       }
     }
-    dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, IMPLEMENTER, DC::LogChannel::LOG_GOD);
   }
   break;
   case 23: /* bank */
   {
     GET_BANK(vict) = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 24: /* platinum */
@@ -698,21 +696,21 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       quint32 before_plat = GET_PLATINUM(vict);
       GET_PLATINUM(vict) = dc_atoi(buf);
-      dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
-                qPrintable(ch->name()), qPrintable(vict->name()), before_plat, GET_PLATINUM(vict));
+      ch->dc_->logf(IMPLEMENTER, DC::LogChannel::LOG_GOD, "%s sets %s's platinum from %u to %u.",
+                    qPrintable(ch->name()), qPrintable(vict->name()), before_plat, GET_PLATINUM(vict));
     }
   }
   break;
   case 25: /* ki */
   {
     vict->raw_ki = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 26: /* clan number */
   {
-    vict->clan = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
+    vict->clan_id_ = dc_atoi(buf);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_BUG);
   }
   break;
   case 27: // saves
@@ -747,25 +745,25 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
   case 28:
   {
     GET_HP_METAS(vict) = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 29:
   {
     GET_MANA_METAS(vict) = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 30:
   {
     GET_MOVE_METAS(vict) = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 31:
   {
     vict->armor = dc_atoi(buf);
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   case 32:
@@ -789,7 +787,7 @@ ReturnValues do_set(CharacterPtr ch, QString argument, cmd_t cmd)
     }
 
     vict->player->profession = value;
-    dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(buf2, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
   break;
   }

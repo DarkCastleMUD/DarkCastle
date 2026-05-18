@@ -45,7 +45,7 @@ void DC::mobile_activity(void)
   qint32 done;
   qint32 tmp_race, tmp_bitv;
   ReturnValues retval;
-  extern qint32 mprog_cur_result;
+  extern ReturnValues mprog_cur_result;
 
   /* Examine all mobs. */
   const auto &character_list = dc_->character_list;
@@ -117,7 +117,7 @@ void DC::mobile_activity(void)
     // Only activate mprog random triggers if someone is in the zone
     try
     {
-      if (dc_->zones.value(dc_->world[ch->in_room]->zone).players)
+      if (dc_->zones_.value(dc_->world[ch->in_room]->zone).players)
       {
         retval = mprog_random_trigger(ch);
         if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
@@ -170,7 +170,7 @@ void DC::mobile_activity(void)
     // TODO - this really should be cleaned up and put into functions look at it and you'll
     //    see what I mean.
 
-    if (dc_->world[ch->in_room].contents &&
+    if (dc_->world[ch->in_room]->contents_ &&
         ISSET(ch->mobdata->actflags, ACT_SCAVENGER) &&
         !IS_AFFECTED(ch, AFF_CHARM) &&
         dc_->number(0, 2) == 0)
@@ -185,11 +185,11 @@ void DC::mobile_activity(void)
     // into the above SCAVENGER if statement, and streamline them both to be more effecient
 
     // Scavenge
-    if (ISSET(ch->mobdata->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && dc_->world[ch->in_room].contents && dc_->number(0, 4) == 0)
+    if (ISSET(ch->mobdata->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && dc_->world[ch->in_room]->contents_ && dc_->number(0, 4) == 0)
     {
       max = 1;
       best_obj = {};
-      for (obj = dc_->world[ch->in_room].contents; obj; obj = obj->next_content)
+      for (obj = dc_->world[ch->in_room]->contents_; obj; obj = obj->next_content)
       {
         if (CAN_GET_OBJ(ch, obj) && obj->flags_.cost > max)
         {
@@ -228,7 +228,7 @@ void DC::mobile_activity(void)
           if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
             ch->mobdata->last_direction = -1;
           else if (!is_r_denied(ch, EXIT(ch, door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
-                                                                 !dc_->zones.value(dc_->world[EXIT(ch, door)->to_room].zone).isTown()))
+                                                                 !dc_->zones_.value(dc_->world[EXIT(ch, door)->to_room].zone).isTown()))
           {
             ch->mobdata->last_direction = door;
             auto cmd_dir = getCommandFromDirection(door);
@@ -655,7 +655,7 @@ void scavenge(CharacterPtr ch)
   done = {};
   if (IS_AFFECTED(ch, AFF_CHARM))
     return;
-  for (obj = dc_->world[ch->in_room].contents; obj; obj = obj->next_content)
+  for (obj = dc_->world[ch->in_room]->contents_; obj; obj = obj->next_content)
   {
     if (!CAN_GET_OBJ(ch, obj))
       continue;

@@ -902,7 +902,7 @@ ReturnValue Character::special(QString arguments, cmd_t cmd)
   }
 
   /* special in object present? */
-  for (i = dc_->world[in_room].contents; i; i = i->next_content)
+  for (i = dc_->world[in_room]->contents_; i; i = i->next_content)
     if (i->item_number >= 0)
       if (dc_->obj_index_[i->item_number].non_combat_func)
       {

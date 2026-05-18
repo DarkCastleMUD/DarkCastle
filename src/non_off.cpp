@@ -60,7 +60,7 @@ ReturnValues do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
   /* Ok, lets see if it's a corpse on the ground then */
   if (obj == nullptr)
   {
-    obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room].contents);
+    obj = get_obj_in_list_vis(ch, name, dc_->world[ch->in_room]->contents_);
     if (obj == nullptr || GET_ITEM_TYPE(obj) != ITEM_CONTAINER || !isexact("corpse", obj->name()) || isexact("pc", obj->name()))
     {
       act_to_character("You don't seem to be holding that object.", ch, 0, 0, 0);
@@ -104,7 +104,7 @@ ReturnValues do_sacrifice(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   /* don't let people sac stuff in donations */
-  if (ch->in_room == real_room(3099))
+  if (ch->in_room == 3099)
   {
     ch->sendln(u"Not in the donation room."_s);
     return (ReturnValue::eFAILURE);
@@ -212,7 +212,7 @@ ReturnValues do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
         act_to_room("$n yields $p.", ch, obj, 0, 0);
         act_to_character("You yield $p.", ch, obj, 0, 0);
 
-        location = real_room(CFLAG_HOME);
+        location = CFLAG_HOME;
         origin = ch->in_room;
         move_char(ch, location);
 
@@ -290,7 +290,7 @@ ReturnValues do_donate(CharacterPtr ch, QString argument, cmd_t cmd)
                 dc_->obj_index_[loop_obj->item_number]->vnum());
   }
 
-  location = real_room(room);
+  location = room;
   origin = ch->in_room;
   move_char(ch, location, false);
 

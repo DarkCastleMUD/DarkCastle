@@ -79,7 +79,7 @@ void reset_time(void);
 void clear_char(CharacterPtr ch);
 
 // MOBprogram locals
-qint32 mprog_name_to_type(QString name);
+ReturnValues mprog_name_to_type(QString name);
 
 extern bool MOBtrigger;
 
@@ -219,25 +219,6 @@ bool operator==(const Room &r1, const Room &r2)
 TracksPtr Room::TrackItem(qint32 nIndex)
 {
   return tracks_.value(nIndex);
-}
-
-void Character::add_to_bard_list(void)
-{
-  if (GET_CLASS(this) != CLASS_BARD)
-    return;
-
-  dc_->bard_list_.push_back(this);
-}
-
-void Character::remove_from_bard_list(void)
-{
-  if (dc_->bard_list_.isEmpty())
-    return;
-
-  if (dc_->bard_list_.contains(this))
-  {
-    dc_->bard_list_.remove(dc_->bard_list_.indexOf(this)))
-  }
 }
 
 const QStringList funnybootmessages =
@@ -934,7 +915,7 @@ MobileIndexPtr DC::generate_mob_indices(qint32 *top, MobileIndexPtr index)
           vnum_t vnum = {};
           sscanf(buf, "#%ld", &vnum);
           index[i]->vnum(vnum);
-          index[i].qty = {};
+          index[i]->qty = {};
           index[i].non_combat_func = {};
           index[i].combat_func = {};
           index[i]->programs_ = {};
@@ -1234,7 +1215,7 @@ ObjectIndexPtr DC::generate_obj_indices(qint32 *top, ObjectIndexPtr index)
           vnum_t vnum = {};
           sscanf(buf, "#%ld", &vnum);
           index[i]->vnum(vnum);
-          index[i].qty = {};
+          index[i]->qty = {};
           index[i].non_combat_func = {};
           index[i].combat_func = {};
           index[i]->progtypes_ = {};
@@ -2724,7 +2705,8 @@ void write_mobile(LegacyFile &lf, CharacterPtr mob)
 
   if (mob_index_[mob->mobdata->nr]->programs_)
   {
-    write_mprog_recur(stream, mob_index_[mob->mobdata->nr]->programs_, true);
+    // TODO
+    // write_mprog_recur(stream, mob_index_[mob->mobdata->nr]->programs_, true);
     dc_fprintf(stream, "|\n");
   }
 
@@ -3123,7 +3105,7 @@ CharacterPtr DC::clone_mobile(qint32 nr)
 
   auto &character_list = character_list;
   character_list.insert(mob);
-  mob_index_[nr].qty++;
+  mob_index_[nr]->qty++;
   mob->next_in_room = {};
 
   handle_automatic_mob_settings(mob);
@@ -3207,12 +3189,12 @@ auto DC::create_blank_item(qint32 nr) -> std::expected<qint32, create_error>
   obj->item_number = cur_index;
   obj->ex_description = {};
   // shift > items right
-  memmove(&obj_index_[cur_index + 1], &obj_index_[cur_index], ((top_of_objt - cur_index + 1) * sizeof(ObjectIndex)));
+  // memmove(&obj_index_[cur_index + 1], &obj_index_[cur_index], ((top_of_objt - cur_index + 1) * sizeof(ObjectIndex)));
   top_of_objt++;
 
   // insert
   obj_index_[cur_index]->vnum(nr);
-  obj_index_[cur_index].qty = {};
+  obj_index_[cur_index]->qty = {};
   obj_index_[cur_index].non_combat_func = {};
   obj_index_[cur_index].combat_func = {};
   obj_index_[cur_index]->item = obj;
@@ -3312,12 +3294,12 @@ qint32 DC::create_blank_mobile(qint32 nr)
   mob->misc = {};
 
   // shift > items right
-  memmove(&mob_index_[cur_index + 1], &mob_index_[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(MobileIndex)));
+  // memmove(&mob_index_[cur_index + 1], &mob_index_[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(MobileIndex)));
   top_of_mobt++;
 
   // insert
   mob_index_[cur_index]->vnum(nr);
-  mob_index_[cur_index].qty = {};
+  mob_index_[cur_index]->qty = {};
   if (mob_non_combat_functions.contains(nr))
   {
     mob_index_[cur_index].non_combat_func = mob_non_combat_functions[nr];
@@ -3582,7 +3564,8 @@ void write_object(LegacyFile &lf, ObjectPtr obj)
 
   if (obj_index_[obj->item_number]->programs_)
   {
-    write_mprog_recur(stream, obj_index_[obj->item_number]->programs_, false);
+    // TODO
+    // write_mprog_recur(stream, obj_index_[obj->item_number]->programs_, false);
     dc_fprintf(stream, "|\n");
   }
 
@@ -3776,7 +3759,7 @@ ObjectPtr clone_object(qint32 nr)
   obj->next_content = {};
   obj->next = object_list;
   object_list = obj;
-  obj_index_[nr].qty++;
+  obj_index_[nr]->qty++;
   obj->save_expiration = {};
   obj->no_sell_expiration = {};
 
@@ -4097,7 +4080,7 @@ void Zone::reset(ResetType reset_type)
         break;
 
       case 'O': /* Load object on the ground */
-        if (cmd[reset_cmd_index]->arg2 == -1 || obj_index_[cmd[reset_cmd_index]->arg1].qty < cmd[reset_cmd_index]->arg2)
+        if (cmd[reset_cmd_index]->arg2 == -1 || obj_index_[cmd[reset_cmd_index]->arg1]->qty < cmd[reset_cmd_index]->arg2)
         {
           if (cmd[reset_cmd_index]->arg3 >= 0)
           {
@@ -4138,7 +4121,7 @@ void Zone::reset(ResetType reset_type)
 
       case 'P': /* object to object */
 
-        if (cmd[reset_cmd_index]->arg2 == -1 || obj_index_[cmd[reset_cmd_index]->arg1].qty < cmd[reset_cmd_index]->arg2)
+        if (cmd[reset_cmd_index]->arg2 == -1 || obj_index_[cmd[reset_cmd_index]->arg1]->qty < cmd[reset_cmd_index]->arg2)
         {
           obj_to = {};
           obj = {};
@@ -4174,13 +4157,13 @@ void Zone::reset(ResetType reset_type)
         // Never load the same totem as long as it exists in the world
         if (reinterpret_cast<ObjectPtr>(obj_index_[cmd[reset_cmd_index]->arg1]->item)->isTotem() &&
             cmd[reset_cmd_index]->arg2 != -1 &&
-            obj_index_[cmd[reset_cmd_index]->arg1].qty >= cmd[reset_cmd_index]->arg2)
+            obj_index_[cmd[reset_cmd_index]->arg1]->qty >= cmd[reset_cmd_index]->arg2)
         {
           last_cmd = {};
           last_obj = {};
           break;
         }
-        if ((cmd[reset_cmd_index]->arg2 == -1 || obj_index_[cmd[reset_cmd_index]->arg1].qty < cmd[reset_cmd_index]->arg2 || number(0, 1)) && (obj = clone_object(cmd[reset_cmd_index]->arg1)))
+        if ((cmd[reset_cmd_index]->arg2 == -1 || obj_index_[cmd[reset_cmd_index]->arg1]->qty < cmd[reset_cmd_index]->arg2 || number(0, 1)) && (obj = clone_object(cmd[reset_cmd_index]->arg1)))
         {
           obj_to_char(obj, mob);
           last_cmd = 1;
@@ -4229,7 +4212,7 @@ void Zone::reset(ResetType reset_type)
         // Never load the same totem as long as it exists in the world
         if (reinterpret_cast<ObjectPtr>(obj_index_[cmd[reset_cmd_index]->arg1]->item)->isTotem() &&
             cmd[reset_cmd_index]->arg2 != -1 &&
-            obj_index_[cmd[reset_cmd_index]->arg1].qty >= cmd[reset_cmd_index]->arg2)
+            obj_index_[cmd[reset_cmd_index]->arg1]->qty >= cmd[reset_cmd_index]->arg2)
         {
           last_cmd = {};
           last_obj = {};
@@ -4726,13 +4709,13 @@ void init_char(CharacterPtr ch)
 {
   ch->title = u"is still a virgin."_s;
 
-  ch->clan = {};
+  ch->clan_id_ = {};
 
   ch->short_description({});
   ch->long_description({});
   ch->description({});
 
-  ch->hometown = real_room(START_ROOM);
+  ch->hometown = START_ROOM;
 
   GET_STR(ch) = GET_RAW_STR(ch);
   GET_INT(ch) = GET_RAW_INT(ch);
@@ -4817,22 +4800,6 @@ void init_char(CharacterPtr ch)
     GET_COND(ch, i) = 50; // 50 ticks of "full-ness"
 
   reset_char(ch);
-}
-
-/* returns the real number of the room with given virt number */
-room_t real_room(room_t virt)
-{
-  if (virt < 0 || virt > top_of_world)
-  {
-    return INVALID_ROOM;
-  }
-
-  if (rooms.contains(virt))
-  {
-    return virt;
-  }
-
-  return INVALID_ROOM;
 }
 
 /* returns the real number of the monster with given virt number */
@@ -5317,8 +5284,8 @@ bool verify_item(ObjectPtr obj)
   return true;
 }
 
-LegacyFile::LegacyFile(QString directory, QString filename, QString error_message)
-    : directory_(directory), filename_(filename), error_message_(error_message), file_handle_(nullptr)
+LegacyFile::LegacyFile(DCPtr dc, QString directory, QString filename, QString error_message)
+    : dc_(dc), QObject(dc), directory_(directory), filename_(filename), error_message_(error_message), file_handle_(nullptr)
 {
   if (directory_.isEmpty())
   {
@@ -5372,12 +5339,12 @@ bool LegacyFile::backupFile(void)
     {
       if (!QFile::remove(backupFileName))
       {
-        logentry(u"Unable to remove '%1'."_s.arg(backupFileName));
+        dc_->logentry(u"Unable to remove '%1'."_s.arg(backupFileName));
       }
     }
     if (!QFile::copy(originalfileName, backupFileName))
     {
-      logentry(u"Unable to copy '%1' to '%2'."_s.arg(originalfileName).arg(backupFileName));
+      dc_->logentry(u"Unable to copy '%1' to '%2'."_s.arg(originalfileName).arg(backupFileName));
     }
     else
     {

@@ -341,7 +341,7 @@ void DC::load_corpses(void)
           if (debug == 1)
             dc_sprintf(buf3, "GOLD FOUND: %d total", t[1]);
           money = create_money(t[1]);
-          obj_to_room(money, real_room(frozen_start_room));
+          obj_to_room(money, frozen_start_room);
           continue;
         }
         if (debug == 1)
@@ -354,7 +354,7 @@ void DC::load_corpses(void)
         if (IS_OBJ_STAT(temp, ITEM_PC_CORPSE))
         {
           /* scan our temp room for objects */
-          for (obj = dc_->world[real_room(frozen_start_room)].contents; obj; obj = next_obj)
+          for (obj = dc_->world[frozen_start_room]->contents_; obj; obj = next_obj)
           {
             next_obj = obj->next_content;
             if (obj)
@@ -374,7 +374,7 @@ void DC::load_corpses(void)
             {
               logmisc(u"  -Moving corpse [%1] to [%2]"_s.arg(temp->name()).arg(GET_OBJ_VROOM(temp)));
             }
-            obj_to_room(temp, real_room(GET_OBJ_VROOM(temp)));
+            obj_to_room(temp, GET_OBJ_VROOM(temp));
           }
         }
         else
@@ -384,7 +384,7 @@ void DC::load_corpses(void)
           {
             logmisc(u"  -Moving corpse [%1] to holding room."_s.arg(temp->name()));
           }
-          obj_to_room(temp, real_room(frozen_start_room));
+          obj_to_room(temp, frozen_start_room);
         }
       }
     }

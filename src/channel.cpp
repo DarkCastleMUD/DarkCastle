@@ -23,15 +23,15 @@ ReturnValues do_say(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
+  if (isSet(ch->ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -92,15 +92,15 @@ ReturnValues do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
+  if (isSet(ch->ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
   ObjectPtr tmp_obj = {};
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (tmp_obj && tmp_obj->item_number >= 0 && dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (tmp_obj && tmp_obj->item_number >= 0 && ch->ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -188,7 +188,7 @@ ReturnValues do_pray(CharacterPtr ch, QString arg, cmd_t cmd)
 
   dc_sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", qPrintable(ch->name()), arg);
 
-  for (auto &conn : dc_->connections_)
+  for (auto &conn : ch->ch->dc_->connections_)
   {
     if ((conn->character == nullptr) || (conn->character->getLevel() <= MORTAL))
       continue;
@@ -211,14 +211,14 @@ ReturnValues do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
+  if (isSet(ch->ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -294,13 +294,13 @@ ReturnValues do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
       }
     }
 
-    for (auto &i : dc_->connections_)
+    for (auto &i : ch->ch->dc_->connections_)
     {
       if (conn->character != ch && !conn->connected && (isSet(conn->character->misc, DC::LogChannel::CHANNEL_GOSSIP)) && !is_ignoring(conn->character, ch))
       {
-        for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+        for (tmp_obj = ch->ch->dc_->world[conn->character->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
         {
-          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+          if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
@@ -317,117 +317,21 @@ ReturnValues do_gossip(CharacterPtr ch, const QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValues Character::do_auction(QStringList arguments, cmd_t cmd)
-{
-  ConnectionPtr i = {};
-  ObjectPtr tmp_obj = {};
-  bool silence = false;
-
-  if (isSet(dc_->world[in_room]->room_flags_, QUIET))
-  {
-    send(u"SHHHHHH!! Can't you see people are trying to read?\r\n"_s);
-    return ReturnValue::eSUCCESS;
-  }
-
-  for (tmp_obj = dc_->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
-    {
-      send(u"The magical silence prevents you from speaking!\r\n"_s);
-      return ReturnValue::eFAILURE;
-    }
-
-  if (isNonPlayer() && master)
-  {
-    do_say(this, "That's okay, I'll let you do all the auctioning, master.");
-    return ReturnValue::eSUCCESS;
-  }
-
-  if (isPlayer())
-  {
-    if (!isNonPlayer() && isSet(player->punish, PUNISH_SILENCED))
-    {
-      send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\r\n",
-                   this);
-      return ReturnValue::eSUCCESS;
-    }
-    if (!(isSet(misc, DC::LogChannel::CHANNEL_AUCTION)))
-    {
-      sendln(u"You told yourself not to AUCTION!!"_s);
-      return ReturnValue::eSUCCESS;
-    }
-    if (level_ < 3)
-    {
-      sendln(u"You must be at least 3rd level to auction."_s);
-      return ReturnValue::eSUCCESS;
-    }
-  }
-
-  if (arguments.isEmpty())
-  {
-    QQueue<QString> tmp = auction_history;
-    sendln(u"Here are the last 10 auctions:"_s);
-    while (!tmp.isEmpty())
-    {
-      act_to_victim(tmp.front(), this, 0, this, 0);
-      tmp.pop();
-    }
-  }
-  else
-  {
-    decrementMove(5);
-
-    QString buf1;
-    if (isNonPlayer())
-    {
-      buf1 = u"$6$B%1 auctions '%2'$R"_s.arg(qPrintable(shortdesc_or_name())).arg(arguments.join(' '));
-    }
-    else
-    {
-      buf1 = u"$6$B%1 auctions '%2'$R"_s.arg(qPrintable(name())).arg(arguments.join(' '));
-    }
-
-    QString buf2 = u"$6$BYou auction '%1'$R"_s.arg(arguments.join(' '));
-    act_to_character(buf2, this, 0, 0, 0);
-
-    auction_history.push(buf1);
-    if (auction_history.size() > 10)
-      auction_history.pop();
-
-    for (auto &i : dc_->connections_)
-      if (conn->character != this && !conn->connected &&
-          (isSet(conn->character->misc, DC::LogChannel::CHANNEL_AUCTION)) &&
-          !is_ignoring(conn->character, this))
-      {
-        for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
-          {
-            silence = true;
-            break;
-          }
-        if (!silence)
-          act_to_victim(buf1, this, 0, conn->character, 0);
-      }
-  }
-  return ReturnValue::eSUCCESS;
-}
-
 ReturnValues do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
 {
   QString buf1;
   QString buf2;
   ConnectionPtr i;
-  ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
+  if (isSet(ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (const auto &tmp_obj : ch->dc_->world[ch->in_room]->contents_)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -470,14 +374,14 @@ ReturnValues do_shout(CharacterPtr ch, const QString argument, cmd_t cmd)
     dc_sprintf(buf2, "$BYou shout '%s'$R", argument);
     act_to_character(buf2, ch, 0, 0, 0);
 
-    for (auto &i : dc_->connections_)
+    for (auto &i : ch->dc_->connections_)
       if (conn->character != ch && !conn->connected &&
-          (dc_->world[conn->character->in_room]->zone == dc_->world[ch->in_room]->zone) &&
+          (ch->dc_->world[conn->character->in_room]->zone == ch->dc_->world[ch->in_room]->zone) &&
           (conn->character->isNonPlayer() || isSet(conn->character->misc, DC::LogChannel::CHANNEL_SHOUT)) &&
           !is_ignoring(conn->character, ch))
       {
-        for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+        for (tmp_obj = ch->dc_->world[conn->character->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+          if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
@@ -497,14 +401,14 @@ ReturnValues do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
+  if (isSet(ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -573,13 +477,13 @@ ReturnValues do_trivia(CharacterPtr ch, QString argument, cmd_t cmd)
   if (trivia_history.size() > 10)
     trivia_history.pop();
 
-  for (auto &i : dc_->connections_)
+  for (auto &i : ch->dc_->connections_)
     if (conn->character != ch && !conn->connected &&
         (isSet(conn->character->misc, DC::LogChannel::CHANNEL_TRIVIA)) &&
         !is_ignoring(conn->character, ch))
     {
-      for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-        if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+      for (tmp_obj = ch->dc_->world[conn->character->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+        if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
         {
           silence = true;
           break;
@@ -651,7 +555,7 @@ ReturnValues do_dream(CharacterPtr ch, QString argument, cmd_t cmd)
     dc_sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", qPrintable(ch->shortdesc_or_name()), argument);
     dc_sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\r\n", argument);
     send_to_char(buf2, ch);
-    for (auto &i : dc_->connections_)
+    for (auto &i : ch->dc_->connections_)
     {
       if ((conn->character != ch) &&
           (!conn->connected) &&
@@ -701,229 +605,6 @@ ReturnValues do_tellhistory(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-ReturnValues Character::do_tell(QStringList arguments, cmd_t cmd)
-{
-  CharacterPtr vict = {};
-  QString name = {}, message = {}, buf = {}, log_buf = {};
-  ObjectPtr tmp_obj = {};
-
-  if (!isNonPlayer() && isSet(player->punish, PUNISH_NOTELL))
-  {
-    sendln(u"Your message didn't get through!!"_s);
-    return ReturnValue::eSUCCESS;
-  }
-
-  for (tmp_obj = dc_->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
-    {
-      sendln(u"The magical silence prevents you from speaking!"_s);
-      return ReturnValue::eFAILURE;
-    }
-
-  if (!isNonPlayer() && !isSet(misc, DC::LogChannel::CHANNEL_TELL))
-  {
-    sendln(u"You have tell channeled off!!"_s);
-    return ReturnValue::eSUCCESS;
-  }
-
-  name = arguments.value(0);
-  if (!arguments.isEmpty())
-  {
-    arguments.pop_front();
-  }
-  message = arguments.join(' ');
-
-  if (name.isEmpty() || message.isEmpty())
-  {
-    if (player->tell_history.isEmpty())
-    {
-      sendln(u"You have not sent or recieved any tell messages."_s);
-      return ReturnValue::eSUCCESS;
-    }
-
-    if (player->tell_history.isEmpty())
-    {
-      sendln(u"There have been no tell messages."_s);
-      return ReturnValue::eSUCCESS;
-    }
-    else if (player->tell_history.count() == 1)
-    {
-      sendln(u"Here is the only tell message:"_s);
-    }
-    else
-    {
-      sendln(u"Here are the last %1 tell messages:"_s.arg(player->tell_history.count()));
-    }
-    for (const auto &c : player->tell_history)
-    {
-      sendln(c.getMessage(this));
-    }
-
-    return ReturnValue::eSUCCESS;
-  }
-
-  if (cmd == cmd_t::TELL_REPLY)
-  {
-    if (!(vict = get_active_pc(name)))
-    {
-      sendln(u"They seem to have left!"_s);
-      return ReturnValue::eSUCCESS;
-    }
-    cmd = cmd_t::DEFAULT;
-  }
-  else if (!(vict = get_active_pc_vis(name)))
-  {
-    vict = get_pc_vis(this, name);
-    if ((vict != nullptr) && vict->getLevel() >= IMMORTAL)
-    {
-      sendln(u"That person is busy right now."_s);
-      sendln(u"Your message has been saved."_s);
-
-      buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(this, vict), message.toStdString()).c_str();
-      record_msg(buf, vict);
-
-      buf = fmt::format("$2$B{} told you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
-      vict->tell_history(this, buf);
-
-      buf = fmt::format("$2$BYou told {}, '{}'$R", qPrintable(vict->shortdesc_or_name()), message.toStdString()).c_str();
-      tell_history(this, buf);
-    }
-    else
-    {
-      sendln(u"No-one by that name here."_s);
-    }
-
-    return ReturnValue::eSUCCESS;
-  }
-
-  // vict guarantted to be a PC
-  // Re: Last comment. Switched immortals crash this.
-
-  if (vict->isPlayer() && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL) && level_ <= DC::MAX_MORTAL_LEVEL)
-  {
-    sendln(u"The person is ignoring all tells right now."_s);
-    return ReturnValue::eSUCCESS;
-  }
-  else if (vict->isPlayer() && !isSet(vict->misc, DC::LogChannel::CHANNEL_TELL))
-  {
-    // Immortal sent a tell to a player with NOTELL.  Allow the tell butnotify the imm.
-    sendln(u"That player has tell channeled off btw..."_s);
-  }
-  if (this == vict)
-    sendln(u"You try to tell yourself something."_s);
-  else if ((GET_POS(vict) == position_t::SLEEPING || isSet(dc_->world[vict->in_room]->room_flags_, QUIET)) && level_ < IMMORTAL)
-    act_to_character("Sorry, $E cannot hear you.", this, 0, vict, STAYHIDE);
-  else
-  {
-    for (tmp_obj = dc_->world[vict->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-      if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
-      {
-        act_to_character("$E cannot hear you right now.", this, 0, vict, STAYHIDE);
-        return ReturnValue::eSUCCESS;
-      }
-    if (is_ignoring(vict, this))
-    {
-      send(u"%s is ignoring you right now.\r\n"_s.arg(qPrintable(vict->shortdesc_or_name())));
-      return ReturnValue::eSUCCESS;
-    }
-    if (is_busy(vict) && level_ >= OVERSEER)
-    {
-      if (vict->isNonPlayer())
-      {
-        buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
-      }
-      else
-      {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
-
-        if (isPlayer() && vict->isPlayer())
-        {
-          vict->player->last_tell = qPrintable(name());
-        }
-      }
-
-      ansi_color(GREEN, vict);
-      ansi_color(BOLD, vict);
-      send_to_char_regardless(buf, vict);
-      ansi_color(NTEXT, vict);
-
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
-
-      vict->tell_history(this, buf);
-
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      send(buf);
-    }
-    else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
-    {
-      if (vict->isNonPlayer())
-      {
-        buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
-      }
-      else
-      {
-        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
-        if (isPlayer() && vict->isPlayer())
-          vict->player->last_tell = qPrintable(name());
-      }
-      act_to_character(buf, vict, 0, 0, STAYHIDE);
-
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
-      vict->tell_history(this, buf);
-
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      act_return ar = act_to_character(buf, this, 0, 0, STAYHIDE);
-      tell_history(this, ar.str);
-
-      // Log what I told a logged player under their name
-      if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
-      {
-        dc_->logentry(u"Log %1: %2 told them: %3"_s.arg(qPrintable(vict->name())).arg(qPrintable(name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
-      }
-    }
-    else if (!is_busy(vict) && GET_POS(vict) == position_t::SLEEPING &&
-             level_ >= SERAPH)
-    {
-      vict->sendln(u"A heavenly power intrudes on your subconcious dreaming..."_s);
-      if (vict->isNonPlayer())
-      {
-        buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
-      }
-      else
-      {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
-
-        if (isPlayer() && vict->isPlayer())
-          vict->player->last_tell = qPrintable(name());
-      }
-      ansi_color(GREEN, vict);
-      ansi_color(BOLD, vict);
-      send_to_char_regardless(buf, vict);
-      ansi_color(NTEXT, vict);
-
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
-      vict->tell_history(this, buf);
-
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
-      act_return ar = act_to_character(buf, this, 0, 0, STAYHIDE);
-      tell_history(this, ar.str);
-
-      sendln(u"They were sleeping btw..."_s);
-      // Log what I told a logged player under their name
-      if (!vict->isNonPlayer() && isSet(vict->player->punish, PUNISH_LOG) && isPlayer())
-      {
-        dc_->logentry(u"Log %1: %2 told them: %3"_s.arg(qPrintable(vict->name())).arg(qPrintable(name())).arg(message), IMPLEMENTER, DC::LogChannel::LOG_PLAYER, vict);
-      }
-    }
-    else
-    {
-      buf = fmt::format("$2$B%s can't hear anything right now.$R", qPrintable(vict->shortdesc_or_name())).c_str();
-      act_to_character(buf, this, 0, 0, STAYHIDE);
-    }
-  }
-  return ReturnValue::eSUCCESS;
-}
-
 ReturnValues do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
 {
   QString buf = {};
@@ -936,8 +617,8 @@ ReturnValues do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -971,8 +652,8 @@ ReturnValues do_whisper(CharacterPtr ch, QString argument, cmd_t cmd)
   QString name, message, buf;
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1014,8 +695,8 @@ ReturnValues do_ask(CharacterPtr ch, QString argument, cmd_t cmd)
   QString name, message, buf;
 
   ObjectPtr tmp_obj;
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1081,8 +762,8 @@ ReturnValues do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1126,9 +807,9 @@ ReturnValues do_grouptell(CharacterPtr ch, QString argument, cmd_t cmd)
   {
     if (IS_AFFECTED(f->follower, AFF_GROUP) && (f->follower != ch))
     {
-      for (tmp_obj = dc_->world[f->follower->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+      for (tmp_obj = ch->dc_->world[f->follower->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
       {
-        if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+        if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
         {
           silence = true;
           break;
@@ -1155,14 +836,14 @@ ReturnValues do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
   ObjectPtr tmp_obj;
   bool silence = false;
 
-  if (isSet(dc_->world[ch->in_room]->room_flags_, QUIET))
+  if (isSet(ch->dc_->world[ch->in_room]->room_flags_, QUIET))
   {
     ch->sendln(u"SHHHHHH!! Can't you see people are trying to read?"_s);
     return ReturnValue::eSUCCESS;
   }
 
-  for (tmp_obj = dc_->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+  for (tmp_obj = ch->dc_->world[ch->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+    if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln(u"The magical silence prevents you from speaking!"_s);
       return ReturnValue::eFAILURE;
@@ -1216,13 +897,13 @@ ReturnValues do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
     if (newbie_history.size() > 10)
       newbie_history.pop();
 
-    for (auto &i : dc_->connections_)
+    for (auto &i : ch->dc_->connections_)
       if (conn->character != ch && !conn->connected &&
           !is_ignoring(conn->character, ch) &&
           (isSet(conn->character->misc, DC::LogChannel::CHANNEL_NEWBIE)))
       {
-        for (tmp_obj = dc_->world[conn->character->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-          if (dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
+        for (tmp_obj = ch->dc_->world[conn->character->in_room]->contents_; tmp_obj; tmp_obj = tmp_obj->next_content)
+          if (ch->dc_->obj_index_[tmp_obj->item_number]->vnum() == SILENCE_OBJ_NUMBER)
           {
             silence = true;
             break;
@@ -1232,38 +913,6 @@ ReturnValues do_newbie(CharacterPtr ch, QString argument, cmd_t cmd)
       }
   }
   return ReturnValue::eSUCCESS;
-}
-
-void Character::tell_history(CharacterPtr ch, QString message)
-{
-  if (!isPlayer())
-  {
-    return;
-  }
-
-  ChannelMessage cm(ch, DC::LogChannel::CHANNEL_TELL, message);
-
-  player->tell_history.enqueue(cm);
-  if (player->tell_history.size() > 1000)
-  {
-    player->tell_history.dequeue();
-  }
-}
-
-void Character::gtell_history(CharacterPtr ch, QString message)
-{
-  if (player == nullptr)
-  {
-    return;
-  }
-
-  communication c(ch, message);
-
-  player->gtell_history.push_back(c);
-  if (player->gtell_history.size() > 10)
-  {
-    player->gtell_history.pop_front();
-  }
 }
 
 communication::communication(CharacterPtr ch, QString message)

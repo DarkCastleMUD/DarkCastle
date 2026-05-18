@@ -195,8 +195,8 @@ ReturnValues Character::do_split(QStringList arguments, cmd_t cmd)
   {
     k->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(shortdesc_or_name())).arg(amount).arg(share));
     qint32 lost = {};
-    if (k->clan && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
-        (k->clan != clan || (k->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
+    if (k->clan_id_ && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
+        (k->clan_id_ != clan || (k->clan_id_ == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
     {
       lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(k)->tax / 100));
       k->send(u"Your clan taxes %L1 $B$5gold$R of your share.\r\n"_s.arg(lost));
@@ -214,8 +214,8 @@ ReturnValues Character::do_split(QStringList arguments, cmd_t cmd)
     {
       f->follower->send(u"%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n"_s.arg(qPrintable(shortdesc_or_name())).arg(amount).arg(share));
       qint32 lost = {};
-      if (f->follower->clan && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
-          (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
+      if (f->follower->clan_id_ && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
+          (f->follower->clan_id_ != clan || (f->follower->clan_id_ == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
         lost = (qint32)((qreal)share * (qreal)((qreal)get_clan(f->follower)->tax / 100));
         f->follower->send(u"Your clan taxes %L1 gold of your share.\r\n"_s.arg(lost));
@@ -230,7 +230,7 @@ ReturnValues Character::do_split(QStringList arguments, cmd_t cmd)
 
 void setup_group_buf(QString report, CharacterPtr j, CharacterPtr i)
 {
-  if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
+  if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan_id_ != j->clan_id_ || !i->clan_id_)))
   {
     if (GET_CLASS(j) == CLASS_MONK || GET_CLASS(j) == CLASS_BARD)
       dc_sprintf(report, "[-====-|      %3d%%    hp     %3d%%   k     %3d%%   mv]",

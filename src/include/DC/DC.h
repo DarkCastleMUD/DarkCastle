@@ -30,6 +30,7 @@
 
 #include <cstdlib>
 #include <expected>
+#include <qdebug.h>
 #include <qobject.h>
 #include <qtmetamacros.h>
 #include <sys/stat.h>
@@ -2560,7 +2561,8 @@ bool can_modify_room(CharacterPtr ch, qint32 room);
 bool can_modify_mobile(CharacterPtr ch, qint32 room);
 bool can_modify_object(CharacterPtr ch, qint32 room);
 
-void write_mprog_recur(auto &stream, MobileProgramPtr mprg, bool mob);
+// TODO
+// void write_mprog_recur(QTextStream &stream, MobileProgramPtr mprg, bool mob);
 qint32 load_new_help(auto &stream, qint32 reload = 0, CharacterPtr ch = {});
 
 void init_char(CharacterPtr ch);
@@ -2641,8 +2643,6 @@ quest_infoPtr get_quest_struct(QString);
 void quest_update();
 QString fname(QString namelist);
 bool isprefix(const QString str, const QString namel);
-qint32 get_number(QString *name);
-qint32 get_number(QString &name);
 qint32 get_number(QString &name);
 void warn_if_duplicate_ip(CharacterPtr ch);
 void record_msg(QString messg, CharacterPtr ch);
@@ -2654,7 +2654,7 @@ void remove_familiars(QString name, BACKUP_TYPE backup = NONE);
 
 auto &operator<<(auto &out, RoomPtr room);
 bool operator==(RoomPtr r1, RoomPtr r2);
-room_t real_room(room_t virt);
+
 bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key);
 bool isValidZoneCommandKey(CharacterPtr ch, const Zone &zone, const qsizetype zone_command_key);
 qsizetype getZoneLastCommandNumber(const Zone &zone);
@@ -2679,7 +2679,7 @@ void make_bowels(CharacterPtr ch);
 void make_blood(CharacterPtr ch);
 void make_scraps(CharacterPtr ch, ObjectPtr obj);
 void room_mobs_only_hate(CharacterPtr ch);
-qint32 attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 attack = WEAR_WIELD);
+ReturnValues attack(CharacterPtr ch, CharacterPtr vict, qint32 type, qint32 attack = WEAR_WIELD);
 void dam_message(qint32 dam, CharacterPtr ch, CharacterPtr vict, qint32 w_type, qint32 modifier);
 void group_gain(CharacterPtr ch, CharacterPtr vict);
 qint32 check_magic_block(CharacterPtr ch, CharacterPtr victim, qint32 attacktype);
@@ -2864,7 +2864,7 @@ void check_timer(void);
 #define GET_MAX_KI(ch) ((ch)->max_ki)
 #define GET_PLATINUM(ch) ((ch)->plat)
 #define GET_BANK(ch) ((ch)->player->bank)
-#define GET_CLAN(ch) ((ch)->clan)
+#define GET_CLAN(ch) ((ch)->clan_id_)
 #define GET_HEIGHT(ch) ((ch)->height)
 #define GET_WEIGHT(ch) ((ch)->weight)
 #define GET_SEX(ch) ((ch)->sex)
@@ -2944,10 +2944,10 @@ public:
   QList<message> msgs;
 };
 void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
-qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
+ReturnValues board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
+ReturnValues board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
 void board_save_board(QMap<QString, BOARD_INFO>::iterator board);
-qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
+ReturnValues board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board);
 
 class Direction
 {
@@ -3083,7 +3083,7 @@ public:
   QString login_message_{};
   QString death_message_{};
   QString logout_message_{};
-  QString clanmotd_{};
+  QString motd_{};
   quint16 tax_{};
   clan_id_t id_{};
   quint16 amt_{};
@@ -3516,7 +3516,7 @@ class Program : public QObject
   DCPtr dc_;
 
 public:
-  Program(QObject *parent) : QObject(parent), dc_(qobject_cast<class DC *>(parent)) {}
+  Program(DCPtr dc);
   [[nodiscard]] qint32 type(void) const { return type_; }
   qint32 type(qint32 type)
   {
@@ -3541,14 +3541,14 @@ public:
 class MobileProgram : public Program
 {
 public:
-  MobileProgram(QObject *parent) : Program(parent) {}
+  MobileProgram(DCPtr dc) : Program(dc) {}
   static qint32 name_to_type(QString name);
 };
 
 class ObjectProgram : public Program
 {
 public:
-  ObjectProgram(QObject *parent) : Program(parent) {}
+  ObjectProgram(DCPtr dc) : Program(dc) {}
 };
 
 class index_data
@@ -3556,29 +3556,39 @@ class index_data
 public:
   void vnum(vnum_t v) { vnum_ = v; }
   [[nodiscard]] vnum_t vnum(void) const { return vnum_; }
-  quint64 qty{};                                                                            /* number of existing units of ths mob/obj */
-  qint32 (*non_combat_func)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr){}; // non Combat special proc
-  qint32 (*combat_func)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr){};     // combat special proc
+  quint64 qty{};                                                                                  /* number of existing units of ths mob/obj */
+  ReturnValues (*non_combat_func)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr){}; // non Combat special proc
+  ReturnValues (*combat_func)(CharacterPtr, ObjectPtr, cmd_t, const QString, CharacterPtr){};     // combat special proc
   qint32 progtypes_{};
 
 private:
   vnum_t vnum_{}; /* virt number of ths mob/obj           */
 };
 
-class ObjectIndex : public index_data
+class ObjectIndex : public QObject, public index_data
 {
+  Q_OBJECT
 public:
-  ObjectPtr item{}; /* the mobile/object itself                 */
+  ObjectIndex(DCPtr dc);
+  ObjectPtr item;
   QList<ObjectProgramPtr> programs_;
   QList<ObjectProgramPtr> class_programs_;
+
+private:
+  DCPtr dc_;
 };
 
-class MobileIndex : public index_data
+class MobileIndex : public QObject, public index_data
 {
+  Q_OBJECT
 public:
-  CharacterPtr item{};
+  MobileIndex(DCPtr dc);
+  CharacterPtr item;
   QList<MobileProgramPtr> programs_;
   QList<MobileProgramPtr> class_programs_;
+
+private:
+  DCPtr dc_;
 };
 
 namespace SSH
@@ -3707,10 +3717,15 @@ auto &operator>>(auto &stream, Ban::type_t &type)
 
 class Reservation
 {
+  Q_OBJECT
 public:
+  Reservation(DCPtr dc);
   QString buf;
   message new_post;
   QMap<QString, BOARD_INFO>::iterator board;
+
+private:
+  DCPtr dc_;
 };
 
 class Bans
@@ -3813,7 +3828,7 @@ public:
   quint32 temp_room_flags{}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags_.
   qint16 light{};            // Light factor of room
 
-  qint32 (*funct)(CharacterPtr, cmd_t, const QString){}; // special procedure
+  ReturnValues (*funct)(CharacterPtr, cmd_t, const QString){}; // special procedure
 
   QList<ObjectPtr> contents_{};  // List of items in room
   QList<CharacterPtr> people_{}; // List of NPC / PC in room
@@ -5196,7 +5211,7 @@ class Leaderboard : public QObject
 {
   Q_OBJECT
 public:
-  Leaderboard(QObject *parent);
+  Leaderboard(DCPtr dc);
   virtual ~Leaderboard();
   void check(void);
   void check_offline(void);
@@ -5278,12 +5293,16 @@ public:
   auto difficulty(void) const { return difficulty_; }
 };
 
-class ExtraDescription
+class ExtraDescription : public QObject
 {
+  Q_OBJECT
 public:
+  ExtraDescription(DCPtr dc);
   QString keyword_{};         /* Keyword in look/examine          */
   QString description_{};     /* What to see                      */
   ExtraDescriptionPtr next{}; /* Next in list                     */
+private:
+  DCPtr dc_;
 };
 
 auto &operator<<(auto &out, ExtraDescriptionPtr currdesc)
@@ -5405,9 +5424,11 @@ public:
   void *vo{};
 };
 
-class Mobile
+class Mobile : public QObject
 {
+  Q_OBJECT
 public:
+  Mobile(DCPtr dc);
   qint32 nr{};
   position_t default_pos{};                // Default position for NPC
   qint8 last_direction{};                  // Last direction the mobile went in
@@ -5437,6 +5458,7 @@ public:
 
 private:
   ObjectPtr object{};
+  DCPtr dc_;
 };
 
 class Character : public QObject, public MinimumEntity, public Entity
@@ -5729,7 +5751,7 @@ public:
   qint16 song_mitigation{};  // modifies song damage
   qint16 spell_reflect{};
 
-  clan_id_t clan{}; /* Clan the character is in */
+  clan_id_t clan_id_{}; /* Clan the character is in */
 
   qint16 armor{};   // Armor class
   qint16 hitroll{}; // Any bonus or penalty to the hit roll
@@ -6157,16 +6179,16 @@ public:
   void remove_vault_access(QString name, VaultPtr vault);
   void vault_list(QString owner);
   void load_golem_data(qint32 golemtype);
-  qint32 mprog_greet_trigger(void);
-  qint32 mprog_can_see_trigger(CharacterPtr mob);
-  qint32 mprog_speech_trigger(const QString txt);
-  qint32 oprog_can_see_trigger(ObjectPtr item);
-  qint32 oprog_speech_trigger(const QString txt);
-  qint32 oprog_act_trigger(QString txt);
-  qint32 oprog_greet_trigger(void);
-  qint32 oprog_load_trigger(void);
-  qint32 oprog_weapon_trigger(ObjectPtr item);
-  qint32 oprog_armour_trigger(ObjectPtr item);
+  ReturnValues mprog_greet_trigger(void);
+  ReturnValues mprog_can_see_trigger(CharacterPtr mob);
+  ReturnValues mprog_speech_trigger(const QString txt);
+  ReturnValues oprog_can_see_trigger(ObjectPtr item);
+  ReturnValues oprog_speech_trigger(const QString txt);
+  ReturnValues oprog_act_trigger(QString txt);
+  ReturnValues oprog_greet_trigger(void);
+  ReturnValues oprog_load_trigger(void);
+  ReturnValues oprog_weapon_trigger(ObjectPtr item);
+  ReturnValues oprog_armour_trigger(ObjectPtr item);
   bool isTank(void);
   void save_char_obj(void);
 
@@ -6302,11 +6324,10 @@ public:
   // Obj proc types
   static const QStringList obj_types;
 
-  class config
+  class Config
   {
   public:
-    config(int &argc, char **argv)
-        : argc_(argc), argv_(argv) {}
+    Config(int &argc, char **argv);
     qint32 argc_{};
     char **argv_{};
     bool sql = true;
@@ -6325,7 +6346,7 @@ public:
     QString library_directory = DEFAULT_LIBRARY_PATH;
     QString leaderboard_check;
     QString implementer;
-  } cf;
+  };
 
   enum LogChannel
   {
@@ -6384,6 +6405,7 @@ public:
   static const QByteArrayList cond_colorcodes;
   static const QList<race_data> races;
 
+  Config cf;
   QMap<CharacterPtr, ReservationPtr> wait_for_write{};
   QList<class game_portal> game_portals_{};
   QList<ConnectionPtr> connections_{}; // master desc list
@@ -6687,7 +6709,7 @@ public:
       {
       case 'E':
         qDebugQTextStreamLine(stream, "Type E before first fread_string");
-        new_new_descr = new ExtraDescription;
+        new_new_descr = new ExtraDescription(this);
 
         new_new_descr->keyword_ = fread_string(stream);
 
@@ -6803,7 +6825,7 @@ public:
   void do_godlist(void);
   void write_wizlist(QString filename);
   explicit DC(qint32 &argc, char **argv);
-  explicit DC(config c);
+  explicit DC(Config c);
   void setup(void);
   DC(const DC &) = delete; // non-copyable
   DC(DC &&) = delete;      // and non-movable
@@ -6930,9 +6952,9 @@ public:
   bool has_vault_access(CharacterPtr ch, VaultPtr vault);
   void update_mprog_throws(void);
   CharacterPtr initiate_oproc(CharacterPtr ch, ObjectPtr obj);
-  qint32 oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
-  qint32 oprog_rand_trigger(ObjectPtr item);
-  qint32 oprog_arand_trigger(ObjectPtr item);
+  ReturnValues oprog_catch_trigger(ObjectPtr obj, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm);
+  ReturnValues oprog_rand_trigger(ObjectPtr item);
+  ReturnValues oprog_arand_trigger(ObjectPtr item);
   void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = {});
   void logf(qint32 level, DC::LogChannel type, QString cformat, ...);
   qint32 send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
@@ -7321,7 +7343,7 @@ class LegacyFile : public QObject
 {
   Q_OBJECT
 public:
-  LegacyFile(QString directory, QString filename, QString error_message);
+  LegacyFile(DCPtr dc, QString directory, QString filename, QString error_message);
   ~LegacyFile();
   QTextStream openFile(void);
   bool backupFile(void);
@@ -7340,6 +7362,7 @@ public:
   QString error_message_;
 
 private:
+  DCPtr dc_;
 };
 void write_one_room(LegacyFile &stream, qint32 room_number);
 void write_mobile(LegacyFile &stream, CharacterPtr mob);
@@ -7347,12 +7370,13 @@ void write_object(LegacyFile &stream, ObjectPtr obj);
 
 class LegacyFileWorld : public LegacyFile
 {
+
 public:
-  LegacyFileWorld(QString filename)
-      : LegacyFile("world", filename, "Unable to open world file '%1")
-  {
-  }
+  LegacyFileWorld(DCPtr dc, QString filename);
   ~LegacyFileWorld();
+
+private:
+  DCPtr dc_;
 };
 class Programs
 {
@@ -7360,7 +7384,7 @@ class Programs
   QList<ProgramPtr> list_;
 
 public:
-  friend qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, qint32 type, bool reverse);
+  friend ReturnValues mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, qint32 type, bool reverse);
   [[nodiscard]] bool isEmpty(void) const { return list_.isEmpty(); }
   [[nodiscard]] ProgramPtr value(qsizetype i) { return list_.value(i); }
   [[nodiscard]] qint32 types(void) const
@@ -8478,21 +8502,21 @@ qint32 contains_no_trade_item(ObjectPtr obj);
 qint32 contents_cause_unique_problem(ObjectPtr obj, CharacterPtr vict);
 bool check_make_camp(qint32);
 qint32 get_leadership_bonus(CharacterPtr);
-qint32 mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr object, void *vo, qint32 type, bool reverse = false);
+ReturnValues mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr object, void *vo, qint32 type, bool reverse = false);
 void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr object, void *vo, qint32 type);
-qint32 mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch, ObjectPtr obj, void *vo);
-qint32 mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount);
-qint32 mprog_entry_trigger(CharacterPtr mob);
-qint32 mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj);
-qint32 mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch);
-qint32 mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch);
-qint32 mprog_death_trigger(CharacterPtr mob, CharacterPtr killer);
-qint32 mprog_random_trigger(CharacterPtr mob);
-qint32 mprog_arandom_trigger(CharacterPtr mob);
-qint32 mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm);
-qint32 mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch);
-qint32 mprog_load_trigger(CharacterPtr mob);
-qint32 mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount);
+ReturnValues mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch, ObjectPtr obj, void *vo);
+ReturnValues mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount);
+ReturnValues mprog_entry_trigger(CharacterPtr mob);
+ReturnValues mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj);
+ReturnValues mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch);
+ReturnValues mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch);
+ReturnValues mprog_death_trigger(CharacterPtr mob, CharacterPtr killer);
+ReturnValues mprog_random_trigger(CharacterPtr mob);
+ReturnValues mprog_arandom_trigger(CharacterPtr mob);
+ReturnValues mprog_catch_trigger(CharacterPtr mob, qint32 catch_num, QString var, qint32 opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm);
+ReturnValues mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch);
+ReturnValues mprog_load_trigger(CharacterPtr mob);
+ReturnValues mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, qint32 amount);
 bool is_in_game(CharacterPtr ch);
 qint32 get_stat(CharacterPtr ch, attribute_t stat);
 qint32 handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, qint32 percent);
@@ -8634,7 +8658,8 @@ auto &operator<<(auto &out, MobileProgramPtr mobprogs)
 {
   if (mobprogs)
   {
-    write_mprog_recur(out, mobprogs, false);
+    // TODO
+    // write_mprog_recur(out, mobprogs, false);
     out << "|\n";
   }
   return out;
@@ -8844,7 +8869,8 @@ auto &operator<<(auto &stream, ObjectPtr obj)
 
   if (!obj->dc_->obj_index_[obj->item_number]->programs_.isEmpty())
   {
-    write_mprog_recur(stream, obj->dc_->obj_index_[obj->item_number]->programs_, false);
+    // TODO
+    // write_mprog_recur(stream, obj->dc_->obj_index_[obj->item_number]->programs_, false);
     stream << "|\n";
   }
 
@@ -9170,7 +9196,7 @@ bool CAN_GO(auto ch, auto door)
 template <class T>
 T fread_bitvector(auto &in)
 {
-  auto value = fread_uint(in);
+  auto value = fread_uint<quint64>(in);
   T flags = T::fromInt(value);
 
   return flags;
@@ -9209,7 +9235,7 @@ auto &operator>>(auto &stream, ObjectPtr obj)
 
   obj->flags_.type_flag = fread_int(stream, -1000, 2147483467);
 
-  obj->flags_.extra_flags = fread_uint(stream);
+  obj->flags_.extra_flags = fread_uint<quint32>(stream);
   obj->flags_.wear_flags = fread_bitvector<ObjectPositions>(stream);
   obj->flags_.size = fread_uint<quint16>(stream);
 
@@ -9243,7 +9269,7 @@ auto &operator>>(auto &stream, ObjectPtr obj)
       break;
     case 'E':
     {
-      auto new_new_descr = new ExtraDescription;
+      auto new_new_descr = new ExtraDescription(obj->dc_);
       new_new_descr->keyword_ = fread_string(stream);
       new_new_descr->description_ = fread_string(stream);
       new_new_descr->next = obj->ex_description;
@@ -9748,8 +9774,8 @@ constexpr auto BEACON_OBJ_NUMBER = 405;
 void update_pos(CharacterPtr victim);
 bool many_charms(CharacterPtr ch);
 bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
-
 qint32 debug_retval(CharacterPtr ch, CharacterPtr victim, ReturnValues retval);
+ReturnValues pet_shops(CharacterPtr ch, cmd_t cmd, QString arg);
 
 static const QStringList champ_death_messages =
     {
