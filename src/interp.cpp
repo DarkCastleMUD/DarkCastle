@@ -778,7 +778,7 @@ std::tuple<QString, QString> last_argument(QString arguments)
   catch (...)
   {
     dc_->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error in last_argument(%s)",
-              arguments.c_str());
+              qPrintable(arguments));
   }
 
   return std::tuple<QString, QString>(QString(), QString());

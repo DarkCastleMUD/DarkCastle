@@ -669,7 +669,7 @@ void board_write_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::it
   ch->conn_->strnew = &reserve->buf;
 }
 
-qint32 board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
+ReturnValues board_remove_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
   quint32 ind, tmessage;
   QString buf, number;
@@ -878,8 +878,7 @@ ReturnValues board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD
     send_to_char("You try and look at the messages on the board but"
                  " you\r\ncannot comprehend their meaning.\r\n\r\n",
                  ch);
-    act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
-        TO_ROOM, INVIS_NULL);
+    act_to_room("$n tries to read the board, but looks bewildered.", ch, 0, 0, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -898,31 +897,34 @@ ReturnValues board_display_msg(CharacterPtr ch, QString arg, QMap<QString, BOARD
   if (!ch->isNonPlayer())
     ch->player->last_mess_read = tmessage;
 
-  dc_sprintf(buf, "$n reads message %d titled: %s", tmessage, board.value().msgs[tmessage].title.c_str());
+  auto msg = board.value().msgs[tmessage];
+  auto author = msg.author;
+  auto date = msg.date;
+  auto text = msg.text;
+  auto title = msg.title;
+
+  dc_sprintf(buf, "$n reads message %d titled: %s", tmessage, qPrintable(board.value().msgs[tmessage].title));
   act_to_room(buf, ch, 0, 0, INVIS_NULL);
 
   if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
   {
-    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
-                tmessage, board.value().msgs[tmessage].date.c_str(),
-                board.value().msgs[tmessage].author.c_str(), board.value().msgs[tmessage].title.c_str());
+    buf = u"Message %1 (%2): $R$B%3 - %4$R"_s.arg(tmessage).arg(date).arg(author).arg(title);
     board_msg += buf;
   }
   else
   {
-    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board.value().msgs[tmessage].date.c_str(),
-                board.value().msgs[tmessage].author.c_str(), board.value().msgs[tmessage].title.c_str());
+    dc_snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, qPrintable(board.value().msgs[tmessage].date), qPrintable(board.value().msgs[tmessage].author), qPrintable(board.value().msgs[tmessage].title));
     board_msg += buf;
   }
 
-  dc_snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board.value().msgs[tmessage].text.c_str());
+  dc_snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n$3%s$R", qPrintable(board.value().msgs[tmessage].text));
   board_msg += buf;
 
-  page_string(ch->conn_, board_msg.c_str(), 1);
+  page_string(ch->conn_, board_msg, 1);
   return ReturnValue::eSUCCESS;
 }
 
-qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
+ReturnValues board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>::iterator board)
 {
   qint32 i;
   QString board_msg;
@@ -951,8 +953,7 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
     send_to_char("You try and look at the messages on the board "
                  "but you\r\ncannot comprehend their meaning.\r\n",
                  ch);
-    act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
-        TO_ROOM, INVIS_NULL);
+    act_to_room("$n tries to read the board, but looks bewildered.", ch, 0, 0, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -966,26 +967,26 @@ qint32 board_show_board(CharacterPtr ch, QString arg, QMap<QString, BOARD_INFO>:
     ch->send(u"There are %d messages on the board.\r\n"_s.arg(board.value().msgs.size()));
     ;
 
-    ch->send(u"Board Topic:\r\n%s------------\r\n"_s.arg(board.value().msgs[0].text.c_str()));
+    ch->send(u"Board Topic:\r\n%s------------\r\n"_s.arg(board.value().msgs[0].text));
     QList<message>::reverse_iterator msg_it;
     i = board.value().msgs.size() - 1;
     for (msg_it = board.value().msgs.rbegin(); (i > 0) && (msg_it < board.value().msgs.rend()); ++msg_it)
       if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
       {
-        dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
-                    msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
+        dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) $5%-14s $4%2d: $2%.47s$R\r\n",
+                    qPrintable(msg_it->date), qPrintable(msg_it->author), i--, qPrintable(msg_it->title));
         board_msg += buf;
-        //         ch->send(u"(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n"_s.arg(msg_it->date.c_str()).arg(       //                    msg_it->author.c_str(),i--).arg(msg_it->title.c_str()));
+        //         ch->send(u"(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n"_s.arg(qPrintable(msg_it->date)).arg(       //                    qPrintable(msg_it->author),i--).arg(qPrintable(msg_it->title)));
       }
       else
       {
-        dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", msg_it->date.c_str(),
-                    msg_it->author.c_str(), i--, msg_it->title.c_str());
+        dc_snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", qPrintable(msg_it->date),
+                    qPrintable(msg_it->author), i--, qPrintable(msg_it->title));
         board_msg += buf;
       }
   }
   board_save_board(board);
-  page_string(ch->conn_, board_msg.c_str(), 1);
+  page_string(ch->conn_, qPrintable(board_msg), 1);
   return ReturnValue::eSUCCESS;
 }
 

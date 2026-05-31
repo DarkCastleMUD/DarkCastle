@@ -3188,7 +3188,7 @@ void mprog_translate(CharacterPtr ch, QString t, CharacterPtr mob, CharacterPtr 
 
   auto q = mob->name();
   auto s = q.toStdString();
-  auto mob_nameC = s.c_str();
+  auto mob_nameC = qPrintable(s);
 
   switch (ch)
   {
@@ -4019,7 +4019,7 @@ ReturnValues mprog_act_trigger(QString buf, CharacterPtr mob, CharacterPtr ch,
     return mprog_cur_result;
 
   if (mob->isNonPlayer() && (dc_->mob_index_[mob->mobdata->nr]->progtypes_ & ACT_PROG) && isPaused(mob) == false)
-    mprog_wordlist_check(buf.c_str(), mob, ch, obj, vo, ACT_PROG);
+    mprog_wordlist_check(qPrintable(buf), mob, ch, obj, vo, ACT_PROG);
 
   return mprog_cur_result;
 }

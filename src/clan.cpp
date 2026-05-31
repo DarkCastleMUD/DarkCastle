@@ -2773,7 +2773,7 @@ void check_victory(takeover_pulse_data *take)
   }
 }
 
-void check_quitter(varg_t arg1, void *arg2, void *arg3)
+void check_quitter(QObject *arg1, void *arg2, void *arg3)
 {
   qint32 clan = arg1.clan;
   QString buf;

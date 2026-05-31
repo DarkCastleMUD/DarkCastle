@@ -609,7 +609,7 @@ void DC::write_wizlist(std::stringstream &filename)
 
 void DC::write_wizlist(QString filename)
 {
-  write_wizlist(filename.c_str());
+  write_wizlist(qPrintable(filename));
 }
 
 void DC::write_wizlist(const QString filename)

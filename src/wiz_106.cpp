@@ -89,8 +89,8 @@ ReturnValues Character::do_force(QStringList arguments, cmd_t cmd)
         }
         buf = fmt::format("{} just forced %s to %s.", qPrintable(name()),
                           qPrintable(vict->name()), to_force);
-        vict->command_interpreter(to_force.c_str());
-        dc_->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
+        vict->command_interpreter(qPrintable(to_force));
+        dc_->logentry(qPrintable(buf), getLevel(), DC::LogChannel::LOG_GOD);
       }
     }
   }
@@ -117,13 +117,13 @@ ReturnValues Character::do_force(QStringList arguments, cmd_t cmd)
             buf = fmt::format("$n has forced you to '{}'.", to_force);
             act_to_victim(buf, ch, 0, vict, 0);
           }
-          vict->command_interpreter(to_force.c_str());
+          vict->command_interpreter(qPrintable(to_force));
         }
       }
     }
     sendln(u"Ok."_s);
     buf = fmt::format("{} just forced all to {}.", qPrintable(name()), to_force);
-    dc_->logentry(buf.c_str(), getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(qPrintable(buf), getLevel(), DC::LogChannel::LOG_GOD);
   }
   return ReturnValue::eSUCCESS;
 }

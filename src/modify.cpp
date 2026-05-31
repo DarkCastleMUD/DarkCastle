@@ -580,7 +580,7 @@ void page_string(ConnectionPtr conn, const QString str, qint32 keep_internal)
     print_me = print_me.substr(pagebreak, QString::npos);
 
     // if they don't want things paginated
-    send_to_char(tmp.c_str(), conn->character);
+    send_to_char(qPrintable(tmp), conn->character);
   }
 }
 

@@ -830,9 +830,9 @@ void DC::nanny(ConnectionPtr conn, QString arg)
 
     // If first line of text is a proxy header then construct Proxy
     // otherwise assume it's a name.
-    if (QString(arg.c_str()).indexOf("PROXY ") == 0)
+    if (QString(qPrintable(arg)).indexOf("PROXY ") == 0)
     {
-      conn->proxy = Proxy(arg.c_str());
+      conn->proxy = Proxy(qPrintable(arg));
       return;
     }
   case Connection::states::GET_NAME:
@@ -849,7 +849,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
     for (y = 1; arg[y] != '\0'; y++)
       arg[y] = LOWER(arg[y]);
 
-    if (_parse_name(arg.c_str(), tmp_name))
+    if (_parse_name(qPrintable(arg), tmp_name))
     {
       write_to_output("Illegal name, try another.\r\nName: ", d);
       telnet_ga(d);
@@ -947,7 +947,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
       }
     }
 
-    if (QString(crypt(arg.c_str(), password)) != password)
+    if (QString(crypt(qPrintable(arg), password)) != password)
     {
       write_to_output("Wrong password.\r\n", d);
       dc_sprintf(log_buf, "%s wrong password: %s", qPrintable(ch->name()), qPrintable(conn->getPeerOriginalAddress().toString()));
@@ -1085,7 +1085,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
   case Connection::states::CONFIRM_NEW_PASSWORD:
     write_to_output("\r\n", d);
 
-    if (QString(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+    if (QString(crypt(qPrintable(arg), ch->player->pwd)) != ch->player->pwd)
     {
       write_to_output("Passwords don't match.\r\nRetype password: ", d);
       telnet_ga(d);
@@ -1819,7 +1819,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
 
   case Connection::states::CONFIRM_PASSWORD_CHANGE:
     write_to_output("\r\n", d);
-    if (QString(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
+    if (QString(crypt(qPrintable(arg), ch->player->pwd)) == ch->player->pwd)
     {
       write_to_output("Enter a new password: ", d);
       telnet_ga(d);
@@ -1852,7 +1852,7 @@ void DC::nanny(ConnectionPtr conn, QString arg)
   case Connection::states::CONFIRM_RESET_PASSWORD:
     write_to_output("\r\n", d);
 
-    if (QString(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+    if (QString(crypt(qPrintable(arg), ch->player->pwd)) != ch->player->pwd)
     {
       write_to_output("Passwords don't match.\r\nRetype password: ", d);
       telnet_ga(d);
@@ -2460,7 +2460,7 @@ void show_question_race(ConnectionPtr conn)
     ch->undo_race_saves();
   }
   buffer += "Type 1-" + std::to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
-  write_to_output(buffer.c_str(), d);
+  write_to_output(qPrintable(buffer), d);
   telnet_ga(d);
 }
 
@@ -2534,7 +2534,7 @@ void show_question_class(ConnectionPtr conn)
 
   buffer += "Type 'back' to go back and pick a different race.\r\n";
   buffer += "Type '1-" + std::to_string(CLASS_MAX_PROD) + "," + classes_buffer + "' or 'help keyword': ";
-  write_to_output(buffer.c_str(), d);
+  write_to_output(qPrintable(buffer), d);
   telnet_ga(d);
 }
 
@@ -2714,7 +2714,7 @@ void show_question_stats(ConnectionPtr conn)
   {
     buffer += "Type -, 1-5, confirm or help strength,wisdom,etc: ";
   }
-  write_to_output(buffer.c_str(), d);
+  write_to_output(qPrintable(buffer), d);
   telnet_ga(d);
 }
 

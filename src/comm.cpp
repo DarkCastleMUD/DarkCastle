@@ -718,7 +718,7 @@ void DC::game_loop(void)
           conn->prompt_mode = {};
         else if (d && conn->character && conn->character->player)
         {
-          comm = conn->character->player->perform_alias(comm.c_str()).toStdString();
+          comm = conn->character->player->perform_alias(qPrintable(comm)).toStdString();
         }
         PerfTimers["command"].start();
         // Azrack's a chode.  Don't forget to check
@@ -729,7 +729,7 @@ void DC::game_loop(void)
         }
         else
         {
-          conn->character->command_interpreter(comm.c_str()); /* send it to interpreter */
+          conn->character->command_interpreter(qPrintable(comm)); /* send it to interpreter */
         }
         PerfTimers["command"].stop();
 
@@ -1469,7 +1469,7 @@ void write_to_output(QString txt,  ConnectionPtr t)
 {
   if (!txt.isEmpty())
   {
-    write_to_output(QByteArray(txt.c_str()), t);
+    write_to_output(QByteArray(qPrintable(txt)), t);
   }
 }
 
@@ -1881,7 +1881,7 @@ qint32 process_input(ConnectionPtr t)
         {
           new_buffer += "\r\n";
         }
-        write_to_descriptor(t->descriptor, new_buffer.c_str());
+        write_to_descriptor(t->descriptor, qPrintable(new_buffer));
       }
     }
     // Keep looping until client sends us a \n or \r
@@ -2595,7 +2595,7 @@ void send_info(QString messg)
 
 void send_info(QString messg)
 {
-  send_info(messg.c_str());
+  send_info(qPrintable(messg));
 }
 
 void send_info(const QString messg)

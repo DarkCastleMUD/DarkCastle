@@ -121,7 +121,7 @@ ReturnValues do_zoneexits(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
 
-  send_to_char(output.c_str(), ch);
+  send_to_char(qPrintable(output), ch);
   // }
   // catch(QString errmsg)
   // {

@@ -708,7 +708,7 @@ QTextStream &operator>>(QTextStream &stream, RoomPtr room)
           stream.seek(-1);
         }
 
-        new_new_descr = new ExtraDescription;
+        new_new_descr = new ExtraDescription(room->dc_);
         new_new_descr->keyword_ = fread_string(stream, 0);
         new_new_descr->description_ = fread_string(stream, 0);
 
@@ -794,4 +794,127 @@ LegacyFileWorld::LegacyFileWorld(DCPtr dc, QString filename)
 Reservation ::Reservation(DCPtr dc)
     : dc_(dc), QObject(dc)
 {
+}
+
+void DC::pulse_countdown(QObject *arg1, void *arg2, void *arg3)
+{
+  CasinoRouletteWheelPtr wheel = arg1.wheel;
+  qint32 spin = (qint64)arg2;
+  QString buf;
+
+  if (wheel->countdown <= 0 && !spin)
+  {
+    wheel->spinning = true;
+    send_to_room("The croupier places the ball on the wheel and spins both objects....\r\n", wheel->obj->in_room);
+    wheel->countdown = 2;
+    roulette_timer(wheel, 1);
+  }
+  else if (!spin)
+  {
+    if (!number(0, 3))
+    {
+      dc_sprintf(buf, "$B$7The croupier says 'The wheel will be spun in about %d seconds!'$R\r\n", wheel->countdown * 2);
+      send_to_room(buf, wheel->obj->in_room);
+    }
+    wheel->countdown -= 1;
+    roulette_timer(wheel, 0);
+  }
+  else if (wheel->countdown < 0)
+  {
+    wheel_stop(wheel);
+  }
+  else
+  {
+    send_roulette_message(wheel);
+    wheel->countdown -= 1;
+    roulette_timer(wheel, 1);
+  }
+}
+
+RoomDirectionPtr EXIT(CharacterPtr ch, qsizetype door);
+{
+  return ch->dc_->world[ch->in_room]->dir_option[door];
+}
+
+Timer::Timer(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}
+
+void DC::roulette_timer(CasinoRouletteWheelPtr wheel, qint32 spin)
+{
+  if (!wheel)
+    return;
+  TimerPtr timer = new Timer(this);
+  timer->arg1.wheel = wheel;
+  timer->arg2 = (void *)(qint64)spin;
+  timer->function = &DC::pulse_countdown;
+  timer->timeleft = 4;
+  addtimer(timer);
+}
+
+void DC::free_player(CasinoPlayerPtr plr)
+{
+  CasinoPlayerPtr tmp, prev = {};
+  CasinoTablePtr tbl = plr->table;
+  for (tmp = tbl->plr; tmp; tmp = tmp->next)
+  {
+    if (tmp == plr)
+    {
+      if (prev)
+        prev->next = plr->next;
+      else
+        tbl->plr = plr->next;
+    }
+    prev = tmp;
+  }
+  if (plr->ch && charExists(plr->ch) && plr->ch->isPlayer())
+  {
+    plr->ch->save(cmd_t::SAVE_SILENTLY);
+  }
+  if (tbl->cr == plr)
+  {
+    nextturn(tbl);
+    /*	tbl->cr = tbl->cr->next;
+       if (tbl->cr)
+       pulse_table_bj(tbl);
+       else
+       reset_table(tbl);*/
+  }
+  if (!tbl->plr)
+    reset_table(tbl);
+  plr = {};
+}
+
+void DC::nextturn(CasinoTablePtr tbl)
+{
+  if (!tbl->plr)
+  {
+    reset_table(tbl);
+    return;
+  }
+
+  if (tbl->cr->next)
+  {
+    tbl->cr = tbl->cr->next;
+    pulse_table_bj(tbl);
+  }
+  else
+  {
+    tbl->cr = {};
+    add_timer_bj_dealer(tbl);
+  }
+}
+
+void DC::send_to_table(QString msg, CasinoTablePtr tbl, CasinoPlayerPtr plrSilent = {})
+{
+  //  CasinoPlayerPtr plr;
+  /*  for (plr = tbl->plr ; plr ; plr = plr->next)
+     if (verify(plr) && plrSilent != plr)
+       plr->ch->send(msg);
+    */
+  if (tbl && tbl->obj && tbl->obj->in_room)
+  {
+    send_to_room(msg, tbl->obj->in_room, true, plrSilent ? plrSilent->ch : 0);
+  }
 }

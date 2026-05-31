@@ -2909,7 +2909,7 @@ bool file_exists(QString filename)
 {
   struct stat buffer;
 
-  if (stat(filename.c_str(), &buffer) == 0)
+  if (stat(qPrintable(filename), &buffer) == 0)
   {
     return true;
   }

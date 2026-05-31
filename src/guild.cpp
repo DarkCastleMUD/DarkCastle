@@ -53,7 +53,7 @@ ReturnValues do_profession(CharacterPtr ch, QString args, cmd_t cmd)
     {
       if ((*i).c_class == GET_CLASS(ch))
       {
-        ch->send(u"%s\r\n"_s.arg((*i).Name.c_str()));
+        ch->send(u"%s\r\n"_s.arg((*i)qPrintable(.Name)));
       }
     }
 

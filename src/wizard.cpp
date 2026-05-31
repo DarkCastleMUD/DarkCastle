@@ -1350,14 +1350,14 @@ ReturnValues do_repop(CharacterPtr ch, QString arguments, cmd_t cmd)
   {
     ch->sendln(u"Performing full zone reset!"_s);
     QString buf = fmt::format("{} full repopped zone #{}.", qPrintable(ch->name()), ch->dc_->world[ch->in_room]->zone);
-    ch->dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(qPrintable(buf), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(dc_->world[ch->in_room]->zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln(u"Resetting this entire zone!"_s);
     QString buf = fmt::format("{} repopped zone #{}.", qPrintable(ch->name()), ch->dc_->world[ch->in_room]->zone);
-    ch->dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->dc_->logentry(qPrintable(buf), ch->getLevel(), DC::LogChannel::LOG_GOD);
     DC::resetZone(dc_->world[ch->in_room]->zone);
   }
 

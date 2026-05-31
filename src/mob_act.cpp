@@ -932,12 +932,12 @@ void scavenge(CharacterPtr ch)
   } /* for obj */
 }
 
-void clear_hunt(varg_t arg1, void *arg2, void *arg3)
+void clear_hunt(QObject *arg1, void *arg2, void *arg3)
 {
   clear_hunt(arg1, (CharacterPtr)arg2, nullptr);
 }
 
-void clear_hunt(varg_t arg1, CharacterPtr arg2, void *arg3)
+void clear_hunt(QObject *arg1, CharacterPtr arg2, void *arg3)
 {
   const auto &character_list = dc_->character_list;
   for (const auto &curr : character_list)

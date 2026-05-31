@@ -40,77 +40,9 @@ void switch_cards(cDeckPtr tDeck, qint32 pos1, qint32 pos2)
   tDeck->cards[pos2] = b;
 }
 
-void free_player(CasinoPlayerPtr plr)
-{
-  CasinoPlayerPtr tmp, prev = {};
-  CasinoTablePtr tbl = plr->table;
-  for (tmp = tbl->plr; tmp; tmp = tmp->next)
-  {
-    if (tmp == plr)
-    {
-      if (prev)
-        prev->next = plr->next;
-      else
-        tbl->plr = plr->next;
-    }
-    prev = tmp;
-  }
-  if (plr->ch && charExists(plr->ch) && plr->ch->isPlayer())
-  {
-    plr->ch->save(cmd_t::SAVE_SILENTLY);
-  }
-  if (tbl->cr == plr)
-  {
-    nextturn(tbl);
-    /*	tbl->cr = tbl->cr->next;
-       if (tbl->cr)
-       pulse_table_bj(tbl);
-       else
-       reset_table(tbl);*/
-  }
-  if (!tbl->plr)
-    reset_table(tbl);
-  plr = {};
-}
-
-void nextturn(CasinoTablePtr tbl)
-{
-  if (!tbl->plr)
-  {
-    reset_table(tbl);
-    return;
-  }
-
-  if (tbl->cr->next)
-  {
-    tbl->cr = tbl->cr->next;
-    pulse_table_bj(tbl);
-  }
-  else
-  {
-    tbl->cr = {};
-    add_timer_bj_dealer(tbl);
-  }
-}
-
-void DC::send_to_table(QString msg, CasinoTablePtr tbl, CasinoPlayerPtr plrSilent = {})
-{
-  //  CasinoPlayerPtr plr;
-  /*  for (plr = tbl->plr ; plr ; plr = plr->next)
-     if (verify(plr) && plrSilent != plr)
-       plr->ch->send(msg);
-    */
-  if (tbl && tbl->obj && tbl->obj->in_room)
-  {
-    send_to_room(msg, tbl->obj->in_room, true, plrSilent ? plrSilent->ch : 0);
-  }
-}
-
 bool charExists(CharacterPtr ch)
 {
-  const auto &character_list = dc_->character_list;
-
-  if (character_list.find(ch) != character_list.end())
+  if (character_list->find(ch) != character_listend())
   {
     return true;
   }
@@ -379,7 +311,7 @@ void dealcard(CasinoPlayerPtr plr)
   plr->hand_data[i] = pickCard(plr->table->deck);
 }
 
-void DC::check_active(varg_t arg1, void *arg2, void *arg3)
+void DC::check_active(QObject *arg1, void *arg2, void *arg3)
 {
   CasinoPlayerPtr plr = arg1.player;
   CasinoTablePtr tbl = (CasinoTablePtr)arg3;
@@ -444,7 +376,7 @@ void addtimer(TimerPtr add)
 void add_timer(CasinoPlayerPtr plr)
 {
   TimerPtr timer = TimerPtr(new Timer);
-  timer->arg1.player = plr;
+  timer->arg1 = plr;
   timer->arg2 = (void *)(qint64)plr->table->handnr;
   timer->arg3 = (void *)plr->table;
   timer->function = check_active;
@@ -454,7 +386,7 @@ void add_timer(CasinoPlayerPtr plr)
   addtimer(timer);
 }
 
-void bj_dealer_aiz(varg_t arg1, void *arg2, void *arg3)
+void bj_dealer_aiz(QObject *arg1, void *arg2, void *arg3)
 { // hack so I don't have to bother
   CasinoTablePtr tbl = arg1.table;
   tbl->state = 2;
@@ -485,7 +417,7 @@ void add_timer_bj_dealer2(CasinoTablePtr tbl, qint32 time = 10)
   timer->timeleft = time;
   addtimer(timer);
 }
-void bj_finish(varg_t arg1, void *arg2, void *arg3)
+void bj_finish(QObject *arg1, void *arg2, void *arg3)
 {
   CasinoTablePtr tbl = arg1.table;
   send_to_room("$B$7The dealer says 'Place your bets!'$R\r\n", tbl->obj->in_room, true);
@@ -585,7 +517,7 @@ void DC::check_winner(CasinoTablePtr tbl)
   add_new_bets(tbl);
 }
 
-void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3)
+void bj_dealer_ai(QObject *arg1, void *arg2, void *arg3)
 {
   CasinoTablePtr tbl = arg1.table;
   qint32 a = (qint64)arg2;
@@ -708,7 +640,7 @@ void DC::check_blackjacks(CasinoTablePtr tbl)
   }
 }
 
-void check_insurance2(varg_t arg1, void *arg2, void *arg3)
+void check_insurance2(QObject *arg1, void *arg2, void *arg3)
 {
   CasinoTablePtr tbl = arg1.table;
 
@@ -1894,7 +1826,7 @@ void slot_timer(CasinoSlotMachinePtr machine, qint32 stop1, qint32 stop2, qint32
   addtimer(timer);
 }
 
-void reel_spin(varg_t arg1, void *arg2, void *arg3)
+void reel_spin(QObject *arg1, void *arg2, void *arg3)
 {
   CasinoSlotMachinePtr machine = arg1.machine;
   qint32 stop1 = (qint64)arg2;
@@ -2148,21 +2080,15 @@ const QStringList roulette_display = {
     "$4$B25$R", "$0$B26$R", "$4$B27$R", "$0$B28$R", "$0$B29$R", "$4$B30$R", "$0$B31$R", "$4$B32$R",
     "$0$B33$R", "$4$B34$R", "$0$B35$R", "$4$B36$R"};
 
-class roulette_player
+CasinoRouletteWheel::CasinoRouletteWheel(DCPtr dc)
+    : dc_(dc), QObject(dc)
 {
-public:
-  CharacterPtr ch;
-  quint32 bet_array[48];
-};
+}
 
-class CasinoRouletteWheel
+roulette_player::roulette_player(DCPtr dc)
+    : dc_(dc), QObject(dc)
 {
-public:
-  ObjectPtr obj;
-  roulette_player *plr[6];
-  qint32 countdown;
-  bool spinning;
-};
+}
 
 void create_wheel(ObjectPtr obj)
 {
@@ -2384,53 +2310,6 @@ void wheel_stop(CasinoRouletteWheelPtr wheel)
   wheel->countdown = 11;
 }
 
-void pulse_countdown(varg_t arg1, void *arg2, void *arg3);
-
-void roulette_timer(CasinoRouletteWheelPtr wheel, qint32 spin)
-{
-  TimerPtr timer = TimerPtr(new Timer);
-  timer->arg1.wheel = wheel;
-  timer->arg2 = (void *)(qint64)spin;
-  timer->function = pulse_countdown;
-  timer->timeleft = 4;
-  addtimer(timer);
-}
-
-void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
-{
-  CasinoRouletteWheelPtr wheel = arg1.wheel;
-  qint32 spin = (qint64)arg2;
-  QString buf;
-
-  if (wheel->countdown <= 0 && !spin)
-  {
-    wheel->spinning = true;
-    send_to_room("The croupier places the ball on the wheel and spins both objects....\r\n", wheel->obj->in_room);
-    wheel->countdown = 2;
-    roulette_timer(wheel, 1);
-  }
-  else if (!spin)
-  {
-    if (!number(0, 3))
-    {
-      dc_sprintf(buf, "$B$7The croupier says 'The wheel will be spun in about %d seconds!'$R\r\n", wheel->countdown * 2);
-      send_to_room(buf, wheel->obj->in_room);
-    }
-    wheel->countdown -= 1;
-    roulette_timer(wheel, 0);
-  }
-  else if (wheel->countdown < 0)
-  {
-    wheel_stop(wheel);
-  }
-  else
-  {
-    send_roulette_message(wheel);
-    wheel->countdown -= 1;
-    roulette_timer(wheel, 1);
-  }
-}
-
 qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, CharacterPtr invoker)
 {
   QString arg1, arg2, buf;
@@ -2493,7 +2372,7 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 
   if (cmd == cmd_t::BET) // bet
   {
-    if (arg.isEmpty() 2)
+    if (arg.isEmpty())
     {
       ch->sendln(u"Syntax: Bet <keyword>/<range (1-12)>/<number>  <amount>"_s);
       return ReturnValue::eSUCCESS;
@@ -2806,15 +2685,14 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
         else
         {
           ch->send(u"You add %u to your bet on %s.  The total bet is now %u coins.\r\n"_s.arg(bet).arg(roulette_display[number]).arg(obj->wheel->plr[i]->bet_array[number + 11] + bet));
-          dc_sprintf(buf, "$n adds to $s bet on %s for a total of %u coins.",
-                     roulette_display[number], obj->wheel->plr[i]->bet_array[number + 11] + bet);
+          buf = u"$n adds to $s bet on %1 for a total of %2 coins."_s.arg(roulette_display[number]).arg(obj->wheel->plr[i]->bet_array[number + 11] + bet);
           act_to_room(buf, ch, 0, 0, 0);
         }
       }
       else
       {
         ch->send(u"You have placed a bet of %u on %s.\r\n"_s.arg(bet).arg(roulette_display[number]));
-        dc_sprintf(buf, "$n places a bet of %u on %s.", bet, roulette_display[number]);
+        buf = u"$n places a bet of %1 on %2."_s.arg(bet).arg(roulette_display[number]);
         act_to_room(buf, ch, 0, 0, 0);
       }
       obj->wheel->plr[i]->bet_array[number + 11] += bet;
@@ -2838,3 +2716,8 @@ qint32 roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, Ch
 }
 
 /* End Roulette */
+
+CasinoTable::CasinoTable(DCPtr dc)
+    : dc_(dc), QObject(dc)
+{
+}

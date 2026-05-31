@@ -4183,7 +4183,7 @@ ObjectPtr Character::getVisibleObject(QString name)
 
 CharacterPtr get_pc_vis(CharacterPtr ch, QString name)
 {
-  return get_pc_vis(ch, name.c_str());
+  return get_pc_vis(ch, qPrintable(name));
 }
 
 CharacterPtr get_pc_vis(CharacterPtr ch, QString name)
@@ -4320,7 +4320,7 @@ ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, boo
 ObjectPtr get_obj_vis(CharacterPtr ch, QString name, bool loc)
 {
   /*search the entire world for an object, and return a pointer  */
-  return get_obj_vis(ch, name.c_str(), loc);
+  return get_obj_vis(ch, qPrintable(name), loc);
 }
 
 /*search the entire world for an object, and return a pointer  */

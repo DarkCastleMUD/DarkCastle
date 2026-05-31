@@ -1227,10 +1227,10 @@ qint32 ki_transfer(quint8 level, CharacterPtr ch, QString arg, CharacterPtr vict
 
     QString buffer;
     buffer = fmt::format("You focus intently, bonding briefly with $N's spirit, transferring {} ki of your essence into {} mana for $M.", amount, temp);
-    act_to_character(buffer.c_str(), ch, 0, victim, 0);
+    act_to_character(qPrintable(buffer), ch, 0, victim, 0);
 
     buffer = fmt::format("$n focuses intently, bonding briefly with your spirit, replenishing {} mana with a portion of $s essence.", temp);
-    act_to_victim(buffer.c_str(), ch, 0, victim, 0);
+    act_to_victim(qPrintable(buffer), ch, 0, victim, 0);
 
     act_to_room("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, NOTVICT);
   }

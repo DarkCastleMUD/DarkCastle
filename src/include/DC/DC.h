@@ -1,6 +1,6 @@
 #pragma once
 /*
- * Copyright 2017-2023 Jared H. Hudson
+ * Copyright 2017-2026 Jared H. Hudson
  * Licensed under the LGPL.
  */
 #include <QtTypes>
@@ -502,16 +502,6 @@ using VaultPtr = QPointer<class Vault>;
 using world_file_list_itemPtr = QPointer<class world_file_list_item>;
 using ZonePtr = QPointer<class Zone>;
 
-union varg_t
-{
-  CharacterPtr ch;
-  clan_id_t clan;
-  CasinoPlayerPtr player;
-  CasinoTablePtr table;
-  CasinoSlotMachinePtr machine;
-  CasinoRouletteWheelPtr wheel;
-};
-
 using command_gen2_t = ReturnValues (*)(CharacterPtr ch, QString arguments, cmd_t cmd);
 using command_gen3_t = ReturnValues (*)(QStringList arguments, cmd_t cmd);
 using command_special_t = ReturnValues (*)(QString arguments, cmd_t cmd);
@@ -529,7 +519,7 @@ using spell_gen2_t = ReturnValues (*)(quint8 level, CharacterPtr ch, QString arg
 using SPELL_POINTER = ReturnValues (*)(quint8, CharacterPtr, QString, qint32, CharacterPtr, ObjectPtr, qint32);
 using SPEC_FUN = ReturnValues (*)(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString argument, CharacterPtr owner);
 
-using TIMER_FUNC = void (*)(varg_t arg1, void *arg2, void *arg3);
+using TIMER_FUNC = void (*)(QObject *arg1, void *arg2, void *arg3);
 
 using aliases_t = QMap<QString, QString>;
 using area_stats_t = QMap<zone_t, class AreaStats>;
@@ -2448,7 +2438,6 @@ extern class CharacterClassSkill k_skills[];
 extern class CharacterClassSkill u_skills[];
 extern class CharacterClassSkill c_skills[];
 extern class CharacterClassSkill m_skills[];
-extern CharacterPtr character_list;
 extern CharacterPtr combat_list;
 extern const QList<class ki_info_type> ki_info;
 extern void end_oproc(CharacterPtr ch);
@@ -3406,16 +3395,45 @@ private:
   test_function_t function_;
 };
 
-class Timer
+class Timer : public QObject
 {
+  Q_OBJECT
 public:
+  Timer(DCPtr dc);
   qint32 timeleft{};
-  varg_t arg1{};
+  QPointer<QObject> arg1{};
   QVariant var_arg1{};
   void *arg2{};
   void *arg3{};
-  TIMER_FUNC *function{};
+  TIMER_FUNC function{};
+
+private:
+  DCPtr dc_;
 };
+class roulette_player : public QObject
+{
+public:
+  roulette_player(DCPtr dc);
+  CharacterPtr ch;
+  quint32 bet_array[48];
+
+private:
+  DCPtr dc_;
+};
+
+class CasinoRouletteWheel : public QObject
+{
+public:
+  CasinoRouletteWheel(DCPtr dc);
+  ObjectPtr obj;
+  roulette_player *plr[6];
+  qint32 countdown;
+  bool spinning;
+
+private:
+  DCPtr dc_;
+};
+
 class redeem_t
 {
 public:
@@ -3715,7 +3733,7 @@ auto &operator>>(auto &stream, Ban::type_t &type)
   return stream;
 }
 
-class Reservation
+class Reservation : public QObject
 {
   Q_OBJECT
 public:
@@ -4480,9 +4498,11 @@ public:
   qint32 state;
 };
 
-class CasinoTable
+class CasinoTable : public QObject
 {
+  Q_OBJECT
 public:
+  CasinoTable(DCPtr dc);
   ObjectPtr obj; // linked to obj
   cDeckPtr deck;
   CasinoPlayerPtr plr;
@@ -4495,6 +4515,9 @@ public:
   qint32 state;
   qint32 won;
   qint32 lost;
+
+private:
+  DCPtr dc_;
 };
 
 class cDeck : public QObject
@@ -5465,7 +5488,7 @@ class Character : public QObject, public MinimumEntity, public Entity
 {
   Q_OBJECT
 public:
-  explicit Character(QObject *parent);
+  Character(QObject *parent);
   enum Type
   {
     Undefined,
@@ -6486,6 +6509,7 @@ public:
   qint32 count_controlled_areas(qint32 clan);
   ObjectPtr create_obj_new(void);
   qint32 corpse_save(ObjectPtr obj, QTextStream stream, qint32 location, bool recurse_this_tree);
+  void pulse_countdown(QObject *arg1, void *arg2, void *arg3);
 
   ClanPtr get_clan(qint32 nClan);
   ClanPtr get_clan(CharacterPtr ch);
@@ -6495,6 +6519,7 @@ public:
   void remove_clan_member(ClanPtr theClan, CharacterPtr ch);
   QString get_clan_name(ClanPtr clan);
   void funny_boot_message(void);
+  void roulette_timer(CasinoRouletteWheelPtr wheel, qint32 spin);
 
   void mprog_read_programs(auto &stream, qint32 i, bool ignore)
   {
@@ -6808,13 +6833,14 @@ public:
   void pulse_table_bj(CasinoTablePtr tbl, qint32 recall = 0);
   void reset_table(CasinoTablePtr tbl);
   void nextturn(CasinoTablePtr tbl);
-  void bj_dealer_ai(varg_t arg1, void *arg2, void *arg3);
+  void bj_dealer_ai(QObject *arg1, void *arg2, void *arg3);
   void add_timer_bj_dealer(CasinoTablePtr tbl);
   void addtimer(TimerPtr add);
   qint32 hand_number(CasinoPlayerPtr plr);
   qint32 hands(CasinoPlayerPtr plr);
   bool charExists(CharacterPtr ch);
-  void reel_spin(varg_t, void *, void *);
+  void reel_spin(QObject *, void *, void *);
+  void free_player(CasinoPlayerPtr plr);
 
   ReturnValue save_boards(void);
   bool is_forbidden(QString name);
@@ -7085,10 +7111,8 @@ public:
   void set_wizinvis(const CharacterPtr sender);
   void set_name(const CharacterPtr sender);
 };
-RoomDirectionPtr EXIT(auto ch, qsizetype door)
-{
-  return ch->dc_->world[ch->in_room].dir_option[door];
-}
+
+RoomDirectionPtr EXIT(CharacterPtr ch, qsizetype door);
 
 class news_data
 {
@@ -8424,8 +8448,8 @@ void affect_join(CharacterPtr ch, affected_typePtr af, bool avg_dur, bool avg_mo
 void char_to_store(class char_file_u4 *st, Time &tmpage);
 void renum_world(void);
 void renum_zone_table(void);
-void clear_hunt(varg_t arg1, void *arg2, void *arg3);
-void clear_hunt(varg_t arg1, CharacterPtr arg2, void *arg3);
+// void clear_hunt(QObject *arg1, void *arg2, void *arg3);
+// void clear_hunt(QObject *arg1, CharacterPtr arg2, void *arg3);
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
 bool operator==(class ResetCommand a, class ResetCommand b);
 void extractFamiliar(CharacterPtr ch);

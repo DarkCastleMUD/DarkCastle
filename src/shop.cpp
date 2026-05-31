@@ -1612,12 +1612,12 @@ qint32 eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, QString arg, 
       else if (eddie[i].cost_exp > 0)
       {
         QString cost_buf_str = u"{:L} experience", eddie[i].cost_exp);
-        dc_snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
+        dc_snprintf(cost_buf, 1024, "%s", qPrintable(cost_buf_str));
       }
       else if (eddie[i].cost_plats > 0)
       {
         QString cost_buf_str = u"{:L} platinum", eddie[i].cost_plats);
-        dc_snprintf(cost_buf, 1024, "%s", cost_buf_str.c_str());
+        dc_snprintf(cost_buf, 1024, "%s", qPrintable(cost_buf_str));
       }
 
       if (last_vnum != 0 && last_vnum != eddie[i].item_vnum)

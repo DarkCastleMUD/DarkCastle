@@ -56,13 +56,13 @@ ReturnValues do_say(CharacterPtr ch, QString argument, cmd_t cmd)
     if (ch->isPlayer())
       MOBtrigger = false;
 
-    buf = fmt::format("$B$7You say '{}$B$7'$R", argument.c_str());
+    buf = fmt::format("$B$7You say '{}$B$7'$R", qPrintable(argument));
     act_to_character(buf, ch, 0, 0, 0);
 
     if (ch->isPlayer())
     {
       MOBtrigger = true;
-      retval = ch->mprog_speech_trigger(argument.c_str());
+      retval = ch->mprog_speech_trigger(qPrintable(argument));
       if (SOMEONE_DIED(retval))
         return SWAP_CH_VICT(retval);
     }
@@ -70,7 +70,7 @@ ReturnValues do_say(CharacterPtr ch, QString argument, cmd_t cmd)
     if (ch->isPlayer())
     {
       MOBtrigger = true;
-      retval = ch->oprog_speech_trigger(argument.c_str());
+      retval = ch->oprog_speech_trigger(qPrintable(argument));
       if (SOMEONE_DIED(retval))
         return SWAP_CH_VICT(retval);
     }
@@ -114,9 +114,9 @@ ReturnValues do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  if (!(victim = ch->get_char_room_vis(vict.c_str())))
+  if (!(victim = ch->get_char_room_vis(qPrintable(vict))))
   {
-    ch->send(u"You see noone that goes by '%1' here.\r\n"_s.arg(vict.c_str()));
+    ch->send(u"You see noone that goes by '%1' here.\r\n"_s.arg(qPrintable(vict)));
     return ReturnValue::eSUCCESS;
   }
 
@@ -128,17 +128,17 @@ ReturnValues do_psay(CharacterPtr ch, QString argument, cmd_t cmd)
 
   if (ch->isPlayer())
     MOBtrigger = false;
-  buf = fmt::format("$B$n says (to $N) '{}'$R", messageStr.c_str());
+  buf = fmt::format("$B$n says (to $N) '{}'$R", qPrintable(messageStr));
   act_to_room(buf, ch, 0, victim, NOTVICT);
 
   if (ch->isPlayer())
     MOBtrigger = false;
-  buf = fmt::format("$B$n says (to $3you$7) '{}'$R", messageStr.c_str());
+  buf = fmt::format("$B$n says (to $3you$7) '{}'$R", qPrintable(messageStr));
   act_to_victim(buf, ch, 0, victim, 0);
 
   if (ch->isPlayer())
     MOBtrigger = false;
-  buf = fmt::format("$BYou say (to $N) '{}'$R", messageStr.c_str());
+  buf = fmt::format("$BYou say (to $N) '{}'$R", qPrintable(messageStr));
   act_to_character(buf, ch, 0, victim, 0);
   MOBtrigger = true;
   //   if(ch->isPlayer()) {
@@ -642,7 +642,7 @@ ReturnValues do_reply(CharacterPtr ch, QString argument, cmd_t cmd)
   }
 
   buf = fmt::format("{} {}", qPrintable(ch->player->last_tell), argument);
-  ch->do_tell(QString(buf.c_str()).split(' '), cmd_t::TELL_REPLY);
+  ch->do_tell(QString(qPrintable(buf)).split(' '), cmd_t::TELL_REPLY);
   return ReturnValue::eSUCCESS;
 }
 

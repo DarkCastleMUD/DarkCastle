@@ -321,7 +321,7 @@ void Player::save(auto &streamfpsave, Time tmpage)
       if (name.second.ignore)
       {
         fwrite("IGN", sizeof(QChar), 3, fpsave);
-        fwrite_var_string(name.first.c_str(), fpsave);
+        fwrite_var_string(qPrintable(name.first), fpsave);
         fwrite(&name.second.ignored_count, sizeof(name.second.ignored_count), 1, fpsave);
       }
     }

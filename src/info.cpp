@@ -384,7 +384,7 @@ void show_spells(CharacterPtr i, CharacterPtr ch)
     else
       strbuf = QString("$B$7-$1") + qPrintable(i->name()) + " has: " + strbuf + "$R\r\n";
 
-    send_to_char(strbuf.c_str(), ch);
+    send_to_char(qPrintable(strbuf), ch);
   }
 }
 
@@ -1917,7 +1917,7 @@ ReturnValues do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                   scratch, "Immunity", isrString.c_str(), scratch);
+                   scratch, "Immunity", qPrintable(isrString), scratch);
         ch->send(buf);
         found = true;
         isrString = QString();
@@ -1935,7 +1935,7 @@ ReturnValues do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                   scratch, "Susceptibility", isrString.c_str(), scratch);
+                   scratch, "Susceptibility", qPrintable(isrString), scratch);
         ch->send(buf);
         found = true;
         isrString = QString();
@@ -1953,7 +1953,7 @@ ReturnValues do_score(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                   scratch, "Resistibility", isrString.c_str(), scratch);
+                   scratch, "Resistibility", qPrintable(isrString), scratch);
         ch->send(buf);
         found = true;
         isrString = QString();
@@ -3301,7 +3301,7 @@ ReturnValues do_sector(CharacterPtr ch, QString arg, cmd_t cmd)
       break;
     }
 
-    ch->send(u"You are currently in %s %s area.\r\n"_s.arg(art.c_str()).arg(sector_types[sector]));
+    ch->send(u"You are currently in %s %s area.\r\n"_s.arg(qPrintable(art)).arg(sector_types[sector]));
   }
 
   return ReturnValue::eSUCCESS;

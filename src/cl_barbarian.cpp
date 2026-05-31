@@ -754,7 +754,7 @@ ReturnValues do_crazedassault(CharacterPtr ch, QString argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void rush_reset(varg_t arg1, void *arg2, void *arg3)
+void rush_reset(QObject *arg1, void *arg2, void *arg3)
 {
   CharacterPtr ch = arg1.ch;
   extern bool charExists(CharacterPtr ch);

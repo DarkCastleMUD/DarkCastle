@@ -1369,11 +1369,11 @@ void CVoteData::DisplayVote(CharacterPtr ch)
   }
   ch->send(u"\r\n--Current Vote Infortmation--\r\nTo vote, type \"vote #\".\r\n"
            "Enter \"vote results\" to see the current voting demographics.\r\n\r\n");
-  dc_strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
+  dc_strncpy(buf, qPrintable(vote_question), MAX_STRING_LENGTH);
   ch->send(buf);
   ch->send(u"\r\n"_s);
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
-    ch->send(u"%1: %2\r\n"_s.arg(i++, 2).arg(answer_it->answer.c_str()));
+    ch->send(u"%1: %2\r\n"_s.arg(i++, 2).arg(qPrintable(answer_it->answer)));
   ch->send(u"\r\n"_s);
 }
 
@@ -1507,10 +1507,10 @@ void CVoteData::DisplayResults(CharacterPtr ch)
     if (ch->isMortalPlayer())
     {
       qint32 percent = (answer_it->votes * 100) / total_votes;
-      ch->send(u"%3d\%: %s\r\n"_s.arg(percent).arg(answer_it->answer.c_str()));
+      ch->send(u"%3d\%: %s\r\n"_s.arg(percent).arg(qPrintable(answer_it->answer)));
     }
     else
-      ch->send(u"%3d: %s\r\n"_s.arg(answer_it->votes).arg(answer_it->answer.c_str()));
+      ch->send(u"%3d: %s\r\n"_s.arg(answer_it->votes).arg(qPrintable(answer_it->answer)));
   }
   ch->sendln(u""_s);
 }
@@ -1550,7 +1550,7 @@ void CVoteData::OutToFile()
   dc_fprintf(the_file, "%d\n", active);
   dc_fprintf(the_file, "%d\n", total_votes);
 
-  dc_fprintf(the_file, "%s\n", vote_question.c_str());
+  dc_fprintf(the_file, "%s\n", qPrintable(vote_question));
 
   dc_fprintf(the_file, "%d\n", answers.size());
 
@@ -1559,7 +1559,7 @@ void CVoteData::OutToFile()
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
     dc_fprintf(the_file, "%d\n", answer_it->votes);
-    dc_fprintf(the_file, "%s\n", answer_it->answer.c_str());
+    dc_fprintf(the_file, "%s\n", qPrintable(answer_it->answer));
   }
 
   QMap<QString, bool>::iterator ip_it;
@@ -1567,13 +1567,13 @@ void CVoteData::OutToFile()
   dc_fprintf(the_file, "%d\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
-    dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
+    dc_fprintf(the_file, "%s\n", qPrintable(ip_it->first));
   }
 
   dc_fprintf(the_file, "%d\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
-    dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
+    dc_fprintf(the_file, "%s\n", qPrintable(ip_it->first));
   }
 }
 

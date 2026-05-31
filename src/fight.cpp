@@ -7615,7 +7615,7 @@ void Character::send(QString buffer)
 
 void Character::send(QString buffer)
 {
-  send_to_char(buffer.c_str(), this);
+  send_to_char(qPrintable(buffer), this);
 }
 
 void Character::send(QString buffer)

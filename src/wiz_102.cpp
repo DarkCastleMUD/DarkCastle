@@ -1319,7 +1319,7 @@ ReturnValues do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(vict = get_char_vis(ch, target.c_str())))
+  if (!(vict = get_char_vis(ch, qPrintable(target))))
   {
     ch->send(fmt::format("Cannot find player '{}'.\r\n", target));
     return ReturnValue::eFAILURE;
@@ -1390,7 +1390,7 @@ ReturnValues do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
     vict->learn_skill(skillnum, 1, 1);
 
     buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", qPrintable(vict->name()), text, skillnum, qPrintable(ch->name()));
-    dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(qPrintable(buf), ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", qPrintable(vict->name()), text, skillnum, qPrintable(ch->name())));
     break;
   }
@@ -1408,7 +1408,7 @@ ReturnValues do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->skills.erase(skillnum);
 
       buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, qPrintable(vict->name()), qPrintable(ch->name()));
-      dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+      dc_->logentry(qPrintable(buf), ch->getLevel(), DC::LogChannel::LOG_GOD);
       ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, qPrintable(vict->name())));
     }
     else
@@ -1431,7 +1431,7 @@ ReturnValues do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->send(fmt::format("'{}' does not have skill '{}'.\r\n", qPrintable(vict->name()), text));
       return ReturnValue::eFAILURE;
     }
-    if (!check_range_valid_and_convert(i, value.c_str(), 1, 100))
+    if (!check_range_valid_and_convert(i, qPrintable(value), 1, 100))
     {
       ch->sendln(u"Invalid skill amount.  Must be 1 - 100."_s);
       return ReturnValue::eFAILURE;
@@ -1440,7 +1440,7 @@ ReturnValues do_sedit(CharacterPtr ch, QString argument, cmd_t cmd)
     vict->learn_skill(skillnum, i, i);
 
     buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", qPrintable(vict->name()), text, i, learned, qPrintable(ch->name()));
-    dc_->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    dc_->logentry(qPrintable(buf), ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", qPrintable(vict->name()), text, i, learned));
     break;
   }
@@ -4110,7 +4110,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     dc_->world[ch->in_room]->name_ = {};
-    dc_->world[ch->in_room]->name_ = (remainder_args.c_str());
+    dc_->world[ch->in_room]->name_ = (qPrintable(remainder_args));
     ch->sendln(u"Ok."_s);
   }
   break;
@@ -4122,7 +4122,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       QString description = remainder_args + "\r\n";
       dc_->world[ch->in_room].description = {};
-      dc_->world[ch->in_room].description = (description.c_str());
+      dc_->world[ch->in_room].description = (qPrintable(description));
       ch->sendln(u"Ok."_s);
       return ReturnValue::eFAILURE;
     }
@@ -4166,7 +4166,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       std::tie(direction, remainder_args) = half_chop(remainder_args);
       for (x = {}; x <= 6; x++)
       {
-        if (is_abbrev(direction.c_str(), dirs[x]))
+        if (is_abbrev(qPrintable(direction), dirs[x]))
         {
           if (dc_->world[ch->in_room].dir_option[x] == nullptr)
           {
@@ -4313,7 +4313,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
     {
       if (dc_->world[ch->in_room].dir_option[x]->keyword)
         dc_->world[ch->in_room].dir_option[x]->keyword = {};
-      dc_->world[ch->in_room].dir_option[x]->keyword = (remainder_args.c_str());
+      dc_->world[ch->in_room].dir_option[x]->keyword = (qPrintable(remainder_args));
     }
 
     ch->sendln(u"Ok."_s);
@@ -4331,9 +4331,9 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         buf = fmt::format("{} redit exit {} {} {} {} {}", d,
                           return_directions[x], dc_->world[ch->in_room]->number_,
-                          a, b, (remainder_args != "" ? remainder_args.c_str() : ""));
+                          a, b, (remainder_args != "" ? qPrintable(remainder_args) : ""));
         SET_BIT(ch->player->toggles, Player::PLR_ONEWAY);
-        QString tmp = strdup(buf.c_str());
+        QString tmp = strdup(qPrintable(buf));
         do_at(ch, tmp);
 
         REMOVE_BIT(ch->player->toggles, Player::PLR_ONEWAY);
@@ -4524,7 +4524,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
       ch->sendln(u"\r\n"_s);
       return ReturnValue::eFAILURE;
     }
-    parse_bitstrings_into_int(room_bits, remainder_args.c_str(), ch, (dc_->world[ch->in_room]->room_flags_));
+    parse_bitstrings_into_int(room_bits, qPrintable(remainder_args), ch, (dc_->world[ch->in_room]->room_flags_));
   }
   break;
 
@@ -4558,7 +4558,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
         ch->sendln(u"No such sector type."_s);
         return ReturnValue::eFAILURE;
       }
-      else if (is_abbrev(remainder_args.c_str(), sector_types[x]))
+      else if (is_abbrev(qPrintable(remainder_args), sector_types[x]))
       {
         dc_->world[ch->in_room].sector_type = x;
         ch->send(u"Sector type set to %s.\r\n"_s.arg(sector_types[x]));
@@ -4568,7 +4568,7 @@ ReturnValues do_redit(CharacterPtr ch, QString argument, cmd_t cmd)
   }
   break;
   case 7: // denymob
-    if (remainder_args.isEmpty() || !is_number(remainder_args.c_str()))
+    if (remainder_args.isEmpty() || !is_number(qPrintable(remainder_args)))
     {
       ch->sendln(u"Syntax: redit denymob <vnum>\r\nDoing this on an already denied_mobile_vnums mob will allow it once more."_s);
       return ReturnValue::eFAILURE;
@@ -5335,7 +5335,7 @@ ReturnValues do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
   ch->send(u"Room flags: "_s);
   sprintbit((qint32)rm->room_flags_, room_bits, buf);
   QString buffer = fmt::format("{} [ {} ]\r\n", buf, rm->room_flags_);
-  send_to_char(buffer.c_str(), ch);
+  send_to_char(qPrintable(buffer), ch);
 
   ch->sendln(u"Description:"_s);
   ch->send(rm->description);
@@ -5393,7 +5393,7 @@ ReturnValues do_rstat(CharacterPtr ch, QString argument, cmd_t cmd)
     }
   }
   buffer += "\r\n";
-  send_to_char(const_cast<QString>(buffer.c_str()), ch);
+  send_to_char(const_cast<QString>(qPrintable(buffer)), ch);
 
   ch->sendln(u"------- Exits defined -------"_s);
   for (i = {}; i <= 5; i++)

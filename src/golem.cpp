@@ -479,7 +479,7 @@ ReturnValues do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                   scratch, "Immunity", isrString.c_str(), scratch);
+                   scratch, "Immunity", qPrintable(isrString), scratch);
         master->send(buf);
         isrString = QString();
         if (++level == 4)
@@ -496,7 +496,7 @@ ReturnValues do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                   scratch, "Susceptibility", isrString.c_str(), scratch);
+                   scratch, "Susceptibility", qPrintable(isrString), scratch);
         master->send(buf);
         isrString = QString();
         if (++level == 4)
@@ -513,7 +513,7 @@ ReturnValues do_golem_score(CharacterPtr ch, QString argument, cmd_t cmd)
       {
         scratch = frills[level];
         dc_sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
-                   scratch, "Resistibility", isrString.c_str(), scratch);
+                   scratch, "Resistibility", qPrintable(isrString), scratch);
         master->send(buf);
         isrString = QString();
         if (++level == 4)
