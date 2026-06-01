@@ -3401,7 +3401,7 @@ class Timer : public QObject
 public:
   Timer(DCPtr dc);
   qint32 timeleft{};
-  QPointer<QObject> arg1{};
+  T arg1{};
   QVariant var_arg1{};
   void *arg2{};
   void *arg3{};
@@ -6509,7 +6509,9 @@ public:
   qint32 count_controlled_areas(qint32 clan);
   ObjectPtr create_obj_new(void);
   qint32 corpse_save(ObjectPtr obj, QTextStream stream, qint32 location, bool recurse_this_tree);
-  void pulse_countdown(QObject *arg1, void *arg2, void *arg3);
+  void pulse_countdown(CasinoRouletteWheelPtr wheel, void *arg2, void *arg3);
+  void wheel_stop(CasinoRouletteWheelPtr wheel);
+  void send_roulette_message(CasinoRouletteWheelPtr wheel);
 
   ClanPtr get_clan(qint32 nClan);
   ClanPtr get_clan(CharacterPtr ch);

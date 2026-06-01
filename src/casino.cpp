@@ -326,7 +326,7 @@ void DC::check_active(QObject *arg1, void *arg2, void *arg3)
 
   if ((qint64)arg2 == plr->table->handnr || (qint64)arg2 == (plr->table->handnr + 100) * 2)
   {
-    TimerPtr timer = TimerPtr(new Timer);
+    TimerPtr timer = TimerPtr(new Timer<CasinoPlayerPtr>(this));
     timer->arg1.player = plr;
     timer->arg2 = (void *)(((qint64)arg2 + 100) * 2);
     timer->arg3 = (void *)plr->table;
@@ -2243,7 +2243,7 @@ quint32 check_roulette_wins(roulette_player *plr, qint32 num)
   return winnings;
 }
 
-void send_roulette_message(CasinoRouletteWheelPtr wheel)
+void DC::send_roulette_message(CasinoRouletteWheelPtr wheel)
 {
   QString buf;
 
@@ -2273,7 +2273,7 @@ void send_roulette_message(CasinoRouletteWheelPtr wheel)
   }
 }
 
-void wheel_stop(CasinoRouletteWheelPtr wheel)
+void DC::wheel_stop(CasinoRouletteWheelPtr wheel)
 {
   qint32 num = dc_->number(0, 36);
   quint32 payout = {};

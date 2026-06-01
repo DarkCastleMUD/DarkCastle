@@ -796,9 +796,8 @@ Reservation ::Reservation(DCPtr dc)
 {
 }
 
-void DC::pulse_countdown(QObject *arg1, void *arg2, void *arg3)
+void DC::pulse_countdown(CasinoRouletteWheelPtr wheel, void *arg2, void *arg3)
 {
-  CasinoRouletteWheelPtr wheel = arg1.wheel;
   qint32 spin = (qint64)arg2;
   QString buf;
 
@@ -845,8 +844,8 @@ void DC::roulette_timer(CasinoRouletteWheelPtr wheel, qint32 spin)
 {
   if (!wheel)
     return;
-  TimerPtr timer = new Timer(this);
-  timer->arg1.wheel = wheel;
+  TimerPtr timer = TimerPtr(new Timer<CasinoRouletteWheelPtr>(this));
+  timer->arg1 = wheel;
   timer->arg2 = (void *)(qint64)spin;
   timer->function = &DC::pulse_countdown;
   timer->timeleft = 4;
