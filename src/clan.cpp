@@ -174,14 +174,14 @@ void boot_clans(void)
         }
         catch (error_negative_int &e)
         {
-          qCritical(qUtf8Printable(QStringLiteral("negative clan balance read for clan %1.\n").arg(new_new_clan->number)));
-          qCritical(qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("negative clan balance read for clan %1.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
           new_new_clan->setBalance(0);
         }
         catch (...)
         {
-          qCritical(qUtf8Printable(QStringLiteral("unknown error reading clan balance for clan %1.\n").arg(new_new_clan->number)));
-          qCritical(qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("unknown error reading clan balance for clan %1.\n").arg(new_new_clan->number)));
+          qCritical("%s", qUtf8Printable(QStringLiteral("Setting clan %1's balance to 0.\n").arg(new_new_clan->number)));
           new_new_clan->setBalance(0);
         }
         break;
@@ -1611,7 +1611,7 @@ void do_clan_list(Character *ch)
     ch->sendln("$B$7## Clan                 Leader           $R");
   }
 
-  std::locale("en_US.UTF-8");
+  // std::locale("en_US.UTF-8");
   for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
   {
     if (ch->getLevel() > 103)

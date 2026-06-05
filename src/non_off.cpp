@@ -306,7 +306,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%d]", GET_NAME(ch), qPrintable(obj->Name()), DC::getInstance()->obj_index[obj->item_number].vnum());
+    sprintf(log_buf, "%s donates %s[%lu]", GET_NAME(ch), qPrintable(obj->Name()), DC::getInstance()->obj_index[obj->item_number].vnum());
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
@@ -1580,7 +1580,7 @@ void CVoteData::OutToFile()
 
   fprintf(the_file, "%s\n", vote_question.c_str());
 
-  fprintf(the_file, "%d\n", answers.size());
+  fprintf(the_file, "%zu\n", answers.size());
 
   std::vector<SVoteData>::iterator answer_it;
 
@@ -1592,13 +1592,13 @@ void CVoteData::OutToFile()
 
   std::map<std::string, bool>::iterator ip_it;
 
-  fprintf(the_file, "%d\n", ip_voted.size());
+  fprintf(the_file, "%zu\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  fprintf(the_file, "%d\n", char_voted.size());
+  fprintf(the_file, "%zu\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
     fprintf(the_file, "%s\n", ip_it->first.c_str());

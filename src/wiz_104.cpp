@@ -468,7 +468,7 @@ int Zone::show_info(Character *ch)
   ch->send(buf);
   sprintf(buf, "\r\n"
                "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-               "$3DiedThisTick$R: %3d $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
+               "$3DiedThisTick$R: %3lu $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
           num_mob_on_repop,
           death_counter,
           counter_mod,

@@ -46,14 +46,11 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <string>
 #include <map>
 #include <vector>
-#include <sstream>
 
 #include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/player.h"   // MAX_*
 #include "DC/connect.h"  // Connection::states::WRITE_BOARD
 #include "DC/terminal.h" // BOLD
-#include "DC/fileinfo.h" // for the board files
 #include "DC/clan.h"
 #include "DC/character.h"
 #include "DC/utility.h" // false
@@ -894,7 +891,7 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
     return;
   }
 
-  fprintf(the_file, " %d ", board->second.msgs.size());
+  fprintf(the_file, " %zu ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);

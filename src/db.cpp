@@ -658,7 +658,7 @@ void DC::boot_db(void)
   {
     if (cf.verbose_mode)
     {
-      qInfo(qUtf8Printable(QStringLiteral("[%1 %2]\t%3.").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.Name())));
+      qInfo("%s", qUtf8Printable(QStringLiteral("[%1 %2]\t%3.").arg(zone.getBottom(), 5).arg(zone.getTop(), 5).arg(zone.Name())));
     }
 
     zone.reset(Zone::ResetType::full);
@@ -3744,7 +3744,7 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 
   if (!message.isEmpty())
   {
-    qDebug(qPrintable(QStringLiteral("%1: [%2]").arg(message).arg(current_line)));
+    qDebug("%s", qPrintable(QStringLiteral("%1: [%2]").arg(message).arg(current_line)));
   }
   auto ok = stream.seek(current_pos);
   assert(stream.pos() == current_pos);
@@ -3777,7 +3777,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 
   obj->Name(fread_string(fl, 1));
 
-  qDebug(qPrintable(QStringLiteral("Object name: %1").arg(obj->Name())));
+  qDebug("%s", qPrintable(QStringLiteral("Object name: %1").arg(obj->Name())));
   obj->short_description = fread_string(fl, 1);
   if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
   {
@@ -4442,7 +4442,7 @@ class Object *clone_object(int nr)
   }
   else
   {
-    qWarning(qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
+    qWarning("%s", qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
     dc_free(obj);
     return nullptr;
   }

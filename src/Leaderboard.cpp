@@ -70,7 +70,7 @@ void Leaderboard::check(void)
   {
     if (!d->character || d->character->getLevel() >= IMMORTAL || d->character->isNonPlayer())
       continue;
-    if (!d->connected == Connection::states::PLAYING)
+    if (d->connected != Connection::states::PLAYING)
       continue;
     if (!d->character->player)
       continue;
@@ -1572,7 +1572,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 
     if (!d->character || d->character->getLevel() >= IMMORTAL)
       continue;
-    if (!d->connected == Connection::states::PLAYING)
+    if (d->connected != Connection::states::PLAYING)
       continue;
     if (!d->character->player)
       continue;

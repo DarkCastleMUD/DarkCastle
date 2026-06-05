@@ -2496,7 +2496,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       if ((learned = ch->has_skill(SKILL_CRIT_HIT)) && dam)
         if (number(1, 101) <= learned / 10 + GET_DEX(ch) - GET_DEX(victim))
         {
-          dam += (int)(dam * (float)(2 + learned / 5) / 100);
+          dam += (int)(dam * (float)(2.0 + learned / 5.0) / 100.0);
           act("Your strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_CHAR, 0);
           act("$n's strike lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_VICT, 0);
           act("$n's strike at $N lands with lethal accuracy and inflicts additional damage!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -4553,7 +4553,7 @@ void make_corpse(Character *ch)
     {
       class Object *recipeitem = nullptr;
       int rarity = number(1, 100);
-      bool itemtype = number(0, 1);
+      auto itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
       {
         switch (itemtype)
@@ -5577,8 +5577,7 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %d (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(),
-                GET_NAME(ch));
+        sprintf(buf, "%s killed by %lu (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(), GET_NAME(ch));
       }
       else
       {
@@ -7513,7 +7512,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
 
     ch->skill_increase_check(SKILL_ESCAPE, escape, SKILL_INCREASE_HARD);
-    if (number(1, 101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape / 1.5 - GET_INT(vict) / 2 - GET_WIS(vict) / 2), 100))
+    if (number(1, 101) > MIN((GET_INT(ch) + GET_DEX(ch) + (float)escape / 1.5 - GET_INT(vict) / 2.0 - GET_WIS(vict) / 2.0), 100))
       escape = 0;
   }
 

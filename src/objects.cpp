@@ -1641,7 +1641,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   {
     if (ch->getLevel() < obj_object->obj_flags.eq_level)
     {
-      sprintf(buffer, "You must be level %d to use $p.",
+      sprintf(buffer, "You must be level %llu to use $p.",
               obj_object->obj_flags.eq_level);
       act(buffer, ch, obj_object, 0, TO_CHAR, 0);
       return;
@@ -1652,7 +1652,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
     if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
-        sprintf(buffer, "You must be level %d to use $p.",
+        sprintf(buffer, "You must be level %llu to use $p.",
                 obj_object->obj_flags.eq_level);
         act(buffer, ch, obj_object, 0, TO_CHAR, 0);
         return;
@@ -2613,7 +2613,7 @@ int Character::recheck_height_wears(void)
 {
   int j;
   class Object *obj = nullptr;
-  if (!this || this->isNonPlayer())
+  if (isNonPlayer())
     return ReturnValue::eFAILURE; // NPCs get to wear the stuff.
 
   for (j = 0; j < MAX_WEAR; j++)

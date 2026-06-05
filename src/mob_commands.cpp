@@ -134,7 +134,7 @@ void mpstat(Character *ch, Character *victim)
   mob_prog_data *mprg{};
   int i;
 
-  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n",
+  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %lu.\r\n",
           victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
   ch->send(buf);
 
@@ -2092,7 +2092,7 @@ char *expand_data(Character *ch, char *orig)
     strcpy(right, ptr + 1);
     *(ptr + r) = c;
     r--;
-    if (!c == '\0')
+    if (c != '\0')
       *(ptr + r) = '~';
 
     int16_t *lvali = nullptr;

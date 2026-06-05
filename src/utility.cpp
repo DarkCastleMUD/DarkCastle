@@ -391,7 +391,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
     logpath << SOCKET_LOG;
     if (!(*f = fopen(logpath.str().c_str(), "a")))
     {
-      qFatal(qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
+      qFatal("%s", qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
     }
     break;
   case DC::LogChannel::LOG_PLAYER:
@@ -401,7 +401,7 @@ void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *v
       logpath << vict->getName().toStdString();
       if (!(*f = fopen(logpath.str().c_str(), "a")))
       {
-        qCritical(qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
+        qCritical("%s", qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
       }
     }
     else

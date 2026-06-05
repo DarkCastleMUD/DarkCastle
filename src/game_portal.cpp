@@ -77,7 +77,7 @@ void load_game_portals()
     |    WILL CAUSE THE GAME TO CRASH.  I could build a sanity check, but
     |    if people read this it's not necessary.  -Morc 24 Apr 1997
     */
-    if (fscanf(cur_file, "%d\n%d\n%d\n",
+    if (fscanf(cur_file, "%ld\n%d\n%d\n",
                &(game_portals[i].to_room),
                &(game_portals[i].obj_num),
                &(game_portals[i].max_timer)) != 3)
@@ -155,7 +155,7 @@ void process_portals()
               game_portals[i].max_timer) == 0)
       {
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
+        sprintf(log_buf, "Making portal from %d to %lu failed.", from_room,
                 game_portals[i].to_room);
         logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }

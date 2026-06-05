@@ -45,10 +45,8 @@
 #include "DC/act.h"
 #include "DC/set.h"
 #include "DC/returnvals.h"
-#include "DC/fileinfo.h"
 #include "DC/utility.h"
 #include "DC/isr.h"
-#include "DC/Leaderboard.h"
 #include "DC/handler.h"
 #include "DC/const.h"
 #include "DC/vault.h"
@@ -376,7 +374,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
       if (object->obj_flags.timer)
       {
         char timebuffer[101] = {};
-        snprintf(timebuffer, 100, " $R($B$0%lu ticks left$R)", object->obj_flags.timer);
+        snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
         strcat(buffer, timebuffer);
       }
     }
@@ -1964,7 +1962,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf,
           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
-          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3d        $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
+          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %3llu        $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d        $1Rdeaths$7:   %-5d     |~|\r\n"
           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
@@ -2389,7 +2387,7 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
   // 	s = timep % 60;
   // 	sprintf (buf, "The mud has been running for: %02li:%02li:%02li \r\n",
   // 			h,m,s);
-  sprintf(buf, "The mud has been running for: %02li:%02li \r\n", h, m);
+  sprintf(buf, "The mud has been running for: %02i:%02i \r\n", h, m);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2851,8 +2849,7 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
 
   char *thief_messages[] = {
       "At least they'll hang you quickly.",
-      "Bards will sing of your bravery, rogues will snicker at"
-      "\r\nyour stupidity.",
+      "Bards will sing of your bravery, rogues will snicker at\r\nyour stupidity.",
       "Don't plan on sending your kids to college.",
       "I'd bet against you.",
       "The odds aren't quite in your favor.",
@@ -3776,6 +3773,10 @@ bool Search::operator==(const Object *obj)
 
   case O_AFFECTED:
     break;
+  case O_CARRIED_BY:
+  case O_EQUIPPED_BY:
+  case LIMIT:
+    break;
   }
   return false;
 }
@@ -4584,6 +4585,10 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       case Search::locations::in_vault:
       case Search::locations::in_clan_vault:
         custom_columns += QStringLiteral(" [%1 vault]").arg(result.getName(), 13);
+        break;
+      case Search::in_object_database:
+        break;
+      default:
         break;
       }
     }

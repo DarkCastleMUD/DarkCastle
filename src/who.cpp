@@ -127,7 +127,7 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
       if ((!ch->isNonPlayer() && hasholylight) || (!IS_ANONYMOUS(k) || (k->clan == ch->clan && ch->clan)))
       {
         sprintf(tempbuffer,
-                "   $B%-18s %-10s %-14s   Level %2d      $1($7Leader$1)$R \r\n",
+                "   $B%-18s %-10s %-14s   Level %2llu      $1($7Leader$1)$R \r\n",
                 GET_NAME(k), races[(int)GET_RACE(k)].singular_name,
                 pc_clss_types[(int)GET_CLASS(k)], k->getLevel());
       }
@@ -150,7 +150,7 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
               foundtarget = 1;
             // First if they're not anonymous
             if (!IS_ANONYMOUS(f->follower) || (f->follower->clan == ch->clan && ch->clan))
-              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2d\r\n",
+              sprintf(tempbuffer, "   %-18s %-10s %-14s   Level %2llu\r\n",
                       GET_NAME(f->follower), races[(int)GET_RACE(f->follower)].singular_name,
                       pc_clss_types[(int)GET_CLASS(f->follower)], f->follower->getLevel());
             else
@@ -224,7 +224,7 @@ int do_whosolo(Character *ch, char *argument, cmd_t cmd)
       {
         if (!IS_ANONYMOUS(i) || (i->clan && i->clan == ch->clan))
           sprintf(tempbuffer,
-                  "   %-15s %-9s %-13s %2d     %-4d%-7d%d\r\n",
+                  "   %-15s %-9s %-13s %2llu     %-4d%-7d%d\r\n",
                   i->getNameC(),
                   races[(int)GET_RACE(i)].singular_name,
                   pc_clss_types[(int)GET_CLASS(i)], i->getLevel(),

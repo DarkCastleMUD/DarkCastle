@@ -1002,7 +1002,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s stole %s[%d] from %s",
+            sprintf(log_buf, "%s stole %s[%lu] from %s",
                     GET_NAME(ch), obj->short_description,
                     DC::getInstance()->obj_index[obj->item_number].vnum(), victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);

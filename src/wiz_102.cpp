@@ -156,7 +156,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
 
   sprintf(buf, "$3Short Desc$R: %s\r\n", GET_SHORT(vict));
   ch->send(buf);
-  sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8d $3In Room$R: %d\r\n",
+  sprintf(buf, "$3Race$R: %-9s $3Class$R: %-9s $3Level$R: %-8llu $3In Room$R: %d\r\n",
           races[(int)(GET_RACE(vict))].singular_name,
           pc_clss_types[(int)(GET_CLASS(vict))], vict->getLevel(),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));

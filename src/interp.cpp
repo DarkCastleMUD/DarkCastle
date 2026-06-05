@@ -287,6 +287,8 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
           this->sendln("No way!  You are still fighting!");
           return logcmd.setReturn(ReturnValue::eFAILURE, QStringLiteral("fighting < %1").arg(minimum_position_str));
           break;
+        case position_t::STANDING:
+          break;
         }
         return logcmd.setReturn(ReturnValue::eFAILURE, QStringLiteral("wrong position for cmd < %1").arg(minimum_position_str));
       }
@@ -894,7 +896,7 @@ void automail(char *name)
   char buf[100];
 
   blah = fopen("../lib/whassup.txt", "w");
-  fprintf(blah, name);
+  fprintf(blah, "%s", name);
   fclose(blah);
   sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
