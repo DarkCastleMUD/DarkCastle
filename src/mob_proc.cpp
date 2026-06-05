@@ -3323,7 +3323,8 @@ int mage_golem(Character *ch, class Object *obj, cmd_t cmd,
   if (cmd != cmd_t::UNDEFINED || !ch->master || ch->fighting || ch->in_room != ch->master->in_room)
     return ReturnValue::eFAILURE;
 
-  if (ch->master->fighting && ch->master->fighting->isNonPlayer())
+  if (ch->master->fighting && ch->master->fighting->isNonPlayer() &&
+      ch->master->isPlayer() && isSet(ch->master->player->toggles, Player::PLR_CHARMIEJOIN))
     ch->do_join(ch->master->getName().split(' '));
 
   return ReturnValue::eFAILURE;
@@ -3379,7 +3380,7 @@ int mage_familiar_gremlin_non(Character *ch, class Object *obj,
       return ReturnValue::eFAILURE;
     }
 
-    if (ch->master->fighting)
+    if (ch->master->fighting && ch->master->isPlayer() && isSet(ch->master->player->toggles, Player::PLR_CHARMIEJOIN))
     { // help him!
       ch->do_join(ch->master->getName().split(' '));
       return ReturnValue::eFAILURE;
@@ -3437,7 +3438,7 @@ int mage_familiar_imp_non(Character *ch, class Object *obj, cmd_t cmd, const cha
       return ReturnValue::eFAILURE;
     }
 
-    if (ch->master->fighting)
+    if (ch->master->fighting && ch->master->isPlayer() && isSet(ch->master->player->toggles, Player::PLR_CHARMIEJOIN))
     { // help him!
       ch->do_join(ch->master->getName().split(' '));
       return ReturnValue::eFAILURE;
@@ -3525,7 +3526,7 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, cmd_t cmd, const ch
         return ReturnValue::eFAILURE;
       }
 
-      if (ch->master->fighting)
+      if (ch->master->fighting && ch->master->isPlayer() && isSet(ch->master->player->toggles, Player::PLR_CHARMIEJOIN))
       { // help him!
         ch->do_join(ch->master->getName().split(' '));
         return ReturnValue::eFAILURE;
@@ -3571,7 +3572,7 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, cmd_t cmd, con
       return ReturnValue::eFAILURE;
     }
 
-    if (ch->master->fighting)
+    if (ch->master->fighting && ch->master->isPlayer() && isSet(ch->master->player->toggles, Player::PLR_CHARMIEJOIN))
     { // help him!
       ch->do_join(ch->master->getName().split(' '));
       return ReturnValue::eFAILURE;

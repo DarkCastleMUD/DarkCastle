@@ -3304,7 +3304,7 @@ Character *DC::clone_mobile(int nr)
 
   mob->mobdata = new Mobile;
 
-  mob->mobdata = old->mobdata;
+  *mob->mobdata = *old->mobdata;
 
   for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
     mob->equipment[i] = 0;
