@@ -1,0 +1,9 @@
+BasedOnStyle: LLVM
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false
+ColumnLimit: 0
+IndentAccessModifiers: false
+NamespaceIndentation: All
+FixNamespaceComments: false
+SortIncludes: false
