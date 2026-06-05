@@ -25,33 +25,34 @@ typedef int socket_t;
 
 enum pulse_type
 {
-	TIMER,
-	MOBILE,
-	OBJECT,
-	VIOLENCE,
-	BARD,
-	TENSEC,
-	WEATHER,
-	TIME,
-	REGEN,
-	SHORT
+  TIMER,
+  MOBILE,
+  OBJECT,
+  VIOLENCE,
+  BARD,
+  TENSEC,
+  WEATHER,
+  TIME,
+  REGEN,
+  SHORT
 };
 
-struct pulse_info
+class pulse_info
 {
-	pulse_type pulse;
-	uint64_t duration;
-	char name[];
+public:
+  pulse_type pulse;
+  uint64_t duration;
+  char name[];
 };
 
 const QStringList cond_colorcodes = {
-	QStringLiteral(BOLD GREEN),
-	QStringLiteral(GREEN),
-	QStringLiteral(BOLD YELLOW),
-	QStringLiteral(YELLOW),
-	QStringLiteral(RED),
-	QStringLiteral(BOLD RED),
-	QStringLiteral(BOLD GREY)};
+    QStringLiteral(BOLD GREEN),
+    QStringLiteral(GREEN),
+    QStringLiteral(BOLD YELLOW),
+    QStringLiteral(YELLOW),
+    QStringLiteral(RED),
+    QStringLiteral(BOLD RED),
+    QStringLiteral(BOLD GREY)};
 
 #define BAN_NOT 0
 #define BAN_NEW 1

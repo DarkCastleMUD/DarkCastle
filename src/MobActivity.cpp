@@ -1,5 +1,4 @@
 
-#include <cctype>
 #include <cstring>
 
 #include "DC/structs.h"
@@ -7,22 +6,14 @@
 #include "DC/character.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
-#include "DC/terminal.h"
-#include "DC/player.h"
 #include "DC/mobile.h"
-#include "DC/clan.h"
-#include "DC/handler.h"
-#include "DC/db.h" // exp_table
 #include "DC/interp.h"
-#include "DC/connect.h"
-#include "DC/spells.h"
-#include "DC/race.h"
-#include "DC/act.h"
 #include "DC/set.h"
 #include "DC/returnvals.h"
-#include "DC/fileinfo.h"
 #include "DC/MobActivity.h"
 #include "DC/const.h"
+#include "DC/memory.h"
+
 // Externs
 
 // Locals
@@ -30,16 +21,20 @@ class Path *mPathList = nullptr;
 
 /* PATHFINDING */
 
-struct path_data *newPath()
+path_data *newPath()
 {
-  struct path_data *p;
-  p = new struct path_data;
+  path_data *p;
+#ifdef LEAK_CHECK
+  p = (path_data *)calloc(1, sizeof(path_data));
+#else
+  p = (path_data *)dc_alloc(1, sizeof(path_data));
+#endif
   return p;
 }
 
 bool Path::isRoomConnected(int room)
 {
-  struct path_data *p;
+  path_data *p;
   int i;
 
   for (i = 0; i < MAX_DIRS; i++)
@@ -53,7 +48,7 @@ bool Path::isRoomConnected(int room)
 
 bool Path::isRoomPathed(int room)
 {
-  struct path_data *p;
+  path_data *p;
 
   for (p = DC::getInstance()->world[room].paths; p; p = p->next)
     if (p->p == this)
@@ -156,7 +151,7 @@ int Path::leastSteps(int from, int to, int val, int *bestval)
 
 bool Path::isPathConnected(class Path *pa)
 {
-  struct path_data *t;
+  path_data *t;
   for (t = p; t; t = t->next)
     if (t->p == pa)
       return true;
@@ -184,17 +179,17 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
       ch->sendln("This room is already connected to that path.");
     return;
   }
-  struct path_data *pa;
+  path_data *pa;
 
   if (DC::getInstance()->world[room].paths)
   {
-    struct path_data *t;
+    path_data *t;
     for (pa = DC::getInstance()->world[room].paths; pa; pa = pa->next)
     {
       if (isPathConnected(pa->p))
       {
-        struct path_data *t;
-        for (t = p; t; t = t->next)
+        path_data *t;
+        for (t = this->p; t; t = t->next)
           if (t->p == pa->p)
             t->num++;
       }
@@ -209,7 +204,7 @@ void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
 
       if (pa->p->isPathConnected(this))
       {
-        struct path_data *t;
+        path_data *t;
         for (t = pa->p->p; t; t = t->next)
           if (t->p == this)
             t->num++;
@@ -241,7 +236,7 @@ int do_newPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0])
   {
     ch->sendln("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *p;
   for (p = mPathList; p; p = p->next)
@@ -250,14 +245,14 @@ int do_newPath(Character *ch, char *argument, cmd_t cmd)
   if (p)
   {
     ch->sendln("That path already exists.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   p = new Path;
   p->name = str_dup(arg1);
   p->addRoom(ch, ch->in_room, true);
   p->next = mPathList;
   mPathList = p;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
@@ -266,7 +261,7 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
   int i = DC::getInstance()->world[ch->in_room].zone;
   if (zones.contains(i) == false)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   auto &zone = DC::getInstance()->zones[i];
@@ -279,7 +274,7 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
       if ((*iter).first >= low && (*iter).first <= high)
       {
         ch->send(QStringLiteral("Path '%1' connects to this zone.\r\n").arg(p->name));
-        struct path_data *pa;
+        path_data *pa;
         for (pa = p->p; pa; pa = pa->next)
           csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
                  pa->p->name, pa->num);
@@ -289,7 +284,7 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
   if (!found)
     ch->sendln("No paths connecting to this zone has been found.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
@@ -299,7 +294,7 @@ int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
   for (p = mPathList; p; p = p->next)
   {
     ch->send(QStringLiteral("Path '%1'.\r\n").arg(p->name));
-    struct path_data *pa;
+    path_data *pa;
     for (pa = p->p; pa; pa = pa->next)
       csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
              pa->p->name, pa->num);
@@ -308,7 +303,7 @@ int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
   if (!found)
     ch->sendln("No paths found.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_addRoom(Character *ch, char *argument, cmd_t cmd)
@@ -318,7 +313,7 @@ int do_addRoom(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0])
   {
     ch->sendln("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *p;
   for (p = mPathList; p; p = p->next)
@@ -327,10 +322,10 @@ int do_addRoom(Character *ch, char *argument, cmd_t cmd)
   if (!p)
   {
     ch->sendln("No such path exists.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   p->addRoom(ch, ch->in_room, false);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_findPath(Character *ch, char *argument, cmd_t cmd)
@@ -340,7 +335,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0])
   {
     ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *p;
   for (p = mPathList; p; p = p->next)
@@ -349,7 +344,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!p)
   {
     ch->sendln("No such path exists.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int start, end;
   argument = one_argument(argument, arg1);
@@ -357,7 +352,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0] || !is_number(arg1))
   {
     do_findPath(ch, "");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   start = atoi(arg1);
   argument = one_argument(argument, arg1);
@@ -365,15 +360,15 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   if (!arg1[0] || !is_number(arg1))
   {
     do_findPath(ch, "");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   end = atoi(arg1);
   char *path = p->determineRoute(ch, start, end);
 
   if (!path)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int leastPathSteps(class Path *goal, class Path *at, int steps, int *beststeps)
@@ -384,7 +379,7 @@ int leastPathSteps(class Path *goal, class Path *at, int steps, int *beststeps)
     return *beststeps;
   // Determine path
   at->s = steps;
-  struct path_data *pt;
+  path_data *pt;
   for (pt = at->p; pt; pt = pt->next)
   {
     if (pt->p == goal)
@@ -406,7 +401,7 @@ bool determinePath(class Path *goal, class Path *at, int beststeps, int steps, c
     return false;
   // Determine path
   at->s = steps;
-  struct path_data *pt;
+  path_data *pt;
   for (pt = at->p; pt; pt = pt->next)
   {
     if (pt->p == goal)
@@ -440,7 +435,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   if (!pt || !pt2)
   {
     ch->sendln("Missing path.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   class Path *pa;
   for (pa = mPathList; pa; pa = pa->next)
@@ -455,7 +450,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   if (i >= 50)
   {
     ch->sendln("Crazy #. Stopping.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   class Path *p[50]; // Maximum of 50 pathsteps atm
@@ -469,7 +464,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln(QStringLiteral("%1 -- ").arg(p[z]->name));
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int find_closest_path(int from, int steps, char *buf, std::map<int, int> z)
@@ -506,9 +501,9 @@ int find_closest_path(int from, int steps, char *buf, std::map<int, int> z)
 
 int Path::connectRoom(class Path *z)
 {
-  struct path_data *pa;
+  path_data *pa;
 
-  for (std::map<int, int>::iterator iter = begin(); iter != end(); iter++)
+  for (std::map<int, int>::iterator iter = this->begin(); iter != this->end(); iter++)
     for (pa = DC::getInstance()->world[(*iter).first].paths; pa; pa = pa->next)
       if (pa->p == z)
         return (*iter).first;
@@ -596,14 +591,14 @@ int do_findpath(Character *ch, char *argument, cmd_t cmd)
   for (p = mPathList; p; p = p->next)
     for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       csendf(ch, "Hmm: %d\r\n", (*iter).first);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
     int i = atoi(arg1), z = atoi(arg2);
-    if (!i || !z) { ch->sendln("BLeh!"); return eFAILURE; }
+    if (!i || !z) { ch->sendln("BLeh!"); return ReturnValue::eFAILURE; }
     char *t =  findPath(i, z, ch);
     ch->send(QStringLiteral("Final Path: %1\r\n").arg(t));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   */
 }
 

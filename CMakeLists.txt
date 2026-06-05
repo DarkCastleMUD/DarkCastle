@@ -133,7 +133,6 @@ add_library(DC SHARED
     src/const.cpp
     src/corpse.cpp
     src/Database.cpp
-    src/DataSource.cpp
     src/db.cpp
     src/DC.cpp
     src/fight.cpp
@@ -152,6 +151,7 @@ add_library(DC SHARED
     src/Leaderboard.cpp
     src/limits.cpp
     src/magic.cpp
+    src/memory.cpp
     src/meta.cpp
     src/mob_act.cpp
     src/MobActivity.cpp
@@ -216,7 +216,6 @@ add_library(DC SHARED
     src/include/DC/const.h
     src/include/DC/corpse.h
     src/include/DC/Database.h
-    src/include/DC/DataSource.h
     src/include/DC/db.h
     src/include/DC/DC.h
     src/include/DC/DC_global.h
@@ -228,6 +227,7 @@ add_library(DC SHARED
     src/include/DC/guild.h
     src/include/DC/handler.h
     src/include/DC/help.h
+    src/include/DC/Index.h
     src/include/DC/innate.h
     src/include/DC/interp.h
     src/include/DC/inventory.h
@@ -237,6 +237,7 @@ add_library(DC SHARED
     src/include/DC/Leaderboard.h
     src/include/DC/levels.h
     src/include/DC/magic.h
+    src/include/DC/memory.h
     src/include/DC/MobActivity.h
     src/include/DC/mobile.h
     src/include/DC/move.h

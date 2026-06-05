@@ -32,12 +32,9 @@
 #include <sys/types.h>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdarg>
 #include <QStringLiteral>
 
-#include "DC/fileinfo.h"
 #include "DC/act.h"
-#include "DC/player.h"
 #include "DC/room.h"
 #include "DC/structs.h"
 #include "DC/fight.h"
@@ -47,17 +44,17 @@
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"
-#include "DC/comm.h"
 #include "DC/returnvals.h"
 #include "DC/innate.h"
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/guild.h"
+#include "DC/memory.h"
 
 // external vars
 
 extern bool MOBtrigger;
-extern struct mprog_throw_type *g_mprog_throw_list;
+extern mprog_throw_type *g_mprog_throw_list;
 
 extern Character *activeActor;
 extern Character *activeRndm;
@@ -137,7 +134,8 @@ void mpstat(Character *ch, Character *victim)
   mob_prog_data *mprg{};
   int i;
 
-  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %d.\r\n", qPrintable(victim->getName()), DC::getInstance()->mob_index[victim->mobdata->nr].virt);
+  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %lu.\r\n",
+          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
@@ -172,16 +170,16 @@ int do_mpasound(Character *ch, char *argument, cmd_t cmd)
   int32_t was_in_room;
   int door;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (argument[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpasound - No argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   was_in_room = ch->in_room;
@@ -200,7 +198,7 @@ int do_mpasound(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->in_room = was_in_room;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile kill any player or mobile without murder*/
@@ -210,10 +208,10 @@ int do_mpkill(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(argument, arg);
@@ -221,31 +219,31 @@ int do_mpkill(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("MpKill - no argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
     ch->prog_error(QStringLiteral("MpKill - Victim not in room."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim == ch)
   {
     ch->prog_error(QStringLiteral("MpKill - Bad victim to attack."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim)
   {
     ch->prog_error(QStringLiteral("MpKill - Charmed mob attacking master."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (ch->isFighting())
   {
     ch->prog_error(QStringLiteral("MpKill - Already fighting"));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   return attack(ch, victim, TYPE_UNDEFINED);
@@ -256,10 +254,10 @@ int do_mphit(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(argument, arg);
@@ -267,31 +265,31 @@ int do_mphit(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("MpHit - no argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
     ch->prog_error(QStringLiteral("MpHit - Victim not in room."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (GET_POS(victim) == position_t::DEAD)
   {
     ch->prog_error(QStringLiteral("MpHit - Victim already dead."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim == ch)
   {
     ch->prog_error(QStringLiteral("MpHit - Bad victim to attack."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (IS_AFFECTED(ch, AFF_CHARM) && ch->master == victim)
   {
     ch->prog_error(QStringLiteral("MpHit - Charmed mob attacking master."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   return one_hit(ch, victim, TYPE_UNDEFINED, FIRST);
@@ -303,10 +301,10 @@ int do_mpaddlag(Character *ch, char *argument, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -315,21 +313,21 @@ int do_mpaddlag(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("MpAddlag - no argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((victim = ch->get_char_room_vis(arg)) == nullptr)
   {
     ch->prog_error(QStringLiteral("MpAddlag - Victim not in room."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg1[0] || !is_number(arg1))
   {
     ch->prog_error(QStringLiteral("MpAddlag - Invalid duration."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   WAIT_STATE(victim, atoi(arg1));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile destroy an object in its inventory
@@ -343,10 +341,10 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
   int location;
   bool dot = false;
   char dotbuf[MAX_INPUT_LENGTH];
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   dotbuf[0] = '\0';
   one_argument(argument, arg);
@@ -354,7 +352,7 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpjunk - No argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (str_cmp(arg, "all") && !sscanf(arg, "all.%s", dotbuf))
@@ -362,12 +360,12 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
     if ((obj = ch->get_object_in_equip_vis(arg, ch->equipment, &location, false)))
     {
       extract_obj(ch->unequip_char(location));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if ((obj = get_obj_in_list(arg, ch->carrying)))
     {
       extract_obj(obj);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   else
@@ -387,9 +385,9 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
       if (!dot || isexact(dotbuf, x->Name()))
         extract_obj(x);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 /* prints the message to everyone in the room other than the mob and victim */
@@ -399,10 +397,10 @@ int do_mpechoaround(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -410,17 +408,17 @@ int do_mpechoaround(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpechoaround - No argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room, true)))
   {
     ch->prog_error(QStringLiteral("Mpechoaround - victim does not exist."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (CAN_SEE(ch, victim))
     act(argument + 1, ch, nullptr, victim, TO_ROOM, NOTVICT);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
@@ -428,10 +426,10 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
   Character *victim, *victim2;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -439,23 +437,23 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || arg1[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpechoaroundnotbad - No argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room)))
   {
     ch->prog_error(QStringLiteral("Mpechoaroundnotbad - victim does not exist."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (!(victim2 = get_char_room(arg1, ch->in_room)))
   {
     ch->prog_error(QStringLiteral("Mpechoaroundnotbad - victim does not exist."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   //     if (CAN_SEE(ch,victim))
   act(argument + 1, victim, nullptr, victim2, TO_ROOM, NOTVICT);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* prints the message to only the victim */
@@ -465,10 +463,10 @@ int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -476,37 +474,37 @@ int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || argument[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpechoat - No argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room, true)))
   {
     ch->prog_error(QStringLiteral("Mpechoat - victim does not exist."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   act(argument + 1, ch, nullptr, victim, TO_VICT, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* prints the message to the room at large */
 
 int do_mpecho(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (argument[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpecho - called w/o argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   act(argument + 1, ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile load an item or mobile.  All items
@@ -519,10 +517,10 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
   int realnum;
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(argument, arg);
@@ -530,13 +528,13 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || !is_number(arg))
   {
     ch->prog_error(QStringLiteral("Mpmload - Bad vnum as arg."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((realnum = real_mobile(atoi(arg))) < 0)
   {
     ch->prog_error(QStringLiteral("Mpmload - Bad mob vnum."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   victim = ch->getDC()->clone_mobile(realnum);
@@ -544,7 +542,7 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
   char_to_room(victim, ch->in_room);
   mprog_load_trigger(victim); // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpoload(Character *ch, char *argument, cmd_t cmd)
@@ -555,10 +553,10 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
   Object *obj;
   int realnum;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg1);
@@ -567,19 +565,19 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
   if (arg1[0] == '\0' || !is_number(arg1))
   {
     ch->prog_error(QStringLiteral("Mpoload - Bad syntax."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if ((realnum = real_object(atoi(arg1))) < 0)
   {
     ch->prog_error(QStringLiteral("Mpoload - Bad vnum arg."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   obj = clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
+  if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!strcasecmp(arg2, "random"))
@@ -596,7 +594,7 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
     obj_to_room(obj, ch->in_room);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile purge all objects and other npcs in the room,
@@ -610,10 +608,10 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   Object *obj;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   one_argument(argument, arg);
@@ -627,7 +625,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
     for (victim = DC::getInstance()->world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
       vnext = victim->next_in_room;
-      if (IS_NPC(victim) && victim != ch)
+      if (victim->isNonPlayer() && victim != ch)
       {
         extract_char(victim, true);
       }
@@ -639,7 +637,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
       extract_obj(obj);
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(victim = get_char_room(arg, ch->in_room)))
@@ -656,21 +654,21 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
     //	else
     //	{
     //	    ch->prog_error( QStringLiteral("Mppurge - Bad argument."));
-    //            return eFAILURE|eINTERNAL_ERROR;
+    //            return ReturnValue::eFAILURE|ReturnValue::eINTERNAL_ERROR;
     //	}
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     ch->prog_error(QStringLiteral("Mppurge - Purging a PC."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   //    issame = (ch == victim);
   if (ch == victim)
   {
-    // DC::getInstance()->logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), qPrintable(victim->getName()));
+    // logf(0, DC::LogChannel::LOG_BUG, "selfpurge on %s to %s", GET_NAME(ch), victim->getNameC());
     selfpurge = true;
     selfpurge.setOwner(ch, "do_mppurge");
   }
@@ -682,9 +680,9 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
   // or a number of other possibilities and we dunno who died.  Otherwise we continue
   // trying to move someone that is dead.
 
-  return eSUCCESS | eCH_DIED | eVICT_DIED;
+  return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED | ReturnValue::eVICT_DIED;
 
-  //    return eSUCCESS;
+  //    return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile goto any location it wishes that is not private */
@@ -694,17 +692,17 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   int32_t location = -1;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpgoto - No argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   // TODO - make this work with strings (goto chode) too
@@ -716,7 +714,7 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
     if (arg[0] == '\0' || !is_number(arg))
     {
       ch->prog_error(QStringLiteral("Mpgoto - Missing vnum after 'mob' argument."));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     vict = get_mob_vnum(atoi(arg));
     if (!vict)
@@ -730,7 +728,7 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
     if (arg[0] == '\0')
     {
       ch->prog_error(QStringLiteral("Mpgoto - Missing arg after 'pc' argument."));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     if (!(vict = get_pc(arg)))
       location = -1;
@@ -756,10 +754,10 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
   if (location < 0)
   {
     ch->prog_error(QStringLiteral("Mpgoto - No such location."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (location == ch->in_room)
-    return eFAILURE; // zz
+    return ReturnValue::eFAILURE; // zz
   if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
     location = 0;
 
@@ -769,7 +767,7 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
   char_from_room(ch);
   char_to_room(ch, location);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile do a command at another location. Very useful */
@@ -781,10 +779,10 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   int32_t original;
   int result;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -792,7 +790,7 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || argument[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpat - Bad argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   // TODO - make location take args
@@ -809,14 +807,14 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   if (location < 0)
   {
     ch->prog_error(QStringLiteral("do_mpat - No such location."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   if (location > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(location))
   {
     if (!DC::getInstance()->rooms.contains(1))
     {
-      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(QString::number(location)));
-      return eFAILURE | eINTERNAL_ERROR;
+      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     else
     {
@@ -829,7 +827,7 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   char_to_room(ch, location);
   result = ch->command_interpreter(QString(argument));
 
-  if (isSet(result, eCH_DIED))
+  if (isSet(result, ReturnValue::eCH_DIED))
     return result;
 
   char_from_room(ch);
@@ -849,10 +847,10 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
 
   Character *get_pc_room_vis_exact(Character * ch, const char *name);
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   half_chop(argument, arg, buf);
@@ -860,13 +858,13 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || !(vict = get_pc_room_vis_exact(ch, arg)))
   {
     ch->prog_error(QStringLiteral("Mpxpreward - Bad argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!check_valid_and_convert(reward, buf))
   {
     ch->prog_error(QStringLiteral("Mpxpreward - Bad argument."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (reward < 0)
@@ -874,12 +872,12 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
     {
       csendf(vict, "You lose %d exps.\r\n", (-1 * reward));
       GET_EXP(vict) = 0;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
-  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(QString::number(reward)));
+  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(reward));
   gain_exp(vict, reward);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile transfer people.  the all argument transfers
@@ -893,10 +891,10 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
   Connection *d;
   Character *victim;
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
@@ -904,7 +902,7 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
   if (arg1[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mptransfer - Bad syntax"));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (!str_cmp(arg1, "all"))
@@ -914,11 +912,11 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
       if (d->connected == Connection::states::PLAYING && d->character != ch && d->character->in_room == ch->in_room && CAN_SEE(ch, d->character))
       {
         char buf[MAX_STRING_LENGTH];
-        sprintf(buf, "%s %s", qPrintable(d->character->getName()), arg2);
+        sprintf(buf, "%s %s", d->character->getNameC(), arg2);
         do_mptransfer(ch, buf, cmd);
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /*
@@ -936,26 +934,26 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
     if (location < 0)
     {
       ch->prog_error(QStringLiteral("Mptransfer - No such location."));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
     if (isSet(DC::getInstance()->world[location].room_flags, PRIVATE))
     {
       ch->prog_error(QStringLiteral("Mptransfer - Private room."));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
   }
 
   if ((victim = get_char_vis(ch, arg1)) == nullptr)
   {
     ch->prog_error(QStringLiteral("Mptransfer - No such person."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim->in_room == DC::NOWHERE)
   {
     ch->prog_error(QStringLiteral("Mptransfer - Victim in Limbo."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   if (victim->fighting != nullptr)
@@ -964,7 +962,7 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
   char_from_room(victim);
   char_to_room(victim, location);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* lets the mobile force someone to do something.  must be mortal level
@@ -974,10 +972,10 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -985,7 +983,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || argument[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpforce - Bad syntax"));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   // TODO - this is dangerous...need to rework it.  If the person we force kills the
@@ -1013,13 +1011,13 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
     if ((victim = ch->get_char_room_vis(arg)) == nullptr)
     {
       ch->prog_error(QStringLiteral("Mpforce - No such victim."));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
     if (victim == ch)
     {
       ch->prog_error(QStringLiteral("Mpforce - Forcing oneself"));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
     if (CAN_SEE(ch, victim))
@@ -1033,7 +1031,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // "Throw" a message to another mob.  Right now, it's only an int specifying which
@@ -1041,7 +1039,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 // argument should be <mob> <catchnum> <delay>
 int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
 {
-  struct mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = nullptr;
   int mob_num;
   int catch_num;
   int delay;
@@ -1063,7 +1061,7 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
     if (!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0))
     {
       ch->prog_error(QStringLiteral("Mpthrow - Invalid mobnum."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     *first = '\0';
   }
@@ -1072,28 +1070,28 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
     if (strlen(first) >= MAX_THROW_NAME)
     {
       ch->prog_error(QStringLiteral("Mpthrow - Name too long."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (!check_range_valid_and_convert(catch_num, second, MPROG_CATCH_MIN, MPROG_CATCH_MAX))
   {
     ch->prog_error(QStringLiteral("Mpthrow - Invalid catch_num."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!check_range_valid_and_convert(delay, third, 0, 500000))
   {
     ch->prog_error(QStringLiteral("Mpthrow - Invalid delay."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int opt = 0;
   if (!check_range_valid_and_convert(opt, fifth, 0, 50000))
     opt = 0;
 
-  // create struct
-  throwitem = new struct mprog_throw_type;
+  // create
+  throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
   throwitem->target_mob_num = mob_num;
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
@@ -1113,7 +1111,7 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
@@ -1121,10 +1119,10 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   char skill[MAX_INPUT_LENGTH];
 
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   half_chop(argument, arg, skill);
@@ -1132,7 +1130,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || skill[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpteachskill - Bad syntax."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   Character *victim;
@@ -1140,45 +1138,45 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   if ((victim = get_char_room(arg, ch->in_room)) == nullptr)
   {
     ch->prog_error(QStringLiteral("Mpteachskill - No such victim."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   int skillnum;
   if (!(check_range_valid_and_convert(skillnum, skill, 0, SKILL_SONG_MAX)))
   {
     ch->prog_error(QStringLiteral("Mpteachskill - No such skill"));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   QString skillname = get_skill_name(skillnum);
 
   if (victim->has_skill(skillnum))
   {
-    csendf(victim, "You already know the basics of %s!\r\n", skillname.isEmpty() ? "Unknown" : qPrintable(skillname));
-    return eFAILURE;
+    csendf(victim, "You already know the basics of %s!\r\n", skillname.isEmpty() ? "Unknown" : skillname.toStdString().c_str());
+    return ReturnValue::eFAILURE;
   }
 
   class_skill_defines *skilllist = victim->get_skill_list();
   if (!skilllist)
   {
     ch->prog_error(QStringLiteral("Mpteachskill - %1 had no skill list?").arg(victim->getName()));
-    return eFAILURE; // no skills to train
+    return ReturnValue::eFAILURE; // no skills to train
   }
 
   int index = search_skills2(skillnum, skilllist);
   if (victim->getLevel() < skilllist[index].levelavailable)
   {
     victim->send(QStringLiteral("You try to learn the basics of %1, but it is too advanced for you right now.\r\n").arg(skillname));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!skillname.isEmpty())
-    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", qPrintable(skillname));
+    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", skillname.toStdString().c_str());
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
     ch->prog_error(QStringLiteral("Mpteachskill - invalid skill number"));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   victim->send(skill);
@@ -1187,10 +1185,10 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
 
   prepare_character_for_sixty(ch);
 
-  snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", qPrintable(skillname));
+  snprintf(skill, sizeof(skill), "$N has learned the basics of %s.", skillname.toStdString().c_str());
   act(skill, ch, 0, victim, TO_ROOM, NOTVICT);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int determine_attack_type(char *attacktype)
@@ -1209,7 +1207,7 @@ int determine_attack_type(char *attacktype)
 
 QString Character::getTemp(QString name)
 {
-  struct tempvariable *eh;
+  tempvariable *eh;
   for (eh = tempVariable; eh; eh = eh->next)
     if (eh->name == name)
       return eh->data;
@@ -1225,15 +1223,15 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   QString arg3 = arguments.value(3);
   if (arg.isEmpty() || temp.isEmpty() || arg2.isEmpty())
   {
-    if (IS_NPC(this))
+    if (this->isNonPlayer())
     {
-      int num = DC::getInstance()->mob_index[mobdata->nr].virt;
+      int num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
 
-      DC::getInstance()->logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(QString::number(num)));
+      logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  victim = get_char_room(arg, in_room);
+  victim = get_char_room(arg, this->in_room);
   int type = 0;
   if (!victim)
   {
@@ -1246,18 +1244,18 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   }
 
   if (!victim && type == 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (!victim)
-    victim = DC::getInstance()->world[in_room].people;
+    victim = DC::getInstance()->world[this->in_room].people;
 
   for (; victim; victim = victim->next_in_room)
   {
-    if (type == 1 && IS_NPC(victim))
+    if (type == 1 && victim->isNonPlayer())
       continue;
-    else if (type == 2 && IS_PC(victim))
+    else if (type == 2 && victim->isPlayer())
       continue;
 
-    struct tempvariable *eh;
+    tempvariable *eh;
     for (eh = victim->tempVariable; eh; eh = eh->next)
     {
       if (eh->name == temp)
@@ -1283,68 +1281,73 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
     if (type == 0)
       break;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpsetalign(Character *ch, char *argument, cmd_t cmd)
 {
   Character *victim;
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!*argument || !ch->in_room)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   half_chop(argument, arg, align);
   victim = get_char_room(arg, ch->in_room);
   if (!victim || (!is_number(align) && (!is_number(align + 1) || *align != '-')))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if (atoi(align) > 1000 || atoi(align) < -1000)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   victim->alignment = atoi(align);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // List of people who have been recently damaged by mpdamage
 // Used for connecting mpdamage with messaging
-struct damage_list
+class damage_list
 {
-  struct damage_list *next;
+public:
+  damage_list *next;
   char name[512];
   int damage; // Damage #
 };
 
-struct damage_list *dmg_list = nullptr;
+damage_list *dmg_list = nullptr;
 
 void free_dmg_list()
 {
-  struct damage_list *c, *n;
+  damage_list *c, *n;
   for (c = dmg_list; c; c = n)
   {
     n = c->next;
-    delete c;
+    dc_free(c);
   }
   dmg_list = nullptr;
 }
 
 void add_dmg(Character *ch, int dmg)
 {
-  struct damage_list *c;
+  damage_list *c;
 
   for (c = dmg_list; c; c = c->next)
   {
-    if ((IS_NPC(ch) && !str_cmp(c->name, GET_SHORT(ch))) ||
-        (IS_PC(ch) && !str_cmp(c->name, GET_NAME(ch))))
+    if ((ch->isNonPlayer() && !str_cmp(c->name, GET_SHORT(ch))) ||
+        (ch->isPlayer() && !str_cmp(c->name, GET_NAME(ch))))
     {
       c->damage += dmg;
       return;
     }
   }
 
-  c = new struct damage_list;
-  if (IS_NPC(ch))
+#ifdef LEAK_CHECK
+  c = (damage_list *)calloc(1, sizeof(damage_list));
+#else
+  c = (damage_list *)dc_alloc(1, sizeof(damage_list));
+#endif
+  if (ch->isNonPlayer())
     strcpy(c->name, GET_SHORT(ch));
   else
     strcpy(c->name, GET_NAME(ch));
@@ -1362,10 +1365,10 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
   int32_t hitpoints = 0;
 
   free_dmg_list();
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   argument = one_argument(argument, arg);
@@ -1373,7 +1376,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     ch->prog_error(QStringLiteral("Mpdamage - Bad syntax: Missing victim."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
   Character *victim = nullptr;
@@ -1382,14 +1385,14 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
-    if (victim && (victim->getLevel() > MORTAL || IS_NPC(victim))) // don't target immortals
+    if (victim && (victim->getLevel() > MORTAL || victim->isNonPlayer())) // don't target immortals
       victim = nullptr;
 
     if (!victim)
-      return eFAILURE; // not an error, just couldn't get valid vict
+      return ReturnValue::eFAILURE; // not an error, just couldn't get valid vict
   }
 
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
   while (1)
   {
     argument = one_argument(argument, damroll);
@@ -1424,7 +1427,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
     if (!numdice || !sizedice)
     {
       ch->prog_error(QStringLiteral("Mpdamage - Invalid damroll"));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
 
     // figure out attack type
@@ -1432,7 +1435,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
     if (!damtype)
     {
       ch->prog_error(QStringLiteral("Mpdamage - Invalid damtype"));
-      return eFAILURE | eINTERNAL_ERROR;
+      return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     int dam = 0;
     // do the damage
@@ -1461,7 +1464,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       else
       {
         ch->prog_error(QStringLiteral("Mpdamage - Must damage either ki,mana,hitpoints or move"));
-        return eFAILURE | eINTERNAL_ERROR;
+        return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
 
       if (perc)
@@ -1506,12 +1509,12 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
     for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
-      if ((IS_PC(victim) && victim->getLevel() > MORTAL) || victim == ch)
+      if ((victim->isPlayer() && victim->getLevel() > MORTAL) || victim == ch)
       {
         continue;
       }
 
-      if (!strcmp(arg, "allpc") && IS_NPC(victim))
+      if (!strcmp(arg, "allpc") && victim->isNonPlayer())
       {
         continue;
       }
@@ -1530,7 +1533,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       else
       {
         ch->prog_error(QStringLiteral("Mpdamage - Must damage either ki,mana,hitpoints or move"));
-        return eFAILURE | eINTERNAL_ERROR;
+        return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
       if (perc)
         dam = (int)((double)(*data) / 100.0 * (double)dice(numdice, sizedice));
@@ -1544,7 +1547,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
         retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
-        if (isSet(retval, eCH_DIED))
+        if (isSet(retval, ReturnValue::eCH_DIED))
         {
           return retval;
         }
@@ -1562,12 +1565,12 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
 {
-  struct mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = nullptr;
   int mob_num;
   int catch_num;
   int delay;
@@ -1588,7 +1591,7 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
         (real_object(mob_num) < 0))
     {
       ch->prog_error(QStringLiteral("Mpothrow - Invalid objnum."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     *first = '\0';
   }
@@ -1597,7 +1600,7 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
     if (strlen(first) >= MAX_THROW_NAME)
     {
       ch->prog_error(QStringLiteral("Mpthrow - Name too long."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1605,17 +1608,18 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
                                      MPROG_CATCH_MAX))
   {
     ch->prog_error(QStringLiteral("Mpthrow - Invalid catch_num."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!check_range_valid_and_convert(delay, third, 0, 500))
   {
     ch->prog_error(QStringLiteral("Mpthrow - Invalid delay."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  // create struct
-  throwitem = new struct mprog_throw_type;
+  // create
+  throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(
+                                                  mprog_throw_type));
   throwitem->target_mob_num = mob_num;
   strcpy(throwitem->target_mob_name, first);
   throwitem->data_num = catch_num;
@@ -1630,7 +1634,7 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int skill_aff[] =
@@ -1654,10 +1658,10 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
   Character *victim, *owner = nullptr;
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   argument = one_argument(argument, arg);
   argument = one_argument(argument, arg1);
@@ -1665,15 +1669,15 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, arg3);
 
   if (arg[0] == '\0' || arg1[0] == '\0' || arg2[0] == '\0')
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   if ((victim = get_char_room(arg, ch->in_room, true)) == nullptr && str_cmp(arg, "all") && str_cmp(arg, "allpc"))
   {
     ch->prog_error(QStringLiteral("Mpbestow - No such person."));
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   int i, o = 0;
   if (!check_range_valid_and_convert(i, arg2, 0, 100))
-    return eFAILURE | eINTERNAL_ERROR;
+    return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   check_range_valid_and_convert(o, arg3, 0, 10000);
   int a = 0;
   if (ch->beacon)
@@ -1689,12 +1693,12 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
       if (!str_cmp(affected_bits[a], arg1))
       {
         // debugpoint();
-        struct affected_type af;
+        affected_type af;
         af.type = z = skill_aff[a];
         if (victim->affected_by_spell(z + BASE_TIMERS))
         {
           //		victim->sendln("A s.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         af.duration = i;
         af.bitvector = a + 1;
@@ -1718,7 +1722,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
     {
       while ((victim = victim->next_in_room))
       {
-        if (IS_PC(victim))
+        if (victim->isPlayer())
           break;
       }
     }
@@ -1727,7 +1731,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
   }
   if (z && o && owner) // Timer on it
   {
-    struct affected_type af;
+    affected_type af;
     af.type = BASE_TIMERS + z;
     af.duration = o;
     af.bitvector = -1;
@@ -1735,20 +1739,20 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
     af.modifier = 0;
     affect_join(owner, &af, true, false);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // simulate a pause in proc execution
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
 int do_mppause(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  struct mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = nullptr;
   int delay;
 
   char first[MAX_INPUT_LENGTH];
@@ -1762,9 +1766,9 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
     if (!check_range_valid_and_convert(delay, second, 0, 65536))
     {
       ch->prog_error(QStringLiteral("mpppause all - Invalid delay."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
-    throwitem = new struct mprog_throw_type;
+    throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
 
     if (ch && ch->mobdata)
     {
@@ -1777,15 +1781,15 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
     if (!check_range_valid_and_convert(delay, first, 0, 65536))
     {
       ch->prog_error(QStringLiteral("mppause - Invalid delay."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
-    throwitem = new struct mprog_throw_type;
+    throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
     throwitem->data_num = -999;
   }
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
-    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].virt;
+    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -1823,7 +1827,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
   // add to delay list
   throwitem->next = g_mprog_throw_list;
   g_mprog_throw_list = throwitem;
-  return eSUCCESS | eDELAYED_EXEC;
+  return ReturnValue::eSUCCESS | ReturnValue::eDELAYED_EXEC;
 }
 
 int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
@@ -1832,8 +1836,8 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
   char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   room_t to_room = 0;
 
-  if (IS_PC(ch) && ch->getLevel() < 110)
-    return eFAILURE;
+  if (ch->isPlayer() && ch->getLevel() < 110)
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, person, type);
 
@@ -1851,7 +1855,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("No-one by that name around.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1864,7 +1868,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
       snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
       victim->send(buf);
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int i = DC::getInstance()->world[ch->in_room].zone,
@@ -1882,7 +1886,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
       // Check to see if we're in an endless loop
       if (attempts++ > high - low)
       {
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else
@@ -1896,7 +1900,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
            isSet(DC::getInstance()->world[to_room].room_flags, ARENA) ||
            (DC::getInstance()->world[to_room].sector_type == SECT_UNDERWATER && GET_RACE(victim) != RACE_FISH) ||
            DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isNoTeleport() ||
-           ((IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
+           ((victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_STAY_NO_TOWN)) ? (DC::getInstance()->zones.value(DC::getInstance()->world[to_room].zone).isTown()) : false) ||
            (IS_AFFECTED(victim, AFF_CHAMPION) && (isSet(DC::getInstance()->world[to_room].room_flags, CLAN_ROOM) ||
                                                   (to_room >= 1900 && to_room <= 1999))));
 
@@ -1905,15 +1909,15 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
   act("$n slowly fades into existence.", victim, 0, 0, TO_ROOM, 0);
 
   do_look(victim, "");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mppeace(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
@@ -1926,30 +1930,30 @@ int do_mppeace(Character *ch, char *argument, cmd_t cmd)
     if (!vict)
     {
       ch->prog_error(QStringLiteral("Mppeace - Vict not found."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
-    if (IS_NPC(vict) && vict->mobdata->hated != nullptr)
+    if (vict->isNonPlayer() && vict->mobdata->hated != nullptr)
       remove_memory(vict, 'h');
     if (vict->fighting != nullptr)
       stop_fighting(vict);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
+    if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_mpretval(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char *retvals[] =
@@ -1959,7 +1963,7 @@ int do_mpretval(Character *ch, char *argument, cmd_t cmd)
           "\n"};
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
-  int retval = eSUCCESS;
+  int retval = ReturnValue::eSUCCESS;
 
   for (int i = 0; retvals[i][0] != '\n'; i++)
     if (!str_cmp(arg, retvals[i]))
@@ -2088,7 +2092,7 @@ char *expand_data(Character *ch, char *orig)
     strcpy(right, ptr + 1);
     *(ptr + r) = c;
     r--;
-    if (!c == '\0')
+    if (c != '\0')
       *(ptr + r) = '~';
 
     int16_t *lvali = nullptr;
@@ -2140,10 +2144,10 @@ char *allowedData[] = {
 
 int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
 {
-  if (IS_PC(ch))
+  if (ch->isPlayer())
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Character *vict;
@@ -2165,7 +2169,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   if (!r || !*r || !*arg1)
   {
     ch->prog_error(QStringLiteral("Mpsetmath - Invalid primary data."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   bool allowed = false;
 
@@ -2182,9 +2186,9 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   if (!vict)
   {
     // ch->prog_error( QStringLiteral("Mpsetmath - No target."));
-    // return eFAILURE;
+    // return ReturnValue::eFAILURE;
   }
-  if (vict && IS_NPC(vict))
+  if (vict && vict->isNonPlayer())
     allowed = true;
   else if (vict)
     for (int i = 0; allowedData[i]; i++)
@@ -2194,7 +2198,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   if (!allowed && vict)
   {
     ch->prog_error(QStringLiteral("Mpsetmath - Accessing unallowed data."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (lvalstr)
@@ -2204,15 +2208,15 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
     if (!nw[0])
     {
       ch->prog_error(QStringLiteral("Mpsetmath - Invalid string."));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     *lvalstr = str_dup(nw);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!lvalui && !lvali && !lvalb)
   {
     ch->prog_error(QStringLiteral("Mpsetmath - Accessing unknown data."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char *fixed = expand_data(ch, arg);
@@ -2222,25 +2226,25 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   if (i == -9839)
   {
     ch->prog_error(QStringLiteral("Mpsetmath - Invalid math-string."));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (lvali)
   {
     *lvali = i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalb)
   {
     *lvalb = (int8_t)i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].virt );
+    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
   }
 
   /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
@@ -2250,21 +2254,21 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
       process_math(ch, "1+101-34+5*10*2/8")
       );
     */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    DC::getInstance()->logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(QString::number(dc_->obj_index[objdata->item_number].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
-  else if (IS_NPC(this))
+  else if (this->isNonPlayer())
   {
-    DC::getInstance()->logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(QString::number(dc_->mob_index[mobdata->nr].virt)).arg(QString::number(mprog_command_num)).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else
   {
-    DC::getInstance()->logworld(QStringLiteral("Unknown prog: %1").arg(error_message));
+    logworld(QStringLiteral("Unknown prog: %1").arg(error_message));
   }
 }

@@ -48,7 +48,7 @@ int do_plats(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "%15d - %s - %ld - %d\r\n", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
     ch->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_force(Character *ch, std::string argument, cmd_t cmd)
@@ -58,15 +58,15 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
   Character *vict = {};
   std::string name = {}, to_force = {}, buf = {};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
     ch->send("Huh?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::tie(name, to_force) = half_chop(argument);
@@ -74,7 +74,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
   if (name.empty() || to_force.empty())
   {
     ch->send("Who do you wish to force to do what?\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (name != "all")
   {
@@ -82,13 +82,13 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
       ch->sendln("No one by that name here..");
     else
     {
-      if (ch->getLevel() < vict->getLevel() && IS_NPC(vict))
+      if (ch->getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
         ch->sendln("Now doing that would just tick off the IMPS!");
-        DC::getInstance()->logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);
-        return eSUCCESS;
+        logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);
+        return ReturnValue::eSUCCESS;
       }
-      if ((ch->getLevel() <= vict->getLevel()) && IS_PC(vict))
+      if ((ch->getLevel() <= vict->getLevel()) && vict->isPlayer())
       {
         ch->sendln("Why be forceful?");
         buf = fmt::format("$n has failed to force you to '{}'.", to_force);
@@ -105,7 +105,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
         buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
                           GET_NAME(vict), to_force);
         vict->command_interpreter(to_force.c_str());
-        DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+        logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
       }
     }
   }
@@ -115,7 +115,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
     if (ch->getLevel() < OVERSEER)
     {
       ch->sendln("Not gonna happen.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = next_i)
     {
@@ -138,9 +138,9 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
     }
     ch->sendln("Ok.");
     buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
-    DC::getInstance()->logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 typedef command_return_t (*test_function_t)(Character *ch);
@@ -159,7 +159,7 @@ public:
     {
       return function_(ch);
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   QString getName(void) const { return name_; }
 
@@ -184,49 +184,49 @@ command_return_t run_all_events(Character *ch = nullptr)
   }
   if (counter >= 1000)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 QString rc_to_qstring(const command_return_t &rc)
 {
   QStringList strings;
-  if (isSet(rc, eFAILURE))
+  if (isSet(rc, ReturnValue::eFAILURE))
   {
-    strings += "eFAILURE";
+    strings += "ReturnValue::eFAILURE";
   }
-  if (isSet(rc, eSUCCESS))
+  if (isSet(rc, ReturnValue::eSUCCESS))
   {
-    strings += "eSUCCESS ";
+    strings += "ReturnValue::eSUCCESS ";
   }
-  if (isSet(rc, eCH_DIED))
+  if (isSet(rc, ReturnValue::eCH_DIED))
   {
-    strings += "eCH_DIED ";
+    strings += "ReturnValue::eCH_DIED ";
   }
-  if (isSet(rc, eDELAYED_EXEC))
+  if (isSet(rc, ReturnValue::eDELAYED_EXEC))
   {
-    strings += "eDELAYED_EXEC ";
+    strings += "ReturnValue::eDELAYED_EXEC ";
   }
-  if (isSet(rc, eEXTRA_VAL2))
+  if (isSet(rc, ReturnValue::eEXTRA_VAL2))
   {
-    strings += "eEXTRA_VAL2 ";
+    strings += "ReturnValue::eEXTRA_VAL2 ";
   }
-  if (isSet(rc, eEXTRA_VALUE))
+  if (isSet(rc, ReturnValue::eEXTRA_VALUE))
   {
-    strings += "eEXTRA_VALUE ";
+    strings += "ReturnValue::eEXTRA_VALUE ";
   }
-  if (isSet(rc, eIMMUNE_VICTIM))
+  if (isSet(rc, ReturnValue::eIMMUNE_VICTIM))
   {
-    strings += "eIMMUNE_VICTIM ";
+    strings += "ReturnValue::eIMMUNE_VICTIM ";
   }
-  if (isSet(rc, eINTERNAL_ERROR))
+  if (isSet(rc, ReturnValue::eINTERNAL_ERROR))
   {
-    strings += "eINTERNAL_ERROR ";
+    strings += "ReturnValue::eINTERNAL_ERROR ";
   }
-  if (isSet(rc, eVICT_DIED))
+  if (isSet(rc, ReturnValue::eVICT_DIED))
   {
-    strings += "eVICT_DIED ";
+    strings += "ReturnValue::eVICT_DIED ";
   }
 
   return strings.join(',');
@@ -324,7 +324,7 @@ command_return_t test_casino(Character *ch)
 {
   if (!ch || !ch->player)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int max_rc{};
@@ -411,7 +411,7 @@ command_return_t test_casino(Character *ch)
   if (ch->getGold() > 2000000)
   {
     ch->send(QStringLiteral("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
-    max_rc = max_rc | eFAILURE;
+    max_rc = max_rc | ReturnValue::eFAILURE;
   }
 
   ch->player->bank = original_bank;
@@ -434,7 +434,7 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
     {
       send(test.getName() + "\r\n");
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (arg1 == "all")
   {
@@ -455,5 +455,5 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
     return rc;
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }

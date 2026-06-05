@@ -26,11 +26,11 @@
 /* handling the affected-structures */
 void affect_total(Character *ch);
 void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
-void affect_to_char(Character *ch, struct affected_type *af, int32_t duration_type = DC::PULSE_TIME);
+void affect_to_char(Character *ch, affected_type *af, int32_t duration_type = DC::PULSE_TIME);
 void affect_from_char(Character *ch, int skill, int flags = 0);
-void affect_remove(Character *ch, struct affected_type *af, int flags);
-void affect_join(Character *ch, struct affected_type *af,
-				 bool avg_dur, bool avg_mod);
+void affect_remove(Character *ch, affected_type *af, int flags);
+void affect_join(Character *ch, affected_type *af,
+                 bool avg_dur, bool avg_mod);
 affected_type *affected_by_random(Character *ch);
 
 /* flag bit values for affect_remove() */
@@ -139,12 +139,12 @@ bool is_wearing(Character *ch, Object *item);
 class ErrorHandler
 {
 public:
-	class underrun
-	{
-	};
-	class overrun
-	{
-	};
+  class underrun
+  {
+  };
+  class overrun
+  {
+  };
 };
 
 bool objExists(Object *obj);

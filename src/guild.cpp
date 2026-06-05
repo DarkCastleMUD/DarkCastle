@@ -35,7 +35,7 @@ int do_practice(Character *ch, char *arg, cmd_t cmd)
   {
     guild(ch, 0, cmd, "", ch);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_profession(Character *ch, char *args, cmd_t cmd)
@@ -44,7 +44,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (!ch->has_skill(SKILL_PROFESSION))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // You can only use the command in the same room of a mob named guildmaster
@@ -52,7 +52,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (victim == nullptr)
   {
     ch->sendln("You can't pick a profession here. You need to find a Guild Master.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   char arg1[MAX_INPUT_LENGTH];
@@ -78,7 +78,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
                "\r\n"
                "Resetting your profession costs 10000 platinum.\r\n");
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   bool found = false;
@@ -94,7 +94,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
       else
       {
         ch->sendln("That profession is not available to your class.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -102,10 +102,10 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (found == false)
   {
     csendf(ch, "%s not a valid profession.\r\n", arg1);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 char *per_col(int percent)
@@ -450,7 +450,7 @@ char *attrname(int clss, int attr)
 
 int Character::skillmax(int skill, int eh)
 {
-  if (isNPC())
+  if (isNonPlayer())
   {
     return eh;
   }
@@ -499,7 +499,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
     if (!known && getLevel() < skilllist[i].levelavailable)
       continue;
 
-    if (IS_PC(this) && skilllist[i].group > 0 && skilllist[i].group != player->profession)
+    if (this->isPlayer() && skilllist[i].group > 0 && skilllist[i].group != player->profession)
     {
       continue;
     }
@@ -508,7 +508,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\r\n$B%s Profession Skills:$R\r\n", find_profession(c_class, skilllist[i].group));
+        csendf(this, "\r\n$B%s Profession Skills:$R\r\n", qPrintable(find_profession(c_class, skilllist[i].group)));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -520,7 +520,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       self_learn_max = getLevel() * 2;
     }
 
-    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3d/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
+    sprintf(buf, " %c%-24s%s%15s $B$0$R%s%3d/%3llu/%3d$B$0$R  ", UPPER(*skilllist[i].skillname), (skilllist[i].skillname + 1),
             per_col(known), how_good(known), per_col(known), known, self_learn_max, get_max(skilllist[i].skillnum));
     send(buf);
     if (skilllist[i].skillnum >= 1 && skilllist[i].skillnum <= MAX_SPL_LIST)
@@ -627,13 +627,13 @@ int Character::skills_guild(const char *arg, Character *owner)
   int skillnumber;
   int percent;
 
-  if (IS_NPC(this))
-    return eFAILURE;
+  if (this->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   class_skill_defines *skilllist = get_skill_list();
 
   if (!skilllist)
-    return eFAILURE; // no skills to train
+    return ReturnValue::eFAILURE; // no skills to train
 
   if (!*arg) // display skills that can be learned
   {
@@ -663,25 +663,25 @@ int Character::skills_guild(const char *arg, Character *owner)
     if (GET_CLASS(this) == CLASS_BARD)
       sendln("$B#$R denotes a song which requires an instrument.");
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (GET_POS(this) == position_t::SLEEPING)
   {
     sendln("You cannot practice in your sleep.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   skillnumber = search_skills(arg, skilllist);
 
   if (skillnumber == -1)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (getLevel() < skilllist[skillnumber].levelavailable)
   {
     sendln("You aren't advanced enough for that yet.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   x = skilllist[skillnumber].skillnum;
@@ -693,11 +693,11 @@ int Character::skills_guild(const char *arg, Character *owner)
     if (GET_CLASS(this) != GET_CLASS(owner))
     {
       do_say(owner, "I am sorry, I cannot teach you that.  You will have to find another trainer.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
-      struct skill_quest *sq;
+      skill_quest *sq;
       if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && sq->message && isSet(sq->clas, 1 << (GET_CLASS(this) - 1)))
       {
         mprog_driver(sq->message, owner, this, nullptr, nullptr, nullptr, nullptr);
@@ -716,25 +716,25 @@ int Character::skills_guild(const char *arg, Character *owner)
         case SKILL_NAT_SELECT:
           do_say(owner, "Alternately, should you feel that you are not up to the task of an exciting quest, you can seek the Skills Master west of town.");
           do_say(owner, "Rumour has it he will teach certain skills for a hefty fee.  He will give you a LIST of what he has to offer.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         default:
           break;
         }
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
 
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
-    if (skilllist[skillnumber].group && IS_PC(this) && skilllist[skillnumber].group != player->profession)
+    if (skilllist[skillnumber].group && this->isPlayer() && skilllist[skillnumber].group != player->profession)
     {
-      csendf(this, "You must join the %s profession in order to learn that.\r\n", find_profession(c_class, skilllist[skillnumber].group));
-      return eSUCCESS;
+      csendf(this, "You must join the %s profession in order to learn that.\r\n", qPrintable(find_profession(c_class, skilllist[skillnumber].group)));
+      return ReturnValue::eSUCCESS;
     }
   }
   if (player->practices <= 0)
   {
     sendln("You do not seem to be able to practice now.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (known >= get_max(x))
@@ -742,13 +742,13 @@ int Character::skills_guild(const char *arg, Character *owner)
     do_emote(owner, "eyes you up and down.");
     do_say(owner, "Taking into account your current attributes, your");
     do_say(owner, "maximum proficiency in this ability has been reached.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (known >= skilllist[skillnumber].maximum)
   {
     sendln("You are already learned in this area.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   float maxlearn = (float)skilllist[skillnumber].maximum;
   maxlearn *= 0.5;
@@ -756,12 +756,12 @@ int Character::skills_guild(const char *arg, Character *owner)
   if (known >= (getLevel() * 2))
   {
     sendln("You are not experienced enough to practice that any further right now.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (known >= maxlearn)
   {
     sendln("You cannot learn more here.. you need to go out into the world and use it.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   switch (skillnumber)
   {
@@ -778,7 +778,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   case SKILL_NAT_SELECT:
     do_say(owner, "I cannot teach you that. You need to learn it by yourself.");
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   default:
     break;
   }
@@ -802,7 +802,7 @@ int Character::skills_guild(const char *arg, Character *owner)
       do_say(owner, "My woodland lore is more than sufficient to teach you this myself young apprentice!");
       break;
     case CLASS_ANTI_PAL:
-      do_say(owner, "Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my instruction.");
+      do_say(owner, "Ahh, young dark lord, it is but a simple matter to learn this ability.  Follow my inion.");
       break;
     case CLASS_PALADIN:
       do_say(owner, "This ability is one that I am capable of teaching you myself young novice.  Observe closely.");
@@ -831,10 +831,10 @@ int Character::skills_guild(const char *arg, Character *owner)
   if (known >= skilllist[skillnumber].maximum)
   {
     sendln("You are now learned in this area.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
@@ -842,13 +842,13 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   int64_t exp_needed;
   int x = 0;
 
-  if (cmd == cmd_t::GAIN && ch->isPlayer())
+  if (cmd == cmd_t::GAIN && !ch->isNonPlayer())
   { /*   gain crap...  */
 
     if (ch->isImmortalPlayer() || ch->getLevel() >= DC::MAX_MORTAL_LEVEL)
     {
       ch->sendln("You have already reached the highest level!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     // TODO - make it so you have to be at YOUR guildmaster to gain
@@ -895,7 +895,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
       if (!ch->has_skill(skl))
       {
         ch->sendln("You need to learn your Quest Skill before you can progress further.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     exp_needed = exp_table[(int)ch->getLevel() + 1];
@@ -905,11 +905,11 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
       x = (int)(exp_needed - GET_EXP(ch));
 
       ch->send(QStringLiteral("You need %1 experience to level.\r\n").arg(x));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->sendln("You raise a level!");
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
+    logf(IMMORTAL, DC::LogChannel::LOG_MORTAL, "%s (%s) just gained level %d.", GET_NAME(ch), pc_clss_types3[(int)GET_CLASS(ch)], ch->getLevel() + 1);
 
     ch->incrementLevel();
     advance_level(ch, 0);
@@ -935,7 +935,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
         GET_PLATINUM(ch) += bonus;
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (cmd == cmd_t::REMORT)
@@ -960,12 +960,12 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     else
     {
       ch->sendln("You have not even chosen a profession out of which to remort!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     ch->sendln("Your profession skills have been reset.");
-    struct class_skill_defines *class_skills = ch->get_skill_list();
-    struct char_skill_data *skill;
+    class_skill_defines *class_skills = ch->get_skill_list();
+    char_skill_data *skill;
 
     for (int i = 0; *class_skills[i].skillname != '\n'; i++)
       if (class_skills[i].group == groupnumber)
@@ -983,16 +983,16 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     SET_BIT(ch->player->toggles, Player::PLR_REMORTED);
 
     ch->save(cmd_t::SAVE_SILENTLY);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((cmd != cmd_t::PRACTICE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (; *arg == ' '; arg++)
@@ -1004,15 +1004,15 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   }
   else
   {
-    if (isSet(ch->skills_guild(arg, owner), eSUCCESS))
-      return eSUCCESS;
+    if (isSet(ch->skills_guild(arg, owner), ReturnValue::eSUCCESS))
+      return ReturnValue::eSUCCESS;
     else if (search_skills(arg, g_skills) != -1)
       do_say(owner, "Seek out the SKILLS MASTER in the forests west of Sorpigal to learn ch ability.");
     else
       ch->sendln("You do not know of ch ability...");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -1022,14 +1022,14 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   int learned = 0;
   class_skill_defines *skilllist = ch->get_skill_list();
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Why practice?  You're just going to die anyway...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (cmd != cmd_t::PRACTICE && cmd != cmd_t::BUY && cmd != cmd_t::LIST)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   for (; *arg == ' '; arg++)
     ;
@@ -1077,31 +1077,31 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 
     snprintf(buf, sizeof(buf), "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (cmd == cmd_t::BUY)
   {
     if (ch->getLevel() < 50)
     {
       do_say(invoker, "You have not obtained a high enough level to buy anything from me.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (str_cmp(arg, "questskill"))
     {
       do_say(invoker, "I cannot teach you that. Type LIST to see what is available.");
       //      do_say(invoker,"I could teach you your Quest Skill, for a price of 2000 platinum coins.",9);
       //     do_say(invoker,"Just \"buy questskill\" to obtain it.",9);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (ch->has_skill(skl))
     {
       do_say(invoker, "I cannot teach you anything further.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (GET_PLATINUM(ch) < 2000)
     {
       do_say(invoker, "You can't afford it, you need 2000 platinum!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     GET_PLATINUM(ch) -= 2000;
     do_say(invoker, "Okay, you've got a deal!");
@@ -1120,7 +1120,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
       ch->send(buf);
       break;
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!*arg)
@@ -1133,41 +1133,41 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
       int known = ch->has_skill(g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
-      sprintf(buf, " %-20s%14s   (Level %2d)\r\n", g_skills[i].skillname,
+      sprintf(buf, " %-20s%14s   (Level %2llu)\r\n", g_skills[i].skillname,
               how_good(known), g_skills[i].levelavailable);
       ch->send(buf);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   number = search_skills(arg, g_skills);
 
   if (number == -1)
   {
     if (!skilllist)
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     if (search_skills(arg, skilllist) != -1)
       do_say(invoker, "You must speak with your guildmaster to learn such a complicated ability.");
     else
       ch->sendln("You do not know of ch skill...");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ch->player->practices <= 0)
   {
     ch->sendln("You do not seem to be able to practice now.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   learned = ch->has_skill(g_skills[number].skillnum);
 
   if (learned >= g_skills[number].maximum)
   {
     ch->sendln("You are already learned in ch area.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (learned >= (ch->getLevel() * 3))
   {
     ch->sendln("You aren't experienced enough to practice that any further right now.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ch->sendln("You practice for a while...");
@@ -1181,9 +1181,9 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   if (learned >= g_skills[number].maximum)
   {
     ch->sendln("You are now learned in ch area.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int Character::get_stat(attribute_t stat)
@@ -1205,8 +1205,9 @@ int Character::get_stat(attribute_t stat)
   case attribute_t::CONSTITUTION:
     return GET_RAW_CON(this);
     break;
+  default:
+    return 0;
   };
-  return 0;
 }
 
 int Character::get_stat_bonus(int stat)
@@ -1261,7 +1262,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 {
   int chance, maximum;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     return;
   }
@@ -1283,7 +1284,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 
   if (difficulty < 1)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s had an invalid skill level of %d in skill %d.", GET_NAME(this), difficulty, skill);
     return; // Skill w/out difficulty.
   }
 
@@ -1401,7 +1402,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
     oi -= int_app[GET_INT(this)].hard_bonus;
     break;
   default:
-    DC::getInstance()->logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Illegal difficulty value sent to skill_increase_check"), IMMORTAL, DC::LogChannel::LOG_BUG);
     break;
   }
 
@@ -1415,7 +1416,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
   if (skillname.isEmpty())
   {
     send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
     return;
   }
 

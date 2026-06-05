@@ -10,10 +10,11 @@
 /*			 PATHFINDING 				*/
 /*			 PATHFINDING 				*/
 /*			 PATHFINDING 				*/
-struct path_data
+class path_data
 { // Keeps track of paths connecting to a room or path.
+public:
   class Path *p;
-  struct path_data *next;
+  path_data *next;
   int num;
 };
 
@@ -34,7 +35,7 @@ public:
   bool isRoomConnected(int room);
   bool isPathConnected(class Path *pa);
   int connectRoom(class Path *);
-  struct path_data *p;
+  path_data *p;
   char *name;
   int s;
   Path() : next(nullptr), p(nullptr), name(nullptr), s(0) {}

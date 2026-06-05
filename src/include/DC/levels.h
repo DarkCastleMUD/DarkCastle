@@ -3,6 +3,7 @@
 #ifndef LEVELS_H_
 #define LEVELS_H_
 
+#include <cstdint>
 #define MORTAL 60
 /* #define GLADIATOR */
 

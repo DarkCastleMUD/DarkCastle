@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <QString>
+#include <queue>
 
 constexpr size_t MAX_CLAN_LEN = 15;
 #define CLAN_RIGHTS_ACCEPT 1
@@ -28,10 +29,11 @@ constexpr size_t MAX_CLAN_LEN = 15;
 #define CLAN_RIGHTS_VAULTLOG 1 << 14
 #define CLAN_RIGHTS_LOG 1 << 15
 
-struct clan_room_data
+class clan_room_data
 {
+public:
   int32_t room_number;
-  struct clan_room_data *next;
+  clan_room_data *next;
 };
 
 class ClanMember
@@ -76,12 +78,12 @@ public:
   [[nodiscard]] inline char *NameC() const
   {
     char *str_hsh(const char *);
-    return str_hsh(qPrintable(name_));
+    return str_hsh(name_.toStdString().c_str());
   }
   [[nodiscard]] inline char *Unused4C() const
   {
     char *str_hsh(const char *);
-    return str_hsh(qPrintable(unused4_));
+    return str_hsh(unused4_.toStdString().c_str());
   }
 
   inline void Name(const QString &name)
@@ -146,7 +148,7 @@ public:
   clan_room_data *rooms;
   ClanMember *members;
   clan_data *next;
-  struct vault_access_data *acc;
+  class vault_access_data *acc;
   clan_data(void);
   void cdeposit(const uint64_t &deposit);
   void cwithdraw(const uint64_t &withdraw);
@@ -160,11 +162,11 @@ private:
 };
 // if you add to the clan rights, update clan_rights[] in clan.C
 
-void add_totem(Object *altar, Object *totem);
+void add_totem(class Object *altar, Object *totem);
 void remove_totem(Object *altar, Object *totem);
 void add_totem_stats(Character *ch, int stat = 0);
 void remove_totem_stats(Character *ch, int stat = 0);
-bool others_clan_room(Character *ch, Room *room);
+bool others_clan_room(Character *ch, class Room *room);
 void clan_login(Character *ch);
 void clan_logout(Character *ch);
 int has_right(Character *ch, uint32_t bit);

@@ -14,8 +14,6 @@
  ***************************************************************************/
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 
-#include <cstdio>
-
 #include <map>
 #include <string>
 
@@ -30,297 +28,297 @@ room_t IMM_PIRAHNA_ROOM = 25;
 
 std::map<int, int> fill_skill_cost()
 {
-    std::map<int, int> skill_cost_map;
-    skill_cost_map[SKILL_KICK] = 5;
-    skill_cost_map[SKILL_TRIP] = 7;
-    skill_cost_map[SKILL_RESCUE] = 10;
-    skill_cost_map[SKILL_REDIRECT] = 5;
-    skill_cost_map[SKILL_EAGLE_CLAW] = 12;
-    skill_cost_map[SKILL_QUIVERING_PALM] = 45;
-    skill_cost_map[SKILL_STUN] = 15;
-    skill_cost_map[SKILL_BACKSTAB] = 4;
-    skill_cost_map[SKILL_SNEAK] = 5;
-    skill_cost_map[SKILL_HIDE] = 2;
-    skill_cost_map[SKILL_HARM_TOUCH] = 30;
-    skill_cost_map[SKILL_STALK] = 12;
-    skill_cost_map[SKILL_POCKET] = 15;
-    skill_cost_map[SKILL_STEAL] = 20;
-    skill_cost_map[SKILL_CIRCLE] = 12;
-    skill_cost_map[SKILL_DISARM] = 20;
-    skill_cost_map[SKILL_VITAL_STRIKE] = 15;
-    skill_cost_map[SKILL_EYEGOUGE] = 12;
-    skill_cost_map[SKILL_JAB] = 4;
-    skill_cost_map[SKILL_CRIPPLE] = 30;
-    skill_cost_map[SKILL_PALM] = 2;
-    skill_cost_map[SKILL_SLIP] = 2;
-    skill_cost_map[SKILL_DECEIT] = 16;
-    skill_cost_map[SKILL_APPRAISE] = 6;
-    skill_cost_map[SKILL_PICK_LOCK] = 3;
-    skill_cost_map[SKILL_ESCAPE] = 25;
-    skill_cost_map[SKILL_LAY_HANDS] = 30;
-    skill_cost_map[SKILL_BASH] = 10;
-    skill_cost_map[SKILL_FOCUSED_REPELANCE] = 45;
-    skill_cost_map[SKILL_BLOOD_FURY] = 60;
-    skill_cost_map[SKILL_CRAZED_ASSAULT] = 18;
-    skill_cost_map[SKILL_RAGE] = 6;
-    skill_cost_map[SKILL_FEROCITY] = 15;
-    skill_cost_map[SKILL_BATTLECRY] = 24;
-    skill_cost_map[SKILL_BERSERK] = 12;
-    skill_cost_map[SKILL_HITALL] = 24;
-    skill_cost_map[SKILL_BULLRUSH] = 20;
-    skill_cost_map[SKILL_KNOCKBACK] = 24;
-    skill_cost_map[SKILL_ARCHERY] = 2;
-    skill_cost_map[SKILL_FORAGE] = 8;
-    skill_cost_map[SKILL_TAME] = 15;
-    skill_cost_map[SKILL_AMBUSH] = 24;
-    skill_cost_map[SKILL_TRACK] = 3;
-    skill_cost_map[SKILL_TACTICS] = 15;
-    skill_cost_map[SKILL_RETREAT] = 15;
-    skill_cost_map[SKILL_DEATHSTROKE] = 20;
-    skill_cost_map[SKILL_BLADESHIELD] = 15;
-    skill_cost_map[SKILL_GUARD] = 5;
-    skill_cost_map[SKILL_PRIMAL_FURY] = 40;
-    skill_cost_map[SKILL_HEADBUTT] = 15;
-    skill_cost_map[SKILL_FREE_ANIMAL] = 25;
-    skill_cost_map[SKILL_BEHEAD] = 25;
-    skill_cost_map[SKILL_MAKE_CAMP] = 50;
-    skill_cost_map[SKILL_ONSLAUGHT] = 50;
-    skill_cost_map[SKILL_IMBUE] = 50;
-    skill_cost_map[SKILL_BATTERBRACE] = 60;
-    skill_cost_map[SKILL_TRIAGE] = 40;
-    skill_cost_map[SKILL_BREW] = 100;
-    skill_cost_map[SKILL_SCRIBE] = 100;
-    skill_cost_map[SKILL_PURSUIT] = 20;
-    return skill_cost_map;
+  std::map<int, int> skill_cost_map;
+  skill_cost_map[SKILL_KICK] = 5;
+  skill_cost_map[SKILL_TRIP] = 7;
+  skill_cost_map[SKILL_RESCUE] = 10;
+  skill_cost_map[SKILL_REDIRECT] = 5;
+  skill_cost_map[SKILL_EAGLE_CLAW] = 12;
+  skill_cost_map[SKILL_QUIVERING_PALM] = 45;
+  skill_cost_map[SKILL_STUN] = 15;
+  skill_cost_map[SKILL_BACKSTAB] = 4;
+  skill_cost_map[SKILL_SNEAK] = 5;
+  skill_cost_map[SKILL_HIDE] = 2;
+  skill_cost_map[SKILL_HARM_TOUCH] = 30;
+  skill_cost_map[SKILL_STALK] = 12;
+  skill_cost_map[SKILL_POCKET] = 15;
+  skill_cost_map[SKILL_STEAL] = 20;
+  skill_cost_map[SKILL_CIRCLE] = 12;
+  skill_cost_map[SKILL_DISARM] = 20;
+  skill_cost_map[SKILL_VITAL_STRIKE] = 15;
+  skill_cost_map[SKILL_EYEGOUGE] = 12;
+  skill_cost_map[SKILL_JAB] = 4;
+  skill_cost_map[SKILL_CRIPPLE] = 30;
+  skill_cost_map[SKILL_PALM] = 2;
+  skill_cost_map[SKILL_SLIP] = 2;
+  skill_cost_map[SKILL_DECEIT] = 16;
+  skill_cost_map[SKILL_APPRAISE] = 6;
+  skill_cost_map[SKILL_PICK_LOCK] = 3;
+  skill_cost_map[SKILL_ESCAPE] = 25;
+  skill_cost_map[SKILL_LAY_HANDS] = 30;
+  skill_cost_map[SKILL_BASH] = 10;
+  skill_cost_map[SKILL_FOCUSED_REPELANCE] = 45;
+  skill_cost_map[SKILL_BLOOD_FURY] = 60;
+  skill_cost_map[SKILL_CRAZED_ASSAULT] = 18;
+  skill_cost_map[SKILL_RAGE] = 6;
+  skill_cost_map[SKILL_FEROCITY] = 15;
+  skill_cost_map[SKILL_BATTLECRY] = 24;
+  skill_cost_map[SKILL_BERSERK] = 12;
+  skill_cost_map[SKILL_HITALL] = 24;
+  skill_cost_map[SKILL_BULLRUSH] = 20;
+  skill_cost_map[SKILL_KNOCKBACK] = 24;
+  skill_cost_map[SKILL_ARCHERY] = 2;
+  skill_cost_map[SKILL_FORAGE] = 8;
+  skill_cost_map[SKILL_TAME] = 15;
+  skill_cost_map[SKILL_AMBUSH] = 24;
+  skill_cost_map[SKILL_TRACK] = 3;
+  skill_cost_map[SKILL_TACTICS] = 15;
+  skill_cost_map[SKILL_RETREAT] = 15;
+  skill_cost_map[SKILL_DEATHSTROKE] = 20;
+  skill_cost_map[SKILL_BLADESHIELD] = 15;
+  skill_cost_map[SKILL_GUARD] = 5;
+  skill_cost_map[SKILL_PRIMAL_FURY] = 40;
+  skill_cost_map[SKILL_HEADBUTT] = 15;
+  skill_cost_map[SKILL_FREE_ANIMAL] = 25;
+  skill_cost_map[SKILL_BEHEAD] = 25;
+  skill_cost_map[SKILL_MAKE_CAMP] = 50;
+  skill_cost_map[SKILL_ONSLAUGHT] = 50;
+  skill_cost_map[SKILL_IMBUE] = 50;
+  skill_cost_map[SKILL_BATTERBRACE] = 60;
+  skill_cost_map[SKILL_TRIAGE] = 40;
+  skill_cost_map[SKILL_BREW] = 100;
+  skill_cost_map[SKILL_SCRIBE] = 100;
+  skill_cost_map[SKILL_PURSUIT] = 20;
+  return skill_cost_map;
 }
 
 std::map<int, int> fill_scribe_recipes()
 {
-    std::map<int, int> tmp_scribe_recipes;
-    tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | FIRE_INK | GENERIC_DUST] = SPELL_CREATE_FOOD;
-    tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_CREATE_WATER;
-    tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_CONT_LIGHT;
-    tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_IDENTIFY;
-    tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_BURNING_HANDS;
-    tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | EVIL_INK | GENERIC_DUST] = SPELL_CAUSE_CRITICAL;
-    tmp_scribe_recipes[RARE1_PAPER | NONE_PEN | FIRE_INK | FLASHY_DUST] = SPELL_SPARKS;
-    tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | EVIL_INK | FLASHY_DUST] = SPELL_SHOCKING_GRASP;
-    tmp_scribe_recipes[RARE1_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_BLUE_BIRD;
+  std::map<int, int> tmp_scribe_recipes;
+  tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | FIRE_INK | GENERIC_DUST] = SPELL_CREATE_FOOD;
+  tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_CREATE_WATER;
+  tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_CONT_LIGHT;
+  tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_IDENTIFY;
+  tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_BURNING_HANDS;
+  tmp_scribe_recipes[RARE1_PAPER | CLERIC_PEN | EVIL_INK | GENERIC_DUST] = SPELL_CAUSE_CRITICAL;
+  tmp_scribe_recipes[RARE1_PAPER | NONE_PEN | FIRE_INK | FLASHY_DUST] = SPELL_SPARKS;
+  tmp_scribe_recipes[RARE1_PAPER | MAGE_PEN | EVIL_INK | FLASHY_DUST] = SPELL_SHOCKING_GRASP;
+  tmp_scribe_recipes[RARE1_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_BLUE_BIRD;
 
-    tmp_scribe_recipes[RARE2_PAPER | CLERIC_PEN | FIRE_INK | FLASHY_DUST] = SPELL_HEROES_FEAST;
-    tmp_scribe_recipes[RARE2_PAPER | NONE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_INSOMNIA;
-    tmp_scribe_recipes[RARE2_PAPER | DRUID_PEN | FIRE_INK | GENERIC_DUST] = SPELL_CONTROL_WEATHER;
-    tmp_scribe_recipes[RARE2_PAPER | ANTI_PEN | FIRE_INK | FLASHY_DUST] = SPELL_GLOBE_OF_DARKNESS;
-    tmp_scribe_recipes[RARE2_PAPER | NONE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_HOWL;
-    tmp_scribe_recipes[RARE2_PAPER | CLERIC_PEN | EVIL_INK | GENERIC_DUST] = SPELL_HARM;
-    tmp_scribe_recipes[RARE2_PAPER | MAGE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_CHILL_TOUCH;
-    tmp_scribe_recipes[RARE2_PAPER | RANGER_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_BEE_STING;
-    tmp_scribe_recipes[RARE2_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_LIGHTNING_BOLT;
-    tmp_scribe_recipes[RARE2_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_FIREBALL;
+  tmp_scribe_recipes[RARE2_PAPER | CLERIC_PEN | FIRE_INK | FLASHY_DUST] = SPELL_HEROES_FEAST;
+  tmp_scribe_recipes[RARE2_PAPER | NONE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_INSOMNIA;
+  tmp_scribe_recipes[RARE2_PAPER | DRUID_PEN | FIRE_INK | GENERIC_DUST] = SPELL_CONTROL_WEATHER;
+  tmp_scribe_recipes[RARE2_PAPER | ANTI_PEN | FIRE_INK | FLASHY_DUST] = SPELL_GLOBE_OF_DARKNESS;
+  tmp_scribe_recipes[RARE2_PAPER | NONE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_HOWL;
+  tmp_scribe_recipes[RARE2_PAPER | CLERIC_PEN | EVIL_INK | GENERIC_DUST] = SPELL_HARM;
+  tmp_scribe_recipes[RARE2_PAPER | MAGE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_CHILL_TOUCH;
+  tmp_scribe_recipes[RARE2_PAPER | RANGER_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_BEE_STING;
+  tmp_scribe_recipes[RARE2_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_LIGHTNING_BOLT;
+  tmp_scribe_recipes[RARE2_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_FIREBALL;
 
-    tmp_scribe_recipes[RARE3_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_MASS_INVISIBILITY;
-    tmp_scribe_recipes[RARE3_PAPER | CLERIC_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_REMOVE_PARALYSIS;
-    tmp_scribe_recipes[RARE3_PAPER | MAGE_PEN | FIRE_INK | GENERIC_DUST] = SPELL_DISPEL_MINOR;
-    tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_WEAKEN;
-    tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | EVIL_INK | GENERIC_DUST] = SPELL_POISON;
-    tmp_scribe_recipes[RARE3_PAPER | MAGE_PEN | EVIL_INK | GENERIC_DUST] = SPELL_FEAR;
-    tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_DROWN;
-    tmp_scribe_recipes[RARE3_PAPER | ANTI_PEN | FIRE_INK | GENERIC_DUST] = SPELL_VAMPIRIC_TOUCH;
-    tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_EARTHQUAKE;
-    tmp_scribe_recipes[RARE3_PAPER | RANGER_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_BEE_SWARM;
+  tmp_scribe_recipes[RARE3_PAPER | MAGE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_MASS_INVISIBILITY;
+  tmp_scribe_recipes[RARE3_PAPER | CLERIC_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_REMOVE_PARALYSIS;
+  tmp_scribe_recipes[RARE3_PAPER | MAGE_PEN | FIRE_INK | GENERIC_DUST] = SPELL_DISPEL_MINOR;
+  tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_WEAKEN;
+  tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | EVIL_INK | GENERIC_DUST] = SPELL_POISON;
+  tmp_scribe_recipes[RARE3_PAPER | MAGE_PEN | EVIL_INK | GENERIC_DUST] = SPELL_FEAR;
+  tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_DROWN;
+  tmp_scribe_recipes[RARE3_PAPER | ANTI_PEN | FIRE_INK | GENERIC_DUST] = SPELL_VAMPIRIC_TOUCH;
+  tmp_scribe_recipes[RARE3_PAPER | DRUID_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_EARTHQUAKE;
+  tmp_scribe_recipes[RARE3_PAPER | RANGER_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_BEE_SWARM;
 
-    tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | EVIL_INK | FLASHY_DUST] = SPELL_CURSE;
-    tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | EVIL_INK | GENERIC_DUST] = SPELL_ATTRITION;
-    tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_DEBILITY;
-    tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_ENTANGLE;
-    tmp_scribe_recipes[RARE4_PAPER | CLERIC_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_FLAMESTRIKE;
-    tmp_scribe_recipes[RARE4_PAPER | ANTI_PEN | MAGIC_INK | EXPLOSIVE_DUST] = SPELL_ACID_BLAST;
-    tmp_scribe_recipes[RARE4_PAPER | CLERIC_PEN | EVIL_INK | FLASHY_DUST] = SPELL_DISPEL_GOOD;
-    tmp_scribe_recipes[RARE4_PAPER | CLERIC_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_DISPEL_EVIL;
-    tmp_scribe_recipes[RARE4_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_FIRESTORM;
-    tmp_scribe_recipes[RARE4_PAPER | NONE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_WILD_MAGIC;
+  tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | EVIL_INK | FLASHY_DUST] = SPELL_CURSE;
+  tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | EVIL_INK | GENERIC_DUST] = SPELL_ATTRITION;
+  tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_DEBILITY;
+  tmp_scribe_recipes[RARE4_PAPER | DRUID_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_ENTANGLE;
+  tmp_scribe_recipes[RARE4_PAPER | CLERIC_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_FLAMESTRIKE;
+  tmp_scribe_recipes[RARE4_PAPER | ANTI_PEN | MAGIC_INK | EXPLOSIVE_DUST] = SPELL_ACID_BLAST;
+  tmp_scribe_recipes[RARE4_PAPER | CLERIC_PEN | EVIL_INK | FLASHY_DUST] = SPELL_DISPEL_GOOD;
+  tmp_scribe_recipes[RARE4_PAPER | CLERIC_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_DISPEL_EVIL;
+  tmp_scribe_recipes[RARE4_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_FIRESTORM;
+  tmp_scribe_recipes[RARE4_PAPER | NONE_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_WILD_MAGIC;
 
-    tmp_scribe_recipes[RARE5_PAPER | MAGE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_TELEPORT;
-    tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | EVIL_INK | GENERIC_DUST] = SPELL_BLINDNESS;
-    tmp_scribe_recipes[RARE5_PAPER | RANGER_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_CREEPING_DEATH;
-    tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | FIRE_INK | FLASHY_DUST] = SPELL_COLOUR_SPRAY;
-    tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_SUN_RAY;
-    tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | MAGIC_INK | EXPLOSIVE_DUST] = SPELL_CALL_LIGHTNING;
-    tmp_scribe_recipes[RARE5_PAPER | CLERIC_PEN | EVIL_INK | GENERIC_DUST] = SPELL_POWER_HARM;
-    tmp_scribe_recipes[RARE5_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_SOLAR_GATE;
+  tmp_scribe_recipes[RARE5_PAPER | MAGE_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_TELEPORT;
+  tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | EVIL_INK | GENERIC_DUST] = SPELL_BLINDNESS;
+  tmp_scribe_recipes[RARE5_PAPER | RANGER_PEN | MAGIC_INK | FLASHY_DUST] = SPELL_CREEPING_DEATH;
+  tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | FIRE_INK | FLASHY_DUST] = SPELL_COLOUR_SPRAY;
+  tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | MAGIC_INK | GENERIC_DUST] = SPELL_SUN_RAY;
+  tmp_scribe_recipes[RARE5_PAPER | DRUID_PEN | MAGIC_INK | EXPLOSIVE_DUST] = SPELL_CALL_LIGHTNING;
+  tmp_scribe_recipes[RARE5_PAPER | CLERIC_PEN | EVIL_INK | GENERIC_DUST] = SPELL_POWER_HARM;
+  tmp_scribe_recipes[RARE5_PAPER | MAGE_PEN | FIRE_INK | EXPLOSIVE_DUST] = SPELL_SOLAR_GATE;
 
-    return tmp_scribe_recipes;
+  return tmp_scribe_recipes;
 }
 
 std::map<int, int> scribe_recipes = fill_scribe_recipes();
 
 std::map<int, int> fill_scribe_ingredients()
 {
-    std::map<int, int> tmp_scribe_ingredients;
-    tmp_scribe_ingredients[0] = RARE1_PAPER;
-    tmp_scribe_ingredients[0] = RARE2_PAPER;
-    tmp_scribe_ingredients[0] = RARE3_PAPER;
-    tmp_scribe_ingredients[0] = RARE4_PAPER;
-    tmp_scribe_ingredients[0] = RARE5_PAPER;
+  std::map<int, int> tmp_scribe_ingredients;
+  tmp_scribe_ingredients[0] = RARE1_PAPER;
+  tmp_scribe_ingredients[0] = RARE2_PAPER;
+  tmp_scribe_ingredients[0] = RARE3_PAPER;
+  tmp_scribe_ingredients[0] = RARE4_PAPER;
+  tmp_scribe_ingredients[0] = RARE5_PAPER;
 
-    tmp_scribe_ingredients[0] = CLERIC_PEN;
-    tmp_scribe_ingredients[0] = MAGE_PEN;
-    tmp_scribe_ingredients[0] = DRUID_PEN;
-    tmp_scribe_ingredients[0] = ANTI_PEN;
-    tmp_scribe_ingredients[0] = RANGER_PEN;
-    tmp_scribe_ingredients[0] = NONE_PEN;
+  tmp_scribe_ingredients[0] = CLERIC_PEN;
+  tmp_scribe_ingredients[0] = MAGE_PEN;
+  tmp_scribe_ingredients[0] = DRUID_PEN;
+  tmp_scribe_ingredients[0] = ANTI_PEN;
+  tmp_scribe_ingredients[0] = RANGER_PEN;
+  tmp_scribe_ingredients[0] = NONE_PEN;
 
-    tmp_scribe_ingredients[0] = MAGIC_INK;
-    tmp_scribe_ingredients[0] = FIRE_INK;
-    tmp_scribe_ingredients[0] = EVIL_INK;
+  tmp_scribe_ingredients[0] = MAGIC_INK;
+  tmp_scribe_ingredients[0] = FIRE_INK;
+  tmp_scribe_ingredients[0] = EVIL_INK;
 
-    tmp_scribe_ingredients[0] = FLASHY_DUST;
-    tmp_scribe_ingredients[0] = EXPLOSIVE_DUST;
-    tmp_scribe_ingredients[0] = GENERIC_DUST;
+  tmp_scribe_ingredients[0] = FLASHY_DUST;
+  tmp_scribe_ingredients[0] = EXPLOSIVE_DUST;
+  tmp_scribe_ingredients[0] = GENERIC_DUST;
 
-    return tmp_scribe_ingredients;
+  return tmp_scribe_ingredients;
 }
 
 std::map<int, int> scribe_ingredients = fill_scribe_ingredients();
 
 std::vector<profession> fill_professions(void)
 {
-    std::vector<profession> tmp_professions;
+  std::vector<profession> tmp_professions;
 
-    profession p;
-    p.name = std::string("legionnaire");
-    p.Name = std::string("Legionnaire");
-    p.c_class = CLASS_WARRIOR;
-    p.skillno = SKILL_LEGIONNAIRE;
-    tmp_professions.push_back(p);
+  profession p;
+  p.name = std::string("legionnaire");
+  p.Name = std::string("Legionnaire");
+  p.c_class = CLASS_WARRIOR;
+  p.skillno = SKILL_LEGIONNAIRE;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("gladiator");
-    p.Name = std::string("Gladiator");
-    p.c_class = CLASS_WARRIOR;
-    p.skillno = SKILL_GLADIATOR;
-    tmp_professions.push_back(p);
+  p.name = std::string("gladiator");
+  p.Name = std::string("Gladiator");
+  p.c_class = CLASS_WARRIOR;
+  p.skillno = SKILL_GLADIATOR;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("battlerager");
-    p.Name = std::string("Battlerager");
-    p.c_class = CLASS_BARBARIAN;
-    p.skillno = SKILL_BATTLERAGER;
-    tmp_professions.push_back(p);
+  p.name = std::string("battlerager");
+  p.Name = std::string("Battlerager");
+  p.c_class = CLASS_BARBARIAN;
+  p.skillno = SKILL_BATTLERAGER;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("chieftan");
-    p.Name = std::string("Chieftan");
-    p.c_class = CLASS_BARBARIAN;
-    p.skillno = SKILL_CHIEFTAN;
-    tmp_professions.push_back(p);
+  p.name = std::string("chieftan");
+  p.Name = std::string("Chieftan");
+  p.c_class = CLASS_BARBARIAN;
+  p.skillno = SKILL_CHIEFTAN;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("pilferer");
-    p.Name = std::string("Pilferer");
-    p.c_class = CLASS_THIEF;
-    p.skillno = SKILL_PILFERER;
-    tmp_professions.push_back(p);
+  p.name = std::string("pilferer");
+  p.Name = std::string("Pilferer");
+  p.c_class = CLASS_THIEF;
+  p.skillno = SKILL_PILFERER;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("assassin");
-    p.Name = std::string("Assassin");
-    p.c_class = CLASS_THIEF;
-    p.skillno = SKILL_ASSASSIN;
-    tmp_professions.push_back(p);
+  p.name = std::string("assassin");
+  p.Name = std::string("Assassin");
+  p.c_class = CLASS_THIEF;
+  p.skillno = SKILL_ASSASSIN;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("warmage");
-    p.Name = std::string("Warmage");
-    p.c_class = CLASS_MAGE;
-    p.skillno = SKILL_WARMAGE;
-    tmp_professions.push_back(p);
+  p.name = std::string("warmage");
+  p.Name = std::string("Warmage");
+  p.c_class = CLASS_MAGE;
+  p.skillno = SKILL_WARMAGE;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("spellbinder");
-    p.Name = std::string("Spellbinder");
-    p.c_class = CLASS_MAGE;
-    p.skillno = SKILL_SPELLBINDER;
-    tmp_professions.push_back(p);
+  p.name = std::string("spellbinder");
+  p.Name = std::string("Spellbinder");
+  p.c_class = CLASS_MAGE;
+  p.skillno = SKILL_SPELLBINDER;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("zealot");
-    p.Name = std::string("Zealot");
-    p.c_class = CLASS_CLERIC;
-    p.skillno = SKILL_ZEALOT;
-    tmp_professions.push_back(p);
+  p.name = std::string("zealot");
+  p.Name = std::string("Zealot");
+  p.c_class = CLASS_CLERIC;
+  p.skillno = SKILL_ZEALOT;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("ritualist");
-    p.Name = std::string("Ritualist");
-    p.c_class = CLASS_CLERIC;
-    p.skillno = SKILL_RITUALIST;
-    tmp_professions.push_back(p);
+  p.name = std::string("ritualist");
+  p.Name = std::string("Ritualist");
+  p.c_class = CLASS_CLERIC;
+  p.skillno = SKILL_RITUALIST;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("elementalist");
-    p.Name = std::string("Elementalist");
-    p.c_class = CLASS_DRUID;
-    p.skillno = SKILL_ELEMENTALIST;
-    tmp_professions.push_back(p);
+  p.name = std::string("elementalist");
+  p.Name = std::string("Elementalist");
+  p.c_class = CLASS_DRUID;
+  p.skillno = SKILL_ELEMENTALIST;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("shapeshifter");
-    p.Name = std::string("Shapeshifter");
-    p.c_class = CLASS_DRUID;
-    p.skillno = SKILL_SHAPESHIFTER;
-    tmp_professions.push_back(p);
+  p.name = std::string("shapeshifter");
+  p.Name = std::string("Shapeshifter");
+  p.c_class = CLASS_DRUID;
+  p.skillno = SKILL_SHAPESHIFTER;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("cultist");
-    p.Name = std::string("Cultist");
-    p.c_class = CLASS_ANTI_PAL;
-    p.skillno = SKILL_CULTIST;
-    tmp_professions.push_back(p);
+  p.name = std::string("cultist");
+  p.Name = std::string("Cultist");
+  p.c_class = CLASS_ANTI_PAL;
+  p.skillno = SKILL_CULTIST;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("reaver");
-    p.Name = std::string("Reaver");
-    p.c_class = CLASS_ANTI_PAL;
-    p.skillno = SKILL_REAVER;
-    tmp_professions.push_back(p);
+  p.name = std::string("reaver");
+  p.Name = std::string("Reaver");
+  p.c_class = CLASS_ANTI_PAL;
+  p.skillno = SKILL_REAVER;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("templar");
-    p.Name = std::string("Templar");
-    p.c_class = CLASS_PALADIN;
-    p.skillno = SKILL_TEMPLAR;
-    tmp_professions.push_back(p);
+  p.name = std::string("templar");
+  p.Name = std::string("Templar");
+  p.c_class = CLASS_PALADIN;
+  p.skillno = SKILL_TEMPLAR;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("inquisitor");
-    p.Name = std::string("Inquisitor");
-    p.c_class = CLASS_PALADIN;
-    p.skillno = SKILL_INQUISITOR;
-    tmp_professions.push_back(p);
+  p.name = std::string("inquisitor");
+  p.Name = std::string("Inquisitor");
+  p.c_class = CLASS_PALADIN;
+  p.skillno = SKILL_INQUISITOR;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("scout");
-    p.Name = std::string("Scout");
-    p.c_class = CLASS_RANGER;
-    p.skillno = SKILL_SCOUT;
-    tmp_professions.push_back(p);
+  p.name = std::string("scout");
+  p.Name = std::string("Scout");
+  p.c_class = CLASS_RANGER;
+  p.skillno = SKILL_SCOUT;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("tracker");
-    p.Name = std::string("Tracker");
-    p.c_class = CLASS_RANGER;
-    p.skillno = SKILL_TRACKER;
-    tmp_professions.push_back(p);
+  p.name = std::string("tracker");
+  p.Name = std::string("Tracker");
+  p.c_class = CLASS_RANGER;
+  p.skillno = SKILL_TRACKER;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("sensei");
-    p.Name = std::string("Sensei");
-    p.c_class = CLASS_MONK;
-    p.skillno = SKILL_SENSEI;
-    tmp_professions.push_back(p);
+  p.name = std::string("sensei");
+  p.Name = std::string("Sensei");
+  p.c_class = CLASS_MONK;
+  p.skillno = SKILL_SENSEI;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("spiritualist");
-    p.Name = std::string("Spiritualist");
-    p.c_class = CLASS_MONK;
-    p.skillno = SKILL_SPIRITUALIST;
-    tmp_professions.push_back(p);
+  p.name = std::string("spiritualist");
+  p.Name = std::string("Spiritualist");
+  p.c_class = CLASS_MONK;
+  p.skillno = SKILL_SPIRITUALIST;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("troubadour");
-    p.Name = std::string("Troubadour");
-    p.c_class = CLASS_BARD;
-    p.skillno = SKILL_TROUBADOUR;
-    tmp_professions.push_back(p);
+  p.name = std::string("troubadour");
+  p.Name = std::string("Troubadour");
+  p.c_class = CLASS_BARD;
+  p.skillno = SKILL_TROUBADOUR;
+  tmp_professions.push_back(p);
 
-    p.name = std::string("minstrel");
-    p.Name = std::string("Minstrel");
-    p.c_class = CLASS_BARD;
-    p.skillno = SKILL_MINISTREL;
-    tmp_professions.push_back(p);
+  p.name = std::string("minstrel");
+  p.Name = std::string("Minstrel");
+  p.c_class = CLASS_BARD;
+  p.skillno = SKILL_MINISTREL;
+  tmp_professions.push_back(p);
 
-    return tmp_professions;
+  return tmp_professions;
 }
 
 std::vector<profession> professions = fill_professions();
@@ -838,18 +836,18 @@ const char *zone_modes[] =
 
 std::vector<std::string> get_cont_names()
 {
-    std::vector<std::string> tmp;
-    tmp.push_back("");
-    tmp.push_back("Undefined");
-    tmp.push_back("Sorpigal");
-    tmp.push_back("Kyu Shi'i Kaze");
-    tmp.push_back("Diamond Isle");
-    tmp.push_back("Underdark");
-    tmp.push_back("Behind the Mirror");
-    tmp.push_back("Planes of Existence");
-    tmp.push_back("Forbidden Island");
-    tmp.push_back("Other");
-    return tmp;
+  std::vector<std::string> tmp;
+  tmp.push_back("");
+  tmp.push_back("Undefined");
+  tmp.push_back("Sorpigal");
+  tmp.push_back("Kyu Shi'i Kaze");
+  tmp.push_back("Diamond Isle");
+  tmp.push_back("Underdark");
+  tmp.push_back("Behind the Mirror");
+  tmp.push_back("Planes of Existence");
+  tmp.push_back("Forbidden Island");
+  tmp.push_back("Other");
+  return tmp;
 }
 
 std::vector<std::string> continent_names = get_cont_names();
@@ -1328,7 +1326,7 @@ const char *class_tree_name[11][3] = {
 // Begin abilities listings for each class.
 
 // skills master 10011 - done and checked, Apoc
-struct class_skill_defines g_skills[] = { // all-class skills
+class_skill_defines g_skills[] = { // all-class skills
 
     //   Ability Name       Ability File          Level     Max  Group  Requisites
     //   ------------       ------------          -----     ---  -----  ----------
@@ -1340,7 +1338,7 @@ struct class_skill_defines g_skills[] = { // all-class skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // warrior 3023 guildmaster - done and checked, Apoc
-struct class_skill_defines w_skills[] = { // warrior skills
+class_skill_defines w_skills[] = { // warrior skills
 
     //   Ability Name       Ability File            Level  Max  Group  Requisite
     //   ------------       ------------            -----  ---  -----  ---------
@@ -1387,7 +1385,7 @@ struct class_skill_defines w_skills[] = { // warrior skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // thief 3022 guildmaster - done and checked, Apoc
-struct class_skill_defines t_skills[] = { // thief skills
+class_skill_defines t_skills[] = { // thief skills
 
     //   Ability Name       Ability File          Level    Max  Group  Requisites
     //   ------------       ------------          -----    ---  -----  ----------
@@ -1423,7 +1421,7 @@ struct class_skill_defines t_skills[] = { // thief skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // anti-paladin 10005 guildmaster - done and checked, Apoc
-struct class_skill_defines a_skills[] = { // anti-paladin skills
+class_skill_defines a_skills[] = { // anti-paladin skills
 
     //   Ability Name            Ability File           Level     Max  Group   Requisites
     //   ------------            ------------           -----     ---  -----   ----------
@@ -1470,7 +1468,7 @@ struct class_skill_defines a_skills[] = { // anti-paladin skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // paladin 10006 guildmaster - done and checked, Apoc
-struct class_skill_defines p_skills[] = { // paladin skills
+class_skill_defines p_skills[] = { // paladin skills
 
     //   Ability Name            Ability File            Level     Max  Group   Requisites
     //   ------------            ------------            -----     ---  -----   ----------
@@ -1517,7 +1515,7 @@ struct class_skill_defines p_skills[] = { // paladin skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // barbarian 10007 guildmaster - done and checked, Apoc
-struct class_skill_defines b_skills[] = { // barbarian skills
+class_skill_defines b_skills[] = { // barbarian skills
 
     //   Ability Name       Ability File            Level  Max  Group  Requisites
     //   ------------       ------------            -----  ---  -----  ----------
@@ -1555,7 +1553,7 @@ struct class_skill_defines b_skills[] = { // barbarian skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // monk 10008 guildmaster - done and checked, Apoc
-struct class_skill_defines k_skills[] = { // monk skills
+class_skill_defines k_skills[] = { // monk skills
 
     //   Ability Name       Ability File          Level    Max   Group   Requisites
     //   ------------       ------------          -----    ---   -----   ----------
@@ -1587,7 +1585,7 @@ struct class_skill_defines k_skills[] = { // monk skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // ranger 10013 guildmaster - done and checked, Apoc
-struct class_skill_defines r_skills[] = { // ranger skills
+class_skill_defines r_skills[] = { // ranger skills
 
     //   Ability Name       Ability File           Level     Max  Group   Requisites
     //   ------------       ------------           -----     ---  -----   ----------
@@ -1636,7 +1634,7 @@ struct class_skill_defines r_skills[] = { // ranger skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // bard 3204 guildmaster - done and checked, Apoc
-struct class_skill_defines d_skills[] = { // bard skills
+class_skill_defines d_skills[] = { // bard skills
 
     // Ability Name            Ability File                  Level    Max   Group   Requisites
     // ------------            ------------                  -----    ---   -----   ----------
@@ -1684,7 +1682,7 @@ struct class_skill_defines d_skills[] = { // bard skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // druid 3203 guildmaster - done and checked, Apoc
-struct class_skill_defines u_skills[] = { // druid skills
+class_skill_defines u_skills[] = { // druid skills
 
     //   Ability Name            Ability File              Level     Max  Group   Requisites
     //   ------------            ------------              -----     ---  -----   ----------
@@ -1745,7 +1743,7 @@ struct class_skill_defines u_skills[] = { // druid skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // cleric 3021 guildmaster - done and checked, Apoc
-struct class_skill_defines c_skills[] = { // cleric skills
+class_skill_defines c_skills[] = { // cleric skills
 
     //   Ability Name            Ability File           Level     Max  Group   Requisites
     //   ------------            ------------           -----     ---  -----   ----------
@@ -1811,7 +1809,7 @@ struct class_skill_defines c_skills[] = { // cleric skills
     {"\n", 0, 1, 0, 0, 0}};
 
 // mage 3020 guildmaster - done and checked, Apoc
-struct class_skill_defines m_skills[] = { // mage skills
+class_skill_defines m_skills[] = { // mage skills
 
     //   Ability Name           Ability File           Level     Max  Group   Requisites
     //   ------------           ------------           -----     ---  -----   ----------
@@ -1873,7 +1871,7 @@ struct class_skill_defines m_skills[] = { // mage skills
 
 const char *languages[] =
     {
-        "common"
+        "common",
         "human",
         "elvish",
         "dwarven",
@@ -1942,8 +1940,9 @@ const char *race_abbrev[] =
 };
 
 /*
-struct race_shit
+class race_shit
 {
+public:
   char *singular_name;  // dwarf, elf, etc.
   char *plural_name;     // dwarves, elves, etc.
 
@@ -1958,7 +1957,7 @@ struct race_shit
 };
 */
 
-struct race_data races[] =
+race_data races[] =
     {
         // Name,        Lowercase    Plural,       Playable Parts, Immun,    Res,  Sus,  Hates/Fears,  Frnd, MinWt, MaxWt, MinHt, MaxHt,    Str      Dex         Con      Int    Wis,   Mob Affects, UnarmedHitType
         {"NPC", "npc", "NPC", false, 63, 0, 0, 0, 0, 0, 150, 150, 72, 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, AFF_IGNORE_WEAPON_WEIGHT, "hit"},
@@ -2242,7 +2241,7 @@ const char *connected_types[] =
         "\n"};
 
 // Constitution Attribute Modifiers
-const struct con_app_type con_app[] = {
+const con_app_type con_app[] = {
     /*STAT#  { HP_REGEN/TICK, MOVE_REGEN/TICK, HP_GAIN/LEVEL, POSION_RES	},*/
     /*  0 */ {
         -20,
@@ -2433,7 +2432,7 @@ const struct con_app_type con_app[] = {
 };
 
 // Intelligence Attribute Modifiers
-const struct int_app_type int_app[] = {
+const int_app_type int_app[] = {
     /* STAT# { MANA_REGEN/TICK, KI_REGEN/TICK, EASY_BONUS,   MEDIUM_BONUS, HARD_BONUS, PRAC_BONUS, MAGIC_RES, CONC_BONUS,	SPELL_DAM
     },*/
     /*  0 */ {
@@ -2760,7 +2759,7 @@ const struct int_app_type int_app[] = {
 };
 
 // Wisdom Attribute Modifiers
-const struct wis_app_type wis_app[] = {
+const wis_app_type wis_app[] = {
     /* STAT# { MANA_REGEN/TICK, KI_REGEN/TICK, PRACS/LEVEL BONUS, ENERGY_RES, CONC_BONUS,	SPELL_DAM 	},*/
     /*  0 */ {
         -10,
@@ -3013,7 +3012,7 @@ const struct wis_app_type wis_app[] = {
 };
 
 // Dexterity Attribute Modifiers
-const struct dex_app_type dex_app[] = {
+const dex_app_type dex_app[] = {
     /* STAT# { TO_HIT_ BONUS, AC_BONUS, MOVE_GAIN/LEVEL, FIRE_RES	},*/
     /*  0 */ {
         -5,
@@ -3204,7 +3203,7 @@ const struct dex_app_type dex_app[] = {
 };
 
 // Strength Attribute Modifiers
-const struct str_app_type str_app[] = {
+const str_app_type str_app[] = {
     /* STAT# { TO_DAMAGE_BONUS, MAX_CARRIED, COLD RES	},*/
     /*  0 */ {
         -7,
@@ -3473,7 +3472,7 @@ int mana_bonus[31] =
         160 /* 30 */
 };
 
-struct mob_matrix_data mob_matrix[] =
+mob_matrix_data mob_matrix[] =
     {
         /* LVL       EXP    HP   HIT DAM   AC    GOLD */
         /*  0 */ {5, 1, 1, 1, 100, 0},

@@ -8,7 +8,6 @@
 #include <fmt/format.h>
 #include <expected>
 
-#include "DC/wizard.h"
 #include "DC/utility.h"
 #include "DC/mobile.h"
 
@@ -18,11 +17,10 @@
 #include "DC/character.h"
 #include "DC/terminal.h"
 #include "DC/handler.h"
-#include "DC/player.h"
 #include "DC/connect.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
-#include "DC/const.h"
+#include "DC/db.h"
 
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;
@@ -33,7 +31,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
 {
   if (!isImmortalPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   const auto dc = DC::getInstance();
@@ -113,7 +111,7 @@ command_return_t Character::do_wizhelp(QStringList arguments, cmd_t cmd)
   sendln("Test commands:");
   sendln(test_buffer);
   sendln();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
@@ -122,19 +120,19 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   zone_t zone_nr = {};
   Character *target_mob = {}, *pers = {};
   Character *tmp_ch = {};
-  struct follow_type *k = {}, *next_dude = {};
+  follow_type *k = {}, *next_dude = {};
   class Object *target_obj = {};
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   start_room = in_room;
 
   if (arguments.isEmpty())
   {
     send("You must supply a room number, a name or zone <zone number>.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.at(0);
@@ -145,7 +143,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     if (arguments.size() < 2)
     {
       send("No zone number specified.\r\n");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     QString arg2 = arguments.at(1);
 
@@ -156,12 +154,12 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if (zones.isEmpty())
       {
         send(QStringLiteral("Invalid zone %1 specified. No zones loaded.\r\n").arg(zone_key));
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       auto last_zone_nr = zones.lastKey();
       send(QStringLiteral("Invalid zone %1 specified. Valid values are 1-%2\r\n").arg(zone_key).arg(last_zone_nr));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     auto &zone = zones[zone_key];
 
@@ -179,7 +177,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
     {
       send("No room exists with that number.\r\n");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (DC::getInstance()->rooms.contains(loc_nr))
@@ -200,7 +198,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     if (location == -1)
     {
       send("No room exists with that number.\r\n");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else if (arg1.isEmpty() == false)
@@ -228,13 +226,13 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         else
         {
           send("The object is not available.\r\n");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       else
       {
         send("No such creature or object around.\r\n");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
     else
@@ -242,7 +240,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       if (loc_nr > DC::getInstance()->top_of_world || loc_nr < 0)
       {
         send("No room exists with that number.\r\n");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       if (DC::getInstance()->rooms.contains(loc_nr))
@@ -260,13 +258,13 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         else
         {
           send(QStringLiteral("You can't modify room %1").arg(loc_nr));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (location == -1)
       {
         send("No room exists with that number.\r\n");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -276,7 +274,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       level_ < OVERSEER)
   {
     send("That room is for implementers only.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
@@ -284,7 +282,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
       level_ < DEITY)
   {
     send("For your protection, 104-'s may not be in clanhalls.\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((isSet(DC::getInstance()->world[location].room_flags, PRIVATE)) && (level_ < OVERSEER))
@@ -296,13 +294,13 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
     if (i > 1)
     {
       send("There's a private conversation going on in that room.\r\n");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   send("\r\n");
 
-  if (isPlayer())
+  if (!this->isNonPlayer())
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -324,7 +322,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 
   move_char(this, location);
 
-  if (isPlayer())
+  if (!this->isNonPlayer())
     for (tmp_ch = DC::getInstance()->world[in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if ((CAN_SEE(tmp_ch, this) && (tmp_ch != this) && !player->stealth) || (tmp_ch->getLevel() > level_ && tmp_ch->getLevel() > PATRON))
@@ -358,7 +356,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
         k->follower->do_goto(arguments, cmd_t::DEFAULT);
       }
     }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_poof(Character *ch, char *arg, cmd_t cmd)
@@ -367,10 +365,10 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   int ctr, nope;
   char _convert[2];
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->sendln("Mobs can't poof.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   arg = one_argument(arg, inout);
@@ -384,25 +382,25 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("\r\nCurrent poof out is:");
     ch->send(ch->player->poofout);
     ch->sendln("");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (inout[0] != 'i' && inout[0] != 'o')
   {
     ch->sendln("Usage:\r\npoof [i|o] <std::string>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*arg)
   {
     ch->sendln("A poof type message was expected.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (strlen(arg) > 72)
   {
     ch->sendln("Poof message too long, must be under 72 characters long.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   nope = 0;
@@ -416,7 +414,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
       else if (nope == 1)
       {
         ch->sendln("You can only include one % in your poofin ;)");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -426,7 +424,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
     send_to_char("You MUST include your name. Use % to indicate where "
                  "you want it.\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* For the first time, use strcpy to avoid that annoying space
@@ -460,7 +458,7 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   }
 
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_at(Character *ch, char *argument, cmd_t cmd)
@@ -470,14 +468,14 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
   Character *target_mob;
   class Object *target_obj;
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, loc_str, command);
   if (!*loc_str)
   {
     ch->sendln("You must supply a room number or a name.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isdigit(*loc_str) && !strchr(loc_str, '.'))
@@ -487,7 +485,7 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
         ((location = real_room(loc_nr)) < 0))
     {
       ch->sendln("No room exists with that number.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else if ((target_mob = get_char_vis(ch, loc_str)) != nullptr)
@@ -498,19 +496,19 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("The object is not available.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   else
   {
     ch->sendln("No such creature or object around.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* a location has been found. */
   if (isSet(DC::getInstance()->world[location].room_flags, IMP_ONLY) && ch->getLevel() < IMPLEMENTER)
   {
     ch->sendln("No.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Let's keep 104-'s out of clan halls....sigh... */
@@ -518,7 +516,7 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
       ch->getLevel() < DEITY)
   {
     ch->sendln("For your protection, 104-'s may not be in clanhalls.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   original_loc = ch->in_room;
@@ -540,20 +538,20 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   char buf[200];
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   one_argument(argument, buf);
   if (!*buf)
   {
     ch->sendln("Who do you wish to high-five? ");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_char_vis(ch, buf)))
   {
     ch->sendln("No-one by that name in the world.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch == victim)
@@ -566,13 +564,13 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "Time stops for a minute as %s and %s high-five!\r\n", GET_SHORT(ch), GET_SHORT(victim));
     send_to_all(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_holylite(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   if (argument[0] != '\0')
   {
@@ -589,7 +587,7 @@ int do_holylite(Character *ch, char *argument, cmd_t cmd)
     ch->player->holyLite = true;
     ch->sendln("Holy light mode on.");
   } /* if */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
@@ -598,9 +596,9 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
 
   int arg1;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   arg1 = atoi(argument);
@@ -625,15 +623,15 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
       arg1 = ch->getLevel();
     ch->player->wizinvis = arg1;
   }
-  sprintf(buf, "WizInvis Set to: %ld \r\n", ch->player->wizinvis);
+  sprintf(buf, "WizInvis Set to: %d \r\n", ch->player->wizinvis);
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_nohassle(Character *ch, char *argument, cmd_t cmd)
 {
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   if (isSet(ch->player->toggles, Player::PLR_NOHASSLE))
   {
@@ -645,7 +643,7 @@ int do_nohassle(Character *ch, char *argument, cmd_t cmd)
     SET_BIT(ch->player->toggles, Player::PLR_NOHASSLE);
     ch->sendln("Those pesky mobiles will leave you alone now.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // cmd == cmd_t::DEFAULT - imm
@@ -655,15 +653,15 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
   std::string buf1 = {};
   Connection *i = nullptr;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (cmd == cmd_t::IMPCHAN && !ch->has_skill(COMMAND_IMP_CHAN))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = ltrim(argument);
@@ -685,7 +683,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
     else
     {
       ch->sendln("What? How did you get here?? Contact a coder.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     while (!tmp.empty())
@@ -721,7 +719,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
 
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
-      if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && IS_PC(i->character))
+      if (i->character && i->character != ch && i->character->getLevel() >= IMMORTAL && i->character->isPlayer())
       {
         if (cmd == cmd_t::IMPCHAN && !i->character->has_skill(COMMAND_IMP_CHAN))
           continue;
@@ -737,7 +735,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_findfix(Character *ch, char *argument, cmd_t cmd)
@@ -781,20 +779,20 @@ int do_findfix(Character *ch, char *argument, cmd_t cmd)
       if (amt > max)
       {
         ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands OVER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        char *buffer = str_dup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
-        delete[] buffer;
+        free(buffer);
       }
       else
       {
         ch->send(QStringLiteral("Reset %1 in zone %2: %3 reset commands UNDER %4 max in world.\r\n").arg(j + 1).arg(zone_key).arg(amt).arg(max));
-        char *buffer = str_dup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
+        char *buffer = strdup(QStringLiteral("%1 list %2 1").arg(zone_key).arg(j + 1).toStdString().c_str());
         do_zedit(ch, buffer);
-        delete[] buffer;
+        free(buffer);
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_varstat(Character *ch, char *argument, cmd_t cmd)
@@ -806,20 +804,19 @@ int do_varstat(Character *ch, char *argument, cmd_t cmd)
   if ((vict = get_char_vis(ch, arg)) == nullptr)
   {
     ch->sendln("Target not found.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];
   buf[0] = '\0';
-  struct tempvariable *eh;
+  tempvariable *eh;
   for (eh = vict->tempVariable; eh; eh = eh->next)
   {
-    snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n",
-             qPrintable(eh->name), qPrintable(eh->data));
+    snprintf(buf, sizeof(buf), "$B$3%-30s $R-- $B$5 %s\r\n", qPrintable(eh->name), qPrintable(eh->data));
     ch->send(buf);
   }
   if (buf[0] == '\0')
   {
     ch->sendln("No temporary variables found.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

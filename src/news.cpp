@@ -13,7 +13,6 @@
  *   share your changes too.  What goes around, comes around.               *
  ****************************************************************************/
 
-#include <cctype>
 #include <cstring>
 #include <cstdlib>
 #include "DC/structs.h"
@@ -21,29 +20,24 @@
 #include "DC/character.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
-#include "DC/terminal.h"
-#include "DC/player.h"
 #include "DC/mobile.h"
-#include "DC/clan.h"
-#include "DC/handler.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
 #include "DC/connect.h"
 #include "DC/spells.h"
-#include "DC/race.h"
-#include "DC/act.h"
 #include "DC/set.h"
 #include "DC/returnvals.h"
 #include "DC/news.h"
+#include "DC/memory.h"
 
-struct news_data *thenews = nullptr;
-void addnews(struct news_data *newnews)
+news_data *thenews = nullptr;
+void addnews(news_data *newnews)
 {
   if (!thenews)
     thenews = newnews;
   else
   {
-    struct news_data *tmpnews, *tmpnews2 = nullptr;
+    news_data *tmpnews, *tmpnews2 = nullptr;
     for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
     {
       if (tmpnews->time < newnews->time)
@@ -73,10 +67,10 @@ void savenews()
   FILE *fl;
   if (!(fl = fopen("news.data", "w")))
   {
-    DC::getInstance()->logmisc(QStringLiteral("Cannot open news file 'news.data'"));
+    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     abort();
   }
-  struct news_data *tmpnews;
+  news_data *tmpnews;
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
@@ -88,7 +82,7 @@ void savenews()
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
-    DC::getInstance()->logmisc(QStringLiteral("Cannot save news file to web dir."));
+    logentry(QStringLiteral("Cannot save news file to web dir."), 0, DC::LogChannel::LOG_MISC);
 }
 
 void loadnews()
@@ -96,15 +90,20 @@ void loadnews()
   FILE *fl;
   if (!(fl = fopen("news.data", "r")))
   {
-    DC::getInstance()->logmisc(QStringLiteral("Cannot open news file 'news.data'"));
+    logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     return;
   }
   int i;
   while ((i = fread_int(fl, 0, 2147483467)) != 0)
   {
-    struct news_data *nnews;
-    nnews = new struct news_data;
-
+    news_data *nnews;
+#ifdef LEAK_CHECK
+    nnews = (news_data *)
+        calloc(1, sizeof(news_data));
+#else
+    nnews = (news_data *)
+        dc_alloc(1, sizeof(news_data));
+#endif
     nnews->time = i;
     nnews->addedby = fread_string(fl, 0);
     nnews->news = fread_string(fl, 0);
@@ -145,11 +144,11 @@ const char *newsify(char *string)
 int do_news(Character *ch, char *argument, cmd_t cmd)
 {
   bool up;
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     up = true;
   else
     up = !isSet(ch->player->toggles, Player::PLR_NEWS);
-  struct news_data *tnews;
+  news_data *tnews;
   char buf[MAX_STRING_LENGTH * 2], old[MAX_STRING_LENGTH * 2];
   char timez[15];
   buf[0] = '\0';
@@ -188,9 +187,9 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
     else
       ch->sendln("There's been no recent news. Type 'news all' to see all news.");
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_addnews(Character *ch, char *argument, cmd_t cmd)
@@ -199,7 +198,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(COMMAND_ADDNEWS))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!argument || !*argument || !ch->desc)
@@ -208,7 +207,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
                  "Date is either TODAY or in the following format: day/month/year\r\n"
                  "such as 23/02/06 for 23rd february 2006\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   char arg[MAX_INPUT_LENGTH];
   time_t thetime;
@@ -217,15 +216,15 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   {
     savenews();
     ch->sendln("Saved!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (str_cmp(arg, "today"))
   {
-    struct tm tmptime;
+    tm tmptime;
     if (strptime(arg, "%d/%m/%y", &tmptime) == nullptr)
     {
       do_addnews(ch, "");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     tmptime.tm_sec = 0;
     tmptime.tm_hour = 0;
@@ -236,7 +235,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   else
   {
     thetime = time(nullptr);
-    struct tm *tmptime = localtime(&thetime);
+    tm *tmptime = localtime(&thetime);
     tmptime->tm_sec = 0;
     tmptime->tm_hour = 0;
     tmptime->tm_min = 0;
@@ -245,7 +244,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   }
   // Time acquired. Whoppin'.
 
-  struct news_data *nnews;
+  news_data *nnews;
   for (nnews = thenews; nnews; nnews = nnews->next)
   {
     if (nnews->time == thetime)
@@ -253,8 +252,13 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   }
   if (!nnews)
   {
-    nnews = new struct news_data;
-
+#ifdef LEAK_CHECK
+    nnews = (news_data *)
+        calloc(1, sizeof(news_data));
+#else
+    nnews = (news_data *)
+        dc_alloc(1, sizeof(news_data));
+#endif
     nnews->addedby = str_dup(GET_NAME(ch));
     nnews->time = thetime;
     addnews(nnews);
@@ -268,5 +272,5 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

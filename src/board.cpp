@@ -46,17 +46,15 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <string>
 #include <map>
 #include <vector>
-#include <sstream>
 
 #include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/player.h"   // MAX_*
 #include "DC/connect.h"  // Connection::states::WRITE_BOARD
 #include "DC/terminal.h" // BOLD
-#include "DC/fileinfo.h" // for the board files
 #include "DC/clan.h"
 #include "DC/character.h"
 #include "DC/utility.h" // false
+#include "DC/memory.h"
 #include "DC/act.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
@@ -66,16 +64,18 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 #define MAX_MESSAGE_LENGTH 2048
 
-struct message
+class message
 {
+public:
   std::string date;
   std::string title;
   std::string author;
   std::string text;
 };
 
-struct BOARD_INFO
+class BOARD_INFO
 {
+public:
   Character *locked_for = {};
   bool lock = {};
   int min_read_level = {};
@@ -137,8 +137,9 @@ void new_edit_board_unlock_board(Character *ch, int abort);
 #define CLASS_BARD 10
 #define CLASS_DRUID 11
 
-struct RESERVATION_DATA
+class RESERVATION_DATA
 {
+public:
   char *buf;
   message new_post;
   std::map<std::string, BOARD_INFO>::iterator board;
@@ -578,9 +579,9 @@ int save_boards()
 
   if (!the_file)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
-                                DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
+             DC::LogChannel::LOG_BUG);
+    return ReturnValue::eFAILURE;
   }
 
   for (board_it = board_db.begin(); board_it != board_db.end(); board_it++)
@@ -595,7 +596,7 @@ int save_boards()
     fwrite_string((char *)board_it->first.c_str(), the_file);
   }
   fclose(the_file);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /*
@@ -610,14 +611,14 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
 
   if (cmd != cmd_t::LOOK && cmd != cmd_t::READ && cmd != cmd_t::WRITE && cmd != cmd_t::ERASE)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!arg)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->desc)
-    return eFAILURE; /* By MS or all NPC's will be trapped at the board */
+    return ReturnValue::eFAILURE; /* By MS or all NPC's will be trapped at the board */
 
   if (!has_loaded)
   {
@@ -628,18 +629,18 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   // Identify which board we're dealing with
 
   if (!obj)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   board = board_db.find(qPrintable(obj->Name()));
 
   if (board == board_db.end())
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   char arg1[MAX_INPUT_LENGTH];
   one_argument(arg, arg1);
 
   if (!isexact(arg1, obj->Name()) && cmd == cmd_t::LOOK)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
@@ -649,35 +650,35 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to know how to write!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     board_write_msg(ch, arg, board);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   case cmd_t::READ: // read
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to know how to read!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     board_display_msg(ch, arg, board);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   case cmd_t::ERASE: /* erase */
     if (GET_INT(ch) < 9)
     {
       ch->sendln("You are too stupid to read them!\r\nDon't erase them they might be important!");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (
         ((obj->Name() == QStringLiteral("board uruk")) && ch->clan != CLAN_NAZGUL && ch->getLevel() < PATRON))
     {
       ch->sendln("You can't erase posts from this board.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       // added this for Uruk'hai board so only members can remove posts
     }
     board_remove_msg(ch, arg, board);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 }
 
@@ -693,7 +694,7 @@ void new_edit_board_unlock_board(Character *ch, int abort)
   message new_msg;
 
   new_msg.text = reserve->buf;
-  delete[] reserve->buf;
+  dc_free(reserve->buf);
   new_msg.date = reserve->new_post.date;
   new_msg.author = reserve->new_post.author;
   new_msg.title = reserve->new_post.title;
@@ -798,21 +799,21 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   one_argument(arg, number);
 
   if (!*number || !isdigit(*number))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!(tmessage = atoi(number)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (board->second.msgs.empty())
   {
     ch->sendln("The board is empty!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
     ch->sendln("That message exists only in your imagination..");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ind = tmessage;
@@ -823,18 +824,18 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
     if (ch->clan != board->second.owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(GET_NAME(ch)))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   else if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
   {
@@ -842,7 +843,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
                  "get a nasty\r\nshock. Maybe you'd better leave it "
                  "alone.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   board->second.msgs.erase(board->second.msgs.begin() + ind);
@@ -854,7 +855,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   board_save_board(board);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 std::string remove_slashr(std::string unformatted)
@@ -885,12 +886,12 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
 
   if (!the_file)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
-                                DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
+             DC::LogChannel::LOG_BUG);
     return;
   }
 
-  fprintf(the_file, " %d ", board->second.msgs.size());
+  fprintf(the_file, " %zu ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);
@@ -914,7 +915,7 @@ void board_load_board()
 
   FILE *the_file;
   int ind;
-  struct message curr_msg;
+  message curr_msg;
   int number;
 
   std::map<std::string, BOARD_INFO>::iterator map_it;
@@ -964,12 +965,12 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   one_argument(arg, number);
   unsigned int tmessage;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     if (!*number)
     {
       ch->sendln("Sorry, mobs have to specify the number of the post they want to read.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -984,28 +985,28 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   if (!*number || !isdigit(*number))
   {
     ch->sendln("Read what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!(tmessage = atoi(number)))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((ch->getLevel() < board->second.min_read_level))
@@ -1015,28 +1016,28 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (board->second.msgs.empty())
   {
     ch->sendln("The board is empty!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (tmessage == 0 || tmessage >= board->second.msgs.size())
   {
     ch->sendln("That message doesn't exist, moron.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  if (ch->isPlayer())
+  if (!ch->isNonPlayer())
     ch->player->last_mess_read = tmessage;
 
   sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
-  if (IS_NPC(ch) || isSet(ch->player->toggles, Player::PLR_ANSI))
+  if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
   {
     snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
              tmessage, board->second.msgs[tmessage].date.c_str(),
@@ -1054,7 +1055,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   board_msg += buf;
 
   page_string(ch->desc, board_msg.c_str(), 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
@@ -1067,18 +1068,18 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
     if (ch->clan != board->second.owner)
     {
       ch->sendln("You aren't in the right clan bucko.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     if (!has_right(ch, CLAN_RIGHTS_B_READ))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   if (board->second.type == CLASS_BOARD && !ch->isImmortalPlayer() && GET_CLASS(ch) != board->second.owner)
   {
     ch->sendln("You do not understand the writings written on this board.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if ((ch->getLevel() < board->second.min_read_level))
@@ -1088,7 +1089,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("$n studies the board.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -1105,7 +1106,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
     std::vector<message>::reverse_iterator msg_it;
     i = board->second.msgs.size() - 1;
     for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
-      if (IS_NPC(ch) || isSet(ch->player->toggles, Player::PLR_ANSI))
+      if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
       {
         snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
                  msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
@@ -1122,7 +1123,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   }
   board_save_board(board);
   page_string(ch->desc, board_msg.c_str(), 1);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int fwrite_string(char *buf, FILE *fl)

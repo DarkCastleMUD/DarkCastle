@@ -5,26 +5,22 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <cerrno>
-#include <signal.h>
 
 #include <fmt/format.h>
 
 #include "DC/wizard.h"
 #include "DC/spells.h"
-#include "DC/fileinfo.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
-#include "DC/player.h"
 
 #include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
-#include "DC/comm.h"
 #include "DC/vault.h"
 #include "DC/utility.h"
+#include "DC/memory.h"
 
 #ifdef BANDWIDTH
 #include "DC/bandwidth.h"
@@ -37,22 +33,22 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    sendln("Linkload whom?");
-    return eFAILURE;
+    this->sendln("Linkload whom?");
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0).trimmed();
 
   if (get_pc(arg1))
   {
-    sendln("That person is already on the game!");
-    return eFAILURE;
+    this->sendln("That person is already on the game!");
+    return ReturnValue::eFAILURE;
   }
 
   if (!(dc_->load_char_obj(&d, arg1)))
   {
-    sendln("Unable to load! (Character might not exist...)");
-    return eFAILURE;
+    this->sendln("Unable to load! (Character might not exist...)");
+    return ReturnValue::eFAILURE;
   }
 
   new_new = d.character;
@@ -72,8 +68,8 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   char_to_room(new_new, in_room);
   act("$n gestures sharply and $N comes into existence!", this, 0, new_new, TO_ROOM, 0);
   act("You linkload $N.", this, 0, new_new, TO_CHAR, 0);
-  DC::getInstance()->logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
-  return eSUCCESS;
+  logf(level_, DC::LogChannel::LOG_GOD, "%s linkloads %s.", GET_NAME(this), GET_NAME(new_new));
+  return ReturnValue::eSUCCESS;
 }
 
 int do_processes(Character *ch, char *arg, cmd_t cmd)
@@ -88,31 +84,31 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
 
   if (!(fl = fopen("../lib/whassup.txt", "a")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
-                                DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
+             DC::LogChannel::LOG_BUG);
+    return ReturnValue::eFAILURE;
   }
   if (fprintf(fl, "~\n") < 0)
   {
     fclose(fl);
     ch->sendln("Failure writing to transition file.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   fclose(fl);
 
   if (!(fl = fopen("../lib/whassup.txt", "r")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
-                                DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
+             DC::LogChannel::LOG_BUG);
+    return ReturnValue::eFAILURE;
   }
   tmp = fread_string(fl, 0);
   fclose(fl);
 
   ch->send(tmp);
-  delete[] tmp;
-  return eSUCCESS;
+  FREE(tmp);
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
@@ -124,32 +120,32 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
   {
     if (!(victim = get_pc_vis(this, name)))
     {
-      sendln("That player is not here.");
-      return eFAILURE;
+      this->sendln("That player is not here.");
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    sendln("Who exactly would you like to be a guide?");
-    return eFAILURE;
+    this->sendln("Who exactly would you like to be a guide?");
+    return ReturnValue::eFAILURE;
   }
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(QStringLiteral("%1 is now a guide.\r\n").arg(victim->getName()));
+    send(QStringLiteral("%1 is now a guide.\r\n").arg(victim->getNameC()));
     victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(victim->getName()));
+    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
     victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_advance(Character *ch, char *argument, cmd_t cmd)
@@ -160,8 +156,8 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
 
   void gain_exp(Character * ch, int gain);
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, name, buf);
   argument_interpreter(buf, level, passwd);
@@ -171,45 +167,45 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
     if (!(victim = get_char_vis(ch, name)))
     {
       ch->sendln("That player is not here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     ch->sendln("Advance whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim))
+  if (victim->isNonPlayer())
   {
     ch->sendln("NO! Not on NPC's.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*level ||
       (new_newlevel = atoi(level)) <= 0 || new_newlevel > IMPLEMENTER)
   {
     ch->sendln("Level must be 1 to 110.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((new_newlevel > DC::MAX_MORTAL_LEVEL) && (new_newlevel < MIN_GOD))
   {
     ch->sendln("That level doesn't exist!!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < OVERSEER && new_newlevel >= IMMORTAL)
   {
     ch->sendln("Limited to levels lower than Titan.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Who the fuck took ths out in the first place? -Sadus */
   if (new_newlevel > ch->getLevel())
   {
     ch->sendln("Yeah right.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Lower level:  First reset the player to level 1. Remove all special
@@ -247,8 +243,8 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
       ch, 0, victim, TO_VICT, 0);
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
-          qPrintable(victim->getName()), new_newlevel);
-  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+          victim->getNameC(), new_newlevel);
+  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   if (victim->getLevel() == 0)
     do_start(victim);
@@ -260,7 +256,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
       advance_level(victim, 0);
     }
   DC::getInstance()->update_wizlist(victim);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
@@ -277,29 +273,29 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
                  "lower than you.\r\n",
                  this);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   victim = get_pc_vis(this, name);
 
   if (victim)
   {
-    if (IS_PC(victim) && (getLevel() < victim->getLevel()))
+    if (victim->isPlayer() && (this->getLevel() < victim->getLevel()))
     {
       act("$n casts a massive lightning bolt at you.", this, 0, victim,
           TO_VICT, 0);
       act("$n casts a massive lightning bolt at $N.", this, 0, victim,
           TO_ROOM, NOTVICT);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (victim->getLevel() == IMPLEMENTER)
     { // Hehe..
-      sendln("Get stuffed.");
-      return eFAILURE;
+      this->sendln("Get stuffed.");
+      return ReturnValue::eFAILURE;
     }
 
-    if (IS_PC(victim))
+    if (victim->isPlayer())
     {
       victim->sendln(QString("A massive bolt of lightning arcs down from the "
                              "heavens, striking you\r\nbetween the eyes. You have "
@@ -316,15 +312,15 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
                       .arg(GET_SHORT(victim))
                       .arg(GET_SHORT(this));
 
-    remove_familiars(qPrintable(victim->getName()), ZAPPED);
+    remove_familiars(victim->getNameC(), ZAPPED);
     if (cmd == cmd_t::DEFAULT) // cmd_t::DEFAULT = someone typed it. cmd_t::TRACK = rename.
-      remove_vault(qPrintable(victim->getName()), ZAPPED);
+      remove_vault(victim->getNameC(), ZAPPED);
 
     victim->setLevel(1);
     DC::getInstance()->update_wizlist(victim);
 
-    if (clan)
-      remove_clan_member(clan, this);
+    if (this->clan)
+      remove_clan_member(this->clan, this);
 
     DC::getInstance()->TheAuctionHouse.HandleDelete(victim->getName());
 
@@ -333,7 +329,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
     send_to_room(buf, room);
     send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    DC::getInstance()->logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, DC::LogChannel::LOG_GOD);
+    logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, DC::LogChannel::LOG_GOD);
   }
 
   else
@@ -343,7 +339,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
                  this);
   }
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_global(Character *ch, char *argument, cmd_t cmd)
@@ -352,8 +348,8 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   class Connection *point;
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   for (i = 0; *(argument + i) == ' '; i++)
     ;
@@ -367,7 +363,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
       if (!point->connected && point->character)
         point->character->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
@@ -377,13 +373,13 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   extern int do_not_save_corpses;
   char **new_argv = 0;
 
-  if (IS_NPC(this))
-    return eFAILURE;
+  if (this->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    sendln("Huh?");
-    return eFAILURE;
+    this->sendln("Huh?");
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0);
@@ -401,14 +397,14 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
                  "  auto - Toggle auto-hotboot on crash setting.\r\n"
                  "   die - Kill boot script and crash mud so it won't reboot.\r\n",
                  this);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (arg1 == "cold")
   {
     QString buffer = QStringLiteral("Shutdown by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    DC::getInstance()->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     _shutdown = 1;
     DC::getInstance()->quit();
   }
@@ -416,17 +412,17 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   {
     for (const auto &victim : DC::getInstance()->character_list)
     {
-      if (IS_PC(victim))
+      if (victim->isPlayer())
       {
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
-          if (IS_NPC(follower) && IS_AFFECTED(follower, AFF_CHARM))
+          if (follower->isNonPlayer() && IS_AFFECTED(follower, AFF_CHARM))
           {
             if (follower->carrying != nullptr)
             {
-              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getName()).arg(GET_NAME(follower)));
-              return eFAILURE;
+              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+              return ReturnValue::eFAILURE;
             }
           }
         }
@@ -436,25 +432,25 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     do_not_save_corpses = 1;
     QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
     send_to_all(buffer);
-    dc_->logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
-    dc_->logmisc(QStringLiteral("Writing sockets to file for hotboot recovery."));
+    logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
+    logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
     do_force(this, "all save");
     if (!DC::getInstance()->write_hotboot_file())
     {
-      DC::getInstance()->logmisc(QStringLiteral("Hotboot failed.  Closing all sockets."));
-      sendln("Hot reboot failed.");
+      logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
+      this->sendln("Hot reboot failed.");
     }
   }
   else if (arg1 == "auto")
   {
     if (try_to_hotboot_on_crash)
     {
-      sendln("Mud will not try to hotboot when it crashes next.");
+      this->sendln("Mud will not try to hotboot when it crashes next.");
       try_to_hotboot_on_crash = 0;
     }
     else
     {
-      sendln("Mud will now TRY to hotboot when it crashes next.");
+      this->sendln("Mud will now TRY to hotboot when it crashes next.");
       try_to_hotboot_on_crash = 1;
     }
   }
@@ -464,13 +460,13 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     Character *crashus = nullptr;
     if (crashus->in_room == DC::NOWHERE)
     {
-      return eFAILURE; // this should never be reached
+      return ReturnValue::eFAILURE; // this should never be reached
     }
   }
   else if (arg1 == "core")
   {
     produce_coredump(this);
-    DC::getInstance()->logentry(QStringLiteral("Corefile produced."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Corefile produced."), IMMORTAL, DC::LogChannel::LOG_BUG);
   }
   else if (arg1 == "die")
   {
@@ -481,26 +477,26 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     Character *crashus = nullptr;
     if (crashus->in_room == DC::NOWHERE)
     {
-      return eFAILURE; // this should never be reached
+      return ReturnValue::eFAILURE; // this should never be reached
     }
   }
   else if (arg1 == "check")
   {
     for (const auto &victim : DC::getInstance()->character_list)
     {
-      if (IS_PC(victim))
+      if (victim->isPlayer())
       {
         std::vector<Character *> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
-          if (IS_NPC(follower))
+          if (follower->isNonPlayer())
           {
             if (IS_AFFECTED(follower, AFF_CHARM))
             {
-              if (follower->carrying != nullptr || follower->equipment != nullptr)
+              if (follower->carrying != nullptr || follower->equipment[0] != nullptr)
               {
-                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getName()).arg(GET_NAME(follower)));
-                return eFAILURE;
+                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+                return ReturnValue::eFAILURE;
               }
             }
           }
@@ -508,21 +504,21 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
       }
     }
     send("Ok.\r\n");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
 {
   if (!has_skill(COMMAND_SHUTDOWN))
   {
-    sendln("Huh?");
-    return eFAILURE;
+    this->sendln("Huh?");
+    return ReturnValue::eFAILURE;
   }
 
-  sendln("If you want to shut something down - say so!");
-  return eSUCCESS;
+  this->sendln("If you want to shut something down - say so!");
+  return ReturnValue::eSUCCESS;
 }
 
 int do_testport(Character *ch, char *argument, cmd_t cmd)
@@ -533,13 +529,13 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTPORT))
+  if (ch->isNonPlayer() || !ch->has_skill(COMMAND_TESTPORT))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -547,7 +543,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
   if (*arg1 == 0)
   {
     ch->sendln("testport <start | stop>\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg1, "start"))
@@ -559,7 +555,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
       exit(0);
     }
 
-    DC::getInstance()->logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
+    logf(105, DC::LogChannel::LOG_MISC, "Starting testport.");
     ch->sendln("Testport successfully started.");
   }
   else if (!str_cmp(arg1, "stop"))
@@ -571,11 +567,11 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
       exit(0);
     }
 
-    DC::getInstance()->logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
+    logf(105, DC::LogChannel::LOG_MISC, "Shutdown testport under pid %d", child);
     ch->sendln("Testport successfully shutdown.");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_testuser(Character *ch, char *argument, cmd_t cmd)
@@ -589,13 +585,13 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 
   if (ch == nullptr)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch) || !ch->has_skill(COMMAND_TESTUSER))
+  if (ch->isNonPlayer() || !ch->has_skill(COMMAND_TESTUSER))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, arg1);
@@ -604,13 +600,13 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   if (*arg1 == 0 || *arg2 == 0)
   {
     ch->sendln("testuser <user> <on|off>\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (strlen(arg1) > 19 || _parse_name(arg1, username))
   {
     ch->sendln("Invalid username passed.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   username[0] = UPPER(username[0]);
@@ -625,7 +621,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   if (!file_exists(savefile))
   {
     ch->sendln("Player file not found.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!str_cmp(arg2, "on"))
@@ -639,10 +635,10 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
   else
   {
     ch->sendln("Only on or off are valid second arguments to this command.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", qPrintable(ch->getName()), command);
+  logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
 
   if (system(command))
   {
@@ -653,7 +649,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Ok.");
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 #ifdef BANDWIDTH
@@ -661,7 +657,7 @@ int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 {
   csendf(ch, "Bytes sent in %ld seconds: %ld\r\n",
          get_bandwidth_start(), get_bandwidth_amount());
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 #endif
 
@@ -677,7 +673,7 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
     send_to_char("Syntax:  skilledit <character> <action> <value>\r\n"
                  "Possible actions are:  list, add, delete\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   half_chop(argument, name, argument);
   half_chop(argument, type, value);
@@ -685,18 +681,18 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
   if (!(victim = get_pc_vis(ch, name)))
   {
     ch->sendln("Edit the skills of whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isexact(type, "list"))
   {
     if (victim->skills.empty())
     {
-      ch->send(fmt::format("{} has no skills.\r\n", qPrintable(victim->getName())));
-      return eSUCCESS;
+      ch->send(fmt::format("{} has no skills.\r\n", victim->getNameC()));
+      return ReturnValue::eSUCCESS;
     }
 
-    ch->send(fmt::format("Skills for {}:\r\n", qPrintable(victim->getName())));
+    ch->send(fmt::format("Skills for {}:\r\n", victim->getNameC()));
     for (const auto &curr : ch->skills)
     {
       ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
@@ -713,5 +709,5 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
     ch->send(fmt::format("Invalid action '{}'.  Must be 'list', 'add', or 'delete'.\r\n", type));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

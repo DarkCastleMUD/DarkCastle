@@ -3,20 +3,14 @@
 | Description:  This file contains the classes and methods used to make
 |  the act() function work.
 */
-#include <cctype>
-#include <cstring>
-#include <cctype>
 
 #include <string>
 
 #include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/comm.h"
-#include "DC/db.h"
 #include "DC/room.h"
 #include "DC/utility.h"
-#include "DC/player.h"
-#include "DC/terminal.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/act.h"
@@ -63,9 +57,9 @@ act_return act(
   // This shouldn't happen
   if (ch == 0)
   {
-    DC::getInstance()->logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Error in act(), character equal to 0"), OVERSEER, DC::LogChannel::LOG_BUG);
     delete tokens;
-    ar.retval = eFAILURE;
+    ar.retval = ReturnValue::eFAILURE;
     return ar;
   }
 
@@ -128,9 +122,9 @@ act_return act(
   {
     if (destination != TO_ZONE && destination != TO_WORLD)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("Error in act(), invalid value sent as 'destination'"), OVERSEER, DC::LogChannel::LOG_BUG);
       delete tokens;
-      ar.retval = eFAILURE;
+      ar.retval = ReturnValue::eFAILURE;
       return ar;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)

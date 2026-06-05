@@ -31,40 +31,40 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("Syntax: boot <victim> [boot]");
     ch->sendln("The boot option causes the victim to see a large ASCII boot.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   victim = get_pc_vis(ch, name);
 
   if (victim)
   {
-    if (IS_PC(victim) && (ch->getLevel() <= victim->getLevel()))
+    if (victim->isPlayer() && (ch->getLevel() <= victim->getLevel()))
     {
       act("You cast a stream of fire at $N.", ch, 0, victim, TO_CHAR, 0);
       act("$n casts a stream of fire at you.", ch, 0, victim, TO_VICT, 0);
       act("$n casts a stream of fire at $N.", ch, 0, victim, TO_ROOM, NOTVICT);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
-    if (victim->isPlayer() && victim->player->possesing)
+    if (!victim->isNonPlayer() && victim->player->possesing)
     {
       ch->send("Oops! They ain't linkdead! Just possessing.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (IS_AFFECTED(victim, AFF_CANTQUIT))
     {
       if (victim->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
       {
         act("$N is a thief.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       act("$N is a pkiller.  Don't boot $M.", ch, 0, victim, TO_CHAR, 0);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     /* Still here? Ok, the boot continues */
     victim->sendln("You have been disconnected.");
     ch->sendln("Ok.");
-    if (IS_PC(victim))
+    if (victim->isPlayer())
     {
       sprintf(buf, "A stream of fire arcs down from the heavens, striking "
                    "you between the eyes.\r\nYou have been removed from the "
@@ -78,8 +78,8 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
         "by $N.",
         victim, 0, ch, TO_ROOM, INVIS_NULL);
 
-    sprintf(name, "%s has booted %s.", GET_NAME(ch), qPrintable(victim->getName()));
-    DC::getInstance()->logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    sprintf(name, "%s has booted %s.", GET_NAME(ch), victim->getNameC());
+    logentry(name, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
     if (!strcmp(type, "boot"))
     {
@@ -155,7 +155,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
   else
     ch->sendln("Boot Who?");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_disconnect(Character *ch, char *argument, cmd_t cmd)
@@ -165,8 +165,8 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
   class Connection *d;
   unsigned sdesc;
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   one_argument(argument, arg);
   sdesc = atoi(arg);
@@ -174,7 +174,7 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Illegal descriptor number.");
     ch->sendln("Usage: release <#>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
@@ -186,19 +186,19 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
         d->character->send(buf);
         ch->sendln("You dummy, can't do that to your elders!");
         close_socket(ch->desc);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
         close_socket(d);
         sprintf(buf, "Closing socket to descriptor #%d\r\n", sdesc);
         ch->send(buf);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
   ch->sendln("Descriptor not found!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_fsave(Character *ch, std::string argument, cmd_t cmd)
@@ -206,22 +206,22 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
   Character *vict = {};
   std::string name = {}, buf = {};
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::tie(name, argument) = half_chop(argument);
   if (name.empty())
   {
     ch->sendln("Who do you wish to force to save?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(vict = get_char_vis(ch, name)))
   {
     ch->sendln("No-one by that name here..");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->player->stealth == false)
@@ -233,9 +233,9 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
   }
   vict->save();
 
-  DC::getInstance()->logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  logentry(QStringLiteral("%1 just forced %2 to save.").arg(GET_NAME(ch)).arg(GET_NAME(vict)), ch->getLevel(), DC::LogChannel::LOG_GOD);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_fighting(Character *ch, char *argument, cmd_t cmd)
@@ -261,7 +261,7 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
   {
     // Don't show mobs fighting or people not in the arena when arena
     // keyword was specified.
-    if (IS_NPC(i) || (arenaONLY && !i->room().isArena()))
+    if (i->isNonPlayer() || (arenaONLY && !i->room().isArena()))
     {
       continue;
     }
@@ -292,7 +292,7 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
     else
       ch->sendln("No fighting characters found.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_peace(Character *ch, char *argument, cmd_t cmd)
@@ -301,14 +301,14 @@ int do_peace(Character *ch, char *argument, cmd_t cmd)
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
-    if (IS_NPC(rch) && rch->mobdata->hated != nullptr)
+    if (rch->isNonPlayer() && rch->mobdata->hated != nullptr)
       remove_memory(rch, 'h');
     if (rch->fighting != nullptr)
       stop_fighting(rch);
   }
   act("$n makes a gesture and all fighting stops.", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("You stop all fighting in this room.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
@@ -333,7 +333,7 @@ int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
             buf, races[i].plural_name, immbuf, resbuf, susbuf, hatbuf, fribuf);
   }
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int lookupClass(Character *ch, char *str)
@@ -391,8 +391,8 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH] = {0};
   char arg2[MAX_STRING_LENGTH] = {0};
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
@@ -404,7 +404,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("guild <room #>           - List all classes allowed in room");
     ch->sendln("guild <class>            - List all rooms that allow that class");
     ch->sendln("guild <class> <room #>   - Toggle allow/deny class in room\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // guild <room #> or guild <class>
@@ -416,7 +416,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
       room = lookupRoom(ch, arg1);
       if (room == DC::NOWHERE)
       {
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       ch->send(QStringLiteral("Allow list for room #%1: ").arg(room));
@@ -439,7 +439,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("All");
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
@@ -447,7 +447,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
       c_class = lookupClass(ch, arg1);
       if (c_class == -1)
       {
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       int count = 0;
@@ -479,7 +479,7 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("");
       }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
@@ -487,25 +487,25 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
   c_class = lookupClass(ch, arg1);
   if (c_class == -1)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   room = lookupRoom(ch, arg2);
   if (room == DC::NOWHERE)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_modify_room(ch, room))
   {
     ch->sendln("You are unable to work creation outside of your range.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!DC::getInstance()->rooms.contains(room))
   {
     ch->send(QStringLiteral("Room %1 does not exist.\r\n").arg(room));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (DC::getInstance()->rooms[room].allow_class[c_class] == true)
@@ -526,5 +526,5 @@ int do_guild(Character *ch, char *argument, cmd_t cmd)
   do_rsave(ch, "");
   ch->in_room = old_room;
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

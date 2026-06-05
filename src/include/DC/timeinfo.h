@@ -11,7 +11,7 @@
 
 #include <QVariant>
 
-extern struct timer_data *timer_list;
+extern class timer_data *timer_list;
 
 #define SECS_PER_REAL_MIN 60
 #define SECS_PER_REAL_HOUR (60 * SECS_PER_REAL_MIN)
@@ -25,8 +25,9 @@ extern struct timer_data *timer_list;
 
 /* This structure is purely intended to be an easy way to transfer */
 /* and return information about time (real or mudwise).            */
-struct time_info_data
+class time_info_data
 {
+public:
   int hours;
   int day;
   int month;
@@ -34,8 +35,9 @@ struct time_info_data
 };
 
 /* These data contain information about a players time data */
-struct time_data
+class time_data
 {
+public:
   int32_t birth;  /* This represents the characters age                */
   int32_t logon;  /* Time of the last logon (used to calculate played) */
   int32_t played; /* This is the total accumulated time played in secs */

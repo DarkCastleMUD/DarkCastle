@@ -28,19 +28,18 @@
 #include "DC/handler.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
-#include "DC/fileinfo.h"
 #include "DC/db.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/shop.h"
-#include "DC/spells.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/wizard.h"
+#include "DC/memory.h"
 
-struct player_shop *g_playershops;
+player_shop *g_playershops;
 
-extern struct time_info_data time_info;
+extern time_info_data time_info;
 
 int max_shop;
 
@@ -145,7 +144,7 @@ void restock_keeper(Character *keeper, int shop_nr)
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
-  DC::getInstance()->logmisc(buf);
+  logentry(buf, OVERSEER, DC::LogChannel::LOG_MISC);
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -176,7 +175,7 @@ void shopping_buy(const char *arg, Character *ch,
     return;
   }
 
-  if (ch->isPlayer() && ch->isPlayerGoldThief())
+  if (!ch->isNonPlayer() && ch->isPlayerGoldThief())
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -284,7 +283,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  if (ch->isPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
+  if (!ch->isNonPlayer() && ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF))
   {
     ch->sendln("Your criminal acts prohibit it.");
     return;
@@ -325,9 +324,9 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  int virt = DC::getInstance()->obj_index[obj->item_number].virt;
+  int virt = DC::getInstance()->obj_index[obj->item_number].vnum();
   if (virt >= 13400 && virt <= 13707 &&
-      DC::getInstance()->mob_index[keeper->mobdata->nr].virt != 13416)
+      DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() != 13416)
   {
     keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
     return;
@@ -401,7 +400,7 @@ void shopping_value(const char *arg, Character *ch,
     }
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3003)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -426,11 +425,11 @@ void shopping_value(const char *arg, Character *ch,
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
         sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
         do_say(keeper, buf);
-        for (qsizetype i = 0; i < obj->affected.size(); i++)
+        for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0)
           {
@@ -450,7 +449,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3004)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -475,9 +474,9 @@ void shopping_value(const char *arg, Character *ch,
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
-        for (qsizetype i = 0; i < obj->affected.size(); i++)
+        for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
@@ -494,7 +493,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I deal with armor exclusively.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3000)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -551,7 +550,7 @@ void shopping_value(const char *arg, Character *ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].virt == 3010 && keeperhas)
+  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
   { // if the leather worker in town
     act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
     act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
@@ -567,9 +566,9 @@ void shopping_value(const char *arg, Character *ch,
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
         do_say(keeper, buf);
-        sprintf(buf, "The minimum level necessary to use it is %d.", obj->obj_flags.eq_level);
+        sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
         do_say(keeper, buf);
-        for (qsizetype i = 0; i < obj->affected.size(); i++)
+        for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
@@ -635,7 +634,7 @@ void shopping_list(const char *arg, Character *ch,
 
     cost = (int)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_buy);
 
-    int vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+    int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
     bool loop = false;
     for (a = 0; a < i; a++)
       if (done[a] == vnum)
@@ -643,12 +642,12 @@ void shopping_list(const char *arg, Character *ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = DC::getInstance()->obj_index[obj->item_number].virt;
+      done[i++] = DC::getInstance()->obj_index[obj->item_number].vnum();
     else
       break;
     a = 0;
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (DC::getInstance()->obj_index[tobj->item_number].virt == DC::getInstance()->obj_index[obj->item_number].virt)
+      if (DC::getInstance()->obj_index[tobj->item_number].vnum() == DC::getInstance()->obj_index[obj->item_number].vnum())
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
@@ -691,7 +690,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( IS_NPC(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -699,8 +698,8 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   // instead of looping through.  Should allow for multiple keepers too:)
   if (!(keeper = invoker))
   {
-    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eFAILURE;
   }
 
   // LFound1:
@@ -709,17 +708,17 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
     if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
       goto LFound2;
   }
-  DC::getInstance()->logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
-  return eFAILURE;
+  logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
+  return ReturnValue::eFAILURE;
 
 LFound2:
   //    if ( ch->in_room != DC::getInstance()->shop_index[shop_nr].in_room )
-  //      return eFAILURE;
+  //      return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   case cmd_t::BUY:
     shopping_buy(arg, ch, keeper, shop_nr);
     break;
@@ -734,7 +733,7 @@ LFound2:
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void boot_the_shops()
@@ -757,18 +756,18 @@ void boot_the_shops()
     buf = fread_string(fp, 0);
     if (*buf == '$')
     {
-      delete[] buf;
+      dc_free(buf);
       break;
     }
     if (*buf != '#')
     {
-      delete[] buf;
+      dc_free(buf);
       continue;
     }
 
     // we don't seem to use buff after this point, so I'm going to free it
     // otherise, we're leaking memory
-    delete[] buf;
+    dc_free(buf);
 
     if (max_shop >= MAX_SHOP)
     {
@@ -811,7 +810,7 @@ void boot_the_shops()
     int room_nr = real_room(temp);
     if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
     {
-      DC::getInstance()->logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
+      logf(100, DC::LogChannel::LOG_BUG, "shopkeeper %d loaded with in_room set to %d. Setting to 0.", max_shop, room_nr);
       room_nr = 0;
     }
 
@@ -861,7 +860,7 @@ void fix_shopkeepers_inventory()
     for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (IS_NPC(keeper) && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
@@ -891,7 +890,7 @@ player_shop *read_one_player_shop(FILE *fp)
   char code[4];
 
   player_shop_item *item = nullptr;
-  player_shop *shop = new player_shop;
+  player_shop *shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
 
   fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
   fread(&shop->room_num, sizeof(int32_t), 1, fp);
@@ -905,8 +904,8 @@ player_shop *read_one_player_shop(FILE *fp)
   {
     // add future stuff here
 
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal code in player shop %s", shop->owner);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Illegal code in player shop %s", shop->owner);
     exit(1);
   }
 
@@ -915,7 +914,7 @@ player_shop *read_one_player_shop(FILE *fp)
   shop->sale_list = nullptr;
   for (int i = 0; i < count; i++)
   {
-    item = new player_shop_item;
+    item = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
 
     fread(&item->item_vnum, sizeof(int), 1, fp);
     fread(&item->price, sizeof(int), 1, fp);
@@ -941,7 +940,7 @@ void write_one_player_shop(player_shop *shop)
 
   if ((fp = fopen(buf, "w")) == nullptr)
   {
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
@@ -1000,7 +999,7 @@ void save_player_shop_world_range()
   if (!curr)
   {
     // panic!
-    DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
     exit(1);
   }
 
@@ -1129,8 +1128,8 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
   }
 
   // add it to list
-  player_shop_item *newitem = new player_shop_item;
-  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].virt;
+  player_shop_item *newitem = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
+  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -1188,7 +1187,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
 
-  if (!shop->sell_message || !*shop->sell_message)
+  if (!*shop->sell_message)
   {
     keeper->do_tell(QStringLiteral("%1 Thank you, come again!").arg(GET_NAME(ch)).split(' '));
   }
@@ -1203,13 +1202,13 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
     if (curr == item)
     { // first item
       shop->sale_list = curr->next;
-      delete curr;
+      dc_free(curr);
       break;
     }
     if (curr->next == item)
     {
       curr->next = item->next;
-      delete item;
+      dc_free(item);
       break;
     }
   }
@@ -1268,7 +1267,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
   char text[MAX_INPUT_LENGTH];
   int16_t skill;
 
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
     return;
 
   const char *pdesign_values[] = {
@@ -1346,7 +1345,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       ch->sendln("That room name is too long (60 chars max).");
       return;
     }
-    delete[] DC::getInstance()->world[shop->room_num].name;
+    dc_free(DC::getInstance()->world[shop->room_num].name);
     DC::getInstance()->world[shop->room_num].name = str_dup(text);
     csendf(ch, "Room name set to '%s'.\r\n", DC::getInstance()->world[shop->room_num].name);
     save_player_shop_world_range();
@@ -1413,12 +1412,12 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
 
   if (!(keeper = invoker))
   {
-    DC::getInstance()->logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
-    return eFAILURE;
+    logentry(QStringLiteral("Shop_keeper: keeper not found."), ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
@@ -1444,10 +1443,10 @@ int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *
     player_shopping_list(arg, ch, keeper);
     break;
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 /*
 int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
@@ -1458,12 +1457,12 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
   int16_t skill, i;
   player_shop * shop;
 
-  if(IS_NPC(ch))
-    return eFAILURE;
+  if(ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   if(!ch->has_skill( COMMAND_PSHOPEDIT)) {
         ch->sendln("Huh?");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
   }
 
   char * pshopedit_values [] = {
@@ -1480,7 +1479,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
                  "Fields are the following.\r\n"
                  , ch);
     display_string_list(pshopedit_values, ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for(skill = 0 ;; skill++)
@@ -1488,7 +1487,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
     if(pshopedit_values[skill][0] == '\n')
     {
       ch->sendln("Invalid field.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if(is_abbrev(select, pshopedit_values[skill]))
       break;
@@ -1501,14 +1500,14 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
          send_to_char("$3Syntax$R: pshopedit new <Playername> <roomnum>\r\n"
                       "  Make sure that your CAPITALIZE the player name or\r\n"
                       "  they won't be able to use it.\r\n", ch);
-         return eFAILURE;
+         return ReturnValue::eFAILURE;
       }
       i = atoi(text);
       if(i < 1 || i > DC::getInstance()->top_of_world || !DC::getInstance()->rooms[i]) {
          ch->sendln("You must choose a valid room number.");
-         return eFAILURE;
+         return ReturnValue::eFAILURE;
       }
-      shop = new player_shop;
+      shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
       strcpy(shop->owner, buf);
       *shop->sell_message = '\0';
       shop->room_num = i;
@@ -1542,7 +1541,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
       break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 */
 void assign_the_player_shopkeepers()
@@ -1578,8 +1577,9 @@ void redo_shop_profit()
   }
 }
 
-struct obj_exchange
+class obj_exchange
 {
+public:
   int item_qty;
   int item_vnum;
   int cost_qty;
@@ -1617,16 +1617,16 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
 int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
     ch->send("You're too blind to do that!\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::LIST)
   {
@@ -1676,23 +1676,17 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       // setup format specifier based length of item short descriptions
       if (cost_qty > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds|%%2d x %%-%ds|\r\n",
-                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
-                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus|%%2d x %%-%zus|\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_qty, cost_buf);
       }
       else if (cost_plats > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| $B%%-%ds$R    |\r\n",
-                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
-                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| $B%%-%zus$R    |\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
       else
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%ds| %%-%ds    |\r\n",
-                 30 + (strlen(item_buf) - nocolor_strlen(item_buf)),
-                 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
     }
@@ -1716,7 +1710,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
     ch->sendln("$B$312)$R Brownie Point         Cost: 10 Cloverleaf tokens.");
     */
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::BUY)
   {
@@ -1728,14 +1722,14 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     if (*arg1 == 0)
     {
       ch->sendln("Buy what?");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
       ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(QString::number(MAX_EDDIE_ITEMS)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if ((eddie[choice - 1].cost_qty == 0 || eddie[choice - 1].cost_vnum < 1) && eddie[choice - 1].cost_exp > 0)
@@ -1748,7 +1742,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       else
       {
         ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else if (eddie[choice - 1].cost_plats > 0)
@@ -1761,7 +1755,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       else
       {
         ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     else
@@ -1772,7 +1766,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       if (count < eddie[choice - 1].cost_qty)
       {
         ch->sendln("You don't have enough to trade.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
@@ -1794,13 +1788,13 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
           act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
 
           sprintf(buf, "%s gives %s to %s (removed)", GET_NAME(ch), qPrintable(obj->Name()), GET_NAME(owner));
-          DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+          logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         }
         else
         {
           ch->sendln("An error occured.");
           ch->save(cmd_t::SAVE_SILENTLY);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
       }
     }
@@ -1817,26 +1811,26 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
         act("You give $p to $N.", owner, item, ch, TO_CHAR, 0);
 
         sprintf(buf, "%s gives %s to %s (created)", GET_NAME(owner), qPrintable(item->Name()), GET_NAME(ch));
-        DC::getInstance()->logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
         ch->sendln("An error occured.");
         ch->save(cmd_t::SAVE_SILENTLY);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     ch->save();
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
 {
-  if (ch == nullptr || IS_NPC(ch))
+  if (ch == nullptr || ch->isNonPlayer())
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::string arg1, remainder_args;
@@ -1855,7 +1849,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     owner->tell(ch, "Type reroll <object keyword> to reroll that object.");
@@ -1863,25 +1857,25 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     owner->tell(ch, "The cost will be 1 Cloverleaf token.");
     owner->tell(ch, "You will get two re-rolled choices or the original to pick from.");
     owner->tell(ch, "Type choose 1, 2 or 3 to choose either one of the two rerolls or the original.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
 
   case cmd_t::REROLL:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
       owner->tell(ch, QStringLiteral("You need to confirm or cancel rerolling %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else if (r.state == reroll_t::reroll_states_t::REROLLED)
     {
       owner->tell(ch, "You need to choose 1, 2, 3 or type cancel before you can reroll again.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     if (arg1.empty())
     {
       owner->tell(ch, "You have to type reroll <object keyword> to reroll that object.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     else
     {
@@ -1889,7 +1883,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (obj == nullptr)
       {
         owner->tell(ch, QStringLiteral("I don't see anything on you matching \'%1\'").arg(arg1.c_str()));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else
       {
@@ -1901,25 +1895,25 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
             GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
         {
           owner->tell(ch, "I can only reroll weapons, armor, instruments, wands, staffs and containers.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isGodload())
         {
           owner->tell(ch, "I can't reroll GL weapons or armor.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isQuest())
         {
           owner->tell(ch, "I can't reroll quest weapons or armor.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isCustom())
         {
           owner->tell(ch, "I can't reroll objects with the NO_CUSTOM flag set on them.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         r = {};
@@ -1939,7 +1933,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
       {
         owner->tell(ch, "You don't have the required cloverleaf token.");
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       obj = search_char_for_item(ch, real_object(OBJ_CLOVERLEAF), false);
@@ -1949,7 +1943,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
         act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, obj, owner, TO_CHAR, 0);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
 
       if (r.orig_obj != nullptr)
@@ -1958,7 +1952,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
         act("$n gives $p to $N.", ch, r.orig_obj, owner, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", ch, r.orig_obj, owner, TO_VICT, 0);
         act("You give $p to $N.", ch, r.orig_obj, owner, TO_CHAR, 0);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(ch)).arg(r.orig_obj->Name()).arg(GET_NAME(owner)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       }
       else
       {
@@ -1992,7 +1986,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     }
     else
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     break;
@@ -2000,7 +1994,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
   case cmd_t::CHOOSE:
     if (r.state != reroll_t::reroll_states_t::REROLLED)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (arg1 == "1")
@@ -2008,7 +2002,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (r.choice1_obj != nullptr)
       {
         move_obj(r.choice1_obj, ch);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice1_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice1_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice1_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice1_obj, ch, TO_CHAR, 0);
@@ -2025,7 +2019,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (r.choice2_obj != nullptr)
       {
         move_obj(r.choice2_obj, ch);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.choice2_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.choice2_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.choice2_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.choice2_obj, ch, TO_CHAR, 0);
@@ -2043,7 +2037,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (r.orig_obj != nullptr)
       {
         move_obj(r.orig_obj, ch);
-        DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+        logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
         act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
         act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
         act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2058,7 +2052,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     else
     {
       owner->tell(ch, "Type choose 1, 2 or 3.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     reroll_sessions.erase(GET_NAME(ch));
     break;
@@ -2071,7 +2065,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     if (r.orig_obj != nullptr)
     {
       move_obj(r.orig_obj, ch);
-      DC::getInstance()->logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
+      logentry(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(owner)).arg(r.orig_obj->Name()).arg(GET_NAME(ch)), IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
       act("$n gives $p to $N.", owner, r.orig_obj, ch, TO_ROOM, INVIS_NULL | NOTVICT);
       act("$n gives you $p.", owner, r.orig_obj, ch, TO_VICT, 0);
       act("You give $p to $N.", owner, r.orig_obj, ch, TO_CHAR, 0);
@@ -2084,11 +2078,11 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     break;
 
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
     break;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
@@ -2101,12 +2095,12 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
   case cmd_t::CONFIRM:
     break;
   default:
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch || !ch->isPlayer() || !arg)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QStringList arguments = QString(arg).split(' ');
@@ -2130,10 +2124,10 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
                       "for the item with vnum v#. I will then ask you to confirm the item "
                       "you want redeemed. The cost will be 3 Apocalypse tokens for a level "
                       "50 or under item or 6 Apocalypse tokens for a level 51 to 59 item.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       break;
     default:
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
       break;
     }
 
@@ -2156,7 +2150,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       if (obj == nullptr)
       {
         owner->tell(ch, QStringLiteral("I can't find an object with vnum \'%1\'").arg(arg1));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       else
       {
@@ -2166,40 +2160,40 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
             GET_OBJ_TYPE(obj) != ITEM_CONTAINER)
         {
           owner->tell(ch, "I can only redeem Apocalypse tokens for weapons, armor, instruments and containers.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isGodload())
         {
           owner->tell(ch, "I can't redeem for GL items.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isQuest())
         {
           owner->tell(ch, "I can't redeem for quest items.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isCustom() && r.random)
         {
           owner->tell(ch, "I can't redeem randomized versions of items with NO_CUSTOM flag set.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->isTest())
         {
           owner->tell(ch, "You can't redeem for test items.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (obj->getLevel() >= 60)
         {
           owner->tell(ch, "You can't redeem Apocalypse tokens for a level 60 item.");
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
-        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].virt).split(' '));
+        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);
@@ -2216,7 +2210,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
                             .arg(QString::number(r.token_count))
                             .arg(random_str)
                             .arg(GET_OBJ_SHORT(obj)));
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
     }
     break;
@@ -2226,17 +2220,125 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     case cmd_t::REDEEM:
     case cmd_t::LIST:
       owner->tell(ch, QStringLiteral("You need to confirm or cancel redeeming %1.").arg(GET_OBJ_SHORT(r.orig_obj)));
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
       break;
     case cmd_t::CONFIRM:
       break;
+    case cmd_t::UNDEFINED:
+    case cmd_t::NORTH:
+    case cmd_t::EAST:
+    case cmd_t::SOUTH:
+    case cmd_t::WEST:
+    case cmd_t::UP:
+    case cmd_t::DOWN:
+    case cmd_t::BELLOW:
+    case cmd_t::DEFAULT:
+    case cmd_t::TRACK:
+    case cmd_t::PALM:
+    case cmd_t::SAY:
+    case cmd_t::LOOK:
+    case cmd_t::BACKSTAB:
+    case cmd_t::SBS:
+    case cmd_t::ORCHESTRATE:
+    case cmd_t::REPLY:
+    case cmd_t::WHISPER:
+    case cmd_t::GLANCE:
+    case cmd_t::FLEE:
+    case cmd_t::ESCAPE:
+    case cmd_t::PICK:
+    case cmd_t::STOCK:
+    case cmd_t::BUY:
+    case cmd_t::SELL:
+    case cmd_t::VALUE:
+    case cmd_t::ENTER:
+    case cmd_t::CLIMB:
+    case cmd_t::DESIGN:
+    case cmd_t::PRICE:
+    case cmd_t::REPAIR:
+    case cmd_t::READ:
+    case cmd_t::REMOVE:
+    case cmd_t::ERASE:
+    case cmd_t::ESTIMATE:
+    case cmd_t::REMORT:
+    case cmd_t::REROLL:
+    case cmd_t::CHOOSE:
+    case cmd_t::CANCEL:
+    case cmd_t::SLIP:
+    case cmd_t::GIVE:
+    case cmd_t::DROP:
+    case cmd_t::DONATE:
+    case cmd_t::QUIT:
+    case cmd_t::SACRIFICE:
+    case cmd_t::PUT:
+    case cmd_t::OPEN:
+    case cmd_t::EDITOR:
+    case cmd_t::FORCE:
+    case cmd_t::WRITE:
+    case cmd_t::WATCH:
+    case cmd_t::PRACTICE:
+    case cmd_t::TRAIN:
+    case cmd_t::PROFESSION:
+    case cmd_t::GAIN:
+    case cmd_t::BALANCE:
+    case cmd_t::DEPOSIT:
+    case cmd_t::WITHDRAW:
+    case cmd_t::CLEAN:
+    case cmd_t::PLAY:
+    case cmd_t::FINISH:
+    case cmd_t::VETERNARIAN:
+    case cmd_t::FEED:
+    case cmd_t::ASSEMBLE:
+    case cmd_t::PAY:
+    case cmd_t::RESTRING:
+    case cmd_t::PUSH:
+    case cmd_t::PULL:
+    case cmd_t::LEAVE:
+    case cmd_t::TREMOR:
+    case cmd_t::BET:
+    case cmd_t::INSURANCE:
+    case cmd_t::DOUBLE:
+    case cmd_t::STAY:
+    case cmd_t::SPLIT:
+    case cmd_t::HIT:
+    case cmd_t::LOOT:
+    case cmd_t::GTELL:
+    case cmd_t::CTELL:
+    case cmd_t::SETVOTE:
+    case cmd_t::VOTE:
+    case cmd_t::VEND:
+    case cmd_t::FILTER:
+    case cmd_t::EXAMINE:
+    case cmd_t::GAG:
+    case cmd_t::IMMORT:
+    case cmd_t::IMPCHAN:
+    case cmd_t::TELL:
+    case cmd_t::TELLH:
+    case cmd_t::PRIZE:
+    case cmd_t::OTHER:
+    case cmd_t::TELL_REPLY:
+    case cmd_t::GAZE:
+    case cmd_t::SAVE_SILENTLY:
+    case cmd_t::ONEWAY:
+    case cmd_t::TWOWAY:
+    case cmd_t::MLOCATE_CHARACTER:
+    case cmd_t::FEAR:
+    case cmd_t::PAGING_HELP:
+    case cmd_t::QUEST_CANCEL:
+    case cmd_t::QUEST_START:
+    case cmd_t::QUEST_FINISH:
+    case cmd_t::QUEST_LIST:
+    case cmd_t::GOLEMSCORE:
+    case cmd_t::FSCORE:
+      break;
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
     break;
   case redeem_t::state_t::REDEEM:
     owner->tell(ch, "You need to choose 1, 2, 3 or type cancel before you can reroll again.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
+    break;
+  case redeem_t::CHOSEN:
     break;
   }
 
@@ -2252,5 +2354,5 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
 
   */
 
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }

@@ -33,13 +33,13 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
   bool batterwins = false;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], dammsg[20];
-  struct room_direction_data *exit, *back;
+  room_direction_data *exit, *back;
   int other_room, door, dam, skill, retval;
 
   if (!(skill = ch->has_skill(SKILL_BATTERBRACE)))
   {
     ch->sendln("You could accidentally hurt someone if you try this untrained...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument_interpreter(argument, type, dir);
@@ -48,13 +48,13 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("Batter what??");
     ch->sendln("batter <door> <direction>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*dir)
   {
     ch->sendln("What direction?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((door = find_door(ch, type, dir)) >= 0)
@@ -65,48 +65,48 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
     if (!isSet(exit->exit_info, EX_ISDOOR))
     {
       ch->sendln("You can't figure out how to break it down.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!isSet(exit->exit_info, EX_CLOSED))
     {
       ch->sendln("You can't break down an open door!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (isSet(exit->exit_info, EX_PICKPROOF))
     {
       ch->sendln("It seems far too sturdy for you to break down.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (exit->bracee == ch)
     {
       ch->sendln("You can't batter a door you're bracing shut!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
     dam = number(100, 200) + 3 * (100 - skill);
 
-    csendf(ch, "You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n", qPrintable(fname(exit->keyword)));
+    csendf(ch, "You take a deep breath, let loose a mighty bellow, and charge blindly at the %s in your path...\r\n", fname(exit->keyword).toStdString().c_str());
     act("$n takes a deep breath, lets loose a mighty bellow, and charges blindly at the $F in $s path...", ch, 0, exit->keyword, TO_ROOM, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
 
       sprintf(dammsg, "$B%d$R", dam);
-      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", qPrintable(fname(exit->keyword)));
-      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", qPrintable(fname(exit->keyword)));
+      sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", fname(exit->keyword).toStdString().c_str());
       send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", qPrintable(fname(exit->keyword)));
+      sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", fname(exit->keyword).toStdString().c_str());
       send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
 
-      sprintf(buf, "The %s survived, but you didn't...\r\n", qPrintable(fname(exit->keyword)));
-      sprintf(buf2, "The %s survived, but $n didn't...", qPrintable(fname(exit->keyword)));
+      sprintf(buf, "The %s survived, but you didn't...\r\n", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf2, "The %s survived, but $n didn't...", fname(exit->keyword).toStdString().c_str());
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
       if (SOMEONE_DIED(retval))
@@ -116,7 +116,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
 
       ch->setSitting();
       update_pos(ch);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -152,7 +152,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
       {
         if (batterwins)
         {
-          csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", qPrintable(fname(exit->keyword)));
+          csendf(exit->bracee, "The %s bursts open with a resounding crash and you are hurld to the ground!\r\n", fname(exit->keyword).toStdString().c_str());
           act("The $F bursts open with a resounding crash and $n is hurled to the ground!", exit->bracee, 0, exit->keyword, TO_ROOM, 0);
           exit->bracee->setSitting();
           update_pos(exit->bracee);
@@ -160,21 +160,21 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
         }
         else
         { // brace wins
-          csendf(exit->bracee, "The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n", qPrintable(fname(exit->keyword)));
+          csendf(exit->bracee, "The %s shakes dangerously as a powerful blow strikes it from the other side!\r\n", fname(exit->keyword).toStdString().c_str());
         }
       }
       else
       {
         sprintf(dammsg, "$B%d$R", dam);
-        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", qPrintable(fname(exit->keyword)));
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", qPrintable(fname(exit->keyword)));
+        sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword).toStdString().c_str());
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\r\n", fname(exit->keyword).toStdString().c_str());
         send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
-        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", qPrintable(fname(exit->keyword)));
+        sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword).toStdString().c_str());
         send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
       }
 
-      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", qPrintable(fname(exit->keyword)));
-      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", qPrintable(fname(exit->keyword)));
+      sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\r\n", fname(exit->keyword).toStdString().c_str());
+      sprintf(buf2, "$n's heroic efforts manage to slay both the %s... and $mself. Oops.", fname(exit->keyword).toStdString().c_str());
 
       retval = noncombat_damage(ch, dam, buf, buf2, 0, KILL_BATTER);
 
@@ -212,17 +212,17 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
         ch->setSitting();
         update_pos(ch);
       }
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   ch->sendln("You don't see anything like that to batter.");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_brace(Character *ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
-  struct room_direction_data *back, *exit;
+  room_direction_data *back, *exit;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
 
   argument_interpreter(argument, type, dir);
@@ -230,7 +230,7 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(SKILL_BATTERBRACE))
   {
     ch->sendln("You could accidentally hurt someone if you try this untrained...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*type)
@@ -239,11 +239,11 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
     {
       if (cmd == cmd_t::UNDEFINED)
       {
-        csendf(ch, "You are no longer able to brace the %s.\r\n", qPrintable(fname(ch->brace_at->keyword)));
+        csendf(ch, "You are no longer able to brace the %s.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
       }
       else
       {
-        csendf(ch, "You stop holding the %s shut.\r\n", qPrintable(fname(ch->brace_at->keyword)));
+        csendf(ch, "You stop holding the %s shut.\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
         act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
       }
       ch->brace_at->bracee = nullptr;
@@ -251,17 +251,17 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
       if (ch->brace_exit != nullptr) // incase it's a weird exit area
         ch->brace_exit->bracee = nullptr;
       ch->brace_exit = nullptr;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     ch->sendln("Brace what??");
     ch->sendln("brace <door> <direction>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!*dir)
   {
     ch->sendln("What direction?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if ((door = find_door(ch, type, dir)) >= 0)
@@ -272,13 +272,13 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
     if (!isSet(exit->exit_info, EX_ISDOOR))
     {
       ch->sendln("You can't figure out how to hold it shut.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!isSet(exit->exit_info, EX_CLOSED))
     {
       ch->sendln("You have to close it first!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (exit->bracee != nullptr)
     {
@@ -286,31 +286,31 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
       {
         if (exit->bracee == ch)
         {
-          csendf(ch, "You are already bracing the %s shut!\r\n", qPrintable(fname(exit->keyword)));
+          csendf(ch, "You are already bracing the %s shut!\r\n", fname(exit->keyword).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%s is already holding the %s shut!\r\n", GET_NAME(exit->bracee), qPrintable(fname(exit->keyword)));
+          csendf(ch, "%s is already holding the %s shut!\r\n", GET_NAME(exit->bracee), fname(exit->keyword).toStdString().c_str());
         }
       }
       else
-        csendf(ch, "The %s is already being braced from the other side!\r\n", qPrintable(fname(exit->keyword)));
+        csendf(ch, "The %s is already being braced from the other side!\r\n", fname(exit->keyword).toStdString().c_str());
 
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1.5);
     if (!charge_moves(ch, SKILL_BATTERBRACE, 0.5))
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
 
-    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", qPrintable(fname(exit->keyword)));
+    csendf(ch, "You lean heavily on the %s, bracing your shoulder solidly against it...\r\n", fname(exit->keyword).toStdString().c_str());
     act("$n leans heavily on the $F, bracing $s shoulder solidly against it...", ch, 0, exit->keyword, TO_ROOM, 0);
 
     if (!skill_success(ch, nullptr, SKILL_BATTERBRACE))
     {
       ch->sendln("Your attempt to block the passage fails.");
       act("$s attempt to block the passage fails!", ch, 0, exit->keyword, TO_ROOM, 0);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -326,12 +326,12 @@ int do_brace(Character *ch, char *argument, cmd_t cmd)
             back->bracee = ch;
           }
 
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
   ch->sendln("You don't see anything like that to block.");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
@@ -339,12 +339,12 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
   if (getHP() == 1)
   {
     sendln("You are feeling too weak right now to work yourself up into a rage.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!canPerform(SKILL_RAGE, "You should learn the skill before you try doing any raging in this machine...\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString name = arguments.value(0);
@@ -359,27 +359,27 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
     else
     {
       sendln("Who do you want to rage on?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   if (in_room != victim->in_room)
   {
-    sendln("That person seems to have left.");
-    return eFAILURE;
+    this->sendln("That person seems to have left.");
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == this)
   {
-    sendln("Aren't we funny today...");
-    return eFAILURE;
+    this->sendln("Aren't we funny today...");
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(this) || !can_be_attacked(this, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(SKILL_RAGE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   int retval = 0;
   if (!skill_success(victim, SKILL_RAGE))
@@ -390,13 +390,13 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
         this, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts advancing toward you, but trips over $s own feet!", this, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
 
-    setSitting();
-    SET_BIT(combat, COMBAT_BASH1);
+    this->setSitting();
+    SET_BIT(this->combat, COMBAT_BASH1);
   }
   else
   {
@@ -406,49 +406,49 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
         this, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n advances confidently towards you, and flies into a rage!", this, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
 
-    SET_BIT(combat, COMBAT_RAGE1);
+    SET_BIT(this->combat, COMBAT_RAGE1);
   }
 
   WAIT_STATE(this, DC::PULSE_VIOLENCE * 3);
 
-  if (!fighting)
+  if (!this->fighting)
     return attack(this, victim, TYPE_UNDEFINED);
 
   // chance of bonus round at high level of skill
   if (has_skill(SKILL_RAGE) > 75 && !number(0, 9))
     return attack(this, victim, TYPE_UNDEFINED);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_battlecry(Character *ch, char *argument, cmd_t cmd)
 {
-  struct follow_type *f = 0;
+  follow_type *f = 0;
 
   if (!ch->canPerform(SKILL_BATTLECRY, "Have to learn how to battlecry before you can run with the big boys...\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->fighting)
   {
     ch->sendln("You must be fighting already in order to battlecry.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->master || !ch->followers)
   {
     ch->sendln("You must be leading a group in order to battlecry.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_BATTLECRY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_BATTLECRY))
   {
@@ -495,7 +495,7 @@ int do_battlecry(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
   else
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_berserk(Character *ch, char *argument, cmd_t cmd)
@@ -507,7 +507,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
 
   if (!ch->canPerform(SKILL_BERSERK, "You aren't crazy enough for that yet... try rage maybe...\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getHP() == 1)
@@ -515,7 +515,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You are feeling too weak right now to work yourself up into "
                  "a frenzy.",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -527,7 +527,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     else
     {
       ch->sendln("Who do you want to go berserk on?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else if (ch->fighting)
@@ -539,20 +539,20 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
   if (ch->in_room != victim->in_room)
   {
     ch->sendln("That person seems to have left.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Aren't we funny today...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_BERSERK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, victim, SKILL_BERSERK))
   {
@@ -560,7 +560,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     act("$n starts freaking out on $N, but trips over $s own feet!", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts freaking out on you, but trips over $s own feet!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -584,7 +584,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     act("$n starts FOAMING at the mouth, as $e goes BERSERK on $N!", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n starts FOAMING at the mouth, and goes BERSERK on you!", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -600,9 +600,9 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
   if (!ch->fighting)
     retval = attack(ch, victim, TYPE_UNDEFINED);
 
-  if (!isSet(retval, eCH_DIED))
+  if (!isSet(retval, ReturnValue::eCH_DIED))
   {
-    if (!isSet(retval, eVICT_DIED) && IS_PC(ch) && isSet(ch->player->toggles, Player::PLR_WIMPY))
+    if (!isSet(retval, ReturnValue::eVICT_DIED) && ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_WIMPY))
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     REMOVE_BIT(ch->combat, COMBAT_RAGE1);
@@ -613,7 +613,7 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
     if (bSuccess)
     {
       SET_BIT(ch->combat, COMBAT_BERSERK);
-      if (IS_PC(ch))
+      if (ch->isPlayer())
         GET_AC(ch) += 30; // we do this here, so we know if someone dies with COMBAT_BERSERK to
                           // give them their AC back
     }
@@ -630,7 +630,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   if (!ch->canPerform(SKILL_HEADBUTT,
                       "You'd bonk yourself silly without proper training.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(argument, name);
@@ -642,63 +642,63 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   if (victim == nullptr)
   {
     ch->sendln("Headbutt whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Aren't we funny today...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE) && ch->has_skill(SKILL_HEADBUTT) < 86)
   {
     ch->sendln("You are too puny to headbutt someone that HUGE!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
   {
     ch->sendln("You cannot pick just one to headbutt!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
   {
     act("$N's small size makes it impossible to target just $S head!", ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NOHEADBUTT))
   {
     ch->sendln("That would be like smashing your head into a wall!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (isSet(victim->combat, COMBAT_BLADESHIELD1) || isSet(victim->combat, COMBAT_BLADESHIELD2))
   {
     ch->sendln("Headbutting a bladeshielded opponent would be asking for decapitation!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_HEADBUTT))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
-  if (isSet(victim->combat, COMBAT_BERSERK) && (IS_NPC(victim) || victim->has_skill(SKILL_BERSERK) > 80))
+  if (isSet(victim->combat, COMBAT_BERSERK) && (victim->isNonPlayer() || victim->has_skill(SKILL_BERSERK) > 80))
   {
     act("$N shakes off $n's attempt to immobilize them.", ch, nullptr, victim, TO_ROOM, NOTVICT);
     act("$N shakes off your attempt to immobilize them.", ch, nullptr, victim, TO_CHAR, NOTVICT);
     act("In your enraged state, you shake off $n's attempt to immobilize you.", ch, nullptr, victim, TO_VICT, 0);
 
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   int mod = 0;
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
     mod = -25;
 
   if (victim->equipment[WEAR_HEAD])
@@ -719,7 +719,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
     // the damage call here takes care of starting combat and such
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
   }
   else
   {
@@ -730,7 +730,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       act("$N's heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_ROOM, NOTVICT);
       act_return ar = act("Your heightened battlesense sees $n's headbutt coming from a mile away.", ch, 0, victim, TO_VICT, 0);
       retval = ar.retval;
-      if (isSet(retval, eVICT_DIED))
+      if (isSet(retval, ReturnValue::eVICT_DIED))
       {
         return retval;
       }
@@ -738,7 +738,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
       retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
       // the damage call here takes care of starting combat and such
-      retval = eSUCCESS;
+      retval = ReturnValue::eSUCCESS;
     }
     else
     {
@@ -752,7 +752,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].virt == 508)
+          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].vnum() == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
@@ -769,24 +769,24 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
 
 int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   float modifier;
   int duration = 42;
 
   if (!ch->canPerform(SKILL_BLOOD_FURY,
                       "You've no idea how to raise such bloodlust.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_BLOOD_FURY))
   {
     ch->sendln("Your body can not yet take the strain of another blood fury yet.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_BLOOD_FURY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_BLOOD_FURY))
   {
@@ -818,24 +818,24 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
 
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   int duration = 20;
   if (ch->affected_by_spell(SKILL_CRAZED_ASSAULT) && !ch->isImmortalPlayer())
   {
     ch->sendln("Your body is still recovering from your last crazed assault technique.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_CRAZED_ASSAULT, "You just aren't crazy enough...try assaulting old ladies.\r\n"))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_CRAZED_ASSAULT))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_CRAZED_ASSAULT))
   {
@@ -862,7 +862,7 @@ int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
   af.location = APPLY_NONE;
   af.bitvector = -1;
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void rush_reset(varg_t arg1, void *arg2, void *arg3)
@@ -885,17 +885,17 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   if (ch->getHP() == 1)
   {
     ch->sendln("You are feeling too weak right now for rushing to and fro.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(ch, AFF_RUSH_CD))
   {
     ch->sendln("You must take a moment to gather your strength before another rush!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!ch->canPerform(SKILL_BULLRUSH, "Closest yer gonna get to a bull right now is a Red one..and you have to drink it...\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, who);
@@ -903,12 +903,12 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   if (!*direction)
   {
     ch->sendln("Bullrush which direction?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!*who)
   {
     ch->sendln("Bullrush on.. who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (int i = 0; i < 6; i++)
@@ -923,11 +923,11 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   if (!dir)
   {
     ch->sendln("Bullrush a valid direction dumb barb...like north maybe?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_BULLRUSH))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   // before we move anyone, we need to check for any spec procs in the
   // room like guild guards
@@ -935,15 +935,15 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   if (cmd_dir)
   {
     retval = ch->special("", *cmd_dir);
-    if (isSet(retval, eSUCCESS) || isSet(retval, eCH_DIED))
+    if (isSet(retval, ReturnValue::eSUCCESS) || isSet(retval, ReturnValue::eCH_DIED))
       return retval;
   }
 
   SETBIT(ch->affected_by, AFF_RUSH_CD);
-  extern void addtimer(struct timer_data * add);
+  extern void addtimer(timer_data * add);
 
   // Reset bullrush AFF in 5 seconds
-  struct timer_data *timer = new timer_data;
+  timer_data *timer = new timer_data;
   timer->arg1.ch = ch;
   timer->function = rush_reset;
   timer->timeleft = 5;
@@ -960,7 +960,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You charge in, but are left confused by the complete lack of such a target!");
     //     WAIT_STATE(ch,DC::PULSE_VIOLENCE/2);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   //  WAIT_STATE(ch, DC::PULSE_VIOLENCE);
 
@@ -969,13 +969,13 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You rush in madly and fail to find your target!");
     act("$n rushes into the room with nostrils flaring then looks around sheepishly.",
         ch, nullptr, nullptr, TO_ROOM, NOTVICT);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!victim || victim == ch)
   {
     ch->sendln("You successfully rush in and bushwack... the air.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n rushes into the room with an amazingly violent speed!",
@@ -985,21 +985,21 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
 
 int do_ferocity(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->canPerform(SKILL_FEROCITY, "You're just not angry enough!\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->affected_by_spell(SKILL_FEROCITY_TIMER))
   {
     ch->sendln("It is too soon to try and rile up the masses!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You have no group to inspire.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int grpsize = 0;
@@ -1013,7 +1013,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_FEROCITY, grpsize))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, nullptr, SKILL_FEROCITY))
   {
@@ -1056,7 +1056,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void barb_magic_resist(Character *ch, int old, int nw)
@@ -1079,12 +1079,12 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   if (ch->getHP() == 1)
   {
     ch->sendln("You are feeling too weak right now to smash into anybody.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_KNOCKBACK, "You'd bounce off of your opponent before you caused any damage.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   argument = one_argument(argument, who);
@@ -1093,7 +1093,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   if (!*who)
   {
     ch->sendln("Knockback whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   victim = ch->get_char_room_vis(who);
@@ -1104,20 +1104,20 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   if (victim == nullptr)
   {
     ch->sendln("Knockback whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Where do you want to go today?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!can_attack(ch) || !can_be_attacked(ch, victim))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!charge_moves(ch, SKILL_KNOCKBACK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   bool victim_paralyzed = false;
   affected_type *af;
@@ -1129,22 +1129,22 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   }
   else
   {
-    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_HUGE))
+    if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_HUGE))
     {
       ch->sendln("You are too tiny to knock someone that HUGE anywhere!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
-    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_SWARM))
+    if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_SWARM))
     {
       ch->sendln("You cannot pick just one to knockback!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
-    if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_TINY))
+    if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_TINY))
     {
       act("$N would evade your knockback attempt with ease!", ch, 0, victim, TO_CHAR, 0);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (IS_AFFECTED(victim, AFF_STABILITY) && number(0, 3) == 0)
@@ -1153,7 +1153,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       act("$n bounces off of $N and crashes into the ground.", ch, 0, victim, TO_ROOM, NOTVICT);
       act("$n bounces off of you and crashes into the ground.", ch, 0, victim, TO_VICT, 0);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1202,7 +1202,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     act("$n lunges forward in an attempt to smash into $N but falls flat on $s face.", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("$n lunges forward in an attempt to smash into you but falls flat on $s face, missing completely.", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
@@ -1210,7 +1210,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (!victim_paralyzed && victim->affected_by_spell(SKILL_BATTLESENSE) &&
            number(1, 100) < victim->affected_by_spell(SKILL_BATTLESENSE)->modifier)
@@ -1219,14 +1219,14 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     act("$N's heightened battlesense sees $n's smash coming from a mile away and $N easily sidesteps it.", ch, 0, victim, TO_ROOM, NOTVICT);
     act_return ar = act("Your heightened battlesense sees $n's smash coming from a mile away and you easily sidestep it.", ch, 0, victim, TO_VICT, 0);
     retval = ar.retval;
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       return retval;
     }
 
     ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else if (CAN_GO(victim, dir) &&
            !victim->affected_by_spell(SPELL_IRON_ROOTS) &&
@@ -1260,14 +1260,14 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
 
       if (selfpurge)
-        return eSUCCESS | eVICT_DIED;
+        return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
       sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
       sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
 
       if (victim->fighting)
       {
-        if (IS_NPC(victim))
+        if (victim->isNonPlayer())
         {
           victim->add_memory(GET_NAME(ch), 'h');
           remove_memory(victim, 'f');
@@ -1282,7 +1282,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       move_char(victim, (DC::getInstance()->world[(ch)->in_room].dir_option[dir])->to_room);
     }
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -1310,35 +1310,35 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       return attack(victim, ch, TYPE_UNDEFINED);
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_primalfury(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!ch->has_skill(SKILL_PRIMAL_FURY))
   {
     ch->sendln("You don't know how to.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (ch->affected_by_spell(SKILL_PRIMAL_FURY))
   {
     ch->sendln("You must wait before using this ability again.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!ch->fighting || GET_POS(ch) != position_t::FIGHTING)
   {
     ch->sendln("You must be in combat in order to use this ability.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (!charge_moves(ch, SKILL_PRIMAL_FURY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (GET_RAW_STR(ch) < 16)
   {
     ch->sendln("You do not possess sufficient strength to attempt this feat.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // Timer applies to both success and failure, so it goes here.
@@ -1355,7 +1355,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You attempt to let forth a primal scream, but manage only a squeak...how embarassing!");
     act("$n attempts to let forth a primal scream, but manages only a squeak...how embarassing!", ch, nullptr, nullptr, TO_ROOM, 0);
     ch->setMove(ch->getMove() / 2.0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   // Success below.
@@ -1366,7 +1366,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
     GET_RAW_STR(ch) -= 1;
     affect_modify(ch, APPLY_STR, 0, -1, true);
     ch->send("You lose one point of strength.");
-    DC::getInstance()->logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
+    logf(OVERSEER, DC::LogChannel::LOG_MORTAL, "Statloss: %s lost one point of strength through primal fury.", GET_NAME(ch));
   }
 
   // rest already set
@@ -1377,7 +1377,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
   act("$n lets forth a primal scream of anger and begins to fight with terrible fury!", ch, nullptr, nullptr, TO_ROOM, 0);
   ch->sendln("You let forth a primal scream of anger and fall upon your enemies with a terrible fury!");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_pursue(Character *ch, char *argument, cmd_t cmd)
@@ -1385,7 +1385,7 @@ int do_pursue(Character *ch, char *argument, cmd_t cmd)
   if (!ch->has_skill(SKILL_PURSUIT))
   {
     ch->sendln("You don't know how to.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_PURSUIT))
@@ -1405,5 +1405,5 @@ int do_pursue(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

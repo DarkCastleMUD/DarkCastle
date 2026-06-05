@@ -11,33 +11,33 @@
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/terminal.h"
-#include "DC/player.h" // Player::PLR_ANSI
 #include "DC/utility.h"
-#include <iostream>
+#include "DC/memory.h"
 
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.
  */
 
-struct hash_info
+class hash_info
 {
+public:
   char *name;
-  struct hash_info *left;
-  struct hash_info *right;
+  hash_info *left;
+  hash_info *right;
 };
 
-struct hash_info tree = {"m", 0, 0};
-// struct hash_info nulltree = {"", 0, 0};
+hash_info tree = {"m", 0, 0};
+//  hash_info nulltree = {"", 0, 0};
 
-void kill_hsh_tree_func(struct hash_info *leaf)
+void kill_hsh_tree_func(hash_info *leaf)
 {
   if (leaf->left)
     kill_hsh_tree_func(leaf->left);
   if (leaf->right)
     kill_hsh_tree_func(leaf->right);
 
-  delete[] leaf->name;
-  delete leaf;
+  dc_free(leaf->name);
+  dc_free(leaf);
 }
 
 // Since the top of the tree is static, we have to free both sides
@@ -52,7 +52,7 @@ void DC::free_hsh_tree_from_memory()
 
 bool ishashed(char *arg)
 {
-  struct hash_info *current = &tree;
+  hash_info *current = &tree;
   for (; current; current = current->right)
   {
     if (current->name == arg)
@@ -64,9 +64,9 @@ bool ishashed(char *arg)
 char *str_hsh(const char *arg)
 {
   int scratch;
-  struct hash_info *current = &tree;
-  struct hash_info *next;
-  struct hash_info *temp;
+  hash_info *current = &tree;
+  hash_info *next;
+  hash_info *temp;
 
   // Second spot for "" args so we don't leak them all over the place
   // if(*arg == '\0')
@@ -86,7 +86,11 @@ char *str_hsh(const char *arg)
     temp = current;
   }
 
-  current = new struct hash_info;
+#ifdef LEAK_CHECK
+  current = (hash_info *)calloc(1, sizeof(hash_info));
+#else
+  current = (hash_info *)dc_alloc(1, sizeof(hash_info));
+#endif
 
   current->right = current->left = nullptr;
   if (scratch < 0)
@@ -98,13 +102,13 @@ char *str_hsh(const char *arg)
   return (current->name);
 }
 
-void DC::logf(int level, DC::LogChannel type, QString arg)
+void logf(int level, DC::LogChannel type, QString arg)
 {
   logentry(arg, level, type);
 }
 
-/* DC::getInstance()->logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
-void DC::logf(int level, DC::LogChannel type, const char *arg, ...)
+/* logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s restored all!", GET_NAME(ch)); */
+void logf(int level, DC::LogChannel type, const char *arg, ...)
 {
   va_list args;
   char s[MAX_STRING_LENGTH];
@@ -152,7 +156,11 @@ char *handle_ansi_(char *s, Character *ch)
     t++;
   }
 
-  t = new char[strlen(s) + numdollars * 11 + 1];
+#ifdef LEAK_CHECK
+  t = (char *)calloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
+#else
+  t = (char *)dc_alloc((strlen(s) + numdollars * 11 + 1), sizeof(char));
+#endif
   *t = '\0';
 
   i = nullstring;
@@ -166,7 +174,7 @@ char *handle_ansi_(char *s, Character *ch)
     }
     else
     {
-      if (IS_NPC(ch) || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
+      if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI) || (ch->desc && ch->desc->color))
       {
         switch (*++sp)
         {
@@ -252,7 +260,7 @@ char *handle_ansi_(char *s, Character *ch)
 
 QString handle_ansi(QString haystack, Character *ch)
 {
-  return handle_ansi(QByteArray(qPrintable(haystack)), ch);
+  return handle_ansi(QByteArray(haystack.toStdString().c_str()), ch);
 }
 
 QByteArray handle_ansi(QByteArray haystack, Character *ch)

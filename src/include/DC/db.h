@@ -33,19 +33,19 @@
 #include "DC/DC.h"
 #include "DC/utility.h"
 
-struct error_eof
+class error_eof
 {
 };
-struct error_negative_int
+class error_negative_int
 {
 };
-struct error_range_int
+class error_range_int
 {
 };
-struct error_range_under
+class error_range_under
 {
 };
-struct error_range_over
+class error_range_over
 {
 };
 
@@ -67,13 +67,14 @@ const int VERSION_NUMBER = 2; /* used for changing pfile format */
 
 #define BANNED_SITE_LENGTH 100
 
-struct ban_list_element
+class ban_list_element
 {
+public:
   char site[BANNED_SITE_LENGTH + 1];
   int type;
   time_t date;
   char name[100];
-  struct ban_list_element *next;
+  ban_list_element *next;
 };
 
 extern std::vector<std::string> continent_names;
@@ -215,7 +216,7 @@ auto &operator<<(auto &out, extra_descr_data *currdesc)
 
 void affects_to_file(auto &out, Object *obj)
 {
-  for (qsizetype i = 0; i < obj->affected.size(); i++)
+  for (int i = 0; i < obj->num_affects; i++)
   {
     out << "A\n";
     out << obj->affected[i].location << " " << obj->affected[i].modifier << "\n";
@@ -234,7 +235,7 @@ auto &operator<<(auto &out, mob_prog_data *mobprogs)
 
 void write_object(Object *obj, auto &out)
 {
-  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].virt);
+  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].vnum());
   string_to_file(out, obj->Name());
   string_to_file(out, obj->short_description);
   string_to_file(out, obj->long_description);
@@ -254,7 +255,7 @@ auto &operator<<(auto &out, const Room &room)
     REMOVE_BIT(temp_room_flags, room.iFlags);
   }
 
-  struct extra_descr_data *extra;
+  extra_descr_data *extra;
   if (!DC::getInstance()->rooms.contains(room.number))
     return out;
 
@@ -297,7 +298,7 @@ auto &operator<<(auto &out, const Room &room)
       out << "~\n"; // print blank
   } /* extra descriptions */
 
-  struct deny_data *deni;
+  deny_data *deni;
   for (deni = room.denied; deni; deni = deni->next)
   {
     out << "B\n"
@@ -321,6 +322,8 @@ void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
 void init_char(Character *ch);
+void clear_char(Character *ch);
+void clear_object(class Object *obj);
 void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
@@ -365,7 +368,7 @@ T fread_bitvector(auto &in)
 
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
-extern struct skill_quest *skill_list;
+extern skill_quest *skill_list;
 extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
 #define VIRTUAL 1
@@ -386,6 +389,7 @@ bool fullItemMatch(Object *obj, Object *obj2);
 bool has_random(Object *obj);
 FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
 void load_messages(char *file, int base = 0);
+void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
 void find_unordered_objects(void);
@@ -393,14 +397,16 @@ void find_unordered_objects(void);
 extern int top_of_objt;
 extern time_t start_time; /* mud start time */
 
-struct pulse_data
+class pulse_data
 { /* list for keeping tract of 'pulsing' chars */
+public:
   Character *thechar;
   pulse_data *next;
 };
 
-struct help_index_element
+class help_index_element
 {
+public:
   char *keyword;
   int32_t pos;
 };

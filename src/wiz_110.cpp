@@ -17,13 +17,11 @@
 
 #include <fmt/format.h>
 
-#include "DC/wizard.h"
 #include "DC/utility.h"
 
 #include "DC/player.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/fileinfo.h"
 #include "DC/clan.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
@@ -31,7 +29,6 @@
 #include "DC/const.h"
 #include "DC/db.h"
 #include "DC/Leaderboard.h"
-#include "DC/guild.h"
 #include "DC/const.h"
 #include "DC/vault.h"
 #include "DC/meta.h"
@@ -97,11 +94,11 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
   if (pc_clss_types2[i][0] == '\n')
   {
     ch->sendln("No such class.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   GET_CLASS(ch) = i;
   if ((classskill = ch->get_skill_list()) == nullptr)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   GET_CLASS(ch) = oclass;
   // Same problem with races... get_max_stat(ch, attribute_t::STRENGTH
   for (i = 1; race_types[i][0] != '\n'; i++)
@@ -124,11 +121,11 @@ int do_maxes(Character *ch, char *argument, cmd_t cmd)
         csendf(ch, "%s: %d\r\n", classskill[i].skillname, (int)percent);
       }
       GET_RACE(ch) = orace;
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
   ch->sendln("No such race.");
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 // give a command to a god
@@ -143,14 +140,14 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
                  "Syntax:  bestow <god> <command>\r\n"
                  "Just 'bestow <god>' will list all available commands for that god.\r\n",
                  this);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   Character *victim = get_pc_vis(this, name);
   if (!victim)
   {
-    sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
-    return eSUCCESS;
+    this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
+    return ReturnValue::eSUCCESS;
   }
 
   if (command.isEmpty())
@@ -162,11 +159,11 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (!bgc.testcmd)
       {
-        sendln(QStringLiteral("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
+        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, 22).arg(victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
-    sendln("");
+    this->sendln("");
     send_to_char("Test Command           Has command?\r\n"
                  "-----------------------------------\r\n\r\n",
                  this);
@@ -174,34 +171,34 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     {
       if (bgc.testcmd)
       {
-        sendln(QStringLiteral("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
+        this->sendln(QStringLiteral("%1 %2").arg(bgc.name, victim->has_skill(bgc.num) ? "YES" : "---"));
       }
     }
 
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   auto bc = get_bestow_command(command);
 
   if (!bc.has_value())
   {
-    sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
-    return eSUCCESS;
+    this->sendln(QStringLiteral("There is no god command named '%1'.").arg(command));
+    return ReturnValue::eSUCCESS;
   }
 
   // if has
   if (victim->has_skill(bc->num))
   {
-    sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
-    return eSUCCESS;
+    this->sendln(QStringLiteral("%1 already has that command.").arg(victim->getName()));
+    return ReturnValue::eSUCCESS;
   }
 
   // give it
   victim->learn_skill(bc->num, 1, 1);
-  DC::getInstance()->logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), getLevel(), DC::LogChannel::LOG_GOD);
-  sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
-  sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
-  return eSUCCESS;
+  logentry(QStringLiteral("%1 has been bestowed %2 by %3.").arg(GET_NAME(victim)).arg(bc->name).arg(GET_NAME(this)), this->getLevel(), DC::LogChannel::LOG_GOD);
+  this->sendln(QStringLiteral("%1 has been bestowed %2.").arg(GET_NAME(victim)).arg(bc->name));
+  this->sendln(QStringLiteral("%1 has bestowed %2 upon you.").arg(getName()).arg(bc->name));
+  return ReturnValue::eSUCCESS;
 }
 
 // take away a command from a god
@@ -220,17 +217,17 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
                  "Syntax:  revoke <god> <command|all>\r\n"
                  "Use 'bestow <god>' to view what commands a god has.\r\n",
                  ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!(vict = get_pc_vis(ch, arg)))
   {
     sprintf(buf, "You don't see anyone named '%s'.", arg);
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  struct char_skill_data *last = nullptr;
+  char_skill_data *last = nullptr;
 
   if (!strcmp(command, "all"))
   {
@@ -240,10 +237,10 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
     ch->send(buf);
     sprintf(buf, "%s has had all commands revoked by %s.\r\n", GET_NAME(vict),
             GET_NAME(ch));
-    DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     sprintf(buf, "%s has revoked all commands from you.\r\n", GET_NAME(ch));
     vict->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   for (i = 0; i < DC::bestowable_god_commands.size(); i++)
@@ -254,27 +251,24 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
   {
     sprintf(buf, "There is no god command named '%s'.\r\n", command);
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (vict->skills.contains(DC::bestowable_god_commands[i].num) == false)
   {
     snprintf(buf, sizeof(buf), "%s does not have %s.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
     ch->send(buf);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   vict->skills.erase(DC::bestowable_god_commands[i].num);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict),
-           qPrintable(DC::bestowable_god_commands[i].name));
+  snprintf(buf, sizeof(buf), "%s has had %s revoked.\r\n", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name));
   ch->send(buf);
-  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict),
-           qPrintable(DC::bestowable_god_commands[i].name), GET_NAME(ch));
-  DC::getInstance()->logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch),
-           qPrintable(DC::bestowable_god_commands[i].name));
+  snprintf(buf, sizeof(buf), "%s has had %s revoked by %s.", GET_NAME(vict), qPrintable(DC::bestowable_god_commands[i].name), GET_NAME(ch));
+  logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+  snprintf(buf, sizeof(buf), "%s has revoked %s from you.\r\n", GET_NAME(ch), qPrintable(DC::bestowable_god_commands[i].name));
   vict->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* Thunder is currently in wiz_104.c */
@@ -287,17 +281,17 @@ int do_wizlock(Character *ch, char *argument, cmd_t cmd)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been wizlocked by %s.", GET_NAME(ch));
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game wizlocked.");
   }
   else
   {
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Game has been un-wizlocked by %s.", GET_NAME(ch));
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_GOD);
     ch->sendln("Game un-wizlocked.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /************************************************************************
@@ -315,20 +309,20 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
   /* Verify preconditions */
   assert(ch != 0);
   if (arg == 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   half_chop(arg, name, buf);
 
   if (!*name)
   {
     ch->sendln("Change whose password?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, name)))
   {
     ch->sendln("That player was not found.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(buf, name);
@@ -336,14 +330,14 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
   if (!*name || strlen(name) > 10)
   {
     ch->sendln("Password must be 10 characters or less.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)victim->getNameC()), PASSWORD_LEN);
   victim->player->pwd[PASSWORD_LEN] = '\0';
 
   ch->sendln("Ok.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_fakelog(Character *ch, char *argument, cmd_t cmd)
@@ -352,15 +346,15 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
   char lev_str[MAX_INPUT_LENGTH];
   uint64_t lev_nr = 110;
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   half_chop(argument, lev_str, command);
 
   if (!*lev_str)
   {
     ch->sendln("Also, you must supply a level.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isdigit(*lev_str))
@@ -369,12 +363,12 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
     if (lev_nr < IMMORTAL || lev_nr > IMPLEMENTER)
     {
       ch->sendln("You must use a valid level from 100-110.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
   send_to_gods(command, lev_nr, DC::LogChannel::LOG_BUG);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
@@ -382,7 +376,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (arguments.size() < 2)
   {
     send("Usage: rename <oldname> <newname> [takeplats]\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString oldname = arguments.value(0);
@@ -401,21 +395,21 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (!victim)
   {
     send(QStringLiteral("%1 is not in the game.\r\n").arg(oldname));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (level_ <= victim->getLevel())
   {
     send("You can't rename someone your level or higher.\r\n");
     send(QStringLiteral("%1 just tried to rename you.\r\n").arg(GET_NAME(this)));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // +1 cause you can actually have 13 char names
   if (newname.length() > (MAX_NAME_LENGTH + 1))
   {
     send(QStringLiteral("New name too long. Maximum allowed length is %1 characters.\r\n").arg(MAX_NAME_LENGTH + 1));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg3 = arguments.value(2);
@@ -424,14 +418,14 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     if (GET_PLATINUM(victim) < 500)
     {
       send(QStringLiteral("They don't have enough plats. They need 500 but have %1\r\n").arg(GET_PLATINUM(victim)));
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
       GET_PLATINUM(victim) -= 500;
       send(QStringLiteral("You reach into %1's soul and remove 500 platinum leaving them %2 platinum.\r\n").arg(GET_SHORT(victim)).arg(GET_PLATINUM(victim)));
       victim->send(QStringLiteral("You feel the hand of god slip into your soul and remove 500 platinum leaving you %1 platinum.\r\n").arg(GET_PLATINUM(victim)));
-      DC::getInstance()->logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, DC::LogChannel::LOG_GOD);
+      logentry(QStringLiteral("500 platinum removed from %1 for rename.").arg(victim->getNameC()), level_, DC::LogChannel::LOG_GOD);
     }
   }
 
@@ -448,7 +442,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   if (QFile(strsave).exists())
   {
     send(QStringLiteral("The name '%1' is already in use at %2.\r\n").arg(newname).arg(strsave));
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (unsigned iWear = 0; iWear < MAX_WEAR; iWear++)
@@ -560,7 +554,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
 
   buffer = QStringLiteral("%1 renamed to %2.").arg(victim->getNameC()).arg(newname);
-  DC::getInstance()->logentry(buffer, level_, DC::LogChannel::LOG_GOD);
+  logentry(buffer, level_, DC::LogChannel::LOG_GOD);
 
   // handle the renames
   DC::getInstance()->TheAuctionHouse.HandleRename(this, victim->getNameC(), newname);
@@ -573,8 +567,8 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   if (!(victim = get_pc(newname)))
   {
-    sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
-    return eFAILURE;
+    this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
+    return ReturnValue::eFAILURE;
   }
   do_name(victim, " %");
 
@@ -585,14 +579,14 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     clan_data *tc = get_clan(clan);
     victim->clan = clan;
     add_clan_member(tc, victim);
-    if ((pmember = get_member(victim->getName(), clan)))
+    if ((pmember = get_member(victim->getName(), this->clan)))
       pmember->Rights(rights);
     add_totem_stats(victim);
   }
   rename_vault_owner(oldname, newname);
   leaderboard.rename(oldname, newname);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 int do_install(Character *ch, char *arg, cmd_t cmd)
 {
@@ -602,7 +596,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
 
   /*  if(!ch->has_skill( COMMAND_INSTALL)) {
           ch->sendln("Huh?");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
     }
   */
   half_chop(arg, arg1, buf);
@@ -613,7 +607,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(range = atoi(arg1)))
@@ -621,13 +615,13 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (range <= 0)
   {
     ch->sendln("Range number must be greater than 0");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(numrooms = atoi(arg2)))
@@ -635,13 +629,13 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (numrooms <= 0)
   {
     ch->sendln("Number of rooms must be greater than 0.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   switch (*type)
@@ -668,7 +662,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");
     ch->send(err);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   sprintf(buf, "./new_zone %d %d %c true %s", range, numrooms, *type, DC::getInstance()->cf.bport == true ? "b" : "n");
@@ -692,7 +686,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
             ret);
   }
   ch->send(err);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_range(Character *ch, char *arg, cmd_t cmd)
@@ -711,7 +705,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   if (!ch->has_skill(COMMAND_RANGE))
   {
     ch->sendln("Huh?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   arg = one_argument(arg, name);
@@ -723,13 +717,13 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("Syntax: range <god> <low vnum> <high vnum>");
     ch->sendln("Syntax: range <god> <r/m/o> <low vnum> <high vnum>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(victim = get_pc_vis(ch, name)))
   {
     ch->sendln("Set whose range?!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int low, high;
   if (trail[0] != '\0')
@@ -737,7 +731,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
     if (!isdigit(*buf) || !isdigit(*trail))
     {
       ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     low = atoi(buf);
     high = atoi(trail);
@@ -747,7 +741,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
     if (!isdigit(*buf) || !isdigit(*kind))
     {
       ch->sendln("Specify valid numbers. To remove, set the ranges to 0 low and 0 high.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     low = atoi(kind);
     high = atoi(buf);
@@ -755,7 +749,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   if (low < 0 || high < 0)
   {
     ch->sendln("The number needs to be positive.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (trail[0])
   {
@@ -768,7 +762,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       ch->send(message);
       sprintf(message, "Your M range has been set to %d-%d.\r\n", low, high);
       victim->send(message);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     case 'o':
       victim->player->buildOLowVnum = low;
       victim->player->buildOHighVnum = high;
@@ -776,7 +770,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       ch->send(message);
       sprintf(message, "Your O range has been set to %d-%d.\r\n", low, high);
       victim->send(message);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     case 'r':
       victim->player->buildLowVnum = low;
       victim->player->buildHighVnum = high;
@@ -784,10 +778,10 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
       ch->send(message);
       sprintf(message, "Your R range has been set to %d-%d.\r\n", low, high);
       victim->send(message);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     default:
       ch->sendln("Invalid type. Valid ones are r/o/m.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
@@ -799,7 +793,7 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
     sprintf(message, "Your range has been set to %d-%d.\r\n", low, high);
     victim->send(message);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_metastat(Character *ch, char *argument, cmd_t cmd)
@@ -810,7 +804,7 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
     ch->sendln("metastat who?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   char buf[MAX_STRING_LENGTH];
 
@@ -845,7 +839,7 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf, "%s%d ", buf, Commands::commands_[i].getNumber());
   }
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_acfinder(Character *ch, char *argument, cmd_t cmd)
@@ -856,7 +850,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   if (!arg[0])
   {
     ch->sendln("Syntax: acfinder <wear slot>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int i = 1;
@@ -866,7 +860,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   if (i >= QFlagsToStrings<ObjectPositions>().size())
   {
     ch->sendln("Syntax: acfinder <wear slot>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   i = 1 << i;
   int r, o = 1;
@@ -880,20 +874,20 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     if (!CAN_WEAR(obj, i))
       continue;
     int ac = 0 - obj->obj_flags.value[0];
-    for (qsizetype z = 0; z < obj->affected.size(); z++)
+    for (int z = 0; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
-    sprintf(buf, "$B%s%d. %-50s Vnum: %d AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].virt, ac);
+    sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
+            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
     {
       ch->sendln("Max number of items hit.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_testhit(Character *ch, char *argument, cmd_t cmd)
@@ -906,7 +900,7 @@ int do_testhit(Character *ch, char *argument, cmd_t cmd)
   if (!arg3[0])
   {
     ch->sendln("Syntax: <tohit> <level> <target level>");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int toHit = atoi(arg1), tlevel = atoi(arg3), level = atoi(arg2);
   float lvldiff = level - tlevel;
@@ -934,7 +928,7 @@ int do_testhit(Character *ch, char *argument, cmd_t cmd)
     csendf(ch, "%d AC - %f%% chance to hit\r\n", AC,
            percent);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void write_array_csv(const char *const *array, std::ofstream &fout)
@@ -967,7 +961,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
   if (*export_type == 0 || *filename == 0)
   {
     ch->sendln("Syntax: export obj <filename>\r\n");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   std::ofstream fout;
@@ -1002,12 +996,12 @@ int do_export(Character *ch, char *args, cmd_t cmd)
   {
     std::stringstream errormsg;
     errormsg << "Exception while writing to " << filename << ".";
-    DC::getInstance()->logmisc(errormsg.str().c_str());
+    logentry(errormsg.str().c_str(), 108, DC::LogChannel::LOG_MISC);
   }
 
-  DC::getInstance()->logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
+  logf(110, DC::LogChannel::LOG_GOD, "Exported objects as %s.", filename);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
@@ -1024,7 +1018,7 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
         ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
         ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
 
-        if (rename(world->filename.toStdString().c_str(), qPrintable(potential_filename)) == -1)
+        if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)
         {
           auto rename_errno = errno;
           char *errStr = strerror(rename_errno);
@@ -1038,5 +1032,5 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
     }
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

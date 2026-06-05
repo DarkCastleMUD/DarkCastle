@@ -21,7 +21,7 @@ int main(int argc, char **argv)
   DC dcastle(parse_arguments(argc, argv));
   QThread::currentThread()->setObjectName("Main Thread");
 
-  DC::getInstance()->logentry(QStringLiteral("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
+  logentry(QStringLiteral("Executable: %1 Version: %2 Build date: %3").arg(argv[0]).arg(DC::getBuildVersion()).arg(DC::getBuildTime()));
 
   // If no ports specified then set default ports
   if (dcastle.cf.ports.size() == 0)
@@ -33,11 +33,11 @@ int main(int argc, char **argv)
     dcastle.cf.ports.push_back(DFLT_PORT4);
   }
 
-  DC::getInstance()->logentry(QStringLiteral("Using %1 as data directory.").arg(dcastle.cf.library_directory));
+  logentry(QStringLiteral("Using %1 as data directory.").arg(dcastle.cf.library_directory));
 
   if (!QFile(dcastle.cf.library_directory).exists())
   {
-    DC::getInstance()->logentry(QStringLiteral("Data directory %1 is missing.").arg(dcastle.cf.library_directory));
+    logentry(QStringLiteral("Data directory %1 is missing.").arg(dcastle.cf.library_directory));
     exit(EXIT_FAILURE);
   }
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
   {
     char strerror_buffer[512];
     const char *strerror_result = strerror_r(errno, strerror_buffer, sizeof(strerror_buffer));
-    DC::getInstance()->logentry(QStringLiteral("Error changing current directory to %1: %2").arg(dcastle.cf.library_directory).arg(strerror_result));
+    logentry(QStringLiteral("Error changing current directory to %1: %2").arg(dcastle.cf.library_directory).arg(strerror_result));
     exit(EXIT_FAILURE);
   }
 
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   {
     dcastle.boot_zones();
     dcastle.boot_world();
-    DC::getInstance()->logmisc(QStringLiteral("Done."));
+    logentry(QStringLiteral("Done."), 0, DC::LogChannel::LOG_MISC);
     exit(EXIT_SUCCESS);
   }
   else
@@ -96,7 +96,7 @@ DC::config parse_arguments(int argc, char **argv)
     case 'm':
       cf.test_mobs = 1;
       cf.test_objs = 1;
-      DC::getInstance()->logmisc(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)"));
+      logentry(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (MOB,OBJ)"), 0, DC::LogChannel::LOG_MISC);
       break;
     case 'n': // inhibits printing timeout on DC::LogChannel::LOG_MISC messages normally sent to STDERR
       cf.stderr_timestamp = false;
@@ -116,13 +116,13 @@ DC::config parse_arguments(int argc, char **argv)
       break;
     case 'w':
       cf.test_world = 1;
-      DC::getInstance()->logmisc(QStringLiteral("Mud in world checking mode. TinyTinyworld being used. (WLD)"));
-      DC::getInstance()->logentry(QStringLiteral("Do NOT have mortals login when in world checking mode."), 0,
-                                  DC::LogChannel::LOG_MISC);
+      logentry(QStringLiteral("Mud in world checking mode. TinyTinyworld being used. (WLD)"), 0, DC::LogChannel::LOG_MISC);
+      logentry(QStringLiteral("Do NOT have mortals login when in world checking mode."), 0,
+               DC::LogChannel::LOG_MISC);
       break;
     case 'c':
       cf.test_objs = 1;
-      DC::getInstance()->logmisc(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (OBJ)"));
+      logentry(QStringLiteral("Mud in testing mode. TinyTinyworld being used. (OBJ)"), 0, DC::LogChannel::LOG_MISC);
       break;
     default:
     case 'h':

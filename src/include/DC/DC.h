@@ -115,10 +115,9 @@ typedef QList<QString> hints_t;
 #include "DC/Database.h"
 #include "DC/Command.h"
 #include "DC/shop.h"
-#include "DC/social.h"
+#include "DC/Index.h"
 
 class Connection;
-class index_data;
 class clan_data;
 
 using special_function = int (*)(Character *, class Object *, cmd_t, const char *, Character *);
@@ -135,6 +134,7 @@ typedef std::set<int>::iterator client_descriptor_list_i;
 typedef std::set<int>::iterator server_descriptor_list_i;
 typedef std::vector<in_port_t>::iterator port_list_i;
 typedef std::unordered_map<Character *, Trace> death_list_t;
+typedef std::unordered_map<Character *, Trace> free_list_t;
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
 typedef uint64_t gold_t;
@@ -143,19 +143,6 @@ typedef std::map<vnum_t, special_function> special_function_list_t;
 typedef QMap<zone_t, Zone> zones_t;
 
 /* element in monster and object index-tables   */
-class index_data
-{
-public:
-  vnum_t virt{};                                                                           /* virt number of ths mob/obj           */
-  quint64 qty{};                                                                           /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(Character *, class Object *, cmd_t, const char *, Character *){}; // non Combat special proc
-  int (*combat_func)(Character *, class Object *, cmd_t, const char *, Character *){};     // combat special proc
-  void *item{};                                                                            /* the mobile/object itself                 */
-
-  struct mob_prog_data *mobprogs{};
-  mob_prog_data *mobspec{};
-  int progtypes{};
-};
 
 class World
 {
@@ -240,8 +227,7 @@ private:
 #define AUC_MIN_PRICE 1000
 #define AUC_MAX_PRICE 2000000000
 
-struct AuctionTicket;
-Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket);
+Object *ticket_object_load(QMap<unsigned int, class AuctionTicket>::iterator Item_it, int ticket);
 
 enum ListOptions
 {
@@ -265,11 +251,9 @@ enum AuctionStates
   AUC_DELETED
 };
 
-/*
-TICKET STRUCT
-*/
-struct AuctionTicket
+class AuctionTicket
 {
+public:
   int vitem;
   QString item_name;
   unsigned int price;
@@ -346,8 +330,9 @@ public:
   level_t getLevel(void) const { return level_; }
   void setLevel(level_t level) { level_ = level; }
 };
-struct world_file_list_item
+class world_file_list_item
 {
+public:
   QString filename;
   vnum_t firstnum;
   vnum_t lastnum;
@@ -365,8 +350,9 @@ class DC_EXPORT DC : public QCoreApplication
   Q_OBJECT
   // Favor reference semantics over pointer semantics
 public:
-  struct config
+  class config
   {
+  public:
     config(int argc = {}, char **argv = {})
         : argc_(argc), argv_(argv) {}
     int argc_{};
@@ -455,6 +441,7 @@ public:
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;
   special_function_list_t obj_combat_functions;
+  free_list_t free_list;
   SSH::SSH ssh;
   fd_set input_set = {};
   fd_set output_set = {};
@@ -470,14 +457,14 @@ public:
 
   class index_data mob_index_array[MAX_INDEX] = {};
   class index_data *mob_index = mob_index_array;
-  struct world_file_list_item *world_file_list = 0; // List of the world files
-  struct world_file_list_item *mob_file_list = 0;   // List of the mob files
-  struct world_file_list_item *obj_file_list = 0;   // List of the obj files
-  class Object *object_list = 0;                    // the global linked list of obj's
-  struct pulse_data *bard_list = 0;                 // global l-list of bards
-  int top_of_helpt = 0;                             // top of help index table
-  int new_top_of_helpt = 0;                         // top of help index table
-  room_t top_of_world_alloc = 0;                    // index of last alloc'd memory in world
+  world_file_list_item *world_file_list = 0; // List of the world files
+  world_file_list_item *mob_file_list = 0;   // List of the mob files
+  world_file_list_item *obj_file_list = 0;   // List of the obj files
+  class Object *object_list = 0;             // the global linked list of obj's
+  class pulse_data *bard_list = 0;           // global l-list of bards
+  int top_of_helpt = 0;                      // top of help index table
+  int new_top_of_helpt = 0;                  // top of help index table
+  room_t top_of_world_alloc = 0;             // index of last alloc'd memory in world
   room_t top_of_world = 0;
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
@@ -486,6 +473,7 @@ public:
 
   static QString getBuildVersion();
   static QString getBuildTime();
+  static DC *getInstance();
   static zone_t getRoomZone(room_t room_nr);
   static QString getZoneName(zone_t zone_key);
   static void setZoneClanOwner(zone_t zone_key, int clan_key);
@@ -496,13 +484,6 @@ public:
   static void setZoneNotModified(zone_t zone_key);
   static void incrementZoneDiedTick(zone_t zone_key);
   static void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
-  static inline DC *getInstance(void)
-  {
-    DC *dc = dynamic_cast<DC *>(DC::instance());
-    assert(dc);
-    return dc;
-  }
-
   Object *getObject(vnum_t vnum);
   void findLibrary(void);
   int create_one_room(Character *ch, int vnum);
@@ -567,39 +548,17 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
-  void logarena(QString message);
-  void logbug(QString message);
-  void logclan(QString message);
-  void logdatabase(QString message);
-  void logdebug(QString message);
-  void loggod(QString message);
-  void loghelp(QString message);
-  void logmisc(QString message);
-  void logmortal(QString message);
-  void logobjects(QString message);
-  void logplayer(QString message);
-  void logprayer(QString message);
-  void logquest(QString message);
-  void logsocket(QString message);
-  void logvault(QString message);
-  void logwarning(QString message);
-  void logvault(QString message, QString name);
-  void logworld(QString message);
-
-  void logf(int level, DC::LogChannel type, const char *arg, ...);
-  void logf(int level, DC::LogChannel type, QString arg);
-  void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
-
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
+  void clean_socials_from_memory(void);
   void remove_all_mobs_from_world(void);
   void remove_all_objs_from_world(void);
   void free_zones_from_memory(void);
   void free_clans_from_memory(void);
   void set_zone_saved_zone(int32_t room);
   void set_zone_modified_zone(int32_t room);
-  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<struct world_file_list_item *, search_error>;
+  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>;
   void set_zone_modified(int32_t modnum, world_file_list_item *list);
   void set_zone_modified_world(int32_t room);
   void set_zone_modified_mob(int32_t mob);
@@ -637,8 +596,8 @@ public:
   void heartbeat(void);
   void finish_hotboot(void);
   load_status_t load_char_obj(Connection *d, QString name);
-  bool has_vault_access(QString owner, struct vault_data *vault);
-  bool has_vault_access(Character *ch, struct vault_data *vault);
+  bool has_vault_access(QString owner, class vault_data *vault);
+  bool has_vault_access(Character *ch, class vault_data *vault);
   void update_mprog_throws(void);
   Character *initiate_oproc(Character *ch, Object *obj);
   int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
@@ -650,6 +609,7 @@ public:
     /* TODO enable and fix all memory leaks
     remove_all_mobs_from_world();
     remove_all_objs_from_world();
+    clean_socials_from_memory();
     free_zones_from_memory();
     free_clans_from_memory();
     free_world_from_memory();
@@ -677,10 +637,9 @@ public:
   room_t last_char_room = {};
   Commands CMD_;
   Arena arena_;
-  Socials socials_;
 
 private:
-  struct timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
+  timeval last_time_ = {}, delay_time_ = {}, now_time_ = {};
   hints_t hints_;
   Shops shops_;
   QList<QHostAddress> host_list_ = {QHostAddress("127.0.0.1")};
@@ -698,6 +657,9 @@ private:
   void nanny(class Connection *d, std::string arg = "");
   void object_activity(uint64_t pulse_type);
 };
+void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+void logf(int level, DC::LogChannel type, const char *arg, ...);
+void logf(int level, DC::LogChannel type, QString arg);
 int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
 void produce_coredump(void *ptr = 0);
 
@@ -712,7 +674,7 @@ T number(T from, T to, QRandomGenerator *rng = &(DC::getInstance()->random_))
   if (from > to)
   {
 
-    DC::getInstance()->logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
+    logentry(QStringLiteral("BACKWARDS usage: number(%1, %2)!").arg(from).arg(to));
     produce_coredump();
     return to;
   }
@@ -744,10 +706,11 @@ union varg_t
 
 typedef void TIMER_FUNC(varg_t arg1, void *arg2, void *arg3);
 
-struct timer_data
+class timer_data
 {
+public:
   int timeleft{};
-  struct timer_data *next{};
+  timer_data *next{};
   varg_t arg1{};
   QVariant var_arg1{};
   void *arg2{};
@@ -767,7 +730,7 @@ auto &operator>>(auto &in, Room &room)
   char *temp = nullptr;
   char ch = 0;
   int dir = 0;
-  struct extra_descr_data *new_new_descr{};
+  extra_descr_data *new_new_descr{};
   zone_t zone_nr = {};
 
   ch = fread_char(in);
@@ -899,7 +862,7 @@ auto &operator>>(auto &in, Room &room)
           fseek(in, -1, SEEK_CUR);
         }
 
-        new_new_descr = new struct extra_descr_data;
+        new_new_descr = new extra_descr_data;
         new_new_descr->keyword = fread_string(in, 0);
         new_new_descr->description = fread_string(in, 0);
 
@@ -915,9 +878,9 @@ auto &operator>>(auto &in, Room &room)
       }
       else if (ch == 'B')
       {
-        struct deny_data *deni;
+        deny_data *deni;
 
-        deni = new struct deny_data;
+        deni = new deny_data;
         deni->vnum = fread_int(in, -1, 2147483467);
 
         if (room_nr)

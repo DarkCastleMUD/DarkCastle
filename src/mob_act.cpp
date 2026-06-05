@@ -21,8 +21,6 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstring>
-
 #include <cstdio>
 
 #include "DC/character.h"
@@ -30,20 +28,18 @@
 #include "DC/mobile.h"
 #include "DC/utility.h"
 #include "DC/fight.h"
-#include "DC/db.h" // index_data
-#include "DC/player.h"
 #include "DC/act.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/race.h" // Race defines used in align-aggro messages.
-#include "DC/comm.h"
 #include "DC/connect.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/Timer.h"
 #include "DC/move.h"
+#include "DC/memory.h"
 
 void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);
@@ -51,11 +47,11 @@ bool is_protected(Character *vict, Character *ch);
 void scavenge(Character *ch);
 bool is_r_denied(Character *ch, int room)
 {
-  struct deny_data *d;
-  if (IS_PC(ch))
+  deny_data *d;
+  if (ch->isPlayer())
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].virt == d->vnum)
+    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == d->vnum)
       return true;
   return false;
 }
@@ -79,7 +75,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (ch->isPlayer())
+    if (!ch->isNonPlayer())
       continue;
 
     if (MOB_WAIT_STATE(ch) > 0)
@@ -98,7 +94,7 @@ void mobile_activity(void)
         (isSet(ch->combat, COMBAT_BASH2)))
       continue;
 
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
 
     // Examine call for special procedure
     // These are done BEFORE checks for awake and stuff, so the proc needs
@@ -120,7 +116,7 @@ void mobile_activity(void)
       retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
-      if (!isSet(retval, eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
+      if (!isSet(retval, ReturnValue::eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
         continue;
     }
 
@@ -143,21 +139,21 @@ void mobile_activity(void)
       if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
-        if (isSet(retval, eCH_DIED) || ch->isDead() || ch->isNowhere())
+        if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
         {
           continue;
         }
       }
 
       retval = mprog_arandom_trigger(ch);
-      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
+      if (isSet(retval, ReturnValue::eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
       {
         continue;
       }
     }
     catch (...)
     {
-      DC::getInstance()->logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -173,17 +169,17 @@ void mobile_activity(void)
         PerfTimers["mprog_wordlist"].stop();
 
         retval = mprog_cur_result;
-        if (isSet(retval, eCH_DIED) || ch->isDead() || ch->isNowhere())
+        if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
           break; // break so we can continue with the next mob
       }
-      if (isSet(retval, eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
+      if (isSet(retval, ReturnValue::eCH_DIED) || selfpurge || ch->isDead() || ch->isNowhere())
         continue; // move on to next mob, this one is dead
 
       for (tmp_act = ch->mobdata->mpact; tmp_act != nullptr; tmp_act = tmp2_act)
       {
         tmp2_act = tmp_act->next;
-        delete[] tmp_act->buf;
-        delete tmp_act;
+        dc_free(tmp_act->buf);
+        dc_free(tmp_act);
       }
       ch->mobdata->mpactnum = 0;
       ch->mobdata->mpact = nullptr;
@@ -242,7 +238,7 @@ void mobile_activity(void)
         int room_nr_past_door = EXIT(ch, door)->to_room;
         if (room_nr_past_door < 0)
         {
-          DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
+          logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
         Room room_past_door = DC::getInstance()->world[room_nr_past_door];
@@ -258,7 +254,7 @@ void mobile_activity(void)
             if (cmd_dir)
             {
               retval = attempt_move(ch, *cmd_dir);
-              if (isSet(retval, eCH_DIED))
+              if (isSet(retval, ReturnValue::eCH_DIED))
                 continue;
             }
           }
@@ -280,7 +276,7 @@ void mobile_activity(void)
 
         if (!CAN_SEE(ch, tmp_ch))
           continue;
-        if (!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
+        if (!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE))
           continue;
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
@@ -292,7 +288,7 @@ void mobile_activity(void)
             act("$n growls at $N.", ch, 0, tmp_ch, TO_ROOM, NOTVICT);
             continue;
           }
-          else if (IS_PC(tmp_ch))
+          else if (tmp_ch->isPlayer())
           {
             act("$n screams, 'I am going to KILL YOU!'", ch, 0, 0, TO_ROOM, 0);
             PerfTimers["mprog_attack"].start();
@@ -353,7 +349,7 @@ void mobile_activity(void)
           {
             if (!tmp_ch || !ch)
             {
-              DC::getInstance()->logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, DC::LogChannel::LOG_BUG);
+              logentry(QStringLiteral("Null ch or tmp_ch in mobile_action()"), IMMORTAL, DC::LogChannel::LOG_BUG);
               break;
             }
             next_aggro = tmp_ch->next_in_room;
@@ -362,12 +358,12 @@ void mobile_activity(void)
               continue;
             if (!CAN_SEE(ch, tmp_ch))
               continue;
-            if (IS_NPC(tmp_ch) && !IS_AFFECTED(tmp_ch, AFF_CHARM) && !tmp_ch->desc)
+            if (tmp_ch->isNonPlayer() && !IS_AFFECTED(tmp_ch, AFF_CHARM) && !tmp_ch->desc)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!IS_NPC(tmp_ch) && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                              isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
+            if ((!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
+                                                                                                     isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -429,7 +425,7 @@ void mobile_activity(void)
               (isSet(races[(int)GET_RACE(ch)].friendly, tmp_bitv) ||
                (int)GET_RACE(ch) == (int)GET_RACE(tmp_ch)) &&
 
-              !(IS_NPC(tmp_ch->fighting) && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, getBitvector(tmp_ch->fighting->race)) &&
+              !(tmp_ch->fighting->isNonPlayer() && !IS_AFFECTED(tmp_ch->fighting, AFF_CHARM)) && !isSet(races[(int)GET_RACE(ch)].friendly, getBitvector(tmp_ch->fighting->race)) &&
               !tmp_ch->affected_by_spell(Character::PLAYER_OBJECT_THIEF) && !tmp_ch->isPlayerGoldThief())
           {
             tmp_race = GET_RACE(tmp_ch);
@@ -456,10 +452,10 @@ void mobile_activity(void)
 
           //           continue;
 
-          if ((IS_PC(tmp_ch) && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
+          if ((tmp_ch->isPlayer() && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
-              (IS_NPC(tmp_ch) && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked IS_PC first
+              (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
                ))
           {
             int i = 0;
@@ -582,7 +578,7 @@ void mobile_activity(void)
               }
               break;
             }
-          } // If IS_PC(tmp_ch)
+          } // If tmp_ch->isPlayer()
         } // for() for the RACIST, AGG_XXX and FRIENDLY flags
 
     // Note, if you add anything to this point, you need to put if(done) continue
@@ -630,7 +626,7 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
 // protected from.  PAL's ANTI's take spell/level whichever higher
 bool is_protected(Character *vict, Character *ch)
 {
-  struct affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
+  affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
   int level_protected = aff ? aff->modifier : 0;
   if (GET_CLASS(vict) == CLASS_ANTI_PAL && IS_EVIL(vict) && vict->getLevel() > level_protected)
     level_protected = vict->getLevel();
@@ -683,7 +679,7 @@ void scavenge(Character *ch)
     if (!CAN_GET_OBJ(ch, obj))
       continue;
 
-    if (DC::getInstance()->obj_index[obj->item_number].virt == CHAMPION_ITEM)
+    if (DC::getInstance()->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
       continue;
 
     keyword = obj->keywordfind();
@@ -940,7 +936,7 @@ void scavenge(Character *ch)
             break;
 
           default:
-            DC::getInstance()->logentry(QStringLiteral("Bad switch in mob_act.C"), 0, DC::LogChannel::LOG_BUG);
+            logentry(QStringLiteral("Bad switch in mob_act.C"), 0, DC::LogChannel::LOG_BUG);
             break;
 
           } /* end switch */

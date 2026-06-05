@@ -14,3 +14,4 @@ lib/gmon.out
 vaults/vaultindex
 gcm.cache/
 _deps/
+.cache/

@@ -1,4 +1,4 @@
-#include <iostream>
+#include <cstddef>
 #include <unistd.h>
 #include "DC/dc_xmlrpc.h"
 #include <cstring>
@@ -80,7 +80,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
+    if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
       result = "plr_editor_dc";
       return;
@@ -89,7 +89,7 @@ public:
     std::string &contents = params[2];
 
     // Remove \r characters from web input
-    unsigned int index = 0;
+    std::size_t index = 0;
     while ((index = contents.find('\r', index)) != std::string::npos)
     {
       contents.erase(index, 1);
@@ -109,16 +109,18 @@ public:
               SEND_TO_Q("String too long - Truncated.\r\n", ch->desc);
               contents[ch->desc->max_str] = '\0';
             }
-            *ch->desc->strnew = new char[contents.size() + 5];
+            CREATE(*ch->desc->strnew, char, contents.size() + 5);
             strcpy(*ch->desc->strnew, contents.c_str());
           }
           else
           {
-            auto buffer = new char[strlen(*ch->desc->strnew) + contents.size() + 5];
-            strcpy(buffer, *ch->desc->strnew);
-            delete[] *ch->desc->strnew;
-            *ch->desc->strnew = buffer;
-            strcat(*ch->desc->strnew, contents.c_str());
+            if (!(*ch->desc->strnew = (char *)dc_realloc(*ch->desc->strnew,
+                                                         strlen(*ch->desc->strnew) + contents.size() + 5)))
+            {
+              perror("string_add");
+              abort();
+            }
+            strcpy(*ch->desc->strnew, contents.c_str());
           }
           ch->desc->web_connected = Connection::states::PLAYING;
           result = *(ch->desc->strnew);
@@ -173,7 +175,7 @@ public:
       return;
     }
 
-    if (IS_PC(ch) && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
+    if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
       result = "plr_editor_dc";
       return;

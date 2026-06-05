@@ -38,7 +38,6 @@
 #include "DC/fight.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
-#include "DC/db.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/interp.h"
@@ -47,20 +46,21 @@
 #include "DC/ki.h"
 #include "DC/sing.h"
 #include "DC/clan.h"
+#include "DC/memory.h"
 
 // Global data
 
-extern struct class_skill_defines w_skills[];
-extern struct class_skill_defines t_skills[];
-extern struct class_skill_defines d_skills[];
-extern struct class_skill_defines b_skills[];
-extern struct class_skill_defines a_skills[];
-extern struct class_skill_defines p_skills[];
-extern struct class_skill_defines r_skills[];
-extern struct class_skill_defines k_skills[];
-extern struct class_skill_defines u_skills[];
-extern struct class_skill_defines c_skills[];
-extern struct class_skill_defines m_skills[];
+extern class_skill_defines w_skills[];
+extern class_skill_defines t_skills[];
+extern class_skill_defines d_skills[];
+extern class_skill_defines b_skills[];
+extern class_skill_defines a_skills[];
+extern class_skill_defines p_skills[];
+extern class_skill_defines r_skills[];
+extern class_skill_defines k_skills[];
+extern class_skill_defines u_skills[];
+extern class_skill_defines c_skills[];
+extern class_skill_defines m_skills[];
 extern char *spell_wear_off_msg[];
 
 // Functions used in spells.C
@@ -899,14 +899,13 @@ bool Character::canPerform(const int_fast32_t &skillType, QString failMessage)
 // Figures out how many % of max your damage does
 int dam_percent(int learned, int damage)
 {
-  float percent;
-  percent = 50;
+  auto percent = 50.0;
   if (!learned)
-    percent /= 2;
-  percent += learned / 2;
+    percent /= 2.0;
+  percent += learned / 2.0;
   //  else percent = 90 + ((learned - 90) *2);
 
-  return (int)((float)damage * (float)percent / 100.0);
+  return damage * percent / 100.0;
 }
 
 int use_mana(Character *ch, int sn)
@@ -947,7 +946,7 @@ int use_mana(Character *ch, int sn)
 
 void affect_update(int32_t duration_type)
 {
-  static struct affected_type *af, *next_af_dude;
+  static affected_type *af, *next_af_dude;
   void update_char_objects(Character * ch); /* handler.c */
 
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
@@ -958,7 +957,7 @@ void affect_update(int32_t duration_type)
   {
     // This doesn't really belong here, but it beats creating an "update" just for it.
     // That way we don't have to traverse the entire list all over again
-    if (duration_type == DC::PULSE_TIME && IS_PC(i))
+    if (duration_type == DC::PULSE_TIME && i->isPlayer())
       update_char_objects(i);
 
     for (af = i->affected; af; af = next_af_dude)
@@ -1036,17 +1035,17 @@ void affect_update(int32_t duration_type)
 void isr_set(Character *ch)
 {
   // char buf[100];
-  static struct affected_type *afisr;
+  static affected_type *afisr;
 
   if (!ch)
   {
-    DC::getInstance()->logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("nullptr ch in isr_set!"), 0, DC::LogChannel::LOG_BUG);
     return;
   }
 
   /*  why do we need this spamming the logs?
      sprintf(buf, "isr_set ch %s", GET_NAME(ch));
-     DC::getInstance()->logentry(buf, 0, DC::LogChannel::LOG_BUG);
+     logentry(buf, 0, DC::LogChannel::LOG_BUG);
   */
   for (afisr = ch->affected; afisr; afisr = afisr->next)
   {
@@ -1059,7 +1058,7 @@ void isr_set(Character *ch)
 
 bool many_charms(Character *ch)
 {
-  struct follow_type *k;
+  follow_type *k;
   for (k = ch->followers; k; k = k->next)
   {
     if (IS_AFFECTED(k->follower, AFF_CHARM))
@@ -1072,8 +1071,8 @@ bool many_charms(Character *ch)
 void extractFamiliar(Character *ch)
 {
   Character *victim = nullptr;
-  for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && IS_AFFECTED(k->follower, AFF_FAMILIAR))
+  for (follow_type *k = ch->followers; k; k = k->next)
+    if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
       victim = k->follower;
       break;
@@ -1090,7 +1089,7 @@ bool any_charms(Character *ch)
 {
   return many_charms(ch);
   /*
-    struct follow_type *k;
+    follow_type *k;
     int counter = 0;
 
     for(k = ch->followers; k; k = k->next) {
@@ -1124,11 +1123,11 @@ bool circle_follow(Character *ch, Character *victim)
 // This will NOT do if a character quits/dies!!
 void stop_follower(Character *ch, follower_reasons_t reason)
 {
-  struct follow_type *j, *k;
+  follow_type *j, *k;
 
   if (ch->master == nullptr)
   {
-    DC::getInstance()->logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Stop_follower: null ch_master!"), ARCHANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   /*
@@ -1192,7 +1191,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
   { /* Head of follower-list? */
     k = ch->master->followers;
     ch->master->followers = k->next;
-    delete k;
+    dc_free(k);
   }
   else
   { /* locate follower who is not head of list */
@@ -1203,7 +1202,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 
       j = k->next;
       k->next = j->next;
-      delete j;
+      dc_free(j);
     }
   }
 
@@ -1223,7 +1222,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 /* Called when a character that follows/is followed dies */
 void die_follower(Character *ch)
 {
-  struct follow_type *j, *k;
+  follow_type *j, *k;
   Character *zombie;
 
   if (ch->master)
@@ -1257,7 +1256,7 @@ void die_follower(Character *ch)
 /* will arise. CH will follow leader                               */
 void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
 {
-  struct follow_type *k;
+  follow_type *k;
 
   if (reason != follower_reasons_t::CHANGE_LEADER)
     REMBIT(ch->affected_by, AFF_GROUP);
@@ -1266,7 +1265,11 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
 
   ch->master = leader;
 
-  k = new struct follow_type;
+#ifdef LEAK_CHECK
+  k = (follow_type *)calloc(1, sizeof(follow_type));
+#else
+  k = (follow_type *)dc_alloc(1, sizeof(follow_type));
+#endif
 
   k->follower = ch;
   k->next = leader->followers;
@@ -1292,13 +1295,14 @@ int say_spell(Character *ch, int si, int room)
   int j, offs, retval = 0;
   Character *temp_char;
 
-  struct syllable
+  class syllable
   {
+  public:
     char org[10];
     char new_new[10];
   };
 
-  struct syllable syls[] = {
+  syllable syls[] = {
       {" ", " "},
       {"ar", "andoa"},
       {"au", "hana"},
@@ -1402,7 +1406,7 @@ int say_spell(Character *ch, int si, int room)
         return retval;
       }
     }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Takes the spell_base (higher = harder to resist)
@@ -1476,17 +1480,17 @@ char *skip_spaces(char *string)
 */
 int do_release(Character *ch, char *argument, cmd_t cmd)
 {
-  struct affected_type *aff, *aff_next;
+  affected_type *aff, *aff_next;
   bool printed = false;
   argument = skip_spaces(argument);
 
   if (!ch->canPerform(SKILL_RELEASE, "You don't know how!"))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   if (!ch->affected)
   {
     ch->sendln("You have no spell effects to release.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!*argument)
@@ -1512,7 +1516,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
         ch->sendln(get_skill_name(aff->type));
       }
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
@@ -1535,7 +1539,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
       if (ch->getMove() < 25)
       {
         ch->sendln(QStringLiteral("You don't have enough movement points to release the spell effect '%1'.").arg(get_skill_name(aff->type)));
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       if (aff->type > 0 && aff->type <= MAX_SPL_LIST && !skill_success(ch, nullptr, SKILL_RELEASE))
@@ -1544,7 +1548,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
         act("$n fails to release the magic surrounding $m and is left momentarily dazed.", ch, 0, 0, TO_ROOM, INVIS_NULL);
         WAIT_STATE(ch, DC::PULSE_VIOLENCE / 2);
         ch->decrementMove(10);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       ch->decrementMove(25);
@@ -1567,7 +1571,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
       ch->sendln(QStringLiteral("No such spell effect '%1' found to be released.").arg(argument));
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int skill_value(Character *ch, int skillnum, int min = 33)
@@ -1602,7 +1606,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
 {
   //  extern int stat_mod[];
   //  int modifier = 0;
-  // struct class_skill_defines *t;
+  // class_skill_defines *t;
   attribute_t stat{};
 
   switch (skillnum)
@@ -1689,7 +1693,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   }
   int i = 0, learned = 0;
 
-  if (!isNPC())
+  if (!isNonPlayer())
   {
     i = learned = has_skill(skillnum);
     if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skillnum == SKILL_DODGE)
@@ -1739,7 +1743,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
 
   int a = get_difficulty(skillnum);
   /*  int o = ch->getLevel()*2+1;
-    if (o > 101 || IS_NPC(ch)) o = 101;
+    if (o > 101 || ch->isNonPlayer()) o = 101;
     if (i > o) o = i+1;
   */
 
@@ -1752,7 +1756,7 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   else
   {
     /* Check for skill improvement anyway */
-    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
+    if (skillnum != SKILL_ENHANCED_REGEN || (skillnum == SKILL_ENHANCED_REGEN && this->getHP() + 50 < GET_MAX_HIT(this) && (GET_POS(this) == position_t::RESTING || GET_POS(this) == position_t::SLEEPING)))
       skill_increase_check(skillnum, learned, a);
     return false; // Failure
   }
@@ -1765,7 +1769,7 @@ bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
 
 void set_conc_loss(Character *ch, int spl)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = CONC_LOSS_FIXER;
   af.duration = 1;
   af.modifier = spl;
@@ -1777,7 +1781,7 @@ void set_conc_loss(Character *ch, int spl)
 }
 bool check_conc_loss(Character *ch, int spl)
 {
-  struct affected_type *af;
+  affected_type *af;
   int afspl;
   if (!(af = ch->affected_by_spell(CONC_LOSS_FIXER)))
     return false;
@@ -1801,77 +1805,77 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   int qend, spl, i, learned;
   bool target_ok;
 
-  //  if (IS_NPC(ch))
-  //    return eFAILURE;
+  //  if (ch->isNonPlayer())
+  //    return ReturnValue::eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (IS_NPC(ch) && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
+  if (ch->isNonPlayer() && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
   {
     ch->sendln("You cannot cast in this form.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SPELL_NO_CAST_TIMER))
   {
     ch->sendln("You seem unable to concentrate enough to cast any spells.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].virt == SILENCE_OBJ_NUMBER)
+    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
     ch->sendln("You cannot cast while charmed!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (ch->getLevel() < ARCHANGEL && (IS_PC(ch) || IS_AFFECTED(ch, AFF_CHARM)))
+  if (ch->getLevel() < ARCHANGEL && (ch->isPlayer() || IS_AFFECTED(ch, AFF_CHARM)))
   {
     if (GET_CLASS(ch) == CLASS_WARRIOR)
     {
       ch->sendln("Think you had better stick to fighting...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_THIEF)
     {
       ch->sendln("Think you should stick to robbing and killing...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_BARBARIAN)
     {
       ch->sendln("Think you should stick to berserking...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_MONK)
     {
       ch->sendln("Think you should stick with meditating...");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if ((GET_CLASS(ch) == CLASS_ANTI_PAL) && (!IS_EVIL(ch)))
     {
       ch->sendln("You're not evil enough!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if ((GET_CLASS(ch) == CLASS_PALADIN) && (!IS_GOOD(ch)))
     {
       ch->sendln("You're not pure enough!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (GET_CLASS(ch) == CLASS_BARD)
     {
       ch->send("Stick to singing bucko.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC))
     {
       ch->sendln("You find yourself unable to weave magic here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1881,13 +1885,13 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   if (!(*argument))
   {
     ch->sendln("Cast which what where?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (*argument != '\'')
   {
     ch->sendln("Magic must always be enclosed by the holy magic symbols : '");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Locate the last quote && lowercase the magic words (if any) */
@@ -1898,19 +1902,19 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   if (*(argument + qend) != '\'')
   {
     ch->sendln("Magic must always be enclosed by the holy magic symbols : '");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   spl = old_search_block(argument, 1, qend - 1, spells, 0);
   if (spl <= 0)
   {
     ch->sendln("Your lips do not move, no magic appears.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (spl == SPELL_DIVINE_INTER && ch->affected_by_spell(SPELL_DIV_INT_TIMER))
   {
     ch->sendln("The gods are unwilling to intervene on your behalf again so soon.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (spell_info[spl].spell_pointer() || spell_info[spl].spell_pointer2())
@@ -1938,14 +1942,14 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      if (ch->isPlayer())
+      if (!ch->isNonPlayer())
       {
         if (!(learned = ch->has_skill(spl)))
         {
           if (ch->getLevel() < 101)
           {
             ch->sendln("You do not know how to cast that spell!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           else
           {
@@ -1993,28 +1997,28 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           if (dir == -1)
           {
             ch->sendln("Fire a lightning bolt where?");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
           {
             ch->sendln("The wall blocks your attempt.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!CAN_GO(ch, dir))
           {
             ch->sendln("You cannot do that.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (ch->fighting)
           {
             ch->sendln("You cannot concentrate enough to fire a bolt of lightning into another room!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           int new_room = DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room;
           if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE) || isSet(DC::getInstance()->world[new_room].room_flags, NO_MAGIC))
           {
             ch->sendln("That room is protected from this harmful magic.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           // can't use spellcraft(ch, SPELL_LIGHTNING_BOLT) here because it
@@ -2023,7 +2027,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               (ch->has_skill(SKILL_SPELLCRAFT) < 21))
           {
             ch->sendln("You don't know how.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
           oldroom = ch->in_room;
@@ -2032,18 +2036,18 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           {
             char_to_room(ch, oldroom);
             ch->sendln("Error code: 57A. Report this to an immortal, along with what you typed and where.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!(tar_char = ch->get_char_room_vis(name)))
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
             ch->sendln("You don't see anyone like that there.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
-          if (IS_NPC(tar_char) && DC::getInstance()->mob_index[tar_char->mobdata->nr].virt >= 2300 &&
-              DC::getInstance()->mob_index[tar_char->mobdata->nr].virt <= 2399)
+          if (tar_char->isNonPlayer() && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
+              DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);
@@ -2085,7 +2089,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         if (!target_ok)
         {
           ch->sendln("There is no such known spell in the realms to protect yourself against.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       } // end spell immunity
       int fil = 0;
@@ -2115,7 +2119,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             if (!fil)
             {
               ch->sendln("You do not know how to filter your spell through that.");
-              return eFAILURE;
+              return ReturnValue::eFAILURE;
             }
 
             if (spl == SPELL_BURNING_HANDS || spl == SPELL_FIREBALL || spl == SPELL_FIRESTORM || spl == SPELL_HELLSTREAM)
@@ -2166,7 +2170,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           else
           {
             ch->sendln("You need to specify a filter type.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
         } // end if filterable spell
@@ -2193,7 +2197,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
               else
               {
                 ch->sendln("You cannot cast this spell on your entire group at once.");
-                return eFAILURE;
+                return ReturnValue::eFAILURE;
               }
             }
           }
@@ -2304,7 +2308,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           else
             ch->sendln("What should the spell be cast upon?");
         }
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       { /* TARGET IS OK */
@@ -2316,21 +2320,21 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_to_room(ch, oldroom);
           }
           ch->sendln("You can not cast this spell upon yourself.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if ((tar_char != ch) && isSet(spell_info[spl].targets(), TAR_SELF_ONLY))
         {
           ch->sendln("You can only cast this spell upon yourself.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
         {
           ch->sendln("You are afraid that it could harm your master.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
 
-      if (ch->getLevel() < ARCHANGEL && ch->isPlayer())
+      if (ch->getLevel() < ARCHANGEL && !ch->isNonPlayer())
       {
         if (GET_MANA(ch) < use_mana(ch, spl) * rel)
         {
@@ -2340,7 +2344,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_to_room(ch, oldroom);
           }
           ch->sendln("You can't summon enough energy to cast the spell.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
       if (tar_char && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
@@ -2352,7 +2356,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_from_room(ch);
             char_to_room(ch, oldroom);
           }
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
       }
 
@@ -2364,7 +2368,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         // Someone died, most likely the mob due to an act_trigger program
         if (SOMEONE_DIED(retval))
         {
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
       }
 
@@ -2384,7 +2388,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
       {
         int chance = 50;
 
-        if (IS_NPC(ch))
+        if (ch->isNonPlayer())
         {
           learned = ch->getLevel();
         }
@@ -2426,7 +2430,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             char_from_room(ch);
             char_to_room(ch, oldroom);
           }
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
 
         if (IS_AFFECTED(ch, AFF_INVISIBLE) && !IS_AFFECTED(ch, AFF_ILLUSION) && ch->affected_by_spell(SPELL_INVISIBLE))
@@ -2446,7 +2450,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           else
             leader = ch;
 
-          struct follow_type *k;
+          follow_type *k;
           int counter = 0;
 
           for (k = leader->followers; k; k = k->next)
@@ -2464,7 +2468,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           if (GET_MANA(ch) < counter)
           {
             ch->sendln("You do not have enough mana to cast this group spell.");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           mana_cost = counter;
           GET_MANA(ch) -= mana_cost;
@@ -2478,14 +2482,14 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           tar_char->sendln("Your sleep is restless.");
         ch->skill_increase_check(spl, learned, 500 + spell_info[spl].difficulty());
 
-        if (tar_char && tar_char != ch && IS_PC(ch) && IS_PC(tar_char) && tar_char->desc && ch->desc)
+        if (tar_char && tar_char != ch && ch->isPlayer() && tar_char->isPlayer() && tar_char->desc && ch->desc)
         {
           /*
           if (!strcmp(tar_char->desc->getPeerOriginalAddress().toString().toStdString().c_str(), ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()))
           {
             sprintf(log_buf, "Multi: %s casted '%s' on %s", GET_NAME(ch),
                     get_skill_name(spl), GET_NAME(tar_char));
-            DC::getInstance()->logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
+            logentry(log_buf, 110, DC::LogChannel::LOG_PLAYER, ch);
           }*/
 
           // Wizard's eye (88) is ok to cast
@@ -2496,24 +2500,24 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that spell on someone in a prize arena.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
-                                      GET_NAME(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
-              return eFAILURE;
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s.",
+                   GET_NAME(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
+              return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
-                                      GET_NAME(ch->fighting), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
-              return eFAILURE;
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s, whom was fighting %s, was prevented from casting '%s' on %s.", GET_NAME(ch),
+                   GET_NAME(ch->fighting), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char));
+              return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch)
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
-                                      get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
-              return eFAILURE;
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s was prevented from casting '%s' on %s who was fighting %s.", GET_NAME(ch),
+                   get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), GET_NAME(tar_char->fighting));
+              return ReturnValue::eFAILURE;
             }
           }
 
@@ -2524,30 +2528,30 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             if (tar_char && tar_char != ch && !isSet(spell_info[spl].targets(), TAR_FIGHT_VICT) && !ARE_CLANNED(ch, tar_char))
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-                                      GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
-              return eFAILURE;
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
+                   GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
+              return ReturnValue::eFAILURE;
             }
 
             if (ch->fighting && ch->fighting != tar_char && !ARE_CLANNED(ch->fighting, tar_char) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
-                                      GET_NAME(ch), get_clan_name(ch),
-                                      GET_NAME(ch->fighting), get_clan_name(ch->fighting),
-                                      get_skill_name(spl).toStdString().c_str(),
-                                      GET_NAME(tar_char), get_clan_name(tar_char));
-              return eFAILURE;
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
+                   GET_NAME(ch), get_clan_name(ch),
+                   GET_NAME(ch->fighting), get_clan_name(ch->fighting),
+                   get_skill_name(spl).toStdString().c_str(),
+                   GET_NAME(tar_char), get_clan_name(tar_char));
+              return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
-              DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
-                                      GET_NAME(ch), get_clan_name(ch),
-                                      get_skill_name(spl).toStdString().c_str(),
-                                      GET_NAME(tar_char), get_clan_name(tar_char),
-                                      GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
-              return eFAILURE;
+              logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
+                   GET_NAME(ch), get_clan_name(ch),
+                   get_skill_name(spl).toStdString().c_str(),
+                   GET_NAME(tar_char), get_clan_name(tar_char),
+                   GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
+              return ReturnValue::eFAILURE;
             }
           }
         }
@@ -2558,7 +2562,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           { // some idiot was shooting at himself
             // out		  act("The spell harmlessly reflects off you and disperses.", tar_char, 0, 0, TO_CHAR, 0);
             // for		  act("The spell harmlessly reflects off $n and disperses.", tar_char, 0, 0, TO_ROOM, 0);
-            // heals		  return eSUCCESS;
+            // heals		  return ReturnValue::eSUCCESS;
           }
           else
           {
@@ -2577,7 +2581,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
                 char_from_room(ch);
                 char_to_room(ch, oldroom);
               }
-              return eSUCCESS;
+              return ReturnValue::eSUCCESS;
             }
           }
         }
@@ -2589,7 +2593,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         {
           ch->sendln("You utter a swift prayer to the gods to amplify your powers.");
           act("$n utters a swift prayer to the gods to amplify $s powers.", ch, 0, 0, TO_ROOM, 0);
-          argument = str_dup("communegroupspell");
+          argument = strdup("communegroupspell");
           argument_ptr = argument;
         }
         else if (tar_char && tar_char->affected_by_spell(SPELL_IMMUNITY) && tar_char->affected_by_spell(SPELL_IMMUNITY)->modifier == spl - 1)
@@ -2597,7 +2601,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           act("Your shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_VICT, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses your magic.", ch, 0, tar_char, TO_CHAR, 0);
           act("$N's shield of holy immunity $Bs$3h$5i$7m$3m$5e$7r$3s$R briefly and disperses $n's magic.", ch, 0, tar_char, TO_ROOM, NOTVICT);
-          return eSUCCESS;
+          return ReturnValue::eSUCCESS;
         }
         else if (fil)
         {
@@ -2645,10 +2649,10 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           int retval = ((*spell_info[spl].spell_pointer2())(level, ch, argument, SPELL_TYPE_SPELL, tar_char, tar_obj, learned, mana_cost));
         if (argument_ptr != nullptr)
         {
-          delete[] argument_ptr;
+          free(argument_ptr);
         }
 
-        if (oldroom && !isSet(retval, eCH_DIED))
+        if (oldroom && !isSet(retval, ReturnValue::eCH_DIED))
         {
           char_from_room(ch);
           char_to_room(ch, oldroom);
@@ -2686,13 +2690,13 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         return retval;
       }
     } /* if GET_POS < min_pos */
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else
   {
     ch->sendln("Your lips do not move, no magic appears.");
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 int do_skills(Character *ch, char *arg, cmd_t cmd)
@@ -2700,8 +2704,8 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   int mage, cleric, thief, warrior, anti, pal, barb, monk, ranger, bard, druid;
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
@@ -2724,7 +2728,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
+        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2735,7 +2739,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
+        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2747,7 +2751,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         thief = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Thi(%d)", t_skills[j].levelavailable);
+        sprintf(buf3, "Thi(%llu)", t_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2759,7 +2763,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         warrior = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "War(%d)", w_skills[j].levelavailable);
+        sprintf(buf3, "War(%llu)", w_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2771,7 +2775,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
+        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2783,7 +2787,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
+        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2795,7 +2799,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         barb = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Bar(%d)", b_skills[j].levelavailable);
+        sprintf(buf3, "Bar(%llu)", b_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2807,7 +2811,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         monk = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Mon(%d)", k_skills[j].levelavailable);
+        sprintf(buf3, "Mon(%llu)", k_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2819,7 +2823,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
+        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2831,7 +2835,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         bard = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Brd(%d)", d_skills[j].levelavailable);
+        sprintf(buf3, "Brd(%llu)", d_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2843,7 +2847,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
+        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2913,15 +2917,15 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_songs(Character *ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
@@ -2929,7 +2933,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   {
     if (d_skills[i].skillnum >= SKILL_SONG_BASE && d_skills[i].skillnum <= SKILL_SONG_MAX)
     {
-      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%d)",
+      sprintf(buf + strlen(buf), "$B$7Song:$R %c%-22s  $B$7Ki:$R %-3d  $B$7Class:$R %s (%llu)",
               UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
               song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
               "Brd", d_skills[i].levelavailable);
@@ -2940,7 +2944,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_spells(Character *ch, char *arg, cmd_t cmd)
@@ -2949,8 +2953,8 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
   int mage, cleric, anti, pal, ranger, druid;
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   buf[0] = '\0';
 
@@ -2968,7 +2972,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
       if (m_skills[j].skillnum == i)
       {
         mage = j;
-        sprintf(buf2, "Mag(%d)", m_skills[j].levelavailable);
+        sprintf(buf2, "Mag(%llu)", m_skills[j].levelavailable);
         break;
       }
     }
@@ -2979,7 +2983,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         cleric = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Cle(%d)", c_skills[j].levelavailable);
+        sprintf(buf3, "Cle(%llu)", c_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -2991,7 +2995,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         anti = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ant(%d)", a_skills[j].levelavailable);
+        sprintf(buf3, "Ant(%llu)", a_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3003,7 +3007,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         pal = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Pal(%d)", p_skills[j].levelavailable);
+        sprintf(buf3, "Pal(%llu)", p_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3015,7 +3019,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         ranger = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Ran(%d)", r_skills[j].levelavailable);
+        sprintf(buf3, "Ran(%llu)", r_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3027,7 +3031,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
         druid = j;
         if (buf2[0] != '\0')
           strcat(buf2, ", ");
-        sprintf(buf3, "Dru(%d)", u_skills[j].levelavailable);
+        sprintf(buf3, "Dru(%llu)", u_skills[j].levelavailable);
         strcat(buf2, buf3);
         break;
       }
@@ -3072,7 +3076,7 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
   strcat(buf, "\r\n");
   page_string(ch->desc, buf, 1);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spl_lvl(int lev)
@@ -3090,7 +3094,7 @@ int Character::has_skill(skill_t skill)
   class Object *o;
   int bonus = 0;
 
-  if (isNPC() || !isPlayer())
+  if (isNonPlayer() || !isPlayer())
     return 0;
 
   if (affected_by_spell(SKILL_DEFENDERS_STANCE) && skill == SKILL_DODGE)
@@ -3109,14 +3113,14 @@ int Character::has_skill(skill_t skill)
   else if (affected_by_spell(SPELL_HEROISM))
     bonus += affected_by_spell(SPELL_HEROISM)->modifier / 5;
 
-  if (skills.contains(skill))
+  if (this->skills.contains(skill))
   {
-    const auto &curr = skills[skill];
+    const auto &curr = this->skills[skill];
 
-    for (o = player->skillchange; o; o = o->next_skill)
+    for (o = this->player->skillchange; o; o = o->next_skill)
     {
       int a;
-      for (a = 0; a < o->affected.size(); a++)
+      for (a = 0; a < o->num_affects; a++)
       {
         if (o->affected[a].location == skill * 1000)
         {

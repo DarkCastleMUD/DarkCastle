@@ -27,15 +27,16 @@
 #include "DC/returnvals.h"
 #include "DC/timeinfo.h"
 
-struct spec_data
+class spec_data
 {
+public:
   char *name;
   char *description;
   int pcclass;
   int skills[10];
 };
 
-const struct spec_data spec_list[] =
+const spec_data spec_list[] =
     {
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
@@ -45,8 +46,8 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
   if (!str_cmp(arg, "list"))
   {
     /*
@@ -67,17 +68,17 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
     {
       // messagemoose, couple below too
       ch->sendln("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (ch->spec == 0)
     {
       ch->sendln("You do not have a specialization.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (GET_PLATINUM(ch) < 10000)
     {
       ch->sendln("You do not have the required 10000 platinum.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     for (int i = 0; i < 10; i++)
     { // Free up skills tied to the specilization.
@@ -129,5 +130,5 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
   else if (!str_cmp(arg, "learn"))
   {
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

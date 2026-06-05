@@ -17,488 +17,351 @@ char_file_u4::char_file_u4()
 }
 QString color_to_code(QString color)
 {
-    QMap<QString, QString> colors;
-    // colors["black"]="$0";
-    colors["blue"] = "$1";
-    colors["green"] = "$2";
-    colors["cyan"] = "$3";
-    colors["red"] = "$4";
-    colors["yellow"] = "$5";
-    colors["magenta"] = "$6";
-    colors["white"] = "$7";
-    colors["gray"] = "$B$0";
-    colors["bright blue"] = "$B$1";
-    colors["bright green"] = "$B$2";
-    colors["bright cyan"] = "$B$3";
-    colors["bright red"] = "$B$4";
-    colors["bright yellow"] = "$B$5";
-    colors["bright magenta"] = "$B$6";
-    colors["bright white"] = "$B$7";
+  QMap<QString, QString> colors;
+  // colors["black"]="$0";
+  colors["blue"] = "$1";
+  colors["green"] = "$2";
+  colors["cyan"] = "$3";
+  colors["red"] = "$4";
+  colors["yellow"] = "$5";
+  colors["magenta"] = "$6";
+  colors["white"] = "$7";
+  colors["gray"] = "$B$0";
+  colors["bright blue"] = "$B$1";
+  colors["bright green"] = "$B$2";
+  colors["bright cyan"] = "$B$3";
+  colors["bright red"] = "$B$4";
+  colors["bright yellow"] = "$B$5";
+  colors["bright magenta"] = "$B$6";
+  colors["bright white"] = "$B$7";
 
-    return colors.value(color);
+  return colors.value(color);
 }
 
 QString Character::getSettingAsColor(QString key, QString defaultValue)
 {
-    return color_to_code(getSetting(key, defaultValue));
+  return color_to_code(getSetting(key, defaultValue));
 }
 
 QString Character::getSetting(QString key, QString defaultValue)
 {
-    if (player != nullptr)
+  if (player != nullptr)
+  {
+    if (player->config == nullptr)
     {
-        if (player->config == nullptr)
-        {
-            player->config = new PlayerConfig;
-        }
-        return player->config->value(key, defaultValue);
+      player->config = new PlayerConfig;
     }
-    return defaultValue;
+    return player->config->value(key, defaultValue);
+  }
+  return defaultValue;
 }
 
 void Mobile::setObject(Object *o)
 {
-    object = o;
+  object = o;
 }
 
 Object *Mobile::getObject(void)
 {
-    return object;
+  return object;
 }
 
 bool Mobile::isObject(void)
 {
-    return object != nullptr;
+  return object != nullptr;
 }
 
 QString Player::getJoining(void)
 {
-    QString buffer;
-    for (joining_t::const_iterator i = joining.begin(); i != joining.end(); ++i)
+  QString buffer;
+  for (joining_t::const_iterator i = joining.begin(); i != joining.end(); ++i)
+  {
+    if (i.value())
     {
-        if (i.value())
-        {
-            if (buffer.isEmpty())
-            {
-                buffer = i.key();
-            }
-            else
-            {
-                buffer += " " + i.key();
-            }
-        }
+      if (buffer.isEmpty())
+      {
+        buffer = i.key();
+      }
+      else
+      {
+        buffer += " " + i.key();
+      }
     }
+  }
 
-    return buffer;
+  return buffer;
 }
 
 void Player::setJoining(QString list)
 {
-    joining.clear();
-    auto parts = list.split(' ');
-    for (auto &i : parts)
-    {
-        joining.insert(i, true);
-    }
+  joining.clear();
+  auto parts = list.split(' ');
+  for (auto &i : parts)
+  {
+    joining.insert(i, true);
+  }
 }
 
 void Player::toggleJoining(QString key)
 {
-    joining_t::iterator i = joining.find(key);
-    if (i == joining.end())
-    {
-        joining.insert(key, true);
-    }
-    else
-    {
-        joining.insert(key, !i.value());
-    }
+  joining_t::iterator i = joining.find(key);
+  if (i == joining.end())
+  {
+    joining.insert(key, true);
+  }
+  else
+  {
+    joining.insert(key, !i.value());
+  }
 }
 
 PlayerConfig::PlayerConfig(QObject *parent)
     : QObject(parent)
 {
-    config["color.good"] = "green";
-    config["color.bad"] = "red";
-    config["tell.history.timestamp"] = "0";
-    config["gossip.history.timestamp"] = "0";
-    config["locale"] = "en_US";
-    config["timezone"] = "America/Chicago";
-    config["mode"] = "line";
-    config["fighting.showdps"] = "0";
-    config["dateformat"] = "ISODate";
+  config["color.good"] = "green";
+  config["color.bad"] = "red";
+  config["tell.history.timestamp"] = "0";
+  config["gossip.history.timestamp"] = "0";
+  config["locale"] = "en_US";
+  config["timezone"] = "America/Chicago";
+  config["mode"] = "line";
+  config["fighting.showdps"] = "0";
+  config["dateformat"] = "ISODate";
 }
 
 player_config_value_t PlayerConfig::value(const player_config_key_t &key, const player_config_value_t &defaultValue) const
 {
-    if (config.contains(key) && config.value(key).isEmpty())
-        return defaultValue;
-    else
-        return config.value(key, defaultValue);
+  if (config.contains(key) && config.value(key).isEmpty())
+    return defaultValue;
+  else
+    return config.value(key, defaultValue);
 }
 
 player_config_key_t PlayerConfig::key(const player_config_value_t &value, const player_config_key_t &defaultKey) const
 {
-    return config.key(value, defaultKey);
+  return config.key(value, defaultKey);
 }
 
 QMap<QString, QString> &PlayerConfig::getQMap(void)
 {
-    return config;
+  return config;
 }
 
 player_config_t::iterator PlayerConfig::insert(const player_config_key_t &key, const player_config_value_t &value)
 {
-    return config.insert(key, value);
+  return config.insert(key, value);
 }
 
 player_config_t::iterator PlayerConfig::find(const player_config_key_t &key)
 {
-    return config.find(key);
+  return config.find(key);
 }
 
 player_config_t::iterator PlayerConfig::begin()
 {
-    return config.begin();
+  return config.begin();
 }
 
 player_config_t::iterator PlayerConfig::end()
 {
-    return config.end();
+  return config.end();
 }
 
 player_config_t::const_iterator PlayerConfig::constBegin() const
 {
-    return config.constBegin();
+  return config.constBegin();
 }
 
 player_config_t::const_iterator PlayerConfig::constEnd() const
 {
-    return config.constEnd();
+  return config.constEnd();
 }
 
 bool Character::isMortalPlayer(void) const
 {
-    return isPlayer() && level_ < IMMORTAL;
+  return isPlayer() && level_ < IMMORTAL;
 }
 
 bool Character::isImmortalPlayer(void) const
 {
-    return isPlayer() && level_ >= IMMORTAL;
+  return isPlayer() && level_ >= IMMORTAL;
 }
 
 bool Character::isImplementerPlayer(void) const
 {
-    return isPlayer() && level_ == IMPLEMENTER;
+  return isPlayer() && level_ == IMPLEMENTER;
 }
 
 uint64_t Character::getGold(void)
 {
-    return gold_;
+  return gold_;
 }
 
 void Character::setGold(uint64_t gold)
 {
-    gold_ = gold;
+  gold_ = gold;
 }
 
 bool Character::addGold(uint64_t gold)
 {
-    if (gold_ + gold < gold)
-    {
-        return false;
-    }
+  if (gold_ + gold < gold)
+  {
+    return false;
+  }
 
-    gold_ += gold;
-    return true;
+  gold_ += gold;
+  return true;
 }
 
 bool Character::removeGold(uint64_t gold)
 {
-    if (gold > gold_)
-    {
-        return false;
-    }
+  if (gold > gold_)
+  {
+    return false;
+  }
 
-    gold_ -= gold;
-    return true;
+  gold_ -= gold;
+  return true;
 }
 
 bool Character::multiplyGold(double mult)
 {
-    if (gold_ * mult < gold_)
-    {
-        return false;
-    }
+  if (gold_ * mult < gold_)
+  {
+    return false;
+  }
 
-    gold_ *= mult;
-    return true;
+  gold_ *= mult;
+  return true;
 }
 
 uint64_t &Character::getGoldReference(void)
 {
-    return gold_;
+  return gold_;
 }
 
 bool Character::load_charmie_equipment(QString player_name, bool previous)
 {
-    int golemtype = 0;
+  int golemtype = 0;
 
-    if (player_name.isEmpty())
+  if (player_name.isEmpty())
+  {
+    return false;
+  }
+
+  FILE *fpfile = nullptr;
+
+  if (this->isNonPlayer() || level_ < IMMORTAL)
+  {
+    return false;
+  }
+
+  player_name = player_name.toLower();
+  player_name[0] = player_name[0].toUpper();
+
+  QString restored = "";
+  if (previous)
+  {
+    restored = ".restored";
+  }
+  QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(QString::number(0)).arg(restored);
+
+  QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
+  QString fullpath = path + filename;
+  if (!(fpfile = fopen(fullpath.toStdString().c_str(), "r")))
+  {
+    send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
+    return false;
+  }
+
+  Character *charmie = dc_->clone_mobile(real_mobile(8));
+  if (charmie == nullptr)
+  {
+    logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
+    return false;
+  }
+  charmie->setLevel(1);
+  class Object *last_cont = nullptr; // Last container.
+  while (!feof(fpfile))
+  {
+    last_cont = obj_store_to_char(charmie, fpfile, last_cont);
+  }
+  fclose(fpfile);
+
+  char_to_room(charmie, in_room);
+
+  QString message = QStringLiteral("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
+  send(message);
+  logentry(message);
+
+  if (!previous)
+  {
+    QFile file(fullpath);
+    if (file.rename(fullpath + ".restored"))
     {
-        return false;
+      logentry(QStringLiteral("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
     }
+  }
 
-    FILE *fpfile = nullptr;
-
-    if (IS_NPC(this) || level_ < IMMORTAL)
-    {
-        return false;
-    }
-
-    player_name = player_name.toLower();
-    player_name[0] = player_name[0].toUpper();
-
-    QString restored = "";
-    if (previous)
-    {
-        restored = ".restored";
-    }
-    QString filename = QStringLiteral("%1.%2%3").arg(player_name).arg(QString::number(0)).arg(restored);
-
-    QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
-    QString fullpath = path + filename;
-    if (!(fpfile = fopen(qPrintable(fullpath), "r")))
-    {
-        send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
-        return false;
-    }
-
-    Character *charmie = dc_->clone_mobile(real_mobile(8));
-    if (charmie == nullptr)
-    {
-        DC::getInstance()->logentry(QStringLiteral("Error. clone_mobile(real_mobile(8)) returned nullptr."));
-        return false;
-    }
-    charmie->setLevel(1);
-    class Object *last_cont = nullptr; // Last container.
-    while (!feof(fpfile))
-    {
-        last_cont = obj_store_to_char(charmie, fpfile, last_cont);
-    }
-    fclose(fpfile);
-
-    char_to_room(charmie, in_room);
-
-    QString message = QStringLiteral("Restored charmie for player %1 with file '%2'.").arg(player_name).arg(fullpath);
-    send(message);
-    DC::getInstance()->logentry(message);
-
-    if (!previous)
-    {
-        QFile file(fullpath);
-        if (file.rename(fullpath + ".restored"))
-        {
-            DC::getInstance()->logentry(QStringLiteral("Renamed '%1' to '%2'.").arg(fullpath).arg(fullpath + ".restored"));
-        }
-    }
-
-    return true;
-}
-
-Character::Character(Character *old, DC *dc, QObject *parent)
-    : Entity(parent), dc_(dc)
-{
-    if (!old)
-        return;
-
-    in_room = old->in_room;
-    // class Mobile *mobdata = nullptr;
-    // class Player *player = nullptr;
-    // class Object *objdata = nullptr;
-    // class Connection *desc = nullptr;
-    short_desc = str_hsh(old->short_desc);
-    long_desc = str_hsh(old->long_desc);
-    description = str_hsh(old->description);
-    title = str_hsh(old->title);
-    sex = old->sex;
-    c_class = old->c_class;
-    race = old->race;
-    str = old->str;
-    raw_str = old->raw_str;
-    str_bonus = old->str_bonus;
-    intel = old->intel;
-    raw_intel = old->raw_intel;
-    intel_bonus = old->intel_bonus;
-    wis = old->wis;
-    raw_wis = old->raw_wis;
-    wis_bonus = old->wis_bonus;
-    dex = old->dex;
-    raw_dex = old->raw_dex;
-    dex_bonus = old->dex_bonus;
-    con = old->con;
-    raw_con = old->raw_con;
-    con_bonus = old->con_bonus;
-    conditions[0] = old->conditions[0];
-    conditions[1] = old->conditions[1];
-    conditions[2] = old->conditions[2];
-    weight = old->weight;
-    height = old->height;
-    hometown = old->hometown;
-    plat = old->plat;
-    exp = old->exp;
-    immune = old->immune;
-    resist = old->resist;
-    suscept = old->suscept;
-    memcpy(saves, old->saves, sizeof(old->saves));
-    mana = old->mana;
-    max_mana = old->max_mana;
-    raw_mana = old->raw_mana;
-    hit = old->hit;
-    max_hit = old->max_hit;
-    raw_hit = old->raw_hit;
-    raw_move = old->raw_move;
-    max_move = old->max_move;
-    ki = old->ki;
-    max_ki = old->max_ki;
-    raw_ki = old->raw_ki;
-    alignment = old->alignment;
-    hpmetas = old->hpmetas;
-    manametas = old->manametas;
-    movemetas = old->movemetas;
-    acmetas = old->acmetas;
-    agemetas = old->agemetas;
-    hit_regen = old->hit_regen;
-    mana_regen = old->mana_regen;
-    move_regen = old->move_regen;
-    ki_regen = old->ki_regen;
-    melee_mitigation = old->melee_mitigation;
-    spell_mitigation = old->spell_mitigation;
-    song_mitigation = old->song_mitigation;
-    spell_reflect = old->spell_reflect;
-    clan = old->clan;
-    armor = old->armor;
-    hitroll = old->hitroll;
-    damroll = old->damroll;
-    glow_factor = old->glow_factor;
-    beacon = old->beacon;
-    songs = old->songs;
-    memcpy(equipment, old->equipment, sizeof(old->equipment));
-    skills = old->skills;
-    // struct affected_type *affected = nullptr;
-    // class Object *carrying = nullptr;
-    poison_amount = old->poison_amount;
-    carry_weight = old->carry_weight;
-    carry_items = old->carry_items;
-    hunting = old->hunting;
-    ambush = old->ambush;
-    // Character *guarding = {};
-    // follow_type *guarded_by = {};
-    // uint32_t affected_by[AFF_MAX / ASIZE + 1] = {};
-    memcpy(affected_by, old->affected_by, sizeof(affected_by));
-    combat = old->combat;
-    misc = old->misc;
-    // Character *fighting = {};
-    // Character *next = {};
-    // Character *next_in_room = {};
-    // Character *next_fighting = {};
-    // Object *altar = {};
-    // struct follow_type *followers = {};
-    // Character *master = {};
-    // char *group_name = {};
-    timer = old->timer;
-    shotsthisround = old->shotsthisround;
-    spellcraftglyph = old->spellcraftglyph;
-    changeLeadBonus = old->changeLeadBonus;
-    curLeadBonus = old->curLeadBonus;
-    cRooms = old->cRooms;
-    deaths = old->deaths;
-    cID = old->cID;
-    // struct timer_data *timerAttached = {};
-    // struct tempvariable *tempVariable = {};
-    spelldamage = old->spelldamage;
-#ifdef USE_SQL
-    player_id = old->player_id;
-#endif
-    spec = old->spec;
-    // struct room_direction_data *brace_at = {}, *brace_exit = {};
-    first_damage = old->first_damage;
-    damage_done = old->damage_done;
-    damages = old->damages;
-    last_damage = old->last_damage;
-    damage_per_second = old->damage_per_second;
-
-    type_ = old->type_;
-    gold_ = old->gold_;
-    level_ = old->level_;
-    debug_ = old->debug_;
-    move_ = old->move_;
-    name_ = old->name_;
-    position_ = old->position_;
-    dc_ = old->dc_;
+  return true;
 }
 
 bool Character::validateName(QString name)
 {
-    if (name.isEmpty() || name.size() < Character::MIN_NAME_SIZE || name.size() > Character::MAX_NAME_SIZE)
-    {
-        return false;
-    }
+  if (name.isEmpty() || name.size() < Character::MIN_NAME_SIZE || name.size() > Character::MAX_NAME_SIZE)
+  {
+    return false;
+  }
 
-    for (auto &c : name)
+  for (auto &c : name)
+  {
+    if (!isalpha(c.toLatin1()))
     {
-        if (!isalpha(c.toLatin1()))
-        {
-            return false;
-        }
+      return false;
     }
+  }
 
-    if (on_forbidden_name_list(qPrintable(name)))
-    {
-        return false;
-    }
+  if (on_forbidden_name_list(qPrintable(name)))
+  {
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
 const char *Character::getNameC(void) const
 {
-    return str_hsh(qPrintable(name_));
-}
-
-Connection::Connection(QObject *parent)
-    : QObject(parent)
-{
+  return str_hsh(name_.toStdString().c_str());
 }
 
 void Connection::send(QString txt)
 {
-    /* if there's no descriptor, don't worry about output */
-    if (descriptor == 0)
-    {
-        return;
-    }
+  /* if there's no descriptor, don't worry about output */
+  if (descriptor == 0)
+  {
+    return;
+  }
 
-    if (allowColor && !isEditing())
-    {
-        txt = handle_ansi(txt, character);
-    }
+  if (allowColor && !isEditing())
+  {
+    txt = handle_ansi(txt, character);
+  }
 
-    if (character != nullptr && IS_AFFECTED(character, AFF_INSANE) && isPlaying())
-    {
-        txt = scramble_text(txt);
-    }
+  if (character != nullptr && IS_AFFECTED(character, AFF_INSANE) && isPlaying())
+  {
+    txt = scramble_text(txt);
+  }
 
-    output += txt.toStdString();
+  output += txt.toStdString();
 }
 
 QString Connection::getName(void)
 {
-    if (character)
-    {
-        return character->getName();
-    }
-    return {};
+  if (character)
+  {
+    return character->getName();
+  }
+  return {};
 }
 
 const QStringList Object::apply_types =
@@ -616,95 +479,95 @@ const QStringList Object::apply_types =
 
 Sockets::Sockets(Character *ch, QString searchkey)
 {
-    for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+  {
+    if (ch->getLevel() < OVERSEER)
     {
-        if (ch->getLevel() < OVERSEER)
-        {
-            if (d->character == nullptr)
-                continue;
-            if (qPrintable(d->character->getName()) == nullptr)
-                continue;
-        }
-        if (d->character)
-        {
-            if (!CAN_SEE(ch, d->character))
-                continue;
-            if (ch->getLevel() < d->character->getLevel())
-                continue;
-            if ((d->connected != Connection::states::PLAYING) && (ch->getLevel() < d->character->getLevel()))
-                continue;
-        }
-
-        if (!searchkey.isEmpty())
-        {
-            if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && qPrintable(d->character->getName()) != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
-            {
-                continue;
-            }
-        }
-
-        const QString name = d->getName();
-        if (name.size() > longest_name_size_)
-        {
-            longest_name_size_ = name.size();
-        }
-
-        const QString IPstr = d->getPeerFullAddressString();
-        if (IPstr.size() > longest_IP_size_)
-        {
-            longest_IP_size_ = IPstr.size();
-        }
-
-        const QString state = constindex(d->connected, DC::connected_states);
-        if (state.size() > longest_connection_state_size_)
-        {
-            longest_connection_state_size_ = state.size();
-        }
-
-        const QString idle = QString::number(d->idle_time / DC::PASSES_PER_SEC);
-        if (idle.size() > longest_idle_size_)
-        {
-            longest_idle_size_ = idle.size();
-        }
-
-        IPs_[d->getPeerAddress().toString()]++;
-        connections_.push_back(d);
+      if (d->character == nullptr)
+        continue;
+      if (d->character->getNameC() == nullptr)
+        continue;
     }
+    if (d->character)
+    {
+      if (!CAN_SEE(ch, d->character))
+        continue;
+      if (ch->getLevel() < d->character->getLevel())
+        continue;
+      if ((d->connected != Connection::states::PLAYING) && (ch->getLevel() < d->character->getLevel()))
+        continue;
+    }
+
+    if (!searchkey.isEmpty())
+    {
+      if (!d->getPeerOriginalAddress().toString().contains(searchkey) && d->character != nullptr && d->character->getNameC() != nullptr && QString(GET_NAME(d->character)).contains(searchkey, Qt::CaseInsensitive) == false)
+      {
+        continue;
+      }
+    }
+
+    const QString name = d->getName();
+    if (name.size() > longest_name_size_)
+    {
+      longest_name_size_ = name.size();
+    }
+
+    const QString IPstr = d->getPeerFullAddressString();
+    if (IPstr.size() > longest_IP_size_)
+    {
+      longest_IP_size_ = IPstr.size();
+    }
+
+    const QString state = constindex(d->connected, DC::connected_states);
+    if (state.size() > longest_connection_state_size_)
+    {
+      longest_connection_state_size_ = state.size();
+    }
+
+    const QString idle = QString::number(d->idle_time / DC::PASSES_PER_SEC);
+    if (idle.size() > longest_idle_size_)
+    {
+      longest_idle_size_ = idle.size();
+    }
+
+    IPs_[d->getPeerAddress().toString()]++;
+    connections_.push_back(d);
+  }
 }
 
 void Character::display_string_list(QStringList list)
 {
-    QString buf;
-    uint64_t count{};
-    for (const auto &item : list)
+  QString buf;
+  uint64_t count{};
+  for (const auto &item : list)
+  {
+    send(QStringLiteral("%1").arg(item, 18));
+    if (++count % 4 == 0)
     {
-        send(QStringLiteral("%1").arg(item, 18));
-        if (++count % 4 == 0)
-        {
-            send("\r\n");
-        }
+      send("\r\n");
     }
-    send("\r\n");
+  }
+  send("\r\n");
 }
 
 void Character::display_string_list(const char *list[])
 {
-    char buf[MAX_STRING_LENGTH]{};
-    *buf = '\0';
+  char buf[MAX_STRING_LENGTH]{};
+  *buf = '\0';
 
-    for (int i = 1; *list[i - 1] != '\n'; i++)
+  for (int i = 1; *list[i - 1] != '\n'; i++)
+  {
+    sprintf(buf + strlen(buf), "%18s", list[i - 1]);
+    if (!(i % 4))
     {
-        sprintf(buf + strlen(buf), "%18s", list[i - 1]);
-        if (!(i % 4))
-        {
-            strlcat(buf, "\r\n", MAX_STRING_LENGTH);
-            send(buf);
-            *buf = '\0';
-        }
+      strlcat(buf, "\r\n", MAX_STRING_LENGTH);
+      this->send(buf);
+      *buf = '\0';
     }
-    if (*buf)
-        send(buf);
-    sendln("");
+  }
+  if (*buf)
+    this->send(buf);
+  this->sendln("");
 }
 
 const QStringList Player::toggle_txt = {
@@ -789,528 +652,528 @@ Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*funct
 
 level_t Character::getLevel(void) const
 {
-    if (level_ > 110)
-    {
-        produce_coredump();
-        DC::getInstance()->logentry(QStringLiteral("Warning: getLevel returned %1.").arg(QString::number(level_)));
-    }
+  if (level_ > 110)
+  {
+    produce_coredump();
+    logentry(QStringLiteral("Warning: getLevel returned %1.").arg(QString::number(level_)));
+  }
 
-    return level_;
+  return level_;
 }
 
 void Character::setLevel(level_t level)
 {
-    level_ = level;
+  level_ = level;
 
-    if (level_ > 110)
-    {
-        produce_coredump();
-        DC::getInstance()->logentry(QStringLiteral("Warning: setLevel(%1).").arg(QString::number(level_)));
-    }
+  if (level_ > 110)
+  {
+    produce_coredump();
+    logentry(QStringLiteral("Warning: setLevel(%1).").arg(QString::number(level_)));
+  }
 }
 
 bool Character::isPlayer(void) const
 {
-    return getType() == Type::Player && player;
+  return getType() == Type::Player && player;
 }
 
-bool Character::isNPC(void) const
+bool Character::isNonPlayer(void) const
 {
-    return (getType() == Type::NPC || getType() == Type::ObjectProgram) && mobdata;
+  return (getType() == Type::NPC || getType() == Type::ObjectProgram) && mobdata;
 }
 
 bool Character::isObjectProgram(void) const
 {
-    return getType() == Type::ObjectProgram && mobdata && objdata;
+  return getType() == Type::ObjectProgram && mobdata && objdata;
 }
 
 auto Character::getType(void) const -> Type
 {
-    return type_;
+  return type_;
 }
 
 void Character::setType(const Type type)
 {
-    type_ = type;
+  type_ = type;
 }
 
 auto Entity::room(void) -> Room &
 {
-    return DC::getInstance()->world[in_room];
+  return DC::getInstance()->world[in_room];
 }
 
 move_t Character::move_limit(void)
 {
-    move_t max;
+  move_t max;
 
-    if (isPlayer())
-        /* HERE SHOULD BE CON CALCULATIONS INSTEAD */
-        max = (max_move) + graf(age().year, 50, 70, 160, 120, 100, 40, 20);
-    else
-        max = max_move;
+  if (isPlayer())
+    /* HERE SHOULD BE CON CALCULATIONS INSTEAD */
+    max = (max_move) + graf(age().year, 50, 70, 160, 120, 100, 40, 20);
+  else
+    max = max_move;
 
-    /* Class/Level calculations */
+  /* Class/Level calculations */
 
-    /* Skill/Spell calculations */
+  /* Skill/Spell calculations */
 
-    return max;
+  return max;
 }
 
 QString Character::parse_prompt_variable(QString variable, PromptVariableType type)
 {
-    bool supports_color = isPlayer() && (isSet(GET_TOGGLES(this), Player::PLR_ANSI) || isSet(GET_TOGGLES(this), Player::PLR_VT100));
-    bool use_color = false;
-    auto target = this;
-    enum class targets
+  bool supports_color = isPlayer() && (isSet(GET_TOGGLES(this), Player::PLR_ANSI) || isSet(GET_TOGGLES(this), Player::PLR_VT100));
+  bool use_color = false;
+  auto target = this;
+  enum class targets
+  {
+    Self,
+    Tank,
+    Fighting,
+    Charmie,
+    GrouptMember
+  } target_is = targets::Self;
+
+  QString color{}, value{};
+
+  const static QMap<QString, QString> legacy_to_modern{
+      {"h", "hp"},
+      {"H", "maxhp"},
+      {"i", "colorhp"},
+      {"m", "mana"},
+      {"M", "maxmana"},
+      {"n", "colormana"},
+      {"v", "move"},
+      {"V", "maxmove"},
+      {"w", "colormove"},
+      {"k", "ki"},
+      {"K", "maxki"},
+      {"l", "colorki"},
+      {"a", "align"},
+      {"A", "coloralign"},
+      {"I", "hp%"},
+      {"N", "mana%"},
+      {"L", "ki%"},
+      {"W", "move%"},
+      {"x", "xp"},
+      {"X", "xptnl"},
+      {"g", "gold"},
+      {"G", "platsofgold"},
+      {"s", "sector"},
+      {"d", "timeofday"},
+      {"D", "weather"},
+      {"R", "room"},
+      {"O", "lastobj"},
+      {"$", "platinum"},
+      {"%", "%"},
+      {"Z", "zone"},
+      {"S", "lastmob"},
+      {"z", "wizinvis"},
+      {"c", "condition"},
+      {"f", "target.condition"},
+      {"t", "tank.condition"},
+      {"y", "charmie.condition"},
+      {"p", "tank.name"},
+      {"q", "target.name"},
+      {"C", "colorcondition"},
+      {"F", "target.colorcondition"},
+      {"T", "tank.colorcondition"},
+      {"Y", "charmie.colorhp%"},
+      {"P", "tank.colorname"},
+      {"Q", "target.colorname"},
+      {"b", "gmember1.name"},
+      {"e", "gmember2.name"},
+      {"j", "gmember3.name"},
+      {"u", "gmember4.name"},
+      {"B", "gmember1.colorhp"},
+      {"E", "gmember2.colorhp"},
+      {"J", "gmember3.colorhp"},
+      {"U", "gmember4.colorhp"},
+      {"0", "normal"},
+      {"1", "red"},
+      {"2", "green"},
+      {"3", "yellow"},
+      {"4", "blue"},
+      {"5", "purple"},
+      {"6", "cyan"},
+      {"7", "grey"},
+      {"8", "bold"},
+      {"r", "cr"}};
+
+  if (type == PromptVariableType::Legacy)
+  {
+    if (legacy_to_modern.contains(variable))
     {
-        Self,
-        Tank,
-        Fighting,
-        Charmie,
-        GrouptMember
-    } target_is = targets::Self;
-
-    QString color{}, value{};
-
-    const static QMap<QString, QString> legacy_to_modern{
-        {"h", "hp"},
-        {"H", "maxhp"},
-        {"i", "colorhp"},
-        {"m", "mana"},
-        {"M", "maxmana"},
-        {"n", "colormana"},
-        {"v", "move"},
-        {"V", "maxmove"},
-        {"w", "colormove"},
-        {"k", "ki"},
-        {"K", "maxki"},
-        {"l", "colorki"},
-        {"a", "align"},
-        {"A", "coloralign"},
-        {"I", "hp%"},
-        {"N", "mana%"},
-        {"L", "ki%"},
-        {"W", "move%"},
-        {"x", "xp"},
-        {"X", "xptnl"},
-        {"g", "gold"},
-        {"G", "platsofgold"},
-        {"s", "sector"},
-        {"d", "timeofday"},
-        {"D", "weather"},
-        {"R", "room"},
-        {"O", "lastobj"},
-        {"$", "platinum"},
-        {"%", "%"},
-        {"Z", "zone"},
-        {"S", "lastmob"},
-        {"z", "wizinvis"},
-        {"c", "condition"},
-        {"f", "target.condition"},
-        {"t", "tank.condition"},
-        {"y", "charmie.condition"},
-        {"p", "tank.name"},
-        {"q", "target.name"},
-        {"C", "colorcondition"},
-        {"F", "target.colorcondition"},
-        {"T", "tank.colorcondition"},
-        {"Y", "charmie.colorhp%"},
-        {"P", "tank.colorname"},
-        {"Q", "target.colorname"},
-        {"b", "gmember1.name"},
-        {"e", "gmember2.name"},
-        {"j", "gmember3.name"},
-        {"u", "gmember4.name"},
-        {"B", "gmember1.colorhp"},
-        {"E", "gmember2.colorhp"},
-        {"J", "gmember3.colorhp"},
-        {"U", "gmember4.colorhp"},
-        {"0", "normal"},
-        {"1", "red"},
-        {"2", "green"},
-        {"3", "yellow"},
-        {"4", "blue"},
-        {"5", "purple"},
-        {"6", "cyan"},
-        {"7", "grey"},
-        {"8", "bold"},
-        {"r", "cr"}};
-
-    if (type == PromptVariableType::Legacy)
-    {
-        if (legacy_to_modern.contains(variable))
-        {
-            variable = legacy_to_modern.value(variable);
-        }
+      variable = legacy_to_modern.value(variable);
     }
+  }
 
-    QStringList arguments = variable.split('.');
+  QStringList arguments = variable.split('.');
+  variable = arguments.value(0);
+  if (variable == "charmie")
+  {
+    target = get_charmie(this);
+    if (!target)
+      return {};
+    target_is = targets::Charmie;
+    arguments.pop_front();
     variable = arguments.value(0);
-    if (variable == "charmie")
+  }
+  else if (variable == "tank")
+  {
+    if (fighting && fighting->fighting)
     {
-        target = get_charmie(this);
-        if (!target)
-            return {};
-        target_is = targets::Charmie;
-        arguments.pop_front();
-        variable = arguments.value(0);
-    }
-    else if (variable == "tank")
-    {
-        if (fighting && fighting->fighting)
-        {
-            target = fighting->fighting;
-            target_is = targets::Tank;
-        }
-        else
-            return {};
-        arguments.pop_front();
-        variable = arguments.value(0);
-    }
-    else if (variable == "fighting" || variable == "target" || variable == "opponent")
-    {
-        if (!fighting)
-            return {};
-        target = fighting;
-        target_is = targets::Fighting;
-        arguments.pop_front();
-        variable = arguments.value(0);
+      target = fighting->fighting;
+      target_is = targets::Tank;
     }
     else
+      return {};
+    arguments.pop_front();
+    variable = arguments.value(0);
+  }
+  else if (variable == "fighting" || variable == "target" || variable == "opponent")
+  {
+    if (!fighting)
+      return {};
+    target = fighting;
+    target_is = targets::Fighting;
+    arguments.pop_front();
+    variable = arguments.value(0);
+  }
+  else
+  {
+    QStringList gmembers = variable.split(QRegularExpression("(gmember|groupmember)"));
+    if (gmembers.size() > 1)
     {
-        QStringList gmembers = variable.split(QRegularExpression("(gmember|groupmember)"));
-        if (gmembers.size() > 1)
-        {
-            bool ok = false;
-            auto gmember_no = gmembers.last().toUInt(&ok);
-            if (!ok || !gmember_no || gmember_no > getFollowers().size())
-                return {};
-
-            target = getFollowers().at(gmember_no - 1);
-            if (!target)
-                return {};
-            target_is = targets::GrouptMember;
-
-            arguments.pop_front();
-            variable = arguments.value(0);
-        }
-    }
-
-    if (variable.startsWith("color"))
-    {
-        arguments[0] = arguments[0].remove(QRegularExpression{"^color"});
-        variable = arguments.value(0);
-        use_color = supports_color;
-    }
-
-    // %h or %{hp} - Current hitpoints
-    // %i          - Current hitpoints with color
-    if (variable == "hp")
-    {
-        value = QString::number(target->getHP());
-        if (use_color)
-            color = calc_color(target->getHP(), GET_MAX_HIT(target));
-    }
-    // %H or %{maxhp} - Maximum hitpoints
-    else if (variable == "maxhp")
-    {
-        value = QString::number(GET_MAX_HIT(target));
-    }
-    // %I or %{hp%} - Current hitpoints as a percent
-    else if (variable == "hp%")
-    {
-        value = QString::number((target->getHP() * 100) / GET_MAX_HIT(target));
-        if (use_color)
-            color = calc_color(target->getHP(), GET_MAX_HIT(target));
-    }
-    // %m or %{mana} - Current mana
-    // %n            - Current mana with color
-    else if (variable == "mana")
-    {
-        value = QString::number(GET_MANA(target));
-        if (use_color)
-            color = calc_color(GET_MANA(target), GET_MAX_MANA(target));
-    }
-    else if (variable == "maxmana")
-    {
-        value = QString::number(GET_MAX_MANA(target));
-    }
-    else if (variable == "mana%")
-    {
-        value = QString::number((GET_MANA(target) * 100) / GET_MAX_MANA(target));
-        if (use_color)
-            color = calc_color(GET_MANA(target), GET_MAX_MANA(target));
-    }
-    else if (variable == "move")
-    {
-        value = QString::number(GET_MOVE(target));
-        if (use_color)
-            color = calc_color(GET_MOVE(target), GET_MAX_MOVE(target));
-    }
-    else if (variable == "maxmove")
-    {
-        value = QString::number(GET_MAX_MOVE(target));
-    }
-    else if (variable == "move%")
-    {
-        value = QString::number((GET_MOVE(target) * 100) / GET_MAX_MOVE(target));
-        if (use_color)
-            color = calc_color(GET_MOVE(target), GET_MAX_MOVE(target));
-    }
-    else if (variable == "ki")
-    {
-        value = QString::number(GET_KI(target));
-        if (use_color)
-            color = calc_color(GET_KI(target), GET_MAX_KI(target));
-    }
-    else if (variable == "maxki")
-    {
-        value = QString::number(GET_MAX_KI(target));
-    }
-    else if (variable == "ki%")
-    {
-        value = QString::number((GET_KI(target) * 100) / GET_MAX_KI(target));
-        if (use_color)
-            color = calc_color(GET_KI(target), GET_MAX_KI(target));
-    }
-    else if (variable == "xp")
-        value = QString::number(GET_EXP(target));
-    else if (variable == "xptnl")
-        value = QString::number(exp_table[getLevel() + 1] - GET_EXP(this));
-    else if (variable == "align" || variable == "alignment")
-    {
-        value = QString::number(GET_ALIGNMENT(this));
-        if (use_color)
-            color = calc_color_align(GET_ALIGNMENT(this));
-    }
-    else if (variable == "gold")
-        value = QString::number(getGold());
-    else if (variable == "platinum" || variable == "plats")
-        value = QString::number(GET_PLATINUM(this));
-    else if (variable == "platsofgold")
-        value = QString::number(getGold() / 20000);
-    else if (variable == "cond" || variable == "condition")
-    {
-        if (target)
-        {
-            if (target_is == targets::Charmie || target_is == targets::GrouptMember)
-                return QStringLiteral("%1").arg(calc_condition(target, use_color));
-
-            if (fighting)
-            {
-                if (target_is == targets::Self)
-                    return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
-                else if (target_is == targets::Fighting)
-                    return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
-                else if (target_is == targets::Tank)
-                    return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
-            }
-        }
-    }
-    else if (variable == "normal" && supports_color)
-        value = NTEXT;
-    else if (variable == "red" && supports_color)
-        value = RED;
-    else if (variable == "green" && supports_color)
-        value = GREEN;
-    else if (variable == "yellow" && supports_color)
-        value = YELLOW;
-    else if (variable == "blue" && supports_color)
-        value = BLUE;
-    else if (variable == "purple" && supports_color)
-        value = PURPLE;
-    else if (variable == "cyan" && supports_color)
-        value = CYAN;
-    else if (variable == "grey" && supports_color)
-        value = GREY;
-    else if (variable == "bold" && supports_color)
-        value = BOLD;
-    else if (variable == "%")
-        value = "%";
-    else if (variable == "lastobj")
-    {
-        if (isPlayer())
-            value = QString::number(player->last_obj_vnum);
-    }
-    else if (variable == "lastmob")
-    {
-        if (isPlayer())
-            value = QString::number(player->last_mob_edit);
-    }
-    else if (variable == "weather")
-    {
-        extern char *sky_look[];
-        if (OUTSIDE(this))
-            value = sky_look[weather_info.sky];
-        else
-            value = "indoors";
-    }
-    else if (variable == "name")
-    {
-        return target->calc_name(use_color);
-    }
-    else if (variable == "room")
-    {
-        value = QString::number(in_room);
-        if (supports_color)
-            color = GREEN;
-    }
-    else if (variable == "zone")
-    {
-        const auto rm = DC::getInstance()->world[in_room];
-        value = QString::number(rm.zone);
-        if (supports_color)
-            color = RED;
-    }
-    else if (variable == "sector")
-    {
-        if (DC::getInstance()->rooms.contains(in_room))
-            value = sector_types[DC::getInstance()->world[in_room].sector_type];
-    }
-    else if (variable == "timeofday")
-    {
-        value = time_look[weather_info.sunlight];
-    }
-    else if (variable == "cr")
-        value = QStringLiteral("\r\n");
-
-    if (value.isEmpty())
+      bool ok = false;
+      auto gmember_no = gmembers.last().toUInt(&ok);
+      if (!ok || !gmember_no || gmember_no > getFollowers().size())
         return {};
 
-    if (color.isEmpty())
-        return value;
+      target = getFollowers().at(gmember_no - 1);
+      if (!target)
+        return {};
+      target_is = targets::GrouptMember;
 
-    return QStringLiteral("%1%2%3").arg(color).arg(value).arg(NTEXT);
+      arguments.pop_front();
+      variable = arguments.value(0);
+    }
+  }
+
+  if (variable.startsWith("color"))
+  {
+    arguments[0] = arguments[0].remove(QRegularExpression{"^color"});
+    variable = arguments.value(0);
+    use_color = supports_color;
+  }
+
+  // %h or %{hp} - Current hitpoints
+  // %i          - Current hitpoints with color
+  if (variable == "hp")
+  {
+    value = QString::number(target->getHP());
+    if (use_color)
+      color = calc_color(target->getHP(), GET_MAX_HIT(target));
+  }
+  // %H or %{maxhp} - Maximum hitpoints
+  else if (variable == "maxhp")
+  {
+    value = QString::number(GET_MAX_HIT(target));
+  }
+  // %I or %{hp%} - Current hitpoints as a percent
+  else if (variable == "hp%")
+  {
+    value = QString::number((target->getHP() * 100) / GET_MAX_HIT(target));
+    if (use_color)
+      color = calc_color(target->getHP(), GET_MAX_HIT(target));
+  }
+  // %m or %{mana} - Current mana
+  // %n            - Current mana with color
+  else if (variable == "mana")
+  {
+    value = QString::number(GET_MANA(target));
+    if (use_color)
+      color = calc_color(GET_MANA(target), GET_MAX_MANA(target));
+  }
+  else if (variable == "maxmana")
+  {
+    value = QString::number(GET_MAX_MANA(target));
+  }
+  else if (variable == "mana%")
+  {
+    value = QString::number((GET_MANA(target) * 100) / GET_MAX_MANA(target));
+    if (use_color)
+      color = calc_color(GET_MANA(target), GET_MAX_MANA(target));
+  }
+  else if (variable == "move")
+  {
+    value = QString::number(GET_MOVE(target));
+    if (use_color)
+      color = calc_color(GET_MOVE(target), GET_MAX_MOVE(target));
+  }
+  else if (variable == "maxmove")
+  {
+    value = QString::number(GET_MAX_MOVE(target));
+  }
+  else if (variable == "move%")
+  {
+    value = QString::number((GET_MOVE(target) * 100) / GET_MAX_MOVE(target));
+    if (use_color)
+      color = calc_color(GET_MOVE(target), GET_MAX_MOVE(target));
+  }
+  else if (variable == "ki")
+  {
+    value = QString::number(GET_KI(target));
+    if (use_color)
+      color = calc_color(GET_KI(target), GET_MAX_KI(target));
+  }
+  else if (variable == "maxki")
+  {
+    value = QString::number(GET_MAX_KI(target));
+  }
+  else if (variable == "ki%")
+  {
+    value = QString::number((GET_KI(target) * 100) / GET_MAX_KI(target));
+    if (use_color)
+      color = calc_color(GET_KI(target), GET_MAX_KI(target));
+  }
+  else if (variable == "xp")
+    value = QString::number(GET_EXP(target));
+  else if (variable == "xptnl")
+    value = QString::number(exp_table[getLevel() + 1] - GET_EXP(this));
+  else if (variable == "align" || variable == "alignment")
+  {
+    value = QString::number(GET_ALIGNMENT(this));
+    if (use_color)
+      color = calc_color_align(GET_ALIGNMENT(this));
+  }
+  else if (variable == "gold")
+    value = QString::number(getGold());
+  else if (variable == "platinum" || variable == "plats")
+    value = QString::number(GET_PLATINUM(this));
+  else if (variable == "platsofgold")
+    value = QString::number(getGold() / 20000);
+  else if (variable == "cond" || variable == "condition")
+  {
+    if (target)
+    {
+      if (target_is == targets::Charmie || target_is == targets::GrouptMember)
+        return QStringLiteral("%1").arg(calc_condition(target, use_color));
+
+      if (fighting)
+      {
+        if (target_is == targets::Self)
+          return QStringLiteral("<%1>").arg(calc_condition(target, use_color));
+        else if (target_is == targets::Fighting)
+          return QStringLiteral("(%1)").arg(calc_condition(target, use_color));
+        else if (target_is == targets::Tank)
+          return QStringLiteral("[%1]").arg(calc_condition(target, use_color));
+      }
+    }
+  }
+  else if (variable == "normal" && supports_color)
+    value = NTEXT;
+  else if (variable == "red" && supports_color)
+    value = RED;
+  else if (variable == "green" && supports_color)
+    value = GREEN;
+  else if (variable == "yellow" && supports_color)
+    value = YELLOW;
+  else if (variable == "blue" && supports_color)
+    value = BLUE;
+  else if (variable == "purple" && supports_color)
+    value = PURPLE;
+  else if (variable == "cyan" && supports_color)
+    value = CYAN;
+  else if (variable == "grey" && supports_color)
+    value = GREY;
+  else if (variable == "bold" && supports_color)
+    value = BOLD;
+  else if (variable == "%")
+    value = "%";
+  else if (variable == "lastobj")
+  {
+    if (isPlayer())
+      value = QString::number(player->last_obj_vnum);
+  }
+  else if (variable == "lastmob")
+  {
+    if (isPlayer())
+      value = QString::number(player->last_mob_edit);
+  }
+  else if (variable == "weather")
+  {
+    extern char *sky_look[];
+    if (OUTSIDE(this))
+      value = sky_look[weather_info.sky];
+    else
+      value = "indoors";
+  }
+  else if (variable == "name")
+  {
+    return target->calc_name(use_color);
+  }
+  else if (variable == "room")
+  {
+    value = QString::number(in_room);
+    if (supports_color)
+      color = GREEN;
+  }
+  else if (variable == "zone")
+  {
+    const auto rm = DC::getInstance()->world[in_room];
+    value = QString::number(rm.zone);
+    if (supports_color)
+      color = RED;
+  }
+  else if (variable == "sector")
+  {
+    if (DC::getInstance()->rooms.contains(in_room))
+      value = sector_types[DC::getInstance()->world[in_room].sector_type];
+  }
+  else if (variable == "timeofday")
+  {
+    value = time_look[weather_info.sunlight];
+  }
+  else if (variable == "cr")
+    value = QStringLiteral("\r\n");
+
+  if (value.isEmpty())
+    return {};
+
+  if (color.isEmpty())
+    return value;
+
+  return QStringLiteral("%1%2%3").arg(color).arg(value).arg(NTEXT);
 }
 
 QString Character::createPrompt(void)
 {
-    QString source{};
-    if (IS_NPC(this))
-    {
-        source = QStringLiteral("HP: %i/%H %f >");
-    }
-    else
-    {
-        source = getPrompt();
-    }
+  QString source{};
+  if (this->isNonPlayer())
+  {
+    source = QStringLiteral("HP: %i/%H %f >");
+  }
+  else
+  {
+    source = getPrompt();
+  }
 
-    // Searching for %{variable} like %{hp}
-    // or %{variable1.variable2} like %{gmember1.hp}
-    QRegularExpression re{"%{([a-zA-Z0-9.%]+)}"};
-    auto match = re.match(source);
-    while (match.hasMatch())
-    {
-        source = source.replace(match.capturedStart(), match.capturedLength(), parse_prompt_variable(match.captured(1)));
-        match = re.match(source);
-    }
-
-    re = QRegularExpression{"%([a-np-zA-Z0-8%$])"};
+  // Searching for %{variable} like %{hp}
+  // or %{variable1.variable2} like %{gmember1.hp}
+  QRegularExpression re{"%{([a-zA-Z0-9.%]+)}"};
+  auto match = re.match(source);
+  while (match.hasMatch())
+  {
+    source = source.replace(match.capturedStart(), match.capturedLength(), parse_prompt_variable(match.captured(1)));
     match = re.match(source);
-    while (match.hasMatch())
-    {
-        source = source.replace(match.capturedStart(), match.capturedLength(), parse_prompt_variable(match.captured(1), PromptVariableType::Legacy));
-        match = re.match(source);
-    }
+  }
 
-    if (!source.endsWith(' ') && !source.endsWith('\n') && !source.endsWith('\r'))
-        source.append(" ");
+  re = QRegularExpression{"%([a-np-zA-Z0-8%$])"};
+  match = re.match(source);
+  while (match.hasMatch())
+  {
+    source = source.replace(match.capturedStart(), match.capturedLength(), parse_prompt_variable(match.captured(1), PromptVariableType::Legacy));
+    match = re.match(source);
+  }
 
-    return source;
+  if (!source.endsWith(' ') && !source.endsWith('\n') && !source.endsWith('\r'))
+    source.append(" ");
+
+  return source;
 }
 
 QString Character::calc_name(bool use_color)
 {
-    uint_fast8_t percent{};
-    QString name;
+  uint_fast8_t percent{};
+  QString name;
 
-    if (getHP() == 0 || GET_MAX_HIT(this) == 0)
-        percent = 0;
-    else
-        percent = getHP() * 100 / GET_MAX_HIT(this);
+  if (getHP() == 0 || GET_MAX_HIT(this) == 0)
+    percent = 0;
+  else
+    percent = getHP() * 100 / GET_MAX_HIT(this);
 
-    if (use_color)
-    {
-        if (percent >= 100)
-            name = cond_colorcodes.value(0);
-        else if (percent >= 90)
-            name = cond_colorcodes.value(1);
-        else if (percent >= 75)
-            name = cond_colorcodes.value(2);
-        else if (percent >= 50)
-            name = cond_colorcodes.value(3);
-        else if (percent >= 30)
-            name = cond_colorcodes.value(4);
-        else if (percent >= 15)
-            name = cond_colorcodes.value(5);
-        else if (percent >= 0)
-            name = cond_colorcodes.value(6);
-    }
+  if (use_color)
+  {
+    if (percent >= 100)
+      name = cond_colorcodes.value(0);
+    else if (percent >= 90)
+      name = cond_colorcodes.value(1);
+    else if (percent >= 75)
+      name = cond_colorcodes.value(2);
+    else if (percent >= 50)
+      name = cond_colorcodes.value(3);
+    else if (percent >= 30)
+      name = cond_colorcodes.value(4);
+    else if (percent >= 15)
+      name = cond_colorcodes.value(5);
+    else if (percent >= 0)
+      name = cond_colorcodes.value(6);
+  }
 
-    if (isPlayer())
-        name += getName();
-    else if (short_desc)
-        name += short_desc;
-    else
-        name += QStringLiteral("unknown");
+  if (isPlayer())
+    name += getName();
+  else if (short_desc)
+    name += short_desc;
+  else
+    name += QStringLiteral("unknown");
 
-    if (use_color)
-        name += NTEXT;
+  if (use_color)
+    name += NTEXT;
 
-    return name;
+  return name;
 }
 
 void ChannelMessage::set_wizinvis(const class Character *sender)
 {
-    if (sender && sender->isPlayer())
-    {
-        wizinvis_ = sender->player->wizinvis;
-    }
-    else
-    {
-        wizinvis_ = 0;
-    }
+  if (sender && sender->isPlayer())
+  {
+    wizinvis_ = sender->player->wizinvis;
+  }
+  else
+  {
+    wizinvis_ = 0;
+  }
 }
 
 void ChannelMessage::set_name(const class Character *sender)
 {
-    if (sender)
-    {
-        sender_name_ = GET_SHORT(sender);
-    }
-    else
-    {
-        sender_name_ = QStringLiteral("Unknown");
-        DC::getInstance()->logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(QString::number(type_)).arg(msg_));
-    }
+  if (sender)
+  {
+    sender_name_ = GET_SHORT(sender);
+  }
+  else
+  {
+    sender_name_ = QStringLiteral("Unknown");
+    logbug(QStringLiteral("channel_msg::set_name: sender is nullptr. type: %1 msg: %2").arg(type_).arg(msg_));
+  }
 }
 
 QString ChannelMessage::getMessage(Character *ch) const
 {
-    if (!ch)
-        return {};
+  if (!ch)
+    return {};
 
-    QString prefix;
-    switch (type_)
-    {
-    case DC::LogChannel::CHANNEL_TELL:
-        prefix = "tell";
-        break;
-    case DC::LogChannel::CHANNEL_GOSSIP:
-        prefix = "gossip";
-        break;
-    default:
-        prefix = "unknown";
-        break;
-    }
+  QString prefix;
+  switch (type_)
+  {
+  case DC::LogChannel::CHANNEL_TELL:
+    prefix = "tell";
+    break;
+  case DC::LogChannel::CHANNEL_GOSSIP:
+    prefix = "gossip";
+    break;
+  default:
+    prefix = "unknown";
+    break;
+  }
 
-    QTimeZone timezone = QTimeZone(ch->getSetting("timezone", "America/Chicago").toLatin1());
-    QString timestamp = ch->getSetting(QStringLiteral("%1.history.timestamp").arg(prefix));
-    QString dateformat_str = ch->getSetting("dateformat", "ISODate");
-    Qt::DateFormat dateformat = Qt::DateFormat(QMetaEnum::fromType<Qt::DateFormat>().keyToValue(qPrintable(dateformat_str)));
+  QTimeZone timezone = QTimeZone(ch->getSetting("timezone", "America/Chicago").toLatin1());
+  QString timestamp = ch->getSetting(QStringLiteral("%1.history.timestamp").arg(prefix));
+  QString dateformat_str = ch->getSetting("dateformat", "ISODate");
+  Qt::DateFormat dateformat = Qt::DateFormat(QMetaEnum::fromType<Qt::DateFormat>().keyToValue(qPrintable(dateformat_str)));
 
-    if (timestamp == "1" || timestamp.startsWith('t', Qt::CaseInsensitive))
-        return getMessage(ch->getLevel(), true, timezone, dateformat);
-    else
-        return getMessage(ch->getLevel(), false, timezone, dateformat);
+  if (timestamp == "1" || timestamp.startsWith('t', Qt::CaseInsensitive))
+    return getMessage(ch->getLevel(), true, timezone, dateformat);
+  else
+    return getMessage(ch->getLevel(), false, timezone, dateformat);
 }

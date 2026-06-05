@@ -31,61 +31,61 @@ int spellcraft(Character *ch, int spell)
   {
     if (a < 11)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_BURNING_HANDS && a > 10)
   {
     if (a < 21)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_LIGHTNING_BOLT && a > 20)
   {
     if (a < 31)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_CHILL_TOUCH && a > 30)
   {
     if (a < 41)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_FIREBALL && a > 40)
   {
     if (a < 51)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_METEOR_SWARM && a > 50)
   {
     if (a < 61)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_PARALYZE && a > 60)
   {
     if (a < 71)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_CREATE_GOLEM && a > 70)
   {
     if (a < 81)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_HELLSTREAM && a > 80)
   {
     if (a < 91)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   if (spell == SPELL_SOLAR_GATE && a > 90)
   {
     if (a < 100)
       ch->skill_increase_check(SKILL_SPELLCRAFT, a, SKILL_INCREASE_HARD);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   return false;
@@ -94,18 +94,18 @@ int spellcraft(Character *ch, int spell)
 int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 {
   // uint8_t percent;
-  struct affected_type af;
+  affected_type af;
   int duration = 40;
 
   if (!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_FOCUSED_REPELANCE))
   {
     ch->sendln("Your mind can not yet take the strain of another repelance.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!skill_success(ch, nullptr, SKILL_FOCUSED_REPELANCE))
@@ -135,7 +135,7 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
 
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_imbue(Character *ch, char *argument, cmd_t cmd)
@@ -144,7 +144,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   int lvl = ch->has_skill(SKILL_IMBUE);
   int charges = 0, manacost = 0;
   Object *wand;
-  struct affected_type af;
+  affected_type af;
 
   *buf = '\0';
 
@@ -153,25 +153,25 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (!lvl)
   {
     ch->sendln("The best you can do to a wand is polish it.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SKILL_IMBUE))
   {
     ch->sendln("Your mind has not yet recovered from the previous imbuement.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (*buf == '\0')
   {
     ch->sendln("Imbue what?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->in_room && (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_MAGIC) || isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)))
   {
     ch->sendln("Something about this room prohibits your magical imbuement.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(wand = get_obj_in_list_vis(ch, buf, ch->carrying)))
@@ -183,7 +183,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
       if ((wand == 0) || !isexact(buf, wand->Name()))
       {
         ch->sendln("You do not have that wand.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
   }
@@ -191,13 +191,13 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (GET_ITEM_TYPE(wand) != ITEM_WAND)
   {
     ch->sendln("That \"wand\" doesn't seem very wand-like.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->getLevel() < wand->obj_flags.value[0])
   {
     ch->sendln("This wand is too powerful for you to imbue.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   manacost = 4 + (11 - lvl / 10) * spell_info[wand->obj_flags.value[3]].min_usesmana();
@@ -205,11 +205,11 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
   if (GET_MANA(ch) < manacost)
   {
     ch->sendln("You do not have enough magical energy to imbue this wand.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_IMBUE))
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   GET_MANA(ch) -= manacost;
 
@@ -238,7 +238,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
       act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
       make_scraps(ch, wand);
       extract_obj(wand);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     wand->obj_flags.value[2] += charges; // refill charges
@@ -268,7 +268,7 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
       act("Unable to bear the strain, $n's $p splits asunder with a sharp crack!", ch, wand, 0, TO_ROOM, 0);
       make_scraps(ch, wand);
       extract_obj(wand);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
 
     wand->obj_flags.value[2] -= charges;
@@ -280,15 +280,15 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
     else
       act("Some of the energy in $p has been lost!", ch, wand, 0, TO_CHAR, 0);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 // Okay, if we enter this function, we came here either from do_move because I entered a room
 // or because of an act() call, meaning a made a 'noise'.
 // This is to check if ethereal focus should fire and handle the ramifications
 // Remember that ch is the person triggering the call, meaning they are actually the victim
-// eSUCCESS means the character is unaffected and can keep doing whatever.
-// eFAILURE means the character was interrupted
+// ReturnValue::eSUCCESS means the character is unaffected and can keep doing whatever.
+// ReturnValue::eFAILURE means the character was interrupted
 int check_ethereal_focus(Character *ch, int trigger_type)
 {
   Character *i, *next_i, *ally, *next_ally;
@@ -299,7 +299,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
   // we can.  We do this by checking if the room has a flag or not
   // NOTICE:  This is a TEMP_room_flag
   if (!isSet(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   // loop through the room to find the caster. It should only be possible for a single
   // caster in a room to have this running (as long as no imms are being stupid)
@@ -320,7 +320,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     REMOVE_BIT(DC::getInstance()->world[ch->in_room].temp_room_flags, ROOM_ETHEREAL_FOCUS);
     affect_from_char(i, SPELL_ETHEREAL_FOCUS);
 
-    if (IS_PC(i) && !i->desc) // don't work if I'm linkdead
+    if (i->isPlayer() && !i->desc) // don't work if I'm linkdead
       break;
 
     // If for some reason the caster is busy, the spell fails.
@@ -340,16 +340,16 @@ int check_ethereal_focus(Character *ch, int trigger_type)
     }
     else
     {
-      sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
+      sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
       do_say(i, buf);
       set_fighting(i, ch);
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
-      if (isSet(retval, eVICT_DIED))
-        return (eFAILURE | eCH_DIED); // dead target, so spell ends
-      if (isSet(retval, eCH_DIED))
-        return (eSUCCESS); // caster died, so spell ends, target gets no lag and can keep going
-      retval = eFAILURE;
+      if (isSet(retval, ReturnValue::eVICT_DIED))
+        return (ReturnValue::eFAILURE | ReturnValue::eCH_DIED); // dead target, so spell ends
+      if (isSet(retval, ReturnValue::eCH_DIED))
+        return (ReturnValue::eSUCCESS); // caster died, so spell ends, target gets no lag and can keep going
+      retval = ReturnValue::eFAILURE;
     }
     WAIT_STATE(i, DC::PULSE_VIOLENCE * 2);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 1);
@@ -362,7 +362,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
       // Skip anyone unable to fight
       // Note that since they are joining the mage here, we don't check CAN_SEE.  Magical join!
       if (ally == ch || ally == i || ally->fighting || GET_POS(ally) != position_t::STANDING ||
-          (IS_PC(ally) && !ally->desc) // linkdead groupies won't help
+          (ally->isPlayer() && !ally->desc) // linkdead groupies won't help
       )
         continue;
       // TODO - skip anyone with this toggle turned off
@@ -380,13 +380,13 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         if (trigger_type == ETHEREAL_FOCUS_TRIGGER_MOVE || trigger_type == ETHEREAL_FOCUS_TRIGGER_SOCIAL)
         {
           // Get um!
-          sprintf(buf, "I see movement!!!  It's %s!", IS_NPC(ch) ? GET_SHORT(ch) : GET_NAME(ch));
+          sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
           do_say(ally, buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED);
-          if (isSet(retval, eVICT_DIED))
-            return (eFAILURE | eCH_DIED); // ch = damage vict, return since they are dead
+          if (isSet(retval, ReturnValue::eVICT_DIED))
+            return (ReturnValue::eFAILURE | ReturnValue::eCH_DIED); // ch = damage vict, return since they are dead
         }
         else
         { // trigger_type == ETHEREAL_FOCUS_TRIGGER_ACT
@@ -402,8 +402,8 @@ int check_ethereal_focus(Character *ch, int trigger_type)
   } // loop looking for caster
 
   if (ch->fighting)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
 
   // If I made it through and no one was able to attack me for whatever reason, I'm good
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

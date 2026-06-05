@@ -14,8 +14,6 @@
 #include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
-#include "DC/ki.h"
-#include "DC/fileinfo.h"
 #include "DC/mobile.h"
 #include "DC/race.h"
 #include "DC/act.h"
@@ -33,8 +31,9 @@ void advance_golem_level(Character *golem);
 int store_worn_eq(Character *ch, FILE *fpsave);
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 
-struct golem_data
+class golem_data
 { // This is how a golem looks.
+public:
   char *keyword;
   char *name;
   char *short_desc;
@@ -52,7 +51,7 @@ struct golem_data
   char *release_message;
 };
 
-const struct golem_data golem_list[] = {
+const golem_data golem_list[] = {
     {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\r\n", "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most powerful forces available in \r\na wizard's arsenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n", 1400, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100, "There is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n", "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.", "As the magic binding it is released, the iron golem rusts to pieces."},
     {"stone", "stone enchanted golem", "an enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n", "The stone golem is bound by its caster's magics.  A mindless automaton,\r\nthe stone golem is one of the sturdiest and most resilliant creatures\r\nknown in the realms.  Nearly a full 8 feet tall and weighing several\r\ntons, this mountain of rock is absolutely loyal to its master and\r\nsilently follows orders without fail.\r\n", 2000, 5, 5, 25, 50, {104, 105, 106, 0, 7003}, -1, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\r\n", "Unable to sustain further damage, the stone golem shatters to pieces.", "As the magic binding it is released, the golem crumbles to dust."}};
 
@@ -90,8 +89,8 @@ int verify_existing_components(Character *ch, int golemtype)
   // OVERSEERS or higher don't need components
   if (ch->getLevel() >= OVERSEER)
   {
-    SET_BIT(retval, eSUCCESS);
-    SET_BIT(retval, eEXTRA_VALUE); // Special effect.
+    SET_BIT(retval, ReturnValue::eSUCCESS);
+    SET_BIT(retval, ReturnValue::eEXTRA_VALUE); // Special effect.
     return retval;
   }
 
@@ -99,7 +98,7 @@ int verify_existing_components(Character *ch, int golemtype)
   int i;
   class Object *curr, *next_content;
   char buf[MAX_STRING_LENGTH];
-  SET_BIT(retval, eSUCCESS);
+  SET_BIT(retval, ReturnValue::eSUCCESS);
   for (i = 0; i < 5; i++)
   {
     if (golem_list[golemtype].components[i] == 0)
@@ -108,17 +107,17 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      int vnum = DC::getInstance()->obj_index[curr->item_number].virt;
+      int vnum = DC::getInstance()->obj_index[curr->item_number].vnum();
       if (vnum == golem_list[golemtype].components[i])
       {
         found = true;
         if (i == 4)
-          SET_BIT(retval, eEXTRA_VALUE); // Special effect.
+          SET_BIT(retval, ReturnValue::eEXTRA_VALUE); // Special effect.
       }
     }
     if (!found && i != 4)
     {
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   for (i = 0; i < 5; i++)
@@ -126,7 +125,7 @@ int verify_existing_components(Character *ch, int golemtype)
     for (curr = ch->carrying; curr; curr = next_content)
     {
       next_content = curr->next_content;
-      if (golem_list[golemtype].components[i] == DC::getInstance()->obj_index[curr->item_number].virt)
+      if (golem_list[golemtype].components[i] == DC::getInstance()->obj_index[curr->item_number].vnum())
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
@@ -153,13 +152,13 @@ void save_golem_data(Character *ch)
   char file[200];
   FILE *fpfile = nullptr;
   int golemtype = 0;
-  if (IS_NPC(ch) || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
+  if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
   golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "w")))
   {
-    DC::getInstance()->logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
@@ -177,7 +176,7 @@ void save_charmie_data(Character *ch)
   char file[200];
   FILE *fpfile = nullptr;
 
-  if (IS_NPC(ch) || ch->followers == nullptr)
+  if (ch->isNonPlayer() || ch->followers == nullptr)
   {
     return;
   }
@@ -186,16 +185,16 @@ void save_charmie_data(Character *ch)
   {
     Character *follower = followers->follower;
 
-    if (follower == nullptr || IS_PC(follower) || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
+    if (follower == nullptr || follower->isPlayer() || follower->master == nullptr || !IS_AFFECTED(follower, AFF_CHARM))
     {
       continue;
     }
 
-    // DC::getInstance()->logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
+    // logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->getNameC()[0], ch->getNameC(), 0);
     if (!(fpfile = fopen(file, "w")))
     {
-      DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
+      logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
@@ -261,22 +260,22 @@ void Character::load_golem_data(int golemtype)
   char file[200];
   FILE *fpfile = nullptr;
   Character *golem;
-  if (IS_NPC(this) || (GET_CLASS(this) != CLASS_MAGIC_USER && getLevel() < OVERSEER) || player->golem)
+  if (this->isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
-  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, getNameC()[0], getNameC(), golemtype);
+  sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, this->getNameC()[0], this->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
     golem = dc_->clone_mobile(real_mobile(8));
     set_golem(golem, golemtype);
-    golem->alignment = alignment;
-    player->golem = golem;
+    golem->alignment = this->alignment;
+    this->player->golem = golem;
     return;
   }
   golem = dc_->clone_mobile(real_mobile(8));
   set_golem(golem, golemtype); // Basics
-  player->golem = golem;
+  this->player->golem = golem;
   uint8_t golem_level{};
   fread(&(golem_level), sizeof(golem_level), 1, fpfile);
   golem->setLevel(golem_level);
@@ -301,12 +300,12 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   int i;
   char buf[MAX_INPUT_LENGTH];
   arg = one_argument(arg, buf);
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
   if (ch->player->golem)
   {
     ch->sendln("You already have a golem.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   for (i = 0; i < MAX_GOLEMS; i++)
   {
@@ -316,13 +315,13 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   if (i >= MAX_GOLEMS)
   {
     ch->sendln("You cannot create any such golem.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   int retval = verify_existing_components(ch, i);
-  if (isSet(retval, eFAILURE))
+  if (isSet(retval, ReturnValue::eFAILURE))
   {
     ch->sendln("Since you do not have the required spell components, the magic fades into nothingness.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   ch->load_golem_data(i); // Load the golem up;
   ch->skill_increase_check(SPELL_CREATE_GOLEM, skill, SKILL_INCREASE_EASY);
@@ -330,9 +329,9 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   if (!golem)
   { // Returns false if something goes wrong. (Not a mage, etc).
     ch->send("Something goes wrong, and you fail!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  if (isSet(retval, eEXTRA_VALUE))
+  if (isSet(retval, ReturnValue::eEXTRA_VALUE))
   {
     ch->sendln("Adding in the final ingredient, your golem increases in strength!");
     SETBIT(golem->affected_by, golem_list[i].special_aff);
@@ -341,9 +340,9 @@ int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Charact
   char_to_room(golem, ch->in_room);
   add_follower(golem, ch);
   SETBIT(golem->affected_by, AFF_CHARM);
-  //  struct affected_type af;
+  //  affected_type af;
   send_to_char(golem_list[i].creation_message, ch);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 extern char frills[];
@@ -355,15 +354,15 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   int level = 0;
   int to_dam, to_hit;
   Character *master = ch;
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   if (cmd == cmd_t::GOLEMSCORE)
   {
     if (!ch->player->golem)
     {
       ch->sendln("But you don't have a golem!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else
     {
@@ -386,7 +385,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       if (QString(argument).isEmpty())
       {
         ch->sendln(QStringLiteral("Specify which non-player follower you want to fscore."));
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else
       {
@@ -394,17 +393,17 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
         if (!vict)
         {
           ch->sendln("No mob by that name here.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (!IS_AFFECTED(vict, AFF_CHARM))
         {
           ch->sendln(QStringLiteral("%1 is not a charmie.").arg(GET_SHORT(vict)));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (vict->master != ch)
         {
           ch->sendln(QStringLiteral("%1 is not your charmie.").arg(GET_SHORT(vict)));
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         ch = vict;
       }
@@ -425,16 +424,16 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
     if (ch == master)
     {
       ch->sendln("But you don't have any non-player followers!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
-    DC::getInstance()->logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
-    return eFAILURE;
+    logentry(QStringLiteral("unexpected cmd set to %1 sent to do_golem_score").arg(QString::number(static_cast<quint64>(cmd))));
+    return ReturnValue::eFAILURE;
   }
 
-  struct affected_type *aff;
+  affected_type *aff;
 
   int64_t exp_needed;
 
@@ -444,10 +443,10 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   sprintf(race, "%s", races[(int)GET_RACE(ch)].singular_name);
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
-    DC::getInstance()->logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
+    logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
     master->send("There is an error with your golem. Contact an immortal.\r\n");
     produce_coredump(ch);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   exp_needed = (int)(exp_table[(int)ch->getLevel() + 19] - (int64_t)GET_EXP(ch));
 
@@ -467,7 +466,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf,
           "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
           "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
-          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6d     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
+          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
           "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
           "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\r\n"
           "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
@@ -495,7 +494,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
           get_saves(ch, SAVE_TYPE_FIRE), get_saves(ch, SAVE_TYPE_COLD), get_saves(ch, SAVE_TYPE_ENERGY), ch->getLevel() == 50 ? 0 : exp_needed,
-          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), (int)ch->getGold(), (int)GET_PLATINUM(ch),
+          get_saves(ch, SAVE_TYPE_ACID), get_saves(ch, SAVE_TYPE_MAGIC), get_saves(ch, SAVE_TYPE_POISON), ch->getGold(), (int)GET_PLATINUM(ch),
           ch->melee_mitigation, ch->spell_mitigation, ch->song_mitigation, 0);
   master->send(buf);
 
@@ -609,7 +608,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
       if (aff->type == Character::PLAYER_CANTQUIT)
       {
-        sprintf(buf, "|%c| Affected by %-25s (%s) |%c|\r\n",
+        sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\r\n",
                 scratch, qPrintable(aff_name),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], aff->caster.c_str());
@@ -617,7 +616,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       else
       {
         sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\r\n",
-                scratch, qPrintable(aff_name),
+                scratch, aff_name.toStdString().c_str(),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], scratch);
       }
@@ -629,19 +628,19 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
   master->sendln("($5:$7)=========================================================================($5:$7)");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)
 {
-  struct follow_type *fol;
+  follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (IS_NPC(fol->follower) && DC::getInstance()->mob_index[fol->follower->mobdata->nr].virt == 8)
+    if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   ch->sendln("You don't have a golem.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

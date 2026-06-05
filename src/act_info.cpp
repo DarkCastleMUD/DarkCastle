@@ -40,20 +40,20 @@ void page_string(class Connection *d, const char *str, int keep_internal);
 
 int do_levels(Character *ch, char *argument, cmd_t cmd)
 {
-	int i;
-	char buf[MAX_STRING_LENGTH];
+  int i;
+  char buf[MAX_STRING_LENGTH];
 
-	if (IS_NPC(ch))
-	{
-		ch->sendln("You ain't nothin' but a hound-dog.");
-		return eSUCCESS;
-	}
+  if (ch->isNonPlayer())
+  {
+    ch->sendln("You ain't nothin' but a hound-dog.");
+    return ReturnValue::eSUCCESS;
+  }
 
-	buf[0] = '\0';
+  buf[0] = '\0';
 
-	for (i = 1; i <= DC::MAX_MORTAL_LEVEL; i++)
-		sprintf(buf + strlen(buf), "[%2d] %9d\r\n", i, exp_table[i]);
+  for (i = 1; i <= DC::MAX_MORTAL_LEVEL; i++)
+    sprintf(buf + strlen(buf), "[%2d] %9d\r\n", i, exp_table[i]);
 
-	page_string(ch->desc, buf, 1);
-	return eSUCCESS;
+  page_string(ch->desc, buf, 1);
+  return ReturnValue::eSUCCESS;
 }

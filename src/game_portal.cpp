@@ -7,21 +7,19 @@
 
 #include "DC/obj.h"
 #include "DC/game_portal.h"
-#include "DC/fileinfo.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/player.h"
 #include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/db.h"
 #include "DC/handler.h"
 
-#include <cstring>
+#include "DC/memory.h"
 
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
 
-struct game_portal game_portals[MAX_GAME_PORTALS];
+game_portal game_portals[MAX_GAME_PORTALS];
 
 /************************************************************************
 | load_game_portals
@@ -52,7 +50,7 @@ void load_game_portals()
           "portal/portal.ship6",
           "portal/portal.arcana"};
 
-  extern struct game_portal game_portals[MAX_GAME_PORTALS];
+  extern game_portal game_portals[MAX_GAME_PORTALS];
   int i, j;
   int num_lines = 0; /* Temporary to count lines */
   int32_t file_pos;  /* Used to store position before counting length */
@@ -66,10 +64,10 @@ void load_game_portals()
     QString portal_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
     if ((cur_file = fopen(portal_filename.toStdString().c_str(), "r")) == 0)
     {
-      DC::getInstance()->logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
+      logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
     }
-    /* Now we have a readable file.  Here's the structure:
+    /* Now we have a readable file.  Here's the ure:
     |  First Line:  to_room -- the room the portal goes to
     |  Second Line: object -- Object to duplicate for portal (-1 for none)
     |  Third Line:  timer  -- Length object sticks around (-1 for FOREVER)
@@ -79,12 +77,12 @@ void load_game_portals()
     |    WILL CAUSE THE GAME TO CRASH.  I could build a sanity check, but
     |    if people read this it's not necessary.  -Morc 24 Apr 1997
     */
-    if (fscanf(cur_file, "%d\n%d\n%d\n",
+    if (fscanf(cur_file, "%ld\n%d\n%d\n",
                &(game_portals[i].to_room),
                &(game_portals[i].obj_num),
                &(game_portals[i].max_timer)) != 3)
     {
-      DC::getInstance()->logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
+      logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
       break;
     }
     /* Store the current file value and count line feeds */
@@ -93,7 +91,11 @@ void load_game_portals()
       num_lines++;
     fseek(cur_file, file_pos, 0);
     game_portals[i].num_rooms = num_lines;
-    game_portals[i].from_rooms = new int[game_portals[i].num_rooms];
+#ifdef LEAK_CHECK
+    game_portals[i].from_rooms = (int *)calloc(game_portals[i].num_rooms, sizeof(int));
+#else
+    game_portals[i].from_rooms = (int *)dc_alloc(game_portals[i].num_rooms, sizeof(int));
+#endif
     for (j = 0; j < game_portals[i].num_rooms; j++)
     {
       fscanf(cur_file, "%d\n", ((game_portals[i]).from_rooms + j));
@@ -112,7 +114,7 @@ void DC::free_game_portals_from_memory(void)
   {
     if (game_portals[i].from_rooms)
     {
-      delete[] game_portals[i].from_rooms;
+      dc_free(game_portals[i].from_rooms);
       game_portals[i].from_rooms = {};
     }
   }
@@ -127,7 +129,7 @@ void DC::free_game_portals_from_memory(void)
 void process_portals()
 {
   int i;
-  //  extern struct game_portal game_portals[];
+  //  extern  game_portal game_portals[];
 
   for (i = 0; i < MAX_GAME_PORTALS; i++)
   {
@@ -153,9 +155,9 @@ void process_portals()
               game_portals[i].max_timer) == 0)
       {
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "Making portal from %d to %d failed.", from_room,
+        sprintf(log_buf, "Making portal from %d to %lu failed.", from_room,
                 game_portals[i].to_room);
-        DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+        logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       }
       game_portals[i].cur_timer = game_portals[i].max_timer;
     }
@@ -175,20 +177,29 @@ void process_portals()
 */
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 {
+
+  class Object *from_portal;
   char log_buf[256];
-  auto from_portal = new Object;
+
+#ifdef LEAK_CHECK
+  from_portal = (class Object *)calloc(1, sizeof(class Object));
+#else
+  from_portal = (class Object *)dc_alloc(1, sizeof(class Object));
+#endif
+  clear_object(from_portal);
+
   if (real_room(from_room) == DC::NOWHERE)
   {
     sprintf(log_buf, "Cannot create arbitrary portal: room %d doesn't exist.", from_room);
-    delete from_portal;
-    DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_free(from_portal);
+    logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
   if (from_room == to_room)
   {
-    delete from_portal;
-    DC::getInstance()->logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
+    dc_free(from_portal);
+    logentry(QStringLiteral("Arbitrary portal made to itself!"), OVERSEER, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
@@ -213,8 +224,8 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
     if (!from_portal->isPortal())
     {
       sprintf(log_buf, "Non-portal object (%d) sent to make_arbitrary_portal!", duplicate);
-      delete from_portal;
-      DC::getInstance()->logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
+      dc_free(from_portal);
+      logentry(log_buf, OVERSEER, DC::LogChannel::LOG_BUG);
       return 0;
     }
   }

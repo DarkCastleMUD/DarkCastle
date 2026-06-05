@@ -59,11 +59,9 @@ private:
   quint16 destination_port = {};
 };
 
-class Connection : public QObject
+class Connection
 {
-  Q_OBJECT
 public:
-  Connection(QObject *parent = nullptr);
   enum states
   {
     PLAYING,
@@ -157,8 +155,6 @@ public:
   bool allowColor = 1;
 
   void send(QString txt);
-
-  const char *getPeerOriginalAddressC(void);
 
   QHostAddress getPeerAddress(void)
   {

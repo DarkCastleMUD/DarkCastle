@@ -1,8 +1,9 @@
 #pragma once
 #include <QString>
 
-struct Version
+class Version
 {
-    const static QString build_version_;
-    const static QString build_time_;
+public:
+  const static QString build_version_;
+  const static QString build_time_;
 };

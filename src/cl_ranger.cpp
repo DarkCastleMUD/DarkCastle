@@ -27,7 +27,7 @@
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/act.h"
-#include "DC/fileinfo.h"
+#include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
@@ -60,7 +60,7 @@ int charm_levels(Character *ch)
 {
   int i = ch->getLevel() / 5;
   int z = 3;
-  struct follow_type *f;
+  follow_type *f;
   for (f = ch->followers; f; f = f->next)
     if (IS_AFFECTED(f->follower, AFF_CHARM))
     {
@@ -80,13 +80,13 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
   {
     ch->sendln("Try learning HOW to free an animal first.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   arg = one_argument(arg, buf);
 
-  for (struct follow_type *k = ch->followers; k; k = k->next)
-    if (IS_NPC(k->follower) && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
+  for (follow_type *k = ch->followers; k; k = k->next)
+    if (k->follower->isNonPlayer() && ISSET(k->follower->affected_by, AFF_CHARM) && isexact(buf, GET_NAME(k->follower)))
     {
       victim = k->follower;
       break;
@@ -95,11 +95,11 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   if (!victim)
   {
     ch->sendln("They aren't even here!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (!charge_moves(ch, SKILL_FREE_ANIMAL))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (!skill_success(ch, victim, SKILL_FREE_ANIMAL))
   {
@@ -107,7 +107,7 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
         ch, nullptr, victim, TO_CHAR, 0);
     act("$n gives $N a gentle pat to the head, but $E seems unwilling to leave $s side.",
         ch, nullptr, victim, TO_ROOM, INVIS_NULL);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   act("With a gentle pat to the head, you set $N free to roam the wilds again.",
@@ -117,12 +117,12 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
 
   stop_follower(victim);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_tame(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   Character *victim;
   char buf[MAX_INPUT_LENGTH];
 
@@ -132,12 +132,12 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Who do you want to tame?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->canPerform(SKILL_TAME, "Try learning HOW to tame first.\r\n"))
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(arg, buf);
@@ -145,41 +145,41 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   if (!(victim = ch->get_char_room_vis(buf)))
   {
     ch->sendln("No one here by that name!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim == ch)
   {
     ch->sendln("Tame the wild beast!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     ch->sendln("You find yourself unable to tame this player.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (IS_AFFECTED(victim, AFF_CHARM) || IS_AFFECTED(ch, AFF_CHARM) ||
       (ch->getLevel() < victim->getLevel()))
   {
     ch->sendln("You find yourself unable to tame this creature.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (circle_follow(victim, ch))
   {
     ch->sendln("Sorry, following in circles can not be allowed.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0)
   {
     ch->sendln("How you plan on controlling so many followers?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
     /*   Character * vict = nullptr;
-       for(struct follow_type *k = ch->followers; k; k = k->next)
-         if(IS_NPC(k->follower) &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
+       for(follow_type *k = ch->followers; k; k = k->next)
+         if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
             vict = k->follower;
             break;
@@ -196,7 +196,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   }
 
   if (!charge_moves(ch, SKILL_TAME))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   act("$n holds out $s hand to $N and beckons softly.", ch, nullptr, victim, TO_ROOM, INVIS_NULL);
 
@@ -206,13 +206,13 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
       !ISSET(victim->mobdata->actflags, ACT_CHARM))
   {
     act("$N is wilder than you thought.", ch, nullptr, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!skill_success(ch, victim, SKILL_TAME) || saves_spell(ch, victim, 0, SAVE_TYPE_MAGIC) >= 0)
   {
     act("$N is unreceptive to your attempts to tame $M.", ch, nullptr, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (victim->master)
@@ -239,7 +239,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   check_eq(victim);
 
   act("Isn't $n just such a nice person?", ch, 0, victim, TO_VICT, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
@@ -260,7 +260,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
 
   learned = how_deep = ((has_skill(SKILL_TRACK) / 10) + 1);
 
-  if (getLevel() >= IMMORTAL)
+  if (this->getLevel() >= IMMORTAL)
     how_deep = 50;
 
   quarry = get_char_room_vis(victim);
@@ -271,32 +271,32 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      sendln("You have found your target!");
+      this->sendln("You have found your target!");
       ansi_color(NTEXT, this);
 
       //      remove_memory(this, 't');
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
   else if (quarry)
   {
-    sendln("There's one right here ;)");
+    this->sendln("There's one right here ;)");
     //  remove_memory(this, 't');
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
-  if (!victim.isEmpty() && IS_PC(this) && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && getLevel() < ANGEL)
+  if (!victim.isEmpty() && this->isPlayer() && GET_CLASS(this) != CLASS_RANGER && GET_CLASS(this) != CLASS_DRUID && this->getLevel() < ANGEL)
   {
-    sendln("Only a ranger could track someone by name.");
-    return eFAILURE;
+    this->sendln("Only a ranger could track someone by name.");
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(SKILL_TRACK))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
-  sendln("You search for signs of your quarry...\r\n");
+  this->sendln("You search for signs of your quarry...\r\n");
 
   if (learned)
     skill_increase_check(SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
@@ -304,28 +304,28 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   // TODO - once we're sure that act_mob is properly checking for this,
   // and that it isn't call from anywhere else, we can probably remove it.
   // That way possessing imms can track.
-  if (IS_NPC(this) && ISSET(mobdata->actflags, ACT_STUPID))
+  if (this->isNonPlayer() && ISSET(this->mobdata->actflags, ACT_STUPID))
   {
-    sendln("Being stupid, you cannot find any..");
-    return eFAILURE;
+    this->sendln("Being stupid, you cannot find any..");
+    return ReturnValue::eFAILURE;
   }
 
-  if (DC::getInstance()->world[in_room].nTracks < 1)
+  if (DC::getInstance()->world[this->in_room].nTracks < 1)
   {
     if (!hunting.isEmpty())
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      sendln("You have lost the trail.");
+      this->sendln("You have lost the trail.");
       ansi_color(NTEXT, this);
       // remove_memory(this, 't');
     }
     else
-      sendln("There are no distinct scents here.");
-    return eFAILURE;
+      this->sendln("There are no distinct scents here.");
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
     how_deep = 10;
 
   if (!victim.isEmpty())
@@ -333,51 +333,51 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     for (x = 1; x <= how_deep; x++)
     {
 
-      if ((x > DC::getInstance()->world[in_room].nTracks) ||
-          !(pScent = DC::getInstance()->world[in_room].TrackItem(x)))
+      if ((x > DC::getInstance()->world[this->in_room].nTracks) ||
+          !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
       {
         if (!hunting.isEmpty())
         {
           ansi_color(RED, this);
           ansi_color(BOLD, this);
-          sendln("You have lost the trail.");
+          this->sendln("You have lost the trail.");
           ansi_color(NTEXT, this);
         }
         else
-          sendln("You can't find any traces of such a scent.");
+          this->sendln("You can't find any traces of such a scent.");
         //         remove_memory(this, 't');
-        if (IS_NPC(this))
+        if (this->isNonPlayer())
           swap_hate_memory();
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       if (isexact(victim, pScent->trackee))
       {
         y = pScent->direction;
-        add_memory(pScent->trackee, 't');
+        this->add_memory(pScent->trackee, 't');
         ansi_color(RED, this);
         ansi_color(BOLD, this);
         csendf(this, "You sense traces of your quarry to the %s.\r\n",
                dirs[y]);
         ansi_color(NTEXT, this);
 
-        if (IS_NPC(this))
+        if (this->isNonPlayer())
         {
           // temp disable tracking mobs into town
           if (DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(this, y)->to_room].zone).isTown() == false && !isSet(DC::getInstance()->world[EXIT(this, y)->to_room].room_flags, NO_TRACK))
           {
-            mobdata->last_direction = y;
+            this->mobdata->last_direction = y;
             auto cmd_dir = getCommandFromDirection(y);
             if (cmd_dir)
             {
               retval = do_move(this, "", *cmd_dir);
-              if (isSet(retval, eCH_DIED))
+              if (isSet(retval, ReturnValue::eCH_DIED))
                 return retval;
             }
           }
 
           if (hunting.isEmpty())
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
 
           // Here's the deal: if the mob can't see the character in
           // the room, but the character IS in the room, then the
@@ -387,29 +387,29 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
           // Morc 28 July 96
 
           if ((tmp_ch = get_char(hunting)) == 0)
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           if (!(get_char_room_vis(hunting)))
           {
-            if (tmp_ch->in_room == in_room)
+            if (tmp_ch->in_room == this->in_room)
             {
               // The mob can't see him
               act("$n says 'Damn, must have lost $M!'", this, 0, tmp_ch,
                   TO_ROOM, 0);
               //                    remove_memory(this, 't');
             }
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
 
-          if (!isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
+          if (!isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
           {
             act("$n screams 'YOU CAN RUN, BUT YOU CAN'T HIDE!'",
                 this, 0, 0, TO_ROOM, 0);
-            retval = eSUCCESS;
+            retval = ReturnValue::eSUCCESS;
             if (tmp_ch)
             {
               retval = mprog_attack_trigger(this, tmp_ch);
             }
-            if (SOMEONE_DIED(retval) || (this && fighting) || !!hunting.isEmpty())
+            if (SOMEONE_DIED(retval) || fighting || hunting.isEmpty())
               return retval;
             else
               return do_hit(hunting.split(' '));
@@ -419,7 +419,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
                 this, 0, 0, TO_ROOM, 0);
         } // if IS_NPC
 
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       } // if isname
     } // for
 
@@ -427,22 +427,22 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     {
       ansi_color(RED, this);
       ansi_color(BOLD, this);
-      sendln("You have lost the trail.");
+      this->sendln("You have lost the trail.");
       ansi_color(NTEXT, this);
     }
     else
-      sendln("You can't find any traces of such a scent.");
+      this->sendln("You can't find any traces of such a scent.");
 
     //    remove_memory(this, 't');
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   } // if *victim
 
   for (x = 1; x <= how_deep; x++)
   {
-    if ((x > DC::getInstance()->world[in_room].nTracks) || !(pScent = DC::getInstance()->world[in_room].TrackItem(x)))
+    if ((x > DC::getInstance()->world[this->in_room].nTracks) || !(pScent = DC::getInstance()->world[this->in_room].TrackItem(x)))
     {
       if (x == 1)
-        sendln("There are no distinct smells here.");
+        this->sendln("There are no distinct smells here.");
       break;
     }
 
@@ -498,7 +498,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
       strcpy(sex, "");
 
     if (x == 1)
-      sendln("Freshest scents first...");
+      this->sendln("Freshest scents first...");
 
     sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
             weight,
@@ -506,9 +506,9 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             sex,
             race,
             dirs[y]);
-    send(buf);
+    this->send(buf);
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
@@ -516,7 +516,7 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
   if (!canPerform(SKILL_AMBUSH))
   {
     sendln("You don't know how to ambush people!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0);
@@ -524,19 +524,19 @@ command_return_t Character::do_ambush(QStringList arguments, cmd_t cmd)
   if (arg1.isEmpty())
   {
     sendln(QStringLiteral("You will ambush %1 on sight.").arg(ambush.isEmpty() ? "no one" : ambush));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (ambush == arg1)
   {
     ambush.clear();
     sendln(QStringLiteral("You will no longer ambush %1 on sight.").arg(arg1));
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   ambush = arg1;
   sendln(QStringLiteral("You will now ambush %1 on sight.").arg(arg1));
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int pick_one(int a, int b)
@@ -570,13 +570,14 @@ int pick_one(int a, int b, int c, int d)
     return d;
 }
 
-struct forage_lookup
+class forage_lookup
 {
+public:
   int ovnum;
   int rate[4];
 };
 
-struct forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
+forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
     // SECT_INSIDE
     {{0, {0, 0, 0, 0}},
      {0, {0, 0, 0, 0}},
@@ -710,7 +711,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
 {
   int learned;
   class Object *new_obj = 0;
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(SKILL_FORAGE))
   {
@@ -718,17 +719,17 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
       ch->sendln("You already foraged recently.  Give mother nature a break!");
     else
       ch->sendln("There's a limit to how often you can play with your nuts.  Give it some time.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_FORAGE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   learned = ch->has_skill(SKILL_FORAGE);
   if (!learned)
   {
     ch->sendln("Not knowing how to forage, you poke at the dirt with a stick, finding nothing.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int pick = number(1, 100);
@@ -772,7 +773,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
       if ((1 + IS_CARRYING_N(ch)) > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items!");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
       new_obj = clone_object(real_object(ovnum));
@@ -799,14 +800,14 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
   {
     act("$n forages around for some food, but turns up nothing.", ch, 0, 0, TO_ROOM, 0);
     act("You forage around for some food, but turn up nothing.", ch, 0, 0, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n forages around, turning up $p.", ch, new_obj, 0, TO_ROOM, 0);
   act("You forage around, turning up $p.", ch, new_obj, 0, TO_CHAR, 0);
   obj_to_char(new_obj, ch);
   new_obj->obj_flags.timer = 4;
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* this is sent the arrow char std::string, and return the arrow type.
@@ -943,7 +944,7 @@ int mob_arrow_response(Character *ch, Character *victim,
   {
     if (!number(0, 20))
       do_shout(victim, "Duh George, someone keeps shooting me!");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   /* make mob hate the person, but _not_ track them, this should
@@ -955,10 +956,10 @@ int mob_arrow_response(Character *ch, Character *victim,
 
   /* don't want the mob leaving a fight its already in */
   if (victim->fighting)
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (dir < 0) // in the same room
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   if (number(0, 1))
   {
@@ -1009,7 +1010,7 @@ int mob_arrow_response(Character *ch, Character *victim,
                 return retval;
             }
 
-            if (isSet(retval, eFAILURE)) // can't go after the archer
+            if (isSet(retval, ReturnValue::eFAILURE)) // can't go after the archer
               return do_flee(victim, "");
           }
     }
@@ -1025,7 +1026,7 @@ int mob_arrow_response(Character *ch, Character *victim,
       }
     }
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 /* no need anymore
@@ -1090,7 +1091,7 @@ int do_arrow_damage(Character *ch, Character *victim,
               break;
       default: break;
     }
-    if(IS_NPC(victim))
+    if(victim->isNonPlayer())
       retval = mob_arrow_response(ch, victim, dir);
       if(SOMEONE_DIED(retval)) // mob died somehow while moving
          return retval;
@@ -1110,10 +1111,10 @@ int do_arrow_damage(Character *ch, Character *victim,
   {
     group_gain(ch, victim);
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
-    return (eSUCCESS | eVICT_DIED);
+    return (ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED);
   } // End of Hit < 0
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 */
 
@@ -1136,31 +1137,31 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   if (!ch->canPerform(SKILL_ARCHERY))
   {
     ch->sendln("You've no idea how those pointy things with strings and feathers work.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!ch->equipment[WEAR_HOLD])
   {
     ch->sendln("You need to be holding a bow, moron.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(ch->equipment[WEAR_HOLD]->obj_flags.type_flag == ITEM_FIREWEAPON))
   {
     ch->sendln("You need to be holding a bow, moron.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   /*
    if(GET_POS(ch) == position_t::FIGHTING)
    {
    ch->sendln("Aren't you a bit busy with hand to hand combat?");
-   return eFAILURE;
+   return ReturnValue::eFAILURE;
    }*/
 
   if (ch->shotsthisround > 0)
   {
     ch->sendln("Slow down there tiger, you can't fire them that fast!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /*  Command syntax is: fire [target] <dir> [arrowtype]
@@ -1173,7 +1174,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Shoot at whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   half_chop(arg, target, buf2);
   half_chop(buf2, direct, arrow);
@@ -1186,7 +1187,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
     ch->sendln("You can't shoot arrows if yer in a safe room silly.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   cost = 0;
@@ -1199,7 +1200,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     if (!artype)
     {
       ch->sendln("You don't know of that type of arrow.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     switch (artype)
     {
@@ -1236,13 +1237,13 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     else
     {
       ch->sendln("Shoot in which direction?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (dir >= 0 && !CAN_GO(ch, dir))
     {
       ch->sendln("There is nothing to shoot in that direction.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     else if (artype)
     {
@@ -1267,11 +1268,11 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   if ((GET_MANA(ch) < cost) && (ch->getLevel() < ANGEL))
   {
     ch->sendln("You don't have enough mana for that arrow.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!charge_moves(ch, SKILL_ARCHERY))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   /* check if you can see your target */
   /* put ch in the targets room to check if they are visible */
@@ -1289,7 +1290,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
           if (isSet(DC::getInstance()->world[new_room].room_flags, SAFE))
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           char_from_room(ch, false);
           if (!char_to_room(ch, new_room))
@@ -1297,7 +1298,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
             ch->sendln("Error moving you to room in do_fire");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
         }
@@ -1313,14 +1314,14 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!char_to_room(ch, new_room))
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
             ch->sendln("Error moving you to room in do_fire");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
         }
@@ -1336,14 +1337,14 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
           {
             ch->sendln("Don't shoot into a safe room!  You might hit someone!");
             char_to_room(ch, cur_room);
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           if (!char_to_room(ch, new_room))
           {
             /* put ch into a room before we exit */
             char_to_room(ch, cur_room);
             ch->sendln("Error moving you to room in do_fire");
-            return eFAILURE;
+            return ReturnValue::eFAILURE;
           }
           victim = ch->get_char_room_vis(target);
         }
@@ -1360,7 +1361,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     else if (dir < 0)
     {
       ch->sendln("You aren't skilled enough to fire at a target this close.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     if (!victim)
     {
@@ -1368,33 +1369,33 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("You cannot concentrate enough to fire into an adjacent room while fighting.");
       else
         ch->sendln("You cannot seem to locate your target.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
   else
   {
     ch->sendln("Sorry, you must specify a target.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* check for accidental targeting of self */
   if (victim == ch)
   {
     ch->sendln("You need to type more of the target's name.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* Protect the newbies! */
-  if (IS_PC(victim) && victim->getLevel() < 6)
+  if (victim->isPlayer() && victim->getLevel() < 6)
   {
     ch->sendln("Don't shoot at a poor defenseless n00b! :(");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   /* check if target is fighting */
   /*  if(victim->fighting)
    {
    ch->sendln("You can't seem to get a clear line of sight.");
-   return eFAILURE;
+   return ReturnValue::eFAILURE;
    }*/
 
   /* check for arrows here */
@@ -1418,14 +1419,14 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   if (!found)
   {
     ch->sendln("You aren't wearing any quivers with arrows!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (IS_NPC(victim) && DC::getInstance()->mob_index[victim->mobdata->nr].virt >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].virt <= 2399)
+  if (victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() <= 2399)
   {
     ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   /* go ahead and shoot */
@@ -1452,7 +1453,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
   if (!skill_success(ch, victim, SKILL_ARCHERY))
   {
-    retval = eSUCCESS;
+    retval = ReturnValue::eSUCCESS;
     do_arrow_miss(ch, victim, dir, found);
   }
   else
@@ -1460,7 +1461,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     dam = dice(found->obj_flags.value[1], found->obj_flags.value[2]);
     dam += dice(ch->equipment[WEAR_HOLD]->obj_flags.value[1],
                 ch->equipment[WEAR_HOLD]->obj_flags.value[2]);
-    for (int i = 0; i < found->affected.size(); i++)
+    for (int i = 0; i < found->num_affects; i++)
       if (found->affected[i].location == APPLY_DAMROLL && found->affected[i].modifier != 0)
         dam += found->affected[i].modifier;
       else if (found->affected[i].location == APPLY_HIT_N_DAM && found->affected[i].modifier != 0)
@@ -1478,7 +1479,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);
 
-    if (isSet(retval, eVICT_DIED))
+    if (isSet(retval, ReturnValue::eVICT_DIED))
     {
       switch (number(1, 3))
       {
@@ -1572,7 +1573,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       }
       victim->setStanding();
 
-      if (IS_NPC(victim))
+      if (victim->isNonPlayer())
         retval = mob_arrow_response(ch, victim, dir);
       if (SOMEONE_DIED(retval))
       { // mob died somehow while moving
@@ -1589,11 +1590,11 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       {
         char_to_room(ch, cur_room);
         ch->sendln("Error moving you to room in do_fire.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
       // just in case
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
       {
         Object *corpse, *next;
         for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
@@ -1738,7 +1739,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
   if (!*arg)
   {
     ch->sendln("Delve into whom?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   one_argument(arg, arg);
@@ -1746,11 +1747,11 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
   /*
     TODO - make this into a skill and put it in
 
-    if(IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
+    if(ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
        learned = 75;
     else if(!(learned = ch->has_skill( SKILL_MIND_DELVE))) {
        ch->sendln("You try to think like a chipmunk and go nuts.");
-       return eFAILURE;
+       return ReturnValue::eFAILURE;
     }
     specialization = learned / 100;
     learned = learned % 100;
@@ -1762,14 +1763,14 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
   if (ch->getLevel() < target->getLevel())
   {
     ch->sendln("You can't seem to understand your target's mental processes.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  if (target->isPlayer())
+  if (!target->isNonPlayer())
   {
     sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
     ch->send(buf);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
@@ -1782,7 +1783,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
     sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
             "Noone!");
   ch->send(buf);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 void check_eq(Character *ch)
@@ -1800,21 +1801,21 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct affected_type af, *cur;
+  affected_type af, *cur;
 
   one_argument(arg, buf);
 
   int learned = ch->has_skill(SKILL_NAT_SELECT);
-  if (IS_NPC(ch) || !learned)
+  if (ch->isNonPlayer() || !learned)
   {
     ch->sendln("You don't know how to use this to your advantage.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SPELL_NAT_SELECT_TIMER))
   {
     ch->sendln("You cannot yet select a new enemy of choice.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   cur = ch->affected_by_spell(SKILL_NAT_SELECT);
@@ -1826,14 +1827,14 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
       if (cur && cur->modifier == i)
       {
         ch->sendln("You are already studying this race.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       break;
     }
     if (i == 32)
     {
       ch->sendln("Please select a valid race.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
   }
 
@@ -1856,5 +1857,5 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
 
   csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\r\n", races[i].singular_name);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

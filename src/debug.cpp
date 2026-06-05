@@ -25,14 +25,14 @@
 #include "DC/Database.h"
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
-void store_to_char(struct char_file_u4 *st, Character *ch);
+void store_to_char(char_file_u4 *st, Character *ch);
 int store_to_char_variable_data(Character *ch, FILE *fpsave);
 class Object *my_obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 qsizetype fread_to_tilde(FILE *fpsave, QString filename);
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename);
 void load_vaults();
 
-extern struct vault_data *vault_table;
+extern vault_data *vault_table;
 extern Leaderboard leaderboard;
 
 bool verbose_mode = false;
@@ -50,7 +50,7 @@ void test_handle_ansi(QString test)
   QString str1 = test;
   char *str2 = new char[1024];
   memset(str2, 1024, 0);
-  strncpy(str2, qPrintable(str1), 1024);
+  strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
   // std::cerr <<  "Result1: [" << result1 << "]" << std::endl;
@@ -115,7 +115,7 @@ void test_random_stats(void)
 QString showObjectAffects(Object *obj)
 {
   QString buffer;
-  for (qsizetype i = 0; i < obj->affected.size(); ++i)
+  for (int i = 0; i < obj->num_affects; ++i)
   {
     if (i > 0)
     {
@@ -142,7 +142,7 @@ QString showObjectAffects(Object *obj)
 
 QString showObjectVault(Object *obj)
 {
-  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
   // std::cerr <<  buf << ":";
 
@@ -163,7 +163,7 @@ QString showObjectVault(Object *obj)
 
 void showObject(Character *ch, Object *obj)
 {
-  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].virt << ":";
+  // std::cerr <<  DC::getInstance()->obj_index[obj->item_number].vnum() << ":";
   char buf[255];
 
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
@@ -231,29 +231,29 @@ int main(int argc, char **argv)
     if (!dclib.isEmpty())
     {
       orig_cwd = getcwd(nullptr, 0);
-      chdir(qPrintable(dclib));
+      chdir(dclib.toStdString().c_str());
     }
   }
 
-  DC::getInstance()->logmisc(QStringLiteral("Loading the zones"));
+  logentry(QStringLiteral("Loading the zones"), 0, DC::LogChannel::LOG_MISC);
   debug.boot_zones();
 
-  DC::getInstance()->logmisc(QStringLiteral("Loading the world."));
+  logentry(QStringLiteral("Loading the world."), 0, DC::LogChannel::LOG_MISC);
 
   debug.top_of_world_alloc = 2000;
 
   debug.boot_world();
 
-  DC::getInstance()->logmisc(QStringLiteral("Renumbering the world."));
+  logentry(QStringLiteral("Renumbering the world."), 0, DC::LogChannel::LOG_MISC);
   renum_world();
 
-  DC::getInstance()->logmisc(QStringLiteral("Generating object indices/loading all objects"));
+  logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
   debug.generate_obj_indices(&top_of_objt, debug.obj_index);
 
-  DC::getInstance()->logmisc(QStringLiteral("Generating mob indices/loading all mobiles"));
+  logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
   debug.generate_mob_indices(&top_of_mobt, debug.mob_index);
 
-  DC::getInstance()->logmisc(QStringLiteral("renumbering zone table"));
+  logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
 
   class Connection *d = new Connection;
@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 
   debug.load_vaults();
 
-  chdir(qPrintable(orig_cwd));
+  chdir(orig_cwd.toStdString().c_str());
 
   // std::cerr << real_mobile(0) << " " << real_mobile(1) << std::endl;
 
@@ -398,7 +398,7 @@ int main(int argc, char **argv)
               // std::cerr << pfile.path().c_str() << std::endl;
               ch->do_linkload(path.split(' '), cmd_t::DEFAULT);
               d->process_output();
-              do_fsave(ch, qPrintable(path));
+              do_fsave(ch, path.toStdString().c_str());
               d->process_output();
             }
             else
@@ -416,7 +416,7 @@ int main(int argc, char **argv)
                   obj = ch->equipment[iWear];
                   if (obj)
                   {
-                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum)
                     {
                       showObject(ch, obj);
                     }
@@ -426,7 +426,7 @@ int main(int argc, char **argv)
 
               for (Object *obj = ch->carrying; obj; obj = obj->next_content)
               {
-                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum))
+                if (vnum == 0 || (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum))
                 {
                   showObject(ch, obj);
                 }
@@ -435,7 +435,7 @@ int main(int argc, char **argv)
                 {
                   for (Object *container = obj->contains; container; container = container->next_content)
                   {
-                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].virt == vnum)
+                    if (vnum > 0 && DC::getInstance()->obj_index[container->item_number].vnum() == vnum)
                     {
                       showObject(ch, container);
                     }
@@ -461,7 +461,7 @@ int main(int argc, char **argv)
 
       if (c->isImmortalPlayer())
       {
-        qWarning("%s", qPrintable(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel())));
+        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
       }
     }
 
@@ -476,9 +476,9 @@ int main(int argc, char **argv)
         std::multimap<int32_t, QString> hp_leaders;
         for (auto& ch : DC::getInstance()->character_list)
         {
-          if (IS_PC(ch))
+          if (ch->isPlayer())
           {
-            hp_leaders.insert(std::pair<int32_t,QString>(ch->max_hit, qPrintable(ch->getName())));
+            hp_leaders.insert(std::pair<int32_t,QString>(ch->max_hit, ch->getNameC()));
           }
         }
 
@@ -507,14 +507,14 @@ int main(int argc, char **argv)
     // do_leaderboard(ch, "");
     // d->process_output();
 
-    struct vault_data *vault;
+    vault_data *vault;
 
     for (vault = vault_table; vault; vault = vault->next)
     {
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
         Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
-        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].virt == vnum)
+        if (vnum > 0 && DC::getInstance()->obj_index[obj->item_number].vnum() == vnum)
         {
           ch->send(showObjectVault(obj));
         }

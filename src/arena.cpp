@@ -13,6 +13,7 @@
 #include "DC/db.h"     // get_mob_room_vis
 #include "DC/spells.h" // INTERNAL_SLEEPING
 #include "DC/act.h"    // TO_ROOM
+#include "DC/punish.h"
 
 auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {
@@ -20,7 +21,7 @@ auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
   if (!isImmortalPlayer() && !rufus)
   {
     sendln("You must be in the same room as Rufus the Arena-keeper to use this command.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   QString arg1 = arguments.value(0);
@@ -51,14 +52,14 @@ auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
     return do_arena_usage(arguments);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
 {
   char buf[256];
   int send_to = DC::NOWHERE;
-  struct affected_type *af, *next_af;
+  affected_type *af, *next_af;
   int pot_low = 6362;
   int pot_hi = 6379;
 
@@ -66,42 +67,42 @@ auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
   if (arena.Low() > ch->getLevel() || arena.High() < ch->getLevel())
   {
     ch->sendln("The arena is not open for anyone your level.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_NOARENA))
+  if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_NOARENA))
   {
     ch->sendln("You have been banned from arenas.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
   {
     ch->sendln("They don't allow criminals in the arena.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (arena.isChaos() && !ch->clan)
   {
     ch->sendln("Only clan members may join this arena.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->room().isArena())
   {
     ch->sendln("You are already there!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (arena.CurrentNumber() >= arena.Number() && arena.Number() > 0)
   {
     ch->sendln("The arena is already full!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (arena.isHP() && GET_RAW_HIT(ch) > arena.HPLimit())
   {
     ch->sendln("You are too strong for this arena!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->fighting)
   {
     ch->sendln("You're ALREADY in a fight...isn't that kinda silly?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (GET_POS(ch) == position_t::SLEEPING)
@@ -139,10 +140,10 @@ auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
     }
   }
   if (move_char(ch, send_to) == 0)
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   act("$n appears, preparing for battle.", ch, 0, 0, TO_ROOM, 0);
   sprintf(buf, "## %s has joined the bloodbath!\r\n", GET_SHORT(ch));
   send_info(buf);
   do_look(ch, "");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

@@ -29,52 +29,59 @@ const size_t MESS_VICTIM = 2;
 const size_t MESS_ROOM = 3;
 
 /* ======================================================================== */
-struct txt_block
+class txt_block
 {
+public:
   std::string text = {};
-  struct txt_block *next = {};
+  txt_block *next = {};
   int aliased = {};
 };
 
-typedef struct txt_q
+typedef class txt_q
 {
-  struct txt_block *head;
-  struct txt_block *tail;
+public:
+  txt_block *head;
+  txt_block *tail;
 } TXT_Q;
 
-struct snoop_data
+class snoop_data
 {
+public:
   class Character *snooping;
   class Character *snoop_by;
 };
 
-struct msg_type
+class msg_type
 {
+public:
   QString attacker_msg; /* message to attacker */
   QString victim_msg;   /* message to victim   */
   QString room_msg;     /* message to room     */
 };
 
-struct message_type
+class message_type
 {
-  struct msg_type die_msg;       /* messages when death            */
-  struct msg_type miss_msg;      /* messages when miss             */
-  struct msg_type hit_msg;       /* messages when hit              */
-  struct msg_type sanctuary_msg; /* messages when hit on sanctuary */
-  struct msg_type god_msg;       /* messages when hit on god       */
-  struct message_type *next;     /* to next messages of ths kind.*/
+public:
+  msg_type die_msg;       /* messages when death            */
+  msg_type miss_msg;      /* messages when miss             */
+  msg_type hit_msg;       /* messages when hit              */
+  msg_type sanctuary_msg; /* messages when hit on sanctuary */
+  msg_type god_msg;       /* messages when hit on god       */
+  message_type *next;     /* to next messages of ths kind.*/
 };
 
-struct message_list
+class message_list
 {
-  int a_type;                /* Attack type				*/
-  int number_of_attacks;     /* # messages to chose from		*/
-  struct message_type *msg;  /* List of messages			*/
-  struct message_type *msg2; /* List of messages with toggle damage ON */
+public:
+  int a_type;            /* Attack type				*/
+  int number_of_attacks; /* # messages to chose from		*/
+  message_type *msg;     /* List of messages			*/
+  message_type *msg2;    /* List of messages with toggle damage ON */
 };
 
-struct SVoteData
+class SVoteData
 {
+public:
   std::string answer;
   int votes;
 };
@@ -106,11 +113,12 @@ private:
   std::map<std::string, bool> char_voted;
 };
 
-struct extra_descr_data
+class extra_descr_data
 {
-  char *keyword = {};                 /* Keyword in look/examine          */
-  char *description = {};             /* What to see                      */
-  struct extra_descr_data *next = {}; /* Next in list                     */
+public:
+  char *keyword = {};          /* Keyword in look/examine          */
+  char *description = {};      /* What to see                      */
+  extra_descr_data *next = {}; /* Next in list                     */
 };
 
 /*

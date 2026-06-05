@@ -3,18 +3,15 @@
 #include <fmt/format.h>
 #include <fmt/chrono.h>
 
-#include "DC/player.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/comm.h"
 #include "DC/interp.h"
-#include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
-#include "DC/spells.h"
+#include "DC/memory.h"
 
-struct ban_list_element *ban_list = nullptr;
+ban_list_element *ban_list = nullptr;
 
 const char *ban_types[] = {
     "no",
@@ -29,7 +26,7 @@ void load_banned(void)
   int i, date;
   char site_name[BANNED_SITE_LENGTH + 1], ban_type[100];
   char name[100 + 1];
-  struct ban_list_element *next_node;
+  ban_list_element *next_node;
 
   ban_list = 0;
 
@@ -40,7 +37,7 @@ void load_banned(void)
   }
   while (fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
   {
-    next_node = new struct ban_list_element;
+    CREATE(next_node, ban_list_element, 1);
     strncpy(next_node->site, site_name, BANNED_SITE_LENGTH);
     next_node->site[BANNED_SITE_LENGTH] = '\0';
     strncpy(next_node->name, name, 100);
@@ -65,7 +62,7 @@ void DC::free_ban_list_from_memory(void)
   for (; ban_list; ban_list = next)
   {
     next = ban_list->next;
-    delete ban_list;
+    dc_free(ban_list);
   }
 }
 
@@ -81,7 +78,7 @@ int isbanned(QHostAddress address)
   hostname = hostname.trimmed().toLower();
 
   int i = 0;
-  for (struct ban_list_element *banned_node = ban_list; banned_node; banned_node = banned_node->next)
+  for (ban_list_element *banned_node = ban_list; banned_node; banned_node = banned_node->next)
   {
     if (hostname == banned_node->site) /* if hostname is a substring */
     {
@@ -92,7 +89,7 @@ int isbanned(QHostAddress address)
   return i;
 }
 
-void _write_one_node(FILE *fp, struct ban_list_element *node)
+void _write_one_node(FILE *fp, ban_list_element *node)
 {
   if (node)
   {
@@ -120,7 +117,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
   char flag[MAX_INPUT_LENGTH], format[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
   int i;
   char buf[MAX_STRING_LENGTH];
-  struct ban_list_element *ban_node;
+  ban_list_element *ban_node;
   std::string buffer;
 
   *buf = '\0';
@@ -130,7 +127,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
     if (!ban_list)
     {
       ch->sendln("No sites are banned.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
     strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\r\n");
     sprintf(buf, format,
@@ -159,37 +156,37 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
 
       csendf(ch, format, ban_node->site, ban_types[ban_node->type], buffer.c_str(), ban_node->name);
     }
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   half_chop(argument, flag, site);
   if (!*site || !*flag)
   {
     ch->sendln("Usage: ban {all | select | new} site_name");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   struct sockaddr_in sa;
   if (inet_pton(AF_INET, site, &(sa.sin_addr)) == 0)
   {
     ch->sendln("Invalid IP address.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!(!str_cmp(flag, "select") || !str_cmp(flag, "all") || !str_cmp(flag, "new")))
   {
     ch->sendln("Flag must be ALL, SELECT, or NEW.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   for (ban_node = ban_list; ban_node; ban_node = ban_node->next)
   {
     if (!str_cmp(ban_node->site, site))
     {
       ch->sendln("That site has already been banned -- unban it to change the ban type.");
-      return eSUCCESS;
+      return ReturnValue::eSUCCESS;
     }
   }
 
-  ban_node = new struct ban_list_element;
+  CREATE(ban_node, ban_list_element, 1);
   strncpy(ban_node->site, site, BANNED_SITE_LENGTH);
   for (nextchar = ban_node->site; *nextchar; nextchar++)
     *nextchar = LOWER(*nextchar);
@@ -207,16 +204,16 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(buf, "%s has banned %s for %s players.", GET_NAME(ch), site,
           ban_types[ban_node->type]);
-  DC::getInstance()->logentry(buf, POWER, DC::LogChannel::LOG_GOD);
+  logentry(buf, POWER, DC::LogChannel::LOG_GOD);
   ch->sendln("Site banned.");
   write_ban_list();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int do_unban(Character *ch, char *argument, cmd_t cmd)
 {
   char site[MAX_INPUT_LENGTH + 1];
-  struct ban_list_element *ban_node, *temp;
+  ban_list_element *ban_node, *temp;
   int found = 0;
   char buf[MAX_STRING_LENGTH];
 
@@ -224,7 +221,7 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
   if (!*site)
   {
     ch->sendln("A site to unban might help.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   ban_node = ban_list;
   while (ban_node && !found)
@@ -238,15 +235,15 @@ int do_unban(Character *ch, char *argument, cmd_t cmd)
   if (!found)
   {
     ch->sendln("That site is not currently banned.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   REMOVE_FROM_LIST(ban_node, ban_list, next);
   ch->sendln("Site unbanned.");
   sprintf(buf, "%s removed the %s-player ban on %s.",
           GET_NAME(ch), ban_types[ban_node->type], ban_node->site);
-  DC::getInstance()->logentry(buf, POWER, DC::LogChannel::LOG_GOD);
+  logentry(buf, POWER, DC::LogChannel::LOG_GOD);
 
-  delete ban_node;
+  dc_free(ban_node);
   write_ban_list();
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

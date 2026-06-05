@@ -36,7 +36,7 @@
 #define RACE_GHOST       25
 #define RACE_GOLEM       26
 #define RACE_ELEMENT     27
-#define RACE_ASTRAL      28
+#define RACE_PLANAR      28
 #define RACE_DEMON       29
 #define RACE_YRNALI      30
 #define RACE_IMMORTAL    31
@@ -71,7 +71,7 @@
 #define BITV_GHOST       1<<24
 #define BITV_GOLEM       1<<25
 #define BITV_ELEMENT     1<<26
-#define BITV_ASTRAL      1<<27
+#define BITV_PLANAR      1<<27
 #define BITV_DEMON       1<<28
 #define BITV_YRNALI	 1<<29
 #define BITV_IMMORTAL    1<<30

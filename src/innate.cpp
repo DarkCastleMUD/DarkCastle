@@ -43,14 +43,15 @@ int innate_fly(Character *ch, char *argument, cmd_t cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
-struct in_skills
+class in_skills
 {
+public:
   char *name;
   int race;
   DO_FUN *func;
 };
 
-const struct in_skills innates[] = {
+const in_skills innates[] = {
     {"powerwield", RACE_GIANT, innate_powerwield},
     {"regeneration", RACE_TROLL, innate_regeneration},
     {"illusion", RACE_GNOME, innate_illusion},
@@ -85,7 +86,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
       ch->room().isArena() && arena.isPotato())
   {
     ch->sendln("Cannot use innate skills within a potato arena.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   bool found = false;
@@ -106,18 +107,18 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
         if (str_cmp(buf, "fly") && ch->affected_by_spell(SKILL_INNATE_TIMER))
         {
           ch->sendln("You cannot use that yet.");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         if (GET_POS(ch) == position_t::SLEEPING &&
             i != 1)
         {
           ch->sendln("In your dreams, or what?");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
         int retval = (*(innates[i].func))(ch, arg, cmd);
-        if (retval & eSUCCESS)
+        if (retval & ReturnValue::eSUCCESS)
         {
-          struct affected_type af;
+          affected_type af;
           af.type = SKILL_INNATE_TIMER;
 
           if (!str_cmp(buf, "fly"))
@@ -150,17 +151,17 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
     {
       ch->sendln("You do not have access to any such ability.");
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   else
   {
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 }
 
 int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_REGENERATION;
   af.duration = 6;
   af.modifier = 0;
@@ -168,12 +169,12 @@ int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = AFF_REGENERATION;
   affect_to_char(ch, &af);
   ch->sendln("Your innate regenerative abilities allow you to heal quickly.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_POWERWIELD;
   af.duration = 3;
   af.modifier = 0;
@@ -182,7 +183,7 @@ int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
   affect_to_char(ch, &af);
   ch->sendln("You gather your energy in an effort to wield two mighty weapons.");
   act("$n gathers his strength in order to wield two mighty weapons.", ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_focus(Character *ch, char *arg, cmd_t cmd)
@@ -190,12 +191,12 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   if (IS_AFFECTED(ch, AFF_FOCUS))
   {
     ch->sendln("But you are already focusing!  Why waste it?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   ch->sendln("You enter a trance and find yourself able to concentrate much better.");
 
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_FOCUS;
   af.duration = 4;
   af.modifier = 0;
@@ -203,7 +204,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = AFF_FOCUS;
   affect_to_char(ch, &af);
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_illusion(Character *ch, char *arg, cmd_t cmd)
@@ -211,9 +212,9 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
     ch->sendln("But you're already invisible!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_ILLUSION;
   af.duration = 4;
   af.modifier = 0;
@@ -225,7 +226,7 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   affect_to_char(ch, &af);
   ch->sendln("You use your race's innate illusion powers, and fade out of existence.");
   act("$n chants something incoherent and fades out of existence.", ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
@@ -233,12 +234,12 @@ int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
   if (!ch->fighting)
   {
     ch->sendln("You need to be fighting to use that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   SET_BIT(ch->combat, COMBAT_ORC_BLOODLUST1);
   ch->sendln("Your blood boils as you drive yourself into a war-like state.");
   act("$n's blood boils has $e drives $mself into warlike rage.", ch, nullptr, nullptr, TO_ROOM, 0);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_repair(Character *ch, char *arg, cmd_t cmd)
@@ -251,19 +252,19 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
   if ((obj = get_obj_in_list_vis(ch, buf, ch->carrying)) == nullptr)
   {
     ch->sendln("You are not carrying anything like that.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (ch->getLevel() < obj->obj_flags.eq_level)
   {
     ch->sendln("This item is beyond your skill.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
     ch->sendln("This item is unrepairable.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  for (qsizetype i = 0; i < obj->affected.size(); i++)
+  for (i = 0; i < obj->num_affects; i++)
   {
     if (obj->affected[i].location == APPLY_DAMAGED)
     {
@@ -271,30 +272,32 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
       {
         ch->sendln("You failed to repair it!");
         act("$n fails to repair $p.", ch, obj, obj, TO_ROOM, 0);
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
       found = true;
-      obj->affected.remove(i);
-      break;
+      obj->num_affects--;
+    }
+    else if (found)
+    {
+      obj->affected[i - 1] = obj->affected[i];
     }
   }
-
   if (found)
   {
     act("Your knowledge of weapons and armour allow you to quickly repair $p.", ch, obj, obj, TO_CHAR, 0);
     act("$n quickly repairs their $p.", ch, obj, obj, TO_ROOM, 0);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else
   {
     ch->sendln("That item is already in excellent condition!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 }
 
 int innate_evasion(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_EVASION;
   af.duration = 4;
   af.modifier = 0;
@@ -302,12 +305,12 @@ int innate_evasion(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
   ch->sendln("You bring up an aura, blocking all forms of scrying your location.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
 {
-  struct affected_type af;
+  affected_type af;
   af.type = SKILL_INNATE_SHADOWSLIP;
   af.duration = 4;
   af.modifier = 0;
@@ -315,7 +318,7 @@ int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = AFF_SHADOWSLIP;
   affect_to_char(ch, &af);
   ch->sendln("You blend with the shadows, preventing people from reaching you magically.");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int innate_fly(Character *ch, char *arg, cmd_t cmd)
@@ -331,10 +334,10 @@ int innate_fly(Character *ch, char *arg, cmd_t cmd)
     if (ISSET(ch->affected_by, AFF_FLYING))
     {
       ch->sendln("You are already flying.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
-    struct affected_type af;
+    affected_type af;
     af.type = SKILL_INNATE_FLY;
     af.duration = -1;
     af.modifier = 0;
@@ -345,5 +348,5 @@ int innate_fly(Character *ch, char *arg, cmd_t cmd)
     act("$n spreads $s delicate wings and lifts lightly into the air.", ch, nullptr, nullptr, TO_ROOM, 0);
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

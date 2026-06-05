@@ -113,13 +113,13 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
   if (ch->getLevel() < ARCHANGEL && GET_CLASS(ch) != CLASS_MONK)
   {
     ch->sendln("You are unable to control your ki in this way!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   /*
    if ((isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) && (ch->getLevel() < IMPLEMENTER)) {
    send_to_char("You feel at peace, calm, relaxed, one with yourself and "
    "the universe.\r\n", ch);
-   return eFAILURE;
+   return ReturnValue::eFAILURE;
    }*/
 
   argument = skip_spaces(argument);
@@ -127,7 +127,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
   if (!(*argument))
   {
     ch->sendln("Yes, but WHAT would you like to do?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   for (qend = 1; *(argument + qend) && (*(argument + qend) != ' '); qend++)
@@ -139,7 +139,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
   if (spl < 0)
   {
     ch->sendln("You cannot harness that energy!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && (ch->getLevel() < IMPLEMENTER) && spl != KI_SENSE && spl != KI_SPEED && spl != KI_PURIFY && spl != KI_STANCE && spl != KI_AGILITY && spl != KI_MEDITATION)
@@ -147,14 +147,14 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
     send_to_char("You feel at peace, calm, relaxed, one with yourself and "
                  "the universe.\r\n",
                  ch);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   learned = ch->has_skill((spl + KI_OFFSET));
   if (!learned)
   {
     ch->sendln("You do not know that ki power!");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ki_info[spl].ki_pointer())
@@ -181,7 +181,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("It seems like you're in a pretty bad shape!");
         break;
       }
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     argument += qend; /* Point to the space after the last ' */
     for (; *argument == ' '; argument++)
@@ -238,7 +238,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
       else
         /* No arguments were given */
         ch->sendln("Whom should the power be used upon?");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     else if (target_ok)
@@ -246,17 +246,17 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
       if ((tar_char == ch) && isSet(ki_info[spl].targets(), TAR_SELF_NONO))
       {
         ch->sendln("You cannot use this power on yourself.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if ((tar_char != ch) && isSet(ki_info[spl].targets(), TAR_SELF_ONLY))
       {
         ch->sendln("You can only use this power upon yourself.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
       else if (IS_AFFECTED(ch, AFF_CHARM) && (ch->master == tar_char))
       {
         ch->sendln("You are afraid that it might harm your master.");
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
     }
 
@@ -267,30 +267,30 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!tar_char)
       {
-        DC::getInstance()->logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
-                                    DC::LogChannel::LOG_BUG);
+        logentry(QStringLiteral("Dammit Morc, fix that null tar_char thing in ki"), IMPLEMENTER,
+                 DC::LogChannel::LOG_BUG);
         send_to_char(
             "If you triggered this message, you almost crashed the\r\n"
             "game.  Tell a god what you did immediately.\r\n",
             ch);
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
       }
 
     /* crasher right here */
     if (isSet(DC::getInstance()->world[ch->in_room].room_flags, NO_KI))
     {
       ch->sendln("You find yourself unable to focus your energy here.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
       if (!can_attack(ch) || !can_be_attacked(ch, tar_char))
-        return eFAILURE;
+        return ReturnValue::eFAILURE;
 
     if (ch->getLevel() < ARCHANGEL && GET_KI(ch) < use_ki(ch, spl))
     {
       ch->sendln("You do not have enough ki!");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
 
     WAIT_STATE(ch, ki_info[spl].beats());
@@ -307,27 +307,27 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
         GET_KI(ch) -= use_ki(ch, spl) / 2;
         WAIT_STATE(ch, ki_info[spl].beats() / 2);
 
-        return eSUCCESS;
+        return ReturnValue::eSUCCESS;
       }
 
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
         if (!tar_char || (ch->in_room != tar_char->in_room))
         {
           ch->sendln("Whom should the power be used upon?");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
       /* Stop abusing your betters  */
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
-        if (IS_PC(tar_char) && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
+        if (tar_char->isPlayer() && (ch->getLevel() > ARCHANGEL) && (tar_char->getLevel() > ch->getLevel()))
         {
           ch->sendln("That just might annoy them!");
-          return eFAILURE;
+          return ReturnValue::eFAILURE;
         }
 
       /* Imps ignore safe flags  */
       if (!isSet(ki_info[spl].targets(), TAR_IGNORE))
-        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && IS_PC(ch) && (ch->getLevel() == IMPLEMENTER))
+        if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) && ch->isPlayer() && (ch->getLevel() == IMPLEMENTER))
         {
           tar_char->sendln("There is no safe haven from an angry IMPLEMENTER!");
         }
@@ -338,9 +338,9 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
       return ((*ki_info[spl].ki_pointer())(ch->getLevel(), ch, argument,
                                            tar_char));
     }
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  return eFAILURE;
+  return ReturnValue::eFAILURE;
 }
 
 void reduce_ki(Character *ch, int type)
@@ -361,8 +361,8 @@ int Character::ki_gain_lookup(void)
   int gain;
 
   /* gain 1 - 7 depedant on level */
-  gain = GET_CLASS(this) == CLASS_MONK ? (int)(max_ki * 0.04) : (int)(max_ki * 0.05); /*(getLevel() / 8) + 1;*/
-  gain += ki_regen;
+  gain = GET_CLASS(this) == CLASS_MONK ? (int)(this->max_ki * 0.04) : (int)(this->max_ki * 0.05); /*(this->getLevel() / 8) + 1;*/
+  gain += this->ki_regen;
 
   // Normalize these so we dont underun the array below
   int norm_wis = MAX(0, GET_WIS(this));
@@ -379,7 +379,7 @@ int Character::ki_gain_lookup(void)
 
   gain += age().year / 25;
 
-  if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE) || check_make_camp(in_room))
+  if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE) || check_make_camp(this->in_room))
     gain = (int)(gain * 1.25);
 
   int multiplyer = 1;
@@ -413,8 +413,8 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    logentry(QStringLiteral("Serious problem in ki blast!"), ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   success += ch->getLevel();
@@ -433,9 +433,9 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     act("$n fails to blast $N!", ch, 0, vict, TO_ROOM, NOTVICT);
     act("You fail to blast $N!", ch, 0, vict, TO_CHAR, 0);
     act("$n finds that you are hard to blast!", ch, 0, vict, TO_VICT, 0);
-    if (!vict->fighting && IS_NPC(vict))
+    if (!vict->fighting && vict->isNonPlayer())
       return attack(vict, ch, TYPE_UNDEFINED);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   if (CAN_GO(vict, exit) &&
@@ -453,7 +453,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
 
     if (vict->fighting)
     {
-      if (IS_NPC(vict))
+      if (vict->isNonPlayer())
       {
         vict->add_memory(GET_NAME(ch), 'h');
         remove_memory(vict, 'f');
@@ -468,7 +468,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     move_char(vict, (DC::getInstance()->world[(ch)->in_room].dir_option[exit])->to_room);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
   else /* There is no exit there */
   {
@@ -479,26 +479,26 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
-    if (!SOMEONE_DIED(retval) && !vict->fighting && IS_NPC(vict))
+    if (!SOMEONE_DIED(retval) && !vict->fighting && vict->isNonPlayer())
       return attack(vict, ch, TYPE_UNDEFINED);
     return retval;
   }
   /* still here?  It was unsuccessful */
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    DC::getInstance()->logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "Serious problem in ki punch!", ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   set_cantquit(ch, vict);
   auto dam = number(500, 700);
   auto manadam = GET_MANA(vict) / 4;
-  int retval = eFAILURE;
+  int retval = ReturnValue::eFAILURE;
 
   manadam = MAX(150, manadam);
   manadam = MIN(750, manadam);
@@ -530,16 +530,16 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
       return attack(vict, ch, TYPE_UNDEFINED);
   }
 
-  return eSUCCESS; // shouldn't get here
+  return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
 int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
 {
-  struct affected_type af;
+  affected_type af;
   if (IS_AFFECTED(ch, AFF_INFRARED))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   if (ch->affected_by_spell(SPELL_INFRAVISION))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   af.type = SPELL_INFRAVISION;
   af.modifier = 0;
@@ -549,7 +549,7 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
   affect_to_char(vict, &af);
   vict->sendln("You feel your sense become more acute.");
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
@@ -570,7 +570,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     {
       retval = damage(ch, tmp_victim, dam, TYPE_KI,
                       KI_OFFSET + KI_STORM, 0);
-      if (isSet(retval, eCH_DIED))
+      if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
     } // else
@@ -599,21 +599,21 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
   }
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    logentry(QStringLiteral("Null victim sent to ki speed"), ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   if (vict->affected_by_spell(SPELL_HASTE))
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
 
   af.type = SPELL_HASTE;
   af.duration = ch->has_skill(KI_OFFSET + KI_SPEED) / 15;
@@ -632,20 +632,20 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
   affect_to_char(vict, &af);
 
   vict->sendln("You feel a quickening in your limbs!");
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   if (!vict)
   {
-    DC::getInstance()->logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    logentry(QStringLiteral("Null victim sent to ki purify"), ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eINTERNAL_ERROR;
   }
   if (!arg)
   {
     ch->send("You can only purify poison, blindness, alcohol or weaken.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
   if (!str_cmp(arg, "poison"))
   {
@@ -654,7 +654,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
     else
     {
       ch->sendln("That taint is not present.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     ch->sendln("You purge the poison.");
   }
@@ -665,7 +665,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
     else
     {
       ch->sendln("That taint is not present.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     ch->sendln("You purge the blindness.");
   }
@@ -676,7 +676,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
     else
     {
       ch->sendln("That taint is not present.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     ch->sendln("You purge the poison.");
   }
@@ -687,7 +687,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
     else
     {
       ch->sendln("That taint is not present.");
-      return eFAILURE;
+      return ReturnValue::eFAILURE;
     }
     ch->sendln("You purge the alcohol.");
   }
@@ -695,15 +695,15 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   {
     ch->sendln("You cannot purge that.");
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   if (!victim)
   {
-    DC::getInstance()->logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
-    return eINTERNAL_ERROR;
+    logentry(QStringLiteral("Serious problem in ki disrupt!"), ANGEL, DC::LogChannel::LOG_BUG);
+    return ReturnValue::eINTERNAL_ERROR;
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -757,13 +757,13 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   {
     ch->sendln("The golem seems to shrug off your ki disrupt attempt!");
     act("The golem seems to ignore $n's disrupting energy!", ch, 0, 0, TO_ROOM, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
-  if (IS_NPC(victim) && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
+  if (victim->isNonPlayer() && ISSET(victim->mobdata->actflags, ACT_NODISPEL))
   {
     act("$N seems to ignore $n's disrupting energy!", ch, 0, victim, TO_ROOM, 0);
     act("$N seems to ignore your disrupting energy!", ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int savebonus = 0;
@@ -785,7 +785,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
 
   // Players are easier to disrupt
-  if (IS_PC(victim))
+  if (victim->isPlayer())
   {
     savebonus -= 10;
   }
@@ -838,7 +838,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("You resist $n's attempt to disrupt magic!", ch, nullptr, victim, TO_VICT,
         0);
 
-    if (IS_NPC(victim) && (!victim->fighting) &&
+    if (victim->isNonPlayer() && (!victim->fighting) &&
         GET_POS(ch) > position_t::SLEEPING)
     {
       retval = attack(victim, ch, TYPE_UNDEFINED);
@@ -846,7 +846,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       return retval;
     }
 
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // We have success so if af is set then the victim had a ki_disupt
@@ -929,7 +929,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
       act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
     }
 
-    if (IS_NPC(victim) && !victim->fighting)
+    if (victim->isNonPlayer() && !victim->fighting)
     {
       retval = attack(victim, ch, 0);
       SWAP_CH_VICT(retval);
@@ -1000,7 +1000,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   // Nothing applicable found to be removed
   if (aff_list.size() < 1)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   // Pick the lucky spell/affect to be removed
@@ -1012,7 +1012,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   }
   catch (...)
   {
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (af->type == SPELL_SANCTUARY)
@@ -1088,23 +1088,23 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
     act("The light, $B$6pulsing$R aura surrounding $n has been disrupted!", victim, 0, 0, TO_ROOM, 0);
   }
 
-  if (IS_NPC(victim) && !victim->fighting)
+  if (victim->isNonPlayer() && !victim->fighting)
   {
     retval = attack(victim, ch, 0);
     SWAP_CH_VICT(retval);
     return retval;
   }
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
 {
-  struct affected_type af;
+  affected_type af;
 
   if (ch->affected_by_spell(KI_STANCE + KI_OFFSET))
   {
     ch->sendln("You focus your ki to harden your stance, but your body is still recovering from last time...");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   act("$n assumes a defensive stance and attempts to absorb the energies that surround $m.",
@@ -1115,7 +1115,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   if (number(1, 100) > (GET_DEX(ch) * 4))
   {
     ch->sendln("You accidently stub your toe and fall out of the defenseive stance.");
-    return eSUCCESS;
+    return ReturnValue::eSUCCESS;
   }
 
   SET_BIT(ch->combat, COMBAT_MONK_STANCE);
@@ -1127,26 +1127,26 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   af.bitvector = -1;
 
   affect_to_char(ch, &af);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   int learned, chance, percent;
-  struct affected_type af;
+  affected_type af;
 
-  if (IS_NPC(ch) || ch->getLevel() >= ARCHANGEL)
+  if (ch->isNonPlayer() || ch->getLevel() >= ARCHANGEL)
     learned = 75;
   else if (!(learned = ch->has_skill(KI_AGILITY + KI_OFFSET)))
   {
     ch->sendln("You aren't experienced enough to teach others graceful movement.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (!IS_AFFECTED(ch, AFF_GROUP))
   {
     ch->sendln("You have no group to instruct.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   learned = learned % 100;
@@ -1188,15 +1188,15 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   }
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
 {
   int gain;
 
-  if (IS_NPC(ch))
-    return eFAILURE;
+  if (ch->isNonPlayer())
+    return ReturnValue::eFAILURE;
 
   act("You enter a brief meditative state and focus your ki to heal your injuries.", ch, 0, vict, TO_CHAR, 0);
   act("$n enters a brief meditative state and focuses $s ki to heal several wounds.", ch, 0, vict, TO_ROOM, 0);
@@ -1205,14 +1205,14 @@ int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
 
   ch->setHP(MIN(ch->getHP() + gain, hit_limit(ch)));
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }
 
 int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
 {
   char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
   int amount, temp = 0;
-  struct affected_type af;
+  affected_type af;
 
   argument_interpreter(arg, amt, type);
   // arg = one_argument(arg, amt);
@@ -1223,13 +1223,13 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
   if (amount < 0)
   {
     ch->sendln("Trying to be a funny guy?");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (amount > GET_KI(ch))
   {
     ch->sendln("You do not have that much energy to transfer.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   int learned = ch->has_skill(KI_TRANSFER + KI_OFFSET);
@@ -1237,7 +1237,7 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
   if (victim->affected_by_spell(SPELL_KI_TRANS_TIMER))
   {
     act("$N cannot receive a transfer right now due to the stress $S mind has been recently been through.", ch, 0, victim, TO_CHAR, 0);
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
   if (ch->affected_by_spell(SPELL_KI_TRANS_TIMER))
@@ -1293,8 +1293,8 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
   else
   {
     ch->sendln("You do not know of that essense.");
-    return eFAILURE;
+    return ReturnValue::eFAILURE;
   }
 
-  return eSUCCESS;
+  return ReturnValue::eSUCCESS;
 }

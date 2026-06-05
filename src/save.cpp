@@ -17,7 +17,6 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <cctype>
 #include <cstring>
 
 #include <fmt/format.h>
@@ -29,15 +28,12 @@
 #include "DC/mobile.h"
 #include "DC/utility.h"
 #include "DC/spells.h"
-#include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/player.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/handler.h"
-#include "DC/race.h"
 #include "DC/vault.h"
-#include "DC/const.h"
-#include "DC/guild.h"
+#include "DC/memory.h"
 
 #ifdef USE_SQL
 #include <iostream>
@@ -50,7 +46,7 @@ extern Database db;
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
 void restore_weight(class Object *obj);
-void store_to_char(struct char_file_u4 *st, Character *ch);
+void store_to_char(char_file_u4 *st, Character *ch);
 QString fread_alias_string(FILE *fpsave);
 
 // return 1 on success
@@ -91,7 +87,7 @@ aliases_t read_char_aliases(FILE *fpsave)
     QString command = fread_alias_string(fpsave);
     if (keyword.isEmpty() || command.isEmpty())
     {
-      DC::getInstance()->logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
+      logentry(QStringLiteral("Removing command alias [%1] because it's missing a keyword.").arg(command));
       continue;
     }
 
@@ -107,7 +103,7 @@ QString fread_alias_string(FILE *fpsave)
   size_t read_count = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (read_count != 1)
   {
-    DC::getInstance()->logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
+    logentry(QStringLiteral("fread_alias_string: fread() read %1 bytes instead of %2 at position %3").arg(read_count).arg(sizeof(tmp_size)).arg(ftell(fpsave)));
     return QString();
   }
 
@@ -157,7 +153,7 @@ char *fread_var_string(FILE *fpsave)
   size_t records_read = fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (tmp_size > 0 && records_read > 0)
   {
-    tmp_str = new char[tmp_size];
+    tmp_str = (char *)dc_alloc(tmp_size, sizeof(char));
     assert(tmp_str);
     if (tmp_str == nullptr)
     {
@@ -169,7 +165,7 @@ char *fread_var_string(FILE *fpsave)
     {
       return tmp_str;
     }
-    delete[] tmp_str;
+    dc_free(tmp_str);
   }
 
   return nullptr;
@@ -211,7 +207,7 @@ void Mobile::read(FILE *fpsave)
   // at this point, typeflag should = "STP", and we're done reading mob data
 }
 
-// TODO - make sure I go back and update the time_data structs everywhere when
+// TODO - make sure I go back and update the time_data s everywhere when
 // we lose link, or logout, etc so that the 'played' variable is correct
 
 void fwrite_string_tilde(FILE *fpsave)
@@ -220,7 +216,7 @@ void fwrite_string_tilde(FILE *fpsave)
   strcpy(buf, "Bugfixbugfixbugfixbugfixbugfixbugfix~");
   fwrite(&buf, 37, 1, fpsave);
 }
-void Player::save(FILE *fpsave, struct time_data tmpage)
+void Player::save(FILE *fpsave, time_data tmpage)
 {
   fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(fpsave);
@@ -373,13 +369,13 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
   {
     if (feof(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
+      qDebug("%s", QStringLiteral("fread_to_tilde: unexpected EOF in %1").arg(filename).toStdString().c_str());
       return characters_read;
     }
 
     if (ferror(fpsave))
     {
-      qDebug(QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
+      qDebug("%s", QStringLiteral("fread_to_tilde: unexpected error in %1").arg(filename).toStdString().c_str());
       return characters_read;
     }
 
@@ -388,7 +384,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
     long after_fread_offset = ftell(fpsave);
     if (read_count != 1)
     {
-      qDebug(QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
+      qDebug("%s", QStringLiteral("fread_to_tilde: fread returned %1 at position %2 now at position %3 in %4").arg(read_count).arg(before_fread_offset).arg(after_fread_offset).arg(filename).toStdString().c_str());
     }
 
     buffer += a;
@@ -400,7 +396,7 @@ qsizetype fread_to_tilde(FILE *fpsave, QString filename)
 
   if (characters_read >= 160)
   {
-    qDebug(QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
+    qDebug("%s", QStringLiteral("fread_to_tilde: >= 160 buffer: [%1] in %2").arg(buffer).arg(filename).toStdString().c_str());
   }
 
   return characters_read;
@@ -427,7 +423,7 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   {
     if (fread_to_tilde(fpsave, filename) >= 160)
     {
-      DC::getInstance()->logbug(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
+      logbug(QStringLiteral("read_Player: Error reading %1. fread_to_tilde >= 160. Aborting.").arg(ch->getName()));
       return false;
     }
   }
@@ -586,9 +582,9 @@ bool Player::read(FILE *fpsave, Character *ch, QString filename)
   return true;
 }
 
-bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
+bool Character::save_pc_or_mob_data(FILE *fpsave, time_data tmpage)
 {
-  if (isNPC())
+  if (isNonPlayer())
   {
     mobdata->save(fpsave);
     return true;
@@ -599,16 +595,20 @@ bool Character::save_pc_or_mob_data(FILE *fpsave, struct time_data tmpage)
     return true;
   }
 
-  DC::getInstance()->logbug(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
+  logbug(QStringLiteral("save_pc_or_mob_data: %1 not an NPC and not a player.").arg(getName()));
   return false;
 }
 
 bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
 {
-  if (IS_NPC(ch))
+  if (ch->isNonPlayer())
   {
     ch->player = nullptr;
-    ch->mobdata = new Mobile;
+#ifdef LEAK_CHECK
+    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
+#else
+    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
+#endif
     ch->mobdata->read(fpsave);
   }
   else
@@ -645,16 +645,16 @@ int store_worn_eq(Character *ch, FILE *fpsave)
 
 int Character::char_to_store_variable_data(FILE *fpsave)
 {
-  fwrite_var_string(getName(), fpsave);
-  fwrite_var_string(short_desc, fpsave);
-  fwrite_var_string(long_desc, fpsave);
-  fwrite_var_string(description, fpsave);
-  fwrite_var_string(title, fpsave);
+  fwrite_var_string(this->getName(), fpsave);
+  fwrite_var_string(this->short_desc, fpsave);
+  fwrite_var_string(this->long_desc, fpsave);
+  fwrite_var_string(this->description, fpsave);
+  fwrite_var_string(this->title, fpsave);
 
   if (!has_skill(NEW_SAVE)) // New save.
     learn_skill(NEW_SAVE, 1, 100);
 
-  for (const auto &skill : skills)
+  for (const auto &skill : this->skills)
   {
     fwrite("SKL", sizeof(char), 3, fpsave);
     fwrite(&(skill.first), sizeof(skill.first), 1, fpsave);
@@ -663,17 +663,17 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   }
   fwrite("END", sizeof(char), 3, fpsave);
 
-  struct affected_type *af;
+  affected_type *af;
   int16_t aff_count = 0; // do not change from int16_t
 
-  for (af = affected; af; af = af->next)
+  for (af = this->affected; af; af = af->next)
     aff_count++;
 
   if (aff_count)
   {
     fwrite("AFS", sizeof(char), 3, fpsave);
     fwrite(&aff_count, sizeof(aff_count), 1, fpsave);
-    for (af = affected; af; af = af->next)
+    for (af = this->affected; af; af = af->next)
     {
       fwrite(&(af->type), sizeof(af->type), 1, fpsave);
       fwrite(&(af->duration), sizeof(af->duration), 1, fpsave);
@@ -683,7 +683,8 @@ int Character::char_to_store_variable_data(FILE *fpsave)
     }
   }
 
-  for (auto mpv = tempVariable; mpv; mpv = mpv->next)
+  tempvariable *mpv;
+  for (mpv = this->tempVariable; mpv; mpv = mpv->next)
   {
     if (!mpv->save)
       continue;
@@ -693,7 +694,7 @@ int Character::char_to_store_variable_data(FILE *fpsave)
   }
 
   fwrite("GLD", sizeof(char), 3, fpsave);
-  fwrite(&gold_, sizeof(gold_), 1, fpsave);
+  fwrite(&this->gold_, sizeof(this->gold_), 1, fpsave);
 
   // Any future additions to this save file will need to be placed LAST here with a 3 letter code
   // and appropriate strcmp statement in the read_mob_data object
@@ -709,19 +710,19 @@ void read_skill(Character *ch, FILE *fpsave)
 
   if (fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
   {
-    DC::getInstance()->logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -737,11 +738,11 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 {
   char typeflag[4];
 
-  setName(fread_var_string(fpsave));
-  short_desc = fread_var_string(fpsave);
-  long_desc = fread_var_string(fpsave);
-  description = fread_var_string(fpsave);
-  title = fread_var_string(fpsave);
+  this->setName(fread_var_string(fpsave));
+  this->short_desc = fread_var_string(fpsave);
+  this->long_desc = fread_var_string(fpsave);
+  this->description = fread_var_string(fpsave);
+  this->title = fread_var_string(fpsave);
 
   typeflag[3] = '\0';
   fread(&typeflag, sizeof(char), 3, fpsave);
@@ -758,13 +759,13 @@ int Character::store_to_char_variable_data(FILE *fpsave)
   {
     int16_t aff_count; // do not change form int16_t
     fread(&aff_count, sizeof(aff_count), 1, fpsave);
-    affected = nullptr;
+    this->affected = nullptr;
     for (int16_t i = 0; i < aff_count; i++)
     {
       affected_type *af = new (std::nothrow) affected_type;
       af->duration_type = 0;
-      af->next = affected;
-      affected = af;
+      af->next = this->affected;
+      this->affected = af;
 
       fread(&(af->type), sizeof(af->type), 1, fpsave);
       fread(&(af->duration), sizeof(af->duration), 1, fpsave);
@@ -779,17 +780,22 @@ int Character::store_to_char_variable_data(FILE *fpsave)
 
   while (!strcmp(typeflag, "MPV"))
   { // MobProgVars6
-    auto mpv = new struct tempvariable;
+    tempvariable *mpv;
+#ifdef LEAK_CHECK
+    mpv = (tempvariable *)calloc(1, sizeof(tempvariable));
+#else
+    mpv = (tempvariable *)dc_alloc(1, sizeof(tempvariable));
+#endif
     mpv->name = fread_var_string(fpsave);
     mpv->data = fread_var_string(fpsave);
     mpv->save = 1;
-    mpv->next = tempVariable;
-    tempVariable = mpv;
+    mpv->next = this->tempVariable;
+    this->tempVariable = mpv;
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   if (!strcmp(typeflag, "GLD"))
   {
-    fread(&(gold_), sizeof(gold_), 1, fpsave);
+    fread(&(this->gold_), sizeof(this->gold_), 1, fpsave);
     fread(&typeflag, sizeof(char), 3, fpsave);
   }
   // Add new items in this format
@@ -809,11 +815,11 @@ void save_char_obj_db(Character *ch)
   if (ch == 0)
     return;
 
-  if (IS_NPC(ch) || ch->getLevel() < 2)
+  if (ch->isNonPlayer() || ch->getLevel() < 2)
     return;
 
   // so weapons stop falling off
-  SETBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  SETBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
 
   char_file_u4 uchar;
   time_data tmpage;
@@ -825,8 +831,8 @@ void save_char_obj_db(Character *ch)
   // if they're in a safe room, save them there.
   // if they're a god, send 'em home
   // otherwise save them in tavern
-  if (isSet(DC::getInstance()->world[in_room].room_flags, SAFE))
-    uchar.load_room = DC::getInstance()->world[in_room].number;
+  if (isSet(DC::getInstance()->world[this->in_room].room_flags, SAFE))
+    uchar.load_room = DC::getInstance()->world[this->in_room].number;
   else
     uchar.load_room = real_room(GET_HOME(ch));
 
@@ -844,7 +850,7 @@ void save_char_obj_db(Character *ch)
   if((fwrite(&uchar, sizeof(uchar), 1, fpsave))               &&
      (char_to_store_variable_data(ch, fpsave))                &&
      (ch->save_pc_or_mob_data(fpsave, tmpage))                &&
-     (obj_to_store (carrying, ch, fpsave, -1))            &&
+     (obj_to_store (this->carrying, ch, fpsave, -1))            &&
      (store_worn_eq(ch, fpsave))
     )
   {
@@ -860,11 +866,11 @@ void save_char_obj_db(Character *ch)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     ch->send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
-  REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  struct vault_data *vault;
+  REMBIT(this->affected_by, AFF_IGNORE_WEAPON_WEIGHT);
+  vault_data *vault;
   if ((vault = has_vault(GET_NAME(ch))))
     save_vault(vault->owner);
   */
@@ -883,7 +889,7 @@ void Character::save_char_obj(void)
 
   memset(&tmpage, 0, sizeof(tmpage));
 
-  if (IS_NPC(this) || getLevel() < 1)
+  if (this->isNonPlayer() || getLevel() < 1)
   {
     return;
   }
@@ -911,7 +917,7 @@ void Character::save_char_obj(void)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "Could not open file in save_char_obj. '%s'", strsave);
     perror(log_buf);
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
 
@@ -956,11 +962,11 @@ void Character::save_char_obj(void)
     sprintf(log_buf, "Save_char_obj: %s", strsave);
     send("WARNING: file problem. You did not save!");
     perror(log_buf);
-    DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+    logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   }
 
   REMBIT(affected_by, AFF_IGNORE_WEAPON_WEIGHT);
-  struct vault_data *vault;
+  vault_data *vault;
   if ((vault = has_vault(getName())))
     save_vault(vault->owner);
 }
@@ -970,17 +976,17 @@ void load_char_obj_error(FILE *fpsave, QString strsave)
 {
   QString log_buf = QStringLiteral("Load_char_obj: %1").arg(strsave);
   perror(log_buf.toStdString().c_str());
-  DC::getInstance()->logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
+  logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
   if (fpsave != nullptr)
     fclose(fpsave);
 }
 
-// Load a char and inventory into a new_new ch structure.
+// Load a char and inventory into a new_new ch ure.
 load_status_t DC::load_char_obj(class Connection *d, QString name)
 {
   FILE *fpsave = nullptr;
   QString strsave;
-  struct char_file_u4 uchar;
+  char_file_u4 uchar;
   class Object *last_cont = nullptr;
   Character *ch;
 
@@ -989,12 +995,16 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   name[0] = name[0].toUpper();
 
   ch = new Character(this);
+  auto &free_list = DC::getInstance()->free_list;
+  free_list.erase(ch);
+
   if (d->character)
   {
     free_char(d->character, Trace("load_char_obj"));
   }
 
   d->character = ch;
+  clear_char(ch);
   ch->desc = d;
 
   if (DC::getInstance()->cf.bport)
@@ -1006,7 +1016,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
     strsave = QStringLiteral("%1/%2/%3").arg(SAVE_DIR).arg(name[0]).arg(name);
   }
 
-  //  struct stat mystats;
+  //   stat mystats;
   //  stat(strsave, &mystats);
   //  TODO - Eventually, i'm going to just slurp in the whole file
   //  then parse the memory instead of reading each item from file seperately
@@ -1030,14 +1040,14 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
     return load_status_t::error;
   }
 
-  if (IS_PC(ch) && ch->player->time.logon < 1117527906)
+  if (ch->isPlayer() && ch->player->time.logon < 1117527906)
   {
     do_clearaff(ch, "");
     ch->affected_by[0] = ch->affected_by[1] = 0;
   }
 
   // stored names only matter for mobs
-  if (ch->isPlayer())
+  if (!ch->isNonPlayer())
   {
     ch->setName(name);
   }
@@ -1056,8 +1066,8 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont)
 {
   class Object *obj;
-  //  struct extra_descr_data *new_new_descr;
-  //  struct extra_descr_data *ed, *next_ed;
+  //  extra_descr_data *new_new_descr;
+  //  extra_descr_data *ed, *next_ed;
 
   int j;
   int nr;
@@ -1067,7 +1077,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   char buf[MAX_STRING_LENGTH];
 
   // read in the standard file data
-  struct obj_file_elem object;
+  obj_file_elem object;
   fread(&object, sizeof(object), 1, fpsave);
 
   if (feof(fpsave))
@@ -1151,21 +1161,44 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
   }
   if (!strcmp("AFF", mod_type))
   {
-    qsizetype num_affects{};
-    fread(&num_affects, sizeof(num_affects), 1, fpsave);
-    obj->affected = QList<obj_affected_type>(num_affects);
-    for (j = 0; j < obj->affected.size(); j++)
+    fread(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
+    if (obj->affected)
+      dc_free(obj->affected);
+
+#ifdef LEAK_CHECK
+    obj->affected = (obj_affected_type *)calloc(obj->num_affects, sizeof(obj_affected_type));
+#else
+    obj->affected = (obj_affected_type *)dc_alloc(obj->num_affects, sizeof(obj_affected_type));
+#endif
+
+    for (j = 0; j < obj->num_affects; j++)
     {
       fread(&obj->affected[j].location, sizeof(obj->affected[j].location), 1, fpsave);
       fread(&obj->affected[j].modifier, sizeof(obj->affected[j].modifier), 1, fpsave);
     }
+
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("RPR", mod_type))
   {
-    obj->affected = QList<obj_affected_type>(1);
-    obj->affected[0].location = APPLY_DAMAGED;
-    fread(&obj->affected[0].modifier, sizeof(obj->affected[0].modifier), 1, fpsave);
+    obj_affected_type *a;
+#ifdef LEAK_CHECK
+    a = (obj_affected_type *)calloc(obj->num_affects + 1, sizeof(obj_affected_type));
+#else
+    a = (obj_affected_type *)dc_alloc(obj->num_affects + 1, sizeof(obj_affected_type));
+#endif
+    int i;
+    for (i = 0; i < obj->num_affects; i++)
+    {
+      a[i].location = obj->affected[i].location;
+      a[i].modifier = obj->affected[i].modifier;
+    }
+    if (obj->affected)
+      dc_free(obj->affected);
+    a[i].location = APPLY_DAMAGED;
+    fread(&a[i].modifier, sizeof(a[i].modifier), 1, fpsave);
+    obj->affected = a;
+    obj->num_affects++;
     fread(&mod_type, sizeof(char), 3, fpsave);
   }
   if (!strcmp("NAM", mod_type))
@@ -1243,7 +1276,7 @@ class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_
     {
       obj_to_obj(obj, last_cont);
       // we don't add weight to the character for containers that are worn
-      if (!last_cont->equipped_by && DC::getInstance()->obj_index[last_cont->item_number].virt != 536)
+      if (!last_cont->equipped_by && DC::getInstance()->obj_index[last_cont->item_number].vnum() != 536)
         IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
     }
     else
@@ -1326,7 +1359,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
 
   // Set up items saved for all items
   object.version = CURRENT_OBJ_VERSION;
-  object.item_number = DC::getInstance()->obj_index[obj->item_number].virt;
+  object.item_number = DC::getInstance()->obj_index[obj->item_number].vnum();
   object.timer = obj->obj_flags.timer;
   object.wear_pos = wear_pos;
   if (obj->in_obj) // I'm in a container
@@ -1423,7 +1456,7 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
 
     tmp_weight = obj->obj_flags.weight;
     if(GET_ITEM_TYPE(obj) == ITEM_CONTAINER && (loop_obj = obj->contains)
-    && DC::getInstance()->obj_index[obj->item->number].virt != 536)
+    && DC::getInstance()->obj_index[obj->item->number].vnum() != 536)
       for (; loop_obj; loop_obj = loop_obj->next_content)
         tmp_weight -= GET_OBJ_WEIGHT(loop_obj);
     if(tmp_weight      != standard_obj->obj_flags.weight)
@@ -1431,15 +1464,15 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
       fwrite("WEI", sizeof(char), 3, fpsave);
       fwrite(&tmp_weight, sizeof(tmp_weight), 1, fpsave);
     }
-    change = (obj->affected.size() != standard_obj->affected.size());
+    change = (obj->num_affects != standard_obj->num_affects);
     // since they aren't always in the same order (builder might have swapped them in an
     // rsave or something) we have to search through for each one to see if they are there,
     // just in a different spot
-    for (iAffect = 0; (iAffect < obj->affected.size()) && !change; iAffect++)
+    for (iAffect = 0; (iAffect < obj->num_affects) && !change; iAffect++)
     {
       // set it to changed, and if we find it, set it back to unchanged, then continue prior loop
       change = 1;
-      for(iAff2 = 0; (iAff2 < obj->affected.size()) && change; iAff2++)
+      for(iAff2 = 0; (iAff2 < obj->num_affects) && change; iAff2++)
         if( (obj->affected[iAffect].location == standard_obj->affected[iAff2].location) ||
             (obj->affected[iAffect].modifier == standard_obj->affected[iAff2].modifier))
           change = 0;
@@ -1449,9 +1482,8 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   if (isSet(obj->obj_flags.more_flags, ITEM_CUSTOM))
   {
     fwrite("AFF", sizeof(char), 3, fpsave);
-    auto num_affects = obj->affected.size();
-    fwrite(&num_affects, sizeof(num_affects), 1, fpsave);
-    for (int iAffect = 0; iAffect < obj->affected.size(); iAffect++)
+    fwrite(&obj->num_affects, sizeof(obj->num_affects), 1, fpsave);
+    for (int iAffect = 0; iAffect < obj->num_affects; iAffect++)
     {
       fwrite(&obj->affected[iAffect].location, sizeof(obj->affected[iAffect].location), 1, fpsave);
       fwrite(&obj->affected[iAffect].modifier, sizeof(obj->affected[iAffect].modifier), 1, fpsave);
@@ -1459,7 +1491,8 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILE *fpsave, int wear_p
   }
   else
   { // non-custom objects only get the damaged affect copied by way of RPR
-    for (qsizetype i = 0; i < obj->affected.size(); i++)
+    int i;
+    for (i = 0; i < obj->num_affects; i++)
     {
       if (obj->affected[i].location == APPLY_DAMAGED)
       {
@@ -1541,7 +1574,7 @@ void restore_weight(class Object *obj)
 
   if (obj == nullptr)
     return;
-  if (DC::getInstance()->obj_index[obj->item_number].virt == 536)
+  if (DC::getInstance()->obj_index[obj->item_number].vnum() == 536)
     return;
   restore_weight(obj->contains);
   restore_weight(obj->next_content);
@@ -1551,7 +1584,7 @@ void restore_weight(class Object *obj)
 
 void donothin() {}
 // Read shared data from pfile
-void store_to_char(struct char_file_u4 *st, Character *ch)
+void store_to_char(char_file_u4 *st, Character *ch)
 {
   int i;
 
@@ -1632,13 +1665,13 @@ void store_to_char(struct char_file_u4 *st, Character *ch)
   }
 }
 
-// copy vital data from a players char-structure to the file structure
+// copy vital data from a players char-ure to the file ure
 // return 'age' of character unmodified
-void Character::char_to_store(struct char_file_u4 *st, struct time_data &tmpage)
+void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 {
   int i;
   int x;
-  struct affected_type *af;
+  affected_type *af;
   class Object *char_eq[MAX_WEAR];
 
   // Remove all the eq and store it in temp storage
@@ -1705,7 +1738,7 @@ void Character::char_to_store(struct char_file_u4 *st, struct time_data &tmpage)
   for (x = 0; x < 3; x++)
     st->extra_ints[x] = 0;
 
-  if (IS_NPC(this))
+  if (this->isNonPlayer())
   {
     st->armor = armor;
     st->hitroll = hitroll;

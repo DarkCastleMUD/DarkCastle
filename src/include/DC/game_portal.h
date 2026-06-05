@@ -7,8 +7,9 @@
 
 typedef uint64_t room_t;
 
-struct game_portal
+class game_portal
 {
+  public:
   room_t to_room;  /* Room to make the portal to */
   int *from_rooms; /* Rooms to make the portal from */
   int num_rooms;   /* Number of rooms in from_rooms */
