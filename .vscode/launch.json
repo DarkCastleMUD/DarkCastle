@@ -356,7 +356,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "rebuild"
+            "preLaunchTask": "rebuild release"
         },
         {
             "name": "valgrind debug/testDC",
