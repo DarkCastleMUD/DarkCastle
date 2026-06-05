@@ -387,7 +387,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         break;
       }
 
-      if ((found->getFunction1() || found->getFunction1b()) && command_arguments.length() > MAX_STRING_LENGTH - 1)
+      if ((found->getFunction1() || found->getFunction1b()) && command_arguments.length() > MAX_STRING_LENGTH - 81)
       {
         logmisc(u"input buffer by %1 size %2 exceeds %3"_s.arg(name_).arg(command_arguments.length()).arg(MAX_STRING_LENGTH - 81));
         command_arguments.truncate(MAX_STRING_LENGTH - 81);
