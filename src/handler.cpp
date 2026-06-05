@@ -5022,6 +5022,9 @@ void room_mobs_only_hate(Character *ch)
 
 void remove_memory(Character *ch, char type)
 {
+  if (!ch || !ch->mobdata)
+    return;
+
   if (type == 't')
     ch->hunting = 0;
 
@@ -5031,7 +5034,6 @@ void remove_memory(Character *ch, char type)
   if (type == 'h' && !ch->mobdata->hated.isEmpty())
   {
     ch->mobdata->hated.clear();
-    ch->mobdata->hated = nullptr;
   }
 
   if (type == 'f')
