@@ -5933,6 +5933,7 @@ void free_char(Character *ch, Trace trace)
       ch->mobdata->mpact = currmprog;
     }
     delete ch->mobdata;
+    ch->mobdata = nullptr;
   }
   else
   {
