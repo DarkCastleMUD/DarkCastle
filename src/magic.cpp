@@ -558,9 +558,30 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
   if (skill > 80)
     if (number(0, 100) < (skill / 5))
     {
-      act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_ROOM, 0);
-      act("The expanding $B$4flames$R suddenly recombine and fly at $N again!", ch, 0, victim, TO_CHAR, 0);
-      retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL);
+      // Follow the elemental filter (encoded in level > 200) for both the
+      // damage type and the flavor text, instead of always saying "flames".
+      int dtype = (level > 200) ? (TYPE_HIT + level - 200) : TYPE_FIRE;
+      QString element;
+      switch (dtype)
+      {
+      case TYPE_COLD:
+        element = QStringLiteral("$B$3shards of ice$R");
+        break;
+      case TYPE_ENERGY:
+        element = QStringLiteral("$B$5crackling energy$R");
+        break;
+      case TYPE_MAGIC:
+        element = QStringLiteral("$B$7burst of magic$R");
+        break;
+      case TYPE_FIRE:
+      default:
+        element = QStringLiteral("$B$4flames$R");
+        break;
+      }
+      QString recombine = QStringLiteral("The expanding %1 suddenly recombine and fly at $N again!").arg(element);
+      act(recombine, ch, 0, victim, TO_ROOM, 0);
+      act(recombine, ch, 0, victim, TO_CHAR, 0);
+      retval = damage(ch, victim, dam, dtype, SPELL_FIREBALL);
     }
   return retval;
 }
