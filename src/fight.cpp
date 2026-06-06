@@ -263,7 +263,7 @@ void perform_violence(void)
         for (fol = ch->followers; fol; fol = folnext)
         {
           folnext = fol->next;
-          if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
+          if ((IS_AFFECTED(fol->follower, AFF_CHARM) || IS_AFFECTED(fol->follower, AFF_FAMILIAR)) && ch->in_room == fol->follower->in_room)
             retval = check_charmiejoin(fol->follower);
           if (isSet(retval, ReturnValue::eVICT_DIED))
             break;
@@ -2848,7 +2848,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
           for (fol = ch->followers; fol; fol = folnext)
           {
             folnext = fol->next;
-            if (IS_AFFECTED(fol->follower, AFF_CHARM) && ch->in_room == fol->follower->in_room)
+            if ((IS_AFFECTED(fol->follower, AFF_CHARM) || IS_AFFECTED(fol->follower, AFF_FAMILIAR)) && ch->in_room == fol->follower->in_room)
               SET_BIT(retval, check_charmiejoin(fol->follower));
             if (isSet(retval, ReturnValue::eVICT_DIED))
               break;

@@ -15,3 +15,8 @@ vaults/vaultindex
 gcm.cache/
 _deps/
 .cache/
+
+# Local dev tooling (not part of the project)
+CLAUDE.md
+Dockerfile.dev
+Dockerfile.dev.dockerignore
