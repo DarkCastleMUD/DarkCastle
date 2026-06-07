@@ -443,25 +443,22 @@ void perform_violence(void)
 
 void add_threat(Character *mob, Character *ch, int amt)
 {
-  threat_data *thr;
   if (!mob || !ch || !amt || mob->isPlayer() || !ch->getNameC())
     return;
-  for (thr = mob->mobdata->threat; thr; thr = thr->next)
+
+  for (auto thr = mob->mobdata->threat; thr; thr = thr->next)
   {
-    if (!str_cmp(ch->getNameC(), thr->name))
+    if (ch->getName() == thr->name_)
     { // Already angry with player.
       thr->threat += amt;
       return;
     }
   }
-#ifdef LEAK_CHECK
-  thr = (threat_data *)calloc(1, sizeof(threat_data));
-#else
-  thr = (threat_data *)dc_alloc(1, sizeof(threat_data));
-#endif
+
+  auto thr = threat_dataPtr::create();
   thr->next = mob->mobdata->threat;
   thr->threat = amt;
-  thr->name = str_dup(GET_NAME(ch));
+  thr->name_ = ch->getName();
   mob->mobdata->threat = thr;
   // Threat added.
   return;
@@ -477,10 +474,11 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
 {
   if (!actor || !mob || mob->isPlayer())
     return;
-  threat_data *thr;
+
   float v = (float)actor->has_skill(skill) / 100.0;
   if (!v)
     v = 0.4; // like weapons
+
   int type = 0;
   int threat = 0;
   switch (skill)
@@ -505,8 +503,8 @@ void generate_skillthreat(Character *mob, int skill, int damage, Character *acto
     if (target != mob && target != actor)
     {
       // damaging yerself gets you no coochie coochie
-      for (thr = mob->mobdata->threat; thr; thr = thr->next)
-        if (!str_cmp(thr->name, GET_NAME(target)))
+      for (auto thr = mob->mobdata->threat; thr; thr = thr->next)
+        if (thr->name_ == target->getName())
           threat = 0 - threat; // this guy deserves mucho love, let's provide.
       // it damaged something else, get pissed off if friendly flagged
       if (threat > 0 && !ISSET(mob->mobdata->actflags, ACT_FRIENDLY))
@@ -5560,11 +5558,12 @@ void raw_kill(Character *ch, Character *victim)
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &i : character_list)
   {
-
     remove_memory(i, 'h', victim);
-    if (i->isNonPlayer() && (i->mobdata->fears))
-      if (!strcmp(i->mobdata->fears, victim->getNameC()))
+
+    if (i->isNonPlayer() && !i->mobdata->fears_.isEmpty())
+      if (i->mobdata->fears_ == victim->getName())
         remove_memory(i, 'f');
+
     if (i->isNonPlayer() && !i->hunting.isEmpty())
       if (i->hunting == victim->getName())
         remove_memory(i, 't');

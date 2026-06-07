@@ -2452,14 +2452,8 @@ zone_t DC::read_one_zone(FILE *fl)
 
   for (;;)
   {
-    QSharedPointer<ResetCommand> reset = QSharedPointer<ResetCommand>::create();
-    reset->comment = nullptr; // needs to be initialized
+    ResetCommandPtr reset = ResetCommandPtr::create();
     reset->command = fread_char(fl);
-    reset->if_flag = 0;
-    reset->last = 0;
-    reset->arg1 = 0;
-    reset->arg2 = 0;
-    reset->arg3 = 0;
     if (reset->command == 'S')
     {
       break;
@@ -2639,7 +2633,7 @@ Character *DC::read_mobile(int nr, FILE *fl)
   mob->description = fread_string(fl, 1);
   mob->title = 0;
 
-  mob->mobdata = new Mobile;
+  mob->mobdata = MobilePtr::create();
   mob->mobdata->reset = {};
   /* *** Numeric data *** */
   j = 0;
@@ -3302,9 +3296,7 @@ Character *DC::clone_mobile(int nr)
 
   *mob = *old;
 
-  mob->mobdata = new Mobile;
-
-  *mob->mobdata = *old->mobdata;
+  mob->mobdata = MobilePtr::create(old->mobdata);
 
   for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
     mob->equipment[i] = 0;
@@ -3492,11 +3484,7 @@ int DC::create_blank_mobile(int nr)
   GET_RAW_CON(mob) = 11;
   mob->height = 198;
   mob->weight = 200;
-#ifdef LEAK_CHECK
-  mob->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-  mob->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+  mob->mobdata = MobilePtr::create();
   int i;
   for (i = 0; i < ACT_MAX / ASIZE + 1; i++)
     mob->mobdata->actflags[i] = 0;
@@ -5932,8 +5920,6 @@ void free_char(Character *ch, Trace trace)
       dc_free(ch->mobdata->mpact);
       ch->mobdata->mpact = currmprog;
     }
-    delete ch->mobdata;
-    ch->mobdata = nullptr;
   }
   else
   {

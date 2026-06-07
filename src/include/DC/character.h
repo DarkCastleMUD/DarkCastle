@@ -498,9 +498,20 @@ public:
   mob_type_t type;               /* Type of mobile                     */
 };
 
+using threat_dataPtr = QSharedPointer<class threat_data>;
+class threat_data
+{
+public:
+  threat_dataPtr next = {};
+  int threat = {};
+  QString name_ = {};
+};
+
+using MobilePtr = QSharedPointer<class Mobile>;
 class Mobile
 {
 public:
+  Mobile(MobilePtr old = {});
   int32_t nr = {};
   position_t default_pos = {};                 // Default position for NPC
   int8_t last_direction = {};                  // Last direction the mobile went in
@@ -510,15 +521,15 @@ public:
   int16_t damnodice = {};   // The number of damage dice's
   int16_t damsizedice = {}; // The size of the damage dice's
 
-  char *fears = {};   /* will flee from ths person on sight     */
-  QString hated = {}; /* List of PC's I hate */
+  QString fears_ = {}; /* will flee from ths person on sight     */
+  QString hated = {};  /* List of PC's I hate */
 
   mob_prog_act_list *mpact = {}; // list of MOBProgs
   int16_t mpactnum = {};         // num
   int32_t last_room = {};        // Room rnum the mob was last in. Used
                                  // For !magic,!track changing flags.
-  class threat_data *threat = {};
-  QSharedPointer<ResetCommand> reset = {};
+  threat_dataPtr threat = {};
+  ResetCommandPtr reset = {};
   mob_flag_data mob_flags = {}; /* Mobile information               */
   bool paused = {};
 
@@ -571,7 +582,7 @@ public:
   static const QList<int> wear_to_item_wear;
   static bool validateName(QString name);
 
-  class Mobile *mobdata = nullptr;
+  MobilePtr mobdata = {};
   class Player *player = nullptr;
   class Object *objdata = nullptr;
 

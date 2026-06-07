@@ -8,7 +8,6 @@
 */
 #include "DC/structs.h" // uint8_t, uint8_t, etc..
 #include "DC/character.h"
-#include "DC/utility.h" // false
 
 /* External prototype */
 void debug_point();
@@ -137,13 +136,5 @@ void remove_active_potato(Character *vict);
 #define DAMAGE_TYPE_PHYSICAL 0
 #define DAMAGE_TYPE_MAGIC 1
 #define DAMAGE_TYPE_SONG 2
-
-class threat_data
-{
-public:
-  threat_data *next;
-  int threat;
-  char *name;
-};
 
 #endif

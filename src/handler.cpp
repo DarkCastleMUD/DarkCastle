@@ -4186,31 +4186,31 @@ Character *get_mob_vis(Character *ch, char *name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](Character *const &i)
                         {
-		if (number == 1)
-		{
-			if (isexact(tmp, GET_NAME(i))&& i->isNonPlayer() && CAN_SEE(ch,i))
-			return true;
-			else if (isprefix(tmp, GET_NAME(i))&& i->isNonPlayer() && CAN_SEE(ch,i))
-			{
-				if (partial_match)
-				{
-					if (strlen(GET_NAME(partial_match)) > strlen(GET_NAME(i)))
-					partial_match = i;
-				}
-				else
-				partial_match = i;
-			}
-		}
-		else
-		{
-			if(isexact(tmp, GET_NAME(i)) && i->isNonPlayer() && CAN_SEE(ch, i))
-			{
-				if(j == number)
-				return true;
-				j++;
-			}
-		}
-		return false; });
+    if (number == 1)
+    {
+      if (isexact(tmp, GET_NAME(i)) && i->isNonPlayer() && CAN_SEE(ch, i))
+        return true;
+      else if (isprefix(tmp, GET_NAME(i)) && i->isNonPlayer() && CAN_SEE(ch, i))
+      {
+        if (partial_match)
+        {
+          if (strlen(GET_NAME(partial_match)) > strlen(GET_NAME(i)))
+            partial_match = i;
+        }
+        else
+          partial_match = i;
+      }
+    }
+    else
+    {
+      if (isexact(tmp, GET_NAME(i)) && i->isNonPlayer() && CAN_SEE(ch, i))
+      {
+        if (j == number)
+          return true;
+        j++;
+      }
+    }
+    return false; });
 
   if (result != end(character_list))
   {
@@ -4389,10 +4389,10 @@ Character *get_pc(QString name)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
                         {
-		if(i->isPlayer() && isexact(name, GET_NAME(i)))
-		return true;
+                          if (i->isPlayer() && isexact(name, GET_NAME(i)))
+                            return true;
 
-		return false; });
+                          return false; });
 
   if (result != end(character_list))
   {
@@ -4973,7 +4973,7 @@ int fears_someone(Character *ch)
   if (!ch->isNonPlayer())
     return 0;
 
-  return (ch->mobdata->fears != nullptr);
+  return !ch->mobdata->fears_.isEmpty();
 }
 
 void remove_memory(Character *ch, char type, Character *vict)
@@ -5004,7 +5004,7 @@ void remove_memory(Character *ch, char type, Character *vict)
 
   // these two are str_hsh'd, so just null them out
   if (type == 'f')
-    ch->mobdata->fears = nullptr;
+    ch->mobdata->fears_.clear();
 }
 
 void room_mobs_only_hate(Character *ch)
@@ -5037,7 +5037,7 @@ void remove_memory(Character *ch, char type)
   }
 
   if (type == 'f')
-    ch->mobdata->fears = 0;
+    ch->mobdata->fears_.clear();
 }
 
 void Character::add_memory(QString victim_name, char type)
@@ -5068,7 +5068,7 @@ void Character::add_memory(QString victim_name, char type)
   }
   else if (type == 'f')
   {
-    mobdata->fears = strdup(victim_name.toStdString().c_str());
+    mobdata->fears_ = victim_name;
   }
   else if (type == 't')
   {

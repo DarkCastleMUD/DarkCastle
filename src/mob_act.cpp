@@ -393,10 +393,10 @@ void mobile_activity(void)
       } // if aggressive
 
     if (!ch->fighting)
-      if (ch->mobdata->fears)
-        if (ch->get_char_room_vis(ch->mobdata->fears))
+      if (!ch->mobdata->fears_.isEmpty())
+        if (ch->get_char_room_vis(ch->mobdata->fears_))
         {
-          if (ch->mobdata->hated != nullptr)
+          if (!ch->mobdata->hated.isEmpty())
             remove_memory(ch, 'h');
           act("$n screams 'Oh SHIT!'", ch, 0, 0, TO_ROOM, 0);
           do_flee(ch, "");

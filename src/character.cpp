@@ -1177,3 +1177,30 @@ QString ChannelMessage::getMessage(Character *ch) const
   else
     return getMessage(ch->getLevel(), false, timezone, dateformat);
 }
+
+Mobile::Mobile(MobilePtr old)
+{
+  if (old)
+  {
+    nr = old->nr;
+    default_pos = old->default_pos;
+    last_direction = old->last_direction;
+    attack_type = old->attack_type;
+    memcpy(actflags, old->actflags, ACT_MAX / ASIZE + 1);
+    damnodice = old->damnodice;
+    damsizedice = old->damsizedice;
+    hated = old->hated;
+    mpact = old->mpact;
+    mpactnum = old->mpactnum;
+    last_room = old->last_room;
+    fears_ = old->fears_;
+    mob_flags = old->mob_flags;
+    paused = old->paused;
+    object = old->object;
+    reset = old->reset;
+
+    threat = threat_dataPtr::create(old->threat);
+    if (!threat)
+      qCritical("threat_dataPtr::create returned nullptr");
+  }
+}

@@ -861,7 +861,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   QString text = arguments.at(0);
   if (isexact(text, "new"))
   {
-    zone.cmd.push_back(QSharedPointer<ResetCommand>::create('J'));
+    zone.cmd.push_back(ResetCommandPtr::create('J'));
     ch->send(QStringLiteral("New command 'J' added at %1.\r\n").arg(zone.cmd.size()));
     return zone.cmd.size() - 1;
   }
@@ -873,7 +873,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
     return ReturnValue::eFAILURE;
   }
 
-  zone.cmd.insert(i, QSharedPointer<ResetCommand>::create('J'));
+  zone.cmd.insert(i, ResetCommandPtr::create('J'));
   ch->send(QStringLiteral("New command 'J' added at %1.\r\n").arg(i + 1));
   return i - 1;
 }
@@ -983,7 +983,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
   unsigned int k = 0;
   vnum_t robj = {}, rmob = {};
   bool ok = false;
-  QSharedPointer<ResetCommand> tmp = {}, temp_com = {};
+  ResetCommandPtr tmp = {}, temp_com = {};
   char *str = {};
 
   QStringList arguments = QString(argument).trimmed().split(' ');

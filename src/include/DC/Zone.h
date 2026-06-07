@@ -9,6 +9,7 @@
 typedef uint64_t zone_t;
 typedef uint64_t room_t;
 
+using ResetCommandPtr = QSharedPointer<class ResetCommand>;
 class ResetCommand
 {
 public:
@@ -40,7 +41,7 @@ public:
 };
 
 bool operator==(ResetCommand a, ResetCommand b);
-typedef QList<QSharedPointer<ResetCommand>> zone_commands_t;
+typedef QList<ResetCommandPtr> zone_commands_t;
 
 #define MAX_INDEX 6000
 

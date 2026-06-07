@@ -604,11 +604,7 @@ bool read_pc_or_mob_data(Character *ch, FILE *fpsave, QString filename)
   if (ch->isNonPlayer())
   {
     ch->player = nullptr;
-#ifdef LEAK_CHECK
-    ch->mobdata = (Mobile *)calloc(1, sizeof(Mobile));
-#else
-    ch->mobdata = (Mobile *)dc_alloc(1, sizeof(Mobile));
-#endif
+    ch->mobdata = MobilePtr::create();
     ch->mobdata->read(fpsave);
   }
   else
