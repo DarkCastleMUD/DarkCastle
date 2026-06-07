@@ -1,6 +1,3 @@
-#include <cstring>
-#include <memory>
-#include <iostream>
 
 #include <QTest>
 #include <QtLogging>
