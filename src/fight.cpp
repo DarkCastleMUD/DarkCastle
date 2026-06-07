@@ -2031,9 +2031,9 @@ void Character::fillHPLimit(void)
 void Character::addHP(int newhp, Character *causer)
 {
   hit += newhp;
-  if (hit > max_hit)
+  if (hit > hit_limit(this))
   {
-    hit = max_hit;
+    hit = hit_limit(this);
   }
 }
 
