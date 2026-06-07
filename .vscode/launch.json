@@ -97,13 +97,13 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Clean release with debug info build"
+            "preLaunchTask": "rebuild release"
         },
         {
             "name": "Production dcastle -P -p6969 in dcastle.6969/lib",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/debug/dcastle",
+            "program": "${workspaceFolder}/build/release/dcastle",
             "args": [
                 "-P",
                 "-p 6969"
@@ -120,7 +120,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Clean release with debug info build"
+            "preLaunchTask": "rebuild release"
         },
         {
             "name": "debug in lib/",
@@ -431,7 +431,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "rebuild"
+            "preLaunchTask": "rebuild release"
         }
     ]
 }

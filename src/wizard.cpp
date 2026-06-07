@@ -315,8 +315,8 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (k->isNonPlayer())
   {
-    sprintf(buf2, "%s", (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
-    sprintf(buf3, "%s", (k->mobdata->fears ? k->mobdata->fears : "NOBODY"));
+    snprintf(buf2, sizeof(buf2), "%s", k->mobdata->hated.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->hated));
+    snprintf(buf3, sizeof(buf3), "%s", k->mobdata->fears_.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->fears_));
   }
   else
   {
@@ -835,8 +835,7 @@ command_return_t mob_stat(Character *ch, Character *k)
             (k->mobdata->hated.isEmpty() ? "NOBODY" : k->mobdata->hated.toStdString().c_str()));
     ch->send(buf);
 
-    sprintf(buf, "$3Fears$R: '%s'\r\n",
-            ((k->mobdata->fears) ? k->mobdata->fears : "NOBODY"));
+    snprintf(buf, sizeof(buf), "$3Fears$R: '%s'\r\n", k->mobdata->fears_.isEmpty() ? "NOBODY" : qPrintable(k->mobdata->fears_));
     ch->send(buf);
   }
 
