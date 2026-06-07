@@ -283,7 +283,7 @@
             "preLaunchTask": "rebuild"
         },
         {
-            "name": "testDC",
+            "name": "debug testDC",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/debug/testDC",
@@ -307,6 +307,32 @@
                 }
             ],
             "preLaunchTask": "rebuild"
+        },
+        {
+            "name": "release testDC",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/release/testDC",
+            "args": [
+                // "test_redeem_trader"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerArgs": "-ex \"set debuginfod enabled off\"",
+            "logging": {
+                "engineLogging": false,
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": false
+                }
+            ],
+            "preLaunchTask": "rebuild release"
         },
         {
             "name": "valgrind debug/dcastle",
