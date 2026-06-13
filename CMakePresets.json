@@ -1,8 +1,8 @@
 {
     "version": 10,
     "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 23,
+        "major": 4,
+        "minor": 0,
         "patch": 0
     },
     "$comment": "An example CMakePresets.json file",
@@ -12,15 +12,35 @@
             "displayName": "Debug Config",
             "description": "debug build using Ninja generator",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/debug",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_COMPILER": "/usr/bin/g++-15",
-                "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
                 "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON"
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CXX_STANDARD": "26",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_FLAGS": ""
+            }
+        },
+        {
+            "name": "debugtracy",
+            "displayName": "Debug Config with Tracy",
+            "description": "debug with Tracy build using Ninja generator",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
+                "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CXX_STANDARD": "26",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_FLAGS": ""
             }
         },
         {
@@ -28,15 +48,17 @@
             "displayName": "Release Config",
             "description": "release build using Ninja generator",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/release",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "CMAKE_CXX_COMPILER": "/usr/bin/g++-15",
-                "CMAKE_C_COMPILER_LAUNCHER": "ccache",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
                 "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
                 "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON"
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_CXX_STANDARD": "26",
+                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+                "CMAKE_CXX_FLAGS": ""
             }
         }
     ],
@@ -44,20 +66,34 @@
         {
             "name": "debug",
             "configurePreset": "debug",
-            "verbose": true,
-            "jobs": 128
+            "verbose": true
+        },
+        {
+            "name": "debugtracy",
+            "configurePreset": "debugtracy",
+            "verbose": true
         },
         {
             "name": "release",
             "configurePreset": "release",
-            "verbose": false,
-            "jobs": 128
+            "verbose": true
         }
     ],
     "testPresets": [
         {
             "name": "debug",
             "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "debugtracy",
+            "configurePreset": "debugtracy",
             "output": {
                 "outputOnFailure": true
             },
@@ -98,6 +134,19 @@
                 {
                     "type": "build",
                     "name": "debug"
+                }
+            ]
+        },
+        {
+            "name": "debugtracy",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "debugtracy"
+                },
+                {
+                    "type": "build",
+                    "name": "debugtracy"
                 }
             ]
         },
