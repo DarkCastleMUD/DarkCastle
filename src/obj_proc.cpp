@@ -1714,7 +1714,7 @@ int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (!move_char(ch, real_room(number(17800, 17949))) == 0)
+  if (move_char(ch, real_room(number(17800, 17949))) != ReturnValue::eSUCCESS)
     return ReturnValue::eFAILURE;
 
   if (ch->fighting)
