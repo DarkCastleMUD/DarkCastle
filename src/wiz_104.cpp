@@ -878,9 +878,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       {
         if ((nr = real_mobile(begin)) >= 0)
         {
-          sprintf(buf, "[  1] [%5d] [%2d] %s\r\n", begin,
-                  ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-                  ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
           ch->send(buf);
         }
       }
@@ -893,9 +891,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
-                  ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-                  ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
           ch->send(buf);
 
           if (count > 200)
@@ -919,9 +915,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].item))->getNameC()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
-                  ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-                  ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
           ch->send(buf);
 
           if (count > 200)
@@ -982,9 +976,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       {
         if ((nr = real_object(begin)) >= 0)
         {
-          sprintf(buf, "[  1] [%5d] [%2d] %s\r\n", begin,
-                  ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                  ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
           ch->send(buf);
         }
       }
@@ -997,9 +989,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
-                  ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                  ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
           ch->send(buf);
 
           if (count > 200)
@@ -1023,9 +1013,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[nr].item))->Name()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, i,
-                  ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-                  ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
           ch->send(buf);
         }
 
@@ -1402,9 +1390,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, c,
-              ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(),
-              ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
       ch->send(buf);
     eheh:
       continue;
@@ -1726,9 +1712,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2d] %s\r\n", count, c,
-              ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level,
-              ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
       ch->send(buf);
     endLoop:
       continue;
@@ -2109,6 +2093,7 @@ int do_opstat(Character *ch, char *argument, cmd_t cmd)
 
 void update_objprog_bits(int num)
 {
+  assert(num >= 0 && num <= MAX_INDEX);
   mob_prog_data *prog = DC::getInstance()->obj_index[num].mobprogs;
   DC::getInstance()->obj_index[num].progtypes = 0;
 
