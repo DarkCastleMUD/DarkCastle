@@ -83,7 +83,6 @@
 #define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
 
 #include <set>
-#include <queue>
 #include <unordered_set>
 #include <unordered_map>
 #include <netinet/in.h>
