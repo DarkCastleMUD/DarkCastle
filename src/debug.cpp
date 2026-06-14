@@ -2,9 +2,7 @@
 
 #include <iostream>
 #include <map>
-#include <cmath>
 #include <filesystem>
-#include <queue>
 #include <cassert>
 
 #include <QtSql/QSqlRelationalTableModel>
@@ -12,7 +10,6 @@
 #include <QtSql/QSqlField>
 #include <QtSql/QSqlError>
 
-#include "DC/spells.h"
 #include "DC/connect.h"
 #include "DC/utility.h"
 #include "DC/db.h"
@@ -22,7 +19,6 @@
 #include "DC/vault.h"
 #include "DC/Leaderboard.h"
 #include "DC/interp.h"
-#include "DC/Database.h"
 
 void load_char_obj_error(FILE *fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(char_file_u4 *st, Character *ch);
@@ -49,7 +45,7 @@ void test_handle_ansi(QString test)
   // QString str1 = "$b$B$1test$R $ $$ $$$ $$$";
   QString str1 = test;
   char *str2 = new char[1024];
-  memset(str2, 1024, 0);
+  memset(str2, 0, 1024);
   strncpy(str2, str1.toStdString().c_str(), 1024);
   QString result1 = handle_ansi(str1, ch);
   QString result2 = QString(handle_ansi_(str2, ch));
@@ -259,7 +255,9 @@ int main(int argc, char **argv)
   class Connection *d = new Connection;
 
   /* Create 1 blank obj to be used when playerfile loads */
-  debug.create_blank_item(1);
+  auto rc = debug.create_blank_item(1);
+  if (!rc)
+    qCritical("error in debug.create_blank_item(1) of %d", rc.error());
 
   debug.load_vaults();
 
@@ -461,7 +459,7 @@ int main(int argc, char **argv)
 
       if (c->isImmortalPlayer())
       {
-        qWarning(QStringLiteral("WARNING: %1 level: %2").arg(c->getName()).arg(c->getLevel()).toStdString().c_str());
+        qWarning("%s", qPrintable(u"WARNING: %1 level: %2"_s.arg(c->getName()).arg(c->getLevel())));
       }
     }
 
