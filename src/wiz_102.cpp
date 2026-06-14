@@ -186,7 +186,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
 
     /* ctime adds a \n to the std::string it returns! */
     const time_t tBuffer = vict->player->time.logon;
-    +sprintf(buf, "$3Last connected on$R: %s\r", ctime(&tBuffer));
+    snprintf(buf, sizeof(buf), "$3Last connected on$R: %s\r", ctime(&tBuffer));
     ch->send(buf);
   }
 
@@ -1832,7 +1832,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %lu has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1893,7 +1893,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1930,8 +1930,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1971,8 +1970,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %d has no affects to modify.\r\n",
-              DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -2628,6 +2626,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
 void update_mobprog_bits(int mob_num)
 {
+  assert(mob_num >= 0 && mob_num < MAX_INDEX);
   mob_prog_data *prog = DC::getInstance()->mob_index[mob_num].mobprogs;
   DC::getInstance()->mob_index[mob_num].progtypes = 0;
 
@@ -2676,7 +2675,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
                  "  The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
-    sprintf(buf2, "\r\n$3Current mob vnum set to$R: %d\r\n", ch->player->last_mob_edit);
+    sprintf(buf2, "\r\n$3Current mob vnum set to$R: %lu\r\n", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return ReturnValue::eFAILURE;
   }
@@ -3359,8 +3358,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] level <levelnum>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%d\n",
-              ((Character *)DC::getInstance()->mob_index[mob_num].item)->getLevel());
+      sprintf(buf, "%llu\n", ((Character *)DC::getInstance()->mob_index[mob_num].item)->getLevel());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -5155,7 +5153,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
     break;
   }
 
-  fprintf(fl, "#%d\n", DC::getInstance()->world[room].zone);
+  fprintf(fl, "#%lu\n", DC::getInstance()->world[room].zone);
   sprintf(buf, "%s's Area.", ch->getNameC());
   string_to_file(fl, buf);
   fprintf(fl, "~\n");
@@ -5219,9 +5217,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
         if (!obj->in_obj)
         {
-          fprintf(fl, "O 0 %d %d %d",
-                  DC::getInstance()->obj_index[obj->item_number].vnum(), count,
-                  DC::getInstance()->world[room].number);
+          fprintf(fl, "O 0 %lu %d %d", DC::getInstance()->obj_index[obj->item_number].vnum(), count, DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
           string_to_file(fl, buf);
 
@@ -5239,12 +5235,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   count++;
               }
 
-              fprintf(fl, "P 1 %d %d %d",
-                      DC::getInstance()->obj_index[tmp_obj->item_number].vnum(), count,
-                      DC::getInstance()->obj_index[obj->item_number].vnum());
-              sprintf(buf, "     %s placed inside %s\n",
-                      tmp_obj->short_description,
-                      obj->short_description);
+              fprintf(fl, "P 1 %lu %d %lu", DC::getInstance()->obj_index[tmp_obj->item_number].vnum(), count, DC::getInstance()->obj_index[obj->item_number].vnum());
+              sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
               string_to_file(fl, buf);
             } /*  for loop */
           } /* end of the object's contents... */
@@ -5282,8 +5274,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             count++;
         }
 
-        fprintf(fl, "M 0 %d %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].vnum(),
-                count, DC::getInstance()->world[room].number);
+        fprintf(fl, "M 0 %lu %d %d", DC::getInstance()->mob_index[mob->mobdata->nr].vnum(), count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
 
@@ -5304,11 +5295,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "E 1 %d %d %d",
-                      DC::getInstance()->obj_index[obj->item_number].vnum(), count,
-                      pos);
-              sprintf(buf, "      Equip %s with %s\n",
-                      mob->short_desc, obj->short_description);
+              fprintf(fl, "E 1 %lu %d %d", DC::getInstance()->obj_index[obj->item_number].vnum(), count, pos);
+              sprintf(buf, "      Equip %s with %s\n", mob->short_desc, obj->short_description);
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5325,13 +5313,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %d %d %d",
-                          DC::getInstance()->obj_index[tmp_obj->item_number].vnum(),
-                          count,
-                          DC::getInstance()->obj_index[obj->item_number].vnum());
-                  sprintf(buf, "     %s placed inside %s\n",
-                          tmp_obj->short_description,
-                          obj->short_description);
+                  fprintf(fl, "P 1 %lu %d %lu", DC::getInstance()->obj_index[tmp_obj->item_number].vnum(), count, DC::getInstance()->obj_index[obj->item_number].vnum());
+                  sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5355,10 +5338,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "G 1 %d %d",
-                      DC::getInstance()->obj_index[obj->item_number].vnum(), count);
-              sprintf(buf, "      Give %s %s\n", mob->short_desc,
-                      obj->short_description);
+              fprintf(fl, "G 1 %lu %d", DC::getInstance()->obj_index[obj->item_number].vnum(), count);
+              sprintf(buf, "      Give %s %s\n", mob->short_desc, obj->short_description);
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5375,13 +5356,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %d %d %d",
-                          DC::getInstance()->obj_index[tmp_obj->item_number].vnum(),
-                          count,
-                          DC::getInstance()->obj_index[obj->item_number].vnum());
-                  sprintf(buf, "     %s placed inside %s\n",
-                          tmp_obj->short_description,
-                          obj->short_description);
+                  fprintf(fl, "P 1 %lu %d %lu", DC::getInstance()->obj_index[tmp_obj->item_number].vnum(), count, DC::getInstance()->obj_index[obj->item_number].vnum());
+                  sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5437,9 +5413,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     logentry(buf, PATRON, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
-  sprintf(buf,
-          "Room name: %s, Of zone : %d. V-Number : %d, R-number : %d\r\n",
-          rm->name, rm->zone, rm->number, ch->in_room);
+  sprintf(buf, "Room name: %s, Of zone : %lu. V-Number : %d, R-number : %lu\r\n", rm->name, rm->zone, rm->number, ch->in_room);
   ch->send(buf);
 
   sprinttype(rm->sector_type, sector_types, buf2);
