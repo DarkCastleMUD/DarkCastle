@@ -27,10 +27,10 @@ jobs:
       - name: make
         run: |
           git config --global --add safe.directory /__w/DarkCastle/DarkCastle
-          cmake --workflow --preset debug
-          zypper -n in --allow-unsigned-rpm build/debug/dc*rpm
+          cmake --workflow --preset release
+          zypper -n in --allow-unsigned-rpm build/release/dc*rpm
 
       - name: test
         run: |
-          build/testDC
-          build/benchmarkDC
+          build/release/testDC
+          build/release/benchmarkDC
