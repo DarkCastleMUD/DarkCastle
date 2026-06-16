@@ -28,7 +28,7 @@ jobs:
         run: |
           git config --global --add safe.directory /__w/DarkCastle/DarkCastle
           cmake --workflow --preset debug
-          zypper -n in --allow-unsigned-rpm build/dc*rpm
+          zypper -n in --allow-unsigned-rpm build/debug/dc*rpm
 
       - name: test
         run: |
