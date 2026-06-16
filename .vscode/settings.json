@@ -86,7 +86,6 @@
         "-extra-arg=-std=c++23",
         "-extra-arg=-stdlib=libc++"
     ],
-    "cmake.sourceDirectory": "${workspaceFolder}/src",
     "C_Cpp.codeAnalysis.exclude": {
         "**/.github": true,
         "**/.git": true,
