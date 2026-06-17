@@ -4689,8 +4689,8 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
 { // Sneakiness.
   Character *temp;
   temp = clone_mobile(real_mobile(12));
-  mob_index[real_mobile(12)].mobprogs = obj_index[obj->item_number].mobprogs;
-  mob_index[real_mobile(12)].progtypes = obj_index[obj->item_number].progtypes;
+  mob_index[12].mobprogs = obj_index[obj->item_number].mobprogs;
+  mob_index[12].progtypes = obj_index[obj->item_number].progtypes;
 
   if (ch)
     char_to_room(temp, ch->in_room);
@@ -4735,8 +4735,8 @@ void end_oproc(Character *ch, Trace trace)
   {
     trace.addTrack("end_oproc");
     extract_char(ch, true, trace);
-    DC::getInstance()->mob_index[real_mobile(12)].progtypes = {};
-    DC::getInstance()->mob_index[real_mobile(12)].mobprogs = {};
+    DC::getInstance()->mob_index[12].progtypes = {};
+    DC::getInstance()->mob_index[12].mobprogs = {};
   }
 }
 

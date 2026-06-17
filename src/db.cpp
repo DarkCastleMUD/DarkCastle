@@ -1231,13 +1231,13 @@ void add_mobspec(int i)
     break;
   case CLASS_PSIONIC:
     if (a->getLevel() < 21)
-      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(149)].mobprogs;
+      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[149].mobprogs;
     else if (a->getLevel() < 35)
-      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(150)].mobprogs;
+      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[150].mobprogs;
     else if (a->getLevel() < 51)
-      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(151)].mobprogs;
+      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[151].mobprogs;
     else
-      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(152)].mobprogs;
+      DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[152].mobprogs;
     break;
   default:
     break;
