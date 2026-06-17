@@ -896,6 +896,7 @@ public:
 
   int32_t timer = {};           // Timer for update
   int32_t shotsthisround = {};  // Arrows fired this round
+  bool firing_arrow = {};       // Mid weapon_spells of a fired arrow; cannot be melee'd
   int32_t spellcraftglyph = {}; // Used for spellcraft glyphs
   bool changeLeadBonus = {};
   int32_t curLeadBonus = {};

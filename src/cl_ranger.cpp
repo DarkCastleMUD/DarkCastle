@@ -1592,7 +1592,9 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("Error moving you to room in do_fire.");
         return ReturnValue::eFAILURE;
       }
+      ch->firing_arrow = true;
       retval = weapon_spells(ch, victim, ITEM_MISSILE);
+      ch->firing_arrow = false;
       // just in case
       if (isSet(retval, ReturnValue::eCH_DIED))
       {
