@@ -977,7 +977,7 @@ void reset_time(void)
 }
 
 /* generate index table for monster file */
-index_data *DC::generate_mob_indices(int *top, index_data *index)
+void DC::generate_mob_indices(int *top, QMap<vnum_t, class index_data> &index)
 {
   int i = 0;
   char buf[82];
@@ -1091,7 +1091,6 @@ index_data *DC::generate_mob_indices(int *top, index_data *index)
   {
     add_mobspec(i);
   }
-  return (index);
 }
 
 void add_mobspec(int i)
@@ -3500,7 +3499,7 @@ int DC::create_blank_mobile(int nr)
   mob->misc = 0;
 
   // shift > items right
-  memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(index_data)));
+  // memmove(&DC::getInstance()->mob_index[cur_index + 1], &DC::getInstance()->mob_index[cur_index], ((top_of_mobt - cur_index + 1) * sizeof(index_data)));
   top_of_mobt++;
 
   // insert
@@ -3592,7 +3591,7 @@ void delete_mob_from_index(int nr)
 
   dc_free(DC::getInstance()->mob_index[nr].item);
   // shift > items left
-  memmove(&DC::getInstance()->mob_index[nr], &DC::getInstance()->mob_index[nr + 1], ((top_of_mobt - nr) * sizeof(index_data)));
+  // memmove(&DC::getInstance()->mob_index[nr], &DC::getInstance()->mob_index[nr + 1], ((top_of_mobt - nr) * sizeof(index_data)));
   top_of_mobt--;
 
   // update index of all mobiles in game - these store rnums
@@ -6270,30 +6269,9 @@ room_t real_room(room_t virt)
   return DC::NOWHERE;
 }
 
-/* returns the real number of the monster with given virt number */
 int real_mobile(int virt)
 {
-  int bot, top, mid;
-
-  bot = 0;
-  top = top_of_mobt;
-
-  /* perform binary search on mob-table */
-  for (;;)
-  {
-    mid = (bot + top) / 2;
-
-    if ((DC::getInstance()->mob_index + mid)->vnum() == virt)
-      return (mid);
-    if (bot >= top)
-      return (-1);
-    if ((DC::getInstance()->mob_index + mid)->vnum() > virt)
-      top = mid - 1;
-    else
-      bot = mid + 1;
-  }
-
-  return -1;
+  return virt;
 }
 
 /* returns the real number of the object with given virt number */
