@@ -2813,7 +2813,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
   // int i;
   /*   for (i = 22394; i < 22399; i++)
-   if (real_mobile(i) == target->mobdata->nr)
+   if (i == target->mobdata->nr)
    {
    ch->sendln("The undead being is unaffected by your song.");
    return ReturnValue::eFAILURE;

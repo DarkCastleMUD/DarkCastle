@@ -72,7 +72,7 @@ int call_for_help_in_room(Character *ch, int iFriendId)
     if (ally == ch->fighting)
       continue;
 
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (iFriendId == ally->mobdata->nr)
     {
       if (!can_be_attacked(ally, ch->fighting))
         continue;
@@ -119,7 +119,7 @@ int protect(Character *ch, int iFriendId)
     if (ally == ch->fighting)
       continue;
 
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (iFriendId == ally->mobdata->nr)
     {
       // obscure whitney houston joke
       do_say(ch, "and IiiiIIiiii will always, looove yooooou!", cmd_t::DEFAULT);
@@ -229,7 +229,7 @@ void summon_all_of_mob_to_room(Character *ch, int iFriendId)
   {
     if (!victim->isNonPlayer())
       continue;
-    if (real_mobile(iFriendId) == victim->mobdata->nr)
+    if (iFriendId == victim->mobdata->nr)
     {
       move_char(victim, ch->in_room);
     }
@@ -252,7 +252,7 @@ Character *find_mob_in_room(Character *ch, int iFriendId)
   {
     if (!ally->isNonPlayer())
       continue;
-    if (real_mobile(iFriendId) == ally->mobdata->nr)
+    if (iFriendId == ally->mobdata->nr)
       return ally;
   }
   return nullptr;
