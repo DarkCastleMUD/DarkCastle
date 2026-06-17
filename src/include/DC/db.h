@@ -369,7 +369,6 @@ T fread_bitvector(auto &in)
 void add_mobspec(int i);
 void write_object_csv(Object *obj, std::ofstream &fout);
 extern skill_quest *skill_list;
-extern index_data mob_index_array[MAX_INDEX];
 #define REAL 0
 #define VIRTUAL 1
 
