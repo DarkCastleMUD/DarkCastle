@@ -567,6 +567,9 @@ int attack(Character *ch, Character *vict, int type, int weapon)
   if (!can_be_attacked(ch, vict))
     return ReturnValue::eFAILURE;
 
+  if (vict->firing_arrow)
+    return ReturnValue::eFAILURE;
+
   // TODO - until I can make sure that area effects don't attack other mobs
   // when cast by mobs, I need to make sure mobs aren't killing each other
   if (ch->isNonPlayer() && vict->isNonPlayer() &&
@@ -1469,6 +1472,8 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   // TODO - I'd like to remove these 3 cause they are checked in attack()
   /* This happens with multi-attacks */
   if (ch->in_room != vict->in_room)
+    return ReturnValue::eFAILURE;
+  if (vict->firing_arrow)
     return ReturnValue::eFAILURE;
   if (!can_be_attacked(ch, vict))
     return ReturnValue::eFAILURE;
