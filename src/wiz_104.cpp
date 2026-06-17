@@ -2196,7 +2196,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     currprog->type = 0;
     dc_free(currprog->arglist);
     dc_free(currprog->comlist);
-    dc_free(currprog);
+    delete currprog;
 
     update_objprog_bits(num);
 
