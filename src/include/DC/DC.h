@@ -455,8 +455,7 @@ public:
   class index_data obj_index_array[MAX_INDEX] = {};
   class index_data *obj_index = obj_index_array;
 
-  class index_data mob_index_array[MAX_INDEX] = {};
-  class index_data *mob_index = mob_index_array;
+  QMap<vnum_t, class index_data> mob_index;
   world_file_list_item *world_file_list = 0; // List of the world files
   world_file_list_item *mob_file_list = 0;   // List of the mob files
   world_file_list_item *obj_file_list = 0;   // List of the obj files
@@ -586,7 +585,7 @@ public:
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
   vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
   vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
-  index_data *generate_mob_indices(int *top, index_data *index);
+  void generate_mob_indices(int *top, QMap<vnum_t, class index_data> &index);
   index_data *generate_obj_indices(int *top, index_data *index);
   Character *read_mobile(int nr, FILE *fl);
   Character *clone_mobile(int nr);
