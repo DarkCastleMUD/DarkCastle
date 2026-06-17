@@ -2831,7 +2831,7 @@ int foggy_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   // create the mob
-  mob = ch->getDC()->clone_mobile(real_mobile(22026));
+  mob = ch->getDC()->clone_mobile(22026);
   if (!mob)
   {
     logentry(QStringLiteral("Foggy combat mobile missing"), ANGEL, DC::LogChannel::LOG_BUG);

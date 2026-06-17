@@ -4688,7 +4688,7 @@ void DC::update_mprog_throws(void)
 Character *DC::initiate_oproc(Character *ch, Object *obj)
 { // Sneakiness.
   Character *temp;
-  temp = clone_mobile(real_mobile(12));
+  temp = clone_mobile(12);
   mob_index[12].mobprogs = obj_index[obj->item_number].mobprogs;
   mob_index[12].progtypes = obj_index[obj->item_number].progtypes;
 

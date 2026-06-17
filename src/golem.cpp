@@ -267,13 +267,13 @@ void Character::load_golem_data(int golemtype)
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, this->getNameC()[0], this->getNameC(), golemtype);
   if (!(fpfile = fopen(file, "r")))
   { // No golem. Create a new one.
-    golem = dc_->clone_mobile(real_mobile(8));
+    golem = dc_->clone_mobile(8);
     set_golem(golem, golemtype);
     golem->alignment = this->alignment;
     this->player->golem = golem;
     return;
   }
-  golem = dc_->clone_mobile(real_mobile(8));
+  golem = dc_->clone_mobile(8);
   set_golem(golem, golemtype); // Basics
   this->player->golem = golem;
   uint8_t golem_level{};

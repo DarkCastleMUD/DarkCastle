@@ -12341,7 +12341,7 @@ int spell_create_golem(int level, Character *ch, Character *victim, class Object
 
   // create golem
 
-  mob = ch->getDC()->clone_mobile(real_mobile(201));
+  mob = ch->getDC()->clone_mobile(201);
   if (!mob)
   {
     ch->sendln("Warning: Load mob not found in create_corpse");
