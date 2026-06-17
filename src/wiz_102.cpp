@@ -5458,7 +5458,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     if (real_mobile(d->vnum) == -1)
       ch->send(QStringLiteral("UNKNOWN(%1)\r\n").arg(d->vnum));
     else
-      csendf(ch, "%s(%d)\r\n", ((Character *)DC::getInstance()->mob_index[real_mobile(d->vnum)].item)->short_desc, d->vnum);
+      csendf(ch, "%s(%d)\r\n", ((Character *)DC::getInstance()->mob_index[d->vnum].item)->short_desc, d->vnum);
     a++;
   }
   ch->sendln("");
