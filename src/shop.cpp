@@ -1546,7 +1546,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
 */
 void assign_the_player_shopkeepers()
 {
-  DC::getInstance()->mob_index[real_mobile(PLAYER_SHOP_KEEPER)].non_combat_func = player_shop_keeper;
+  DC::getInstance()->mob_index[PLAYER_SHOP_KEEPER].non_combat_func = player_shop_keeper;
 }
 
 void redo_shop_profit()
