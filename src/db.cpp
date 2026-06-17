@@ -6468,7 +6468,7 @@ void load_mobprogs(FILE *fp)
       break;
     case 'm':
       value = fread_int(fp, 0, 2147483467);
-      if (real_mobile(value) < 0)
+      if (!DC::getInstance()->mob_index.contains(value))
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Load_mobprogs: vnum %d doesn't exist.", value);
         break;

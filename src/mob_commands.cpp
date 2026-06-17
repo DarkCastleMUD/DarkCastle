@@ -1058,7 +1058,7 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
 
   if (isdigit(*first))
   {
-    if (!check_valid_and_convert(mob_num, first) || (real_mobile(mob_num) < 0))
+    if (!check_valid_and_convert(mob_num, first) || !DC::getInstance()->mob_index.contains(mob_num))
     {
       ch->prog_error(QStringLiteral("Mpthrow - Invalid mobnum."));
       return ReturnValue::eFAILURE;

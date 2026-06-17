@@ -966,7 +966,7 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {
-    if (mob && (real_mobile(i) < 0 || !DC::getInstance()->mob_index[i].mobprogs))
+    if (mob && (!DC::getInstance()->mob_index.contains(i) || !DC::getInstance()->mob_index[i].mobprogs))
       continue;
     else if (!mob && (real_object(i) < 0 || !DC::getInstance()->obj_index[real_object(i)].mobprogs))
       continue;

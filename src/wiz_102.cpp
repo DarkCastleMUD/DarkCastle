@@ -5455,7 +5455,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   {
     if (a == 0)
       ch->send("Mobiles Denied: ");
-    if (real_mobile(d->vnum) == -1)
+    if (!DC::getInstance()->mob_index.contains(d->vnum))
       ch->send(QStringLiteral("UNKNOWN(%1)\r\n").arg(d->vnum));
     else
       csendf(ch, "%s(%d)\r\n", ((Character *)DC::getInstance()->mob_index[d->vnum].item)->short_desc, d->vnum);
