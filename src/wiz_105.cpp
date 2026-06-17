@@ -966,7 +966,7 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
   buf[0] = '\0';
   for (i = start, tot = 1; i <= end; i++)
   {
-    if (mob && (real_mobile(i) < 0 || !DC::getInstance()->mob_index[real_mobile(i)].mobprogs))
+    if (mob && (real_mobile(i) < 0 || !DC::getInstance()->mob_index[i].mobprogs))
       continue;
     else if (!mob && (real_object(i) < 0 || !DC::getInstance()->obj_index[real_object(i)].mobprogs))
       continue;
@@ -974,7 +974,7 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
       break;
     if (mob)
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Character *)DC::getInstance()->mob_index[real_mobile(i)].item)->getName()));
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Character *)DC::getInstance()->mob_index[i].item)->getName()));
     }
     else
     {

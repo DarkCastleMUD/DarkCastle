@@ -1245,18 +1245,18 @@ void add_mobspec(int i)
 
   if (mob)
   {
-    DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[real_mobile(mob)].mobprogs;
+    DC::getInstance()->mob_index[i].mobspec = DC::getInstance()->mob_index[mob].mobprogs;
 
     for (int j = 0; j < ACT_MAX / ASIZE + 1; j++)
     {
       SET_BIT(((Character *)DC::getInstance()->mob_index[i].item)->mobdata->actflags[j],
-              ((Character *)DC::getInstance()->mob_index[real_mobile(mob)].item)->mobdata->actflags[j]);
+              ((Character *)DC::getInstance()->mob_index[mob].item)->mobdata->actflags[j]);
     }
 
     for (int j = 0; j < AFF_MAX / ASIZE + 1; j++)
     {
       SET_BIT(((Character *)DC::getInstance()->mob_index[i].item)->affected_by[j],
-              ((Character *)DC::getInstance()->mob_index[real_mobile(mob)].item)->affected_by[j]);
+              ((Character *)DC::getInstance()->mob_index[mob].item)->affected_by[j]);
     }
   }
 
