@@ -2679,11 +2679,12 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int mobvnum = -1;
+  int mobvnum = {};
   if (isdigit(*buf))
   {
     mobvnum = atoi(buf);
-    if (((mob_num = real_mobile(mobvnum)) < 0) || (mobvnum == 0 && *buf != '0'))
+    mob_num = mobvnum;
+    if (!DC::getInstance()->mob_index.contains(mobvnum) || (mobvnum == 0 && *buf != '0'))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
       return ReturnValue::eSUCCESS;
@@ -3044,7 +3045,8 @@ int do_mscore(Character *ch, char *argument, cmd_t cmd)
   }
 
   int64_t mob_vnum = atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
-  if (((mob_num = real_mobile(mob_vnum)) < 0))
+  mob_num = mob_vnum;
+  if (!DC::getInstance()->mob_index.contains(mob_vnum))
   {
     ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mob_vnum));
     return ReturnValue::eSUCCESS;
@@ -3118,7 +3120,8 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   else
   {
     mobvnum = ch->player->last_mob_edit;
-    if (((mob_num = real_mobile(mobvnum)) < 0 && strcmp(buf, "new")))
+    mob_num = mobvnum;
+    if (!DC::getInstance()->mob_index.contains(mobvnum) && strcmp(buf, "new"))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
       return ReturnValue::eFAILURE;

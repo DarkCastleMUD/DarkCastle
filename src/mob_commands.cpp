@@ -531,7 +531,8 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((realnum = real_mobile(atoi(arg))) < 0)
+  realnum = atoi(arg);
+  if (!DC::getInstance()->mob_index.contains(realnum))
   {
     ch->prog_error(QStringLiteral("Mpmload - Bad mob vnum."));
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;

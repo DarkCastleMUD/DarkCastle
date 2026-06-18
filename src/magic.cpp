@@ -5334,7 +5334,8 @@ int spell_animate_dead(uint8_t level, Character *ch, Character *victim, class Ob
       number = 22393;
   }
 
-  if ((r_num = real_mobile(number)) < 0)
+  r_num = number;
+  if (!DC::getInstance()->mob_index.contains(number))
   {
     ch->sendln("Mobile: Zombie not found.");
     return ReturnValue::eFAILURE;
@@ -12786,7 +12787,8 @@ int spell_summon_familiar(uint8_t level, Character *ch, char *arg, int type, Cha
   if (-1 == fam_type)
     return ReturnValue::eFAILURE;
 
-  if ((r_num = real_mobile(fam_type)) < 0)
+  r_num = fam_type;
+  if (!DC::getInstance()->mob_index.contains(fam_type))
   {
     ch->sendln("Summon familiar mob not found.  Tell a god.");
     return ReturnValue::eFAILURE;
@@ -14447,8 +14449,8 @@ int spell_ghost_walk(uint8_t level, Character *ch, Character *victim, class Obje
     ch->sendln("Invalid sectortype. Please report location to an imm.");
     return ReturnValue::eFAILURE;
   }
-  int mobile;
-  if ((mobile = real_mobile(vnum)) < 0)
+  int mobile = vnum;
+  if (!DC::getInstance()->mob_index.contains(vnum))
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Ghostwalk - Bad mob vnum: vnum %d.", vnum);
     ch->sendln("\"Spirit\" for this sector not yet implented.");
@@ -14579,7 +14581,8 @@ int spell_conjure_elemental(uint8_t level, Character *ch, char *arg, Character *
     ch->sendln("That item is not used for elemental summoning.");
     return ReturnValue::eFAILURE;
   }
-  if ((r_num = real_mobile(virt)) < 0)
+  r_num = virt;
+  if (!DC::getInstance()->mob_index.contains(virt))
   {
     ch->sendln("Mobile: Elemental not found.");
     return ReturnValue::eFAILURE;

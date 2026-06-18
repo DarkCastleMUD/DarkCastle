@@ -337,7 +337,6 @@ QString fread_word(QTextStream &);
 void delete_item_from_index(int nr);
 void delete_mob_from_index(int nr);
 int real_object(int virt);
-int real_mobile(int virt);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
 
 int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);

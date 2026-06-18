@@ -263,8 +263,6 @@ int main(int argc, char **argv)
 
   chdir(orig_cwd.toStdString().c_str());
 
-  // std::cerr << real_mobile(0) << " " << real_mobile(1) << std::endl;
-
   int vnum = 0;
   if (argc >= 3)
   {

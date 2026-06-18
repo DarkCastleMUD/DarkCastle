@@ -232,7 +232,8 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     else if (number == -1)
     {
-      if ((number = real_mobile(num)) < 0)
+      number = num;
+      if (!DC::getInstance()->mob_index.contains(num))
       {
         ch->sendln("No such mobile.");
         return ReturnValue::eFAILURE;
@@ -876,7 +877,8 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 
       if (end == -1)
       {
-        if ((nr = real_mobile(begin)) >= 0)
+        nr = begin;
+        if (DC::getInstance()->mob_index.contains(begin))
         {
           sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
           ch->send(buf);
@@ -887,7 +889,8 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         for (i = begin; i <= DC::getInstance()->mob_index[top_of_mobt].vnum() && i <= end;
              i++)
         {
-          if ((nr = real_mobile(i)) < 0)
+          nr = i;
+          if (!DC::getInstance()->mob_index.contains(i))
             continue;
 
           count++;
@@ -909,7 +912,8 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 
       for (i = 0; (i <= DC::getInstance()->mob_index[top_of_mobt].vnum()); i++)
       {
-        if ((nr = real_mobile(i)) < 0)
+        nr = i;
+        if (!DC::getInstance()->mob_index.contains(i))
           continue;
 
         if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].item))->getNameC()))
@@ -1343,7 +1347,8 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     }
     for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].vnum(); c++)
     {
-      if ((nr = real_mobile(c)) < 0)
+      nr = c;
+      if (!DC::getInstance()->mob_index.contains(c))
         continue;
       if (race > -1)
         if (((Character *)(DC::getInstance()->mob_index[nr].item))->race != race)

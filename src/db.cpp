@@ -2203,13 +2203,8 @@ void renum_zone_table(void)
          zone.cmd[comm]->arg1);
          zone.cmd[comm]->command = 'J';
          }*/
-        if (real_mobile(zone.cmd[comm]->arg1) >= 0 && real_room(zone.cmd[comm]->arg3) >= 0)
-          zone.cmd[comm]->arg1 =
-              real_mobile(zone.cmd[comm]->arg1);
-        else
-        {
+        if (!DC::getInstance()->mob_index.contains(zone.cmd[comm]->arg1) || real_room(zone.cmd[comm]->arg3) < 0)
           zone.cmd[comm]->active = 0;
-        }
         //          zone.cmd[comm]->arg3;// =
         //                real_room(zone.cmd[comm]->arg3);
 
@@ -6267,11 +6262,6 @@ room_t real_room(room_t virt)
   }
 
   return DC::NOWHERE;
-}
-
-int real_mobile(int virt)
-{
-  return virt;
 }
 
 /* returns the real number of the object with given virt number */

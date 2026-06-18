@@ -256,7 +256,7 @@ void show_quest_info(Character *ch, int num)
              quest->number, quest->name, quest->level, quest->cost,
              quest->brownie ? "Required" : "Not Required",
              quest->reward, quest->timer, quest->mobnum,
-             real_mobile(quest->mobnum) > 0 ? ((Character *)(DC::getInstance()->mob_index[quest->mobnum].item))->short_desc : "no current mob",
+             DC::getInstance()->mob_index.contains(quest->mobnum) ? ((Character *)(DC::getInstance()->mob_index[quest->mobnum].item))->short_desc : "no current mob",
              quest->objnum, quest->objkey,
              quest->objshort, quest->objlong, quest->hint1, quest->hint2, quest->hint3);
       return;
