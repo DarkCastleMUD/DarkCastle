@@ -22,16 +22,13 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 #include <QDateTime>
 
 #include "DC/character.h"
-#include "DC/weather.h"
 #include "DC/handler.h"
 #include "DC/DC.h"
-#include "DC/utility.h"
 
 class error_eof
 {
