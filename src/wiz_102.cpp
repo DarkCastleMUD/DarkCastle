@@ -3044,7 +3044,7 @@ int do_mscore(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int64_t mob_vnum = atoi(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
+  int64_t mob_vnum = atoi(buf);
   mob_num = mob_vnum;
   if (!DC::getInstance()->mob_index.contains(mob_vnum))
   {
@@ -3109,7 +3109,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   vnum_t mobvnum = {};
   if (is_number(buf))
   {
-    mob_num = atoll(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
+    mob_num = atoll(buf);
     mobvnum = mob_num;
     if (!DC::getInstance()->mob_index.contains(mobvnum))
     {
