@@ -864,8 +864,8 @@ private slots:
     conn2.output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
-    auto new_mob_rnum = real_mobile(5258);
-    QVERIFY(new_mob_rnum != -1);
+    auto new_mob_rnum = 5258;
+    QVERIFY(DC::getInstance()->mob_index.contains(new_mob_rnum));
 
     auto new_rnum = dc.create_blank_item(1);
     QCOMPARE(new_rnum.error(), create_error::entry_exists);

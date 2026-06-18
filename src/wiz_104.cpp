@@ -2450,8 +2450,8 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   }
   Character *mob;
   int vdst = atoi(arg2), vsrc = atoi(arg1);
-  int dst = real_mobile(vdst), src = real_mobile(vsrc);
-  if (src < 0)
+  int dst = vdst, src = vsrc;
+  if (!DC::getInstance()->mob_index.contains(src))
   {
     ch->sendln("Source vnum does not exist.");
     return ReturnValue::eFAILURE;
@@ -2470,9 +2470,9 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
     int retval = do_medit(ch, buf);
     if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
-    dst = real_mobile(vdst);
-    src = real_mobile(vsrc);
-    if (dst == -1)
+    dst = vdst;
+    src = vsrc;
+    if (!DC::getInstance()->mob_index.contains(dst))
     {
       ch->sendln("Something failed. Possibly your destination vnum was too high.");
       return ReturnValue::eFAILURE;

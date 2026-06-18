@@ -430,9 +430,8 @@ int do_mpstat(Character *ch, char *arg, cmd_t cmd)
       ch->sendln("That is not a valid number.");
       return ReturnValue::eFAILURE;
     }
-    x = real_mobile(x);
 
-    if (x < 0)
+    if (!DC::getInstance()->mob_index.contains(x))
     {
       ch->sendln("No mob of that number.");
       return ReturnValue::eFAILURE;
@@ -710,7 +709,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
         switch (zone.cmd[cmd]->command)
         {
         case 'M':
-          j = real_mobile(i);
+          j = i;
           original_value = DC::getInstance()->mob_index[zone.cmd[cmd]->arg1].vnum();
           break;
         case 'P':
@@ -1135,7 +1134,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Matches:");
 
     robj = real_object(j);
-    rmob = real_mobile(j);
+    rmob = j;
 
     // If that obj/mob doesn't exist, put a junk value that should never (hopefully) match
     if (robj == -1)
@@ -2694,9 +2693,9 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
   else
   {
     mobvnum = ch->player->last_mob_edit;
-    mob_num = real_mobile(mobvnum);
+    mob_num = mobvnum;
 
-    if (mob_num < 0 || mobvnum <= 0)
+    if (!DC::getInstance()->mob_index.contains(mob_num) || !DC::getInstance()->mob_index.contains(mobvnum))
     {
       ch->send(fmt::format("Last mob vnum {} is invalid.\r\n", mobvnum));
       return ReturnValue::eFAILURE;
@@ -3110,8 +3109,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     mob_num = atoll(buf); // there is no mob 0, so this is okay.  Bad 0's get caught in real_mobile
     mobvnum = mob_num;
-    mob_num = real_mobile(mobvnum);
-    if (mobvnum == DC::INVALID_VNUM || mob_num == DC::INVALID_VNUM)
+    if (!DC::getInstance()->mob_index.contains(mobvnum))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", buf));
       return ReturnValue::eFAILURE;
@@ -5004,7 +5002,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  int r = real_mobile(v);
+  int r = v;
 
   curr = DC::getInstance()->mob_file_list;
   while (curr)

@@ -165,8 +165,8 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
 
   for (vnum_t vnum = 0; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
   {
-    auto nr = real_mobile(vnum);
-    if (nr < 0)
+    auto nr = vnum;
+    if (!DC::getInstance()->mob_index.contains(nr))
       continue;
 
     auto victim = (Character *)(DC::getInstance()->mob_index[nr].item);

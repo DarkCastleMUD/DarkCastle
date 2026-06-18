@@ -4264,7 +4264,7 @@ Object *get_objindex_vnum(QString vnum_str)
 
 Character *get_random_mob_vnum(int vnum)
 {
-  int num = real_mobile(vnum);
+  int num = vnum;
   int total = DC::getInstance()->mob_index[num].qty;
   int which = number(1, total);
 
@@ -4292,7 +4292,7 @@ Character *get_random_mob_vnum(int vnum)
 
 Character *get_mob_vnum(int vnum)
 {
-  int number = real_mobile(vnum);
+  int number = vnum;
   const auto &character_list = DC::getInstance()->character_list;
 
   auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)

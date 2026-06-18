@@ -55,9 +55,9 @@ void assign_one_mob_non(int vnum, special_function func)
     DC::getInstance()->mob_non_combat_functions[vnum] = func;
   }
 
-  int rnum = real_mobile(vnum);
+  int rnum = vnum;
 
-  if (rnum >= 0)
+  if (DC::getInstance()->mob_index.contains(rnum))
   {
     DC::getInstance()->mob_index[rnum].non_combat_func = func;
   }
@@ -70,9 +70,9 @@ void assign_one_mob_com(int vnum, special_function func)
     DC::getInstance()->mob_non_combat_functions[vnum] = func;
   }
 
-  int rnum = real_mobile(vnum);
+  int rnum = vnum;
 
-  if (rnum >= 0)
+  if (DC::getInstance()->mob_index.contains(rnum))
   {
     DC::getInstance()->mob_index[rnum].combat_func = func;
   }

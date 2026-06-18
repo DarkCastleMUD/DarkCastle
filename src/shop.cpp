@@ -801,7 +801,7 @@ void boot_the_shops()
     fscanf(fp, "%d \n", &temp); /* Temper       */
 
     fscanf(fp, "%d \n", &temp);
-    DC::getInstance()->shop_index[max_shop].keeper = real_mobile(temp);
+    DC::getInstance()->shop_index[max_shop].keeper = temp;
 
     fscanf(fp, "%d \n", &temp); /* With_whom    */
 

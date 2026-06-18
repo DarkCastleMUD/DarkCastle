@@ -2725,7 +2725,7 @@ int do_mlocate(Character *ch, char *name, cmd_t cmd)
   if (isdigit(*name))
   {
     vnum = atoi(name);
-    searchnum = real_mobile(vnum);
+    searchnum = vnum;
   }
 
   *buf2 = '\0';
