@@ -2,31 +2,32 @@
 # time (rm -rf build && cmake -S src -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_COMPILER="/usr/bin/g++-15" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" -GNinja && ninja -C build package)
 # or
 # cmake -S src -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER="/usr/bin/g++-15" -DCMAKE_EXE_LINKER_FLAGS="-fuse-ld=mold" -DCMAKE_SHARED_LINKER_FLAGS="-fuse-ld=mold" -GNinja && ninja -C build
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 4.2.3)
 
 #set these two options to ON when using tracy
-option(TRACY_ENABLE "" OFF)
-#option(TRACY_NO_EXIT "" ON)
-#option(TRACY_ON_DEMAND "" ON)
-#option(TRACY_ONLY_LOCALHOST "" ON)
-#option(TRACY_ONLY_IPV4 "" ON)
-include(FetchContent)
-FetchContent_Declare(
-    tracy
-    GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-    GIT_TAG v0.10
-    GIT_SHALLOW TRUE
-    GIT_PROGRESS TRUE
-    EXCLUDE_FROM_ALL
-)
-FetchContent_MakeAvailable (tracy)
+if (TRACY_ENABLE)
+    option(TRACY_ENABLE "" ON)
+    #option(TRACY_NO_EXIT "" ON)
+    #option(TRACY_ON_DEMAND "" ON)
+    #option(TRACY_ONLY_LOCALHOST "" ON)
+    #option(TRACY_ONLY_IPV4 "" ON)
+    include(FetchContent)
+    FetchContent_Declare(
+        tracy
+        GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+        GIT_TAG v0.10
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        EXCLUDE_FROM_ALL
+    )
+    FetchContent_MakeAvailable (tracy)
 
-if (NOT "${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo" AND NOT "${CMAKE_BUILD_TYPE}" MATCHES "Release")
-    add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
-    set(TRACY "tracy")
+    if (NOT "${CMAKE_BUILD_TYPE}" MATCHES "RelWithDebInfo" AND NOT "${CMAKE_BUILD_TYPE}" MATCHES "Release")
+        add_library(tracy SHARED _deps/tracy-src/public/TracyClient.cpp)
+        set(TRACY "tracy")
+    endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "-Werror -Wno-write-strings -fdiagnostics-color=always -g3 -I_deps/tracy-src/public/")
 set_source_files_properties(tests/testDC.cpp benchmarks/benchmarkDC.cpp PROPERTIES COMPILE_OPTIONS "-Wwrite-strings")
 #-Wpedantic -Wall -Wextra -Wno-change-meaning -Wno-coverage-mismatch -Wno-coverage-invalid-line-number -Wdouble-promotion -Wformat -Wformat-nonliteral -Wformat-overflow -Wformat-security -Wformat-signedness -Wformat-truncation -Wwrite-strings -Wformat-y2k -Wnonnull -Wnonnull-compare -Wnull-dereference -Winit-self -Wfatal-errors -Wdangling-reference
 #set(CMAKE_CXX_FLAGS "-Wno-write-strings -fdiagnostics-color=always -Werror -Wfatal-errors -w -g3 -Wdangling-reference -Wextra -I_deps/tracy-src/public/ -DTRACY_ENABLE -DTRACY_ON_DEMAND")
@@ -65,8 +66,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${BUILD_VERSION}-${CPACK_SYSTEM_NAME}")
 set(CPACK_GENERATOR RPM)
@@ -102,7 +101,7 @@ find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core Network Sql HttpServer Concur
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql HttpServer Concurrent Test)
 
 find_program(CLANG_TIDY NAMES "clang-tidy" REQUIRED)
-set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++23" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
+set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++26" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
 
 add_library(DC SHARED
     src/act_comm.cpp
@@ -272,6 +271,8 @@ add_library(DC SHARED
     src/include/DC/Zone.h
 )
 #set_target_properties(DC PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
+
+#target_sources(DC PUBLIC FILE_SET CXX_MODULES FILES src/DC.cppm)
 
 target_compile_definitions(DC PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
 target_include_directories(DC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
