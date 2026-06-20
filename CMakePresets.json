@@ -2,8 +2,8 @@
     "version": 10,
     "cmakeMinimumRequired": {
         "major": 4,
-        "minor": 0,
-        "patch": 0
+        "minor": 2,
+        "patch": 3
     },
     "$comment": "An example CMakePresets.json file",
     "configurePresets": [
@@ -15,50 +15,34 @@
             "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
-                "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON",
                 "CMAKE_CXX_STANDARD": "26",
                 "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-                "CMAKE_CXX_FLAGS": ""
+                "CMAKE_CXX_FLAGS": "-Wno-write-strings",
+                "CMAKE_COMPILE_WARNING_AS_ERROR": "ON",
+                "CMAKE_LINK_WARNING_AS_ERROR": "ON",
+                "CMAKE_LINKER_TYPE": "MOLD",
+                "CMAKE_COLOR_DIAGNOSTICS": "ON"
             }
         },
         {
             "name": "debugtracy",
             "displayName": "Debug Config with Tracy",
             "description": "debug with Tracy build using Ninja generator",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "inherits": "debug",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
-                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
-                "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON",
-                "CMAKE_CXX_STANDARD": "26",
-                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-                "CMAKE_CXX_FLAGS": ""
+                "TRACY_ENABLE": "ON",
+                "CMAKE_CXX_FLAGS": "-Wno-write-strings -I_deps/tracy-src/public/"
             }
         },
         {
             "name": "release",
             "displayName": "Release Config",
             "description": "release build using Ninja generator",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "inherits": "debug",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
-                "CMAKE_CXX_COMPILER_LAUNCHER": "ccache",
-                "CMAKE_EXE_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_SHARED_LINKER_FLAGS": "-fuse-ld=mold",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON",
-                "CMAKE_CXX_STANDARD": "26",
-                "CMAKE_CXX_STANDARD_REQUIRED": "ON",
-                "CMAKE_CXX_FLAGS": ""
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
         }
     ],
