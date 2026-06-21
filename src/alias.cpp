@@ -160,21 +160,16 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
   bool arg2_level_ok = false;
   auto arg2_level = arg2.toUInt(&arg2_level_ok);
 
-  extern int top_of_mobt;
   QMultiMap<level_t, QString> results;
 
-  for (vnum_t vnum = 0; (vnum <= DC::getInstance()->mob_index[top_of_mobt].vnum()); ++vnum)
+  for (const auto &vnum : DC::getInstance()->mob_index.keys())
   {
-    auto nr = vnum;
-    if (!DC::getInstance()->mob_index.contains(nr))
-      continue;
-
-    auto victim = (Character *)(DC::getInstance()->mob_index[nr].item);
+    auto victim = (Character *)(DC::getInstance()->mob_index[vnum].item);
     if ((arg1_level_ok && victim->getLevel() < arg1_level) ||
         (arg2_level_ok && victim->getLevel() < arg2_level))
       continue;
 
-    auto victim_qty = DC::getInstance()->mob_index[nr].qty;
+    auto victim_qty = DC::getInstance()->mob_index[vnum].qty;
     bool include_bard = false;
     if (ISSET(victim->mobdata->actflags, ACT_BARDCHARM))
     {
