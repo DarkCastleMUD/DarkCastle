@@ -3095,7 +3095,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   // buf3 = args[0]
   // buf4 = args[1-+]
 
-  if (!*buf)
+  if (!*buf || (!is_number(buf) && !ch->player->last_mob_edit))
   {
     send_to_char("$3Syntax$R:  medit [mob_num] [field] [arg]\r\n"
                  "  Edit a mob_num with no field or arg to view the item.\r\n"
@@ -3987,16 +3987,15 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     mob_num = intval;
-    x = ch->getDC()->create_blank_mobile(intval);
-    if (x < 0)
+    auto rc = ch->getDC()->create_blank_mobile(mob_num);
+    if (!rc)
     {
-      csendf(ch,
-             "Could not create mobile '%d'.  Max index hit or mob already exists.\r\n",
-             intval);
+      csendf(ch, "Could not create mobile '%lu'.  Max index hit or mob already exists.\r\n", mob_num);
       return ReturnValue::eFAILURE;
     }
-    ch->send(QStringLiteral("Mobile '%1' created successfully.\r\n").arg(intval));
-    ch->setPlayerLastMob(intval);
+    x = rc.value();
+    ch->send(QStringLiteral("Mobile '%1' created successfully.\r\n").arg(mob_num));
+    ch->setPlayerLastMob(mob_num);
   }
   break;
   case 31:
