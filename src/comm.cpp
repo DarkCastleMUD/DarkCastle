@@ -24,8 +24,9 @@
 #include <signal.h>
 #include <cctype>
 #include <sys/time.h>
+#ifdef TRACY_ENABLE
 #include <tracy/Tracy.hpp>
-
+#endif
 #include <sstream>
 #include <iostream>
 #include <list>
@@ -878,7 +879,9 @@ void DC::game_loop(void)
   // else logf(110, DC::LogChannel::LOG_BUG, "0 delay on pulse");
   gettimeofday(&last_time_, nullptr);
   PerfTimers["gameloop"].stop();
+#ifdef TRACY_ENABLE
   FrameMark;
+#endif
 }
 
 void DC::game_loop_init(void)
