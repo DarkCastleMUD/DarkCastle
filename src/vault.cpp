@@ -8,8 +8,9 @@
 #include <unistd.h>
 #include <list>
 #include <fmt/format.h>
+#ifdef TRACY_ENABLE
 #include <tracy/Tracy.hpp>
-
+#endif
 #include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/db.h"
