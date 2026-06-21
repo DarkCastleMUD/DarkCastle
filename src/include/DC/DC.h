@@ -585,12 +585,12 @@ public:
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
   vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
   vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
-  void generate_mob_indices(int *top, QMap<vnum_t, class index_data> &index);
+  void generate_mob_indices(QMap<vnum_t, class index_data> &index);
   index_data *generate_obj_indices(int *top, index_data *index);
   Character *read_mobile(int nr, FILE *fl);
   Character *clone_mobile(int nr);
   auto create_blank_item(int nr) -> std::expected<int, create_error>;
-  int create_blank_mobile(int nr);
+  auto create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   void game_test_init(void);
   void heartbeat(void);
   void finish_hotboot(void);
