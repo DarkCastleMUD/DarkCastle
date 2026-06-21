@@ -2795,11 +2795,11 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
     return ReturnValue::eFAILURE;
   }
   int type = 0;
-  if (DC::getInstance()->mob_index[target->mobdata->nr].vnum() == 8)
+  if (target->mobdata->vnum_ == 8)
     type = 4;
   else if (IS_AFFECTED(target, AFF_FAMILIAR))
     type = 3;
-  else if (DC::getInstance()->mob_index[target->mobdata->nr].vnum() >= 22394 && DC::getInstance()->mob_index[target->mobdata->nr].vnum() <= 22398)
+  else if (target->mobdata->vnum_ >= 22394 && target->mobdata->vnum_ <= 22398)
     type = 2;
   else
     type = 1;
@@ -2813,7 +2813,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
   // int i;
   /*   for (i = 22394; i < 22399; i++)
-   if (i == target->mobdata->nr)
+   if (i == target->mobdata->vnum_)
    {
    ch->sendln("The undead being is unaffected by your song.");
    return ReturnValue::eFAILURE;

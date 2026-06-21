@@ -1807,7 +1807,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   {
     fol_next = fol->next;
     if (fol->follower->isNonPlayer() &&
-        DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+        fol->follower->mobdata->vnum_ == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false, QStringLiteral("do_quit/followers"));

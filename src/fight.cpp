@@ -239,7 +239,7 @@ void perform_violence(void)
     int last_virt = -1;
     int last_class = GET_CLASS(ch);
     if (ch->isNonPlayer())
-      last_virt = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+      last_virt = ch->mobdata->vnum_;
     // DEBUG CODE
     if (!ch->fighting)
       continue;
@@ -283,9 +283,9 @@ void perform_violence(void)
       is_mob = ch->isNonPlayer();
       if (is_mob)
       {
-        if ((DC::getInstance()->mob_index[ch->mobdata->nr].combat_func) && MOB_WAIT_STATE(ch) <= 0)
+        if ((DC::getInstance()->mob_index[ch->mobdata->vnum_].combat_func) && MOB_WAIT_STATE(ch) <= 0)
         {
-          retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].combat_func)(ch, nullptr, cmd_t::UNDEFINED, "", ch));
+          retval = ((*DC::getInstance()->mob_index[ch->mobdata->vnum_].combat_func)(ch, nullptr, cmd_t::UNDEFINED, "", ch));
           if (SOMEONE_DIED(retval))
             continue;
           // Check if we're still fighting someone
@@ -1590,7 +1590,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (w_type == TYPE_HIT && ch->isNonPlayer())
   {
-    int a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    int a = ch->mobdata->vnum_;
     switch (a)
     {
     case 88:
@@ -2714,7 +2714,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message.
-  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 87 && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 92) || attacktype == SKILL_FLAMESLASH)
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (ch->isNonPlayer() && ch->mobdata->vnum_ > 87 && ch->mobdata->vnum_ < 92) || attacktype == SKILL_FLAMESLASH)
   {
     if (ch->equipment[weapon] == nullptr)
     {
@@ -3148,10 +3148,10 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
     return;
 
   if (ch->isNonPlayer())
-    ch_vnum = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    ch_vnum = ch->mobdata->vnum_;
 
   if (vict->isNonPlayer())
-    vict_vnum = DC::getInstance()->mob_index[vict->mobdata->nr].vnum();
+    vict_vnum = vict->mobdata->vnum_;
 
   if (ch->isNonPlayer() && (IS_AFFECTED(ch, AFF_CHARM) || IS_AFFECTED(ch, AFF_FAMILIAR) || ch_vnum == 8) && ch->master && ch->master->in_room == ch->in_room)
     realch = ch->master;
@@ -3252,7 +3252,7 @@ QString translate_name(const Character *ch)
 {
   if (ch->isNonPlayer())
   {
-    return QStringLiteral("%1(v%2)").arg(GET_NAME(ch)).arg(DC::getInstance()->mob_index[ch->mobdata->nr].vnum());
+    return QStringLiteral("%1(v%2)").arg(GET_NAME(ch)).arg(ch->mobdata->vnum_);
   }
   return GET_NAME(ch);
 }
@@ -5450,7 +5450,7 @@ void raw_kill(Character *ch, Character *victim)
       GET_RACE(victim) == RACE_ELEMENT ||
       GET_RACE(victim) == RACE_PLANAR ||
       GET_RACE(victim) == RACE_SLIME ||
-      (victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 8))
+      (victim->isNonPlayer() && victim->mobdata->vnum_ == 8))
     make_dust(victim);
   else
     make_corpse(victim);
@@ -5581,7 +5581,7 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %lu (%s)", victim->getNameC(), DC::getInstance()->mob_index[ch->mobdata->nr].vnum(), GET_NAME(ch));
+        sprintf(buf, "%s killed by %lu (%s)", victim->getNameC(), ch->mobdata->vnum_, GET_NAME(ch));
       }
       else
       {
@@ -5929,7 +5929,7 @@ void group_gain(Character *ch, Character *victim)
     // this loops the followers (cut and pasted above)
     tmp_ch = loop_followers(&f);
   } while (tmp_ch);
-  getAreaData(DC::getInstance()->world[victim->in_room].zone, DC::getInstance()->mob_index[victim->mobdata->nr].vnum(), total_share, victim->getGold());
+  getAreaData(DC::getInstance()->world[victim->in_room].zone, victim->mobdata->vnum_, total_share, victim->getGold());
 }
 
 /* find the highest level present at the kill */
@@ -6190,7 +6190,7 @@ void dam_message(int dam, Character *ch, Character *victim,
 
   // Custom damage messages.
   if (ch->isNonPlayer())
-    switch (DC::getInstance()->mob_index[ch->mobdata->nr].vnum())
+    switch (ch->mobdata->vnum_)
     {
     case 13434:
       attack = "$2poison$R";
@@ -6349,7 +6349,7 @@ void dam_message(int dam, Character *ch, Character *victim,
       if (!attack)
         attack = races[GET_RACE(ch)].unarmed;
       int a;
-      if (ch->isNonPlayer() && (a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum()) < 92 && a > 87)
+      if (ch->isNonPlayer() && (a = ch->mobdata->vnum_) < 92 && a > 87)
         attack = elem_type[a - 88];
       sprintf(buf1, "$n's %s%s %s $N%s|%c", modstring, attack, vp, vx, punct);
       sprintf(buf2, "Your %s%s %s $N%s%s%c", modstring, attack, vp, vx, ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "", punct);
@@ -7050,12 +7050,12 @@ int can_be_attacked(Character *ch, Character *vict)
   }
 
   // Golem cannot attack players
-  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8 && vict->isPlayer())
+  if (ch->isNonPlayer() && ch->mobdata->vnum_ == 8 && vict->isPlayer())
     return false;
 
   if (vict->isNonPlayer())
   {
-    if ((IS_AFFECTED(vict, AFF_FAMILIAR) || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == 8 || vict->affected_by_spell(SPELL_CHARM_PERSON) || ISSET(vict->affected_by, AFF_CHARM)) &&
+    if ((IS_AFFECTED(vict, AFF_FAMILIAR) || vict->mobdata->vnum_ == 8 || vict->affected_by_spell(SPELL_CHARM_PERSON) || ISSET(vict->affected_by, AFF_CHARM)) &&
         vict->master &&
         vict->fighting != ch &&
         !(IS_AFFECTED(vict->master, AFF_CANTQUIT) || IS_AFFECTED(vict->master, AFF_CHAMPION)) &&

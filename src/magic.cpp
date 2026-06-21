@@ -146,10 +146,10 @@ bool can_heal(Character *ch, Character *victim, int spellnum)
 
   // You cannot heal an elemental from "conjure elemental"
   if (victim->isNonPlayer() &&
-      (DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 88 ||
-       DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 89 ||
-       DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 90 ||
-       DC::getInstance()->mob_index[victim->mobdata->nr].vnum() == 91))
+      (victim->mobdata->vnum_ == 88 ||
+       victim->mobdata->vnum_ == 89 ||
+       victim->mobdata->vnum_ == 90 ||
+       victim->mobdata->vnum_ == 91))
   {
     ch->sendln("The heavy magics surrounding this being prevent healing.");
     return false;
@@ -1184,8 +1184,8 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
            tmp_victim; tmp_victim = temp)
       {
         temp = tmp_victim->next_in_room;
-        if (tmp_victim->isNonPlayer() && DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() >= 2300 &&
-            DC::getInstance()->mob_index[tmp_victim->mobdata->nr].vnum() <= 2399)
+        if (tmp_victim->isNonPlayer() && tmp_victim->mobdata->vnum_ >= 2300 &&
+            tmp_victim->mobdata->vnum_ <= 2399)
         {
           ch->sendln("The clan hall's enchantments absorbs part of your spell.");
           continue;
@@ -3555,7 +3555,7 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
   char dammsg[30];
   follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && fol->follower->mobdata->vnum_ == 8)
     {
       heal = (int)(GET_MAX_HIT(fol->follower) * (0.12 + level / 1000.0));
       heal = number(heal - (heal / 10), heal + (heal / 10));
@@ -10211,7 +10211,7 @@ int elemental_damage_bonus(int spell, Character *ch)
     // if (f->follower->isNonPlayer() && f->follower->height == 77)
     if (f->follower->isNonPlayer() && f->follower->mobdata->mob_flags.value[3] == 77)
     {
-      switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].vnum())
+      switch (f->follower->mobdata->vnum_)
       {
       case 88:
         fire = true;
@@ -10235,7 +10235,7 @@ int elemental_damage_bonus(int spell, Character *ch)
         // if (t->follower->isNonPlayer() && t->follower->height == 77)
         if (t->follower->isNonPlayer() && t->follower->mobdata->mob_flags.value[3] == 77)
         {
-          switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].vnum())
+          switch (t->follower->mobdata->vnum_)
           {
           case 88:
             fire = true;
@@ -10317,7 +10317,7 @@ bool elemental_score(Character *ch, int level)
     {
       // if (f->follower->height == 77) // improved
       if (f->follower->mobdata->mob_flags.value[3] == 77)
-        switch (DC::getInstance()->mob_index[f->follower->mobdata->nr].vnum())
+        switch (f->follower->mobdata->vnum_)
         {
         case 88:
           fire = true;
@@ -10343,7 +10343,7 @@ bool elemental_score(Character *ch, int level)
         {
           if (t->follower->mobdata->mob_flags.value[3] == 77)
           {
-            switch (DC::getInstance()->mob_index[t->follower->mobdata->nr].vnum())
+            switch (t->follower->mobdata->vnum_)
             {
             case 88:
               fire = true;
@@ -14229,7 +14229,7 @@ int spell_release_elemental(uint8_t level, Character *ch, Character *victim, cla
     return ReturnValue::eFAILURE;
   }
 
-  switch (DC::getInstance()->mob_index[victim->mobdata->nr].vnum())
+  switch (victim->mobdata->vnum_)
   {
   case FIRE_ELEMENTAL:
     act("The room begins to cool as $n returns to it's own plane of existance.", victim, 0, 0, TO_ROOM, INVIS_NULL);

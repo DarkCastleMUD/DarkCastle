@@ -51,7 +51,7 @@ bool is_r_denied(Character *ch, int room)
   if (ch->isPlayer())
     return false;
   for (d = DC::getInstance()->world[room].denied; d; d = d->next)
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == d->vnum)
+    if (ch->mobdata->vnum_ == d->vnum)
       return true;
   return false;
 }
@@ -109,11 +109,11 @@ void mobile_activity(void)
       continue;
     }
 
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)
+    if (DC::getInstance()->mob_index[ch->mobdata->vnum_].non_combat_func)
     {
 
       PerfTimers["mprog"].start();
-      retval = ((*DC::getInstance()->mob_index[ch->mobdata->nr].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
+      retval = ((*DC::getInstance()->mob_index[ch->mobdata->vnum_].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
       if (!isSet(retval, ReturnValue::eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())

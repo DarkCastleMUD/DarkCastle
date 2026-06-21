@@ -135,7 +135,7 @@ void mpstat(Character *ch, Character *victim)
   int i;
 
   sprintf(buf, "$3Name$R: %s  $3Vnum$R: %lu.\r\n",
-          victim->getNameC(), DC::getInstance()->mob_index[victim->mobdata->nr].vnum());
+          victim->getNameC(), victim->mobdata->vnum_);
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
@@ -143,13 +143,13 @@ void mpstat(Character *ch, Character *victim)
           victim->long_desc ? victim->long_desc : "(nullptr)");
   ch->send(buf);
 
-  if (!(DC::getInstance()->mob_index[victim->mobdata->nr].progtypes))
+  if (!(DC::getInstance()->mob_index[victim->mobdata->vnum_].progtypes))
   {
     ch->sendln("That mob has no programs set.");
     return;
   }
 
-  for (mprg = DC::getInstance()->mob_index[victim->mobdata->nr].mobprogs, i = 1; mprg != nullptr;
+  for (mprg = DC::getInstance()->mob_index[victim->mobdata->vnum_].mobprogs, i = 1; mprg != nullptr;
        i++, mprg = mprg->next)
   {
     sprintf(buf, "$3%d$R>$3$B", i);
@@ -1224,9 +1224,9 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   QString arg3 = arguments.value(3);
   if (arg.isEmpty() || temp.isEmpty() || arg2.isEmpty())
   {
-    if (this->isNonPlayer())
+    if (isNonPlayer())
     {
-      int num = DC::getInstance()->mob_index[this->mobdata->nr].vnum();
+      int num = mobdata->vnum_;
 
       logentry(QStringLiteral("Mob %1 lacking argument for mpsettemp.").arg(num));
     }
@@ -1790,7 +1790,7 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isNonPlayer())
   {
-    throwitem->target_mob_num = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    throwitem->target_mob_num = ch->mobdata->vnum_;
     throwitem->mob = true; // This is, suprisingly, a mob
   }
   else
@@ -2233,19 +2233,19 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   {
     *lvali = i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
+    //  r, i, ch->mobdata->vnum_ );
   }
   if (lvalb)
   {
     *lvalb = (int8_t)i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
+    //  r, i, ch->mobdata->vnum_ );
   }
   if (lvalui)
   {
     *lvalui = (unsigned int)i;
     //  ch->prog_error( QStringLiteral("Mpsetmath - %1 set to %2."));
-    //  r, i, DC::getInstance()->mob_index[ch->mobdata->nr].vnum() );
+    //  r, i, ch->mobdata->vnum_ );
   }
 
   /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
@@ -2266,7 +2266,7 @@ void Character::prog_error(QString error_message)
   }
   else if (this->isNonPlayer())
   {
-    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(dc_->mob_index[mobdata->nr].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Mob %1, com %2, line %3: %4").arg(mobdata->vnum_).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else
   {

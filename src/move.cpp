@@ -774,7 +774,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   // Elemental stuff goes HERE
   if (ch->isNonPlayer())
   {
-    int a = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    int a = ch->mobdata->vnum_;
     // code a bit repeaty, but whatever ;)
     if (a == 88 && DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER)
     {
@@ -1128,7 +1128,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isNonPlayer() && ch->master && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && ch->master && ch->mobdata->vnum_ == 8)
   {
     sesame = ch->master;
     if (isSet(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].room_flags, CLAN_ROOM))

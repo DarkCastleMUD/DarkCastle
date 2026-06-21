@@ -2494,7 +2494,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
 
   auto &character_list = DC::getInstance()->character_list;
   character_list.erase(mob);
-  mob->mobdata->nr = dst;
+  mob->mobdata->vnum_ = dst;
 
   // Find old mobile in world and remove
   Character *old_mob = (Character *)DC::getInstance()->mob_index[dst].item;
@@ -2505,7 +2505,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
     {
       if (!tmpch->mobdata)
         continue;
-      if (old_mob->mobdata->nr == tmpch->mobdata->nr)
+      if (old_mob->mobdata->vnum_ == tmpch->mobdata->vnum_)
         extract_char(tmpch, true);
     }
   }

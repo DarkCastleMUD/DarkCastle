@@ -1442,7 +1442,7 @@ int charmie_restricted(Character *ch, class Object *obj, int wear_loc)
   return false; // sigh, work for nohin'
   if (ch->isNonPlayer() && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
   {
-    int vnum = DC::getInstance()->mob_index[ch->mobdata->nr].vnum();
+    int vnum = ch->mobdata->vnum_;
     if (vnum == 8 || (vnum > 22388 && vnum < 22399))
       return false; // golems and corpses wear all
     switch (ch->race)
@@ -1649,17 +1649,15 @@ void wear(Character *ch, class Object *obj_object, int keyword)
   }
   else
   {
-    if (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() != 8)
+    if (ch->mobdata->vnum_ != 8)
       if (ch->getLevel() < obj_object->obj_flags.eq_level)
       {
-        sprintf(buffer, "You must be level %llu to use $p.",
-                obj_object->obj_flags.eq_level);
+        sprintf(buffer, "You must be level %llu to use $p.", obj_object->obj_flags.eq_level);
         act(buffer, ch, obj_object, 0, TO_CHAR, 0);
         return;
       }
   }
-  /*  if (ch->isNonPlayer() && (DC::getInstance()->mob_index[ch->mobdata->nr].vnum() < 22394 &&
-    DC::getInstance()->mob_index[ch->mobdata->nr].vnum() > 22388))
+  /*  if (ch->isNonPlayer() && (ch->mobdata->vnum_ < 22394 && ch->mobdata->vnum_ > 22388))
     {
        return;
     }*/

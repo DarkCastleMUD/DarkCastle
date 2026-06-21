@@ -325,8 +325,7 @@ void shopping_sell(const char *arg, Character *ch,
   }
 
   int virt = DC::getInstance()->obj_index[obj->item_number].vnum();
-  if (virt >= 13400 && virt <= 13707 &&
-      DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() != 13416)
+  if (virt >= 13400 && virt <= 13707 && keeper->mobdata->vnum_ != 13416)
   {
     keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
     return;
@@ -400,7 +399,7 @@ void shopping_value(const char *arg, Character *ch,
     }
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3003)
+  if (keeper->mobdata->vnum_ == 3003)
   { // if the weaponsmith in town
     if (keeperhas)
     {
@@ -449,7 +448,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I'm a weapons expert, that is all.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3004)
+  if (keeper->mobdata->vnum_ == 3004)
   { // if the armourer in town
     if (keeperhas)
     {
@@ -493,7 +492,7 @@ void shopping_value(const char *arg, Character *ch,
     else
       do_say(keeper, "I deal with armor exclusively.");
   }
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3000)
+  if (keeper->mobdata->vnum_ == 3000)
   { // if the wizard in town
     if (keeperhas)
     {
@@ -550,7 +549,7 @@ void shopping_value(const char *arg, Character *ch,
       do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
   }
 
-  if (DC::getInstance()->mob_index[keeper->mobdata->nr].vnum() == 3010 && keeperhas)
+  if (keeper->mobdata->vnum_ == 3010 && keeperhas)
   { // if the leather worker in town
     act("The Leather Worker holds up $p for you to examine.", ch, obj, 0, TO_CHAR, 0);
     act("The Leather Worker holds up $p for $n to examine.", ch, obj, 0, TO_ROOM, 0);
@@ -690,7 +689,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper )
+  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->vnum_].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -705,7 +704,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   // LFound1:
   for (shop_nr = 0; shop_nr < max_shop; shop_nr++)
   {
-    if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->nr)
+    if (DC::getInstance()->shop_index[shop_nr].keeper == keeper->mobdata->vnum_)
       goto LFound2;
   }
   logentry(QStringLiteral("Shop_keeper: shop_nr not found."), ANGEL, DC::LogChannel::LOG_BUG);
@@ -860,7 +859,7 @@ void fix_shopkeepers_inventory()
     for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->nr].non_combat_func == shop_keeper)
+      if (keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->vnum_].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {

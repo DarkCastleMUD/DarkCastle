@@ -637,7 +637,7 @@ void gain_exp(Character *ch, int64_t gain)
   if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
 
-  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8) // it's a golem
+  if (ch->isNonPlayer() && ch->mobdata->vnum_ == 8) // it's a golem
     golem_gain_exp(ch);
 
   if (ch->isNonPlayer())

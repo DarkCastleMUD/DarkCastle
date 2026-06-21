@@ -1817,7 +1817,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (vict->isNonPlayer() && DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper)
+  if (vict->isNonPlayer() && DC::getInstance()->mob_index[vict->mobdata->vnum_].non_combat_func == shop_keeper)
   {
     act("$N graciously refuses your gift.", ch, 0, vict, TO_CHAR, 0);
     return ReturnValue::eFAILURE;

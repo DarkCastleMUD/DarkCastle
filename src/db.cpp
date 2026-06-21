@@ -2791,7 +2791,7 @@ Character *DC::read_mobile(int nr, FILE *fl)
   if (isSet(mob->suscept, ISR_MAGIC))
     mob->saves[SAVE_TYPE_MAGIC] -= 50;
 
-  mob->mobdata->nr = nr;
+  mob->mobdata->vnum_ = nr;
   mob->desc = 0;
 
   return (mob);
@@ -2826,7 +2826,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
   FILE *fl = lf.file_handle_;
   int i = 0;
 
-  fprintf(fl, "#%lu\n", DC::getInstance()->mob_index[mob->mobdata->nr].vnum());
+  fprintf(fl, "#%lu\n", mob->mobdata->vnum_);
   string_to_file(fl, mob->getName());
   string_to_file(fl, mob->short_desc);
   string_to_file(fl, mob->long_desc);
@@ -2888,9 +2888,9 @@ void write_mobile(LegacyFile &lf, Character *mob)
     fprintf(fl, "T %d %d %d %d %d 0\n", mob->raw_str, mob->raw_intel, mob->raw_wis, mob->raw_dex, mob->raw_con);
   }
 
-  if (DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs)
+  if (DC::getInstance()->mob_index[mob->mobdata->vnum_].mobprogs)
   {
-    write_mprog_recur(fl, DC::getInstance()->mob_index[mob->mobdata->nr].mobprogs, true);
+    write_mprog_recur(fl, DC::getInstance()->mob_index[mob->mobdata->vnum_].mobprogs, true);
     fprintf(fl, "|\n");
   }
 
@@ -3283,7 +3283,7 @@ Character *DC::clone_mobile(int nr)
   for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
     mob->equipment[i] = 0;
 
-  mob->mobdata->nr = nr;
+  mob->mobdata->vnum_ = nr;
   mob->desc = 0;
   mob->mobdata->reset = {};
 
@@ -3450,7 +3450,7 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   mob->mobdata->damsizedice = 1;
   mob->mobdata->default_pos = position_t::STANDING;
   mob->mobdata->last_room = 0;
-  mob->mobdata->nr = vnum;
+  mob->mobdata->vnum_ = vnum;
   mob->setType(Character::Type::NPC);
   mob->misc = 0;
 
@@ -3482,14 +3482,14 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   DC::getInstance()->mob_index[vnum].progtypes = 0;
 
   // update index of all mobiles in game
-  const auto &character_list = DC::getInstance()->character_list;
-  for_each(character_list.begin(), character_list.end(),
-           [&vnum](Character *const &curr)
-           {
-             if (curr->isNonPlayer())
-               if (curr->mobdata->nr >= vnum)
-                 curr->mobdata->nr++;
-           });
+  // const auto &character_list = DC::getInstance()->character_list;
+  // for_each(character_list.begin(), character_list.end(),
+  //         [&vnum](Character *const &curr)
+  //         {
+  //           if (curr->isNonPlayer())
+  //             if (curr->mobdata->vnum_ >= vnum)
+  //               curr->mobdata->vnum_++;
+  //         });
 
   world_file_list_item *wcurr = nullptr;
 
@@ -4554,7 +4554,7 @@ uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
   uint64_t count = {};
   for (auto ch = DC::getInstance()->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
   {
-    if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == vnum)
+    if (ch->mobdata && ch->mobdata->vnum_ == vnum)
     {
       count++;
     }
@@ -4567,7 +4567,7 @@ uint64_t countMobsInWorld(uint64_t vnum)
   uint64_t count = {};
   for (const auto ch : DC::getInstance()->character_list)
   {
-    if (ch->mobdata && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == vnum && ch->in_room != DC::NOWHERE)
+    if (ch->mobdata && ch->mobdata->vnum_ == vnum && ch->in_room != DC::NOWHERE)
     {
       count++;
     }
@@ -4638,7 +4638,7 @@ void Zone::reset(ResetType reset_type)
       {
 
       case 'M': /* read a mobile */
-        if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(DC::getInstance()->mob_index[cmd[reset_cmd_index]->arg1].vnum()) < cmd[reset_cmd_index]->arg2 && (mob = DC::getInstance()->clone_mobile(cmd[reset_cmd_index]->arg1)))
+        if ((cmd[reset_cmd_index]->arg2 == -1 || cmd[reset_cmd_index]->lastPop == 0) && countMobsInWorld(cmd[reset_cmd_index]->arg1) < cmd[reset_cmd_index]->arg2 && (mob = DC::getInstance()->clone_mobile(cmd[reset_cmd_index]->arg1)))
         {
           char_to_room(mob, cmd[reset_cmd_index]->arg3);
           cmd[reset_cmd_index]->lastPop = mob;

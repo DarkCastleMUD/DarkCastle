@@ -776,8 +776,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
 
     if (((isSet(wielded->obj_flags.extra_flags, ITEM_NODROP) || isSet(wielded->obj_flags.more_flags, ITEM_NO_DISARM)) ||
          (victim->getLevel() >= IMMORTAL)) &&
-        (victim->isPlayer() || DC::getInstance()->mob_index[victim->mobdata->nr].vnum() > 2400 ||
-         DC::getInstance()->mob_index[victim->mobdata->nr].vnum() < 2300))
+        (victim->isPlayer() || victim->mobdata->vnum_ > 2400 || victim->mobdata->vnum_ < 2300))
       ch->sendln("You can't seem to work it loose.");
     else
       disarm(ch, victim);

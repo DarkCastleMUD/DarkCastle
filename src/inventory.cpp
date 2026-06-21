@@ -1778,7 +1778,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     }
   }
 
-  if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->nr].non_combat_func == shop_keeper || DC::getInstance()->mob_index[vict->mobdata->nr].vnum() == QUEST_MASTER))
+  if (vict->isNonPlayer() && (DC::getInstance()->mob_index[vict->mobdata->vnum_].non_combat_func == shop_keeper || vict->mobdata->vnum_ == QUEST_MASTER))
   {
     act("$N graciously refuses your gift.", this, 0, vict, TO_CHAR, 0);
     return ReturnValue::eFAILURE;

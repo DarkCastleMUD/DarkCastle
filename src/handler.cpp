@@ -2860,7 +2860,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
       continue;
     if (number == 1 || number == 0)
     {
-      if (isexact(tmp, GET_NAME(i)) && !(careful && i->isNonPlayer() && DC::getInstance()->mob_index[i->mobdata->nr].vnum() == 12))
+      if (isexact(tmp, GET_NAME(i)) && !(careful && i->isNonPlayer() && i->mobdata->vnum_ == 12))
         return (i);
       else if (isprefix(tmp, GET_NAME(i)))
       {
@@ -2977,7 +2977,7 @@ Character *get_char_num(int nr)
   const auto &character_list = DC::getInstance()->character_list;
   auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
                         {
- 		if (i->isNonPlayer() && i->mobdata->nr == nr) {
+ 		if (i->isNonPlayer() && i->mobdata->vnum_ == nr) {
  			return true;
  		}
  		return false; });
@@ -3756,7 +3756,7 @@ void extract_char(Character *ch, bool pull, Trace t)
       extract_char(ch->player->golem, false);
     }
   }
-  if (ch->isNonPlayer() && DC::getInstance()->mob_index[ch->mobdata->nr].vnum() == 8)
+  if (ch->isNonPlayer() && ch->mobdata->vnum_ == 8)
   {
     isGolem = true;
     if (pull)
@@ -3911,8 +3911,8 @@ void extract_char(Character *ch, bool pull, Trace t)
   if (ch->desc && ch->desc->original)
     do_return(ch, "", cmd_t::LOOK);
 
-  if (ch->isNonPlayer() && ch->mobdata->nr > -1)
-    DC::getInstance()->mob_index[ch->mobdata->nr].qty--;
+  if (ch->isNonPlayer() && DC::getInstance()->mob_index.contains(ch->mobdata->vnum_))
+    DC::getInstance()->mob_index[ch->mobdata->vnum_].qty--;
 
   if (pull || isGolem)
   {
@@ -4001,7 +4001,7 @@ void lastseen_targeted(Character *ch, Character *victim)
   if (ch->player->lastseen == 0)
     ch->player->lastseen = new std::multimap<int, std::pair<timeval, timeval>>;
 
-  int nr = victim->mobdata->nr;
+  int nr = victim->mobdata->vnum_;
 
   std::multimap<int, std::pair<timeval, timeval>>::iterator i;
   i = ch->player->lastseen->find(nr);
@@ -4272,7 +4272,7 @@ Character *get_random_mob_vnum(int vnum)
 
   auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
                         {
-		if(i->isNonPlayer() && i->mobdata->nr == num)
+		if(i->isNonPlayer() && i->mobdata->vnum_ == num)
 		{
 			if (total == which)
 			return true;
@@ -4297,7 +4297,7 @@ Character *get_mob_vnum(int vnum)
 
   auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
                         {
-		if(i->isNonPlayer() && i->mobdata->nr == number) {
+		if(i->isNonPlayer() && i->mobdata->vnum_ == number) {
 			return true;
 		}
 		return false; });

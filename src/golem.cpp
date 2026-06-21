@@ -635,7 +635,7 @@ int spell_release_golem(uint8_t level, Character *ch, char *arg, int type, Chara
 {
   follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)
-    if (fol->follower->isNonPlayer() && DC::getInstance()->mob_index[fol->follower->mobdata->nr].vnum() == 8)
+    if (fol->follower->isNonPlayer() && fol->follower->mobdata->vnum_ == 8)
     {
       release_message(fol->follower);
       extract_char(fol->follower, false);

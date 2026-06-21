@@ -512,7 +512,7 @@ class Mobile
 {
 public:
   Mobile(MobilePtr old = {});
-  int32_t nr = {};
+  vnum_t vnum_ = {};
   position_t default_pos = {};                 // Default position for NPC
   int8_t last_direction = {};                  // Last direction the mobile went in
   uint32_t attack_type = {};                   // Bitvector of damage type for bare-handed combat

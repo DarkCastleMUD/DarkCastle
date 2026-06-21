@@ -1163,16 +1163,16 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   {
     if (k->isNonPlayer())
     {
-      if (((Character *)DC::getInstance()->mob_index[k->mobdata->nr].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (((Character *)DC::getInstance()->mob_index[k->mobdata->vnum_].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
-      else if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
+      else if (DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)
       {
-        retval = ((*DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)(this, 0,
-                                                                                  cmd, arguments.toStdString().c_str(), k));
+        retval = ((*DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)(this, 0,
+                                                                                     cmd, arguments.toStdString().c_str(), k));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }

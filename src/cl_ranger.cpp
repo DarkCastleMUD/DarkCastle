@@ -1422,7 +1422,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (victim->isNonPlayer() && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() >= 2300 && DC::getInstance()->mob_index[victim->mobdata->nr].vnum() <= 2399)
+  if (victim->isNonPlayer() && victim->mobdata->vnum_ >= 2300 && victim->mobdata->vnum_ <= 2399)
   {
     ch->sendln("Your arrow is disintegrated by the fortress' enchantments.");
     extract_obj(found);

@@ -1182,7 +1182,7 @@ Mobile::Mobile(MobilePtr old)
 {
   if (old)
   {
-    nr = old->nr;
+    vnum_ = old->vnum_;
     default_pos = old->default_pos;
     last_direction = old->last_direction;
     attack_type = old->attack_type;

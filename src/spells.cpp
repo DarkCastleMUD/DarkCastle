@@ -2046,8 +2046,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             return ReturnValue::eFAILURE;
           }
 
-          if (tar_char->isNonPlayer() && DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() >= 2300 &&
-              DC::getInstance()->mob_index[tar_char->mobdata->nr].vnum() <= 2399)
+          if (tar_char->isNonPlayer() && tar_char->mobdata->vnum_ >= 2300 && tar_char->mobdata->vnum_ <= 2399)
           {
             char_from_room(ch);
             char_to_room(ch, oldroom);

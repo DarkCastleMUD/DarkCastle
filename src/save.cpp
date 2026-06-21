@@ -15,6 +15,7 @@
  ***************************************************************************/
 /* $Id: save.cpp,v 1.76 2015/06/15 01:06:10 pirahna Exp $ */
 
+#include <cstdint>
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -173,7 +174,7 @@ char *fread_var_string(FILE *fpsave)
 
 void Mobile::save(FILE *fpsave)
 {
-  fwrite(&(nr), sizeof(nr), 1, fpsave);
+  fwrite(&(vnum_), sizeof(int32_t), 1, fpsave);
   fwrite(&(default_pos), sizeof(default_pos), 1, fpsave);
   fwrite(&(attack_type), sizeof(attack_type), 1, fpsave);
   fwrite(&(actflags), sizeof(actflags), 1, fpsave);
@@ -188,7 +189,7 @@ void Mobile::save(FILE *fpsave)
 
 void Mobile::read(FILE *fpsave)
 {
-  fread(&(nr), sizeof(nr), 1, fpsave);
+  fread(&(vnum_), sizeof(int32_t), 1, fpsave);
   fread(&(default_pos), sizeof(default_pos), 1, fpsave);
   fread(&(attack_type), sizeof(attack_type), 1, fpsave);
   fread(&(actflags), sizeof(actflags), 1, fpsave);

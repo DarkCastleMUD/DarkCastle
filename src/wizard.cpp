@@ -290,12 +290,12 @@ void boro_mob_stat(Character *ch, Character *k)
 
           (k->isPlayer() ? "PC" : "MOB"),
           GET_NAME(k),
-          (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+          (k->isNonPlayer() ? k->mobdata->vnum_ : 0),
           (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
           (k->short_desc ? k->short_desc : "None"),
-          (int32_t)(k->isNonPlayer() ? k->mobdata->nr : 0),
+          (int32_t)(k->isNonPlayer() ? k->mobdata->vnum_ : 0),
           /* end of second line */
 
           (k->long_desc ? k->long_desc : "None"),
@@ -372,12 +372,12 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (k->isNonPlayer())
   {
-    if (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func)
+    if (DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)
       strcpy(buf2, "Exists");
     else
       strcpy(buf2, "None");
 
-    if (DC::getInstance()->mob_index[k->mobdata->nr].combat_func)
+    if (DC::getInstance()->mob_index[k->mobdata->vnum_].combat_func)
       strcpy(buf3, "Exists");
     else
       strcpy(buf3, "None");
@@ -594,7 +594,7 @@ command_return_t mob_stat(Character *ch, Character *k)
     sprintf(buf,
             "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3In room:$R %d $3Mobile type:$R ",
             (k->isPlayer() ? "PC" : "MOB"), GET_NAME(k),
-            (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
+            (k->isNonPlayer() ? k->mobdata->vnum_ : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
@@ -660,7 +660,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   {
     QString mobspec_status;
 
-    if (DC::getInstance()->mob_index[k->mobdata->nr].mobspec == nullptr)
+    if (DC::getInstance()->mob_index[k->mobdata->vnum_].mobspec == nullptr)
     {
       mobspec_status = "none";
     }
@@ -669,7 +669,7 @@ command_return_t mob_stat(Character *ch, Character *k)
       mobspec_status = "exists";
     }
 
-    ch->sendln(QStringLiteral("$3Mobspec$R: %1  $3Progtypes$R: %2").arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->nr].progtypes));
+    ch->sendln(QStringLiteral("$3Mobspec$R: %1  $3Progtypes$R: %2").arg(mobspec_status).arg(DC::getInstance()->mob_index[k->mobdata->vnum_].progtypes));
   }
   sprintf(buf, "$3Height$R:[%d]  $3Weight$R:[%d]  $3Sex$R:[", GET_HEIGHT(k), GET_WEIGHT(k));
   ch->send(buf);
@@ -762,13 +762,13 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (k->isNonPlayer())
   {
     strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].non_combat_func ? "exists  " : "none  "));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func ? "exists  " : "none  "));
     ch->send(buf);
     strcpy(buf, "$3Combat Special Proc$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].combat_func ? "exists  " : "none  "));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->vnum_].combat_func ? "exists  " : "none  "));
     ch->send(buf);
     strcpy(buf, "$3Mob Progs$R: ");
-    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->nr].mobprogs ? "exists\r\n" : "none\r\n"));
+    strcat(buf, (DC::getInstance()->mob_index[k->mobdata->vnum_].mobprogs ? "exists\r\n" : "none\r\n"));
     ch->send(buf);
   }
 
