@@ -49,7 +49,6 @@ extern const char *zone_modes[];
 extern const char *equipment_types[];
 extern const char *utility_item_types[];
 
-extern int top_of_mobt;
 extern int top_of_objt;
 extern const char *action_bits[];
 extern const char *affected_bits[];
