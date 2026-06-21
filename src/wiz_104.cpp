@@ -886,8 +886,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        for (i = begin; i <= DC::getInstance()->mob_index[top_of_mobt].vnum() && i <= end;
-             i++)
+        for (i = begin; i <= DC::getInstance()->mob_index.last().vnum() && i <= end; i++)
         {
           nr = i;
           if (!DC::getInstance()->mob_index.contains(i))
@@ -910,7 +909,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       *buf = '\0';
       ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
-      for (i = 0; (i <= DC::getInstance()->mob_index[top_of_mobt].vnum()); i++)
+      for (i = 0; (i <= DC::getInstance()->mob_index.last().vnum()); i++)
       {
         nr = i;
         if (!DC::getInstance()->mob_index.contains(i))
@@ -935,8 +934,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   } /* "mobile" */
   else if (is_abbrev(type, "counts") && has_range)
   {
-    csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n",
-           DC::getInstance()->total_rooms, top_of_mobt, top_of_objt);
+    csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n", DC::getInstance()->total_rooms, DC::getInstance()->mob_index.count(), top_of_objt);
     return ReturnValue::eSUCCESS;
   }
   else if (is_abbrev(type, "object"))
@@ -1345,7 +1343,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("No valid search supplied.");
       return ReturnValue::eFAILURE;
     }
-    for (c = 0; c < DC::getInstance()->mob_index[top_of_mobt].vnum(); c++)
+    for (c = 0; c < DC::getInstance()->mob_index.last().vnum(); c++)
     {
       nr = c;
       if (!DC::getInstance()->mob_index.contains(c))
