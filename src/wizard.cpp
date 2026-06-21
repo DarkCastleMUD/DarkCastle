@@ -592,10 +592,9 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (k->isNonPlayer())
   {
     sprintf(buf,
-            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3RNum$R: %d  $3In room:$R %d $3Mobile type:$R ",
+            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3In room:$R %d $3Mobile type:$R ",
             (k->isPlayer() ? "PC" : "MOB"), GET_NAME(k),
             (k->isNonPlayer() ? DC::getInstance()->mob_index[k->mobdata->nr].vnum() : 0),
-            (k->isNonPlayer() ? k->mobdata->nr : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
 
     sprinttype(GET_MOB_TYPE(k), mob_types, buf2);
@@ -1900,7 +1899,6 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   if (item == 76)
     init_random_hunt_items(n);
   int rnum = real_object(item);
-  extern int top_of_mobt;
   if (rnum < 0)
     return;
 
@@ -1910,7 +1908,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
     Character *vict;
     while (1)
     {
-      mob = number(1, top_of_mobt);
+      mob = number<vnum_t>(1, DC::getInstance()->mob_index.lastKey());
       int vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
       if (!(DC::getInstance()->mob_index[mob].vnum() > 300 &&
             (DC::getInstance()->mob_index[mob].vnum() < 2300 || DC::getInstance()->mob_index[mob].vnum() > 2499) &&
