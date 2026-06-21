@@ -144,7 +144,6 @@ void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob);
 int load_new_help(FILE *fl, int reload = 0, Character *ch = nullptr);
 int count_hash_records(FILE *fl);
 void load_hints();
-void find_unordered_mobiles(void);
 char *mprog_type_to_name(int type);
 void write_wizlist(std::stringstream &filename);
 void write_wizlist(std::string filename);
@@ -362,7 +361,7 @@ T fread_bitvector(auto &in)
   return flags;
 }
 
-void add_mobspec(int i);
+void add_mobspec(vnum_t vnum);
 void write_object_csv(Object *obj, std::ofstream &fout);
 extern skill_quest *skill_list;
 #define REAL 0
