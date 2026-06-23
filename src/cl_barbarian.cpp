@@ -752,7 +752,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
       retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
-          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->item_number].vnum() == 508)
+          ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->vnum_].vnum() == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);

@@ -683,9 +683,13 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
 
     for (int z = 0; z < 13 && platsmith_list[o].sales[z] != 0; z++)
     {
-      char *tmp = gl_item((Object *)DC::getInstance()->obj_index[real_object(platsmith_list[o].sales[z])].item, z, ch);
-      ch->send(tmp);
-      dc_free(tmp);
+      if (DC::getInstance()->obj_index.contains(platsmith_list[o].sales[z]) &&
+          DC::getInstance()->obj_index[platsmith_list[o].sales[z]].item)
+      {
+        auto tmp = gl_item(DC::getInstance()->obj_index[platsmith_list[o].sales[z]].item, z, ch);
+        ch->send(tmp);
+        dc_free(tmp);
+      }
     }
     return ReturnValue::eSUCCESS;
   }
@@ -719,9 +723,9 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
       return ReturnValue::eSUCCESS;
     }
     class Object *obj;
-    obj = clone_object(real_object(platsmith_list[o].sales[k]));
+    obj = clone_object(platsmith_list[o].sales[k]);
 
-    if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->item_number, false))
+    if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->vnum_, false))
     {
       owner->do_tell(QStringLiteral("%1 That item is not available to you.").arg(GET_NAME(ch)).split(' '));
       extract_obj(obj);

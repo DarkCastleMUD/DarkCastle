@@ -553,7 +553,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     act("You can't write on $p.", ch, paper, 0, TO_CHAR, 0);
   }
   else if (!paper->ActionDescription().isEmpty())
-    /*    else if (paper->item_number != real_object(1205) )  */
+    /*    else if (paper->vnum_ != 1205 )  */
     ch->sendln("There's something written on it already.");
   else
   {

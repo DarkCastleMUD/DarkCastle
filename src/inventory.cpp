@@ -57,7 +57,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     // or if there is no container
     if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
     {
-      if (search_char_for_item(ch, obj_object->item_number, false))
+      if (search_char_for_item(ch, obj_object->vnum_, false))
       {
         ch->sendln("The item's uniqueness prevents it!");
         return;
@@ -70,7 +70,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     }
   }
 
-  if ((ch->isNonPlayer() || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+  if ((ch->isNonPlayer() || ch->affected_by_spell(OBJ_CHAMPFLAG_TIMER)) && DC::getInstance()->obj_index[obj_object->vnum_].vnum() == CHAMPION_ITEM)
   {
     ch->sendln("No champion flag for you, two years!");
     return;
@@ -89,7 +89,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %s[%lu] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->Name()));
+        sprintf(log_buf, "%s looted %s[%lu] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
@@ -138,9 +138,9 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
-      logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->item_number].vnum()));
+      logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->vnum_].vnum()).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->vnum_].vnum()));
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
+        logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->vnum_].vnum()).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->vnum_].vnum()));
     }
     move_obj(obj_object, ch);
     if (sub_object->carried_by == ch)
@@ -161,15 +161,15 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     act("$n gets $p.", ch, obj_object, 0, TO_ROOM, INVIS_NULL);
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
-      logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->item_number].vnum()).arg(ch->in_room));
+      logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->vnum_].vnum()).arg(ch->in_room));
       for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-        logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->item_number].vnum()));
+        logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->vnum_].vnum()));
     }
 
-    if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+    if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == CHAMPION_ITEM)
     {
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      buffer = QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item)->short_description);
+      buffer = QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(static_cast<Object *>(DC::getInstance()->obj_index[obj_object->vnum_].item)->short_description);
       send_info(buffer);
     }
   }
@@ -463,7 +463,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
       {
         // Don't bother checking this if item is gold coins.
         if ((IS_CARRYING_N(ch) + 1) > CAN_CARRY_N(ch) &&
-            !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
+            !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && !DC::getInstance()->obj_index.contains(obj_object->vnum_) && !ch->isImmortalPlayer()))
         {
           sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
@@ -537,7 +537,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
         ch->send(QStringLiteral("The %1 appears to be SPECIAL. Only its rightful owner can take it.\r\n").arg(obj_object->short_description));
       }
       else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-               !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
+               !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && !DC::getInstance()->obj_index.contains(obj_object->vnum_) && !ch->isImmortalPlayer()))
       {
         sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
         ch->send(buffer);
@@ -684,7 +684,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           if (CAN_SEE_OBJ(ch, obj_object))
           {
             if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
+                !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && !DC::getInstance()->obj_index.contains(obj_object->vnum_) && !ch->isImmortalPlayer()))
             {
               sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
               ch->send(buffer);
@@ -843,7 +843,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
           }
 
           else if ((IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch)) &&
-                   !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && obj_object->item_number == -1 && !ch->isImmortalPlayer()))
+                   !(GET_ITEM_TYPE(obj_object) == ITEM_MONEY && !DC::getInstance()->obj_index.contains(obj_object->vnum_) && !ch->isImmortalPlayer()))
           {
             sprintf(buffer, "%s : You can't carry that many items.\r\n", qPrintable(fname(obj_object->Name())));
             ch->send(buffer);
@@ -868,9 +868,9 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   sprintf(log_buf, "%s poofed %s[%lu] from %s[%lu]",
                           GET_NAME(ch),
                           obj_object->short_description,
-                          DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                          DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
                           qPrintable(sub_object->Name()),
-                          DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                          DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                   logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
@@ -1031,15 +1031,15 @@ int contents_cause_unique_problem(Object *obj, Character *vict)
 
   for (Object *inside = obj->contains; inside; inside = inside->next_content)
   {
-    if (inside->item_number < 0) // skip -1 items
+    if (!DC::getInstance()->obj_index.contains(inside->vnum_)) // skip -1 items
       continue;
-    if (lastnum == inside->item_number) // items are in order.  If we've already checked
-      continue;                         // this item, don't do it again.
+    if (lastnum == inside->vnum_) // items are in order.  If we've already checked
+      continue;                   // this item, don't do it again.
 
     if (isSet(inside->obj_flags.more_flags, ITEM_UNIQUE) &&
-        search_char_for_item(vict, inside->item_number, false))
+        search_char_for_item(vict, inside->vnum_, false))
       return true;
-    lastnum = inside->item_number;
+    lastnum = inside->vnum_;
   }
   return false;
 }
@@ -1163,13 +1163,13 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+                   DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
 
           act("$n drops $p.", ch, tmp_object, 0, TO_ROOM, INVIS_NULL);
@@ -1231,13 +1231,13 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->item_number].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    tmp_object->short_description,
                    loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+                   DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
 
           move_obj(tmp_object, ch->in_room);
@@ -1353,7 +1353,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
           else
             ch->sendln("(This item is cursed, BTW.)");
         }
-        if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+        if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == CHAMPION_ITEM)
         {
           ch->sendln("You must display this flag for all to see!");
           return ReturnValue::eFAILURE;
@@ -1413,13 +1413,13 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                 return ReturnValue::eFAILURE;
               }
 
-              if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->item_number))
+              if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE) && search_container_for_item(sub_object, obj_object->vnum_))
               {
                 ch->sendln("The object's uniqueness prevents it!");
                 return ReturnValue::eFAILURE;
               }
 
-              bool duplicate_key = search_container_for_item(sub_object, obj_object->item_number);
+              bool duplicate_key = search_container_for_item(sub_object, obj_object->vnum_);
               if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING)
               {
                 if (duplicate_key == true)
@@ -1439,14 +1439,14 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
               if (((sub_object->obj_flags.weight) +
                    (obj_object->obj_flags.weight)) <=
                       (sub_object->obj_flags.value[0]) &&
-                  (DC::getInstance()->obj_index[sub_object->item_number].vnum() != 536 ||
+                  (DC::getInstance()->obj_index[sub_object->vnum_].vnum() != 536 ||
                    weight_in(sub_object) + obj_object->obj_flags.weight <= 200))
               {
                 if (bits == FIND_OBJ_INV)
                 {
                   obj_from_char(obj_object);
                   /* make up for above line */
-                  if (DC::getInstance()->obj_index[sub_object->item_number].vnum() != 536)
+                  if (DC::getInstance()->obj_index[sub_object->vnum_].vnum() != 536)
                     IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj_object);
                   obj_to_obj(obj_object, sub_object);
                 }
@@ -1462,9 +1462,9 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
                        ch->getNameC(),
                        obj_object->short_description,
-                       DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                       DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
                        sub_object->short_description,
-                       DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                       DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                 }
                 else
                 {
@@ -1473,9 +1473,9 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
                        ch->getNameC(),
                        obj_object->short_description,
-                       DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+                       DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
                        sub_object->short_description,
-                       DC::getInstance()->obj_index[sub_object->item_number].vnum());
+                       DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                 }
 
                 return ReturnValue::eSUCCESS;
@@ -1843,7 +1843,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(vict, obj->item_number, false))
+    if (search_char_for_item(vict, obj->vnum_, false))
     {
       sendln("The item's uniqueness prevents it.");
       csendf(vict, "%s tried to give you an item but was unable.\r\n", GET_SHORT(this));
@@ -1866,12 +1866,12 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          obj->short_description,
-         DC::getInstance()->obj_index[obj->item_number].vnum(),
+         obj->vnum_,
          loop_obj->short_description,
-         DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+         DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
 
   if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) && vict->isMortalPlayer() &&
-      vict->room().isArena() && arena.isPotato() && DC::getInstance()->obj_index[obj->item_number].vnum() == 393)
+      vict->room().isArena() && arena.isPotato() && obj->vnum_ == 393)
   {
     vict->sendln("Here, have some for some potato lag!!");
     WAIT_STATE(vict, DC::PULSE_VIOLENCE * 2);
@@ -1935,7 +1935,7 @@ class Object *bring_type_to_front(Character *ch, int item_type)
 }
 
 // Find an item on a character
-class Object *search_char_for_item(Character *ch, int16_t item_number, bool wearonly)
+class Object *search_char_for_item(Character *ch, vnum_t vnum, bool wearonly)
 {
   class Object *i = nullptr;
   class Object *j = nullptr;
@@ -1945,13 +1945,13 @@ class Object *search_char_for_item(Character *ch, int16_t item_number, bool wear
   {
     if (ch->equipment[k])
     {
-      if (ch->equipment[k]->item_number == item_number)
+      if (ch->equipment[k]->vnum_ == vnum)
         return ch->equipment[k];
       if (GET_ITEM_TYPE(ch->equipment[k]) == ITEM_CONTAINER)
       { // search inside
         for (j = ch->equipment[k]->contains; j; j = j->next_content)
         {
-          if (j->item_number == item_number)
+          if (j->vnum_ == vnum)
             return j;
         }
       }
@@ -1960,7 +1960,7 @@ class Object *search_char_for_item(Character *ch, int16_t item_number, bool wear
   if (!wearonly)
     for (i = ch->carrying; i; i = i->next_content)
     {
-      if (i->item_number == item_number)
+      if (i->vnum_ == vnum)
         return i;
 
       // does not support containers inside containers
@@ -1968,7 +1968,7 @@ class Object *search_char_for_item(Character *ch, int16_t item_number, bool wear
       { // search inside
         for (j = i->contains; j; j = j->next_content)
         {
-          if (j->item_number == item_number)
+          if (j->vnum_ == vnum)
             return j;
         }
       }
@@ -1977,7 +1977,7 @@ class Object *search_char_for_item(Character *ch, int16_t item_number, bool wear
 }
 
 // Find out how many of an item exists on character
-int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly)
+int search_char_for_item_count(Character *ch, vnum_t vnum, bool wearonly)
 {
   class Object *i = nullptr;
   class Object *j = nullptr;
@@ -1988,13 +1988,13 @@ int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly
   {
     if (ch->equipment[k])
     {
-      if (ch->equipment[k]->item_number == item_number)
+      if (ch->equipment[k]->vnum_ == vnum)
         count++;
       if (GET_ITEM_TYPE(ch->equipment[k]) == ITEM_CONTAINER)
       { // search inside
         for (j = ch->equipment[k]->contains; j; j = j->next_content)
         {
-          if (j->item_number == item_number)
+          if (j->vnum_ == vnum)
             count++;
         }
       }
@@ -2004,7 +2004,7 @@ int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly
   if (!wearonly)
     for (i = ch->carrying; i; i = i->next_content)
     {
-      if (i->item_number == item_number)
+      if (i->vnum_ == vnum)
         count++;
 
       // does not support containers inside containers
@@ -2012,7 +2012,7 @@ int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly
       { // search inside
         for (j = i->contains; j; j = j->next_content)
         {
-          if (j->item_number == item_number)
+          if (j->vnum_ == vnum)
             count++;
         }
       }
@@ -2021,7 +2021,7 @@ int search_char_for_item_count(Character *ch, int16_t item_number, bool wearonly
   return count;
 }
 
-bool search_container_for_item(Object *obj, int item_number)
+bool search_container_for_item(Object *obj, vnum_t vnum)
 {
   if (obj == nullptr)
   {
@@ -2035,7 +2035,7 @@ bool search_container_for_item(Object *obj, int item_number)
 
   for (Object *i = obj->contains; i; i = i->next_content)
   {
-    if (i->item_number == item_number)
+    if (i->vnum_ == vnum)
     {
       return true;
     }
@@ -2058,7 +2058,7 @@ bool search_container_for_vnum(Object *obj, int vnum)
 
   for (Object *i = obj->contains; i; i = i->next_content)
   {
-    if (DC::getInstance()->obj_index[i->item_number].vnum() == vnum)
+    if (i->vnum_ == vnum)
     {
       return true;
     }
@@ -2395,7 +2395,7 @@ bool has_key(Character *ch, int key)
   Object *obj = ch->equipment[WEAR_HOLD];
   if (obj && IS_KEY(obj))
   {
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == key)
+    if (obj->vnum_ == key)
     {
       return true;
     }
@@ -2403,7 +2403,7 @@ bool has_key(Character *ch, int key)
 
   for (obj = ch->carrying; obj; obj = obj->next_content)
   {
-    if (IS_KEY(obj) && DC::getInstance()->obj_index[obj->item_number].vnum() == key)
+    if (IS_KEY(obj) && obj->vnum_ == key)
     {
       return true;
     }
@@ -2588,7 +2588,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   if (!sub_object || sub_object->carried_by != ch)
   {
     if (isSet(obj_object->obj_flags.more_flags, ITEM_UNIQUE))
-      if (search_char_for_item(ch, obj_object->item_number, false))
+      if (search_char_for_item(ch, obj_object->vnum_, false))
       {
         ch->sendln("The item's uniqueness prevents it!");
         return ReturnValue::eFAILURE;
@@ -2603,13 +2603,13 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   if (!charge_moves(ch, SKILL_PALM))
     return ReturnValue::eSUCCESS;
 
-  if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == CHAMPION_ITEM)
+  if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == CHAMPION_ITEM)
   {
     if (ch->isNonPlayer() || ch->getLevel() <= 5)
       return ReturnValue::eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
 
-    Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->item_number].item);
+    Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->vnum_].item);
 
     if (o && o->short_description)
       send_info(QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(o->short_description));
@@ -2673,21 +2673,21 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   char log_buf[MAX_STRING_LENGTH] = {};
   if (sub_object && sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY)
   { // Logging gold gets from corpses would just be too much.
-    //"%s palms %s[%d] from %s", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->item_number].vnum(), qPrintable(sub_object->Name()));
+    //"%s palms %s[%d] from %s", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
 
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+           DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    sprintf(log_buf, "%s palms %s[%lu] from room %lu", GET_NAME(ch), qPrintable(obj_object->Name()), DC::getInstance()->obj_index[obj_object->item_number].vnum(),
+    sprintf(log_buf, "%s palms %s[%lu] from room %lu", GET_NAME(ch), qPrintable(obj_object->Name()), DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
             ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+           DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
 
   if (skill_success(ch, nullptr, SKILL_PALM))

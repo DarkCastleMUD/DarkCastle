@@ -408,9 +408,8 @@ public:
   Q_ENUM(LogChannel);
 
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
-  static constexpr room_t NOWHERE = 0ULL;
-  static constexpr vnum_t INVALID_VNUM = -1ULL;
-  static constexpr vnum_t INVALID_RNUM = -1ULL;
+  static constexpr room_t NOWHERE = 0UL;
+  static constexpr vnum_t INVALID_VNUM = 0UL;
   static constexpr uint64_t PASSES_PER_SEC = 100;
   static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
   static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
@@ -452,10 +451,8 @@ public:
   class World world;
   clan_data *clan_list{};
   clan_data *end_clan_list{};
-  class index_data obj_index_array[MAX_INDEX] = {};
-  class index_data *obj_index = obj_index_array;
-
-  QMap<vnum_t, class index_data> mob_index;
+  QMap<vnum_t, class obj_index_data> obj_index;
+  QMap<vnum_t, class mob_index_data> mob_index;
   world_file_list_item *world_file_list = 0; // List of the world files
   world_file_list_item *mob_file_list = 0;   // List of the mob files
   world_file_list_item *obj_file_list = 0;   // List of the obj files
@@ -583,13 +580,11 @@ public:
   int write_hotboot_file(void);
   int load_hotboot_descs(void);
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
-  vnum_t getObjectVNUM(int32_t nr, bool *ok = nullptr);
-  vnum_t getObjectVNUM(rnum_t nr, bool *ok = nullptr);
-  void generate_mob_indices(QMap<vnum_t, class index_data> &index);
-  index_data *generate_obj_indices(int *top, index_data *index);
+  void generate_mob_indices(QMap<vnum_t, class mob_index_data> &index);
+  void generate_obj_indices(QMap<vnum_t, class obj_index_data> &index);
   Character *read_mobile(int nr, FILE *fl);
   Character *clone_mobile(int nr);
-  auto create_blank_item(int nr) -> std::expected<int, create_error>;
+  auto create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   auto create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   void game_test_init(void);
   void heartbeat(void);

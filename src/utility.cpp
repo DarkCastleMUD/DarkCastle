@@ -1829,7 +1829,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (DC::getInstance()->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (obj->vnum_ == CONSECRATE_OBJ_NUMBER)
         if (ch == (Character *)(obj->obj_flags.origin))
           extract_obj(obj);
     }
@@ -2722,8 +2722,8 @@ void unique_scan(Character *victim)
     {
       if (isSet(victim->equipment[k]->obj_flags.more_flags, ITEM_UNIQUE))
       {
-        if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[victim->equipment[k]->item_number].vnum()))
-          virtnums[DC::getInstance()->obj_index[victim->equipment[k]->item_number].vnum()] = 1;
+        if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[victim->equipment[k]->vnum_].vnum()))
+          virtnums[DC::getInstance()->obj_index[victim->equipment[k]->vnum_].vnum()] = 1;
         else
           found_items.push(victim->equipment[k]);
       }
@@ -2733,8 +2733,8 @@ void unique_scan(Character *victim)
         {
           if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
           {
-            if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[j->item_number].vnum()))
-              virtnums[DC::getInstance()->obj_index[j->item_number].vnum()] = 1;
+            if (virtnums.end() == virtnums.find(j->vnum_))
+              virtnums[j->vnum_] = 1;
             else
               found_items.push(j);
           }
@@ -2747,8 +2747,8 @@ void unique_scan(Character *victim)
   {
     if (isSet(i->obj_flags.more_flags, ITEM_UNIQUE))
     {
-      if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[i->item_number].vnum()))
-        virtnums[DC::getInstance()->obj_index[i->item_number].vnum()] = 1;
+      if (virtnums.end() == virtnums.find(i->vnum_))
+        virtnums[i->vnum_] = 1;
       else
         found_items.push(i);
     }
@@ -2760,8 +2760,8 @@ void unique_scan(Character *victim)
       {
         if (isSet(j->obj_flags.more_flags, ITEM_UNIQUE))
         {
-          if (virtnums.end() == virtnums.find(DC::getInstance()->obj_index[j->item_number].vnum()))
-            virtnums[DC::getInstance()->obj_index[j->item_number].vnum()] = 1;
+          if (virtnums.end() == virtnums.find(j->vnum_))
+            virtnums[j->vnum_] = 1;
           else
             found_items.push(j);
         }

@@ -907,7 +907,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("That piece of equipment is protected by the powerful magics of the MUD-school elders.");
       return ReturnValue::eFAILURE;
     }
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
+    if (obj->vnum_ == CHAMPION_ITEM)
     {
       ch->send("You must earn that flag, no stealing allowed!");
       return ReturnValue::eFAILURE;
@@ -1004,18 +1004,18 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s stole %s[%lu] from %s",
                     GET_NAME(ch), obj->short_description,
-                    DC::getInstance()->obj_index[obj->item_number].vnum(), victim->getNameC());
+                    obj->vnum_, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
                    obj->short_description,
                    loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+                   DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
-          if (DC::getInstance()->obj_index[obj->item_number].vnum() != 76)
+          if (obj->vnum_ != 76)
           {
             obj_from_char(obj);
-            has_item = search_char_for_item(ch, obj->item_number, false);
+            has_item = search_char_for_item(ch, obj->vnum_, false);
             obj_to_char(obj, ch);
           }
           if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1210,7 +1210,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           }
         } // !is_npc
         obj_from_char(obj);
-        has_item = search_char_for_item(ch, obj->item_number, false);
+        has_item = search_char_for_item(ch, obj->vnum_, false);
         obj_to_char(obj, ch);
 
         if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
@@ -1466,7 +1466,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
   //      has_lockpicks = true;
 
   for (j = 0; j < MAX_WEAR; j++)
-    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || DC::getInstance()->obj_index[ch->equipment[j]->item_number].vnum() == 504))
+    if (ch->equipment[j] && (ch->equipment[j]->obj_flags.type_flag == ITEM_LOCKPICK || DC::getInstance()->obj_index[ch->equipment[j]->vnum_].vnum() == 504))
       has_lockpicks = true;
 
   if (!has_lockpicks)
@@ -1790,7 +1790,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     }
     if (((container->obj_flags.weight + obj->obj_flags.weight) >=
          container->obj_flags.value[0]) &&
-        (DC::getInstance()->obj_index[container->item_number].vnum() != 536 ||
+        (container->vnum_ != 536 ||
          weight_in(container) + obj->obj_flags.weight >= 200))
     {
       ch->sendln("It won't fit...cheater.");
@@ -1805,7 +1805,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       act("$n slips $p in $P.", ch, obj, container, TO_ROOM, GODS);
     move_obj(obj, container);
     // fix weight (move_obj doesn't re-add it, but it removes it)
-    if (DC::getInstance()->obj_index[container->item_number].vnum() != 536)
+    if (container->vnum_ != 536)
       IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(obj);
 
     act("You slip $p in $P.", ch, obj, container, TO_CHAR, 0);
@@ -1851,7 +1851,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(vict, obj->item_number, false))
+    if (search_char_for_item(vict, obj->vnum_, false))
     {
       ch->sendln("The item's uniqueness prevents it!");
       return ReturnValue::eFAILURE;
@@ -1862,7 +1862,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
 
   if (!skill_success(ch, vict, SKILL_SLIP))
   {
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393)
+    if (obj->vnum_ == 393)
     {
       ch->sendln("Whoa, you almost dropped your hot potato!");
       return ReturnValue::eFAILURE;

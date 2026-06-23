@@ -827,12 +827,12 @@ void DC::testing_load_vaults(void)
         {
           // We discard the line #VNUM
           vault_file_stream.readLine();
-          if (real_object(vnum) == 3846 && vault->owner == "Gipsy")
+          if (vnum == 3846 && vault->owner == "Gipsy")
           {
             qDebug("3846");
           }
           qDebug("%s", qPrintable(vault->owner));
-          obj = read_object(real_object(vnum), vault_file_stream, true);
+          obj = read_object(vnum, vault_file_stream, true);
           items->obj = obj;
         }
 
@@ -1086,7 +1086,7 @@ void DC::load_vaults(void)
         {
           char tmp[MAX_INPUT_LENGTH];
           get_line(fl, tmp);
-          obj = read_object(real_object(vnum), fl, true);
+          obj = read_object(vnum, fl, true);
           items->obj = obj;
         }
 
@@ -1540,7 +1540,7 @@ void vault_get(Character *ch, QString object, QString owner)
       return;
     }
 
-    if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->item_number, false))
+    if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, obj->vnum_, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1575,10 +1575,10 @@ void vault_get(Character *ch, QString object, QString owner)
     item_remove(obj, vault);
 
     if (!fullSave(obj))
-      tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+      tmp_obj = clone_object(GET_OBJ_VNUM(obj));
     else
     {
-      tmp_obj = clone_object(real_object(GET_OBJ_VNUM(obj)));
+      tmp_obj = clone_object(GET_OBJ_VNUM(obj));
       copySaveData(tmp_obj, obj);
 
       if (verify_item(&tmp_obj))
@@ -2162,9 +2162,9 @@ void Character::vault_list(QString owner)
       send(QStringLiteral("%1 $3Lvl: %2$R").arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
     }
 
-    if (getLevel() > IMMORTAL && obj->item_number > 0)
+    if (getLevel() > IMMORTAL && DC::getInstance()->obj_index.contains(obj->vnum_))
     {
-      send(QStringLiteral(" [%1]").arg(DC::getInstance()->obj_index[obj->item_number].vnum()));
+      send(QStringLiteral(" [%1]").arg(obj->vnum_));
     }
     send("\r\n");
   }
@@ -2735,9 +2735,9 @@ int vault_search(Character *ch, const char *args)
           ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
         }
 
-        if (ch->getLevel() > IMMORTAL && obj->item_number > 0)
+        if (ch->getLevel() > IMMORTAL && DC::getInstance()->obj_index.contains(obj->vnum_))
         {
-          ch->send(fmt::format(" [{}]", DC::getInstance()->obj_index[obj->item_number].vnum()));
+          ch->send(fmt::format(" [{}]", obj->vnum_));
         }
         ch->send("\r\n");
       } // for loop of objects

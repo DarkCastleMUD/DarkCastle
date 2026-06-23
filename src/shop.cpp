@@ -131,7 +131,7 @@ int unlimited_supply(class Object *item, int shop_nr)
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
-    if (item->item_number == obj->item_number)
+    if (item->vnum_ == obj->vnum_)
       return true;
   }
 
@@ -148,7 +148,7 @@ void restock_keeper(Character *keeper, int shop_nr)
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
-    obj2 = clone_object(obj->item_number);
+    obj2 = clone_object(obj->vnum_);
     obj_to_char(obj2, keeper);
   }
 }
@@ -226,7 +226,7 @@ void shopping_buy(const char *arg, Character *ch,
 
   if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE))
   {
-    if (search_char_for_item(ch, obj->item_number, false))
+    if (search_char_for_item(ch, obj->vnum_, false))
     {
       ch->sendln("The item's uniqueness prevents it!");
       return;
@@ -245,13 +245,13 @@ void shopping_buy(const char *arg, Character *ch,
   // Wormhole to map_eq_level
   /*
   if( obj->obj_flags.eq_level == 1000 )
-       obj = clone_object(obj->item_number);
+       obj = clone_object(obj->vnum_);
   else
       obj_from_char( obj );
   */
 
   if (unlimited_supply(obj, shop_nr))
-    obj = clone_object(obj->item_number);
+    obj = clone_object(obj->vnum_);
   else
     obj_from_char(obj);
 
@@ -324,7 +324,7 @@ void shopping_sell(const char *arg, Character *ch,
     return;
   }
 
-  int virt = DC::getInstance()->obj_index[obj->item_number].vnum();
+  int virt = obj->vnum_;
   if (virt >= 13400 && virt <= 13707 && keeper->mobdata->vnum_ != 13416)
   {
     keeper->do_tell(QStringLiteral("%1 There is only one merchant in the land that deals with such fine jewels.").arg(GET_NAME(ch)).split(' '));
@@ -633,7 +633,7 @@ void shopping_list(const char *arg, Character *ch,
 
     cost = (int)(obj->obj_flags.cost * DC::getInstance()->shop_index[shop_nr].profit_buy);
 
-    int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+    int vnum = obj->vnum_;
     bool loop = false;
     for (a = 0; a < i; a++)
       if (done[a] == vnum)
@@ -641,12 +641,12 @@ void shopping_list(const char *arg, Character *ch,
     if (loop)
       continue;
     if (i < 100)
-      done[i++] = DC::getInstance()->obj_index[obj->item_number].vnum();
+      done[i++] = obj->vnum_;
     else
       break;
     a = 0;
     for (tobj = keeper->carrying; tobj; tobj = tobj->next_content)
-      if (DC::getInstance()->obj_index[tobj->item_number].vnum() == DC::getInstance()->obj_index[obj->item_number].vnum())
+      if (tobj->vnum_ == obj->vnum_)
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
@@ -863,12 +863,12 @@ void fix_shopkeepers_inventory()
       {
         if (keeper->carrying)
         {
-          last_obj = clone_object(keeper->carrying->item_number);
+          last_obj = clone_object(keeper->carrying->vnum_);
           DC::getInstance()->shop_index[shop_nr].inventory = last_obj;
           for (obj = keeper->carrying->next_content; obj;
                obj = obj->next_content)
           {
-            cloned = clone_object(obj->item_number);
+            cloned = clone_object(obj->vnum_);
             last_obj->next_content = cloned;
             last_obj = cloned;
           }
@@ -1128,7 +1128,7 @@ void player_shopping_stock(const char *arg, Character *ch, Character *keeper)
 
   // add it to list
   player_shop_item *newitem = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
-  newitem->item_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  newitem->item_vnum = obj->vnum_;
   newitem->price = value;
   newitem->next = shop->sale_list;
   shop->sale_list = newitem;
@@ -1173,7 +1173,7 @@ void player_shopping_buy(const char *arg, Character *ch, Character *keeper)
     return;
   }
 
-  int robj = real_object(item->item_vnum);
+  int robj = item->item_vnum;
   if (robj < 0)
   {
     ch->sendln("Error, that is not a valid item.  Let a god know.");
@@ -1394,11 +1394,11 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
     for (player_shop_item *item = shop->sale_list; item; item = item->next)
     {
       count++;
-      robj = real_object(item->item_vnum);
+      robj = item->item_vnum;
       if (robj < 0)
         ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg(((Object *)DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(QString::number(item->price)));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(QString::number(item->price)));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
@@ -1640,7 +1640,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       char cost_buf[1024] = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, ((Object *)DC::getInstance()->obj_index[real_object(eddie[i].item_vnum)].item)->short_description, 1024);
+        strncpy(item_buf, (DC::getInstance()->obj_index[eddie[i].item_vnum].item)->short_description, 1024);
       }
       else
       {
@@ -1649,7 +1649,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, ((Object *)DC::getInstance()->obj_index[real_object(eddie[i].cost_vnum)].item)->short_description, 1024);
+        strncpy(cost_buf, (DC::getInstance()->obj_index[eddie[i].cost_vnum].item)->short_description, 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {
@@ -1760,7 +1760,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     else
     {
 
-      int count = search_char_for_item_count(ch, real_object(eddie[choice - 1].cost_vnum), false);
+      int count = search_char_for_item_count(ch, eddie[choice - 1].cost_vnum, false);
 
       if (count < eddie[choice - 1].cost_qty)
       {
@@ -1770,7 +1770,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
       for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
       {
-        Object *obj = search_char_for_item(ch, real_object(eddie[choice - 1].cost_vnum), false);
+        Object *obj = search_char_for_item(ch, eddie[choice - 1].cost_vnum, false);
         if (obj != 0)
         {
           if (obj->in_obj)
@@ -1800,7 +1800,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
     for (int i = 0; i < eddie[choice - 1].item_qty; i++)
     {
-      Object *item = clone_object(real_object(eddie[choice - 1].item_vnum));
+      Object *item = clone_object(eddie[choice - 1].item_vnum);
       if (item != 0)
       {
         obj_to_char(item, ch);
@@ -1929,13 +1929,13 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
   case cmd_t::CONFIRM:
     if (r.state == reroll_t::reroll_states_t::PICKED_OBJ_TO_REROLL)
     {
-      if (search_char_for_item_count(ch, real_object(OBJ_CLOVERLEAF), false) < 1)
+      if (search_char_for_item_count(ch, OBJ_CLOVERLEAF, false) < 1)
       {
         owner->tell(ch, "You don't have the required cloverleaf token.");
         return ReturnValue::eSUCCESS;
       }
 
-      obj = search_char_for_item(ch, real_object(OBJ_CLOVERLEAF), false);
+      obj = search_char_for_item(ch, OBJ_CLOVERLEAF, false);
       if (obj != 0)
       {
         obj_from(obj);
@@ -2192,7 +2192,7 @@ int redeem_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
           return ReturnValue::eSUCCESS;
         }
 
-        ch->do_identify(QStringLiteral("v%1").arg(DC::getInstance()->obj_index[obj->item_number].vnum()).split(' '));
+        ch->do_identify(QStringLiteral("v%1").arg(obj->vnum_).split(' '));
 
         r.orig_obj = obj;
         r.orig_rnum = GET_OBJ_RNUM(obj);

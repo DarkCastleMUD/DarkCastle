@@ -231,7 +231,7 @@ auto &operator<<(auto &out, mob_prog_data *mobprogs)
 
 void write_object(Object *obj, auto &out)
 {
-  out << QStringLiteral("#%1\n").arg(DC::getInstance()->obj_index[obj->item_number].vnum());
+  out << QStringLiteral("#%1\n").arg(obj->vnum_);
   string_to_file(out, obj->Name());
   string_to_file(out, obj->short_description);
   string_to_file(out, obj->long_description);
@@ -239,7 +239,7 @@ void write_object(Object *obj, auto &out)
   out << obj->obj_flags;
   out << obj->ex_description;
   affects_to_file(out, obj);
-  out << DC::getInstance()->obj_index[obj->item_number].mobprogs;
+  out << DC::getInstance()->obj_index[obj->vnum_].mobprogs;
   out << "S\n";
 }
 
@@ -330,9 +330,8 @@ char *fread_string(FILE *fl, int hasher);
 char *fread_string(std::ifstream &in, int hasher);
 char *fread_word(FILE *, int);
 QString fread_word(QTextStream &);
-void delete_item_from_index(int nr);
-void delete_mob_from_index(int nr);
-int real_object(int virt);
+void delete_item_from_index(vnum_t vnum);
+void delete_mob_from_index(vnum_t vnum);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
 
 int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
@@ -386,9 +385,7 @@ void load_messages(char *file, int base = 0);
 void boot_social_messages(void);
 void boot_clans(void);
 void assign_clan_rooms(void);
-void find_unordered_objects(void);
 
-extern int top_of_objt;
 extern time_t start_time; /* mud start time */
 
 class pulse_data

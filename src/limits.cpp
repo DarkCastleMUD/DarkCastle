@@ -735,7 +735,7 @@ void food_update(void)
     if (i->affected_by_spell(SPELL_PARALYZE))
       continue;
     int amt = -1;
-    if (i->equipment[WEAR_FACE] && DC::getInstance()->obj_index[i->equipment[WEAR_FACE]->item_number].vnum() == 536)
+    if (i->equipment[WEAR_FACE] && DC::getInstance()->obj_index[i->equipment[WEAR_FACE]->vnum_].vnum() == 536)
       amt = -3;
     gain_condition(i, FULL, amt);
     if (!GET_COND(i, FULL) && i->getLevel() < 60)

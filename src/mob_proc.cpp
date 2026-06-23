@@ -919,7 +919,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
-          auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
+          auto obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying);
           if (obj && obj->short_description)
             ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description));
           else
@@ -952,7 +952,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
-          auto obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying);
+          auto obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying);
           if (obj && obj->short_description)
           {
             act("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, TO_ROOM, 0);
@@ -1978,7 +1978,7 @@ int janitor(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (isSet(i->obj_flags.wear_flags, TAKE) &&
         GET_OBJ_WEIGHT(i) < 20 &&
         !isSet(i->obj_flags.extra_flags, ITEM_SPECIAL) &&
-        DC::getInstance()->obj_index[i->item_number].vnum() != CHAMPION_ITEM)
+        i->vnum_ != CHAMPION_ITEM)
     {
       act("$n picks up some trash.", ch, 0, 0, TO_ROOM, 0);
       move_obj(i, ch);

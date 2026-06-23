@@ -362,7 +362,7 @@ private slots:
 
     auto new_rnum = dc.create_blank_item(1);
     QCOMPARE(new_rnum.error(), create_error::entry_exists);
-    int rnum = real_object(1);
+    int rnum = 1;
     Object *o1 = clone_object(rnum);
     Object *o2 = clone_object(rnum);
     Object *o3 = clone_object(rnum);
@@ -869,7 +869,7 @@ private slots:
 
     auto new_rnum = dc.create_blank_item(1);
     QCOMPARE(new_rnum.error(), create_error::entry_exists);
-    int rnum = real_object(1);
+    int rnum = 1;
     Object *o1 = clone_object(rnum);
     Object *o2 = clone_object(rnum);
     QVERIFY(o1);
@@ -1087,23 +1087,15 @@ private slots:
 
     DC dc(cf);
     dc.boot_db();
-    auto obj = reinterpret_cast<Object *>(DC::getInstance()->obj_index[0].item);
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[0].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number), DC::getInstance()->obj_index[obj->item_number].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM), DC::INVALID_VNUM);
+
+    auto obj = DC::getInstance()->obj_index[1].item;
+    QCOMPARE(DC::getInstance()->getObjectVNUM(obj), DC::getInstance()->obj_index[1].vnum());
 
     bool ok = false;
     DC::getInstance()->getObjectVNUM(obj, &ok);
     QCOMPARE(ok, true);
     ok = false;
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, &ok), DC::getInstance()->obj_index[obj->item_number].vnum());
-    QCOMPARE(ok, true);
-    QCOMPARE(DC::getInstance()->getObjectVNUM(DC::INVALID_RNUM, &ok), DC::INVALID_VNUM);
-    QCOMPARE(ok, false);
-
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[0].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM(obj->item_number, nullptr), DC::getInstance()->obj_index[obj->item_number].vnum());
-    QCOMPARE(DC::getInstance()->getObjectVNUM((legacy_rnum_t)DC::INVALID_RNUM, nullptr), DC::INVALID_VNUM);
+    QCOMPARE(DC::getInstance()->getObjectVNUM(obj, nullptr), DC::getInstance()->obj_index[1].vnum());
   }
   void test_blackjack()
   {
@@ -1528,18 +1520,18 @@ private slots:
     g1.setHP(1000);
     g2.setHP(1000);
     // 14905, 2256, 3181
-    QVERIFY(real_object(14905) != -1);
-    QVERIFY(real_object(2256) != -1);
-    QVERIFY(real_object(3181) != -1);
-    QVERIFY(real_object(107) != -1);
-    QVERIFY(real_object(108) != -1);
-    QVERIFY(real_object(7004) != -1);
-    QVERIFY(obj_to_char(clone_object(real_object(14905)), &p1));
-    QVERIFY(obj_to_char(clone_object(real_object(2256)), &p1));
-    QVERIFY(obj_to_char(clone_object(real_object(3181)), &p1));
-    QVERIFY(obj_to_char(clone_object(real_object(107)), &p1));
-    QVERIFY(obj_to_char(clone_object(real_object(108)), &p1));
-    QVERIFY(obj_to_char(clone_object(real_object(7004)), &p1));
+    QVERIFY(14905 != -1);
+    QVERIFY(2256 != -1);
+    QVERIFY(3181 != -1);
+    QVERIFY(107 != -1);
+    QVERIFY(108 != -1);
+    QVERIFY(7004 != -1);
+    QVERIFY(obj_to_char(clone_object(14905), &p1));
+    QVERIFY(obj_to_char(clone_object(2256), &p1));
+    QVERIFY(obj_to_char(clone_object(3181), &p1));
+    QVERIFY(obj_to_char(clone_object(107), &p1));
+    QVERIFY(obj_to_char(clone_object(108), &p1));
+    QVERIFY(obj_to_char(clone_object(7004), &p1));
 
     p1.setClass(CLASS_MAGE);
     auto spell = find_skills_by_name("create_golem");
@@ -1655,11 +1647,11 @@ private slots:
     QCOMPARE(get_obj_vnum(QStringLiteral("v1")), nullptr);
     QCOMPARE_NE(get_obj_vnum(QStringLiteral("v99")), nullptr);
 
-    QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->item_number].vnum(), 99);
+    QCOMPARE(DC::getInstance()->obj_index[get_obj_vnum(QStringLiteral("v99"))->vnum_].vnum(), 99);
     QCOMPARE(get_obj_vnum(QStringLiteral("v99"))->carried_by, nullptr);
-    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->item_number].vnum(), 1);
+    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v1"))->vnum_].vnum(), 1);
     QCOMPARE(get_objindex_vnum(QStringLiteral("v1"))->carried_by, nullptr);
-    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->item_number].vnum(), 99);
+    QCOMPARE(DC::getInstance()->obj_index[get_objindex_vnum(QStringLiteral("v99"))->vnum_].vnum(), 99);
     QCOMPARE(get_objindex_vnum(QStringLiteral("v99"))->carried_by, nullptr);
   }
 

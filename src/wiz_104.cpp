@@ -125,7 +125,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   char buf[MAX_STRING_LENGTH] = {0};
 
   char *c;
-  int x, number = 0, num = 0, cnt = 1;
+  int number = 0, num = 0, cnt = 1;
 
   char *types[] = {
       "mobile",
@@ -160,15 +160,14 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
     *buf = '\0';
     ch->sendln("[#  ] [OBJ #] OBJECT'S DESCRIPTION\n");
 
-    for (x = 0; (x < DC::getInstance()->obj_index[top_of_objt].vnum()); x++)
+    for (const auto &x : DC::getInstance()->obj_index.keys())
     {
-      if ((num = real_object(x)) < 0)
-        continue;
+      num = x;
 
       if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
       {
         cnt++;
-        sprintf(buf, "[%3d] [%5d] %s\r\n", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
+        sprintf(buf, "[%3d] [%5lu] %s\r\n", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
         ch->send(buf);
       }
 
@@ -205,6 +204,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   else
     c = type;
 
+  int x{};
   if (cmd == cmd_t::DEFAULT)
   {
     for (x = 0; x <= 2; x++)
@@ -224,7 +224,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   switch (x)
   {
   default:
-    ch->sendln("Problem...fuck up in do_load.");
+    ch->sendln("Problem in do_load.");
     logentry(QStringLiteral("Default in do_load...should NOT happen."), ANGEL, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   case 0: /* mobile */
@@ -258,7 +258,8 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     else if (number == -1)
     {
-      if ((number = real_object(num)) < 0)
+      number = num;
+      if (!DC::getInstance()->obj_index.contains(num))
       {
         ch->sendln("No such object.");
         return ReturnValue::eFAILURE;
@@ -880,7 +881,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->mob_index.contains(begin))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
           ch->send(buf);
         }
       }
@@ -893,7 +894,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
           ch->send(buf);
 
           if (count > 200)
@@ -915,10 +916,10 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (!DC::getInstance()->mob_index.contains(i))
           continue;
 
-        if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].item))->getNameC()))
+        if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].mob))->getNameC()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
           ch->send(buf);
 
           if (count > 200)
@@ -934,7 +935,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   } /* "mobile" */
   else if (is_abbrev(type, "counts") && has_range)
   {
-    csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n", DC::getInstance()->total_rooms, DC::getInstance()->mob_index.count(), top_of_objt);
+    csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n", DC::getInstance()->total_rooms, DC::getInstance()->mob_index.count(), DC::getInstance()->obj_index.count());
     return ReturnValue::eSUCCESS;
   }
   else if (is_abbrev(type, "object"))
@@ -976,7 +977,8 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 
       if (end == -1)
       {
-        if ((nr = real_object(begin)) >= 0)
+        nr = begin;
+        if (DC::getInstance()->obj_index.contains(nr))
         {
           sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
           ch->send(buf);
@@ -984,10 +986,10 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        for (i = begin; i <= DC::getInstance()->obj_index[top_of_objt].vnum() && i <= end;
-             i++)
+        for (i = begin; i <= DC::getInstance()->obj_index[DC::getInstance()->obj_index.lastKey()].vnum() && i <= end; i++)
         {
-          if ((nr = real_object(i)) < 0)
+          nr = i;
+          if (!DC::getInstance()->obj_index.contains(nr))
             continue;
 
           count++;
@@ -1007,9 +1009,10 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       *buf = '\0';
       ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
-      for (i = 0; (i <= DC::getInstance()->obj_index[top_of_objt].vnum()); i++)
+      for (i = 1; (i <= DC::getInstance()->obj_index[DC::getInstance()->obj_index.lastKey()].vnum()); i++)
       {
-        if ((nr = real_object(i)) < 0)
+        nr = 1;
+        if (!DC::getInstance()->obj_index.contains(nr))
           continue;
 
         if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[nr].item))->Name()))
@@ -1349,42 +1352,42 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       if (!DC::getInstance()->mob_index.contains(c))
         continue;
       if (race > -1)
-        if (((Character *)(DC::getInstance()->mob_index[nr].item))->race != race)
+        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->race != race)
           continue;
       if (align)
       {
-        if (align == 1 && ((Character *)(DC::getInstance()->mob_index[nr].item))->alignment < 350)
+        if (align == 1 && ((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment < 350)
           continue;
-        else if (align == 2 && (((Character *)(DC::getInstance()->mob_index[nr].item))->alignment < -350 || ((Character *)(DC::getInstance()->mob_index[nr].item))->alignment > 350))
+        else if (align == 2 && (((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment < -350 || ((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment > 350))
           continue;
-        else if (align == 3 && ((Character *)(DC::getInstance()->mob_index[nr].item))->alignment > -350)
+        else if (align == 3 && ((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment > -350)
           continue;
       }
       if (immune)
-        if (!isSet(((Character *)(DC::getInstance()->mob_index[nr].item))->immune,
+        if (!isSet(((Character *)(DC::getInstance()->mob_index[nr].mob))->immune,
                    immune))
           continue;
       if (clas)
-        if (((Character *)(DC::getInstance()->mob_index[nr].item))->c_class != clas)
+        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->c_class != clas)
           continue;
       if (levlow != -555)
-        if (((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel() < levlow)
+        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel() < levlow)
           continue;
       if (levhigh != -555)
-        if (((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel() > levhigh)
+        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel() > levhigh)
           continue;
       if (*act)
         for (i = 0; i < ACT_MAX; i++)
           if (ISSET(act, i))
             if (!ISSET(
-                    ((Character *)(DC::getInstance()->mob_index[nr].item))->mobdata->actflags,
+                    ((Character *)(DC::getInstance()->mob_index[nr].mob))->mobdata->actflags,
                     i + 1))
               goto eheh;
       if (*affect)
         for (i = 0; i < AFF_MAX; i++)
           if (ISSET(affect, i))
             if (!ISSET(
-                    ((Character *)(DC::getInstance()->mob_index[nr].item))->affected_by,
+                    ((Character *)(DC::getInstance()->mob_index[nr].mob))->affected_by,
                     i + 1))
               goto eheh;
       count++;
@@ -1393,7 +1396,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((Character *)(DC::getInstance()->mob_index[nr].item))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
       ch->send(buf);
     eheh:
       continue;
@@ -1619,10 +1622,11 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    for (c = 0; c < DC::getInstance()->obj_index[top_of_objt].vnum(); c++)
+    for (c = 0; c < DC::getInstance()->obj_index[DC::getInstance()->obj_index.lastKey()].vnum(); c++)
     {
       found = false;
-      if ((nr = real_object(c)) < 0)
+      nr = c;
+      if (!DC::getInstance()->obj_index.contains(nr))
         continue;
       if (wear)
         for (i = 0; i < 20; i++)
@@ -2025,9 +2029,9 @@ char *oprog_type_to_name(int type)
   }
 }
 
-void opstat(Character *ch, int vnum)
+void opstat(Character *ch, vnum_t vnum)
 {
-  int num = real_object(vnum);
+  auto num = vnum;
   Object *obj;
   char buf[MAX_STRING_LENGTH];
   if (num < 0)
@@ -2035,9 +2039,8 @@ void opstat(Character *ch, int vnum)
     ch->sendln("Error, non-existant object.");
     return;
   }
-  obj = (Object *)DC::getInstance()->obj_index[num].item;
-  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %d.\r\n",
-          qPrintable(obj->Name()), vnum);
+  obj = DC::getInstance()->obj_index[num].item;
+  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %lu.\r\n", qPrintable(obj->Name()), vnum);
   ch->send(buf);
   if (DC::getInstance()->obj_index[num].progtypes == 0)
   {
@@ -2109,7 +2112,8 @@ void update_objprog_bits(int num)
 
 int do_opedit(Character *ch, char *argument, cmd_t cmd)
 {
-  int num = -1, vnum = -1, i = -1, a = -1;
+  int i = -1, a = -1;
+  vnum_t num{}, vnum{};
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
   if (ch->isNonPlayer())
@@ -2124,7 +2128,8 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     vnum = ch->player->last_obj_vnum;
   }
 
-  if ((num = real_object(vnum)) < 0)
+  auto rnum = vnum;
+  if (!DC::getInstance()->obj_index.contains(vnum))
   {
     ch->sendln("No such object.");
     return ReturnValue::eFAILURE;
@@ -2377,7 +2382,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   }
   Object *obj, *otmp;
   int v1 = atoi(arg1), v2 = atoi(arg2);
-  int r1 = real_object(v1), r2 = real_object(v2);
+  int r1 = v1, r2 = v2;
   if (r1 < 0)
   {
     ch->sendln("Source vnum does not exist.");
@@ -2396,8 +2401,8 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
     int retval = ch->do_oedit(buf.split(' '));
     if (!isSet(retval, ReturnValue::eSUCCESS))
       return ReturnValue::eFAILURE;
-    r1 = real_object(v1);
-    r2 = real_object(v2);
+    r1 = v1;
+    r2 = v2;
     if (r2 == -1)
     {
       ch->sendln("Something failed. Possibly your destination vnum was too high.");
@@ -2412,21 +2417,19 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   }
 
   /*
-    if(DC::getInstance()->obj_index[obj->item_number].non_combat_func ||
+    if(DC::getInstance()->obj_index[obj->vnum_].non_combat_func ||
                   obj->obj_flags.type_flag == ITEM_MEGAPHONE ||
                   has_random(obj)) {
           DC::getInstance()->obj_free_list.insert(obj);
     }
   */
 
-  csendf(ch, "Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).\r\n",
-         v1, ((Object *)DC::getInstance()->obj_index[real_object(v1)].item)->short_description,
-         v2, ((Object *)DC::getInstance()->obj_index[real_object(v2)].item)->short_description);
+  csendf(ch, "Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).\r\n", v1, (DC::getInstance()->obj_index[v1].item)->short_description, v2, (DC::getInstance()->obj_index[v2].item)->short_description);
 
   DC::getInstance()->object_list = DC::getInstance()->object_list->next;
-  otmp = (Object *)DC::getInstance()->obj_index[r2].item;
-  obj->item_number = r2;
-  DC::getInstance()->obj_index[r2].item = (void *)obj;
+  otmp = DC::getInstance()->obj_index[r2].item;
+  obj->vnum_ = r2;
+  DC::getInstance()->obj_index[r2].item = obj;
   DC::getInstance()->obj_index[r2].non_combat_func = 0;
   DC::getInstance()->obj_index[r2].qty = 0;
   DC::getInstance()->obj_index[r2].vnum(v2);
@@ -2497,7 +2500,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   mob->mobdata->vnum_ = dst;
 
   // Find old mobile in world and remove
-  Character *old_mob = (Character *)DC::getInstance()->mob_index[dst].item;
+  Character *old_mob = DC::getInstance()->mob_index[dst].mob;
   if (old_mob && old_mob->mobdata)
   {
     const auto &character_list = DC::getInstance()->character_list;
@@ -2511,11 +2514,11 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   }
 
   csendf(ch, "Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
-         vsrc, ((Character *)DC::getInstance()->mob_index[src].item)->short_desc,
-         vdst, ((Character *)DC::getInstance()->mob_index[dst].item)->short_desc);
+         vsrc, (DC::getInstance()->mob_index[src].mob)->short_desc,
+         vdst, (DC::getInstance()->mob_index[dst].mob)->short_desc);
 
   // Overwrite old mob with new mob
-  DC::getInstance()->mob_index[dst].item = (void *)mob;
+  DC::getInstance()->mob_index[dst].mob = mob;
   DC::getInstance()->mob_index[dst].qty = 0;
   DC::getInstance()->mob_index[dst].non_combat_func = 0;
   DC::getInstance()->mob_index[dst].combat_func = 0;

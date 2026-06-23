@@ -1205,7 +1205,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         ch->sendln("$B$2The Meta-physician tells you, 'You can't afford that!'$R");
         return ReturnValue::eSUCCESS;
       }
-      class Object *obj = clone_object(real_object(10003));
+      class Object *obj = clone_object(10003);
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items.");
@@ -1742,7 +1742,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         ch->sendln("$B$2Cardinal Thelonius tells you, 'You can't afford that!'$R");
         return ReturnValue::eSUCCESS;
       }
-      class Object *obj = clone_object(real_object(10004));
+      class Object *obj = clone_object(10004);
       if (IS_CARRYING_N(ch) + 1 > CAN_CARRY_N(ch))
       {
         ch->sendln("You can't carry that many items.");

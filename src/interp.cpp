@@ -1140,20 +1140,20 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
 
   /* special in equipment list? */
   for (j = 0; j <= (MAX_WEAR - 1); j++)
-    if (equipment[j] && this->equipment[j]->item_number >= 0)
-      if (DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)
+    if (equipment[j] && DC::getInstance()->obj_index.contains(this->equipment[j]->vnum_))
+      if (DC::getInstance()->obj_index[this->equipment[j]->vnum_].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->item_number].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[this->equipment[j]->vnum_].non_combat_func)(this, this->equipment[j], cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
 
   /* special in inventory? */
   for (i = carrying; i; i = i->next_content)
-    if (i->item_number >= 0)
-      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
+    if (DC::getInstance()->obj_index.contains(i->vnum_))
+      if (DC::getInstance()->obj_index[i->vnum_].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->vnum_].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }
@@ -1163,7 +1163,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   {
     if (k->isNonPlayer())
     {
-      if (((Character *)DC::getInstance()->mob_index[k->mobdata->vnum_].item)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if ((DC::getInstance()->mob_index[k->mobdata->vnum_].mob)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
@@ -1181,10 +1181,10 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
 
   /* special in object present? */
   for (i = DC::getInstance()->world[this->in_room].contents; i; i = i->next_content)
-    if (i->item_number >= 0)
-      if (DC::getInstance()->obj_index[i->item_number].non_combat_func)
+    if (DC::getInstance()->obj_index.contains(i->vnum_))
+      if (DC::getInstance()->obj_index[i->vnum_].non_combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[i->item_number].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
+        retval = ((*DC::getInstance()->obj_index[i->vnum_].non_combat_func)(this, i, cmd, arguments.toStdString().c_str(), this));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }

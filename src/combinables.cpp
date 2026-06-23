@@ -179,8 +179,8 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   }
 
   // give poison to player
-  int rewardnum = real_object(poison_vial_data[index].result);
-  if (rewardnum < 0)
+  int rewardnum = poison_vial_data[index].result;
+  if (!DC::getInstance()->obj_index.contains(rewardnum))
   {
     ch->sendln("That poison is broken.  Tell a god.");
     return (ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR);
@@ -236,7 +236,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
 
   int found = -1;
   for (int i = 0; poison_vial_data[i].result != -1; i++)
-    if (poison_vial_data[i].result == DC::getInstance()->obj_index[vial->item_number].vnum())
+    if (poison_vial_data[i].result == vial->vnum_)
     {
       found = i;
       break;
@@ -283,8 +283,8 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 
   // take all the items in our container and put them in an array by vnum
   for (Object *j = container->contains; j; j = j->next_content)
-    if (j->item_number >= 0)
-      current.push_back(DC::getInstance()->obj_index[j->item_number].vnum());
+    if (DC::getInstance()->obj_index.contains(j->vnum_))
+      current.push_back(j->vnum_);
     else
       return -1; // only valid object ingrediants will match
 
@@ -551,7 +551,7 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
 
   const char *potion_color;
   // Determine color to use in message based on herb used
-  switch (DC::getInstance()->obj_index[herbobj->item_number].vnum())
+  switch (herbobj->vnum_)
   {
   case 6301:
     potion_color = "$B$2green$R and $B$4red$R";
@@ -595,15 +595,15 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
   }
 
   // Search for the current combination as a recipe
-  Brew::recipe r = {DC::getInstance()->obj_index[herbobj->item_number].vnum(),
+  Brew::recipe r = {herbobj->vnum_,
                     liquidobj->obj_flags.value[2],
-                    DC::getInstance()->obj_index[containerobj->item_number].vnum()};
+                    containerobj->vnum_};
   int spell = b.find(r);
 
   //  csendf(ch, "Searching for herb: %d(%s)\nliquid: %d(%s)\ncontainer: %d(%s).....%d\n",
-  //	 DC::getInstance()->obj_index[herbobj->item_number].vnum(), GET_OBJ_SHORT(herbobj),
+  //	 herbobj->vnum_, GET_OBJ_SHORT(herbobj),
   //	 liquidobj->obj_flags.value[2], GET_OBJ_SHORT(liquidobj),
-  //	 DC::getInstance()->obj_index[containerobj->item_number].vnum(), GET_OBJ_SHORT(containerobj), spell);
+  //	 containerobj->vnum_, GET_OBJ_SHORT(containerobj), spell);
 
   if (spell == 0)
   {
@@ -1063,10 +1063,10 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2.5);
 
   // Search for the current combination as a recipe
-  Scribe::recipe r = {DC::getInstance()->obj_index[inkobj->item_number].vnum(),
-                      DC::getInstance()->obj_index[dustobj->item_number].vnum(),
-                      DC::getInstance()->obj_index[penobj->item_number].vnum(),
-                      DC::getInstance()->obj_index[paperobj->item_number].vnum()};
+  Scribe::recipe r = {inkobj->vnum_,
+                      dustobj->vnum_,
+                      penobj->vnum_,
+                      paperobj->vnum_};
   int spell = s.find(r);
 
   act("You sit down and carefully inscribe the words of the gods onto the parchment.", ch, 0, 0, TO_CHAR, 0);

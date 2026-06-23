@@ -115,7 +115,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (DC::getInstance()->obj_index[obj->item_number].vnum() == CHAMPION_ITEM)
+  if (obj->vnum_ == CHAMPION_ITEM)
   {
     ch->sendln("In soviet russia, champion flag sacrifice YOU!");
     return ReturnValue::eFAILURE;
@@ -306,12 +306,10 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   if (obj->obj_flags.type_flag != ITEM_MONEY)
   {
     char log_buf[MAX_STRING_LENGTH] = {};
-    sprintf(log_buf, "%s donates %s[%lu]", GET_NAME(ch), qPrintable(obj->Name()), DC::getInstance()->obj_index[obj->item_number].vnum());
+    sprintf(log_buf, "%s donates %s[%lu]", GET_NAME(ch), qPrintable(obj->Name()), obj->vnum_);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description,
-           loop_obj->short_description,
-           DC::getInstance()->obj_index[loop_obj->item_number].vnum());
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description, loop_obj->short_description, DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
 
   location = real_room(room);

@@ -801,9 +801,9 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   class Object *obj;
   for (i = 1; i < 32000; i++)
   {
-    if (real_object(i) < 0)
+    if (i < 0)
       continue;
-    obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
+    obj = DC::getInstance()->obj_index[i].item;
     if (!class_restricted(vict, obj) &&
         !size_restricted(vict, obj) &&
         CAN_WEAR(obj, TAKE) &&
@@ -819,7 +819,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
           {
             if (a == 1)
             {
-              last_vnum[0][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
+              last_vnum[0][o] = obj->vnum_;
               last_vnum[1][o] = -1;
               last_vnum[2][o] = -1;
               last_vnum[3][o] = -1;
@@ -833,7 +833,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
               for (v = 0; v < 5; v++)
                 if (last_vnum[v][o] == -1)
                 {
-                  last_vnum[v][o] = DC::getInstance()->obj_index[obj->item_number].vnum();
+                  last_vnum[v][o] = obj->vnum_;
                   break;
                 }
             }
@@ -856,7 +856,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%d)   ", buf1, ((Object *)DC::getInstance()->obj_index[real_object(last_vnum[a][i])].item)->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%d)   ", buf1, (DC::getInstance()->obj_index[last_vnum[a][i]].item)->short_description, last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
@@ -968,17 +968,17 @@ int do_listproc(Character *ch, char *argument, cmd_t cmd)
   {
     if (mob && (!DC::getInstance()->mob_index.contains(i) || !DC::getInstance()->mob_index[i].mobprogs))
       continue;
-    else if (!mob && (real_object(i) < 0 || !DC::getInstance()->obj_index[real_object(i)].mobprogs))
+    else if (!mob && (!DC::getInstance()->obj_index.contains(i) || !DC::getInstance()->obj_index[i].mobprogs))
       continue;
     if (tot++ > 100)
       break;
     if (mob)
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Character *)DC::getInstance()->mob_index[i].item)->getName()));
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg((DC::getInstance()->mob_index[i].mob)->getName()));
     }
     else
     {
-      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg(((Object *)DC::getInstance()->obj_index[real_object(i)].item)->Name()));
+      ch->sendln(QStringLiteral("[%1] [%2] %3").arg(tot, -3).arg(i, -3).arg((DC::getInstance()->obj_index[i].item)->Name()));
     }
   }
   return ReturnValue::eSUCCESS;

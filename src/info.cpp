@@ -398,7 +398,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
   for (i = list; i; i = i->next_content)
   {
     if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
-        i->next_content->item_number == i->item_number && i->item_number != -1 && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
+        i->next_content->vnum_ == i->vnum_ && DC::getInstance()->obj_index.contains(i->vnum_) && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
     {
       number++;
       continue;
@@ -857,7 +857,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
     if (nr >= 0)
     {
       csendf(this, "[%4dms] [%5d] [%s]\r\n", ms, DC::getInstance()->mob_index[nr].vnum(),
-             ((Character *)(DC::getInstance()->mob_index[nr].item))->short_desc);
+             ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
     }
   }
 
@@ -1061,15 +1061,15 @@ bool identify(Character *ch, Object *obj)
   ch->send(QStringLiteral("$3Value: $R%1\r\n").arg(obj->obj_flags.cost));
 
   const Object *vobj = nullptr;
-  if (obj->item_number >= 0)
+  if (DC::getInstance()->obj_index.contains(obj->vnum_))
   {
-    const int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+    const int vnum = obj->vnum_;
     if (vnum >= 0)
     {
-      const int rn_of_vnum = real_object(vnum);
+      const int rn_of_vnum = vnum;
       if (rn_of_vnum >= 0)
       {
-        vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
+        vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
       }
     }
   }
@@ -1264,13 +1264,13 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
     QString buffer = match.captured("vnum");
 
     vnum_t vnum = buffer.toULongLong();
-    vnum_t rnum = real_object(vnum);
-    if (rnum == -1)
+    vnum_t rnum = vnum;
+    if (!DC::getInstance()->obj_index.contains(rnum))
     {
       send("Invalid VNUM.\r\n");
       return ReturnValue::eFAILURE;
     }
-    obj = (Object *)DC::getInstance()->obj_index[rnum].item;
+    obj = DC::getInstance()->obj_index[rnum].item;
 
     if (obj->isDark() && !isImmortalPlayer())
     {
@@ -1429,7 +1429,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
               {
                 logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                      "Bug in object %d. v2: %d > v1: %d. Resetting.",
-                     DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
+                     DC::getInstance()->obj_index[tmp_object->vnum_].vnum(),
                      tmp_object->obj_flags.value[1],
                      tmp_object->obj_flags.value[0]);
                 tmp_object->obj_flags.value[1] =
@@ -1465,7 +1465,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
               {
 
                 int weight_in(class Object * obj);
-                if (DC::getInstance()->obj_index[tmp_object->item_number].vnum() == 536)
+                if (DC::getInstance()->obj_index[tmp_object->vnum_].vnum() == 536)
                   temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                 else
                   temp = ((tmp_object->obj_flags.weight * 3) / tmp_object->obj_flags.value[0]);
@@ -1484,7 +1484,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                 temp = 3;
                 logf(IMMORTAL, DC::LogChannel::LOG_WORLD,
                      "Bug in object %d. Weight: %d v1: %d",
-                     DC::getInstance()->obj_index[tmp_object->item_number].vnum(),
+                     DC::getInstance()->obj_index[tmp_object->vnum_].vnum(),
                      tmp_object->obj_flags.weight,
                      tmp_object->obj_flags.value[0]);
               }
@@ -2607,7 +2607,7 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
   if (isdigit(*name))
   {
     vnum = atoi(name);
-    searchnum = real_object(vnum);
+    searchnum = vnum;
   }
 
   ch->sendln("-#-- Short Description ------- Room Number\n");
@@ -2618,7 +2618,7 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
     // allow search by vnum
     if (vnum)
     {
-      if (k->item_number != searchnum)
+      if (k->vnum_ != searchnum)
         continue;
     }
     else if (!(isexact(name, k->Name())))
@@ -3388,13 +3388,13 @@ void check_champion_and_website_who_list()
       buf << GET_SHORT(ch) << std::endl;
     }
 
-    if ((ch->isNonPlayer() || !ch->desc) && (obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
+    if ((ch->isNonPlayer() || !ch->desc) && (obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying)))
     {
       obj_from_char(obj);
       obj_to_room(obj, CFLAG_HOME);
     }
 
-    if (IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(real_object(CHAMPION_ITEM), ch->carrying)))
+    if (IS_AFFECTED(ch, AFF_CHAMPION) && !(obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying)))
     {
       REMBIT(ch->affected_by, AFF_CHAMPION);
     }
@@ -3403,9 +3403,9 @@ void check_champion_and_website_who_list()
   buf << "endminutenobodywillhavethisnameever" << std::endl;
   addminute++;
 
-  if (!(obj = get_obj_num(real_object(CHAMPION_ITEM))))
+  if (!(obj = get_obj_num(CHAMPION_ITEM)))
   {
-    if ((obj = clone_object(real_object(CHAMPION_ITEM))))
+    if ((obj = clone_object(CHAMPION_ITEM)))
     {
       obj_to_room(obj, CFLAG_HOME);
     }
@@ -3580,7 +3580,7 @@ private:
 
   uint64_t o_value[4] = {};
 
-  uint64_t o_item_number_ = {};  /* Where in data-base               */
+  uint64_t o_vnum_ = {};         /* Where in data-base               */
   uint64_t o_in_room_ = {};      /* In what room -1 when conta/carr  */
   uint64_t o_vroo_ = {};         /* for corpse saving */
   obj_flag_data obj_flags_ = {}; /* Object information               */
@@ -4396,27 +4396,13 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    for (int vnum = 0; vnum < DC::getInstance()->obj_index[top_of_objt].vnum(); ++vnum)
+    for (const auto &vnum : DC::getInstance()->obj_index.keys())
     {
-      int rnum = 0;
-      // real_object returns -1 for missing VNUMs
-      if ((rnum = real_object(vnum)) < 0)
-      {
+      Object *obj = DC::getInstance()->obj_index[vnum].item;
+      if (obj == nullptr || (obj->isDark() && !isImmortalPlayer()))
         continue;
-      }
-      Object *obj = static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
-      if (obj == nullptr)
-      {
-        continue;
-      }
-
-      if (obj->isDark() && !isImmortalPlayer())
-      {
-        continue;
-      }
 
       bool matches = false;
-
       for (auto i = 0; i < sl.size(); ++i)
       {
         if (sl[i].getType() == Search::types::LIMIT)
@@ -4443,7 +4429,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     }
     if (obj_results.empty())
     {
-      send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(top_of_objt));
+      send(QStringLiteral("Searching $B%1$R objects...No results found.\r\n").arg(DC::getInstance()->obj_index.count()));
       return ReturnValue::eFAILURE;
     }
 
@@ -4486,11 +4472,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   {
     if (limit_output)
     {
-      send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(top_of_objt).arg(obj_results.size()).arg(limit_output));
+      send(QStringLiteral("Searching %1 objects...%2 matches found. Limiting output to %3 matches.\r\n").arg(DC::getInstance()->obj_index.count()).arg(obj_results.size()).arg(limit_output));
     }
     else
     {
-      send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(top_of_objt).arg(obj_results.size()));
+      send(QStringLiteral("Searching %1 objects...%2 matches found.\r\n").arg(DC::getInstance()->obj_index.count()).arg(obj_results.size()));
     }
   }
 
@@ -4604,15 +4590,15 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     // Needed to show details or affects below
     const Object *vobj = nullptr;
-    if (obj->item_number >= 0)
+    if (DC::getInstance()->obj_index.contains(obj->vnum_))
     {
-      const int vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
-      if (vnum >= 0)
+      const int vnum = obj->vnum_;
+      if (DC::getInstance()->obj_index.contains(vnum))
       {
-        const int rn_of_vnum = real_object(vnum);
+        const int rn_of_vnum = vnum;
         if (rn_of_vnum >= 0)
         {
-          vobj = (Object *)DC::getInstance()->obj_index[rn_of_vnum].item;
+          vobj = DC::getInstance()->obj_index[rn_of_vnum].item;
         }
       }
     }

@@ -164,7 +164,7 @@ command_return_t Character::do_pets(QStringList arguments, cmd_t cmd)
 
   for (const auto &vnum : DC::getInstance()->mob_index.keys())
   {
-    auto victim = (Character *)(DC::getInstance()->mob_index[vnum].item);
+    auto victim = (Character *)(DC::getInstance()->mob_index[vnum].mob);
     if ((arg1_level_ok && victim->getLevel() < arg1_level) ||
         (arg2_level_ok && victim->getLevel() < arg2_level))
       continue;

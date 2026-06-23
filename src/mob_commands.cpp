@@ -569,14 +569,15 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  if ((realnum = real_object(atoi(arg1))) < 0)
+  realnum = atoi(arg1);
+  if (!DC::getInstance()->obj_index.contains(realnum))
   {
     ch->prog_error(QStringLiteral("Mpoload - Bad vnum arg."));
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
   obj = clone_object(realnum);
 
-  if (DC::getInstance()->obj_index[obj->item_number].vnum() == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
+  if (obj->vnum_ == 393 && ch->room().isArena() && arena.isPotato() && arena.isOpened())
   {
     return ReturnValue::eFAILURE;
   }
@@ -1588,8 +1589,7 @@ int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
 
   if (isdigit(*first))
   {
-    if (!check_valid_and_convert(mob_num, first) ||
-        (real_object(mob_num) < 0))
+    if (!check_valid_and_convert(mob_num, first) || (!DC::getInstance()->obj_index.contains(mob_num)))
     {
       ch->prog_error(QStringLiteral("Mpothrow - Invalid objnum."));
       return ReturnValue::eFAILURE;
@@ -2262,7 +2262,7 @@ void Character::prog_error(QString error_message)
 {
   if (IS_OBJ(this))
   {
-    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->item_number].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
+    logworld(QStringLiteral("Obj %1, com %2, line %3: %4").arg(dc_->obj_index[objdata->vnum_].vnum()).arg(mprog_command_num).arg(mprog_line_num).arg(error_message));
   }
   else if (this->isNonPlayer())
   {

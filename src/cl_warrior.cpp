@@ -108,9 +108,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
     if (SOMEONE_DIED(retval))
       return retval;
     // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-    if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
+    if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->vnum_].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
+      retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->vnum_].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
     }
     if (SOMEONE_DIED(retval))
       return retval;
@@ -139,9 +139,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
       if (SOMEONE_DIED(retval))
         return retval;
       // leaving this built in proc here incase some new stuff is added, like kick_their_head_off
-      if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)
+      if (DC::getInstance()->obj_index[equipment[WEAR_FEET]->vnum_].combat_func)
       {
-        retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->item_number].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
+        retval = ((*DC::getInstance()->obj_index[equipment[WEAR_FEET]->vnum_].combat_func)(this, equipment[WEAR_FEET], cmd_t::UNDEFINED, "", this));
       }
     }
   }
@@ -606,9 +606,9 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   // if our shield has a combat proc and we hit them, let'um have it!
   if (hit && ch->equipment[WEAR_SHIELD])
   {
-    if (DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)
+    if (DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->vnum_].combat_func)
     {
-      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->item_number].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
+      retval = ((*DC::getInstance()->obj_index[ch->equipment[WEAR_SHIELD]->vnum_].combat_func)(ch, ch->equipment[WEAR_SHIELD], cmd_t::UNDEFINED, "", ch));
     }
   }
 
@@ -741,7 +741,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("You can't seem to work it loose.");
       return ReturnValue::eFAILURE;
     }
-    if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
+    if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->vnum_].vnum() == 27997)
     {
       send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
       return ReturnValue::eSUCCESS;

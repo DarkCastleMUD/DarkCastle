@@ -291,7 +291,7 @@ void DC::load_corpses(void)
       if (nr == -1)
       { /* then it is unique */
         temp = create_obj_new();
-        temp->item_number = nr;
+        temp->vnum_ = nr;
       }
       else if (nr < 0)
       {
@@ -302,7 +302,8 @@ void DC::load_corpses(void)
         if (nr >= 999999)
           continue;
 
-        if ((number = real_object(nr)) < 0)
+        number = nr;
+        if (DC::getInstance()->obj_index.contains(number))
           continue;
         temp = clone_object(number);
         if (!temp)

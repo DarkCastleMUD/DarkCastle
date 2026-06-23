@@ -256,7 +256,7 @@ void show_quest_info(Character *ch, int num)
              quest->number, quest->name, quest->level, quest->cost,
              quest->brownie ? "Required" : "Not Required",
              quest->reward, quest->timer, quest->mobnum,
-             DC::getInstance()->mob_index.contains(quest->mobnum) ? ((Character *)(DC::getInstance()->mob_index[quest->mobnum].item))->short_desc : "no current mob",
+             DC::getInstance()->mob_index.contains(quest->mobnum) ? ((Character *)(DC::getInstance()->mob_index[quest->mobnum].mob))->short_desc : "no current mob",
              quest->objnum, quest->objkey,
              quest->objshort, quest->objlong, quest->hint1, quest->hint2, quest->hint3);
       return;
@@ -549,7 +549,7 @@ int start_quest(Character *ch, quest_info *quest)
 
   if (quest->brownie)
   {
-    brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
+    brownie = get_obj_in_list_num(27906, ch->carrying);
     if (!brownie)
     {
       csendf(ch, "You need a brownie point to start this quest!\r\n", price);
@@ -578,7 +578,7 @@ int start_quest(Character *ch, quest_info *quest)
     return ReturnValue::eFAILURE;
   }
 
-  obj = clone_object(real_object(quest->objnum));
+  obj = clone_object(quest->objnum);
   obj->short_description = str_hsh(quest->objshort);
   obj->long_description = str_hsh(quest->objlong);
 
@@ -1069,7 +1069,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eEXTRA_VAL2;
     }
 
-    Object *brownie = get_obj_in_list_num(real_object(27906), ch->carrying);
+    Object *brownie = get_obj_in_list_num(27906, ch->carrying);
     if (!brownie)
     {
       ch->sendln("You need a brownie point to reset all quests!");
@@ -1491,40 +1491,40 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     int n = 0;
     for (int qvnum = 27975; qvnum < 27997; qvnum++)
     {
-      rnum = real_object(qvnum);
-      if (rnum >= 0)
+      rnum = qvnum;
+      if (DC::getInstance()->obj_index.contains(rnum))
       {
-        char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
         dc_free(buffer);
       }
     }
     for (int qvnum = 27943; qvnum <= 27953; qvnum++)
     {
-      rnum = real_object(qvnum);
-      if (rnum >= 0)
+      rnum = qvnum;
+      if (DC::getInstance()->obj_index.contains(rnum))
       {
-        char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
         dc_free(buffer);
       }
     }
     for (int qvnum = 3124; qvnum <= 3128; qvnum++)
     {
-      rnum = real_object(qvnum);
-      if (rnum >= 0)
+      rnum = qvnum;
+      if (DC::getInstance()->obj_index.contains(rnum))
       {
-        char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
         dc_free(buffer);
       }
     }
     for (int qvnum = 3151; qvnum <= 3158; qvnum++)
     {
-      rnum = real_object(qvnum);
-      if (rnum >= 0)
+      rnum = qvnum;
+      if (DC::getInstance()->obj_index.contains(rnum))
       {
-        char *buffer = gl_item((Object *)DC::getInstance()->obj_index[rnum].item, n++, ch, false);
+        char *buffer = gl_item(DC::getInstance()->obj_index[rnum].item, n++, ch, false);
         ch->send(buffer);
         dc_free(buffer);
       }
@@ -1546,8 +1546,8 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     int n = 0;
     for (int qvnum = 27975; qvnum <= 27996; qvnum++)
     {
-      rnum = real_object(qvnum);
-      if (rnum >= 0 && n++ == want_num)
+      rnum = qvnum;
+      if (DC::getInstance()->obj_index.contains(rnum) && n++ == want_num)
       {
         FOUND = true;
         break;
@@ -1557,8 +1557,8 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     {
       for (int qvnum = 27943; qvnum <= 27953; qvnum++)
       {
-        rnum = real_object(qvnum);
-        if (rnum >= 0 && n++ == want_num)
+        rnum = qvnum;
+        if (DC::getInstance()->obj_index.contains(rnum) && n++ == want_num)
         {
           FOUND = true;
           break;
@@ -1569,8 +1569,8 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     {
       for (int qvnum = 3124; qvnum <= 3128; qvnum++)
       {
-        rnum = real_object(qvnum);
-        if (rnum >= 0 && n++ == want_num)
+        rnum = qvnum;
+        if (DC::getInstance()->obj_index.contains(rnum) && n++ == want_num)
         {
           FOUND = true;
           break;
@@ -1581,8 +1581,8 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
     {
       for (int qvnum = 3151; qvnum <= 3158; qvnum++)
       {
-        rnum = real_object(qvnum);
-        if (rnum >= 0 && n++ == want_num)
+        rnum = qvnum;
+        if (DC::getInstance()->obj_index.contains(rnum) && n++ == want_num)
         {
           FOUND = true;
           break;
@@ -1611,7 +1611,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
          return ReturnValue::eSUCCESS;
           } else */
     if (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) &&
-        search_char_for_item(ch, obj->item_number, false))
+        search_char_for_item(ch, obj->vnum_, false))
     {
       owner->do_tell(QStringLiteral("%1 You already have one of those.").arg(GET_NAME(ch)).split(' '));
       extract_obj(obj);

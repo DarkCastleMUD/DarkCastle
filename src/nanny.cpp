@@ -2274,7 +2274,7 @@ void check_silence_beacons(void)
   for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
   {
     tmp_obj = obj->next;
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (obj->vnum_ == SILENCE_OBJ_NUMBER)
     {
       if (obj->obj_flags.value[0] == 0)
         extract_obj(obj);
@@ -2298,7 +2298,7 @@ void checkConsecrate(int pulseType)
     for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (DC::getInstance()->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (obj->vnum_ == CONSECRATE_OBJ_NUMBER)
       {
         spl = obj->obj_flags.value[0];
         obj->obj_flags.value[1]--;
@@ -2363,7 +2363,7 @@ void checkConsecrate(int pulseType)
     for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
     {
       tmp_obj = obj->next;
-      if (DC::getInstance()->obj_index[obj->item_number].vnum() == CONSECRATE_OBJ_NUMBER)
+      if (obj->vnum_ == CONSECRATE_OBJ_NUMBER)
       {
         spl = obj->obj_flags.value[0];
         if (charExists(obj->obj_flags.origin))

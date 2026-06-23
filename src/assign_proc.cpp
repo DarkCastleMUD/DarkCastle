@@ -85,9 +85,9 @@ void assign_one_obj_non(int vnum, special_function func)
     DC::getInstance()->obj_non_combat_functions[vnum] = func;
   }
 
-  int rnum = real_object(vnum);
+  int rnum = vnum;
 
-  if (rnum >= 0)
+  if (DC::getInstance()->obj_index.contains(rnum))
   {
     DC::getInstance()->obj_index[rnum].non_combat_func = func;
   }
@@ -100,9 +100,9 @@ void assign_one_obj_com(int vnum, special_function func)
     DC::getInstance()->obj_combat_functions[vnum] = func;
   }
 
-  int rnum = real_object(vnum);
+  int rnum = vnum;
 
-  if (rnum >= 0)
+  if (DC::getInstance()->obj_index.contains(rnum))
   {
     DC::getInstance()->obj_index[rnum].combat_func = func;
   }

@@ -135,7 +135,7 @@ void eq_remove_damage(Object *obj)
 // Damage a piece of eq once and return the amount of damage currently on it
 int damage_eq_once(Object *obj)
 {
-  if (DC::getInstance()->obj_index[obj->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
+  if (obj->vnum_ == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
     send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
     extract_obj(obj);
@@ -162,7 +162,7 @@ void DC::object_activity(uint64_t pulse_type)
 {
   for (const auto &obj : active_obj_list)
   {
-    int32_t item_number = obj->item_number;
+    int32_t item_number = obj->vnum_;
 
     if (obj_index[item_number].non_combat_func)
     {
@@ -457,7 +457,7 @@ int do_recite(Character *ch, char *argument, cmd_t cmd)
         }
         else
         {
-          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", DC::getInstance()->obj_index[scroll->item_number].vnum(), i, i);
+          logf(100, DC::LogChannel::LOG_BUG, "do_recite ran for scroll %d with spell %d but spell_info[%d].spell_pointer1&2() == nullptr", scroll->vnum_, i, i);
           continue;
         }
       }
@@ -564,7 +564,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   }
 
   // make a new item
-  trap_obj = clone_object(real_object(MORTAR_ROUND_OBJECT_ID));
+  trap_obj = clone_object(MORTAR_ROUND_OBJECT_ID);
 
   // copy the data for that trap item over
   for (int i = 0; i < 4; i++)
@@ -2511,13 +2511,13 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
               send_to_char(arg1, ch);
               continue;
             }
-            if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
+            if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == 30010 && obj_object->obj_flags.timer < 40)
             {
               ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
               continue;
             }
 
-            if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+            if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
             {
               send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
               extract_obj(obj_object);
@@ -2554,7 +2554,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
-          if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == 30010 && obj_object->obj_flags.timer < 40)
+          if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == 30010 && obj_object->obj_flags.timer < 40)
           {
             ch->sendln("The ruby brooch is bound to your flesh. You cannot remove it!");
             return ReturnValue::eFAILURE;
@@ -2571,7 +2571,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             ch->equipment[WEAR_WIELD] = ch->equipment[WEAR_SECOND_WIELD];
             ch->equipment[WEAR_SECOND_WIELD] = 0;
           }
-          else if (DC::getInstance()->obj_index[obj_object->item_number].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
+          else if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
           {
             send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
             extract_obj(obj_object);
@@ -2760,14 +2760,14 @@ uint64_t Object::getLevel(void)
 bool Object::isQuest(void)
 {
   return isexact("quest", Name()) ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3124 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3125 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3126 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3127 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 3128 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 27997 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 27998 ||
-         DC::getInstance()->obj_index[item_number].vnum() == 27999;
+         vnum_ == 3124 ||
+         vnum_ == 3125 ||
+         vnum_ == 3126 ||
+         vnum_ == 3127 ||
+         vnum_ == 3128 ||
+         vnum_ == 27997 ||
+         vnum_ == 27998 ||
+         vnum_ == 27999;
 }
 
 bool Object::isTest(void)

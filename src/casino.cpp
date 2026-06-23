@@ -2017,7 +2017,7 @@ void save_slot_machines()
   {
     for (int x = curr->firstnum; x <= curr->lastnum; x++)
     {
-      write_object(lf, (Object *)DC::getInstance()->obj_index[x].item);
+      write_object(lf, DC::getInstance()->obj_index[x].item);
     }
     fprintf(lf.file_handle_, "$~\n");
   }
@@ -2069,7 +2069,7 @@ void update_linked_slots(machine_data *machine)
   // Find all the slot machines
   for (int i = 21906; i < 21918; i++)
   {
-    Object *slot_obj = (Object *)DC::getInstance()->obj_index[real_object(i)].item;
+    Object *slot_obj = DC::getInstance()->obj_index[i].item;
 
     // Find all the slot machines linked to the same slot machine as us
     // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2086,7 +2086,7 @@ void update_linked_slots(machine_data *machine)
       // Update instances of the original slot obj
       for (Object *j = DC::getInstance()->object_list; j; j = j->next)
       {
-        if (j->item_number == real_object(i))
+        if (j->vnum_ == i)
         {
           // if(!ishashed(j->long_description)) dc_free(j->long_description);
           j->long_description = str_dup(ldesc);
@@ -2169,13 +2169,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+        (DC::getInstance()->obj_index[machine->obj->vnum_].item)->obj_flags.value[1] = (int)machine->jackpot;
         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) dc_free(machine->obj->long_description);
         machine->obj->long_description = str_dup(buf);
-        if (!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description))
-          dc_free(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description);
-        ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description = str_dup(buf);
+        if (!ishashed((DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description))
+          dc_free((DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description);
+        (DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description = str_dup(buf);
       }
     }
 
@@ -2199,13 +2199,13 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
       }
       else
       {
-        ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->obj_flags.value[1] = (int)machine->jackpot;
+        (DC::getInstance()->obj_index[machine->obj->vnum_].item)->obj_flags.value[1] = (int)machine->jackpot;
         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) dc_free(machine->obj->long_description);
         machine->obj->long_description = str_dup(buf);
-        // if(!ishashed(((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description))
-        //    dc_free(((Object*)obj_index[machine->obj->item_number].item)->long_description);
-        ((Object *)DC::getInstance()->obj_index[machine->obj->item_number].item)->long_description = str_dup(buf);
+        // if(!ishashed((DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description))
+        //    dc_free(((Object*)obj_index[machine->obj->vnum_].item)->long_description);
+        (DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description = str_dup(buf);
       }
     }
     else if (payout)

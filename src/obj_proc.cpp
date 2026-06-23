@@ -362,7 +362,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     class Object *curr;
     for (curr = ch->carrying; curr; curr = curr->next_content)
     {
-      if (DC::getInstance()->obj_index[curr->item_number].vnum() == 22427) // red dragon snout
+      if (curr->vnum_ == 22427) // red dragon snout
       {
         obj->obj_flags.value[2] = 5;
         ch->sendln("The wand absorbs the dragon snout and pulses with energy.");
@@ -585,37 +585,37 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
-    if (DC::getInstance()->obj_index[curr->item_number].vnum() == 17399)
+    if (curr->vnum_ == 17399)
       diamond = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27903 && firstP != nullptr)
+    else if (curr->vnum_ == 27903 && firstP != nullptr)
       secondP = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27903)
+    else if (curr->vnum_ == 27903)
       firstP = curr;
-    else if (DC::getInstance()->obj_index[curr->item_number].vnum() == 27904)
+    else if (curr->vnum_ == 27904)
       vial = curr;
   }
 
   if (!firstP || !secondP || !vial || !diamond)
   {
     ch->sendln("Recharge unsuccessful. Missing required components:");
-    if (!firstP && real_object(27903))
+    if (!firstP && DC::getInstance()->obj_index.contains(27903))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27903)].item);
+      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[27903].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
-    if (!secondP && real_object(27903))
+    if (!secondP && DC::getInstance()->obj_index.contains(27903))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27903)].item);
+      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[27903].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
-    if (!vial && real_object(27904))
+    if (!vial && DC::getInstance()->obj_index.contains(27904))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(27904)].item);
+      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[27904].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
-    if (!diamond && real_object(17399))
+    if (!diamond && DC::getInstance()->obj_index.contains(17399))
     {
-      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[real_object(17399)].item);
+      auto obj = static_cast<Object *>(DC::getInstance()->obj_index[17399].item);
       ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
     }
     return ReturnValue::eSUCCESS;
@@ -661,8 +661,8 @@ int holyavenger(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           if (chance > (2 * percent) && !isSet(vict->immune, ISR_SLASH))
           {
             if ((
-                    (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) ||
-                    (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
+                    (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->vnum_].vnum() == 518) ||
+                    (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->vnum_].vnum() == 518)) &&
                 !number(0, 1))
             { // tarrasque's leash..
               act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
@@ -718,7 +718,7 @@ int hooktippedsteelhalberd(Character *ch, class Object *obj, cmd_t cmd,
     eq_destroyed(victim, victim->equipment[which], which);
   else
   {
-    if (DC::getInstance()->obj_index[obj->item_number].vnum() == 17904)
+    if (obj->vnum_ == 17904)
     {
       act("$n's diamond war club cracks your $p!", ch, victim->equipment[which], victim, TO_VICT, 0);
       act("$n smashes $m diamond war club into $N's $p and cracks it!", ch, victim->equipment[which], victim, TO_ROOM, NOTVICT);
@@ -918,7 +918,7 @@ int returner(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (ch->in_room != obj->in_room)
     return ReturnValue::eFAILURE;
 
-  if (get_obj_in_list_num(real_object(2200), ch->carrying))
+  if (get_obj_in_list_num(2200, ch->carrying))
     return ReturnValue::eFAILURE;
 
   if (move_char(ch, real_room(START_ROOM)) == 0)
@@ -1096,7 +1096,7 @@ bool assemble_item_index(Character *ch, int item_index)
       continue;
     }
 
-    int component_real = real_object(component_virt);
+    int component_real = component_virt;
     if (component_real < 0)
     {
       logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items[%d], component_index %d refers to invalid rnum %d for vnum %d.",
@@ -1115,8 +1115,8 @@ bool assemble_item_index(Character *ch, int item_index)
 
   // If we get to this point then all components for item_index were found
   int item_vnum = assemble_items[item_index].item;
-  int item_real = real_object(item_vnum);
-  Object *item = (Object *)DC::getInstance()->obj_index[item_real].item;
+  int item_real = item_vnum;
+  Object *item = DC::getInstance()->obj_index[item_real].item;
 
   // Check if the item to be assembled is marked UNIQUE but the player already has one
   if (isSet(item->obj_flags.more_flags, ITEM_UNIQUE))
@@ -1141,7 +1141,7 @@ bool assemble_item_index(Character *ch, int item_index)
       continue;
     }
 
-    int component_real = real_object(component_virt);
+    int component_real = component_virt;
     if (component_real < 0)
     {
       logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_items index %d, component_index %d refers to invalid rnum %d for vnum %d.",
@@ -1188,7 +1188,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
       // if we can see it
       if (CAN_SEE_OBJ(ch, obj, false))
       {
-        vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+        vnum = obj->vnum_;
         item_index = search_assemble_items(vnum);
 
         // check if it's a component of an item to be assembled
@@ -1246,7 +1246,7 @@ int do_assemble(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  vnum = obj->vnum_;
   item_index = search_assemble_items(vnum);
 
   // Object specified is not part of an item that can be assembled
@@ -1298,7 +1298,7 @@ int gazeofgaiot(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   one_argument(arg, vict);
   if (cmd != cmd_t::GAZE)
     return ReturnValue::eFAILURE;
-  if (!ch->equipment[WEAR_FACE] || real_object(9603) != ch->equipment[WEAR_FACE]->item_number)
+  if (!ch->equipment[WEAR_FACE] || 9603 != ch->equipment[WEAR_FACE]->vnum_)
     return ReturnValue::eFAILURE;
 
   if (ch->affected_by_spell(SKILL_FEARGAZE))
@@ -1366,10 +1366,10 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!ch)
     return ReturnValue::eFAILURE;
   int pos = WEAR_HOLD;
-  if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
+  if (!ch->equipment[pos] || 3611 != ch->equipment[pos]->vnum_)
   {
     pos = WEAR_HOLD2;
-    if (!ch->equipment[pos] || real_object(3611) != ch->equipment[pos]->item_number)
+    if (!ch->equipment[pos] || 3611 != ch->equipment[pos]->vnum_)
       return ReturnValue::eFAILURE;
   }
 
@@ -1427,7 +1427,7 @@ int pfe_word(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (obj_object != ch->equipment[WEAR_HOLD] &&
         obj_object != ch->equipment[WEAR_HOLD2])
       return ReturnValue::eFAILURE;
-    if (obj_object->item_number != real_object(3611))
+    if (obj_object->vnum_ != 3611)
       return ReturnValue::eFAILURE;
 
     if (ch->affected_by_spell(SPELL_PROTECT_FROM_EVIL))
@@ -1456,7 +1456,7 @@ int devilsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!ch || !ch->equipment[0] || !ch->equipment[WEAR_WIELD])
     return ReturnValue::eFAILURE;
 
-  if (real_object(185) != ch->equipment[WEAR_WIELD]->item_number)
+  if (185 != ch->equipment[WEAR_WIELD]->vnum_)
     return ReturnValue::eFAILURE;
 
   half_chop(arg, arg1, junk);
@@ -1630,7 +1630,7 @@ int eliara_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (!ch || !ch->equipment[0] || !ch->equipment[WEAR_WIELD])
     return ReturnValue::eFAILURE;
 
-  if (real_object(30627) != ch->equipment[WEAR_WIELD]->item_number)
+  if (30627 != ch->equipment[WEAR_WIELD]->vnum_)
   {
     remove_eliara(ch);
     return ReturnValue::eFAILURE;
@@ -1658,7 +1658,7 @@ int eliara_non_combat(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (!ch)
     return ReturnValue::eFAILURE;
 
-  if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment[0] && ch->equipment[WEAR_WIELD] && ch->equipment[WEAR_WIELD]->item_number == real_object(30627))
+  if (cmd == cmd_t::REMOVE && GET_POS(ch) == position_t::FIGHTING && ch->equipment[0] && ch->equipment[WEAR_WIELD] && ch->equipment[WEAR_WIELD]->vnum_ == 30627)
   {
     ch->sendln("Eliara refuses to allow you to remove equipment during battle!");
     return ReturnValue::eSUCCESS;
@@ -1977,7 +1977,7 @@ int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *a
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  int obj_vnum = obj->vnum_;
 
   switch (obj_vnum)
   {
@@ -2399,7 +2399,7 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   if (cmd != cmd_t::PULL) // pull
     return ReturnValue::eFAILURE;
 
-  int obj_vnum = DC::getInstance()->obj_index[obj->item_number].vnum();
+  int obj_vnum = obj->vnum_;
 
   switch (obj_vnum)
   {
@@ -2412,13 +2412,13 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
     break;
   case 29203:
-    if (DC::getInstance()->obj_index[real_object(29202)].qty > 0)
+    if (DC::getInstance()->obj_index[29202].qty > 0)
     {
       send_to_room("A compartment in the ceiling opens, but is it empty.\r\n", 29258, true);
       break;
     }
     send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\r\n", 29258, true);
-    obj_to_room(clone_object(real_object(29202)), 29258);
+    obj_to_room(clone_object(29202), 29258);
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
@@ -2454,7 +2454,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     bool first = true;
     for (p = DC::getInstance()->object_list; p; p = p->next)
     {
-      if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
+      if (p->vnum_ == 30097 && p != obj && p->obj_flags.timer != 0) // if any exist that are not at 1800 timer
       {
         first = false;
         break;
@@ -2508,7 +2508,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     for (p = DC::getInstance()->object_list; p; p = n)
     {
       n = p->next;
-      if (DC::getInstance()->obj_index[p->item_number].vnum() == 30097)
+      if (p->vnum_ == 30097)
       {
         Character *v = nullptr;
 
@@ -2587,7 +2587,7 @@ int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char
     if (i->in_room == real_room(30096))
       continue;
 
-    if (!search_char_for_item(i, real_object(30097), false) || (++count) > 4)
+    if (!search_char_for_item(i, 30097, false) || (++count) > 4)
     {
       act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
       act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
@@ -2617,7 +2617,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (obj->vnum_)
   {
   case 11300:
   case 11301:
@@ -2762,13 +2762,13 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
 
   // figure out which boat I am
   int *boat_list = nullptr;
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (obj->vnum_)
   {
   case 9531:
     boat_list = dk_boat;
     break;
   default:
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", obj->vnum_);
     break;
   }
 
@@ -2799,7 +2799,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       if (obj->obj_flags.value[0] == -1) // at beginning
       {
         obj->obj_flags.value[0] = 1;
-        send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
+        send_to_boat(obj->vnum_, "The ship docks at its destination.\r\n");
       }
     }
     else
@@ -2809,11 +2809,11 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       if (obj->obj_flags.value[0] == boat_list[0]) // at beginning
       {
         obj->obj_flags.value[0] *= -1;
-        send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship docks at its destination.\r\n");
+        send_to_boat(obj->vnum_, "The ship docks at its destination.\r\n");
       }
     }
     send_to_room("The ship sails away.\r\n", obj->in_room, true);
-    send_to_boat(DC::getInstance()->obj_index[obj->item_number].vnum(), "The ship sails onwards.\r\n");
+    send_to_boat(obj->vnum_, "The ship sails onwards.\r\n");
     obj_from_room(obj);
     obj_to_room(obj, move_to);
     send_to_room("A ship sails in.\r\n", obj->in_room, true);
@@ -2834,14 +2834,14 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     return ReturnValue::eFAILURE; // someone loaded me
 
   // switch off depending on what item we are
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (obj->vnum_)
   {
   case 9532: // dk boat ramp
     // find the dk boat (9531)
-    i = real_object(9531);
+    i = 9531;
     for (obj2 = DC::getInstance()->object_list; obj2; obj2 = obj2->next)
     {
-      if (obj2->item_number == i)
+      if (obj2->vnum_ == i)
         break;
     }
 
@@ -2875,7 +2875,7 @@ int leave_boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     return ReturnValue::eSUCCESS;
     break;
   default:
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", DC::getInstance()->obj_index[obj->item_number].vnum());
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Illegal boat proc.  Item %d.", obj->vnum_);
     break;
   }
 
@@ -3006,7 +3006,7 @@ int hornoplenty(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
     return ReturnValue::eFAILURE;
 
   class Object *newobj = nullptr;
-  int objnum = real_object(3170); // chewy tuber
+  int objnum = 3170; // chewy tuber
   if (objnum < 0)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Horn o plenty load obj incorrent.");
@@ -3094,7 +3094,7 @@ int shield_combat_procs(Character *ch, class Object *obj, cmd_t cmd, const char 
   if (ch->equipment[WEAR_SHIELD] != obj)
     return ReturnValue::eFAILURE;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (obj->vnum_)
   {
   case 2715: // shield of ares
     if (number(0, 3))
@@ -3128,11 +3128,8 @@ int shield_combat_procs(Character *ch, class Object *obj, cmd_t cmd, const char 
   return ReturnValue::eFAILURE;
 }
 
-int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg,
-                          Character *invoker)
+int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg, Character *invoker)
 {
-  extern int top_of_objt;
-
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
   if (!ch || !ch->fighting)
@@ -3141,13 +3138,13 @@ int generic_weapon_combat(Character *ch, class Object *obj, cmd_t cmd, char *arg
                ch->equipment[WEAR_SECOND_WIELD] != obj))
     return ReturnValue::eFAILURE;
 
-  if (obj->item_number < 0 || obj->item_number > top_of_objt)
+  if (!DC::getInstance()->obj_index.contains(obj->vnum_))
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->item_number");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generic_weapon_combat: illegal obj->vnum_");
     return ReturnValue::eFAILURE;
   }
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (obj->vnum_)
   {
   case 16903: // valhalla hammer
     if (number(1, 100) > GET_DEX(ch) / 4)
@@ -3188,10 +3185,10 @@ int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   ch->sendln("You push the small button and then hold the looking glass to your face peering through it.\r\n");
 
   // 1406 is the portal 'rock' you enter to get to Tohs
-  int searchnum = real_object(1406);
+  int searchnum = 1406;
 
   for (victim = DC::getInstance()->object_list; victim; victim = victim->next)
-    if (victim->item_number == searchnum)
+    if (victim->vnum_ == searchnum)
       break;
 
   if (!victim || victim->in_room == DC::NOWHERE) // couldn't find it?!
@@ -3308,7 +3305,7 @@ int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 
   int dam;
 
-  switch (DC::getInstance()->obj_index[obj->item_number].vnum())
+  switch (obj->vnum_)
   {
   case 9806: // muddy gloves
     if (number(0, 17))
@@ -3743,7 +3740,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (rnd == unequip)
       {
 
-        if (vict->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_WIELD]->item_number].vnum() == 27997)
+        if (vict->equipment[WEAR_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_WIELD]->vnum_].vnum() == 27997)
         {
 
           act("Your $p unequips itself.",
@@ -3759,7 +3756,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
             vict->equip_char(weapon, WEAR_WIELD);
           }
         }
-        else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->item_number].vnum() == 27997)
+        else if (vict->equipment[WEAR_SECOND_WIELD] && DC::getInstance()->obj_index[vict->equipment[WEAR_SECOND_WIELD]->vnum_].vnum() == 27997)
         {
 
           act("Your $p unequips itself.", vict, vict->equipment[WEAR_SECOND_WIELD], 0, TO_CHAR, 0);
@@ -4251,7 +4248,7 @@ int godload_quiver(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     if ((obj->obj_flags.weight + 1) < obj->obj_flags.value[0])
     {
-      obj2 = clone_object(real_object(597));
+      obj2 = clone_object(597);
       if (!obj_to_obj(obj2, obj))
       {
         ch->sendln("Some arrows appear in your quiver.");
@@ -4429,9 +4426,9 @@ void destroy_spellcraft_glyphs(Character *ch)
   {
     if (GET_ITEM_TYPE(tmp_obj) == ITEM_CONTAINER)
       for (loop_obj = tmp_obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-        if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
+        if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == 6353)
           move_obj(loop_obj, ch);
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == 6353)
+    if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == 6351 || DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == 6352 || DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == 6353)
       obj_from_char(tmp_obj);
   }
   ch->spellcraftglyph = 0;

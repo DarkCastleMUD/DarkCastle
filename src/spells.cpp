@@ -1823,7 +1823,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
 
   Object *tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
-    if (DC::getInstance()->obj_index[tmp_obj->item_number].vnum() == SILENCE_OBJ_NUMBER)
+    if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
       ch->sendln("The magical silence prevents you from casting!");
       return ReturnValue::eFAILURE;

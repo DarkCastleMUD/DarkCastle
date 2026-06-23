@@ -285,7 +285,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {
     if ((
-            (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->item_number].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->item_number].vnum() == 518)) &&
+            (vict->equipment[WEAR_NECK_1] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_1]->vnum_].vnum() == 518) || (vict->equipment[WEAR_NECK_2] && DC::getInstance()->obj_index[vict->equipment[WEAR_NECK_2]->vnum_].vnum() == 518)) &&
         !number(0, 1))
     { // tarrasque's leash..
       act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);

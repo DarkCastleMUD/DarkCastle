@@ -329,7 +329,7 @@ bool DC::isAllowedHost(QHostAddress address)
 
 Object *DC::getObject(vnum_t vnum)
 {
-  vnum_t rnum = real_object(vnum);
+  vnum_t rnum = vnum;
 
   if (rnum == -1)
   {

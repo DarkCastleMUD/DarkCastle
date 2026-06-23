@@ -304,7 +304,7 @@ public:
   static const QStringList extra_bits;
   static const QStringList apply_types;
 
-  int32_t item_number = {};     /* Where in data-base               */
+  vnum_t vnum_ = {};            /* Where in data-base               */
   int vroom = {};               /* for corpse saving */
   obj_flag_data obj_flags = {}; /* Object information               */
   int16_t num_affects = {};
