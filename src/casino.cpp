@@ -2015,7 +2015,7 @@ void save_slot_machines()
   LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
   if (lf.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    for (int x = curr->firstnum; x <= curr->lastnum && DC::getInstance()->obj_index.contains(x) && DC::getInstance()->obj_index[x].item; x++)
     {
       write_object(lf, DC::getInstance()->obj_index[x].item);
     }
