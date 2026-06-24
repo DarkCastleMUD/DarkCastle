@@ -167,7 +167,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
       {
         cnt++;
-        sprintf(buf, "[%3d] [%5lu] %s\r\n", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
+        sprintf(buf, "[%3d] [%5llu] %s\r\n", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
         ch->send(buf);
       }
 
@@ -470,7 +470,7 @@ int Zone::show_info(Character *ch)
   ch->send(buf);
   sprintf(buf, "\r\n"
                "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-               "$3DiedThisTick$R: %3lu $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
+               "$3DiedThisTick$R: %3llu $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
           num_mob_on_repop,
           death_counter,
           counter_mod,
@@ -483,7 +483,7 @@ int Zone::show_info(Character *ch)
   return ReturnValue::eSUCCESS;
 }
 
-int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t num_to_show, bool stats)
+int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 num_to_show, bool stats)
 {
   char buf[MAX_STRING_LENGTH];
   int k = 0;
@@ -526,8 +526,8 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
       lastSuccessStr = lastSuccess_date_time.toString("yyyy-MM-dd hh:mm:ss z");
     }
 
-    uint64_t attempts = zone.cmd[j]->attempts;
-    uint64_t successes = zone.cmd[j]->successes;
+    quint64 attempts = zone.cmd[j]->attempts;
+    quint64 successes = zone.cmd[j]->successes;
     double successRate = 0.0;
     if (attempts > 0)
     {
@@ -740,7 +740,7 @@ int show_zone_commands(Character *ch, const Zone &zone, uint64_t start, uint64_t
   return ReturnValue::eSUCCESS;
 }
 
-int show_zone_commands(Character *ch, zone_t zone_key, uint64_t start, uint64_t num_to_show, bool stats)
+int show_zone_commands(Character *ch, zone_t zone_key, quint64 start, quint64 num_to_show, bool stats)
 {
   if (!isValidZoneKey(ch, zone_key))
   {
@@ -764,7 +764,7 @@ int find_file(world_file_list_item *itm, int high)
 void show_legacy_files(Character *ch, world_file_list_item *head)
 {
   world_file_list_item *curr = head;
-  uint64_t i = 0;
+  quint64 i = 0;
 
   ch->send("ID ) Filename                       Begin  End\r\n"
            "----------------------------------------------------------\r\n");
@@ -2040,7 +2040,7 @@ void opstat(Character *ch, vnum_t vnum)
     return;
   }
   obj = DC::getInstance()->obj_index[num].item;
-  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %lu.\r\n", qPrintable(obj->Name()), vnum);
+  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %llu.\r\n", qPrintable(obj->Name()), vnum);
   ch->send(buf);
   if (DC::getInstance()->obj_index[num].progtypes == 0)
   {
@@ -2365,7 +2365,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
                "\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",
                ch);
   char buf[MAX_STRING_LENGTH];
-  sprintf(buf, "$3Current object set to: %lu\r\n", ch->player->last_obj_vnum);
+  sprintf(buf, "$3Current object set to: %llu\r\n", ch->player->last_obj_vnum);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }

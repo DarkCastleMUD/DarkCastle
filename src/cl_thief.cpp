@@ -1002,15 +1002,10 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s stole %s[%lu] from %s",
-                    GET_NAME(ch), obj->short_description,
-                    obj->vnum_, victim->getNameC());
+            sprintf(log_buf, "%s stole %s[%llu] from %s", GET_NAME(ch), obj->short_description, obj->vnum_, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%d]",
-                   obj->short_description,
-                   loop_obj->short_description,
-                   DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
+              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%llu]", obj->short_description, loop_obj->short_description, DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
           if (obj->vnum_ != 76)
           {

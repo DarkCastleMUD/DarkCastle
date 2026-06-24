@@ -41,7 +41,7 @@ class pulse_info
 {
 public:
   pulse_type pulse;
-  uint64_t duration;
+  quint64 duration;
   char name[];
 };
 

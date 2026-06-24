@@ -33,7 +33,7 @@ class Character;
 #include "DC/room.h"
 #include "DC/returnvals.h"
 
-typedef uint64_t gold_t;
+typedef quint64 gold_t;
 
 bool on_forbidden_name_list(const char *name);
 QString color_to_code(QString color);
@@ -51,7 +51,7 @@ class ignore_entry
 {
 public:
   bool ignore;
-  uint64_t ignored_count;
+  quint64 ignored_count;
 };
 
 typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
@@ -287,14 +287,14 @@ class Toggle
 {
 public:
   Toggle(void) = default;
-  Toggle(QString name, uint64_t shift, command_gen3_t function, uint64_t dependency_shift = UINT64_MAX, QString on_message = "$B$2on$R", QString off_message = "$B$4off$R");
+  Toggle(QString name, quint64 shift, command_gen3_t function, quint64 dependency_shift = UINT64_MAX, QString on_message = "$B$2on$R", QString off_message = "$B$4off$R");
   bool isValid(void) { return valid_; }
 
   QString name_;
   bool valid_ = false;
-  uint64_t shift_{};
-  uint64_t dependency_shift_{};
-  uint64_t value_{};
+  quint64 shift_{};
+  quint64 dependency_shift_{};
+  quint64 value_{};
   QString on_message_;
   QString off_message_;
   command_return_t (Character::*function_)(QStringList arguments, cmd_t cmd);
@@ -929,12 +929,12 @@ public:
 
   room_direction_data *brace_at{}, *brace_exit{}; // exits affected by brace
   time_t first_damage = {};
-  uint64_t damage_done = {};
-  uint64_t damages = {};
+  quint64 damage_done = {};
+  quint64 damages = {};
   time_t last_damage = {};
-  uint64_t damage_per_second = {};
+  quint64 damage_per_second = {};
 
-  bool addGold(uint64_t gold);
+  bool addGold(quint64 gold);
   bool save_pc_or_mob_data(FILE *fpsave, time_data tmpage);
   void add_command_lag(cmd_t cmd, int lag);
   bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
@@ -1030,7 +1030,7 @@ public:
       sendln(QStringLiteral("$3Valid types$R:"));
 
       extern item_types_t item_types;
-      uint64_t longest_typename{};
+      quint64 longest_typename{};
       for (const auto &type : item_types)
         if (longest_typename < type.length())
           longest_typename = type.length();
@@ -1166,7 +1166,7 @@ public:
   command_return_t tell(Character *, QString);
   void sendRaw(std::string);
   std::vector<Character *> getFollowers(void);
-  void setPlayerLastMob(u_int64_t mobvnum);
+  void setPlayerLastMob(vnum_t mobvnum);
 
   void swapSkill(skill_t oldSkill, skill_t newSkill);
   void setSkillMin(skill_t skill, int value);
@@ -1184,12 +1184,12 @@ public:
   bool isNonPlayer(void) const;
   bool isObjectProgram(void) const;
 
-  uint64_t getGold(void);
-  uint64_t &getGoldReference(void);
-  void setGold(uint64_t gold);
+  quint64 getGold(void);
+  quint64 &getGoldReference(void);
+  void setGold(quint64 gold);
 
   bool multiplyGold(double mult);
-  bool removeGold(uint64_t gold);
+  bool removeGold(quint64 gold);
   int store_to_char_variable_data(FILE *fpsave);
 
   bool load_charmie_equipment(QString name, bool previous = false);

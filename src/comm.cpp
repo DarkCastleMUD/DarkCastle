@@ -158,7 +158,7 @@ void zone_update(void);
 void point_update(void); /* In limits.c */
 void food_update(void);  /* In limits.c */
 void mobile_activity(void);
-void object_activity(uint64_t pulse_type);
+void object_activity(quint64 pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, char *str);
 void perform_violence(void);
@@ -547,7 +547,7 @@ int DC::init_socket(in_port_t port)
 // it if we are closing the socket that is next to be processed.
 class Connection *next_d;
 std::stringstream timingDebugStr;
-uint64_t pulseavg = 0;
+quint64 pulseavg = 0;
 
 /*
  * game_loop contains the main loop which drives the entire MUD.  It
@@ -2465,7 +2465,7 @@ void sigchld(int sig)
 void signal_handler(int signal, siginfo_t *si, void *)
 {
   logf(IMMORTAL, DC::LogChannel::LOG_BUG, "signal_handler: signo=%d errno=%d code=%d "
-                                          "pid=%d uid=%d status=%d utime=%lu stime=%lu value=%d "
+                                          "pid=%d uid=%d status=%d utime=%llu stime=%llu value=%d "
                                           "int=%d ptr=%p overrun=%d timerid=%d addr=%p band=%ld "
                                           "fd=%d",
        si->si_signo, si->si_errno, si->si_code,

@@ -168,8 +168,8 @@ class Character;
 #define CONT_CLOSED 4
 #define CONT_LOCKED 8
 
-typedef uint64_t vnum_t;
-typedef uint64_t room_t;
+typedef quint64 vnum_t;
+typedef quint64 room_t;
 
 class active_object
 {
@@ -548,7 +548,7 @@ public:
   bool hasPortalFlagNoLeave(void);
   bool hasPortalFlagNoEnter(void);
 
-  uint64_t getLevel(void);
+  quint64 getLevel(void);
 
   int keywordfind(void);
   void setOwner(QString owner) { owner_ = owner; }

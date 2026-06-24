@@ -98,8 +98,8 @@
 #include <QtConcurrent/QtConcurrent>
 #include "DC/DC_global.h"
 
-typedef uint64_t vnum_t;
-typedef uint64_t rnum_t;
+typedef quint64 vnum_t;
+typedef quint64 rnum_t;
 typedef int32_t legacy_rnum_t;
 typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
@@ -135,9 +135,9 @@ typedef std::set<int>::iterator server_descriptor_list_i;
 typedef std::vector<in_port_t>::iterator port_list_i;
 typedef std::unordered_map<Character *, Trace> death_list_t;
 typedef std::unordered_map<Character *, Trace> free_list_t;
-typedef uint64_t zone_t;
-typedef uint64_t room_t;
-typedef uint64_t gold_t;
+typedef quint64 zone_t;
+typedef quint64 room_t;
+typedef quint64 gold_t;
 typedef std::map<vnum_t, special_function> special_function_list_t;
 // class Zone;
 typedef QMap<zone_t, Zone> zones_t;
@@ -410,17 +410,17 @@ public:
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
   static constexpr room_t NOWHERE = 0UL;
   static constexpr vnum_t INVALID_VNUM = 0UL;
-  static constexpr uint64_t PASSES_PER_SEC = 100;
-  static constexpr uint64_t PULSE_TIMER = 1 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_MOBILE = 4 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_OBJECT = 4 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_VIOLENCE = 2 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_BARD = 1 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_TENSEC = 10 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_WEATHER = 45 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_TIME = 60 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_REGEN = 15 * PASSES_PER_SEC;
-  static constexpr uint64_t PULSE_SHORT = 1; // Pulses all the time.
+  static constexpr quint64 PASSES_PER_SEC = 100;
+  static constexpr quint64 PULSE_TIMER = 1 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_MOBILE = 4 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_OBJECT = 4 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_VIOLENCE = 2 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_BARD = 1 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_TENSEC = 10 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_WEATHER = 45 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_TIME = 60 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_REGEN = 15 * PASSES_PER_SEC;
+  static constexpr quint64 PULSE_SHORT = 1; // Pulses all the time.
   static constexpr level_t MAX_MORTAL_LEVEL = 60ULL;
   static constexpr quint64 PER_IP_CONNECTION_LIMIT = 20;
   static const QString HINTS_FILE_NAME;
@@ -509,8 +509,8 @@ public:
   void save_hints(void);
   void send_hint(void);
   void assign_mobiles(void);
-  bool authenticate(QString username, QString password, uint64_t level = 0);
-  bool authenticate(const QHttpServerRequest &request, uint64_t level = 0);
+  bool authenticate(QString username, QString password, quint64 level = 0);
+  bool authenticate(const QHttpServerRequest &request, quint64 level = 0);
   void crash_hotboot(void);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
@@ -544,7 +544,7 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
-  void logverbose(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+  void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
   void clean_socials_from_memory(void);
@@ -623,7 +623,7 @@ public:
   }
 
   QRandomGenerator random_;
-  QMap<uint64_t, Shop> shop_index;
+  QMap<quint64, Shop> shop_index;
   CVoteData DCVote;
 
   QString last_processed_cmd = {};
@@ -649,12 +649,12 @@ private:
   int init_socket(in_port_t port);
   int exceeded_connection_limit(Connection *new_conn);
   void nanny(class Connection *d, std::string arg = "");
-  void object_activity(uint64_t pulse_type);
+  void object_activity(quint64 pulse_type);
 };
-void logentry(QString str, uint64_t god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);
 void logf(int level, DC::LogChannel type, QString arg);
-int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type);
+int send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
 void produce_coredump(void *ptr = 0);
 
 template <typename T>

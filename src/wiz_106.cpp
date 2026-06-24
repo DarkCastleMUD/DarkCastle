@@ -45,7 +45,7 @@ int do_plats(Character *ch, char *argument, cmd_t cmd)
     if (GET_PLATINUM(i) < (uint32_t)minamt)
       continue;
 
-    sprintf(buf, "%15d - %s - %ld - %d\r\n", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
+    sprintf(buf, "%15d - %s - %llu - %d\r\n", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -171,7 +171,7 @@ typedef QMap<QString, Test> tests_t;
 
 command_return_t run_all_events(Character *ch = nullptr)
 {
-  uint64_t counter{};
+  quint64 counter{};
   while (timer_list != nullptr && counter++ < 1000)
   {
     if (ch)

@@ -34,7 +34,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
       sendln("Removed an alias with an empty alias.");
     }
 
-    uint64_t x{};
+    quint64 x{};
     sendln("Aliases:");
     for (const auto [alias, command] : player->aliases_.asKeyValueRange())
     {

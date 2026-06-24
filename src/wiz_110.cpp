@@ -344,7 +344,7 @@ int do_fakelog(Character *ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   char lev_str[MAX_INPUT_LENGTH];
-  uint64_t lev_nr = 110;
+  quint64 lev_nr = 110;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -877,8 +877,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     for (int z = 0; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
-    sprintf(buf, "$B%s%d. %-50s Vnum: %lu AC Apply: %d\r\n$R",
-            o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].vnum(), ac);
+    sprintf(buf, "$B%s%d. %-50s Vnum: %llu AC Apply: %d\r\n$R", o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)

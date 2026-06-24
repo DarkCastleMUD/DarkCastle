@@ -5103,7 +5103,7 @@ bool Character::charge_moves(int skill, double modifier)
   return true;
 }
 
-MatchType add_matching_results(skill_results_t &results, const std::string &name, const std::string &key, uint64_t value)
+MatchType add_matching_results(skill_results_t &results, const std::string &name, const std::string &key, quint64 value)
 {
   auto match = str_n_nosp_cmp_begin(name, key);
   // If this is an exact match we want only a single result

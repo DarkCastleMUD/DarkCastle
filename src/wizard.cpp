@@ -120,7 +120,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     ch->send(buf);
     if (cnt > 1)
     {
-      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu (%s) at room %d (%s).",
+      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %llu (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
@@ -130,7 +130,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     }
     else
     {
-      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %lu (%s) at room %d (%s).",
+      snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copy of mob %llu (%s) at room %d (%s).",
                GET_NAME(ch),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
@@ -142,7 +142,7 @@ void do_mload(Character *ch, int rnum, int cnt)
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %lu at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i copies of mob %llu at room %d (%s).",
              GET_NAME(ch),
              cnt,
              DC::getInstance()->mob_index[rnum].vnum(),
@@ -239,7 +239,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
   ch->send(buf);
   if (cnt > 1)
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %lu (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopies of obj %llu (%s) at room %d (%s).",
              GET_NAME(ch),
              cnt,
              random ? "randomized " : "",
@@ -250,7 +250,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %lu (%s) at room %d (%s).",
+    snprintf(buf, MAX_STRING_LENGTH, "%s loads %i %scopy of obj %llu (%s) at room %d (%s).",
              GET_NAME(ch),
              cnt,
              random ? "randomized " : "",
@@ -281,7 +281,7 @@ void boro_mob_stat(Character *ch, Character *k)
   sprinttype(k->c_class, pc_clss_types, buf2);
   sprintf(buf,
           "$R(:)========================================================================(:)\r\n"
-          "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5lu $3Room$R: %-5d |=|\r\n"
+          "|=|$3 (%3s) Key$R: %-35s $3VNUM$R: %-5llu $3Room$R: %-5d |=|\r\n"
           "|=|$3 Short$R: %-50s $3RNUM$R: %-6d |=|\r\n"
           "|=|$3 Long$R: %s"
           "(:)====================(:)=================================================(:)\r\n"
@@ -498,8 +498,7 @@ void boro_mob_stat(Character *ch, Character *k)
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3Coins$R:[%ld]  $3Bank$R:[%d]\r\n", k->getGold(),
-            k->player->bank);
+    sprintf(buf, "$3Coins$R:[%llu]  $3Bank$R:[%d]\r\n", k->getGold(), k->player->bank);
     ch->send(buf);
   }
 
@@ -592,7 +591,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   if (k->isNonPlayer())
   {
     sprintf(buf,
-            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %lu  $3In room:$R %d $3Mobile type:$R ",
+            "$3%s$R - $3Name$R: [%s]  $3VNum$R: %llu  $3In room:$R %d $3Mobile type:$R ",
             (k->isPlayer() ? "PC" : "MOB"), GET_NAME(k),
             (k->isNonPlayer() ? k->mobdata->vnum_ : 0),
             k->in_room == DC::NOWHERE ? -1 : DC::getInstance()->world[k->in_room].number);
@@ -714,20 +713,16 @@ command_return_t mob_stat(Character *ch, Character *k)
           GET_KI(k), ki_limit(k));
   ch->send(buf);
 
-  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%ld$R]\r\n",
-          GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
+  sprintf(buf, "$3AC$R:[%d]  $3Exp$R:[%ld]  $3Hitroll$R:[%d]  $3Damroll$R:[%d]  $3Gold$R: [$B$5%llu$R]\r\n", GET_ARMOR(k), GET_EXP(k), GET_REAL_HITROLL(k), GET_REAL_DAMROLL(k), k->getGold());
   ch->send(buf);
 
   if (!k->isNonPlayer())
   {
-    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\r\n",
-            GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
+    sprintf(buf, "$3Plats$R:[%d]  $3Bank$R:[%d]  $3Clan$R:[%d]  $3Quest Points$R:[%d]\r\n", GET_PLATINUM(k), GET_BANK(k), GET_CLAN(k), GET_QPOINTS(k));
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", k->getPositionQString().toStdString().c_str(),
-          ((k->fighting) ? GET_NAME(k->fighting)
-                         : "Nobody"));
+  sprintf(buf, "$3Position$R: %s  $3Fighting$R: %s  ", k->getPositionQString().toStdString().c_str(), ((k->fighting) ? GET_NAME(k->fighting) : "Nobody"));
   if (k->desc)
   {
     sprinttype(k->desc->connected, connected_types, buf2);
@@ -986,7 +981,7 @@ void obj_stat(Character *ch, class Object *j)
 */
 
   auto virt = j->vnum_;
-  sprintf(buf, "$3Object name$R:[%s]  $3V-number$R:[%lu]  $3Item type$R: ", qPrintable(j->Name()), virt);
+  sprintf(buf, "$3Object name$R:[%s]  $3V-number$R:[%llu]  $3Item type$R: ", qPrintable(j->Name()), virt);
   sprinttype(GET_ITEM_TYPE(j), item_types, buf2);
 
   strcat(buf, buf2);
@@ -1242,7 +1237,7 @@ void obj_stat(Character *ch, class Object *j)
             j->obj_flags.value[1]);
     break;
   case ITEM_PORTAL:
-    sprintf(buf, "$3ToRoom (v1)$R : %lu\r\n"
+    sprintf(buf, "$3ToRoom (v1)$R : %llu\r\n"
                  "$3Type   (v2)$R : ",
             j->getPortalDestinationRoom());
     switch (j->getPortalType())

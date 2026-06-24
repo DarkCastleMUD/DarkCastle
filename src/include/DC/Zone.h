@@ -6,8 +6,8 @@
 #include <QList>
 #include "DC/weather.h"
 
-typedef uint64_t zone_t;
-typedef uint64_t room_t;
+typedef quint64 zone_t;
+typedef quint64 room_t;
 
 using ResetCommandPtr = QSharedPointer<class ResetCommand>;
 class ResetCommand
@@ -25,8 +25,8 @@ public:
   time_t last = {};     // when was it last reset
   class Character *lastPop = {};
   time_t lastSuccess = {};
-  uint64_t attempts = {};
-  uint64_t successes = {};
+  quint64 attempts = {};
+  quint64 successes = {};
   /*
    *  Commands:              *
    *  'M': Read a mobile     *
@@ -70,13 +70,13 @@ public:
 
   static QStringList zone_bits;
 
-  Zone(uint64_t zone_key = 0);
+  Zone(zone_t zone_key = 0);
 
-  uint64_t lifespan = {}; /* how long between resets (minutes)  */
+  quint64 lifespan = {}; /* how long between resets (minutes)  */
   QDateTime last_full_reset = {};
-  uint64_t age = {}; /* current age of ths zone (minutes) */
+  quint64 age = {}; /* current age of ths zone (minutes) */
 
-  uint64_t players = {}; // Number of PCs in the zone
+  quint64 players = {}; // Number of PCs in the zone
 
   int reset_mode = {}; /* conditions for reset (see below)   */
 
@@ -122,17 +122,17 @@ public:
   void setModified(bool flag = true);
 
   void incrementDiedThisTick(void);
-  void setDiedThisTick(uint64_t died = {});
-  uint64_t getDiedThisTick(void);
+  void setDiedThisTick(quint64 died = {});
+  quint64 getDiedThisTick(void);
 
   QString getFilename(void);
   void setFilename(QString);
 
-  void setZoneFlags(uint64_t);
-  uint64_t getZoneFlags(void) { return zone_flags; }
+  void setZoneFlags(quint64);
+  quint64 getZoneFlags(void) { return zone_flags; }
 
-  void setGold(uint64_t value);
-  void addGold(uint64_t value);
+  void setGold(quint64 value);
+  void addGold(quint64 value);
   void incrementPlayers(void);
   void decrementPlayers(void);
 
@@ -175,11 +175,11 @@ public:
 
 private:
   zone_t id_ = {};
-  uint64_t died_this_tick = {}; // number of mobs that have died in this zone this pop
-  uint64_t zone_flags = {};     /* flags for the entire zone eg: !teleport */
-  QString filename = {};        /* name of the file this zone is kept in */
-  room_t bottom = {};           /* bottom limit for room vnums in this zone */
-  room_t top = {};              /* upper limit for room vnums in this zone */
+  quint64 died_this_tick = {}; // number of mobs that have died in this zone this pop
+  quint64 zone_flags = {};     /* flags for the entire zone eg: !teleport */
+  QString filename = {};       /* name of the file this zone is kept in */
+  room_t bottom = {};          /* bottom limit for room vnums in this zone */
+  room_t top = {};             /* upper limit for room vnums in this zone */
   room_t bottom_rnum = {};
   room_t top_rnum = {};
   QString name_ = {}; /* name of this zone                  */
@@ -189,7 +189,7 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key);
 bool isValidZoneCommandKey(Character *ch, const Zone &zone, const qsizetype zone_command_key);
 qsizetype getZoneLastCommandNumber(const Zone &zone);
 zone_t getZoneKey(Character *ch, const QString input, bool *ok = nullptr);
-uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok = nullptr);
+quint64 getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok = nullptr);
 
 zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone);
 #endif

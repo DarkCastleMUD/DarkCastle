@@ -5,11 +5,11 @@
 #define MAX_GAME_PORTALS 9
 #define FOREVER -5
 
-typedef uint64_t room_t;
+typedef quint64 room_t;
 
 class game_portal
 {
-  public:
+public:
   room_t to_room;  /* Room to make the portal to */
   int *from_rooms; /* Rooms to make the portal from */
   int num_rooms;   /* Number of rooms in from_rooms */

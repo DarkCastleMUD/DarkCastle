@@ -621,9 +621,9 @@ int Character::meta_get_ki_exp_cost(void)
 
 quint64 Character::meta_get_ki_plat_cost(void)
 {
-  uint64_t cost{};
-  uint64_t stat{};
-  const uint64_t adjusted_max_ki = MIN(250UL, MAX(0, GET_MAX_KI(this)));
+  quint64 cost{};
+  quint64 stat{};
+  const quint64 adjusted_max_ki = MIN(250UL, MAX(0, GET_MAX_KI(this)));
 
   switch (GET_CLASS(this))
   {
@@ -639,7 +639,7 @@ quint64 Character::meta_get_ki_plat_cost(void)
     return 0UL;
   }
   cost = 500UL + cost + (((adjusted_max_ki - stat) / 2UL) * ((adjusted_max_ki - stat) / 10UL));
-  return static_cast<uint64_t>(cost * 0.9);
+  return static_cast<quint64>(cost * 0.9);
 }
 
 int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,

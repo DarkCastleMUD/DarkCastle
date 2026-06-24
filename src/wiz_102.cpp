@@ -110,7 +110,7 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
           pc_clss_types[(int)(GET_CLASS(vict))], vict->getLevel(),
           (connected ? DC::getInstance()->world[vict->in_room].number : -1));
   ch->send(buf);
-  sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10ld $3Bank$R: %-9d $3Align$R: %d\r\n",
+  sprintf(buf, "$3Exp$R: %-10ld $3Gold$R: %-10llu $3Bank$R: %-9d $3Align$R: %d\r\n",
           GET_EXP(vict), vict->getGold(), GET_BANK(vict), GET_ALIGNMENT(vict));
   ch->send(buf);
   if (ch->getLevel() >= SERAPH)
@@ -500,7 +500,7 @@ command_return_t zedit_lifetime(Character *ch, QStringList arguments, Zone &zone
   }
   QString text = arguments.value(0);
   bool ok = false;
-  uint64_t ticks = text.toULongLong(&ok);
+  quint64 ticks = text.toULongLong(&ok);
 
   if (!ok || ticks > 32000)
   {
@@ -529,7 +529,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
 
   QString text = arguments.at(0);
   bool ok = false;
-  uint64_t cmd = getZoneCommandKey(ch, zone, text, &ok);
+  quint64 cmd = getZoneCommandKey(ch, zone, text, &ok);
   if (!ok)
   {
     return ReturnValue::eFAILURE;
@@ -537,7 +537,7 @@ command_return_t zedit_edit(Character *ch, QStringList arguments, Zone &zone)
 
   QString select = arguments.at(1);
   QString last = arguments.at(2);
-  uint64_t i = 0, j = 0;
+  quint64 i = 0, j = 0;
 
   if (!select.isEmpty() && !last.isEmpty() && cmd >= 0)
   {
@@ -776,7 +776,7 @@ command_return_t zedit_remove(Character *ch, QStringList arguments, Zone &zone)
   QString text = arguments.at(0);
   bool ok = false;
 
-  uint64_t zone_command_number = getZoneCommandKey(ch, zone, text, &ok);
+  quint64 zone_command_number = getZoneCommandKey(ch, zone, text, &ok);
   if (!ok)
   {
     return ReturnValue::eFAILURE;
@@ -815,7 +815,7 @@ zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone)
   }
 
   bool ok = false;
-  uint64_t i = getZoneCommandKey(ch, zone, text, &ok);
+  quint64 i = getZoneCommandKey(ch, zone, text, &ok);
   if (!ok)
   {
     return ReturnValue::eFAILURE;
@@ -837,13 +837,13 @@ command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zo
 
   // list 1
   bool ok = false;
-  uint64_t command_number = getZoneCommandKey(ch, zone, text, &ok);
+  quint64 command_number = getZoneCommandKey(ch, zone, text, &ok);
   if (!ok)
   {
     return ReturnValue::eFAILURE;
   }
 
-  uint64_t num_to_show = 1;
+  quint64 num_to_show = 1;
   if (arguments.size() > 1)
   {
     bool ok = false;
@@ -885,7 +885,7 @@ command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
                  "attempts to repop itself.  Available modes are:\r\n",
                  ch);
     QString buffer;
-    for (uint64_t j = 0; *zone_modes[j] != '\n'; j++)
+    for (quint64 j = 0; *zone_modes[j] != '\n'; j++)
     {
       ch->send(QStringLiteral("  $C%1$R: %2\r\n").arg(j + 1).arg(zone_modes[j]));
     }
@@ -894,7 +894,7 @@ command_return_t zedit_mode(Character *ch, QStringList arguments, Zone &zone)
 
   QString text = arguments.value(0);
   bool ok = false;
-  uint64_t k = text.toULongLong(&ok);
+  quint64 k = text.toULongLong(&ok);
 
   if (!ok || k > 3)
   {
@@ -927,7 +927,7 @@ command_return_t zedit_help(Character *ch)
 int do_zedit(Character *ch, char *argument, cmd_t cmd)
 {
   QString buf, text, arg;
-  uint64_t i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = 0;
+  quint64 i = 0, j = 0, num_to_show = 0, last_cmd = 0, ticks = 0, cont = 0;
   unsigned int k = 0;
   vnum_t robj = {}, rmob = {};
   bool ok = false;
@@ -975,7 +975,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
   }
 
   bool subcommand_found{};
-  uint64_t subcommand_id{};
+  quint64 subcommand_id{};
   for (subcommand_id = 0; subcommand_id < zedit_subcommands.size(); subcommand_id++)
   {
     if (is_abbrev(select, zedit_subcommands[subcommand_id]))
@@ -996,7 +996,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You are unable to modify a zone other than the one your room-range is in.");
     return ReturnValue::eFAILURE;
   }
-  uint64_t from = {}, to = {};
+  quint64 from = {}, to = {};
 
   // set the zone we're in
 
@@ -1780,7 +1780,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %lu has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %llu has no affects to delete.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1841,7 +1841,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %llu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1878,7 +1878,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %llu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -1918,7 +1918,7 @@ int oedit_affects(Character *ch, int item_num, char *buf)
     }
     if (!obj->affected)
     {
-      sprintf(buf, "Object %lu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
+      sprintf(buf, "Object %llu has no affects to modify.\r\n", DC::getInstance()->obj_index[item_num].vnum());
       ch->send(buf);
       return ReturnValue::eFAILURE;
     }
@@ -2623,7 +2623,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
                  "  The field must be one of the following:\r\n",
                  ch);
     ch->display_string_list(fields);
-    sprintf(buf2, "\r\n$3Current mob vnum set to$R: %lu\r\n", ch->player->last_mob_edit);
+    sprintf(buf2, "\r\n$3Current mob vnum set to$R: %llu\r\n", ch->player->last_mob_edit);
     send_to_char(buf2, ch);
     return ReturnValue::eFAILURE;
   }
@@ -3471,7 +3471,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
 
     if (old_actflags[0] != new_actflags[0] || old_actflags[1] != new_actflags[1])
     {
-      uint64_t NPCs_changed = 0;
+      quint64 NPCs_changed = 0;
       for (auto const &c : DC::getInstance()->character_list)
       {
         if (c->isNonPlayer() && c->mobdata && c->mobdata->vnum_ == mobvnum)
@@ -3646,7 +3646,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
       send_to_char("$3Syntax$R: medit [mob_num] gold <goldamount>\r\n"
                    "$3Current$R: ",
                    ch);
-      sprintf(buf, "%lu\n",
+      sprintf(buf, "%llu\n",
               (DC::getInstance()->mob_index[mob_num].mob)->getGold());
       ch->send(buf);
       ch->sendln("$3Valid Range$R: 0 to 10000000");
@@ -3939,7 +3939,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     auto rc = ch->getDC()->create_blank_mobile(mob_num);
     if (!rc)
     {
-      csendf(ch, "Could not create mobile '%lu'.  Max index hit or mob already exists.\r\n", mob_num);
+      csendf(ch, "Could not create mobile '%llu'.  Max index hit or mob already exists.\r\n", mob_num);
       return ReturnValue::eFAILURE;
     }
     x = rc.value();
@@ -5102,7 +5102,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
     break;
   }
 
-  fprintf(fl, "#%lu\n", DC::getInstance()->world[room].zone);
+  fprintf(fl, "#%llu\n", DC::getInstance()->world[room].zone);
   sprintf(buf, "%s's Area.", ch->getNameC());
   string_to_file(fl, buf);
   fprintf(fl, "~\n");
@@ -5166,7 +5166,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
         if (!obj->in_obj)
         {
-          fprintf(fl, "O 0 %lu %d %d", obj->vnum_, count, DC::getInstance()->world[room].number);
+          fprintf(fl, "O 0 %llu %d %d", obj->vnum_, count, DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
           string_to_file(fl, buf);
 
@@ -5184,7 +5184,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   count++;
               }
 
-              fprintf(fl, "P 1 %lu %d %lu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
+              fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
               sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
               string_to_file(fl, buf);
             } /*  for loop */
@@ -5223,7 +5223,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             count++;
         }
 
-        fprintf(fl, "M 0 %lu %d %d", mob->mobdata->vnum_, count, DC::getInstance()->world[room].number);
+        fprintf(fl, "M 0 %llu %d %d", mob->mobdata->vnum_, count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
 
@@ -5244,7 +5244,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "E 1 %lu %d %d", obj->vnum_, count, pos);
+              fprintf(fl, "E 1 %llu %d %d", obj->vnum_, count, pos);
               sprintf(buf, "      Equip %s with %s\n", mob->short_desc, obj->short_description);
               string_to_file(fl, buf);
 
@@ -5262,7 +5262,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %lu %d %lu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
+                  fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
                   sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
                   string_to_file(fl, buf);
                 } /*  for loop */
@@ -5287,7 +5287,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "G 1 %lu %d", obj->vnum_, count);
+              fprintf(fl, "G 1 %llu %d", obj->vnum_, count);
               sprintf(buf, "      Give %s %s\n", mob->short_desc, obj->short_description);
               string_to_file(fl, buf);
 
@@ -5305,7 +5305,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %lu %d %lu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
+                  fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
                   sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
                   string_to_file(fl, buf);
                 } /*  for loop */
@@ -5362,7 +5362,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     logentry(buf, PATRON, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
-  sprintf(buf, "Room name: %s, Of zone : %lu. V-Number : %d, R-number : %lu\r\n", rm->name, rm->zone, rm->number, ch->in_room);
+  sprintf(buf, "Room name: %s, Of zone : %llu. V-Number : %d, R-number : %llu\r\n", rm->name, rm->zone, rm->number, ch->in_room);
   ch->send(buf);
 
   sprinttype(rm->sector_type, sector_types, buf2);
@@ -5576,12 +5576,12 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
   }
 
   const Sockets sockets{this, searchkey};
-  const QMap<QString, uint64_t> IPs = sockets.getIPs();
+  const QMap<QString, quint64> IPs = sockets.getIPs();
   const QList<Connection *> connections = sockets.getConnections();
-  const uint64_t longest_IP_size = std::max(2UL, sockets.getLongestIPSize());
-  const uint64_t longest_name_size = std::max(4UL, sockets.getLongestNameSize());
-  const uint64_t longest_connection_state_size = std::max(5UL, sockets.getLongestConnectionStateSize());
-  const uint64_t longest_idle_size = std::max(4UL, sockets.getLongestIdleSize() + 1);
+  const quint64 longest_IP_size = std::max(Q_UINT64_C(2), sockets.getLongestIPSize());
+  const quint64 longest_name_size = std::max(Q_UINT64_C(4), sockets.getLongestNameSize());
+  const quint64 longest_connection_state_size = std::max(Q_UINT64_C(5), sockets.getLongestConnectionStateSize());
+  const quint64 longest_idle_size = std::max(Q_UINT64_C(4), sockets.getLongestIdleSize() + 1);
 
   send(QStringLiteral("%1: %2 | %3 | %4 | %5$R\r\n").arg("Des").arg("Name", -longest_name_size).arg("State", -longest_connection_state_size).arg("Idle", -longest_idle_size).arg("IP", -longest_IP_size));
   for (const auto &d : connections)
@@ -5596,7 +5596,7 @@ command_return_t Character::do_sockets(QStringList arguments, cmd_t cmd)
     send(QStringLiteral("%1%2: %3 | %4 | %5 | %6$R\r\n").arg(duplicate_IP ? "$B$4" : "").arg(descriptor, 3).arg(connection_character_name, -longest_name_size).arg(connected_state, -longest_connection_state_size).arg(idle_seconds, -longest_idle_size).arg(IPstr, -longest_IP_size));
   }
 
-  const uint64_t num_can_see = connections.size();
+  const quint64 num_can_see = connections.size();
   send(QStringLiteral("\r\nThere are %1 connections.\r\n").arg(num_can_see));
 
   return ReturnValue::eSUCCESS;

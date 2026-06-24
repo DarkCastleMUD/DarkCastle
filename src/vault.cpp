@@ -53,7 +53,7 @@ int get_line(FILE *fl, char *buf);
 
 Character *find_owner(QString name);
 void vault_log(Character *ch, char *owner);
-QString clanVName(uint64_t clan_id);
+QString clanVName(quint64 clan_id);
 void vault_search_usage(Character *ch);
 
 vault_data *has_vault(QString name)
@@ -479,7 +479,7 @@ void Character::vault_stats(QString name)
       accesses++;
     }
 
-    snprintf(buf1, sizeof(buf1), "%3d) %-15s $B$5%10lu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
+    snprintf(buf1, sizeof(buf1), "%3d) %-15s $B$5%10llu$R     %5d (%4d  ) %11d/%12d/%16d %6d %s\r\n",
              count, vault->owner.toStdString().c_str(), vault->gold, items, unique, weight, vault->weight, vault->size, accesses, weight != vault->weight ? "$5mismatch$R" : "$1    none$R");
     if ((strlen(buf1) + strlen(buf)) < MAX_STRING_LENGTH * 4)
       strcat(buf, buf1);
@@ -740,7 +740,7 @@ void DC::testing_load_vaults(void)
   class Object *obj = nullptr;
   struct stat statbuf = {};
   int vnum = 0, full = 0, count = 0;
-  uint64_t gold = 0;
+  quint64 gold = 0;
   bool saveChanges = false;
   QString buffer;
 
@@ -963,7 +963,7 @@ void DC::load_vaults(void)
   struct stat statbuf = {};
   FILE *fl = nullptr, *index = nullptr;
   int vnum = 0, full = 0, count = 0;
-  uint64_t gold = 0;
+  quint64 gold = 0;
   char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, filename[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = false;
   char src_filename[256] = {};
@@ -1060,7 +1060,7 @@ void DC::load_vaults(void)
 
         break;
       case 'G':
-        sscanf(type, "%s %lu", tmp, &gold);
+        sscanf(type, "%s %llu", tmp, &gold);
         vault->gold = gold;
         break;
       case 'O':
@@ -1241,7 +1241,7 @@ void access_remove(QString name, vault_data *vault)
   }
 }
 
-QString clanVName(uint64_t clan_id)
+QString clanVName(quint64 clan_id)
 {
   return QStringLiteral("Clan%1").arg(clan_id);
 }
@@ -1787,7 +1787,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
     return;
   }
 
-  if (vault->gold >= (uint64_t)amount)
+  if (vault->gold >= (quint64)amount)
   {
     /*    if (amount + ch->getGold() > 2000000000) {
           ch->send("You can't hold that much gold.  The most you could get is %ld.\r\n", 2000000000 - ch->getGold());

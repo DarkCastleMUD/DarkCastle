@@ -434,7 +434,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
     send_to_table(buf, plr->table, plr);
     plr->ch->sendln("The dealer nudges you.");
   }
-  if ((uint64_t)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
+  if ((quint64)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
   { // inactive
     table_data *tbl = plr->table;
     Character *ch = plr->ch;

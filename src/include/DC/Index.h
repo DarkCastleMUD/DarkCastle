@@ -3,7 +3,7 @@
 #include <qnumeric.h>
 #include <DC/Command.h>
 
-typedef uint64_t vnum_t;
+typedef quint64 vnum_t;
 
 class index_data
 {

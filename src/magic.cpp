@@ -3046,7 +3046,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
 
   total = j = (int)(skill / 1.5);
 
-  uint64_t skipped_nosee = 0, skipped_nolocate = 0, skipped_other = 0, skipped_god = 0, skipped_nowhere = 0;
+  quint64 skipped_nosee = 0, skipped_nolocate = 0, skipped_other = 0, skipped_god = 0, skipped_nowhere = 0;
   for (i = DC::getInstance()->object_list, n = 0; i && (j > 0) && (number > 0); i = i->next)
   {
     // TODO
@@ -5455,9 +5455,9 @@ int spell_dispel_minor(uint8_t level, Character *ch, Character *victim, class Ob
   int done = false;
   int retval;
 
-  if (obj && (uint64_t)obj > 100) /* Trying to dispel_minor an obj */
-  {                               // Heh, it passes spell cast through obj now too. Less than 100 = not
-                                  // an actual obj.
+  if (obj && (quint64)obj > 100) /* Trying to dispel_minor an obj */
+  {                              // Heh, it passes spell cast through obj now too. Less than 100 = not
+                                 // an actual obj.
     if (GET_ITEM_TYPE(obj) != ITEM_BEACON)
     {
       if (!obj->equipped_by && !obj->carried_by)

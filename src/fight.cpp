@@ -4359,7 +4359,7 @@ void stop_fighting(Character *ch, int clearlag)
 
   ch->last_damage = time(nullptr);
 
-  uint64_t fight_length = ch->last_damage - ch->first_damage;
+  quint64 fight_length = ch->last_damage - ch->first_damage;
   if (fight_length < 1)
   {
     fight_length = 1;
@@ -4369,7 +4369,7 @@ void stop_fighting(Character *ch, int clearlag)
   auto showdps = ch->getSetting("fighting.showdps", "0");
   if (showdps == "1" || showdps.startsWith('t', Qt::CaseInsensitive))
   {
-    csendf(ch, "You caused %lu damage over %lu seconds with DPS of %lu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
+    csendf(ch, "You caused %llu damage over %llu seconds with DPS of %llu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
   }
   return;
 }
@@ -4411,8 +4411,8 @@ void make_scraps(Character *ch, class Object *obj)
   return;
 }
 
-static constexpr uint64_t MAX_NPC_CORPSE_TIME = 10;
-static constexpr uint64_t MAX_PC_CORPSE_TIME = 30;
+static constexpr quint64 MAX_NPC_CORPSE_TIME = 10;
+static constexpr quint64 MAX_PC_CORPSE_TIME = 30;
 
 void make_corpse(Character *ch)
 {
@@ -5581,7 +5581,7 @@ void raw_kill(Character *ch, Character *victim)
     {
       if (ch->mobdata)
       {
-        sprintf(buf, "%s killed by %lu (%s)", victim->getNameC(), ch->mobdata->vnum_, GET_NAME(ch));
+        sprintf(buf, "%s killed by %llu (%s)", victim->getNameC(), ch->mobdata->vnum_, GET_NAME(ch));
       }
       else
       {

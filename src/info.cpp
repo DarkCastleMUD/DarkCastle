@@ -343,7 +343,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
 #if __x86_64__
         snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
 #else
-        snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
+        snprintf(timebuffer, 100, " $R($B$0%llu secs left$R)", expires - now);
 #endif
         strcat(buffer, timebuffer);
       }
@@ -363,7 +363,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
 #if __x86_64__
         snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
 #else
-        snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
+        snprintf(timebuffer, 100, " $R($B$0No sell for %llu secs$R)", expires - now);
 #endif
         strcat(buffer, timebuffer);
       }
@@ -3530,19 +3530,19 @@ public:
   void setObjectExtra(uint32_t flags) { obj_flags_.extra_flags = flags; }
 
   // weight
-  void setObjectMinimumWeight(uint64_t weight) { o_min_weight_ = weight; }
-  void setObjectMaximumWeight(uint64_t weight) { o_max_weight_ = weight; }
+  void setObjectMinimumWeight(quint64 weight) { o_min_weight_ = weight; }
+  void setObjectMaximumWeight(quint64 weight) { o_max_weight_ = weight; }
 
   // cost
-  void setObjectMinimumCost(uint64_t cost) { o_min_cost_ = cost; }
-  void setObjectMaximumCost(uint64_t cost) { o_max_cost_ = cost; }
+  void setObjectMinimumCost(quint64 cost) { o_min_cost_ = cost; }
+  void setObjectMaximumCost(quint64 cost) { o_max_cost_ = cost; }
 
   // more flags
   void setObjectMore(uint32_t flags) { obj_flags_.more_flags = flags; }
 
   // level=
-  void setObjectMinimumLevel(uint64_t level) { o_min_level_ = level; }
-  void setObjectMaximumLevel(uint64_t level) { o_max_level_ = level; }
+  void setObjectMinimumLevel(quint64 level) { o_min_level_ = level; }
+  void setObjectMaximumLevel(quint64 level) { o_max_level_ = level; }
 
   // v1
   // v2
@@ -3562,8 +3562,8 @@ public:
   void setObjectEquippedBy(QString name) { o_equipped_by_ = name; }
 
   // limit=
-  void setLimitOutput(uint64_t limit_output) { limit_output_ = limit_output; }
-  uint64_t getLimitOutput(void) const { return limit_output_; }
+  void setLimitOutput(quint64 limit_output) { limit_output_ = limit_output; }
+  quint64 getLimitOutput(void) const { return limit_output_; }
 
   void enableShowRange(void) { show_range_ = true; }
   bool isShowRange(void) const { return show_range_; }
@@ -3571,18 +3571,18 @@ public:
 private:
   types type_ = {};
 
-  uint64_t o_min_level_ = {};
-  uint64_t o_max_level_ = {};
-  uint64_t o_min_cost_ = {};
-  uint64_t o_max_cost_ = {};
-  uint64_t o_min_weight_ = {};
-  uint64_t o_max_weight_ = {};
+  quint64 o_min_level_ = {};
+  quint64 o_max_level_ = {};
+  quint64 o_min_cost_ = {};
+  quint64 o_max_cost_ = {};
+  quint64 o_min_weight_ = {};
+  quint64 o_max_weight_ = {};
 
-  uint64_t o_value[4] = {};
+  quint64 o_value[4] = {};
 
-  uint64_t o_vnum_ = {};         /* Where in data-base               */
-  uint64_t o_in_room_ = {};      /* In what room -1 when conta/carr  */
-  uint64_t o_vroo_ = {};         /* for corpse saving */
+  quint64 o_vnum_ = {};          /* Where in data-base               */
+  quint64 o_in_room_ = {};       /* In what room -1 when conta/carr  */
+  quint64 o_vroo_ = {};          /* for corpse saving */
   obj_flag_data obj_flags_ = {}; /* Object information               */
   int16_t o_num_affects_ = {};
   obj_affected_type o_affected_ = {}; /* Which abilities in PC to change  */
@@ -3596,7 +3596,7 @@ private:
   QString o_edd_description_ = {}; /* What to see                      */
   QString o_carried_by_ = {};
   QString o_equipped_by_ = {};
-  uint64_t limit_output_ = {};
+  quint64 limit_output_ = {};
   bool show_range_ = false;
 };
 
@@ -4149,11 +4149,11 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   size_t objects_found = 0;
 
   QList<Result> obj_results;
-  uint64_t limit_output = 0;
+  quint64 limit_output = 0;
 
   if (search_world)
   {
-    uint64_t old_count = 0;
+    quint64 old_count = 0;
 
     // search inventory
     for (auto obj = carrying; obj; obj = obj->next_content)
@@ -4247,7 +4247,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     old_count = obj_results.size();
 
     // Search all vaults player has access to
-    uint64_t vaults_searched = 0;
+    quint64 vaults_searched = 0;
     for (auto vault = vault_table; vault; vault = vault->next)
     {
       if (vault && !vault->owner.isEmpty() && dc_->has_vault_access(GET_NAME(this), vault))
@@ -4368,7 +4368,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       {
         if (s.getType() == Search::types::O_EQ_LEVEL)
         {
-          uint64_t min_level = 100, max_level = 0;
+          quint64 min_level = 100, max_level = 0;
           for (const auto &result : obj_results)
           {
             auto obj = result.getObject();
@@ -4441,7 +4441,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       {
         if (s.getType() == Search::types::O_EQ_LEVEL)
         {
-          uint64_t min_level = 100, max_level = 0;
+          quint64 min_level = 100, max_level = 0;
           for (const auto &result : obj_results)
           {
             auto obj = result.getObject();
@@ -4483,7 +4483,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   QString header;
   qsizetype max_keyword_size = 0, max_short_description_size = 0;
 
-  uint64_t result_nr = {};
+  quint64 result_nr = {};
   for (const auto &result : obj_results)
   {
     auto obj = result.getObject();
@@ -4635,7 +4635,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
 
     if (show_affects)
     {
-      uint64_t affects_found = 0;
+      quint64 affects_found = 0;
       for (int16_t i = 0; i < obj->num_affects; i++)
       {
         if ((obj->affected[i].location != APPLY_NONE) &&

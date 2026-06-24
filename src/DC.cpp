@@ -269,7 +269,7 @@ void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
   }
 }
 
-bool DC::authenticate(QString username, QString password, uint64_t level)
+bool DC::authenticate(QString username, QString password, quint64 level)
 {
   username = username.toLower();
   username[0] = username[0].toUpper();
@@ -301,7 +301,7 @@ bool DC::authenticate(QString username, QString password, uint64_t level)
   return false;
 }
 
-bool DC::authenticate(const QHttpServerRequest &request, uint64_t level)
+bool DC::authenticate(const QHttpServerRequest &request, quint64 level)
 {
   const auto query = request.query();
   if (!query.hasQueryItem("username") || !query.hasQueryItem("password"))
@@ -339,7 +339,7 @@ Object *DC::getObject(vnum_t vnum)
   return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
 }
 
-void DC::logverbose(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
+void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, Character *vict)
 {
   if (cf.verbose_mode)
   {

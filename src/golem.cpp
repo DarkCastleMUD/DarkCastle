@@ -487,7 +487,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
           "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\r\n"
           "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10ld       |\\|\r\n"
           "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10ld       |o|\r\n"
-          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10lu $3Platinum$7: %-5d |/|\r\n"
+          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10llu $3Platinum$7: %-5d |/|\r\n"
           "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\r\n"
           "($5:$7)===================================($5:$7)===================================($5:$7)\r\n",
           GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),

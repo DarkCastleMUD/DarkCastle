@@ -46,10 +46,10 @@ class error_range_over
 {
 };
 
-const uint64_t WORLD_MAX_ROOM = 50000; // should never get this high...
-                                       // it's just to keep builders/imps from
-                                       // doing a 'goto 1831919131928' and
-                                       // creating it
+const quint64 WORLD_MAX_ROOM = 50000ULL; // should never get this high...
+                                         // it's just to keep builders/imps from
+                                         // doing a 'goto 1831919131928' and
+                                         // creating it
 
 const int VERSION_NUMBER = 2; /* used for changing pfile format */
 
@@ -339,10 +339,10 @@ int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range);
 template <class T>
 T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max());
 
-uint64_t fread_uint(FILE *fl, uint64_t minval = std::numeric_limits<uint64_t>::min(), uint64_t maxval = std::numeric_limits<uint64_t>::max());
-uint64_t fread_uint(auto &in, uint64_t minval = std::numeric_limits<uint64_t>::min(), uint64_t maxval = std::numeric_limits<uint64_t>::max())
+quint64 fread_uint(FILE *fl, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max());
+quint64 fread_uint(auto &in, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max())
 {
-  uint64_t val;
+  quint64 val;
   in >> val;
   return val;
 }

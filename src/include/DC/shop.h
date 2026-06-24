@@ -3,7 +3,7 @@
 
 #include "DC/structs.h" // uint8_t, uint8_t, etc..
 
-typedef uint64_t vnum_t;
+typedef quint64 vnum_t;
 
 class player_shop_item
 {
@@ -38,7 +38,7 @@ class reroll_t
 public:
   class Object *choice1_obj = nullptr;
   Object *choice2_obj = nullptr;
-  uint64_t orig_rnum = {};
+  quint64 orig_rnum = {};
   vnum_t orig_vnum = {};
   Object *orig_obj = nullptr;
 
@@ -55,7 +55,7 @@ class redeem_t
 public:
   class Object *choice1_obj = nullptr;
   Object *choice2_obj = nullptr;
-  uint64_t orig_rnum = {};
+  quint64 orig_rnum = {};
   vnum_t orig_vnum = {};
   Object *orig_obj = nullptr;
   uint8_t token_count = {};

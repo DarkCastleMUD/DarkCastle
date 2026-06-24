@@ -121,7 +121,7 @@ bool AuctionHouse::IsClass(int vnum, QString isclass)
   if (IS_OBJ_STAT(obj, ITEM_ANY_CLASS))
     return true;
 
-  QMap<QString, uint64_t> class_lookup = {
+  QMap<QString, quint64> class_lookup = {
       {"warrior", ITEM_WARRIOR},
       {"mage", ITEM_MAGE},
       {"thief", ITEM_THIEF},

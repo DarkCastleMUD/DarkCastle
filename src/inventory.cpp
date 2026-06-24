@@ -89,7 +89,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %s[%lu] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
+        sprintf(log_buf, "%s looted %s[%llu] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
@@ -865,12 +865,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
                   char log_buf[MAX_STRING_LENGTH] = {};
-                  sprintf(log_buf, "%s poofed %s[%lu] from %s[%lu]",
-                          GET_NAME(ch),
-                          obj_object->short_description,
-                          DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
-                          qPrintable(sub_object->Name()),
-                          DC::getInstance()->obj_index[sub_object->vnum_].vnum());
+                  sprintf(log_buf, "%s poofed %s[%llu] from %s[%llu]", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()), DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                   logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
@@ -1163,7 +1158,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
@@ -1231,7 +1226,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%lu] in room %lu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
@@ -2682,8 +2677,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
   {
-    sprintf(log_buf, "%s palms %s[%lu] from room %lu", GET_NAME(ch), qPrintable(obj_object->Name()), DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
-            ch->in_room);
+    sprintf(log_buf, "%s palms %s[%llu] from room %llu", GET_NAME(ch), qPrintable(obj_object->Name()), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,

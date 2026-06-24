@@ -192,17 +192,17 @@ bool Character::isImplementerPlayer(void) const
   return isPlayer() && level_ == IMPLEMENTER;
 }
 
-uint64_t Character::getGold(void)
+quint64 Character::getGold(void)
 {
   return gold_;
 }
 
-void Character::setGold(uint64_t gold)
+void Character::setGold(quint64 gold)
 {
   gold_ = gold;
 }
 
-bool Character::addGold(uint64_t gold)
+bool Character::addGold(quint64 gold)
 {
   if (gold_ + gold < gold)
   {
@@ -213,7 +213,7 @@ bool Character::addGold(uint64_t gold)
   return true;
 }
 
-bool Character::removeGold(uint64_t gold)
+bool Character::removeGold(quint64 gold)
 {
   if (gold > gold_)
   {
@@ -235,7 +235,7 @@ bool Character::multiplyGold(double mult)
   return true;
 }
 
-uint64_t &Character::getGoldReference(void)
+quint64 &Character::getGoldReference(void)
 {
   return gold_;
 }
@@ -538,7 +538,7 @@ Sockets::Sockets(Character *ch, QString searchkey)
 void Character::display_string_list(QStringList list)
 {
   QString buf;
-  uint64_t count{};
+  quint64 count{};
   for (const auto &item : list)
   {
     send(QStringLiteral("%1").arg(item, 18));
@@ -645,7 +645,7 @@ const QList<Toggle> Player::togglables = {
     {"damage", PLR_DAMAGE_BIT, &Character::do_damage_toggle},
     {"nodupekeys", PLR_NODUPEKEYS_BIT, &Character::do_nodupekeys_toggle}};
 
-Toggle::Toggle(QString name, uint64_t shift, command_return_t (Character::*function)(QStringList arguments, cmd_t cmd), uint64_t dependency_shift, QString on_message, QString off_message)
+Toggle::Toggle(QString name, quint64 shift, command_return_t (Character::*function)(QStringList arguments, cmd_t cmd), quint64 dependency_shift, QString on_message, QString off_message)
     : name_(name), valid_(true), shift_(shift), dependency_shift_(dependency_shift), value_(1U << shift), on_message_(on_message), off_message_(off_message), function_(function)
 {
 }

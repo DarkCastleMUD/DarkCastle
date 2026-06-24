@@ -27,12 +27,12 @@ public:
   uint8_t getMin(uint8_t cur, int8_t mod, uint8_t min);
   int str[5], tel[5], wis[5], dex[5], con[5];
   int min_str, min_int, min_wis, min_dex, min_con;
-  uint64_t points;
+  quint64 points;
   attribute_t selection{};
   uint8_t race;
   uint8_t clss;
-  bool increase(uint64_t points = 1);
-  bool decrease(uint64_t points = 1);
+  bool increase(quint64 points = 1);
+  bool decrease(quint64 points = 1);
 };
 
 class Proxy
@@ -221,15 +221,15 @@ class Sockets
 {
 public:
   Sockets(Character *ch = nullptr, QString searchkey = "");
-  QMap<QString, uint64_t> getIPs(void) const { return IPs_; }
+  QMap<QString, quint64> getIPs(void) const { return IPs_; }
   QList<Connection *> getConnections(void) const { return connections_; }
-  uint64_t getLongestNameSize(void) const { return longest_name_size_; }
-  uint64_t getLongestIPSize(void) const { return longest_IP_size_; }
-  uint64_t getLongestConnectionStateSize(void) const { return longest_connection_state_size_; }
-  uint64_t getLongestIdleSize(void) const { return longest_idle_size_; }
+  quint64 getLongestNameSize(void) const { return longest_name_size_; }
+  quint64 getLongestIPSize(void) const { return longest_IP_size_; }
+  quint64 getLongestConnectionStateSize(void) const { return longest_connection_state_size_; }
+  quint64 getLongestIdleSize(void) const { return longest_idle_size_; }
 
 private:
-  QMap<QString, uint64_t> IPs_{};
+  QMap<QString, quint64> IPs_{};
   QList<Connection *> connections_{};
   qsizetype longest_name_size_{};
   qsizetype longest_IP_size_{};

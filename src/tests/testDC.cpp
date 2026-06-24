@@ -698,7 +698,7 @@ private slots:
     QString qfile_filename = QStringLiteral("world/%1.qfile").arg(filename);
     QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
     QString fstream_filename = QStringLiteral("world/%1.fstream").arg(filename);
-    uint64_t rooms_written{};
+    quint64 rooms_written{};
     {
       LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
       QFile qf(qfile_filename);
@@ -739,7 +739,7 @@ private slots:
       fstream_world_file << "$~\n";
     }
 
-    qInfo("Wrote %lu rooms to '%s'.", rooms_written, qPrintable(filename));
+    qInfo("Wrote %llu rooms to '%s'.", rooms_written, qPrintable(filename));
 
     auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
     auto legacyfile_checksum = checksumFile(legacyfile_filename);

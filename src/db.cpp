@@ -1031,7 +1031,7 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
 
         if (*buf == '#')
         { /* allocate new_new cell */
-          sscanf(buf, "#%ld", &vnum);
+          sscanf(buf, "#%llu", &vnum);
           index[vnum].vnum(vnum);
           index[vnum].qty = 0;
           index[vnum].non_combat_func = 0;
@@ -1043,7 +1043,7 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
           if (!(index[vnum].mob = read_mobile(vnum, fl)))
           {
 
-            sprintf(log_buf, "Unable to load mobile %lu!\r\n", index[vnum].vnum());
+            sprintf(log_buf, "Unable to load mobile %llu!\r\n", index[vnum].vnum());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
           }
         }
@@ -1324,7 +1324,7 @@ void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
       {
         if (*buf == '#') /* allocate new_new cell */
         {
-          sscanf(buf, "#%ld", &vnum);
+          sscanf(buf, "#%llu", &vnum);
           index[vnum].vnum(vnum);
           index[vnum].qty = 0;
           index[vnum].non_combat_func = 0;
@@ -1332,7 +1332,7 @@ void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
           index[vnum].progtypes = 0;
           if (!(index[vnum].item = (class Object *)read_object(vnum, fl, false)))
           {
-            sprintf(log_buf, "Unable to load object %lu!\r\n", vnum);
+            sprintf(log_buf, "Unable to load object %llu!\r\n", vnum);
             logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
           }
         }
@@ -1367,7 +1367,7 @@ void write_one_room(LegacyFile &lf, int a)
 
   if (DC::getInstance()->world[a].iFlags)
     REMOVE_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
-  fprintf(f, "%lu %d %d\n", DC::getInstance()->world[a].zone, DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].sector_type);
+  fprintf(f, "%llu %d %d\n", DC::getInstance()->world[a].zone, DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].sector_type);
   if (DC::getInstance()->world[a].iFlags)
     SET_BIT(DC::getInstance()->world[a].room_flags, DC::getInstance()->world[a].iFlags);
 
@@ -1548,7 +1548,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
       if (load_debug)
       {
-        printf("Flags are %lu %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags, DC::getInstance()->world[room_nr].sector_type);
+        printf("Flags are %llu %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags, DC::getInstance()->world[room_nr].sector_type);
         fflush(stdout);
       }
 
@@ -1740,7 +1740,7 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_ite
   for (quint8 i = 1; i < 4; ++i)
   {
     vnum_t generation = pow(10, i);
-    qDebug("searching for vnum %lu. %hhu %lu %lu", vnum, i, generation, vnum - (vnum % generation));
+    qDebug("searching for vnum %llu. %hhu %llu %llu", vnum, i, generation, vnum - (vnum % generation));
   }
 
   return std::unexpected(search_error::not_found);
@@ -2256,9 +2256,9 @@ void DC::free_zones_from_memory()
 void Zone::write(FILE *fl)
 {
   fprintf(fl, "V2\n");
-  fprintf(fl, "#%lu\n", (id_ ? (bottom / 100) : 0));
+  fprintf(fl, "#%llu\n", (id_ ? (bottom / 100) : 0));
   fprintf(fl, "%s~\n", NameC());
-  fprintf(fl, "%lu %lu %d %ld %d\n", top, lifespan, reset_mode, zone_flags, continent);
+  fprintf(fl, "%llu %llu %d %llu %d\n", top, lifespan, reset_mode, zone_flags, continent);
 
   for (int i = 0; i < cmd.size(); i++)
   {
@@ -2802,7 +2802,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
   FILE *fl = lf.file_handle_;
   int i = 0;
 
-  fprintf(fl, "#%lu\n", mob->mobdata->vnum_);
+  fprintf(fl, "#%llu\n", mob->mobdata->vnum_);
   string_to_file(fl, mob->getName());
   string_to_file(fl, mob->short_desc);
   string_to_file(fl, mob->long_desc);
@@ -2825,7 +2825,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
 
   fprintf(fl, "%d %d %llu\n"
               "%d %d %dd%d+%d %dd%d+%d\n"
-              "%ld %ld\n"
+              "%llu %ld\n"
               "%d %d %d %d %d %d\n",
           mob->alignment,
           GET_RACE(mob),
@@ -3946,7 +3946,7 @@ void write_object(LegacyFile &lf, Object *obj)
   FILE *fl = lf.file_handle_;
   extra_descr_data *currdesc;
 
-  fprintf(fl, "#%lu\n", obj->vnum_);
+  fprintf(fl, "#%llu\n", obj->vnum_);
   string_to_file(fl, obj->Name());
   string_to_file(fl, obj->short_description);
   string_to_file(fl, obj->long_description);
@@ -4429,9 +4429,9 @@ void zone_update(void)
   DC::getInstance()->removeDead();
 }
 
-uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
+quint64 countMobsInRoom(quint64 vnum, room_t room_id)
 {
-  uint64_t count = {};
+  quint64 count = {};
   for (auto ch = DC::getInstance()->world[room_id].people; ch != nullptr; ch = ch->next_in_room)
   {
     if (ch->mobdata && ch->mobdata->vnum_ == vnum)
@@ -4442,9 +4442,9 @@ uint64_t countMobsInRoom(uint64_t vnum, room_t room_id)
   return count;
 }
 
-uint64_t countMobsInWorld(uint64_t vnum)
+quint64 countMobsInWorld(quint64 vnum)
 {
-  uint64_t count = {};
+  quint64 count = {};
   for (const auto ch : DC::getInstance()->character_list)
   {
     if (ch->mobdata && ch->mobdata->vnum_ == vnum && ch->in_room != DC::NOWHERE)
@@ -4489,9 +4489,7 @@ void Zone::reset(ResetType reset_type)
   {
     if (reset_cmd_index < 0 || reset_cmd_index > cmd.size())
     {
-      sprintf(buf,
-              "Trapped zone error, Command is null, zone: %lu reset_cmd_index: %d",
-              id_, reset_cmd_index);
+      sprintf(buf, "Trapped zone error, Command is null, zone: %llu reset_cmd_index: %d", id_, reset_cmd_index);
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
       break;
     }
@@ -4567,7 +4565,7 @@ void Zone::reset(ResetType reset_type)
 
             if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
             {
-              sprintf(buf, "Obj %lu loaded to DC::NOWHERE. Zone %lu Cmd %d", DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
+              sprintf(buf, "Obj %llu loaded to NOWHERE. Zone %llu Cmd %d", DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
               logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
             last_cmd = 0;
@@ -4704,7 +4702,7 @@ void Zone::reset(ResetType reset_type)
           {
             if (!mob->equip_char(obj, cmd[reset_cmd_index]->arg3))
             {
-              sprintf(buf, "Bad equip_char zone %lu cmd %d", id_, reset_cmd_index + 1);
+              sprintf(buf, "Bad equip_char zone %llu cmd %d", id_, reset_cmd_index + 1);
               logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
             }
           }
@@ -4732,29 +4730,26 @@ void Zone::reset(ResetType reset_type)
       case 'D': /* set state of door */
         if (cmd[reset_cmd_index]->arg1 < 0 || cmd[reset_cmd_index]->arg1 > DC::getInstance()->top_of_world)
         {
-          sprintf(log_buf, "Illegal room number Z: %lu cmd %d", id_, reset_cmd_index + 1);
+          sprintf(log_buf, "Illegal room number Z: %llu cmd %d", id_, reset_cmd_index + 1);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         if (cmd[reset_cmd_index]->arg2 < 0 || cmd[reset_cmd_index]->arg2 >= 6)
         {
-          sprintf(log_buf, "Illegal direction %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
+          sprintf(log_buf, "Illegal direction %d doesn't exist Z: %llu cmd %d", cmd[reset_cmd_index]->arg2, id_, reset_cmd_index + 1);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
         if (!DC::getInstance()->rooms.contains(cmd[reset_cmd_index]->arg1))
         {
-          sprintf(log_buf, "Room %d doesn't exist Z: %lu cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
+          sprintf(log_buf, "Room %d doesn't exist Z: %llu cmd %d", cmd[reset_cmd_index]->arg1, id_, reset_cmd_index + 1);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
 
         if (DC::getInstance()->world[cmd[reset_cmd_index]->arg1].dir_option[cmd[reset_cmd_index]->arg2] == 0)
         {
-          sprintf(
-              log_buf,
-              "Attempt to reset direction %d on room %d that doesn't exist Z: %lu cmd %d",
-              cmd[reset_cmd_index]->arg2, DC::getInstance()->world[cmd[reset_cmd_index]->arg1].number, id_, reset_cmd_index);
+          sprintf(log_buf, "Attempt to reset direction %d on room %d that doesn't exist Z: %llu cmd %d", cmd[reset_cmd_index]->arg2, DC::getInstance()->world[cmd[reset_cmd_index]->arg1].number, id_, reset_cmd_index);
           logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
           break;
         }
@@ -4834,7 +4829,7 @@ void Zone::reset(ResetType reset_type)
         break;
 
       default:
-        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %lu cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
+        sprintf(log_buf, "UNKNOWN COMMAND!!! ZONE %llu cmd %d: '%c' Skipping .", id_, reset_cmd_index + 1, cmd[reset_cmd_index]->command);
         logentry(log_buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
         age = 0;
         return;
@@ -5303,12 +5298,12 @@ int fread_bitvector(std::ifstream &in, int32_t beg_range, int32_t end_range)
   return 0;
 }
 
-uint64_t fread_uint(FILE *fl, uint64_t beg_range, uint64_t end_range)
+quint64 fread_uint(FILE *fl, quint64 beg_range, quint64 end_range)
 {
   char buf[MAX_STRING_LENGTH];
   char *pBufLast;
   int ch;
-  uint64_t i;
+  quint64 i;
 
   while ((ch = getc(fl)))
   {

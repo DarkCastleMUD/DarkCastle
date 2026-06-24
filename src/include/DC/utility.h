@@ -221,9 +221,9 @@ bool IS_DARK(int room);
 #define GET_OBJ_WEAR(obj) ((obj)->obj_flags.wear_flags)
 #define GET_OBJ_COST(obj) ((obj)->obj_flags.cost)
 #define GET_OBJ_RENT(obj) ((obj)->obj_flags.cost_per_day)
-#define GET_OBJ_VNUM(obj) (DC::getInstance()->obj_index.contains(GET_OBJ_RNUM(obj)) ? GET_OBJ_RNUM(obj) : 0)
+#define GET_OBJ_VNUM(obj) (DC::getInstance()->obj_index.contains(GET_OBJ_RNUM(obj)) ? GET_OBJ_RNUM(obj) : 0ULL)
 #define VALID_ROOM_RNUM(rnum) ((rnum) != DC::NOWHERE && (rnum) <= DC::getInstance()->top_of_world)
-#define GET_ROOM_VNUM(rnum) ((int32_t)(VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
+#define GET_ROOM_VNUM(rnum) ((VALID_ROOM_RNUM(rnum) ? DC::getInstance()->world[(rnum)].number : DC::NOWHERE))
 
 #define GET_TOGGLES(ch) ((ch)->player->toggles)
 
@@ -533,9 +533,9 @@ std::string sprinttype(int type, const char *names[]);
 
 void sprinttype(int type, std::vector<const char *>, char *result);
 void sprinttype(int type, QStringList, char *result);
-QString sprinttype(uint64_t type, QStringList names);
+QString sprinttype(quint64 type, QStringList names);
 
-// void sprinttype(uint64_t type, QStringList names, char *result);
+// void sprinttype(quint64 type, QStringList names, char *result);
 template <typename T>
 void sprinttype(T type, QStringList names, char *result)
 {

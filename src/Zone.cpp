@@ -26,7 +26,7 @@ void Zone::setFilename(QString value)
   filename = value;
 }
 
-uint64_t Zone::getDiedThisTick(void)
+quint64 Zone::getDiedThisTick(void)
 {
   return died_this_tick;
 }
@@ -36,7 +36,7 @@ void Zone::incrementDiedThisTick(void)
   died_this_tick++;
 }
 
-void Zone::setDiedThisTick(uint64_t died)
+void Zone::setDiedThisTick(quint64 died)
 {
   died_this_tick = died;
 }
@@ -126,17 +126,17 @@ void Zone::setNoHunt(bool flag)
   }
 }
 
-void Zone::setZoneFlags(uint64_t flags)
+void Zone::setZoneFlags(quint64 flags)
 {
   zone_flags = flags;
 }
 
-void Zone::setGold(uint64_t value)
+void Zone::setGold(quint64 value)
 {
   gold = value;
 }
 
-void Zone::addGold(uint64_t value)
+void Zone::addGold(quint64 value)
 {
   gold += value;
 }
@@ -234,9 +234,9 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key)
   return true;
 }
 
-uint64_t getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok)
+quint64 getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok)
 {
-  uint64_t zone_command_key = input.toULongLong(ok);
+  quint64 zone_command_key = input.toULongLong(ok);
   if (!isValidZoneCommandKey(ch, zone, zone_command_key - 1) && ok)
   {
     *ok = false;

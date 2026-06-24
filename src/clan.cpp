@@ -6,7 +6,8 @@
 /***********************************************************************/
 #define __STDC_LIMIT_MACROS
 #include <cstdint>
-uint64_t i = UINT64_MAX;
+#include <QtTypes>
+quint64 i = -1ULL;
 
 #include <cstring> // strcat
 #include <cstdio>  // FILE *
@@ -321,7 +322,7 @@ void save_clans(void)
       fprintf(fl, "T\n%d\n", pclan->tax);
 
     if (pclan->getBalance())
-      fprintf(fl, "B\n%lu\n", pclan->getBalance());
+      fprintf(fl, "B\n%llu\n", pclan->getBalance());
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -2683,7 +2684,7 @@ int do_cinfo(Character *ch, char *arg, cmd_t cmd)
   if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
       (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
   {
-    sprintf(buf, "$3Balance$R:         %lu coins\r\n", clan->getBalance());
+    sprintf(buf, "$3Balance$R:         %llu coins\r\n", clan->getBalance());
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -2880,7 +2881,7 @@ int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
     ch->sendln("How much do you want to withdraw?");
     return ReturnValue::eFAILURE;
   }
-  uint64_t wdraw = atoi(arg1);
+  quint64 wdraw = atoi(arg1);
   if (get_clan(ch)->getBalance() < wdraw || wdraw < 0)
   {
     ch->sendln("Your clan lacks the funds.");
@@ -2906,7 +2907,7 @@ int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
   }
   else
   {
-    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %lu $B$5gold$R coins from the clan bank account.\r\n", ch->getNameC(), wdraw);
+    snprintf(buf, MAX_INPUT_LENGTH, "%s withdrew %llu $B$5gold$R coins from the clan bank account.\r\n", ch->getNameC(), wdraw);
   }
   clan_data *clan = get_clan(ch);
   if (clan != nullptr)
@@ -3667,23 +3668,23 @@ clan_data::clan_data(void)
   tax = 0;
 }
 
-void clan_data::cdeposit(const uint64_t &deposit)
+void clan_data::cdeposit(const quint64 &deposit)
 {
   balance += deposit;
   return;
 }
 
-uint64_t clan_data::getBalance(void)
+quint64 clan_data::getBalance(void)
 {
   return balance;
 }
 
-void clan_data::cwithdraw(const uint64_t &withdraw)
+void clan_data::cwithdraw(const quint64 &withdraw)
 {
   balance -= withdraw;
 }
 
-void clan_data::setBalance(const uint64_t &value)
+void clan_data::setBalance(const quint64 &value)
 {
   balance = value;
 }

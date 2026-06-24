@@ -12,7 +12,7 @@ public:
   QString owner;
   unsigned int size;
   unsigned int weight;
-  uint64_t gold;
+  quint64 gold;
 
   class vault_access_data *access;
   class vault_items_data *items;

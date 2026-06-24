@@ -16,8 +16,8 @@
 
 /* Bitvector For 'room_flags' */
 
-typedef uint64_t zone_t;
-typedef uint64_t room_t;
+typedef quint64 zone_t;
+typedef quint64 room_t;
 
 const auto DARK = 1;
 const auto NOHOME = 1 << 1;

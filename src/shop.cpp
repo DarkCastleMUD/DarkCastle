@@ -1583,8 +1583,8 @@ public:
   int item_vnum;
   int cost_qty;
   int cost_vnum;
-  uint64_t cost_exp;
-  uint64_t cost_plats;
+  quint64 cost_exp;
+  quint64 cost_plats;
 };
 
 const int OBJ_APOCALYPSE = 27905;
@@ -1670,7 +1670,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       last_vnum = eddie[i].item_vnum;
       int item_qty = eddie[i].item_qty;
       int cost_qty = eddie[i].cost_qty;
-      uint64_t cost_plats = eddie[i].cost_plats;
+      quint64 cost_plats = eddie[i].cost_plats;
 
       // setup format specifier based length of item short descriptions
       if (cost_qty > 0)

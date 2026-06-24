@@ -257,10 +257,10 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
           std::string key = pt.first;
           Timer t = pt.second;
           csendf(ch, "%15s: "
-                     "cur:%lus %luμs"
-                     "\tmin:%lus %luμs"
-                     "\tmax:%lus %luμs"
-                     "\tavg:%lus %luμs\r\n",
+                     "cur:%llus %lluμs"
+                     "\tmin:%llus %lluμs"
+                     "\tmax:%llus %lluμs"
+                     "\tavg:%llus %lluμs\r\n",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
@@ -276,10 +276,10 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
           std::string key = i->first;
           Timer t = i->second;
           csendf(ch, "%15s: "
-                     "cur:%lus %luμs"
-                     "\tmin:%lus %luμs"
-                     "\tmax:%lus %luμs"
-                     "\tavg:%lus %luμs\r\n",
+                     "cur:%llus %lluμs"
+                     "\tmin:%llus %lluμs"
+                     "\tmax:%llus %lluμs"
+                     "\tavg:%llus %lluμs\r\n",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
@@ -336,7 +336,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
 
         // All NPCs instances of a specific VNUM will have debug toggled
         // according to the first matching NPC.
-        uint64_t change_count{};
+        quint64 change_count{};
         bool first_npc_found = false;
         bool first_npc_debug_state = false;
         for (const auto &c : DC::getInstance()->character_list)

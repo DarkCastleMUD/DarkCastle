@@ -1110,7 +1110,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
 
   if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
   {
-    sprintf(buf, "Error in do_enter(), value 0 on object %lu < 0", portal->vnum_);
+    sprintf(buf, "Error in do_enter(), value 0 on object %llu < 0", portal->vnum_);
     logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     ch->sendln("You can't enter that.");
     return ReturnValue::eFAILURE;
@@ -1193,7 +1193,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You cannot enter that.");
     return ReturnValue::eFAILURE;
   default:
-    sprintf(buf, "Error in do_enter(), value 1 on object %lu returned default case", portal->vnum_);
+    sprintf(buf, "Error in do_enter(), value 1 on object %llu returned default case", portal->vnum_);
     logentry(buf, OVERSEER, DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }

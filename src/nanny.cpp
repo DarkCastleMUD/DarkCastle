@@ -338,7 +338,7 @@ Object *Character::clan_altar(void)
 
 void update_max_who(void)
 {
-  uint64_t players = 0;
+  quint64 players = 0;
   for (auto d = DC::getInstance()->descriptor_list; d != nullptr; d = d->next)
   {
     if (d->isPlaying() || d->isEditing())
@@ -3165,7 +3165,7 @@ stat_data::stat_data(void)
   memset(wis, 0, sizeof(wis));
 }
 
-bool stat_data::increase(uint64_t number)
+bool stat_data::increase(quint64 number)
 {
   if (points <= 0)
   {
@@ -3223,7 +3223,7 @@ bool stat_data::increase(uint64_t number)
     number = points;
   }
 
-  uint64_t diff_from_natural_max = 18 - *attribute_to_change;
+  quint64 diff_from_natural_max = 18 - *attribute_to_change;
   if (number > diff_from_natural_max)
   {
     number = diff_from_natural_max;
@@ -3234,7 +3234,7 @@ bool stat_data::increase(uint64_t number)
   return true;
 }
 
-bool stat_data::decrease(uint64_t number)
+bool stat_data::decrease(quint64 number)
 {
   int *attribute_to_change = nullptr;
   switch (selection)

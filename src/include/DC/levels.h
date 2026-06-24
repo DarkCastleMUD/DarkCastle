@@ -21,13 +21,13 @@
 // #define MIN_GOD IMMORTAL
 
 #define GIFTED_COMMAND 101 // noone should ever "be" this level
-const uint64_t IMMORTAL = 102;
+const quint64 IMMORTAL = 102;
 #define ANGEL 103
 #define DEITY 104
 #define OVERSEER 105
 #define DIVINITY 106
 #define COORDINATOR 108
-const uint64_t IMPLEMENTER = 110;
+const quint64 IMPLEMENTER = 110;
 
 #define ARCHITECT ANGEL
 #define ARCHANGEL ANGEL

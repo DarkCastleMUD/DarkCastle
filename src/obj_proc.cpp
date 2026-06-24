@@ -2647,7 +2647,7 @@ int moving_portals(Character *ch, class Object *obj, cmd_t cmd,
   if (obj->obj_flags.timer <= 0)
   {
     obj->obj_flags.timer = time;
-    uint64_t tries = 0;
+    quint64 tries = 0;
     while ((room = number(low, high)))
     {
       // Give up after 100 tries

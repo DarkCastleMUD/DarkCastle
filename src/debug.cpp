@@ -60,7 +60,7 @@ bool test_rolls(uint8_t total)
   int x, a, b;
   stat_data stats;
 
-  uint64_t attempts = 0;
+  quint64 attempts = 0;
   while (1)
   {
     attempts++;

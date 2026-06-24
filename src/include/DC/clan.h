@@ -150,15 +150,15 @@ public:
   clan_data *next;
   class vault_access_data *acc;
   clan_data(void);
-  void cdeposit(const uint64_t &deposit);
-  void cwithdraw(const uint64_t &withdraw);
-  uint64_t getBalance(void);
-  void setBalance(const uint64_t &value);
+  void cdeposit(const quint64 &deposit);
+  void cwithdraw(const quint64 &withdraw);
+  quint64 getBalance(void);
+  void setBalance(const quint64 &value);
   std::queue<std::string> ctell_history;
   void log(QString log_entry);
 
 private:
-  uint64_t balance;
+  quint64 balance;
 };
 // if you add to the clan rights, update clan_rights[] in clan.C
 

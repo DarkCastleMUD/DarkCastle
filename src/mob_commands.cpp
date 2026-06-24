@@ -134,8 +134,7 @@ void mpstat(Character *ch, Character *victim)
   mob_prog_data *mprg{};
   int i;
 
-  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %lu.\r\n",
-          victim->getNameC(), victim->mobdata->vnum_);
+  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %llu.\r\n", victim->getNameC(), victim->mobdata->vnum_);
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
@@ -2101,7 +2100,7 @@ char *expand_data(Character *ch, char *orig)
     char **lvalstr = nullptr;
     QString lvalqstr;
     int64_t *lvali64 = nullptr;
-    uint64_t *lvalui64 = nullptr;
+    quint64 *lvalui64 = nullptr;
     int8_t *lvalb = nullptr;
     translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
@@ -2179,7 +2178,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   char **lvalstr = nullptr;
   QString lvalqstr;
   int64_t *lvali64 = nullptr;
-  uint64_t *lvalui64 = nullptr;
+  quint64 *lvalui64 = nullptr;
   int8_t *lvalb = nullptr;
   translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 

@@ -158,7 +158,7 @@ int damage_eq_once(Object *obj)
   return 1;
 }
 
-void DC::object_activity(uint64_t pulse_type)
+void DC::object_activity(quint64 pulse_type)
 {
   for (const auto &obj : active_obj_list)
   {
@@ -2752,7 +2752,7 @@ bool Object::isDark(void)
   return isSet(obj_flags.extra_flags, ITEM_DARK);
 }
 
-uint64_t Object::getLevel(void)
+quint64 Object::getLevel(void)
 {
   return obj_flags.eq_level;
 }

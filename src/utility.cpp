@@ -313,7 +313,7 @@ FILE *quest_log = 0;
 FILE *vault_log = 0;
 
 // writes a std::string to the log
-void logentry(QString str, uint64_t god_level, DC::LogChannel type, Character *vict)
+void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vict)
 {
   FILE **f = 0;
   int stream = 1;
@@ -778,7 +778,7 @@ std::string sprintbit(uint32_t vektor, const char *names[])
   return result;
 }
 
-void sprinttype(uint64_t type, QStringList names, char *result)
+void sprinttype(quint64 type, QStringList names, char *result)
 {
   if (result)
   {
@@ -786,7 +786,7 @@ void sprinttype(uint64_t type, QStringList names, char *result)
   }
 }
 
-QString sprinttype(uint64_t type, QStringList names)
+QString sprinttype(quint64 type, QStringList names)
 {
   return names.value(type, "Undefined");
 }
@@ -1532,7 +1532,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   if (this->isPlayer())
   {
     x = GET_WIS(this);
-    uint64_t percent = number(1, 100);
+    quint64 percent = number(1, 100);
     if (percent > x)
     {
       percent -= x;

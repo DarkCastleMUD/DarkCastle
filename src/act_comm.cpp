@@ -127,7 +127,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
 | Returns: 0 on failure, non-zero on success
 | Notes:
 */
-int send_to_gods(QString message, uint64_t god_level, DC::LogChannel type)
+int send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
 {
   QString buf1;
   QString buf;
@@ -718,7 +718,7 @@ void DC::save_hints(void)
 
   QTextStream out(&file);
 
-  uint64_t hint_key = 0;
+  quint64 hint_key = 0;
   for (hints_t::iterator i = hints_.begin(); i != hints_.end(); ++i)
   {
     out << "#" << ++hint_key << "\n";
@@ -737,7 +737,7 @@ void DC::send_hint(void)
 
   auto num = number(0LL, hints_.size() - 1);
 
-  uint64_t attempts = 0;
+  quint64 attempts = 0;
   while (hints_.value(num).isEmpty() && attempts++ < 100)
   {
     num = number(0LL, hints_.size() - 1);
