@@ -881,7 +881,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->mob_index.contains(begin))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, DC::getInstance()->mob_index[nr].mob->getLevel(), DC::getInstance()->mob_index[nr].mob->short_desc);
           ch->send(buf);
         }
       }
@@ -894,7 +894,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, DC::getInstance()->mob_index[nr].mob->getLevel(), DC::getInstance()->mob_index[nr].mob->short_desc);
           ch->send(buf);
 
           if (count > 200)
@@ -910,16 +910,16 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       *buf = '\0';
       ch->sendln("[#  ] [MOB #] [LV] MOB'S DESCRIPTION\n");
 
-      for (i = 0; (i <= DC::getInstance()->mob_index.last().vnum()); i++)
-      {
-        nr = i;
-        if (!DC::getInstance()->mob_index.contains(i))
-          continue;
+      // Debug code checking for broken entries in mob_index
+      // qDebug("%lld", std::count_if(DC::getInstance()->mob_index.cbegin(), DC::getInstance()->mob_index.cend(), [](const auto &index_entry)
+      //                              {if (index_entry.mob == 0)return true; else return false; }));
 
-        if (isexact(name, ((Character *)(DC::getInstance()->mob_index[nr].mob))->getNameC()))
+      for (const auto &vch : DC::getInstance()->mob_index)
+      {
+        if (isexact(name, vch.mob->getNameC()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
+          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vch.vnum(), vch.mob->getLevel(), vch.mob->short_desc);
           ch->send(buf);
 
           if (count > 200)
@@ -1352,43 +1352,38 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       if (!DC::getInstance()->mob_index.contains(c))
         continue;
       if (race > -1)
-        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->race != race)
+        if (DC::getInstance()->mob_index[nr].mob->race != race)
           continue;
       if (align)
       {
-        if (align == 1 && ((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment < 350)
+        if (align == 1 && DC::getInstance()->mob_index[nr].mob->alignment < 350)
           continue;
-        else if (align == 2 && (((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment < -350 || ((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment > 350))
+        else if (align == 2 && (DC::getInstance()->mob_index[nr].mob->alignment < -350 || DC::getInstance()->mob_index[nr].mob->alignment > 350))
           continue;
-        else if (align == 3 && ((Character *)(DC::getInstance()->mob_index[nr].mob))->alignment > -350)
+        else if (align == 3 && DC::getInstance()->mob_index[nr].mob->alignment > -350)
           continue;
       }
       if (immune)
-        if (!isSet(((Character *)(DC::getInstance()->mob_index[nr].mob))->immune,
-                   immune))
+        if (!isSet(DC::getInstance()->mob_index[nr].mob->immune, immune))
           continue;
       if (clas)
-        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->c_class != clas)
+        if (DC::getInstance()->mob_index[nr].mob->c_class != clas)
           continue;
       if (levlow != -555)
-        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel() < levlow)
+        if (DC::getInstance()->mob_index[nr].mob->getLevel() < levlow)
           continue;
       if (levhigh != -555)
-        if (((Character *)(DC::getInstance()->mob_index[nr].mob))->getLevel() > levhigh)
+        if (DC::getInstance()->mob_index[nr].mob->getLevel() > levhigh)
           continue;
       if (*act)
         for (i = 0; i < ACT_MAX; i++)
           if (ISSET(act, i))
-            if (!ISSET(
-                    ((Character *)(DC::getInstance()->mob_index[nr].mob))->mobdata->actflags,
-                    i + 1))
+            if (!ISSET(DC::getInstance()->mob_index[nr].mob->mobdata->actflags, i + 1))
               goto eheh;
       if (*affect)
         for (i = 0; i < AFF_MAX; i++)
           if (ISSET(affect, i))
-            if (!ISSET(
-                    ((Character *)(DC::getInstance()->mob_index[nr].mob))->affected_by,
-                    i + 1))
+            if (!ISSET(DC::getInstance()->mob_index[nr].mob->affected_by, i + 1))
               goto eheh;
       count++;
       if (count > 200)
@@ -1396,7 +1391,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((DC::getInstance()->mob_index[nr].mob))->getLevel(), ((Character *)(DC::getInstance()->mob_index[nr].mob))->short_desc);
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, DC::getInstance()->mob_index[nr].mob->getLevel(), DC::getInstance()->mob_index[nr].mob->short_desc);
       ch->send(buf);
     eheh:
       continue;
