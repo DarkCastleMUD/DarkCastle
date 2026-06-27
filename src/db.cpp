@@ -3250,7 +3250,7 @@ Character *DC::clone_mobile(int nr)
   free_list.erase(mob);
 
   clear_char(mob);
-  old = ((Character *)(DC::getInstance()->mob_index[nr].mob)); /* cast void pointer */
+  old = DC::getInstance()->mob_index[nr].mob;
 
   *mob = *old;
 
@@ -6062,9 +6062,8 @@ int mob_in_index(char *name, int index)
 {
   int i, j;
 
-  for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) && ((Character *)(DC::getInstance()->mob_index[i].mob));
-       i++)
-    if (isexact(name, GET_NAME(((Character *)(DC::getInstance()->mob_index[i].mob)))))
+  for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) && DC::getInstance()->mob_index[i].mob; i++)
+    if (isexact(name, GET_NAME(DC::getInstance()->mob_index[i].mob)))
     {
       if (j == index)
         return i;
