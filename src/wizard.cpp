@@ -370,7 +370,7 @@ void boro_mob_stat(Character *ch, Character *k)
           buf2); /* buf is the sex... */
   ch->send(buf); /* THIRD sprintf */
 
-  if (k->isNonPlayer())
+  if (k->isNonPlayer() && DC::getInstance()->mob_index.contains(k->mobdata->vnum_))
   {
     if (DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)
       strcpy(buf2, "Exists");
@@ -754,7 +754,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   strcat(buf, buf2);
   ch->send(buf);
 
-  if (k->isNonPlayer())
+  if (k->isNonPlayer() && DC::getInstance()->mob_index.contains(k->mobdata->vnum_))
   {
     strcpy(buf, "\r\n$3Non-Combat Special Proc$R: ");
     strcat(buf, (DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func ? "exists  " : "none  "));
@@ -769,13 +769,11 @@ command_return_t mob_stat(Character *ch, Character *k)
 
   if (k->isNonPlayer())
   {
-    sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n",
-            k->mobdata->damnodice, k->mobdata->damsizedice);
+    sprintf(buf, "$3NPC Bare Hand Damage$R: %d$3d$R%d.\r\n", k->mobdata->damnodice, k->mobdata->damsizedice);
     ch->send(buf);
   }
 
-  sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\r\n",
-          IS_CARRYING_W(k), IS_CARRYING_N(k));
+  sprintf(buf, "$3Carried weight$R: %d   $3Carried items$R: %d\r\n", IS_CARRYING_W(k), IS_CARRYING_N(k));
   ch->send(buf);
 
   for (i = 0, j = k->carrying; j; j = j->next_content, i++)

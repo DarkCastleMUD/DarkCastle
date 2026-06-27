@@ -689,7 +689,7 @@ int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   //        keeper != nullptr;
   //        keeper = keeper->next_in_room )
   //    {
-  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->vnum_].non_combat_func == shop_keeper )
+  //        if ( keeper->isNonPlayer() && DC::getInstance()->mob_index.contains(keeper->mobdata->vnum_) && DC::getInstance()->mob_index[keeper->mobdata->vnum_].non_combat_func == shop_keeper )
   //            goto LFound1;
   //    }
 
@@ -841,7 +841,8 @@ void assign_the_shopkeepers()
   int shop_nr;
 
   for (shop_nr = 0; shop_nr < max_shop; shop_nr++)
-    DC::getInstance()->mob_index[DC::getInstance()->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
+    if (DC::getInstance()->mob_index.contains(DC::getInstance()->shop_index[shop_nr].keeper))
+      DC::getInstance()->mob_index[DC::getInstance()->shop_index[shop_nr].keeper].non_combat_func = shop_keeper;
 
   return;
 }
@@ -859,7 +860,7 @@ void fix_shopkeepers_inventory()
     for (keeper = DC::getInstance()->world[DC::getInstance()->shop_index[shop_nr].in_room].people; keeper != nullptr;
          keeper = keeper->next_in_room)
     {
-      if (keeper->isNonPlayer() && DC::getInstance()->mob_index[keeper->mobdata->vnum_].non_combat_func == shop_keeper)
+      if (keeper->isNonPlayer() && DC::getInstance()->mob_index.contains(keeper->mobdata->vnum_) && DC::getInstance()->mob_index[keeper->mobdata->vnum_].non_combat_func == shop_keeper)
       {
         if (keeper->carrying)
         {
@@ -1545,7 +1546,8 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
 */
 void assign_the_player_shopkeepers()
 {
-  DC::getInstance()->mob_index[PLAYER_SHOP_KEEPER].non_combat_func = player_shop_keeper;
+  if (DC::getInstance()->mob_index.contains(PLAYER_SHOP_KEEPER))
+    DC::getInstance()->mob_index[PLAYER_SHOP_KEEPER].non_combat_func = player_shop_keeper;
 }
 
 void redo_shop_profit()

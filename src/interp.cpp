@@ -1161,9 +1161,9 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
   /* special in mobile present? */
   for (k = DC::getInstance()->world[this->in_room].people; k; k = k->next_in_room)
   {
-    if (k->isNonPlayer())
+    if (k->isNonPlayer() && DC::getInstance()->mob_index.contains(k->mobdata->vnum_) && DC::getInstance()->mob_index[k->mobdata->vnum_].mob)
     {
-      if ((DC::getInstance()->mob_index[k->mobdata->vnum_].mob)->mobdata->mob_flags.type == MOB_CLAN_GUARD)
+      if (DC::getInstance()->mob_index[k->mobdata->vnum_].mob->mobdata && DC::getInstance()->mob_index[k->mobdata->vnum_].mob->mobdata->mob_flags.type == MOB_CLAN_GUARD)
       {
         retval = clan_guard(this, 0, cmd, arguments.toStdString().c_str(), k);
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
@@ -1171,8 +1171,7 @@ command_return_t Character::special(QString arguments, cmd_t cmd)
       }
       else if (DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)
       {
-        retval = ((*DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)(this, 0,
-                                                                                     cmd, arguments.toStdString().c_str(), k));
+        retval = ((*DC::getInstance()->mob_index[k->mobdata->vnum_].non_combat_func)(this, 0, cmd, arguments.toStdString().c_str(), k));
         if (isSet(retval, ReturnValue::eCH_DIED) || isSet(retval, ReturnValue::eSUCCESS))
           return retval;
       }

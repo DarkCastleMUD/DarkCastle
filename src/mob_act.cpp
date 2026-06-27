@@ -109,7 +109,7 @@ void mobile_activity(void)
       continue;
     }
 
-    if (DC::getInstance()->mob_index[ch->mobdata->vnum_].non_combat_func)
+    if (DC::getInstance()->mob_index.contains(ch->mobdata->vnum_) && DC::getInstance()->mob_index[ch->mobdata->vnum_].non_combat_func)
     {
 
       PerfTimers["mprog"].start();
