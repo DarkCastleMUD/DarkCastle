@@ -248,14 +248,14 @@ void DC::load_corpses(void)
   FILE *fp;
   char line[256] = {0};
   int t[15], zwei = 0;
-  int nr, num_objs = 0;
+  int num_objs = 0;
+  vnum_t nr{};
   class Object *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
   extra_descr_data *new_descr;
   char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = false;
-  int number = -1;
   class Object *money;
-  int debug = 0;
+  int debug = false;
 
   if (!(fp = fopen(CORPSE_FILE, "r")))
   {
@@ -278,37 +278,28 @@ void DC::load_corpses(void)
       break;
     else if (*line == '#')
     {
-      if (sscanf(line, "#%d", &nr) != 1)
+      if (sscanf(line, "#%llu", &nr) != 1)
       {
         continue;
       }
       if (debug == 1)
       {
-        sprintf(buf3, " -Loading Object: %d", nr);
+        sprintf(buf3, " -Loading Object: %llu", nr);
         logentry(buf3, 0, DC::LogChannel::LOG_MISC);
       }
       /* we have the number, check it, load obj. */
-      if (nr == -1)
+      if (nr == -1 || nr >= 999999 || !DC::getInstance()->obj_index.contains(nr))
       { /* then it is unique */
         temp = create_obj_new();
         temp->vnum_ = nr;
       }
-      else if (nr < 0)
-      {
-        continue;
-      }
       else
       {
-        if (nr >= 999999)
-          continue;
-
-        number = nr;
-        if (DC::getInstance()->obj_index.contains(number))
-          continue;
-        temp = clone_object(number);
+        temp = clone_object(nr);
         if (!temp)
         {
-          continue;
+          qWarning("clone_object(%llu) returned %p", nr, temp);
+          return;
         }
       }
 
