@@ -600,7 +600,6 @@ public:
 
   ~DC(void)
   {
-    /* TODO enable and fix all memory leaks
     remove_all_mobs_from_world();
     remove_all_objs_from_world();
     clean_socials_from_memory();
@@ -619,7 +618,6 @@ public:
     free_ban_list_from_memory();
     free_buff_pool_from_memory();
     removeDead();
-    */
   }
 
   QRandomGenerator random_;
