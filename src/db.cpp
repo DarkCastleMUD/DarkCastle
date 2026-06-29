@@ -111,7 +111,7 @@ void boot_world(void);
 void do_godlist();
 void half_chop(const char *str, char *arg1, char *arg2);
 world_file_list_item *new_mob_file_item(QString filename, vnum_t vnum);
-world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr);
+world_file_list_item *new_obj_file_item(QString filename, vnum_t vnum);
 
 QString read_next_worldfile_name(FILE *flWorldIndex);
 
@@ -1884,14 +1884,11 @@ void DC::free_mobs_from_memory(void)
 
 void DC::free_objs_from_memory(void)
 {
-  class Object *curr = nullptr;
-  // extra_descr_data * curr_extra = nullptr;
-
-  for (const auto &i : obj_index.keys())
-    if ((curr = (class Object *)obj_index[i].item))
+  for (auto &obj_index_entry : obj_index)
+    if (auto curr = obj_index_entry.item; curr)
     {
       free_obj(curr);
-      obj_index[i].item = nullptr;
+      obj_index_entry.item = {};
     }
 }
 
@@ -1940,9 +1937,9 @@ world_file_list_item *new_mob_file_item(QString filename, vnum_t vnum)
   return new_w_file_item(filename, vnum, DC::getInstance()->mob_file_list);
 }
 
-world_file_list_item *new_obj_file_item(QString filename, int32_t room_nr)
+world_file_list_item *new_obj_file_item(QString filename, vnum_t vnum)
 {
-  return new_w_file_item(filename, room_nr, DC::getInstance()->obj_file_list);
+  return new_w_file_item(filename, vnum, DC::getInstance()->obj_file_list);
 }
 
 /* load the rooms */
