@@ -218,8 +218,8 @@ private slots:
     ch->in_room = 3;
     ch->height = 72;
     ch->weight = 150;
-    Player player;
-    ch->player = &player;
+    auto player = new Player;
+    ch->player = player;
     ch->setType(Character::Type::Player);
     auto conn = new Connection;
     conn->descriptor = 1;
@@ -350,8 +350,8 @@ private slots:
     ch->height = 72;
     ch->weight = 150;
     ch->setClass(CLASS_WARRIOR);
-    Player player;
-    ch->player = &player;
+    auto player = new Player;
+    ch->player = player;
     ch->setType(Character::Type::Player);
     auto conn = new Connection;
     conn->descriptor = 1;
@@ -1101,7 +1101,6 @@ private slots:
   }
   void test_blackjack()
   {
-    return;
     DC::config cf;
     cf.sql = false;
     DC dc(cf);
@@ -1112,8 +1111,8 @@ private slots:
     auto ch = new Character(&dc);
     ch->setName(QStringLiteral("Test"));
     ch->setPosition(position_t::STANDING);
-    Player player;
-    ch->player = &player;
+    auto player = new Player;
+    ch->player = player;
     ch->setType(Character::Type::Player);
     auto conn = new Connection;
     dc.descriptor_list = conn;
