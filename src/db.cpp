@@ -110,8 +110,8 @@ void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const char *str, char *arg1, char *arg2);
-world_file_list_item *new_mob_file_item(QString filename, vnum_t vnum);
-world_file_list_item *new_obj_file_item(QString filename, vnum_t vnum);
+world_file_list_itemPtr new_mob_file_item(QString filename, vnum_t vnum);
+world_file_list_itemPtr new_obj_file_item(QString filename, vnum_t vnum);
 
 QString read_next_worldfile_name(FILE *flWorldIndex);
 
@@ -976,8 +976,6 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
   FILE *fl;
   QString temp;
   char endfile[180];
-  world_file_list_item *pItem = nullptr;
-  //  extern short code_testing_mode;
 
   DC::getInstance()->logverbose(QStringLiteral("Opening mobile file index."));
   if (DC::getInstance()->cf.test_mobs)
@@ -1022,7 +1020,7 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
       abort();
     }
 
-    pItem = new_mob_file_item(temp, vnum);
+    auto pItem = new_mob_file_item(temp, vnum);
 
     for (;;)
     {
@@ -1280,8 +1278,6 @@ void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
   FILE *flObjIndex;
   QString temp;
   char endfile[180];
-  world_file_list_item *pItem = nullptr;
-
   //  if (!bport) {
 
   if (!(flObjIndex = fopen(OBJECT_INDEX_FILE, "r")))
@@ -1316,7 +1312,7 @@ void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
       abort();
     }
 
-    pItem = new_obj_file_item(temp, vnum);
+    auto pItem = new_obj_file_item(temp, vnum);
 
     for (;;)
     {
@@ -1733,9 +1729,9 @@ void DC::set_zone_modified_zone(int32_t room)
   setZoneModified(world[room].zone);
 }
 
-auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>
+auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_itemPtr, search_error>
 {
-  world_file_list_item *world_entry = {};
+  // world_file_list_itemPtr world_entry = {};
 
   for (quint8 i = 1; i < 4; ++i)
   {
@@ -1746,10 +1742,9 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_ite
   return std::unexpected(search_error::not_found);
 }
 
-void DC::set_zone_modified(int32_t modnum, world_file_list_item *list)
+void DC::set_zone_modified(int32_t modnum, world_file_list_itemPtr list)
 {
-  world_file_list_item *curr = list;
-
+  world_file_list_itemPtr curr = list;
   while (curr)
     if (modnum >= curr->firstnum && modnum <= curr->lastnum)
       break;
@@ -1783,10 +1778,9 @@ void DC::set_zone_modified_obj(int32_t obj)
   set_zone_modified(obj, DC::getInstance()->obj_file_list);
 }
 
-void DC::set_zone_saved(int32_t modnum, world_file_list_item *list)
+void DC::set_zone_saved(int32_t modnum, world_file_list_itemPtr list)
 {
-  world_file_list_item *curr = list;
-
+  world_file_list_itemPtr curr = list;
   while (curr)
     if (modnum >= curr->firstnum && modnum <= curr->lastnum)
       break;
@@ -1821,8 +1815,6 @@ void DC::set_zone_saved_obj(int32_t obj)
 void DC::free_world_from_memory(void)
 {
   extra_descr_data *curr_extra = nullptr;
-  world_file_list_item *curr_wfli = nullptr;
-
   for (int i = 0; i <= DC::getInstance()->top_of_world; i++)
   {
     if (!DC::getInstance()->rooms.contains(i))
@@ -1857,13 +1849,10 @@ void DC::free_world_from_memory(void)
   }
   DC::getInstance()->rooms.clear();
 
-  curr_wfli = world_file_list;
-
+  auto curr_wfli = world_file_list;
   while (curr_wfli)
   {
-
     world_file_list = curr_wfli->next;
-    dc_free(curr_wfli);
     curr_wfli = world_file_list;
   }
 }
@@ -1892,15 +1881,9 @@ void DC::free_objs_from_memory(void)
     }
 }
 
-world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
+world_file_list_itemPtr one_new_world_file_item(QString filename, int32_t room_nr)
 {
-  world_file_list_item *curr = nullptr;
-
-#ifdef LEAK_CHECK
-  curr = (world_file_list_item *)calloc(1, sizeof(world_file_list_item));
-#else
-  curr = (world_file_list_item *)dc_alloc(1, sizeof(world_file_list_item));
-#endif
+  auto curr = world_file_list_itemPtr::create();
 
   curr->filename = filename;
   curr->firstnum = room_nr;
@@ -1910,10 +1893,9 @@ world_file_list_item *one_new_world_file_item(QString filename, int32_t room_nr)
   return curr;
 }
 
-world_file_list_item *new_w_file_item(QString filename, int32_t room_nr, world_file_list_item *&list)
+world_file_list_itemPtr new_w_file_item(QString filename, int32_t room_nr, world_file_list_itemPtr list)
 {
-  world_file_list_item *curr = list;
-
+  auto curr = list;
   if (!list)
   {
     list = one_new_world_file_item(filename, room_nr);
@@ -1927,17 +1909,17 @@ world_file_list_item *new_w_file_item(QString filename, int32_t room_nr, world_f
   return curr->next;
 }
 
-world_file_list_item *new_world_file_item(QString filename, int32_t room_nr)
+world_file_list_itemPtr new_world_file_item(QString filename, int32_t room_nr)
 {
   return new_w_file_item(filename, room_nr, DC::getInstance()->world_file_list);
 }
 
-world_file_list_item *new_mob_file_item(QString filename, vnum_t vnum)
+world_file_list_itemPtr new_mob_file_item(QString filename, vnum_t vnum)
 {
   return new_w_file_item(filename, vnum, DC::getInstance()->mob_file_list);
 }
 
-world_file_list_item *new_obj_file_item(QString filename, vnum_t vnum)
+world_file_list_itemPtr new_obj_file_item(QString filename, vnum_t vnum)
 {
   return new_w_file_item(filename, vnum, DC::getInstance()->obj_file_list);
 }
@@ -1950,7 +1932,6 @@ void DC::boot_world(void)
   int room_nr = 0;
   QString temp;
   char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
-  world_file_list_item *pItem = nullptr;
 
   DC::getInstance()->object_list = 0;
 
@@ -1999,8 +1980,7 @@ void DC::boot_world(void)
       abort();
     }
 
-    pItem = new_world_file_item(temp, room_nr);
-
+    auto pItem = new_world_file_item(temp, room_nr);
     while (read_one_room(fl, room_nr))
       ;
 
@@ -3426,9 +3406,7 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   //               curr->mobdata->vnum_++;
   //         });
 
-  world_file_list_item *wcurr = nullptr;
-
-  wcurr = DC::getInstance()->mob_file_list;
+  auto wcurr = DC::getInstance()->mob_file_list;
   while (wcurr)
   {
     if (wcurr->firstnum >= vnum)

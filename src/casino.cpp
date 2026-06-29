@@ -1998,11 +1998,10 @@ void save_slot_machines()
     return;
   }
 
-  world_file_list_item *curr;
   char buf[180];
   char buf2[180];
 
-  curr = DC::getInstance()->obj_file_list;
+  auto curr = DC::getInstance()->obj_file_list;
   while (curr && curr->filename != "21900-21999.obj")
     curr = curr->next;
 

@@ -330,6 +330,9 @@ public:
   level_t getLevel(void) const { return level_; }
   void setLevel(level_t level) { level_ = level; }
 };
+
+using world_file_list_itemPtr = QSharedPointer<class world_file_list_item>;
+
 class world_file_list_item
 {
 public:
@@ -337,7 +340,7 @@ public:
   vnum_t firstnum;
   vnum_t lastnum;
   int32_t flags;
-  world_file_list_item *next;
+  world_file_list_itemPtr next;
 };
 enum class create_error
 {
@@ -453,9 +456,9 @@ public:
   clan_data *end_clan_list{};
   QMap<vnum_t, class obj_index_data> obj_index;
   QMap<vnum_t, class mob_index_data> mob_index;
-  world_file_list_item *world_file_list = 0; // List of the world files
-  world_file_list_item *mob_file_list = 0;   // List of the mob files
-  world_file_list_item *obj_file_list = 0;   // List of the obj files
+  world_file_list_itemPtr world_file_list{}; // List of the world files
+  world_file_list_itemPtr mob_file_list{};   // List of the mob files
+  world_file_list_itemPtr obj_file_list{};   // List of the obj files
   class Object *object_list = 0;             // the global linked list of obj's
   class pulse_data *bard_list = 0;           // global l-list of bards
   int top_of_helpt = 0;                      // top of help index table
@@ -554,12 +557,12 @@ public:
   void free_clans_from_memory(void);
   void set_zone_saved_zone(int32_t room);
   void set_zone_modified_zone(int32_t room);
-  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_item *, search_error>;
-  void set_zone_modified(int32_t modnum, world_file_list_item *list);
+  [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_itemPtr, search_error>;
+  void set_zone_modified(int32_t modnum, world_file_list_itemPtr list);
   void set_zone_modified_world(int32_t room);
   void set_zone_modified_mob(int32_t mob);
   void set_zone_modified_obj(int32_t obj);
-  void set_zone_saved(int32_t modnum, world_file_list_item *list);
+  void set_zone_saved(int32_t modnum, world_file_list_itemPtr list);
   void set_zone_saved_world(int32_t room);
   void set_zone_saved_mob(int32_t mob);
   void set_zone_saved_obj(int32_t obj);

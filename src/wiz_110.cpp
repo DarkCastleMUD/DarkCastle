@@ -952,7 +952,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
 int do_export(Character *ch, char *args, cmd_t cmd)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
-  world_file_list_item *curr = DC::getInstance()->obj_file_list;
+  world_file_list_itemPtr curr = DC::getInstance()->obj_file_list;
 
   args = one_argument(args, export_type);
   one_argument(args, filename);

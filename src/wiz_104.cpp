@@ -751,19 +751,19 @@ int show_zone_commands(Character *ch, zone_t zone_key, quint64 start, quint64 nu
   return show_zone_commands(ch, zone, start, num_to_show, stats);
 }
 
-int find_file(world_file_list_item *itm, int high)
+int find_file(world_file_list_itemPtr itm, int high)
 {
   int i;
-  world_file_list_item *tmp;
+  world_file_list_itemPtr tmp;
   for (i = 0, tmp = itm; tmp; tmp = tmp->next, i++)
     if (tmp->lastnum / 100 == high / 100)
       return i;
   return -1;
 }
 
-void show_legacy_files(Character *ch, world_file_list_item *head)
+void show_legacy_files(Character *ch, world_file_list_itemPtr head)
 {
-  world_file_list_item *curr = head;
+  world_file_list_itemPtr curr = head;
   quint64 i = 0;
 
   ch->send("ID ) Filename                       Begin  End\r\n"
@@ -803,7 +803,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   char beginrange[MAX_INPUT_LENGTH];
   char endrange[MAX_INPUT_LENGTH];
   char type[MAX_INPUT_LENGTH];
-  world_file_list_item *curr = nullptr;
+  world_file_list_itemPtr curr = {};
   int i;
   int nr;
   int count = 0;

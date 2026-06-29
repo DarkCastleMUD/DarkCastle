@@ -989,10 +989,9 @@ void save_shop_list()
 
 void save_player_shop_world_range()
 {
-  world_file_list_item *curr;
   char buf[180];
 
-  curr = DC::getInstance()->world_file_list;
+  auto curr = DC::getInstance()->world_file_list;
   while (curr && curr->firstnum != 23000)
     curr = curr->next;
 

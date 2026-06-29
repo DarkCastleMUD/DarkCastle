@@ -4893,15 +4893,13 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 
 int do_rsave(Character *ch, char *arg, cmd_t cmd)
 {
-  world_file_list_item *curr;
-
   if (!can_modify_room(ch, ch->in_room))
   {
     ch->sendln("You may only rsave inside of the room range you are assigned to.");
     return ReturnValue::eFAILURE;
   }
 
-  curr = DC::getInstance()->world_file_list;
+  auto curr = DC::getInstance()->world_file_list;
   while (curr)
     if (curr->firstnum <= ch->in_room && curr->lastnum >= ch->in_room)
       break;
@@ -4936,7 +4934,6 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
 
 int do_msave(Character *ch, char *arg, cmd_t cmd)
 {
-  world_file_list_item *curr;
   char buf[180];
   char buf2[180];
 
@@ -4955,7 +4952,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
 
   int r = v;
 
-  curr = DC::getInstance()->mob_file_list;
+  auto curr = DC::getInstance()->mob_file_list;
   while (curr)
     if (curr->firstnum <= r && curr->lastnum >= r)
       break;
@@ -4991,7 +4988,6 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
 
 int do_osave(Character *ch, char *arg, cmd_t cmd)
 {
-  world_file_list_item *curr;
   char buf[180];
   char buf2[180];
 
@@ -5007,7 +5003,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   int r = v;
-  curr = DC::getInstance()->obj_file_list;
+  auto curr = DC::getInstance()->obj_file_list;
   while (curr)
     if (curr->firstnum <= r && curr->lastnum >= r)
       break;
