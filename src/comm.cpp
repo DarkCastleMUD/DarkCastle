@@ -2203,7 +2203,11 @@ int close_socket(class Connection *d)
   if (!d)
     return 0;
   flush_queues(d);
-  CLOSE_SOCKET(d->descriptor);
+
+  // Don't close STDOUT since testDC creates Character class objects with a Connection class descriptor set to
+  // STDOUT_FILENO across multiple tests.
+  if (d->descriptor != STDOUT_FILENO)
+    CLOSE_SOCKET(d->descriptor);
 
   /* Forget snooping */
   if (d->snooping)

@@ -685,9 +685,9 @@ private slots:
     dc.random_ = QRandomGenerator(0);
 
     QString filename;
-    if (dc.world_file_list)
+    if (!dc.world_file_list.isEmpty())
     {
-      filename = dc.world_file_list->filename;
+      filename = dc.world_file_list.first()->filename;
     }
     else
     {
@@ -713,9 +713,9 @@ private slots:
       QTextStream out(&qf);
       QTextStream out2(&qsf);
 
-      if (dc.world_file_list)
+      if (!dc.world_file_list.isEmpty())
       {
-        for (int x = dc.world_file_list->firstnum; x <= dc.world_file_list->lastnum; x++)
+        for (vnum_t x = dc.world_file_list.first()->firstnum; x <= dc.world_file_list.first()->lastnum; x++)
         {
           write_one_room(lfw, x);
           out << DC::getInstance()->world[x];
@@ -739,7 +739,7 @@ private slots:
       fstream_world_file << "$~\n";
     }
 
-    qInfo("Wrote %llu rooms to '%s'.", rooms_written, qPrintable(filename));
+    qInfo("Wrote %llu rooms to '%s'.", rooms_written, qPrintable(legacyfile_filename));
 
     auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
     auto legacyfile_checksum = checksumFile(legacyfile_filename);
@@ -973,6 +973,7 @@ private slots:
 
     auto ch = new Character(&dc);
     assert(ch);
+    ch->in_room = 3;
     ch->setName(QStringLiteral("Test"));
     auto player = new Player;
     assert(player);
@@ -1140,7 +1141,7 @@ private slots:
                            "Exits: south \r\n");
     conn->output = {};
 
-    QCOMPARE(ch->command_interpreter("list"), ReturnValue::eSUCCESS);
+    QCOMPARE(ch->command_interpreter("list"), ReturnValue::eFAILURE);
     QCOMPARE(conn->output, "Sorry, but you cannot do that here!\r\n"
                            "\x1B[1m\x1B[0m\x1B[37m");
     conn->output = {};
@@ -1380,7 +1381,7 @@ private slots:
     auto p1 = new Character(&dc), g1 = new Character(&dc), g2 = new Character(&dc), g3 = new Character(&dc), g4 = new Character(&dc);
 
     auto count = 0;
-    QStringList names = {QStringLiteral("agis"), QStringLiteral("thalanil"), QStringLiteral("elluin"), QStringLiteral("dakath"), QStringLiteral("reptar")};
+    QStringList names = {QStringLiteral("Agis"), QStringLiteral("Thalanil"), QStringLiteral("Elluin"), QStringLiteral("Dakath"), QStringLiteral("Reptar")};
     for (Character *ch : {p1, g1, g2, g3, g4})
     {
       ch->setName(names.value(count++));
@@ -1429,7 +1430,7 @@ private slots:
       ch->desc->output = {};
       p1->desc->output = {};
       QCOMPARE(do_follow(ch, str_hsh(qUtf8Printable(names[0]))), ReturnValue::eSUCCESS);
-      QCOMPARE(ch->desc->output, "You now follow agis.\r\n");
+      QCOMPARE(ch->desc->output, "You now follow Agis.\r\n");
       QCOMPARE(p1->desc->output, QStringLiteral("%1 starts following you.\r\n").arg(ch->getName().replace(0, 1, ch->getName()[0].toUpper())));
       ch->desc->output = {};
       p1->desc->output = {};
@@ -1507,7 +1508,7 @@ private slots:
 
     g1->desc->output = {};
     QCOMPARE(do_abandon(g1, str_hsh(qPrintable(names[0]))), ReturnValue::eSUCCESS);
-    QCOMPARE(g1->desc->output, "You abandon: .\r\nYou stop following agis.\r\n");
+    QCOMPARE(g1->desc->output, "You abandon: .\r\nYou stop following Agis.\r\n");
     g1->desc->output = {};
     QCOMPARE(p1->desc->output, "Thalanil abandons: .\r\nThalanil stops following you.\r\n");
     p1->desc->output = {};
@@ -1521,12 +1522,12 @@ private slots:
     g1->setHP(1000);
     g2->setHP(1000);
     // 14905, 2256, 3181
-    QVERIFY(14905 != -1);
-    QVERIFY(2256 != -1);
-    QVERIFY(3181 != -1);
-    QVERIFY(107 != -1);
-    QVERIFY(108 != -1);
-    QVERIFY(7004 != -1);
+    QVERIFY(dc.obj_index.contains(14905));
+    QVERIFY(dc.obj_index.contains(2256));
+    QVERIFY(dc.obj_index.contains(3181));
+    QVERIFY(dc.obj_index.contains(107));
+    QVERIFY(dc.obj_index.contains(108));
+    QVERIFY(dc.obj_index.contains(7004));
     QVERIFY(obj_to_char(clone_object(14905), p1));
     QVERIFY(obj_to_char(clone_object(2256), p1));
     QVERIFY(obj_to_char(clone_object(3181), p1));
@@ -1550,11 +1551,11 @@ private slots:
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%Y"), "\u001B[32m100\u001B[0m\u001B[37m "); // %Y
 
     QCOMPARE(p1->do_hit({g1->getName()}), ReturnValue::eSUCCESS);
-    QCOMPARE(p1->desc->output, "Your hit misses thalanil.\r\n");
+    QCOMPARE(p1->desc->output, "Your hit misses Thalanil.\r\n");
     QCOMPARE(p1->fighting->fighting, p1);
     g2->desc->output = {};
     QCOMPARE(g2->do_join({names[0]}), ReturnValue::eSUCCESS);
-    QCOMPARE(g2->desc->output, "ARGGGGG!!!! *** K I L L ***!!!!.\r\nYour hit tickles thalanil.\r\n");
+    QCOMPARE(g2->desc->output, "ARGGGGG!!!! *** K I L L ***!!!!.\r\nYour hit tickles Thalanil.\r\n");
     g2->desc->output = {};
 
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%C"), "<\u001B[32ma few scratches\u001B[0m\u001B[37m> "); // %C
@@ -1573,14 +1574,14 @@ private slots:
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%M"), "3456 ");                                           // %M
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%N"), "92 ");                                             // %N
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%O"), "2222 ");                                           // %O
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%P"), "\u001B[32magis\u001B[0m\u001B[37m ");              // %P
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%Q"), "\u001B[31mthalanil\u001B[0m\u001B[37m ");          // %Q
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%P"), "\u001B[32mAgis\u001B[0m\u001B[37m ");              // %P
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%Q"), "\u001B[31mThalanil\u001B[0m\u001B[37m ");          // %Q
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%R"), "\u001B[32m3014\u001B[0m\u001B[37m ");              // %R
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%S"), "4444 ");                                           // %S
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
     p1->desc->output = {};
     QCOMPARE(do_promote(p1, str_hsh(qUtf8Printable(names[2]))), ReturnValue::eSUCCESS);
-    QCOMPARE(p1->desc->output, "You step down, appointing elluin as the new leader.\r\nElluin stops following you.\r\nReptar stops following you.\r\nDakath stops following you.\r\n");
+    QCOMPARE(p1->desc->output, "You step down, appointing Elluin as the new leader.\r\nElluin stops following you.\r\nReptar stops following you.\r\nDakath stops following you.\r\n");
     p1->desc->output = {};
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%T"), "[\u001B[32ma few scratches\u001B[0m\u001B[37m] "); // %T
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%U"), "\u001B[32m2340\u001B[0m\u001B[37m ");              // %U
@@ -1596,26 +1597,26 @@ private slots:
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%_"), "%_ ");                                // %_
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%`"), "%` ");                                // %`
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%a"), "123 ");                               // %a
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%b"), "elluin ");                            // %b
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%b"), "Elluin ");                            // %b
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%c"), "<a few scratches> ");                 // %c
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%d"), "night time ");                        // %d
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%e"), "agis ");                              // %e
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%e"), "Agis ");                              // %e
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%f"), "(bleeding freely) ");                 // %f
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%g"), "40000 ");                             // %g
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%h"), "2340 ");                              // %h
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%i"), "\u001B[32m2340\u001B[0m\u001B[37m "); // %i
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%j"), "dakath ");                            // %j
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%j"), "Dakath ");                            // %j
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%k"), "1230 ");                              // %k
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%l"), "\u001B[32m1230\u001B[0m\u001B[37m "); // %l
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%m"), "3200 ");                              // %m
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%n"), "\u001B[32m3200\u001B[0m\u001B[37m "); // %n
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%o"), "%o ");                                // %o
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%p"), "agis ");                              // %p
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%q"), "thalanil ");                          // %q
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%p"), "Agis ");                              // %p
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%q"), "Thalanil ");                          // %q
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%r"), "\r\n");                               // %r
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%s"), "city ");                              // %s
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%t"), "[a few scratches] ");                 // %t
-    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%u"), "reptar ");                            // %u
+    QCOMPARE(p1->get_parsed_legacy_prompt_variable("%u"), "Reptar ");                            // %u
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%v"), "4560 ");                              // %v
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%w"), "\u001B[32m4560\u001B[0m\u001B[37m "); // %w
     QCOMPARE(p1->get_parsed_legacy_prompt_variable("%x"), "0 ");                                 // %x

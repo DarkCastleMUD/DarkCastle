@@ -1,0 +1,31 @@
+#1017
+The Roof of the Albatross Tavern~
+   You have dexterously climbed up from Stonewich and made your way to the roof
+of the Albatross Tavern!  From here there is nothing but empty air in every
+direction save down.  Above you, a shimmering island glitters in the sky.  An
+unnatural draft seems to be lifting you upwards.
+~
+6 67108868 1
+D1
+~
+~
+0 -1 1020
+D2
+~
+~
+0 -1 1001
+D3
+~
+~
+0 -1 1024
+D4
+More of the same.
+~
+~
+0 0 1037
+D5
+~
+~
+0 0 3014
+S
+$~

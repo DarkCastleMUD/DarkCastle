@@ -2001,15 +2001,15 @@ void save_slot_machines()
   char buf[180];
   char buf2[180];
 
-  auto curr = DC::getInstance()->obj_file_list;
-  while (curr && curr->filename != "21900-21999.obj")
-    curr = curr->next;
+  const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [](const auto &entry)
+                               { return entry->filename == "21900-21999.obj"; });
 
-  if (!curr)
+  if (it == DC::getInstance()->obj_file_list.cend())
   {
     logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
+  const auto &curr = *it;
 
   LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
   if (lf.isOpen())

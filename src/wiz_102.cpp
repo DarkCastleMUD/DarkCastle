@@ -4899,19 +4899,14 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  auto curr = DC::getInstance()->world_file_list;
-  while (curr)
-    if (curr->firstnum <= ch->in_room && curr->lastnum >= ch->in_room)
-      break;
-    else
-      curr = curr->next;
-
-  if (!curr)
+  const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [&ch](const auto &entry)
+                               { return entry->firstnum <= ch->in_room && entry->lastnum >= ch->in_room; });
+  if (it == DC::getInstance()->world_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
     return ReturnValue::eFAILURE;
   }
-
+  const auto &curr = *it;
   if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   {
     ch->sendln("This range has not been modified.");
@@ -4952,18 +4947,15 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
 
   int r = v;
 
-  auto curr = DC::getInstance()->mob_file_list;
-  while (curr)
-    if (curr->firstnum <= r && curr->lastnum >= r)
-      break;
-    else
-      curr = curr->next;
+  const auto &it = std::find_if(DC::getInstance()->mob_file_list.cbegin(), DC::getInstance()->mob_file_list.cend(), [&r](const auto &entry)
+                                { return entry->firstnum <= r && entry->lastnum >= r; });
 
-  if (!curr)
+  if (it == DC::getInstance()->mob_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
     return ReturnValue::eFAILURE;
   }
+  const auto &curr = *it;
 
   if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   { // this is okay...world_file_saved is used in all
@@ -5003,18 +4995,15 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   int r = v;
-  auto curr = DC::getInstance()->obj_file_list;
-  while (curr)
-    if (curr->firstnum <= r && curr->lastnum >= r)
-      break;
-    else
-      curr = curr->next;
 
-  if (!curr)
+  const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [&r](const auto &entry)
+                               { return entry->firstnum <= r && entry->lastnum >= r; });
+  if (it == DC::getInstance()->obj_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
     return ReturnValue::eFAILURE;
   }
+  const auto &curr = *it;
 
   if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   {

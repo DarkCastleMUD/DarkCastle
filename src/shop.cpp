@@ -991,16 +991,16 @@ void save_player_shop_world_range()
 {
   char buf[180];
 
-  auto curr = DC::getInstance()->world_file_list;
-  while (curr && curr->firstnum != 23000)
-    curr = curr->next;
+  const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [](const auto &entry)
+                               { return entry->firstnum == 23000; });
 
-  if (!curr)
+  if (it == DC::getInstance()->world_file_list.cend())
   {
     // panic!
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files: no world_file_list entries contain firstnum value 2300.");
     exit(1);
   }
+  const auto &curr = *it;
 
   LegacyFile lf("world", curr->filename, "Couldn't open room save file %1 for player shops.");
   if (lf.isOpen())

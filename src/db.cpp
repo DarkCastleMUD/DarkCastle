@@ -1695,12 +1695,12 @@ bool can_modify_this_mobile(Character *ch, int32_t vnum)
   return true;
 }
 
-bool can_modify_mobile(Character *ch, int32_t mob)
+bool can_modify_mobile(Character *ch, vnum_t vnum)
 {
-  return can_modify_this_mobile(ch, mob);
+  return can_modify_this_mobile(ch, vnum);
 }
 
-bool can_modify_this_object(Character *ch, int32_t vnum)
+bool can_modify_this_object(Character *ch, vnum_t vnum)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
@@ -1714,9 +1714,9 @@ bool can_modify_this_object(Character *ch, int32_t vnum)
   return true;
 }
 
-bool can_modify_object(Character *ch, int32_t obj)
+bool can_modify_object(Character *ch, vnum_t vnum)
 {
-  return can_modify_this_object(ch, obj);
+  return can_modify_this_object(ch, vnum);
 }
 
 void DC::set_zone_saved_zone(int32_t room)
@@ -1742,23 +1742,19 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_ite
   return std::unexpected(search_error::not_found);
 }
 
-void DC::set_zone_modified(int32_t modnum, world_file_list_itemPtr list)
+void DC::set_zone_modified(vnum_t vnum, world_file_list_t &list)
 {
-  world_file_list_itemPtr curr = list;
-  while (curr)
-    if (modnum >= curr->firstnum && modnum <= curr->lastnum)
-      break;
-    else
-      curr = curr->next;
+  auto it = std::find_if(list.begin(), list.end(), [vnum](auto &entry)
+                         { return vnum >= entry->firstnum && vnum <= entry->lastnum; });
 
-  if (!curr)
+  if (it == list.end())
   {
-    auto world_file = findWorldFileWithVNUM(modnum);
-    logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(modnum));
+    auto world_file = findWorldFileWithVNUM(vnum);
+    logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(vnum));
     return;
   }
 
-  curr->flags = WORLD_FILE_MODIFIED;
+  (*it)->flags = WORLD_FILE_MODIFIED;
 }
 
 void DC::set_zone_modified_world(int32_t room)
@@ -1767,33 +1763,29 @@ void DC::set_zone_modified_world(int32_t room)
 }
 
 // rnum of mob
-void DC::set_zone_modified_mob(int32_t mob)
+void DC::set_zone_modified_mob(vnum_t vnum)
 {
-  set_zone_modified(mob, DC::getInstance()->mob_file_list);
+  set_zone_modified(vnum, mob_file_list);
 }
 
 // rnum of mob
-void DC::set_zone_modified_obj(int32_t obj)
+void DC::set_zone_modified_obj(vnum_t vnum)
 {
-  set_zone_modified(obj, DC::getInstance()->obj_file_list);
+  set_zone_modified(vnum, obj_file_list);
 }
 
-void DC::set_zone_saved(int32_t modnum, world_file_list_itemPtr list)
+void DC::set_zone_saved(room_t room, world_file_list_t &list)
 {
-  world_file_list_itemPtr curr = list;
-  while (curr)
-    if (modnum >= curr->firstnum && modnum <= curr->lastnum)
-      break;
-    else
-      curr = curr->next;
+  auto it = std::find_if(list.begin(), list.end(), [room](auto &entry)
+                         { return room >= entry->firstnum && room <= entry->lastnum; });
 
-  if (!curr)
+  if (it == list.end())
   {
     logentry(QStringLiteral("ERROR in set_zone_modified: Cannot find room!!!"), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
-  REMOVE_BIT(curr->flags, WORLD_FILE_MODIFIED);
+  REMOVE_BIT((*it)->flags, WORLD_FILE_MODIFIED);
 }
 
 void DC::set_zone_saved_world(int32_t room)
@@ -1801,74 +1793,63 @@ void DC::set_zone_saved_world(int32_t room)
   set_zone_saved(room, world_file_list);
 }
 
-void DC::set_zone_saved_mob(int32_t mob)
+void DC::set_zone_saved_mob(vnum_t vnum)
 {
-  set_zone_saved(mob, DC::getInstance()->mob_file_list);
+  set_zone_saved(vnum, mob_file_list);
 }
 
-void DC::set_zone_saved_obj(int32_t obj)
+void DC::set_zone_saved_obj(vnum_t vnum)
 {
-  set_zone_saved(obj, DC::getInstance()->obj_file_list);
+  set_zone_saved(vnum, obj_file_list);
 }
 
 /* de the world */
 void DC::free_world_from_memory(void)
 {
   extra_descr_data *curr_extra = nullptr;
-  for (int i = 0; i <= DC::getInstance()->top_of_world; i++)
+  for (auto &i : rooms.keys())
   {
-    if (!DC::getInstance()->rooms.contains(i))
-      continue;
+    if (world[i].name)
+      dc_free(world[i].name);
 
-    if (DC::getInstance()->world[i].name)
-      dc_free(DC::getInstance()->world[i].name);
+    if (world[i].description)
+      dc_free(world[i].description);
 
-    if (DC::getInstance()->world[i].description)
-      dc_free(DC::getInstance()->world[i].description);
-
-    while (DC::getInstance()->world[i].ex_description)
+    while (world[i].ex_description)
     {
-      curr_extra = DC::getInstance()->world[i].ex_description->next;
-      if (DC::getInstance()->world[i].ex_description->keyword)
-        dc_free(DC::getInstance()->world[i].ex_description->keyword);
-      if (DC::getInstance()->world[i].ex_description->description)
-        dc_free(DC::getInstance()->world[i].ex_description->description);
-      dc_free(DC::getInstance()->world[i].ex_description);
-      DC::getInstance()->world[i].ex_description = curr_extra;
+      curr_extra = world[i].ex_description->next;
+      if (world[i].ex_description->keyword)
+        dc_free(world[i].ex_description->keyword);
+      if (world[i].ex_description->description)
+        dc_free(world[i].ex_description->description);
+      dc_free(world[i].ex_description);
+      world[i].ex_description = curr_extra;
     }
 
     for (int j = 0; j < 6; j++)
-      if (DC::getInstance()->world[i].dir_option[j])
+      if (world[i].dir_option[j])
       {
-        dc_free(DC::getInstance()->world[i].dir_option[j]->general_description);
-        dc_free(DC::getInstance()->world[i].dir_option[j]->keyword);
-        dc_free(DC::getInstance()->world[i].dir_option[j]);
+        dc_free(world[i].dir_option[j]->general_description);
+        dc_free(world[i].dir_option[j]->keyword);
+        dc_free(world[i].dir_option[j]);
       }
 
-    DC::getInstance()->world[i].FreeTracks();
+    world[i].FreeTracks();
   }
-  DC::getInstance()->rooms.clear();
+  rooms.clear();
 
-  auto curr_wfli = world_file_list;
-  while (curr_wfli)
-  {
-    world_file_list = curr_wfli->next;
-    curr_wfli = world_file_list;
-  }
+  world_file_list.clear();
 }
 
 void DC::free_mobs_from_memory(void)
 {
-  Character *curr = nullptr;
-
-  for (const auto &vnum : mob_index.keys())
-  {
-    if ((curr = (Character *)mob_index[vnum].mob))
+  for (auto &mob_index_entry : mob_index)
+    if (auto curr = mob_index_entry.mob; curr)
     {
-      free_char(curr, Trace("free_mobs_from_memory"));
-      mob_index[vnum].mob = {};
+      free_char(curr);
+      mob_index_entry.mob = {};
     }
-  }
+  mob_index.clear();
 }
 
 void DC::free_objs_from_memory(void)
@@ -1879,6 +1860,7 @@ void DC::free_objs_from_memory(void)
       free_obj(curr);
       obj_index_entry.item = {};
     }
+  obj_index.clear();
 }
 
 world_file_list_itemPtr one_new_world_file_item(QString filename, int32_t room_nr)
@@ -1889,24 +1871,14 @@ world_file_list_itemPtr one_new_world_file_item(QString filename, int32_t room_n
   curr->firstnum = room_nr;
   curr->lastnum = -1;
   curr->flags = 0;
-  curr->next = nullptr;
   return curr;
 }
 
-world_file_list_itemPtr new_w_file_item(QString filename, int32_t room_nr, world_file_list_itemPtr list)
+world_file_list_itemPtr new_w_file_item(QString filename, int32_t room_nr, world_file_list_t &list)
 {
-  auto curr = list;
-  if (!list)
-  {
-    list = one_new_world_file_item(filename, room_nr);
-    return list;
-  }
-
-  while (curr->next)
-    curr = curr->next;
-
-  curr->next = one_new_world_file_item(filename, room_nr);
-  return curr->next;
+  auto curr = one_new_world_file_item(filename, room_nr);
+  list.push_back(curr);
+  return curr;
 }
 
 world_file_list_itemPtr new_world_file_item(QString filename, int32_t room_nr)
@@ -3315,17 +3287,6 @@ auto DC::create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>
   DC::getInstance()->obj_index[vnum].combat_func = 0;
   DC::getInstance()->obj_index[vnum].item = obj;
 
-  auto wcurr = DC::getInstance()->obj_file_list;
-  while (wcurr)
-  {
-    if (wcurr->firstnum >= vnum)
-      wcurr->firstnum++;
-
-    if (wcurr->lastnum >= vnum - 1)
-      wcurr->lastnum++;
-
-    wcurr = wcurr->next;
-  }
   return vnum;
 }
 
@@ -3406,18 +3367,6 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   //               curr->mobdata->vnum_++;
   //         });
 
-  auto wcurr = DC::getInstance()->mob_file_list;
-  while (wcurr)
-  {
-    if (wcurr->firstnum >= vnum)
-      wcurr->firstnum++;
-
-    if (wcurr->lastnum >= vnum - 1)
-      wcurr->lastnum++;
-
-    wcurr = wcurr->next;
-  }
-
   /*
    Shop fixes follow.
    */
@@ -3453,20 +3402,10 @@ void delete_item_from_index(vnum_t vnum)
   if (!DC::getInstance()->obj_index.contains(vnum))
     return;
 
-  dc_free(DC::getInstance()->obj_index[vnum].item);
+  if (DC::getInstance()->obj_index[vnum].item)
+    dc_free(DC::getInstance()->obj_index[vnum].item);
 
   DC::getInstance()->obj_index.remove(vnum);
-
-  auto wcurr = DC::getInstance()->obj_file_list;
-  while (wcurr)
-  {
-    if (wcurr->firstnum > vnum)
-      wcurr->firstnum--;
-
-    if (wcurr->lastnum >= vnum)
-      wcurr->lastnum--;
-    wcurr = wcurr->next;
-  }
 }
 
 QString qDebugQTextStreamLine(QTextStream &stream, QString message)

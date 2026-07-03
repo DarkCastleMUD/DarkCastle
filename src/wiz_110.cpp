@@ -952,8 +952,6 @@ void write_array_csv(QStringList names, std::ofstream &fout)
 int do_export(Character *ch, char *args, cmd_t cmd)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
-  world_file_list_itemPtr curr = DC::getInstance()->obj_file_list;
-
   args = one_argument(args, export_type);
   one_argument(args, filename);
 
@@ -980,13 +978,12 @@ int do_export(Character *ch, char *args, cmd_t cmd)
 
     fout << "affects" << std::endl;
 
-    while (curr)
+    //  world_file_list_itemPtr curr = DC::getInstance()->obj_file_list;
+
+    for (const auto &obj_index_entry : DC::getInstance()->obj_index)
     {
-      for (int x = curr->firstnum; x <= curr->lastnum; x++)
-      {
-        write_object_csv(DC::getInstance()->obj_index[x].item, fout);
-      }
-      curr = curr->next;
+      if (obj_index_entry.item)
+        write_object_csv(obj_index_entry.item, fout);
     }
 
     fout.close();
@@ -1008,10 +1005,9 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
 
   if (args == "rename")
   {
-    auto world = DC::getInstance()->world_file_list;
-    while (world != nullptr)
+    for (const auto &world : DC::getInstance()->world_file_list)
     {
-      QString potential_filename = QStringLiteral("%1-%2.txt").arg(world->firstnum).arg(world->lastnum);
+      QString potential_filename = u"%1-%2.txt"_s.arg(world->firstnum).arg(world->lastnum);
       if (world->filename != potential_filename)
       {
         ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
@@ -1027,7 +1023,6 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
           }
         }
       }
-      world = world->next;
     }
   }
 

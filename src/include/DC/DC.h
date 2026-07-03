@@ -332,6 +332,7 @@ public:
 };
 
 using world_file_list_itemPtr = QSharedPointer<class world_file_list_item>;
+using world_file_list_t = QList<world_file_list_itemPtr>;
 
 class world_file_list_item
 {
@@ -340,7 +341,6 @@ public:
   vnum_t firstnum;
   vnum_t lastnum;
   int32_t flags;
-  world_file_list_itemPtr next;
 };
 enum class create_error
 {
@@ -456,14 +456,14 @@ public:
   clan_data *end_clan_list{};
   QMap<vnum_t, class obj_index_data> obj_index;
   QMap<vnum_t, class mob_index_data> mob_index;
-  world_file_list_itemPtr world_file_list{}; // List of the world files
-  world_file_list_itemPtr mob_file_list{};   // List of the mob files
-  world_file_list_itemPtr obj_file_list{};   // List of the obj files
-  class Object *object_list = 0;             // the global linked list of obj's
-  class pulse_data *bard_list = 0;           // global l-list of bards
-  int top_of_helpt = 0;                      // top of help index table
-  int new_top_of_helpt = 0;                  // top of help index table
-  room_t top_of_world_alloc = 0;             // index of last alloc'd memory in world
+  world_file_list_t world_file_list{}; // List of the world files
+  world_file_list_t mob_file_list{};   // List of the mob files
+  world_file_list_t obj_file_list{};   // List of the obj files
+  class Object *object_list = 0;       // the global linked list of obj's
+  class pulse_data *bard_list = 0;     // global l-list of bards
+  int top_of_helpt = 0;                // top of help index table
+  int new_top_of_helpt = 0;            // top of help index table
+  room_t top_of_world_alloc = 0;       // index of last alloc'd memory in world
   room_t top_of_world = 0;
   int total_rooms = 0; // total amount of rooms in memory
   AuctionHouse TheAuctionHouse;
@@ -558,14 +558,14 @@ public:
   void set_zone_saved_zone(int32_t room);
   void set_zone_modified_zone(int32_t room);
   [[nodiscard]] auto findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_itemPtr, search_error>;
-  void set_zone_modified(int32_t modnum, world_file_list_itemPtr list);
+  void set_zone_modified(vnum_t mob, world_file_list_t &list);
   void set_zone_modified_world(int32_t room);
-  void set_zone_modified_mob(int32_t mob);
-  void set_zone_modified_obj(int32_t obj);
-  void set_zone_saved(int32_t modnum, world_file_list_itemPtr list);
+  void set_zone_modified_mob(vnum_t mob);
+  void set_zone_modified_obj(vnum_t obj);
+  void set_zone_saved(vnum_t mob, world_file_list_t &list);
   void set_zone_saved_world(int32_t room);
-  void set_zone_saved_mob(int32_t mob);
-  void set_zone_saved_obj(int32_t obj);
+  void set_zone_saved_mob(vnum_t vnum);
+  void set_zone_saved_obj(vnum_t vnum);
   void free_world_from_memory(void);
   void free_mobs_from_memory(void);
   void free_objs_from_memory(void);

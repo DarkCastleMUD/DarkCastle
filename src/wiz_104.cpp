@@ -751,25 +751,14 @@ int show_zone_commands(Character *ch, zone_t zone_key, quint64 start, quint64 nu
   return show_zone_commands(ch, zone, start, num_to_show, stats);
 }
 
-int find_file(world_file_list_itemPtr itm, int high)
+void show_legacy_files(Character *ch, const world_file_list_t &list)
 {
-  int i;
-  world_file_list_itemPtr tmp;
-  for (i = 0, tmp = itm; tmp; tmp = tmp->next, i++)
-    if (tmp->lastnum / 100 == high / 100)
-      return i;
-  return -1;
-}
-
-void show_legacy_files(Character *ch, world_file_list_itemPtr head)
-{
-  world_file_list_itemPtr curr = head;
   quint64 i = 0;
 
   ch->send("ID ) Filename                       Begin  End\r\n"
            "----------------------------------------------------------\r\n");
 
-  while (curr != nullptr)
+  for (const auto &curr : list)
   {
     QString file_in_progress, file_ready, file_approved, file_modified;
     if (isSet(curr->flags, WORLD_FILE_IN_PROGRESS))
@@ -793,7 +782,6 @@ void show_legacy_files(Character *ch, world_file_list_itemPtr head)
     }
 
     ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
-    curr = curr->next;
   }
 }
 
