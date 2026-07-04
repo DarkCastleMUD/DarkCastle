@@ -586,7 +586,7 @@ bool AuctionHouse::IsName(QString name, int vnum)
 /*
 IS AUCTION HOUSE?
 */
-bool AuctionHouse::IsAuctionHouse(int room)
+bool AuctionHouse::IsAuctionHouse(room_t room)
 {
   if (auction_rooms.end() == auction_rooms.find(room))
     return false;
@@ -614,7 +614,7 @@ void AuctionHouse::ListRooms(Character *ch)
 /*
 ADD ROOM
 */
-void AuctionHouse::AddRoom(Character *ch, int room)
+void AuctionHouse::AddRoom(Character *ch, room_t room)
 {
   if (auction_rooms.end() == auction_rooms.find(room))
   {
@@ -632,7 +632,7 @@ void AuctionHouse::AddRoom(Character *ch, int room)
 /*
 REMOVE ROOM
 */
-void AuctionHouse::RemoveRoom(Character *ch, int room)
+void AuctionHouse::RemoveRoom(Character *ch, room_t room)
 {
   if (1 == auction_rooms.remove(room))
   {
@@ -683,7 +683,7 @@ void AuctionHouse::Load()
 
   FILE *the_file;
   unsigned int num_rooms, num_items, ticket, i, state;
-  int room;
+  room_t room;
   char *nl;
   char buf[MAX_STRING_LENGTH];
   AuctionTicket InTicket;
@@ -701,7 +701,7 @@ void AuctionHouse::Load()
 
   for (i = 0; i < num_rooms; i++)
   {
-    fscanf(the_file, "%d\n", &room);
+    fscanf(the_file, "%llu\n", &room);
     auction_rooms[room] = 1;
   }
 
@@ -2014,7 +2014,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Add what room?\r\nSyntax: vend addroom <vnum>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.AddRoom(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.AddRoom(ch, atoll(buf));
     return ReturnValue::eSUCCESS;
   }
 
@@ -2027,7 +2027,7 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Remove what room?\r\nSyntax: vend removeroom <vnum>");
       return ReturnValue::eSUCCESS;
     }
-    DC::getInstance()->TheAuctionHouse.RemoveRoom(ch, atoi(buf));
+    DC::getInstance()->TheAuctionHouse.RemoveRoom(ch, atoll(buf));
     return ReturnValue::eSUCCESS;
   }
 

@@ -1014,7 +1014,7 @@ bool ARE_CLANNED(Character *sub, Character *obj)
   return true;
 }
 
-int DARK_AMOUNT(int room)
+int DARK_AMOUNT(room_t room)
 {
   int glow = DC::getInstance()->world[room].light;
 
@@ -1039,7 +1039,7 @@ int DARK_AMOUNT(int room)
 // 0 to + is light
 // -1 to - is dark
 // SUN_DARK = -1
-bool IS_DARK(int room)
+bool IS_DARK(room_t room)
 {
   int glow = DARK_AMOUNT(room);
 
@@ -2551,7 +2551,7 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
   }
 }
 
-bool check_make_camp(int room)
+bool check_make_camp(room_t room)
 {
   Character *i, *next_i;
   bool campok = false;
@@ -2848,7 +2848,7 @@ char *numToStringTH(int number)
   }
 }
 
-bool champion_can_go(int room)
+bool champion_can_go(room_t room)
 {
   try
   {
@@ -2935,7 +2935,7 @@ std::string joinstring(std::vector<std::string> joinme, std::string delims, bool
   return result;
 }
 
-bool class_can_go(int ch_class, int room)
+bool class_can_go(int ch_class, room_t room)
 {
   bool classRestrictions = false;
 

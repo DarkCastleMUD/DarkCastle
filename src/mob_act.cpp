@@ -45,7 +45,7 @@ void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);
 bool is_protected(Character *vict, Character *ch);
 void scavenge(Character *ch);
-bool is_r_denied(Character *ch, int room)
+bool is_r_denied(Character *ch, room_t room)
 {
   deny_data *d;
   if (ch->isPlayer())

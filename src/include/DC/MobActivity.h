@@ -21,18 +21,18 @@ public:
 class Path : public std::map<int, int>
 {
 private:
-  bool findRoom(int from, int to, int steps, int leaststeps, char *buf);
+  bool findRoom(room_t from, room_t to, int steps, int leaststeps, char *buf);
   void resetPath();
-  int leastSteps(int from, int to, int val, int *bestval);
+  int leastSteps(room_t from, room_t to, int val, int *bestval);
 
 public:
   class Path *next; // main Path list
 
-  char *determineRoute(Character *, int, int); // ch, from, to
-  void addRoom(Character *, int, bool);        // ch, room, IgnoreConnectingIssues
+  char *determineRoute(Character *, room_t, room_t); // ch, from, to
+  void addRoom(Character *, room_t, bool);           // ch, room, IgnoreConnectingIssues
 
-  bool isRoomPathed(int room);
-  bool isRoomConnected(int room);
+  bool isRoomPathed(room_t room);
+  bool isRoomConnected(room_t room);
   bool isPathConnected(class Path *pa);
   int connectRoom(class Path *);
   path_data *p;

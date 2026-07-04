@@ -105,7 +105,7 @@ weather_data weather_info; /* the infomation about the weather */
 vault_data *vault_table = 0;
 
 /* local procedures */
-void setup_dir(FILE *fl, int room, int dir);
+void setup_dir(FILE *fl, room_t room, int dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
@@ -1427,7 +1427,7 @@ void write_one_room(LegacyFile &lf, int a)
   fprintf(f, "S\n");
 }
 
-int DC::read_one_room(FILE *fl, int &room_nr)
+bool DC::read_one_room(FILE *fl, room_t &room_nr)
 {
   char *temp = nullptr;
   char ch = 0;
@@ -1443,7 +1443,7 @@ int DC::read_one_room(FILE *fl, int &room_nr)
 
     if (load_debug)
     {
-      printf("Reading Room #: %d\n", room_nr);
+      printf("Reading Room #: %llu\n", room_nr);
       fflush(stdout);
     }
 
@@ -1719,12 +1719,12 @@ bool can_modify_object(Character *ch, vnum_t vnum)
   return can_modify_this_object(ch, vnum);
 }
 
-void DC::set_zone_saved_zone(int32_t room)
+void DC::set_zone_saved_zone(room_t room)
 {
   setZoneNotModified(world[room].zone);
 }
 
-void DC::set_zone_modified_zone(int32_t room)
+void DC::set_zone_modified_zone(room_t room)
 {
   setZoneModified(world[room].zone);
 }
@@ -1757,7 +1757,7 @@ void DC::set_zone_modified(vnum_t vnum, world_file_list_t &list)
   (*it)->flags = WORLD_FILE_MODIFIED;
 }
 
-void DC::set_zone_modified_world(int32_t room)
+void DC::set_zone_modified_world(room_t room)
 {
   set_zone_modified(room, world_file_list);
 }
@@ -1788,7 +1788,7 @@ void DC::set_zone_saved(room_t room, world_file_list_t &list)
   REMOVE_BIT((*it)->flags, WORLD_FILE_MODIFIED);
 }
 
-void DC::set_zone_saved_world(int32_t room)
+void DC::set_zone_saved_world(room_t room)
 {
   set_zone_saved(room, world_file_list);
 }
@@ -1863,7 +1863,7 @@ void DC::free_objs_from_memory(void)
   obj_index.clear();
 }
 
-world_file_list_itemPtr one_new_world_file_item(QString filename, int32_t room_nr)
+world_file_list_itemPtr one_new_world_file_item(QString filename, room_t room_nr)
 {
   auto curr = world_file_list_itemPtr::create();
 
@@ -1874,14 +1874,14 @@ world_file_list_itemPtr one_new_world_file_item(QString filename, int32_t room_n
   return curr;
 }
 
-world_file_list_itemPtr new_w_file_item(QString filename, int32_t room_nr, world_file_list_t &list)
+world_file_list_itemPtr new_w_file_item(QString filename, room_t room_nr, world_file_list_t &list)
 {
   auto curr = one_new_world_file_item(filename, room_nr);
   list.push_back(curr);
   return curr;
 }
 
-world_file_list_itemPtr new_world_file_item(QString filename, int32_t room_nr)
+world_file_list_itemPtr new_world_file_item(QString filename, room_t room_nr)
 {
   return new_w_file_item(filename, room_nr, DC::getInstance()->world_file_list);
 }
@@ -1901,7 +1901,7 @@ void DC::boot_world(void)
 {
   FILE *fl;
   FILE *flWorldIndex;
-  int room_nr = 0;
+  room_t room_nr = {};
   QString temp;
   char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
@@ -1975,7 +1975,7 @@ void DC::boot_world(void)
 }
 
 /* read direction data */
-void setup_dir(FILE *fl, int room, int dir)
+void setup_dir(FILE *fl, room_t room, int dir)
 {
   int tmp;
 
@@ -2088,7 +2088,7 @@ int DC::create_one_room(Character *ch, int vnum)
 
 void renum_world(void)
 {
-  int room, door;
+  room_t room, door;
 
   for (room = 0; room <= DC::getInstance()->top_of_world; room++)
     for (door = 0; door <= 5; door++)

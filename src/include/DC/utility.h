@@ -160,8 +160,8 @@ bool is_hiding(Character *ch, Character *vict);
 
 #define IS_AFFECTED(ch, skill) (ISSET((ch)->affected_by, (skill)))
 
-int DARK_AMOUNT(int room);
-bool IS_DARK(int room);
+int DARK_AMOUNT(room_t room);
+bool IS_DARK(room_t room);
 #define IS_LIGHT(room) (!IS_DARK(room))
 
 #define IS_ARENA(room) (isSet(DC::getInstance()->world[room].room_flags, ARENA))
@@ -639,7 +639,7 @@ void ansi_color(const char *txt, Character *ch);
 void send_to_char(QString messg, Character *ch);
 void send_to_char_nosp(const char *messg, Character *ch);
 void send_to_char_nosp(QString messg, Character *ch);
-void send_to_room(QString messg, int room, bool awakeonly = false, Character *nta = nullptr);
+void send_to_room(QString messg, room_t room, bool awakeonly = false, Character *nta = nullptr);
 void record_track_data(Character *ch, cmd_t cmd);
 int write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(const std::string txt, std::queue<std::string> &queue);
@@ -882,8 +882,8 @@ void remove_familiars(QString name, BACKUP_TYPE backup = NONE);
 std::string replaceString(std::string message, std::string find, std::string replace);
 QString replaceString(QString message, QString find, QString replace);
 char *numToStringTH(int);
-bool champion_can_go(int room);
-bool class_can_go(int ch_class, int room);
+bool champion_can_go(room_t room);
+bool class_can_go(int ch_class, room_t room);
 
 QString find_profession(int c_class, uint8_t profession);
 

@@ -32,7 +32,7 @@
 
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 
-int move_player(Character *ch, int room)
+int move_player(Character *ch, room_t room)
 {
   int retval;
 

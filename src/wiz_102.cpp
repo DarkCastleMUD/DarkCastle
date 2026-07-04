@@ -5030,7 +5030,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 {
   FILE *fl;
   char buf[200], bufl[200] /*,buf2[200],buf3[200]*/;
-  int room = 1, x, door /*,direction*/;
+  room_t room = 1, x, door /*,direction*/;
   int pos;
   int value;
   int low, high;

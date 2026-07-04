@@ -262,7 +262,7 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
 command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 {
   Character *victim{};
-  int room{};
+  room_t room{};
 
   void remove_clan_member(int clannumber, Character *ch);
 

@@ -3074,7 +3074,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     }
 
     Character *owner = 0;
-    int room = 0;
+    room_t room = 0;
     if (i->equipped_by)
     {
       owner = i->equipped_by;

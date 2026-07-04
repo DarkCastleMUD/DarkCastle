@@ -56,7 +56,7 @@ int move_obj(Object *obj, Object *dest_obj);
 int obj_to_char(class Object *object, Character *ch);
 int obj_from_char(class Object *object);
 
-int obj_to_room(class Object *object, int room);
+int obj_to_room(class Object *object, room_t room);
 int obj_from_room(class Object *object);
 
 int obj_to_obj(class Object *obj, class Object *obj_to);

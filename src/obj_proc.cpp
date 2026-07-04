@@ -1735,7 +1735,7 @@ int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
 int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
                       Character *invoker)
 {
-  int32_t room = 17840;
+  room_t room = 17840;
 
   if (cmd == cmd_t::UNDEFINED)
   {

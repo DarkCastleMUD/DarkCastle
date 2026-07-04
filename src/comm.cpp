@@ -2744,7 +2744,7 @@ void send_to_zone(char *messg, int zone)
   }
 }
 
-void send_to_room(QString messg, int room, bool awakeonly, Character *nta)
+void send_to_room(QString messg, room_t room, bool awakeonly, Character *nta)
 {
   Character *i = nullptr;
 

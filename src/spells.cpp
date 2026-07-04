@@ -68,7 +68,7 @@ int spl_lvl(int lev);
 
 // Extern procedures
 void make_dust(Character *ch);
-int say_spell(Character *ch, int si, int room = 0);
+int say_spell(Character *ch, int si, room_t room = 0);
 
 #if (0)
 uint8_t beats;               /* Waiting time after spell     */
@@ -1287,7 +1287,7 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
   }
 }
 
-int say_spell(Character *ch, int si, int room)
+int say_spell(Character *ch, int si, room_t room)
 {
   char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
   char buf2[MAX_STRING_LENGTH];

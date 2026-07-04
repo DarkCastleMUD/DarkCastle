@@ -32,7 +32,7 @@ path_data *newPath()
   return p;
 }
 
-bool Path::isRoomConnected(int room)
+bool Path::isRoomConnected(room_t room)
 {
   path_data *p;
   int i;
@@ -46,7 +46,7 @@ bool Path::isRoomConnected(int room)
   return false;
 }
 
-bool Path::isRoomPathed(int room)
+bool Path::isRoomPathed(room_t room)
 {
   path_data *p;
 
@@ -57,7 +57,7 @@ bool Path::isRoomPathed(int room)
   return false;
 }
 
-char *Path::determineRoute(Character *ch, int from, int to)
+char *Path::determineRoute(Character *ch, room_t from, room_t to)
 {
   int i;
 
@@ -88,7 +88,7 @@ void Path::resetPath()
     (*iter).second = 1000;
 }
 
-bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
+bool Path::findRoom(room_t from, room_t to, int steps, int leastSteps, char *buf)
 {
   if (steps > leastSteps)
     return false; // Longer than the shortest path known. fuck it.
@@ -122,7 +122,7 @@ bool Path::findRoom(int from, int to, int steps, int leastSteps, char *buf)
   return false;
 }
 
-int Path::leastSteps(int from, int to, int val, int *bestval)
+int Path::leastSteps(room_t from, room_t to, int val, int *bestval)
 {
   if (val > (*this)[from])
     return *bestval; // Already been here.
@@ -159,7 +159,7 @@ bool Path::isPathConnected(class Path *pa)
   return false;
 }
 
-void Path::addRoom(Character *ch, int room, bool IgnoreConnectingIssues)
+void Path::addRoom(Character *ch, room_t room, bool IgnoreConnectingIssues)
 {
 
   // Used at times with ch == nullptr

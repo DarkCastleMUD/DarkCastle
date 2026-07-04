@@ -624,7 +624,7 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(numrooms = atoi(arg2)))
+  if (!(numrooms = atoll(arg2)))
   {
     sprintf(err, "Usage: install <range #> <# of rooms> <world|obj|mob|zone|all>\r\n"
                  "  ie.. install 29100 100 m = installs mob range 29100-29199.\r\n");

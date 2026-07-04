@@ -3345,7 +3345,7 @@ int obj_from_char(class Object *object)
 }
 
 // put an object in a room
-int obj_to_room(class Object *object, int room)
+int obj_to_room(class Object *object, room_t room)
 {
   class Object *obj;
 

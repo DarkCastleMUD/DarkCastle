@@ -132,10 +132,10 @@ public:
 };
 
 /* public procedures in db.c */
-bool can_modify_this_room(Character *ch, int32_t room);
-bool can_modify_room(Character *ch, int32_t room);
-bool can_modify_mobile(Character *ch, int32_t room);
-bool can_modify_object(Character *ch, int32_t room);
+bool can_modify_this_room(Character *ch, room_t room);
+bool can_modify_room(Character *ch, room_t room);
+bool can_modify_mobile(Character *ch, room_t room);
+bool can_modify_object(Character *ch, room_t room);
 
 void write_one_room(LegacyFile &fl, int nr);
 void write_mobile(LegacyFile &lf, Character *mob);

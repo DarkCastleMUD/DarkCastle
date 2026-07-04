@@ -176,7 +176,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
   char name[MAX_INPUT_LENGTH + 1]{};
   char buf[MAX_STRING_LENGTH]{};
   int location{};
-  int room = 3099;
+  room_t room = 3099;
   int origin{};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))

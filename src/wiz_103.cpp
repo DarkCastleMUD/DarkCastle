@@ -370,7 +370,7 @@ int lookupRoom(Character *ch, char *str)
   if (str == 0)
     return -1;
 
-  int room = atoi(str);
+  room_t room = atoll(str);
 
   if (room == DC::NOWHERE || room > DC::getInstance()->top_of_world || !DC::getInstance()->rooms.contains(room))
   {
