@@ -236,7 +236,7 @@ void perform_violence(void)
     }
 
     // DEBUG CODE
-    int last_virt = -1;
+    vnum_t last_virt = {};
     int last_class = GET_CLASS(ch);
     if (ch->isNonPlayer())
       last_virt = ch->mobdata->vnum_;
@@ -3134,8 +3134,8 @@ void set_cantquit(Character *ch, Character *vict, bool forced)
   affected_type af, *paf;
   Character *realch;
   Character *realvict;
-  int ch_vnum = -1;
-  int vict_vnum = -1;
+  vnum_t ch_vnum = {};
+  vnum_t vict_vnum = {};
 
   if (!ch || !vict)
     return; /* This will happen if the char was in a fall room */

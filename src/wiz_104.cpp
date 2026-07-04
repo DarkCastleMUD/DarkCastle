@@ -2053,7 +2053,7 @@ void opstat(Character *ch, vnum_t vnum)
 int do_opstat(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  int vnum = -1;
+  vnum_t vnum = {};
 
   if (!*argument)
   {

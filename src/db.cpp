@@ -1869,8 +1869,8 @@ world_file_list_itemPtr one_new_world_file_item(QString filename, int32_t room_n
 
   curr->filename = filename;
   curr->firstnum = room_nr;
-  curr->lastnum = -1;
-  curr->flags = 0;
+  curr->lastnum = {};
+  curr->flags = {};
   return curr;
 }
 
@@ -4377,10 +4377,11 @@ void Zone::reset(ResetType reset_type)
     last_full_reset = QDateTime::currentDateTimeUtc();
   }
 
-  int reset_cmd_index, last_cmd, last_mob, last_obj, last_percent;
+  int reset_cmd_index, last_cmd, last_percent;
+  vnum_t last_mob{}, last_obj{};
   Character *mob = nullptr;
   class Object *obj, *obj_to;
-  last_cmd = last_mob = last_obj = last_percent = -1;
+  last_cmd = last_percent = -1;
 
   char buf[MAX_STRING_LENGTH];
   char log_buf[MAX_STRING_LENGTH] = {};
@@ -4708,17 +4709,17 @@ void Zone::reset(ResetType reset_type)
         {
         case 0:
           last_cmd = -1;
-          last_mob = -1;
-          last_obj = -1;
+          last_mob = {};
+          last_obj = {};
           last_percent = -1;
           break;
 
         case 1:
-          last_mob = -1;
+          last_mob = {};
           break;
 
         case 2:
-          last_obj = -1;
+          last_obj = {};
           break;
 
         case 3:
@@ -4727,8 +4728,8 @@ void Zone::reset(ResetType reset_type)
 
         default:
           last_cmd = -1;
-          last_mob = -1;
-          last_obj = -1;
+          last_mob = {};
+          last_obj = {};
           last_percent = -1;
           break;
         }

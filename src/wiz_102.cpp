@@ -2591,7 +2591,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
   char buf2[MAX_INPUT_LENGTH]{};
   char buf3[MAX_STRING_LENGTH]{};
   char buf4[MAX_INPUT_LENGTH]{};
-  int mob_num = -1;
+  vnum_t mob_num = {};
   int intval = 0;
   int x{}, i{};
   mob_prog_data *prog{};
@@ -2978,7 +2978,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
 int do_mscore(Character *ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH];
-  int mob_num = -1;
+  vnum_t mob_num = {};
 
   void boro_mob_stat(Character * ch, Character * k);
 

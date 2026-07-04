@@ -1642,7 +1642,7 @@ public:
   char *huntname;
   int itemnum;
   int time;
-  int itemsAvail[50];
+  vnum_t itemsAvail[50];
 };
 
 class hunt_items
@@ -1794,7 +1794,7 @@ int get_rand_obj(hunt_data *h)
   v = number(0, i);
   int c = h->itemsAvail[v];
   h->itemsAvail[v] = h->itemsAvail[i];
-  h->itemsAvail[i] = -1;
+  h->itemsAvail[i] = {};
 
   return c;
 }
@@ -1805,7 +1805,7 @@ void init_random_hunt_items(hunt_data *h)
   if ((f = fopen("huntitems.txt", "r")) == nullptr)
   {
     for (int i = 0; i < 50; i++)
-      h->itemsAvail[i] = -1;
+      h->itemsAvail[i] = {};
     return;
   }
   int a, i;
@@ -1823,7 +1823,7 @@ void init_random_hunt_items(hunt_data *h)
         continue;
       }
     }
-    h->itemsAvail[a] = -1;
+    h->itemsAvail[a] = {};
   }
   fclose(f);
 }
@@ -1896,12 +1896,12 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
   for (int i = 0; i < amount; i++)
   {
-    int mob = -1;
+    vnum_t mob = {};
     Character *vict;
     while (1)
     {
       mob = number<vnum_t>(1, DC::getInstance()->mob_index.lastKey());
-      int vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
+      vnum_t vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
       if (!(DC::getInstance()->mob_index[mob].vnum() > 300 &&
             (DC::getInstance()->mob_index[mob].vnum() < 2300 || DC::getInstance()->mob_index[mob].vnum() > 2499) &&
             (DC::getInstance()->mob_index[mob].vnum() < 29200 || DC::getInstance()->mob_index[mob].vnum() > 29299) &&
