@@ -195,12 +195,11 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
+      DC::getInstance()->zones[DC::getInstance()->world[ch->in_room].zone].addGold(cgold);
       if (!ch->isNonPlayer() && isSet(ch->player->toggles, Player::PLR_BRIEF))
       {
         tax = true;
         buffer += QStringLiteral("Bounty: %2").arg(cgold);
-        DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
       }
       else
         ch->sendln(QStringLiteral("Clan %1 collects %2 bounty, leaving %3 for you.").arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name).arg(cgold).arg(obj_object->obj_flags.value[0]));
@@ -2720,7 +2719,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
       obj_object->obj_flags.value[0] -= cgold;
       csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name, cgold,
              obj_object->obj_flags.value[0]);
-      DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).addGold(cgold);
+      DC::getInstance()->zones[DC::getInstance()->world[ch->in_room].zone].addGold(cgold);
     }
 
     ch->addGold(obj_object->obj_flags.value[0]);

@@ -2293,7 +2293,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
       kimore = true;
   }
   if (ch->isPlayer()) // player
-    DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).decrementPlayers();
+    DC::getInstance()->zones[DC::getInstance()->world[ch->in_room].zone].decrementPlayers();
   if (ch->isNonPlayer())
     ch->mobdata->last_room = ch->in_room;
   if (ch->isNonPlayer())
@@ -2400,7 +2400,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
       }
   }
   if (ch->isPlayer()) // player
-    DC::getInstance()->zones.value(DC::getInstance()->world[room].zone).incrementPlayers();
+    DC::getInstance()->zones[DC::getInstance()->world[room].zone].incrementPlayers();
   if (ch->isNonPlayer())
   {
     if (ISSET(ch->mobdata->actflags, ACT_NOMAGIC) && !isSet(DC::getInstance()->world[room].room_flags, NO_MAGIC))
