@@ -5437,7 +5437,7 @@ void raw_kill(Character *ch, Character *victim)
   }
 
   // register my death with this zone's counter
-  DC::incrementZoneDiedTick(DC::getInstance()->world[victim->in_room].zone);
+  DC::getInstance()->incrementZoneDiedTick(DC::getInstance()->world[victim->in_room].zone);
 
   victim->setStanding();
   int retval = mprog_death_trigger(victim, ch);

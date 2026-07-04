@@ -3141,7 +3141,7 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
 
     //     DC::getInstance()->zones.value(zone).gold = 0;
   }
-  DC::setZoneClanOwner(zone, clan);
+  DC::getInstance()->setZoneClanOwner(zone, clan);
 
   send_info(buf);
 }
@@ -3333,7 +3333,7 @@ void pulse_takeover()
       std::sprintf(buf, "\r\n##Control of%s has been lost!\r\n",
                    DC::getInstance()->zones.value(take->zone).NameC());
       send_info(buf);
-      DC::setZoneClanOwner(take->zone, 0);
+      DC::getInstance()->setZoneClanOwner(take->zone, 0);
       recycle_pulse_data(take);
       continue;
     }
@@ -3447,10 +3447,10 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     affect_to_char(this, &af, DC::PULSE_TIMER);
 
     auto zone_key = DC::getInstance()->world[in_room].zone;
-    DC::setZoneClanOwner(zone_key, clan);
+    DC::getInstance()->setZoneClanOwner(zone_key, clan);
 
     send("You claim the area on behalf of your clan.\r\n");
-    send(QStringLiteral("\r\n##%1 has been claimed by %2!\r\n").arg(DC::getZoneName(zone_key)).arg(get_clan(clan)->name));
+    send(QStringLiteral("\r\n##%1 has been claimed by %2!\r\n").arg(DC::getInstance()->getZoneName(zone_key)).arg(get_clan(clan)->name));
 
     return ReturnValue::eSUCCESS;
   }
@@ -3480,7 +3480,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n", get_clan(clan)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     send_info(buf);
-    DC::setZoneClanOwner(DC::getInstance()->world[in_room].zone, 0);
+    DC::getInstance()->setZoneClanOwner(DC::getInstance()->world[in_room].zone, 0);
 
     return ReturnValue::eSUCCESS;
   }
@@ -3512,7 +3512,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     csendf(this, "You collect %d $B$5gold$R for your clan's treasury.\r\n",
            DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).gold);
 
-    DC::setZoneClanGold(DC::getInstance()->world[in_room].zone, 0);
+    DC::getInstance()->setZoneClanGold(DC::getInstance()->world[in_room].zone, 0);
     save_clans();
     return ReturnValue::eSUCCESS;
   }

@@ -2496,7 +2496,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
         }
       }
 
-      DC::resetZone(DC::getInstance()->world[real_room(30000)].zone);
+      DC::getInstance()->resetZone(DC::getInstance()->world[real_room(30000)].zone);
     }
   }
 

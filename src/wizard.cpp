@@ -1420,14 +1420,14 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
     ch->sendln("Performing full zone reset!");
     std::string buf = fmt::format("{} full repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    DC::resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
+    DC::getInstance()->resetZone(DC::getInstance()->world[ch->in_room].zone, Zone::ResetType::full);
   }
   else
   {
     ch->sendln("Resetting this entire zone!");
     std::string buf = fmt::format("{} repopped zone #{}.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].zone);
     logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    DC::resetZone(DC::getInstance()->world[ch->in_room].zone);
+    DC::getInstance()->resetZone(DC::getInstance()->world[ch->in_room].zone);
   }
 
   return ReturnValue::eSUCCESS;

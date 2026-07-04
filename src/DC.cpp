@@ -145,15 +145,11 @@ DC *DC::getInstance(void)
 
 zone_t DC::getRoomZone(room_t room_nr)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  for (auto [zone_key, zone] : zones.asKeyValueRange())
   {
-    for (auto [zone_key, zone] : dc->zones.asKeyValueRange())
+    if (room_nr >= zone.getRealBottom() && room_nr <= zone.getTop())
     {
-      if (room_nr >= zone.getRealBottom() && room_nr <= zone.getTop())
-      {
-        return zone_key;
-      }
+      return zone_key;
     }
   }
   return zone_t();
@@ -161,13 +157,9 @@ zone_t DC::getRoomZone(room_t room_nr)
 
 QString DC::getZoneName(zone_t zone_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      return dc->zones.value(zone_key).Name();
-    }
+    return zones.value(zone_key).Name();
   }
 
   return QString();
@@ -175,97 +167,65 @@ QString DC::getZoneName(zone_t zone_key)
 
 void DC::setZoneClanOwner(zone_t zone_key, int clan_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].clanowner = clan_key;
-    }
+    zones[zone_key].clanowner = clan_key;
   }
 }
 
 void DC::setZoneClanGold(zone_t zone_key, gold_t gold)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].gold = gold;
-    }
+    zones[zone_key].gold = gold;
   }
 }
 
 void DC::setZoneTopRoom(zone_t zone_key, room_t room_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].setRealTop(room_key);
-    }
+    zones[zone_key].setRealTop(room_key);
   }
 }
 
 void DC::setZoneBottomRoom(zone_t zone_key, room_t room_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].setRealBottom(room_key);
-    }
+    zones[zone_key].setRealBottom(room_key);
   }
 }
 
 void DC::setZoneModified(zone_t zone_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].setModified();
-    }
+    zones[zone_key].setModified();
   }
 }
 
 void DC::setZoneNotModified(zone_t zone_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].setModified(false);
-    }
+    zones[zone_key].setModified(false);
   }
 }
 
 void DC::incrementZoneDiedTick(zone_t zone_key)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].incrementDiedThisTick();
-    }
+    zones[zone_key].incrementDiedThisTick();
   }
 }
 
 void DC::resetZone(zone_t zone_key, Zone::ResetType reset_type)
 {
-  DC *dc = getInstance();
-  if (dc != nullptr)
+  if (zones.contains(zone_key))
   {
-    if (dc->zones.contains(zone_key))
-    {
-      dc->zones[zone_key].reset(reset_type);
-    }
+    zones[zone_key].reset(reset_type);
   }
 }
 
