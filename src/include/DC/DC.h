@@ -506,7 +506,7 @@ public:
   void boot_zones(void);
   void boot_world(void);
   void write_one_zone(FILE *fl, zone_t zone_key);
-  zone_t read_one_zone(FILE *fl);
+  zone_t read_one_zone(FILE *fl, QString zone_filename);
   bool read_one_room(FILE *fl, room_t &room_nr);
   void load_hints(void);
   void save_hints(void);
@@ -644,6 +644,7 @@ private:
   QString current_name_;
   vnum_t current_VNUM_{};
   QString current_filename_;
+  room_t last_top_vnum_{};
 
   void game_loop_init(void);
   void game_loop(void);
@@ -920,5 +921,12 @@ T check_returns(T in_str)
 
   return new_string;
 }
+
+struct VNUM_Range
+{
+  vnum_t first{};
+  vnum_t last{};
+};
+struct VNUM_Range &operator<<(struct VNUM_Range &vnum_range, const QString &filename);
 
 #endif

@@ -32,6 +32,7 @@ int load_debug = 0;
 #include <typeinfo>
 
 #include <QDebug>
+#include <QRegularExpression>
 
 #include "DC/obj.h"
 #include "DC/affect.h"
@@ -2289,9 +2290,8 @@ void Zone::write(FILE *fl)
   fprintf(fl, "S\n$~\n");
 }
 
-zone_t DC::read_one_zone(FILE *fl)
+zone_t DC::read_one_zone(FILE *fl, QString zone_filename)
 {
-  static room_t last_top_vnum = 0;
   zone_commands_t reset_tab;
   char *check, buf[161], ch;
   int reset_top, i, tmp;
@@ -2313,7 +2313,6 @@ zone_t DC::read_one_zone(FILE *fl)
   /* alloc a new_new zone */
   //*num = zon = a / 100;
 
-  auto &zones = DC::getInstance()->zones;
   zone_t new_zone_key = 1;
   if (!zones.isEmpty())
   {
@@ -2324,14 +2323,18 @@ zone_t DC::read_one_zone(FILE *fl)
 
   // logentry(QStringLiteral("Reading zone"), 0, DC::LogChannel::LOG_BUG);
 
-  DC::getInstance()->currentVNUM(tmp);
-  DC::getInstance()->currentType("Zone");
-  DC::getInstance()->currentName(check);
+  currentVNUM(tmp);
+  currentType("Zone");
+  currentName(check);
 
   zone.Name(check);
-  zone.setBottom(last_top_vnum + 1);
-  zone.setTop(fread_int(fl, 0, WORLD_MAX_ROOM));
-  last_top_vnum = zone.getTop();
+  zone.setFilename(zone_filename);
+
+  VNUM_Range vnum_range{.first = last_top_vnum_ + 1, .last = fread_uint(fl, 1, WORLD_MAX_ROOM)};
+  vnum_range << zone_filename;
+  zone.setRange(vnum_range);
+  last_top_vnum_ = zone.getTop();
+
   zone.setRealBottom(0);
   zone.setRealTop(0);
   zone.clanowner = 0;
@@ -2451,10 +2454,6 @@ void DC::boot_zones(void)
 {
   FILE *fl;
   FILE *flZoneIndex;
-  QString temp;
-  char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
-
-  DC::config &cf = DC::getInstance()->cf;
 
   if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
   {
@@ -2473,29 +2472,25 @@ void DC::boot_zones(void)
   }
   // logentry(QStringLiteral("Booting individual zone files"), 0, DC::LogChannel::LOG_MISC);
 
-  for (temp = read_next_worldfile_name(flZoneIndex);
-       temp.isEmpty() == false;
-       temp = read_next_worldfile_name(flZoneIndex))
+  for (QString filename = read_next_worldfile_name(flZoneIndex);
+       filename.isEmpty() == false;
+       filename = read_next_worldfile_name(flZoneIndex))
   {
-    strcpy(endfile, "zonefiles/");
-    strcat(endfile, temp.toStdString().c_str());
+    auto zone_filename = u"zonefiles/"_s;
+    zone_filename += filename;
 
     if (cf.verbose_mode)
     {
-      logentry(temp, 0, DC::LogChannel::LOG_MISC);
+      logentry(zone_filename, 0, DC::LogChannel::LOG_MISC);
     }
 
-    if (!(fl = fopen(endfile, "r")))
+    if (!(fl = fopen(qPrintable(zone_filename), "r")))
     {
-      perror(endfile);
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", endfile);
+      perror(qPrintable(zone_filename));
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", qPrintable(zone_filename));
       abort();
     }
-
-    auto zone_key = read_one_zone(fl);
-    auto &zone = zones[zone_key];
-    zone.setFilename(temp);
-    // // std::cerr << QStringLiteral("%1 %2").arg(zone).arg(temp).toStdString() << std::endl;
+    auto zone_key = read_one_zone(fl, zone_filename);
 
     fclose(fl);
   }
@@ -6600,4 +6595,42 @@ QDebug operator<<(QDebug debug, const std::expected<bool, Room::room_errors_t> &
     debug << status.error();
 
   return debug;
+}
+
+VNUM_Range &operator<<(VNUM_Range &vnum_range, const QString &filename)
+{
+  // Examples of different zone filenames to match
+  // 00049-boardsmegaphones.zon    #-A        \d+-\D+
+  // 00200-299.zon                 #-#        \d+-\d+
+  // 00200.zon                     #          \d+
+  // 02400-2499.clan.zon           #-#        \d+-\d+
+  // 02399-clanrange2.zon          #-A#       \d+-\D+\d+
+  // blankzzne.zon                 A          \D+
+  // should be able to match anything that ends with .clan.zon same as .zon
+  QRegularExpression re(R"(^(?:(?<lastvnum1>\d+)-\D+|(?<firstvnum2>\d+)-(?<lastvnum2>\d+)|(?<lastvnum3>\d+)|(?<lastvnum4>\d+)-\D+\d+)(?:\.clan\.)?\.zon$)");
+  QRegularExpressionMatch match = re.match(filename);
+
+  if (match.hasCaptured("lastvnum1"))
+  {
+    vnum_range.last = match.captured("lastvnum1").toULongLong();
+  }
+  else if (match.hasCaptured("lastvnum2"))
+  {
+    vnum_range.first = match.captured("firstvnum2").toULongLong();
+    vnum_range.last = match.captured("lastvnum2").toULongLong();
+  }
+  else if (match.hasCaptured("lastvnum3"))
+  {
+    vnum_range.last = match.captured("lastvnum3").toULongLong();
+  }
+  else if (match.hasCaptured("lastvnum4"))
+  {
+    vnum_range.last = match.captured("lastvnum4").toULongLong();
+  }
+
+  // qDebug().nospace() << "[" << match.hasMatch() << "][" << match.captured(0) << "] firstvnum=" << vnum_range.first << " lastvnum=" << vnum_range.last;
+  // assert(match.hasMatch());
+  // assert(filename == match.captured(0));
+
+  return vnum_range;
 }
