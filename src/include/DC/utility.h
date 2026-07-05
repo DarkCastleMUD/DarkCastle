@@ -45,14 +45,6 @@ void check_timer();
 
 static const int COREDUMP_MAX = 10;
 
-#ifdef WIN32
-inline int random()
-{
-  return (rand());
-}
-char *index(char *buf, char op);
-#endif
-
 #define MOB_WAIT_STATE(ch) ((ch)->deaths)
 
 int GET_WAIT(Character *ch);
@@ -700,7 +692,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string strings, Characte
 void parse_bitstrings_into_int(const char *bits[], std::string strings, Character *ch, uint16_t &value);
 int contains_no_trade_item(Object *obj);
 int contents_cause_unique_problem(Object *obj, Character *vict);
-bool check_make_camp(int);
+bool check_make_camp(room_t);
 int get_leadership_bonus(Character *);
 void update_make_camp_and_leadership(void);
 int _parse_name(const char *arg, char *name);
