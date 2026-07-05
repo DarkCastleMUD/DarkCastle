@@ -1118,7 +1118,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     {
       return ReturnValue::eFAILURE;
     }
-    DC::getInstance()->zones.value(zone_key).show_info(ch);
+    return DC::getInstance()->zones.value(zone_key).show_info(ch);
   } // zone
   else if (is_abbrev(type, "rsearch") && has_range)
   {

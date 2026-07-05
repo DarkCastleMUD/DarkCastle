@@ -1288,8 +1288,7 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
     break;
 
   case 13:
-    zone.show_info(ch);
-    return ReturnValue::eSUCCESS;
+    return zone.show_info(ch);
     break;
 
   default:

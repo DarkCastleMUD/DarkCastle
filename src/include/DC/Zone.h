@@ -136,20 +136,20 @@ public:
   void incrementPlayers(void);
   void decrementPlayers(void);
 
-  room_t getBottom(void);
-  void setBottom(int room_key);
+  [[nodiscard]] room_t getBottom(void) const;
+  void setBottom(room_t room_key);
 
-  int getTop(void);
-  void setTop(int room_key);
+  [[nodiscard]] room_t getTop(void) const;
+  void setTop(room_t room_key);
 
-  room_t getRealBottom(void);
-  void setRealBottom(int room_key);
+  [[nodiscard]] room_t getRealBottom(void) const;
+  void setRealBottom(room_t room_key);
 
-  int getRealTop(void);
-  void setRealTop(int room_key);
+  [[nodiscard]] room_t getRealTop(void) const;
+  void setRealTop(room_t room_key);
 
   void write(FILE *fl);
-  int show_info(Character *ch);
+  [[nodiscard]] int show_info(Character *ch);
 
   zone_t getID(void) const
   {
