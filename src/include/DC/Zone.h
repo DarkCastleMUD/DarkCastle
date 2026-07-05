@@ -135,6 +135,8 @@ public:
   void addGold(quint64 value);
   void incrementPlayers(void);
   void decrementPlayers(void);
+  [[nodiscard]] struct VNUM_Range getRange(void) const;
+  void setRange(const struct VNUM_Range &vnum_range);
 
   [[nodiscard]] room_t getBottom(void) const;
   void setBottom(room_t room_key);

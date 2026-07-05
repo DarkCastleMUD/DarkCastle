@@ -269,3 +269,17 @@ qsizetype getZoneLastCommandNumber(const Zone &zone)
 {
   return zone.cmd.size();
 }
+
+struct VNUM_Range Zone::getRange(void) const
+{
+  return {.first = getBottom(), .last = getTop()};
+}
+
+void Zone::setRange(const VNUM_Range &vnum_range)
+{
+  if (vnum_range.first)
+    setBottom(vnum_range.first);
+
+  if (vnum_range.last)
+    setTop(vnum_range.last);
+}
