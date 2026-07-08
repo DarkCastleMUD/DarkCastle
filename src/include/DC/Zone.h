@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QList>
 #include "DC/weather.h"
-
+#include "DC/types.h"
 typedef quint64 zone_t;
 typedef quint64 room_t;
 
@@ -70,7 +70,7 @@ public:
 
   static QStringList zone_bits;
 
-  Zone(zone_t zone_key = 0);
+  Zone(zone_t zone_key = {}, DCPtr dc = {});
 
   quint64 lifespan = {}; /* how long between resets (minutes)  */
   QDateTime last_full_reset = {};
@@ -185,6 +185,7 @@ private:
   room_t bottom_rnum = {};
   room_t top_rnum = {};
   QString name_ = {}; /* name of this zone                  */
+  DCPtr dc_ = {};
 };
 
 bool isValidZoneKey(Character *ch, const zone_t zone_key);

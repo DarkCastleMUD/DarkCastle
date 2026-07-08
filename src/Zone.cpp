@@ -1,9 +1,11 @@
 #include "DC/DC.h"
 #include "DC/utility.h"
 
-Zone::Zone(zone_t zone_key)
-    : id_(zone_key)
+Zone::Zone(zone_t zone_key, DCPtr dc)
+    : id_(zone_key), dc_(dc)
 {
+  if (!dc_)
+    dc_ = DC::getInstance();
 }
 
 QStringList Zone::zone_bits =

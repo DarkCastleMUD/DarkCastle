@@ -105,6 +105,7 @@ typedef qint64 level_diff_t;
 typedef QMap<QString, bool> joining_t;
 
 typedef QList<QString> hints_t;
+#include "DC/types.h"
 #include "DC/levels.h"
 #include "DC/Trace.h"
 #include "DC/SSH.h"
