@@ -318,8 +318,6 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   FILE **f = 0;
   int stream = 1;
   std::stringstream logpath;
-  // DC *dc = dynamic_cast<DC *>(DC::instance());
-  // DC::config &cf = dc->cf;
 
   if (DC::getInstance()->cf.bport)
   {
