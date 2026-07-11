@@ -68,19 +68,19 @@
 #define QUEST_LOG "quest.log"
 #define VAULT_LOG "vault.log"
 
-#define WORLD_INDEX_FILE "worldindex"
-#define OBJECT_INDEX_FILE "objectindex"
-#define MOB_INDEX_FILE "mobindex"
-#define ZONE_INDEX_FILE "zoneindex"
-#define PLAYER_SHOP_INDEX "playershopindex"
+#define WORLD_INDEX_FILE u"worldindex"_s
+#define OBJECT_INDEX_FILE u"objectindex"_s
+#define MOB_INDEX_FILE u"mobindex"_s
+#define ZONE_INDEX_FILE u"zoneindex"_s
+#define PLAYER_SHOP_INDEX u"playershopindex"_s
 
-#define OBJECT_INDEX_FILE_TINY "objectindex.tiny"
-#define WORLD_INDEX_FILE_TINY "worldindex.tiny"
-#define MOB_INDEX_FILE_TINY "mobindex.tiny"
-#define ZONE_INDEX_FILE_TINY "zoneindex.tiny"
+#define OBJECT_INDEX_FILE_TINY u"objectindex.tiny"_s
+#define WORLD_INDEX_FILE_TINY u"worldindex.tiny"_s
+#define MOB_INDEX_FILE_TINY u"mobindex.tiny"_s
+#define ZONE_INDEX_FILE_TINY u"zoneindex.tiny"_s
 
-#define VAULT_INDEX_FILE "../vaults/vaultindex"
-#define VAULT_INDEX_FILE_TMP "../vaults/vaultindex.tmp"
+#define VAULT_INDEX_FILE u"../vaults/vaultindex"_s
+#define VAULT_INDEX_FILE_TMP u"../vaults/vaultindex.tmp"_s
 
 #include <set>
 #include <unordered_set>
@@ -337,9 +337,9 @@ class world_file_list_item
 {
 public:
   QString filename;
-  vnum_t firstnum;
-  vnum_t lastnum;
-  int32_t flags;
+  vnum_t firstnum{};
+  vnum_t lastnum{};
+  int32_t flags{};
 };
 enum class create_error
 {
@@ -504,9 +504,9 @@ public:
   void boot_db(void);
   void boot_zones(void);
   void boot_world(void);
-  void write_one_zone(FILEPtr fl, zone_t zone_key);
-  zone_t read_one_zone(FILEPtr fl, QString zone_filename);
-  bool read_one_room(FILEPtr fl, room_t &room_nr);
+  void write_one_zone(FILE *fl, zone_t zone_key);
+  zone_t read_one_zone(FILE *fl, QString zone_filename);
+  bool read_one_room(FILE *fl, room_t &room_nr);
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);
