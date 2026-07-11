@@ -307,14 +307,6 @@ void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, Charact
   }
 }
 
-void close_file(std::FILE *fp)
-{
-  if (fp)
-  {
-    std::fclose(fp);
-  }
-}
-
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>
 {
   // auto it = std::find_if(begin(DC::bestowable_god_commands), end(DC::bestowable_god_commands));

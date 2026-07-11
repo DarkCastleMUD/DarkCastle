@@ -122,8 +122,6 @@ class clan_data;
 
 using namespace Qt::StringLiterals;
 using special_function = int (*)(Character *, class Object *, cmd_t, const char *, Character *);
-void close_file(std::FILE *fp);
-using unique_file_t = std::unique_ptr<std::FILE, decltype(&close_file)>;
 
 typedef std::set<Character *> character_list_t;
 typedef std::set<class Object *> obj_list_t;

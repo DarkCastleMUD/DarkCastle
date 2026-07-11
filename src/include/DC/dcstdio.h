@@ -1,4 +1,7 @@
-#include <cstdio>
+#pragma once
 #include <QSharedPointer>
-void close_file(std::FILE *fp);
+
 using FILEPtr = QSharedPointer<std::FILE>;
+
+FILEPtr dc_fopen(const QString &path, const QString &mode);
+int dc_fprintf(FILEPtr stream, const QString &format, ...);
