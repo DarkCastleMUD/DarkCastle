@@ -16,7 +16,7 @@
 #ifndef DC_DB_H_
 #define DC_DB_H_
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <ctime>
 
 #include <string>
@@ -96,17 +96,17 @@ class LegacyFile : public QObject
 public:
   LegacyFile(QString directory, QString filename, QString error_message);
   ~LegacyFile();
-  FILE *openFile(void);
+  FILEPtr openFile(void);
   bool backupFile(void);
   bool isOpen(void)
   {
-    if (!file_handle_ || feof(file_handle_) || ferror(file_handle_))
+    if (!file_handle_ || dc_feof(file_handle_) || dc_ferror(file_handle_))
     {
       return false;
     }
     return true;
   }
-  FILE *file_handle_;
+  FILEPtr file_handle_;
   QString directory_;
   QString filename_;
   QString filepath_;
@@ -126,7 +126,7 @@ public:
   {
     if (file_handle_)
     {
-      fprintf(file_handle_, "$~\n");
+      dc_fprintf(file_handle_, "$~\n");
     }
   }
 };
@@ -140,9 +140,9 @@ bool can_modify_object(Character *ch, room_t room);
 void write_one_room(LegacyFile &fl, int nr);
 void write_mobile(LegacyFile &lf, Character *mob);
 void write_object(LegacyFile &lf, Object *obj);
-void write_mprog_recur(FILE *fl, mob_prog_data *mprg, bool mob);
-int load_new_help(FILE *fl, int reload = 0, Character *ch = nullptr);
-int count_hash_records(FILE *fl);
+void write_mprog_recur(FILEPtr fl, mob_prog_data *mprg, bool mob);
+int load_new_help(FILEPtr fl, int reload = 0, Character *ch = nullptr);
+int count_hash_records(FILEPtr fl);
 void load_hints();
 char *mprog_type_to_name(int type);
 void write_wizlist(std::stringstream &filename);
@@ -325,21 +325,21 @@ void free_char(Character *ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
 char *fread_string(QTextStream &stream, bool hasher, bool *ok = nullptr);
 QString fread_qstring(QTextStream &stream, bool *ok = nullptr);
-QString fread_qstring(FILE *stream, bool *ok = nullptr);
-char *fread_string(FILE *fl, int hasher);
+QString fread_qstring(FILEPtr stream, bool *ok = nullptr);
+char *fread_string(FILEPtr fl, int hasher);
 char *fread_string(std::ifstream &in, int hasher);
-char *fread_word(FILE *, int);
+char *fread_word(FILEPtr, int);
 QString fread_word(QTextStream &);
 void delete_item_from_index(vnum_t vnum);
 void delete_mob_from_index(vnum_t vnum);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
 
-int64_t fread_int(FILE *fl, int64_t minval, int64_t maxval);
+int64_t fread_int(FILEPtr fl, int64_t minval, int64_t maxval);
 int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range);
 template <class T>
 T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max());
 
-quint64 fread_uint(FILE *fl, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max());
+quint64 fread_uint(FILEPtr fl, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max());
 quint64 fread_uint(auto &in, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max())
 {
   quint64 val;
@@ -347,9 +347,9 @@ quint64 fread_uint(auto &in, quint64 minval = std::numeric_limits<quint64>::min(
   return val;
 }
 
-char fread_char(FILE *fl);
+char fread_char(FILEPtr fl);
 char fread_char(QTextStream &fl);
-int fread_bitvector(FILE *fl, int32_t minval, int32_t maxval);
+int fread_bitvector(FILEPtr fl, int32_t minval, int32_t maxval);
 int fread_bitvector(std::ifstream &fl, int32_t minval, int32_t maxval);
 template <class T>
 T fread_bitvector(auto &in)
@@ -366,11 +366,11 @@ extern skill_quest *skill_list;
 #define REAL 0
 #define VIRTUAL 1
 
-class Object *read_object(int nr, FILE *fl, bool zz);
+class Object *read_object(int nr, FILEPtr fl, bool zz);
 class Object *read_object(int nr, QTextStream &fl, bool zz);
 class Object *clone_object(int nr);
 void randomize_object(Object *obj);
-void string_to_file(FILE *fl, QString str);
+void string_to_file(FILEPtr fl, QString str);
 void string_to_file(QTextStream &fl, QString str);
 std::ofstream &operator<<(std::ofstream &out, Object *obj);
 std::ifstream &operator>>(std::ifstream &in, Object *obj);
@@ -380,7 +380,7 @@ void copySaveData(Object *new_obj, Object *obj);
 bool verify_item(class Object **obj);
 bool fullItemMatch(Object *obj, Object *obj2);
 bool has_random(Object *obj);
-FILE *legacyFileOpen(QString directory, QString filename, QString error_message);
+FILEPtr legacyFileOpen(QString directory, QString filename, QString error_message);
 void load_messages(char *file, int base = 0);
 void boot_social_messages(void);
 void boot_clans(void);

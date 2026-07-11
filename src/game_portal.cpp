@@ -3,7 +3,7 @@
 | Description:  Handles creation and removal of the magical portals that
 |   move throughout the game.
 */
-#include <cstdio>
+#include "DC/dcstdio.h"
 
 #include "DC/obj.h"
 #include "DC/game_portal.h"
@@ -54,7 +54,7 @@ void load_game_portals()
   int i, j;
   int num_lines = 0; /* Temporary to count lines */
   int32_t file_pos;  /* Used to store position before counting length */
-  FILE *cur_file;
+  FILEPtr cur_file;
   char buf[256]; /* Stores temp file names */
   char log_buf[256];
 
@@ -62,7 +62,7 @@ void load_game_portals()
   {
     num_lines = 0;
     QString portal_filename = QStringLiteral("%1/%2").arg(DC::getInstance()->cf.library_directory).arg(portal_files[i]);
-    if ((cur_file = fopen(portal_filename.toStdString().c_str(), "r")) == 0)
+    if ((cur_file = dc_fopen(portal_filename.toStdString().c_str(), "r")) == 0)
     {
       logentry(QStringLiteral("Could not open portal file: %1").arg(portal_filename));
       break;
@@ -77,16 +77,16 @@ void load_game_portals()
     |    WILL CAUSE THE GAME TO CRASH.  I could build a sanity check, but
     |    if people read this it's not necessary.  -Morc 24 Apr 1997
     */
-    if (fscanf(cur_file, "%llu\n%d\n%d\n", &(game_portals[i].to_room), &(game_portals[i].obj_num), &(game_portals[i].max_timer)) != 3)
+    if (dc_fscanf(cur_file, "%llu\n%d\n%d\n", &(game_portals[i].to_room), &(game_portals[i].obj_num), &(game_portals[i].max_timer)) != 3)
     {
       logentry(QStringLiteral("Error reading portal file: %1!").arg(buf));
       break;
     }
     /* Store the current file value and count line feeds */
-    file_pos = ftell(cur_file);
-    while (fscanf(cur_file, "%*d\n") != EOF)
+    file_pos = dc_ftell(cur_file);
+    while (dc_fscanf(cur_file, "%*d\n") != EOF)
       num_lines++;
-    fseek(cur_file, file_pos, 0);
+    dc_fseek(cur_file, file_pos, 0);
     game_portals[i].num_rooms = num_lines;
 #ifdef LEAK_CHECK
     game_portals[i].from_rooms = (int *)calloc(game_portals[i].num_rooms, sizeof(int));
@@ -95,13 +95,12 @@ void load_game_portals()
 #endif
     for (j = 0; j < game_portals[i].num_rooms; j++)
     {
-      fscanf(cur_file, "%d\n", ((game_portals[i]).from_rooms + j));
+      dc_fscanf(cur_file, "%d\n", ((game_portals[i]).from_rooms + j));
     }
     /* Now set some other values that aren't set */
     game_portals[i].cur_timer = 0; /* So that we get reset */
     if (game_portals[i].max_timer == (-1))
       game_portals[i].max_timer = FOREVER;
-    fclose(cur_file);
   }
 }
 

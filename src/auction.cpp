@@ -681,13 +681,13 @@ LOAD
 void AuctionHouse::Load()
 {
 
-  FILE *the_file;
+  FILEPtr the_file;
   unsigned int num_rooms, num_items, ticket, i, state;
   room_t room;
   char *nl;
   char buf[MAX_STRING_LENGTH];
   AuctionTicket InTicket;
-  the_file = fopen(file_name.toStdString().c_str(), "r");
+  the_file = dc_fopen(file_name.toStdString().c_str(), "r");
 
   if (!the_file)
   {
@@ -697,56 +697,56 @@ void AuctionHouse::Load()
     return;
   }
 
-  fscanf(the_file, "%u\n", &num_rooms);
+  dc_fscanf(the_file, "%u\n", &num_rooms);
 
   for (i = 0; i < num_rooms; i++)
   {
-    fscanf(the_file, "%llu\n", &room);
+    dc_fscanf(the_file, "%llu\n", &room);
     auction_rooms[room] = 1;
   }
 
-  fscanf(the_file, "%u\n", &num_items);
+  dc_fscanf(the_file, "%u\n", &num_items);
   for (i = 0; i < num_items; i++)
   {
-    fscanf(the_file, "%u\n", &ticket);
-    fscanf(the_file, "%d\n", &InTicket.vitem);
-    fgets(buf, MAX_STRING_LENGTH, the_file);
+    dc_fscanf(the_file, "%u\n", &ticket);
+    dc_fscanf(the_file, "%d\n", &InTicket.vitem);
+    dc_fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
     if (nl)
-      *nl = '\0'; // fgets grabs newline too, removing it here
+      *nl = '\0'; // dc_fgets grabs newline too, removing it here
     InTicket.item_name = buf;
-    fgets(buf, MAX_STRING_LENGTH, the_file);
+    dc_fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
     if (nl)
-      *nl = '\0'; // fgets grabs newline too, removing it here
+      *nl = '\0'; // dc_fgets grabs newline too, removing it here
     InTicket.seller = buf;
-    fgets(buf, MAX_STRING_LENGTH, the_file);
+    dc_fgets(buf, MAX_STRING_LENGTH, the_file);
     nl = strrchr(buf, '\n');
     if (nl)
-      *nl = '\0'; // fgets grabs newline too, removing it here
+      *nl = '\0'; // dc_fgets grabs newline too, removing it here
     InTicket.buyer = buf;
-    fscanf(the_file, "%u\n", &state);
+    dc_fscanf(the_file, "%u\n", &state);
     InTicket.state = (AuctionStates)state;
-    fscanf(the_file, "%u\n", &InTicket.end_time);
-    fscanf(the_file, "%u\n", &InTicket.price);
+    dc_fscanf(the_file, "%u\n", &InTicket.end_time);
+    dc_fscanf(the_file, "%u\n", &InTicket.price);
     InTicket.obj = nullptr;
 
     Items_For_Sale[ticket] = InTicket;
   } // LOOP
 
-  if (feof(the_file)) // this means the stat info was lost somehow
+  if (dc_feof(the_file)) // this means the stat info was lost somehow
     ParseStats();
   else
   {
-    fscanf(the_file, "%u\n", &ItemsPosted);
-    fscanf(the_file, "%u\n", &ItemsExpired);
-    fscanf(the_file, "%u\n", &ItemsSold);
-    fscanf(the_file, "%u\n", &TaxCollected);
-    fscanf(the_file, "%u\n", &Revenue);
-    fscanf(the_file, "%u\n", &ItemsActive);
-    fscanf(the_file, "%u\n", &UncollectedGold);
+    dc_fscanf(the_file, "%u\n", &ItemsPosted);
+    dc_fscanf(the_file, "%u\n", &ItemsExpired);
+    dc_fscanf(the_file, "%u\n", &ItemsSold);
+    dc_fscanf(the_file, "%u\n", &TaxCollected);
+    dc_fscanf(the_file, "%u\n", &Revenue);
+    dc_fscanf(the_file, "%u\n", &ItemsActive);
+    dc_fscanf(the_file, "%u\n", &UncollectedGold);
   }
-  fclose(the_file);
+
   return;
 }
 
@@ -755,7 +755,7 @@ SAVE
 */
 void AuctionHouse::Save()
 {
-  FILE *the_file;
+  FILEPtr the_file;
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   QMap<int, int>::iterator room_it;
 
@@ -765,7 +765,7 @@ void AuctionHouse::Save()
     return;
   }
   QString temp_file_name = file_name + ".temp";
-  the_file = fopen(temp_file_name.toStdString().c_str(), "w");
+  the_file = dc_fopen(temp_file_name.toStdString().c_str(), "w");
 
   if (!the_file)
   {
@@ -775,23 +775,23 @@ void AuctionHouse::Save()
     return;
   }
 
-  fprintf(the_file, "%lld\n", auction_rooms.size());
+  dc_fprintf(the_file, "%lld\n", auction_rooms.size());
   for (room_it = auction_rooms.begin(); room_it != auction_rooms.end(); room_it++)
   {
-    fprintf(the_file, "%d\n", room_it.key());
+    dc_fprintf(the_file, "%d\n", room_it.key());
   }
 
-  fprintf(the_file, "%llu\n", Items_For_Sale.size());
+  dc_fprintf(the_file, "%llu\n", Items_For_Sale.size());
   for (Item_it = Items_For_Sale.begin(); Item_it != Items_For_Sale.end(); Item_it++)
   {
-    fprintf(the_file, "%u\n", Item_it.key());
-    fprintf(the_file, "%d\n", Item_it->vitem);
-    fprintf(the_file, "%s\n", (char *)Item_it->item_name.toStdString().c_str());
-    fprintf(the_file, "%s\n", (char *)Item_it->seller.toStdString().c_str());
-    fprintf(the_file, "%s\n", (char *)Item_it->buyer.toStdString().c_str());
-    fprintf(the_file, "%u\n", Item_it->state);
-    fprintf(the_file, "%u\n", Item_it->end_time);
-    fprintf(the_file, "%u\n", Item_it->price);
+    dc_fprintf(the_file, "%u\n", Item_it.key());
+    dc_fprintf(the_file, "%d\n", Item_it->vitem);
+    dc_fprintf(the_file, "%s\n", (char *)Item_it->item_name.toStdString().c_str());
+    dc_fprintf(the_file, "%s\n", (char *)Item_it->seller.toStdString().c_str());
+    dc_fprintf(the_file, "%s\n", (char *)Item_it->buyer.toStdString().c_str());
+    dc_fprintf(the_file, "%u\n", Item_it->state);
+    dc_fprintf(the_file, "%u\n", Item_it->end_time);
+    dc_fprintf(the_file, "%u\n", Item_it->price);
 
     if (Item_it->obj)
     {
@@ -823,15 +823,14 @@ void AuctionHouse::Save()
       }
     }
   }
-  fprintf(the_file, "%u\n", ItemsPosted);
-  fprintf(the_file, "%u\n", ItemsExpired);
-  fprintf(the_file, "%u\n", ItemsSold);
-  fprintf(the_file, "%u\n", TaxCollected);
-  fprintf(the_file, "%u\n", Revenue);
-  fprintf(the_file, "%u\n", ItemsActive);
-  fprintf(the_file, "%u\n", UncollectedGold);
+  dc_fprintf(the_file, "%u\n", ItemsPosted);
+  dc_fprintf(the_file, "%u\n", ItemsExpired);
+  dc_fprintf(the_file, "%u\n", ItemsSold);
+  dc_fprintf(the_file, "%u\n", TaxCollected);
+  dc_fprintf(the_file, "%u\n", Revenue);
+  dc_fprintf(the_file, "%u\n", ItemsActive);
+  dc_fprintf(the_file, "%u\n", UncollectedGold);
 
-  fclose(the_file);
   if (rename(temp_file_name.toStdString().c_str(), file_name.toStdString().c_str()) != 0)
   {
     perror("AuctionHouse::save() rename");
@@ -988,7 +987,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   Object *obj;
   Character *vict;
-  FILE *fl;
+  FILEPtr fl;
   char *buf[10];
   int i = 0;
 
@@ -1115,33 +1114,29 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   if (DC::getInstance()->cf.bport == false)
   {
     errno = 0;
-    if (!(fl = fopen(WEB_AUCTION_FILE, "r")))
+    if (!(fl = dc_fopen(WEB_AUCTION_FILE, "r")))
     {
       logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
       return;
     }
 
-    while (!feof(fl) && i <= 9)
+    while (!dc_feof(fl) && i <= 9)
     {
       buf[i] = fread_string(fl, 0);
       i++;
     }
 
-    fclose(fl);
-
     errno = 0;
-    if (!(fl = fopen(WEB_AUCTION_FILE, "w")))
+    if (!(fl = dc_fopen(WEB_AUCTION_FILE, "w")))
     {
       logf(IMMORTAL, DC::LogChannel::LOG_BUG, "%s: %s", WEB_AUCTION_FILE, strerror(errno));
       return;
     }
 
-    fprintf(fl, "%s purchased %s's %s~\n", GET_NAME(ch), Item_it->seller.toStdString().c_str(), obj->short_description);
+    dc_fprintf(fl, "%s purchased %s's %s~\n", GET_NAME(ch), Item_it->seller.toStdString().c_str(), obj->short_description);
 
     for (int j = 0; j < i; j++)
-      fprintf(fl, "%s~\n", buf[j]);
-
-    fclose(fl);
+      dc_fprintf(fl, "%s~\n", buf[j]);
   }
   else
   {

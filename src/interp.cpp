@@ -21,7 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cassert>
 
 #include <string>
@@ -898,12 +898,11 @@ int fill_word(char *argument)
 
 void automail(char *name)
 {
-  FILE *blah;
+  FILEPtr blah;
   char buf[100];
 
-  blah = fopen("../lib/whassup.txt", "w");
-  fprintf(blah, "%s", name);
-  fclose(blah);
+  blah = dc_fopen("../lib/whassup.txt", "w");
+  dc_fprintf(blah, "%s", name);
   sprintf(buf, "mail void@dcastle.org < ../lib/whassup.txt");
   system(buf);
 }

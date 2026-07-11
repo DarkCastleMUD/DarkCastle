@@ -1801,8 +1801,8 @@ int get_rand_obj(hunt_data *h)
 
 void init_random_hunt_items(hunt_data *h)
 {
-  FILE *f;
-  if ((f = fopen("huntitems.txt", "r")) == nullptr)
+  FILEPtr f;
+  if ((f = dc_fopen("huntitems.txt", "r")) == nullptr)
   {
     for (int i = 0; i < 50; i++)
       h->itemsAvail[i] = {};
@@ -1825,7 +1825,6 @@ void init_random_hunt_items(hunt_data *h)
     }
     h->itemsAvail[a] = {};
   }
-  fclose(f);
 }
 
 char *last_hunt_time(char *last_hunt)

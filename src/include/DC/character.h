@@ -473,10 +473,10 @@ public:
   QString getJoining(void);
   void setJoining(QString list);
   void toggleJoining(QString key);
-  void save_char_aliases(FILE *fpsave);
+  void save_char_aliases(FILEPtr fpsave);
   QString perform_alias(QString orig);
-  void save(FILE *fpsave, time_data tmpage);
-  bool read(FILE *fpsave, Character *ch, QString filename);
+  void save(FILEPtr fpsave, time_data tmpage);
+  bool read(FILEPtr fpsave, Character *ch, QString filename);
 
   aliases_t aliases_; /* Aliases */
 };
@@ -536,8 +536,8 @@ public:
   void setObject(Object *);
   Object *getObject(void);
   bool isObject(void);
-  void save(FILE *fpsave);
-  void read(FILE *fpsave);
+  void save(FILEPtr fpsave);
+  void read(FILEPtr fpsave);
 
 private:
   Object *object = {};
@@ -935,10 +935,10 @@ public:
   quint64 damage_per_second = {};
 
   bool addGold(quint64 gold);
-  bool save_pc_or_mob_data(FILE *fpsave, time_data tmpage);
+  bool save_pc_or_mob_data(FILEPtr fpsave, time_data tmpage);
   void add_command_lag(cmd_t cmd, int lag);
   bool canPerform(const int_fast32_t &learned, QString failMessage = QString());
-  int char_to_store_variable_data(FILE *fpsave);
+  int char_to_store_variable_data(FILEPtr fpsave);
   void display_string_list(QStringList list);
   void display_string_list(const char **list);
   bool charge_moves(int skill, double modifier = 1);
@@ -1190,7 +1190,7 @@ public:
 
   bool multiplyGold(double mult);
   bool removeGold(quint64 gold);
-  int store_to_char_variable_data(FILE *fpsave);
+  int store_to_char_variable_data(FILEPtr fpsave);
 
   bool load_charmie_equipment(QString name, bool previous = false);
   int has_skill(skill_t skill);

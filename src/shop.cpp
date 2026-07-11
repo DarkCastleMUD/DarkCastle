@@ -14,7 +14,7 @@
  ***************************************************************************/
 /* $Id: shop.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstring>
 #include <fmt/format.h>
 
@@ -44,7 +44,7 @@ extern time_info_data time_info;
 int max_shop;
 
 // extern function
-int fwrite_string(char *buf, FILE *fl);
+int fwrite_string(char *buf, FILEPtr fl);
 
 std::map<std::string, reroll_t> reroll_sessions = {};
 
@@ -740,9 +740,9 @@ void boot_the_shops()
   char *buf;
   int temp;
   int count;
-  FILE *fp;
+  FILEPtr fp;
 
-  if ((fp = fopen(SHOP_FILE, "r")) == nullptr)
+  if ((fp = dc_fopen(SHOP_FILE, "r")) == nullptr)
   {
     perror(SHOP_FILE);
     exit(1);
@@ -778,13 +778,13 @@ void boot_the_shops()
      * Ignore "producing" list.
      */
     for (count = 0; count < 6; count++)
-      fscanf(fp, "%d \n", &temp);
+      dc_fscanf(fp, "%d \n", &temp);
 
-    fscanf(fp, "%f \n", &DC::getInstance()->shop_index[max_shop].profit_buy_base);
-    fscanf(fp, "%f \n", &DC::getInstance()->shop_index[max_shop].profit_sell);
+    dc_fscanf(fp, "%f \n", &DC::getInstance()->shop_index[max_shop].profit_buy_base);
+    dc_fscanf(fp, "%f \n", &DC::getInstance()->shop_index[max_shop].profit_sell);
     for (count = 0; count < MAX_TRADE; count++)
     {
-      fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].type[count]);
+      dc_fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].type[count]);
     }
 
     DC::getInstance()->shop_index[max_shop].profit_buy = DC::getInstance()->shop_index[max_shop].profit_buy_base;
@@ -796,15 +796,15 @@ void boot_the_shops()
     DC::getInstance()->shop_index[max_shop].message_buy = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
     DC::getInstance()->shop_index[max_shop].message_sell = QString(fread_string(fp, 0)).replace("%s", "%1").replace("%d", "%2");
 
-    fscanf(fp, "%d \n", &temp); /* Temper       */
-    fscanf(fp, "%d \n", &temp); /* Temper       */
+    dc_fscanf(fp, "%d \n", &temp); /* Temper       */
+    dc_fscanf(fp, "%d \n", &temp); /* Temper       */
 
-    fscanf(fp, "%d \n", &temp);
+    dc_fscanf(fp, "%d \n", &temp);
     DC::getInstance()->shop_index[max_shop].keeper = temp;
 
-    fscanf(fp, "%d \n", &temp); /* With_whom    */
+    dc_fscanf(fp, "%d \n", &temp); /* With_whom    */
 
-    fscanf(fp, "%d \n", &temp);
+    dc_fscanf(fp, "%d \n", &temp);
 
     int room_nr = real_room(temp);
     if (room_nr < 0 || room_nr > DC::getInstance()->top_of_world)
@@ -815,10 +815,10 @@ void boot_the_shops()
 
     DC::getInstance()->shop_index[max_shop].in_room = room_nr;
 
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].open1);
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].close1);
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].open2);
-    fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].close2);
+    dc_fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].open1);
+    dc_fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].close1);
+    dc_fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].open2);
+    dc_fscanf(fp, "%d \n", &DC::getInstance()->shop_index[max_shop].close2);
 
     DC::getInstance()->shop_index[max_shop].inventory = 0;
 
@@ -832,8 +832,6 @@ void boot_the_shops()
     }
     max_shop++;
   }
-
-  fclose(fp);
 }
 
 void assign_the_shopkeepers()
@@ -884,7 +882,7 @@ void fix_shopkeepers_inventory()
 
 // return nullptr for failure
 // return pointer to new shop on success
-player_shop *read_one_player_shop(FILE *fp)
+player_shop *read_one_player_shop(FILEPtr fp)
 {
   int32_t count;
   char code[4];
@@ -892,13 +890,13 @@ player_shop *read_one_player_shop(FILE *fp)
   player_shop_item *item = nullptr;
   player_shop *shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
 
-  fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
-  fread(&shop->room_num, sizeof(int32_t), 1, fp);
-  fread(&shop->sell_message, sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
-  fread(&shop->money_on_hand, sizeof(int32_t), 1, fp);
+  dc_fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
+  dc_fread(&shop->room_num, sizeof(int32_t), 1, fp);
+  dc_fread(&shop->sell_message, sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
+  dc_fread(&shop->money_on_hand, sizeof(int32_t), 1, fp);
 
   code[3] = '\0';
-  fread(&code, sizeof(char), 3, fp);
+  dc_fread(&code, sizeof(char), 3, fp);
 
   while (strcmp(code, "END"))
   {
@@ -909,16 +907,16 @@ player_shop *read_one_player_shop(FILE *fp)
     exit(1);
   }
 
-  fread(&count, sizeof(int32_t), 1, fp);
+  dc_fread(&count, sizeof(int32_t), 1, fp);
 
   shop->sale_list = nullptr;
   for (int i = 0; i < count; i++)
   {
     item = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
 
-    fread(&item->item_vnum, sizeof(int), 1, fp);
-    fread(&item->price, sizeof(int), 1, fp);
-    fread(&code, sizeof(char), 3, fp);
+    dc_fread(&item->item_vnum, sizeof(int), 1, fp);
+    dc_fread(&item->price, sizeof(int), 1, fp);
+    dc_fread(&code, sizeof(char), 3, fp);
     // code junk right now.  Add future stuff before it if needed
     item->next = shop->sale_list;
     shop->sale_list = item;
@@ -931,50 +929,48 @@ player_shop *read_one_player_shop(FILE *fp)
 // assumes valid shop
 void write_one_player_shop(player_shop *shop)
 {
-  FILE *fp;
+  FILEPtr fp;
   player_shop_item *item;
   char buf[80];
   int32_t count = 0;
 
   sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, shop->owner);
 
-  if ((fp = fopen(buf, "w")) == nullptr)
+  if ((fp = dc_fopen(buf, "w")) == nullptr)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Could not open %s for writing.", buf);
     return;
   }
 
-  fwrite(&(shop->owner), sizeof(char), PC_SHOP_OWNER_SIZE, fp);
-  fwrite(&(shop->room_num), sizeof(int32_t), 1, fp);
-  fwrite(&(shop->sell_message), sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
-  fwrite(&(shop->money_on_hand), sizeof(int32_t), 1, fp);
+  dc_fwrite(&(shop->owner), sizeof(char), PC_SHOP_OWNER_SIZE, fp);
+  dc_fwrite(&(shop->room_num), sizeof(int32_t), 1, fp);
+  dc_fwrite(&(shop->sell_message), sizeof(char), PC_SHOP_SELL_MESS_SIZE, fp);
+  dc_fwrite(&(shop->money_on_hand), sizeof(int32_t), 1, fp);
 
   // add stuff later here with 3 digit code
   // end of variable data
-  fwrite("END", sizeof(char), 3, fp);
+  dc_fwrite("END", sizeof(char), 3, fp);
 
   for (item = shop->sale_list; item; item = item->next)
     count++;
 
-  fwrite(&(count), sizeof(int32_t), 1, fp);
+  dc_fwrite(&(count), sizeof(int32_t), 1, fp);
 
   for (item = shop->sale_list; item; item = item->next)
   {
-    fwrite(&(item->item_vnum), sizeof(int), 1, fp);
-    fwrite(&(item->price), sizeof(int), 1, fp);
-    fwrite("END", sizeof(char), 3, fp);
+    dc_fwrite(&(item->item_vnum), sizeof(int), 1, fp);
+    dc_fwrite(&(item->price), sizeof(int), 1, fp);
+    dc_fwrite("END", sizeof(char), 3, fp);
   }
-
-  fclose(fp);
 }
 
 // save the list of shopfiles (not an individual shop)
 // this only needs to be done when a shop is created or deleted
 void save_shop_list()
 {
-  FILE *fp;
+  FILEPtr fp;
 
-  if ((fp = fopen(PLAYER_SHOP_INDEX, "w")) == nullptr)
+  if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "w")) == nullptr)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -984,7 +980,6 @@ void save_shop_list()
     fwrite_string(shop->owner, fp);
 
   fwrite_string("$", fp);
-  fclose(fp);
 }
 
 void save_player_shop_world_range()
@@ -1009,21 +1004,21 @@ void save_player_shop_world_range()
     {
       write_one_room(lf, x);
     }
-    fprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
 }
 
 void boot_player_shops()
 {
-  FILE *fp;
-  FILE *shopfp;
+  FILEPtr fp;
+  FILEPtr shopfp;
   player_shop *shop;
   char *filename;
   char buf[80];
 
   g_playershops = nullptr;
 
-  if ((fp = fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
+  if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
   {
     perror(PLAYER_SHOP_INDEX);
     exit(1);
@@ -1035,7 +1030,7 @@ void boot_player_shops()
   while (strcmp(filename, "$"))
   {
     sprintf(buf, "%s/%s", PLAYER_SHOP_DIR, filename);
-    if ((shopfp = fopen(buf, "r")) == nullptr)
+    if ((shopfp = dc_fopen(buf, "r")) == nullptr)
     {
       perror(buf);
       exit(1);
@@ -1049,10 +1044,8 @@ void boot_player_shops()
     shop->next = g_playershops;
     g_playershops = shop;
 
-    fclose(shopfp);
     filename = fread_string(fp, 0);
   }
-  fclose(fp);
 }
 
 player_shop *find_player_shop(Character *keeper)

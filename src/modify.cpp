@@ -14,7 +14,7 @@
  ***************************************************************************/
 /* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cctype>
 #include <cstring>
 #include <ctime>
@@ -491,7 +491,7 @@ void DC::free_help_from_memory(void)
   help_index = nullptr;
 }
 
-help_index_element *build_help_index(FILE *fl, int *num)
+help_index_element *build_help_index(FILEPtr fl, int *num)
 {
   int nr = -1, issorted, i;
   help_index_element *list = 0, mem;
@@ -507,8 +507,8 @@ help_index_element *build_help_index(FILE *fl, int *num)
 
   for (;;)
   {
-    pos = ftell(fl);
-    fgets(buf, 81, fl);
+    pos = dc_ftell(fl);
+    dc_fgets(buf, 81, fl);
     *(buf + strlen(buf) - 1) = '\0';
     scan = buf;
     for (;;)
@@ -531,7 +531,7 @@ help_index_element *build_help_index(FILE *fl, int *num)
 
     /* skip the text */
     do
-      fgets(buf, 81, fl);
+      dc_fgets(buf, 81, fl);
     while (*buf != '#');
     if (*(buf + 1) == '~')
       break;

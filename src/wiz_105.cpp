@@ -67,12 +67,12 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
 
 int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
 {
-  extern FILE *help_fl;
+  extern FILEPtr help_fl;
   extern help_index_element *help_index;
-  extern help_index_element *build_help_index(FILE * fl, int *num);
+  extern help_index_element *build_help_index(FILEPtr fl, int *num);
   DC::getInstance()->free_help_from_memory();
-  fclose(help_fl);
-  if (!(help_fl = fopen(HELP_KWRD_FILE, "r")))
+
+  if (!(help_fl = dc_fopen(HELP_KWRD_FILE, "r")))
   {
     perror(HELP_KWRD_FILE);
     abort();

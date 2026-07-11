@@ -74,7 +74,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
 int do_processes(Character *ch, char *arg, cmd_t cmd)
 {
-  FILE *fl;
+  FILEPtr fl;
   char *tmp;
   char buf[100];
 
@@ -82,29 +82,26 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
 
   system(buf);
 
-  if (!(fl = fopen("../lib/whassup.txt", "a")))
+  if (!(fl = dc_fopen("../lib/whassup.txt", "a")))
   {
     logentry(QStringLiteral("Unable to open whassup.txt for adding in do_processes!"), IMPLEMENTER,
              DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
-  if (fprintf(fl, "~\n") < 0)
+  if (dc_fprintf(fl, "~\n") < 0)
   {
-    fclose(fl);
+
     ch->sendln("Failure writing to transition file.");
     return ReturnValue::eFAILURE;
   }
 
-  fclose(fl);
-
-  if (!(fl = fopen("../lib/whassup.txt", "r")))
+  if (!(fl = dc_fopen("../lib/whassup.txt", "r")))
   {
     logentry(QStringLiteral("Unable to open whassup.txt for reading in do_processes!"), IMPLEMENTER,
              DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
   tmp = fread_string(fl, 0);
-  fclose(fl);
 
   ch->send(tmp);
   FREE(tmp);
@@ -470,7 +467,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   }
   else if (arg1 == "die")
   {
-    fclose(fopen("died_in_bootup", "w"));
+    auto died_in_bootup = dc_fopen("died_in_bootup", "w");
     try_to_hotboot_on_crash = 0;
 
     // let's crash the mud!

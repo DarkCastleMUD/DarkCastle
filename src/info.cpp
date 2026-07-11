@@ -2425,7 +2425,7 @@ int do_weather(Character *ch, char *argument, cmd_t cmd)
 int do_help(Character *ch, char *argument, cmd_t cmd)
 {
   extern help_index_element *help_index;
-  extern FILE *help_fl;
+  extern FILEPtr help_fl;
   extern char help[MAX_STRING_LENGTH];
 
   int chk, bot, top, mid;
@@ -2453,11 +2453,11 @@ int do_help(Character *ch, char *argument, cmd_t cmd)
 
       if (!(chk = str_cmp(argument, help_index[mid].keyword)))
       {
-        fseek(help_fl, help_index[mid].pos, 0);
+        dc_fseek(help_fl, help_index[mid].pos, 0);
         *buffer = '\0';
         for (;;)
         {
-          fgets(buf, 80, help_fl);
+          dc_fgets(buf, 80, help_fl);
           if (*buf == '#')
             break;
           buf[80] = 0;

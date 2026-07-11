@@ -1,4 +1,4 @@
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstdlib>
 #include <cctype>
 #include <unistd.h>

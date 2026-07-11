@@ -30,7 +30,7 @@
 #include <cstring>
 
 #include <sys/types.h>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstdlib>
 #include <QStringLiteral>
 

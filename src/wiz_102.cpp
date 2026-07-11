@@ -4875,8 +4875,8 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
   QString command = QStringLiteral("cp %1 %1.last").arg(filename);
   system(command.toStdString().c_str());
 
-  FILE *f = nullptr;
-  if ((f = fopen(filename.toStdString().c_str(), "w")) == nullptr)
+  FILEPtr f = nullptr;
+  if ((f = dc_fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
     logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));
     return ReturnValue::eFAILURE;
@@ -4884,7 +4884,6 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
 
   zone.write(f);
 
-  fclose(f);
   sendln(QStringLiteral("Saved zone %1.").arg(zone_key));
   zone.setModified(false);
   return ReturnValue::eSUCCESS;
@@ -4969,7 +4968,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
     {
       write_mobile(lf, DC::getInstance()->mob_index[x].mob);
     }
-    fprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
 
   ch->sendln("Saved.");
@@ -5017,7 +5016,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
     {
       write_object(lf, DC::getInstance()->obj_index[x].item);
     }
-    fprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
 
   ch->sendln("Saved.");
@@ -5027,7 +5026,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
 
 int do_instazone(Character *ch, char *arg, cmd_t cmd)
 {
-  FILE *fl;
+  FILEPtr fl;
   char buf[200], bufl[200] /*,buf2[200],buf3[200]*/;
   room_t room = 1, x, door /*,direction*/;
   int pos;
@@ -5071,10 +5070,10 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
   sprintf(buf, "../lib/builder/%s.zon", GET_NAME(ch));
 
-  if ((fl = fopen(buf, "w")) == nullptr)
+  if ((fl = dc_fopen(buf, "w")) == nullptr)
   {
     ch->send("Couldn't open up zone file. Tell Godflesh!");
-    fclose(fl);
+
     return ReturnValue::eFAILURE;
   }
 
@@ -5086,11 +5085,11 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
     break;
   }
 
-  fprintf(fl, "#%llu\n", DC::getInstance()->world[room].zone);
+  dc_fprintf(fl, "#%llu\n", DC::getInstance()->world[room].zone);
   sprintf(buf, "%s's Area.", ch->getNameC());
   string_to_file(fl, buf);
-  fprintf(fl, "~\n");
-  fprintf(fl, "%d 30 2\n", high);
+  dc_fprintf(fl, "~\n");
+  dc_fprintf(fl, "%d 30 2\n", high);
 
   /* Set allthe door states..  */
 
@@ -5120,7 +5119,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
           value = 0;
         }
 
-        fprintf(fl, "D 0 %d %d %d\n", DC::getInstance()->world[room].number, DC::getInstance()->world[DC::getInstance()->world[room].dir_option[door]->to_room].number, value);
+        dc_fprintf(fl, "D 0 %d %d %d\n", DC::getInstance()->world[room].number, DC::getInstance()->world[DC::getInstance()->world[room].dir_option[door]->to_room].number, value);
       }
     }
   } /*  Ok.. all door state info written...  */
@@ -5150,7 +5149,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
         if (!obj->in_obj)
         {
-          fprintf(fl, "O 0 %llu %d %d", obj->vnum_, count, DC::getInstance()->world[room].number);
+          dc_fprintf(fl, "O 0 %llu %d %d", obj->vnum_, count, DC::getInstance()->world[room].number);
           sprintf(buf, "           %s\n", obj->short_description);
           string_to_file(fl, buf);
 
@@ -5168,7 +5167,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   count++;
               }
 
-              fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
+              dc_fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
               sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
               string_to_file(fl, buf);
             } /*  for loop */
@@ -5207,7 +5206,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             count++;
         }
 
-        fprintf(fl, "M 0 %llu %d %d", mob->mobdata->vnum_, count, DC::getInstance()->world[room].number);
+        dc_fprintf(fl, "M 0 %llu %d %d", mob->mobdata->vnum_, count, DC::getInstance()->world[room].number);
         sprintf(buf, "           %s\n", mob->short_desc);
         string_to_file(fl, buf);
 
@@ -5228,7 +5227,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "E 1 %llu %d %d", obj->vnum_, count, pos);
+              dc_fprintf(fl, "E 1 %llu %d %d", obj->vnum_, count, pos);
               sprintf(buf, "      Equip %s with %s\n", mob->short_desc, obj->short_description);
               string_to_file(fl, buf);
 
@@ -5246,7 +5245,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
+                  dc_fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
                   sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
                   string_to_file(fl, buf);
                 } /*  for loop */
@@ -5271,7 +5270,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
 
             if (!obj->in_obj)
             {
-              fprintf(fl, "G 1 %llu %d", obj->vnum_, count);
+              dc_fprintf(fl, "G 1 %llu %d", obj->vnum_, count);
               sprintf(buf, "      Give %s %s\n", mob->short_desc, obj->short_description);
               string_to_file(fl, buf);
 
@@ -5289,7 +5288,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                       count++;
                   }
 
-                  fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
+                  dc_fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
                   sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
                   string_to_file(fl, buf);
                 } /*  for loop */
@@ -5301,8 +5300,8 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
     } /* end of if some body is in the fucking room.  */
   } /* end of for loop going through the zone looking for mobs...  */
 
-  fprintf(fl, "S\n");
-  fclose(fl);
+  dc_fprintf(fl, "S\n");
+
   ch->sendln("Zone File Created! Tell someone who can put it in!");
   return ReturnValue::eSUCCESS;
 }

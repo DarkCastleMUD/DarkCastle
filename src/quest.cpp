@@ -45,16 +45,16 @@ extern char *gl_item(Object *obj, int number, Character *ch, bool platinum);
 
 int load_quests(void)
 {
-  FILE *fl;
+  FILEPtr fl;
   quest_info *quest;
 
-  if (!(fl = fopen(QUEST_FILE, "r")))
+  if (!(fl = dc_fopen(QUEST_FILE, "r")))
   {
     logentry(QStringLiteral("Failed to open quest file for reading!"), 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
   }
 
-  while (fgetc(fl) != '$')
+  while (dc_fgetc(fl) != '$')
   {
 
 #ifdef LEAK_CHECK
@@ -83,17 +83,15 @@ int load_quests(void)
     quest_list.push_back(quest);
   }
 
-  fclose(fl);
-
   return ReturnValue::eSUCCESS;
 }
 
 int save_quests(void)
 {
-  FILE *fl;
+  FILEPtr fl;
   quest_info *quest;
 
-  if (!(fl = fopen(QUEST_FILE, "w")))
+  if (!(fl = dc_fopen(QUEST_FILE, "w")))
   {
     logentry(QStringLiteral("Failed to open quest file for writing!"), 0, DC::LogChannel::LOG_MISC);
     return ReturnValue::eFAILURE;
@@ -102,7 +100,7 @@ int save_quests(void)
   for (quest_list_t::iterator node = quest_list.begin(); node != quest_list.end(); node++)
   {
     quest = *node;
-    fprintf(fl, "#%d\n", quest->number);
+    dc_fprintf(fl, "#%d\n", quest->number);
     string_to_file(fl, quest->name);
     string_to_file(fl, quest->hint1);
     string_to_file(fl, quest->hint2);
@@ -110,12 +108,10 @@ int save_quests(void)
     string_to_file(fl, quest->objshort);
     string_to_file(fl, quest->objlong);
     string_to_file(fl, quest->objkey);
-    fprintf(fl, "%d %d %d %d %d %d %d\n", quest->level, quest->objnum, quest->mobnum, quest->timer, quest->reward, quest->cost, quest->brownie);
+    dc_fprintf(fl, "%d %d %d %d %d %d %d\n", quest->level, quest->objnum, quest->mobnum, quest->timer, quest->reward, quest->cost, quest->brownie);
   }
 
-  fprintf(fl, "$");
-
-  fclose(fl);
+  dc_fprintf(fl, "$");
 
   return ReturnValue::eSUCCESS;
 }

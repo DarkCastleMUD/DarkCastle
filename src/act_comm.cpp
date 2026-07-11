@@ -691,7 +691,7 @@ void DC::load_hints(void)
   }
 
   /*
-    while (fgetc(fl) != '$')
+    while (dc_fgetc(fl) != '$')
     {
       fread_uint(fl, 0, 32768); // ignored
 
@@ -703,7 +703,7 @@ void DC::load_hints(void)
       }
     }
 
-    fclose(fl);
+
     */
 }
 

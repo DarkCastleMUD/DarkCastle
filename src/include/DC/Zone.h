@@ -6,6 +6,8 @@
 #include <QList>
 #include "DC/weather.h"
 #include "DC/types.h"
+#include "DC/dcstdio.h"
+
 typedef quint64 zone_t;
 typedef quint64 room_t;
 
@@ -150,7 +152,7 @@ public:
   [[nodiscard]] room_t getRealTop(void) const;
   void setRealTop(room_t room_key);
 
-  void write(FILE *fl);
+  void write(FILEPtr fl);
   [[nodiscard]] int show_info(Character *ch);
 
   zone_t getID(void) const

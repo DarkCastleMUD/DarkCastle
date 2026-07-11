@@ -603,7 +603,7 @@ void save_char_obj_db(Character *ch);
 
 void unique_scan(Character *victim);
 void char_to_store(Character *ch, class char_file_u4 *st, time_data &tmpage);
-bool obj_to_store(class Object *obj, Character *ch, FILE *fpsave, int wear_pos);
+bool obj_to_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos);
 void check_idling(Character *ch);
 
 enum class follower_reasons_t

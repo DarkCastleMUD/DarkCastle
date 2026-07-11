@@ -22,7 +22,7 @@
 
 #include <cassert>
 #include <cstddef>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -300,22 +300,22 @@ int str_n_nosp_cmp(const char *arg1, const char *arg2, int size)
 }
 
 // TODO - Declare these in a more appropriate place
-FILE *bug_log = 0;
-FILE *god_log = 0;
-FILE *mortal_log = 0;
-FILE *socket_log = 0;
-FILE *player_log = 0;
-FILE *world_log = 0;
-FILE *arena_log = 0;
-FILE *clan_log = 0;
-FILE *objects_log = 0;
-FILE *quest_log = 0;
-FILE *vault_log = 0;
+FILEPtr bug_log = 0;
+FILEPtr god_log = 0;
+FILEPtr mortal_log = 0;
+FILEPtr socket_log = 0;
+FILEPtr player_log = 0;
+FILEPtr world_log = 0;
+FILEPtr arena_log = 0;
+FILEPtr clan_log = 0;
+FILEPtr objects_log = 0;
+FILEPtr quest_log = 0;
+FILEPtr vault_log = 0;
 
 // writes a std::string to the log
 void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vict)
 {
-  FILE **f = 0;
+  FILEPtr *f = 0;
   int stream = 1;
   std::stringstream logpath;
 
@@ -355,7 +355,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_BUG:
     f = &bug_log;
     logpath << BUG_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open bug log.\n");
     }
@@ -371,7 +371,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_GOD:
     f = &god_log;
     logpath << GOD_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open god log.\n");
     }
@@ -379,7 +379,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_MORTAL:
     f = &mortal_log;
     logpath << MORTAL_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open mortal log.\n");
     }
@@ -387,7 +387,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_SOCKET:
     f = &socket_log;
     logpath << SOCKET_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("%s", qUtf8Printable(QStringLiteral("Unable to open socket log: %1\n").arg(logpath.str().c_str())));
     }
@@ -397,7 +397,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
     if (vict && !vict->getName().isEmpty())
     {
       logpath << vict->getName().toStdString();
-      if (!(*f = fopen(logpath.str().c_str(), "a")))
+      if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
       {
         qCritical("%s", qUtf8Printable(QStringLiteral("Unable to open player log '%1'.\n").arg(logpath.str().c_str())));
       }
@@ -405,7 +405,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
     else
     {
       logpath << PLAYER_LOG;
-      if (!(*f = fopen(logpath.str().c_str(), "a")))
+      if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
       {
         qCritical("Unable to open player log.\n");
       }
@@ -414,7 +414,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_WORLD:
     f = &world_log;
     logpath << WORLD_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open world log.\n");
     }
@@ -422,7 +422,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_ARENA:
     f = &arena_log;
     logpath << ARENA_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open arena log.\n");
     }
@@ -430,7 +430,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_CLAN:
     f = &clan_log;
     logpath << CLAN_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open clan log.\n");
     }
@@ -438,7 +438,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_OBJECTS:
     f = &objects_log;
     logpath << OBJECTS_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open objects log.\n");
     }
@@ -446,7 +446,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_QUEST:
     f = &quest_log;
     logpath << QUEST_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open quest log.\n");
     }
@@ -454,7 +454,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   case DC::LogChannel::LOG_VAULT:
     f = &vault_log;
     logpath << VAULT_LOG;
-    if (!(*f = fopen(logpath.str().c_str(), "a")))
+    if (!(*f = dc_fopen(logpath.str().c_str(), "a")))
     {
       qFatal("Unable to open vault log.\n");
     }
@@ -480,8 +480,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
 
   if (stream != STDIN_FILENO)
   {
-    fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
-    fclose(*f);
+    dc_fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
   }
 
   if (god_level >= IMMORTAL)
@@ -871,14 +870,13 @@ time_info_data Character::age(void)
 
 bool file_exists(const char *filename)
 {
-  FILE *fp;
+  FILEPtr fp;
 
-  if ((fp = fopen(filename, "r")) == nullptr)
+  if ((fp = dc_fopen(filename, "r")) == nullptr)
   {
     return false;
   }
 
-  fclose(fp);
   return true;
 }
 
@@ -1365,7 +1363,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
 
 int do_idea(Character *ch, char *argument, cmd_t cmd)
 {
-  FILE *fl;
+  FILEPtr fl;
   char str[MAX_STRING_LENGTH];
 
   if (ch->isNonPlayer())
@@ -1384,7 +1382,7 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(fl = fopen(IDEA_LOG, "a")))
+  if (!(fl = dc_fopen(IDEA_LOG, "a")))
   {
     perror("do_idea");
     ch->sendln("Could not open the idea log.");
@@ -1392,15 +1390,14 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
-  fputs(str, fl);
-  fclose(fl);
+  dc_fputs(str, fl);
   ch->sendln("Ok.  Thanks.");
   return ReturnValue::eSUCCESS;
 }
 
 int do_typo(Character *ch, char *argument, cmd_t cmd)
 {
-  FILE *fl;
+  FILEPtr fl;
   char str[MAX_STRING_LENGTH];
 
   if (ch->isNonPlayer())
@@ -1419,7 +1416,7 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(fl = fopen(TYPO_LOG, "a")))
+  if (!(fl = dc_fopen(TYPO_LOG, "a")))
   {
     perror("do_typo");
     ch->sendln("Could not open the typo log.");
@@ -1428,15 +1425,14 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(str, "**%s[%d]: %s\n",
           GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
-  fputs(str, fl);
-  fclose(fl);
+  dc_fputs(str, fl);
   ch->sendln("Ok.  Thanks.");
   return ReturnValue::eSUCCESS;
 }
 
 int do_bug(Character *ch, char *argument, cmd_t cmd)
 {
-  FILE *fl;
+  FILEPtr fl;
   char str[MAX_STRING_LENGTH];
 
   if (ch->isNonPlayer())
@@ -1455,7 +1451,7 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(fl = fopen(BUG_LOG, "a")))
+  if (!(fl = dc_fopen(BUG_LOG, "a")))
   {
     perror("do_bug");
     ch->sendln("Could not open the bug log.");
@@ -1463,8 +1459,8 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
   }
 
   sprintf(str, "**%s[%d]: %s\n", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number, argument);
-  fputs(str, fl);
-  fclose(fl);
+  dc_fputs(str, fl);
+
   ch->sendln("Ok.");
   return ReturnValue::eSUCCESS;
 }
@@ -2290,7 +2286,7 @@ void check_timer()
   DC::getInstance()->removeDead();
 }
 
-int get_line(FILE *fl, char *buf)
+int get_line(FILEPtr fl, char *buf)
 {
   char temp[256] = {};
   int lines = 0;
@@ -2298,12 +2294,12 @@ int get_line(FILE *fl, char *buf)
   do
   {
     lines++;
-    fgets(temp, 256, fl);
+    dc_fgets(temp, 256, fl);
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && (*temp == '*' || !*temp));
+  } while (!dc_feof(fl) && (*temp == '*' || !*temp));
 
-  if (feof(fl))
+  if (dc_feof(fl))
     return 0;
   else
   {

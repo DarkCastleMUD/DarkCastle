@@ -18,7 +18,7 @@
  ***************************************************************************/
 /* $Id: nanny.cpp,v 1.198 2015/05/26 08:55:40 zen Exp $ */
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cctype>
 #include <unistd.h>
 #include <cstring>
@@ -2009,14 +2009,13 @@ int _parse_name(const char *arg, char *name)
 // Check for denial of service.
 bool check_deny(class Connection *d, char *name)
 {
-  FILE *fpdeny = nullptr;
+  FILEPtr fpdeny = nullptr;
   char strdeny[MAX_INPUT_LENGTH];
   char bufdeny[MAX_STRING_LENGTH];
 
   sprintf(strdeny, "%s/%c/%s.deny", SAVE_DIR, UPPER(name[0]), name);
-  if ((fpdeny = fopen(strdeny, "rb")) == nullptr)
+  if ((fpdeny = dc_fopen(strdeny, "rb")) == nullptr)
     return false;
-  fclose(fpdeny);
 
   char log_buf[MAX_STRING_LENGTH] = {};
   sprintf(log_buf, "Denying access to player %s@%s.", name, d->getPeerOriginalAddress().toString().toStdString().c_str());
@@ -2501,12 +2500,12 @@ void checkConsecrate(int pulseType)
 /* check name to see if it is listed in the file of forbidden player names */
 bool on_forbidden_name_list(const char *name)
 {
-  FILE *nameList;
+  FILEPtr nameList;
   char buf[MAX_STRING_LENGTH + 1];
   bool found = false;
   int i;
 
-  nameList = fopen(FORBIDDEN_NAME_FILE, "ro");
+  nameList = dc_fopen(FORBIDDEN_NAME_FILE, "ro");
   if (!nameList)
   {
     logentry(QStringLiteral("Failed to open forbidden name file!"), 0, DC::LogChannel::LOG_MISC);
@@ -2514,7 +2513,7 @@ bool on_forbidden_name_list(const char *name)
   }
   else
   {
-    while (fgets(buf, MAX_STRING_LENGTH, nameList) && !found)
+    while (dc_fgets(buf, MAX_STRING_LENGTH, nameList) && !found)
     {
       /* chop off trailing \n */
       if ((i = strlen(buf)) > 0)
@@ -2522,7 +2521,6 @@ bool on_forbidden_name_list(const char *name)
       if (!str_cmp(name, buf))
         found = true;
     }
-    fclose(nameList);
   }
   return found;
 }

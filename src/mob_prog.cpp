@@ -27,7 +27,7 @@
  ***************************************************************************/
 
 #include <sys/types.h>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstring>
 #include <cstdlib>
 #include <cctype>

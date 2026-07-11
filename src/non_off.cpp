@@ -1562,9 +1562,9 @@ void CVoteData::Reset(Character *ch)
 void CVoteData::OutToFile()
 {
 
-  FILE *the_file;
+  FILEPtr the_file;
 
-  the_file = fopen("vote_data", "w");
+  the_file = dc_fopen("vote_data", "w");
 
   if (!the_file)
   {
@@ -1573,36 +1573,35 @@ void CVoteData::OutToFile()
     return;
   }
 
-  fprintf(the_file, "%d\n", active);
-  fprintf(the_file, "%d\n", total_votes);
+  dc_fprintf(the_file, "%d\n", active);
+  dc_fprintf(the_file, "%d\n", total_votes);
 
-  fprintf(the_file, "%s\n", vote_question.c_str());
+  dc_fprintf(the_file, "%s\n", vote_question.c_str());
 
-  fprintf(the_file, "%zu\n", answers.size());
+  dc_fprintf(the_file, "%zu\n", answers.size());
 
   std::vector<SVoteData>::iterator answer_it;
 
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
   {
-    fprintf(the_file, "%d\n", answer_it->votes);
-    fprintf(the_file, "%s\n", answer_it->answer.c_str());
+    dc_fprintf(the_file, "%d\n", answer_it->votes);
+    dc_fprintf(the_file, "%s\n", answer_it->answer.c_str());
   }
 
   std::map<std::string, bool>::iterator ip_it;
 
-  fprintf(the_file, "%zu\n", ip_voted.size());
+  dc_fprintf(the_file, "%zu\n", ip_voted.size());
   for (ip_it = ip_voted.begin(); ip_it != ip_voted.end(); ip_it++)
   {
-    fprintf(the_file, "%s\n", ip_it->first.c_str());
+    dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  fprintf(the_file, "%zu\n", char_voted.size());
+  dc_fprintf(the_file, "%zu\n", char_voted.size());
   for (ip_it = char_voted.begin(); ip_it != char_voted.end(); ip_it++)
   {
-    fprintf(the_file, "%s\n", ip_it->first.c_str());
+    dc_fprintf(the_file, "%s\n", ip_it->first.c_str());
   }
 
-  fclose(the_file);
   return;
 }
 
@@ -1621,7 +1620,7 @@ CVoteData::CVoteData()
     : active(false), total_votes(0)
 {
   char buf[MAX_STRING_LENGTH];
-  FILE *the_file = nullptr;
+  FILEPtr the_file = nullptr;
   ;
   int num = 0;
   int is_active = 0;
@@ -1629,7 +1628,7 @@ CVoteData::CVoteData()
   SVoteData tmp_vote_data;
   active = false;
 
-  the_file = fopen("../lib/vote_data", "r");
+  the_file = dc_fopen("../lib/vote_data", "r");
   if (!the_file)
   {
     this->Reset(nullptr);
@@ -1637,21 +1636,21 @@ CVoteData::CVoteData()
   }
 
   // save is_active for later
-  fscanf(the_file, "%d\n", &is_active);
+  dc_fscanf(the_file, "%d\n", &is_active);
 
-  if (feof(the_file))
+  if (dc_feof(the_file))
   {
-    fclose(the_file);
+
     this->Reset(nullptr);
     return;
   }
 
-  fscanf(the_file, "%d\n", &num);
+  dc_fscanf(the_file, "%d\n", &num);
   total_votes = num;
 
-  if (!fgets(buf, MAX_STRING_LENGTH, the_file))
+  if (!dc_fgets(buf, MAX_STRING_LENGTH, the_file))
   {
-    fclose(the_file);
+
     this->Reset(nullptr);
     logentry(QStringLiteral("Error reading question from vote file."), 0, DC::LogChannel::LOG_MISC);
     return;
@@ -1660,13 +1659,13 @@ CVoteData::CVoteData()
   vote_question = buf;
 
   // ANSWERS
-  fscanf(the_file, "%d\n", &i);
+  dc_fscanf(the_file, "%d\n", &i);
   for (; i > 0; i--)
   {
-    fscanf(the_file, "%d\n", &num);
-    if (!fgets(buf, MAX_STRING_LENGTH, the_file))
+    dc_fscanf(the_file, "%d\n", &num);
+    if (!dc_fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      fclose(the_file);
+
       logentry(QStringLiteral("Error reading answers from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
@@ -1679,12 +1678,12 @@ CVoteData::CVoteData()
   }
 
   // IP ADDRESSES
-  fscanf(the_file, "%d\n", &i);
+  dc_fscanf(the_file, "%d\n", &i);
   for (; i > 0; i--)
   {
-    if (!fgets(buf, MAX_STRING_LENGTH, the_file))
+    if (!dc_fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      fclose(the_file);
+
       logentry(QStringLiteral("Error reading ip addresses from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
@@ -1694,12 +1693,12 @@ CVoteData::CVoteData()
   }
 
   // CHAR NAMES
-  fscanf(the_file, "%d\n", &i);
+  dc_fscanf(the_file, "%d\n", &i);
   for (; i > 0; i--)
   {
-    if (!fgets(buf, MAX_STRING_LENGTH, the_file))
+    if (!dc_fgets(buf, MAX_STRING_LENGTH, the_file))
     {
-      fclose(the_file);
+
       logentry(QStringLiteral("Error reading char names from vote file."), 0, DC::LogChannel::LOG_MISC);
       this->Reset(nullptr);
       return;
@@ -1710,8 +1709,6 @@ CVoteData::CVoteData()
 
   // everything must have been correct, activate it here
   active = (bool)is_active;
-
-  fclose(the_file);
 }
 
 CVoteData::~CVoteData()

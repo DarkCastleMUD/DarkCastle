@@ -94,14 +94,14 @@ void load_emoting_objects()
 {
   obj_emote_index *index_cursor = nullptr;
   obj_emote_data *data_cursor = nullptr;
-  FILE *fl;
+  FILEPtr fl;
   // short i;
   char fromfile;
   bool done = false,
        done2 = false;
   short offset;
 
-  fl = fopen(EMOTING_FILE, "r");
+  fl = dc_fopen(EMOTING_FILE, "r");
 #ifdef LEAK_CHECK
   obj_emote_head.next = (obj_emote_index *)
       calloc(1, sizeof(obj_emote_index));
@@ -137,7 +137,7 @@ void load_emoting_objects()
       // data_cursor->emote_text = (char *)dc_alloc(100, sizeof(char));
       data_cursor->emote_text = fread_string(fl, 0);
       index_cursor->emote_index_length++;
-      if ((offset = 1) && ((fromfile = fgetc(fl)) == 'S') && ((offset = 2) && (fromfile = fgetc(fl)) == '\n'))
+      if ((offset = 1) && ((fromfile = dc_fgetc(fl)) == 'S') && ((offset = 2) && (fromfile = dc_fgetc(fl)) == '\n'))
       {
         done = true;
       }
@@ -152,18 +152,18 @@ void load_emoting_objects()
 #endif
         data_cursor = data_cursor->next;
         data_cursor->next = nullptr;
-        // Azrack -- fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
-        // because fseek takes an unsigned int.
-        fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
+        // Azrack -- dc_fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
+        // because dc_fseek takes an unsigned int.
+        dc_fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
       }
     }
-    if ((fromfile = fgetc(fl)) == '$')
+    if ((fromfile = dc_fgetc(fl)) == '$')
     {
       done2 = true;
     }
     else
     {
-      fseek(fl, (1 * sizeof(char)), SEEK_CUR);
+      dc_fseek(fl, (1 * sizeof(char)), SEEK_CUR);
 #ifdef LEAK_CHECK
       index_cursor->next = (obj_emote_index *)
           calloc(1, sizeof(obj_emote_index));
@@ -187,7 +187,7 @@ void load_emoting_objects()
       data_cursor->next = nullptr;
     }
   }
-  fclose(fl);
+
   return;
 }
 

@@ -64,8 +64,8 @@ void addnews(news_data *newnews)
 
 void savenews()
 {
-  FILE *fl;
-  if (!(fl = fopen("news.data", "w")))
+  FILEPtr fl;
+  if (!(fl = dc_fopen("news.data", "w")))
   {
     logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     abort();
@@ -74,11 +74,11 @@ void savenews()
   for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
   {
     // This should be %ld but we need to through the existing news files 1st
-    fprintf(fl, "%d %s~\n", (int)tmpnews->time, tmpnews->addedby);
+    dc_fprintf(fl, "%d %s~\n", (int)tmpnews->time, tmpnews->addedby);
     string_to_file(fl, tmpnews->news);
   }
-  fprintf(fl, "0\n");
-  fclose(fl);
+  dc_fprintf(fl, "0\n");
+
   if (std::system(0))
     std::system("cp ../lib/news.data /srv/www/www.dcastle.org/htdocs/news.data");
   else
@@ -87,8 +87,8 @@ void savenews()
 
 void loadnews()
 {
-  FILE *fl;
-  if (!(fl = fopen("news.data", "r")))
+  FILEPtr fl;
+  if (!(fl = dc_fopen("news.data", "r")))
   {
     logentry(QStringLiteral("Cannot open news file 'news.data'"), 0, DC::LogChannel::LOG_MISC);
     return;
@@ -117,7 +117,6 @@ void loadnews()
     nnews->news = str_dup(buf);
     addnews(nnews);
   }
-  fclose(fl);
 }
 
 const char *newsify(char *string)

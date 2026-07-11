@@ -5,7 +5,7 @@
  */
 /* $Id: ki.cpp,v 1.94 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstdlib>
 #include <cstring>
 #include <fmt/format.h>

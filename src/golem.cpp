@@ -28,8 +28,8 @@
 void advance_golem_level(Character *golem);
 
 // save.cpp
-int store_worn_eq(Character *ch, FILE *fpsave);
-class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
+int store_worn_eq(Character *ch, FILEPtr fpsave);
+class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);
 
 class golem_data
 { // This is how a golem looks.
@@ -150,31 +150,30 @@ int verify_existing_components(Character *ch, int golemtype)
 void save_golem_data(Character *ch)
 {
   char file[200];
-  FILE *fpfile = nullptr;
+  FILEPtr fpfile = nullptr;
   int golemtype = 0;
   if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
   golemtype = !IS_AFFECTED(ch->player->golem, AFF_GOLEM); // 0 or 1
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, ch->getNameC()[0], ch->getNameC(), golemtype);
-  if (!(fpfile = fopen(file, "w")))
+  if (!(fpfile = dc_fopen(file, "w")))
   {
     logentry(QStringLiteral("Error while opening file in save_golem_data[golem.cpp]."), ANGEL, DC::LogChannel::LOG_BUG);
     return;
   }
   Character *golem = ch->player->golem; // Just to make the code below cleaner.
   uint8_t legacy_level = (uint8_t)golem->getLevel();
-  fwrite(&legacy_level, 1, 1, fpfile);
-  fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
+  dc_fwrite(&legacy_level, 1, 1, fpfile);
+  dc_fwrite(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   // Use previously defined functions after this.
   obj_to_store(golem->carrying, golem, fpfile, -1);
   store_worn_eq(golem, fpfile);
-  fclose(fpfile);
 }
 
 void save_charmie_data(Character *ch)
 {
   char file[200];
-  FILE *fpfile = nullptr;
+  FILEPtr fpfile = nullptr;
 
   if (ch->isNonPlayer() || ch->followers == nullptr)
   {
@@ -192,14 +191,13 @@ void save_charmie_data(Character *ch)
 
     // logf(IMMORTAL, DC::LogChannel::LOG_MISC, "Saving charmie %s for %s", follower->name, ch->getNameC());
     sprintf(file, "%s/%c/%s.%d", FOLLOWER_DIR, ch->getNameC()[0], ch->getNameC(), 0);
-    if (!(fpfile = fopen(file, "w")))
+    if (!(fpfile = dc_fopen(file, "w")))
     {
       logf(ANGEL, DC::LogChannel::LOG_BUG, "Error while opening file in save_charmie_data[golem.cpp].");
       return;
     }
     obj_to_store(follower->carrying, follower, fpfile, -1);
     store_worn_eq(follower, fpfile);
-    fclose(fpfile);
   }
 }
 
@@ -258,14 +256,14 @@ void set_golem(Character *golem, int golemtype)
 void Character::load_golem_data(int golemtype)
 {
   char file[200];
-  FILE *fpfile = nullptr;
+  FILEPtr fpfile = nullptr;
   Character *golem;
   if (this->isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
     return;
   if (golemtype < 0 || golemtype > 1)
     return; // Say what?
   sprintf(file, "%s/%c/%s.%d", FAMILIAR_DIR, this->getNameC()[0], this->getNameC(), golemtype);
-  if (!(fpfile = fopen(file, "r")))
+  if (!(fpfile = dc_fopen(file, "r")))
   { // No golem. Create a new one.
     golem = dc_->clone_mobile(8);
     set_golem(golem, golemtype);
@@ -277,7 +275,7 @@ void Character::load_golem_data(int golemtype)
   set_golem(golem, golemtype); // Basics
   this->player->golem = golem;
   uint8_t golem_level{};
-  fread(&(golem_level), sizeof(golem_level), 1, fpfile);
+  dc_fread(&(golem_level), sizeof(golem_level), 1, fpfile);
   golem->setLevel(golem_level);
 
   for (; golem_level > 1; golem_level--)
@@ -285,13 +283,12 @@ void Character::load_golem_data(int golemtype)
     advance_golem_level(golem); // Level it up again.
   }
 
-  fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
+  dc_fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
   class Object *last_cont = nullptr; // Last container.
-  while (!feof(fpfile))
+  while (!dc_feof(fpfile))
   {
     last_cont = obj_store_to_char(golem, fpfile, last_cont);
   }
-  fclose(fpfile);
 }
 
 int cast_create_golem(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill)

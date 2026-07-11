@@ -504,9 +504,9 @@ public:
   void boot_db(void);
   void boot_zones(void);
   void boot_world(void);
-  void write_one_zone(FILE *fl, zone_t zone_key);
-  zone_t read_one_zone(FILE *fl, QString zone_filename);
-  bool read_one_room(FILE *fl, room_t &room_nr);
+  void write_one_zone(FILEPtr fl, zone_t zone_key);
+  zone_t read_one_zone(FILEPtr fl, QString zone_filename);
+  bool read_one_room(FILEPtr fl, room_t &room_nr);
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);
@@ -584,7 +584,7 @@ public:
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
   void generate_mob_indices(QMap<vnum_t, class mob_index_data> &index);
   void generate_obj_indices(QMap<vnum_t, class obj_index_data> &index);
-  Character *read_mobile(int nr, FILE *fl);
+  Character *read_mobile(int nr, FILEPtr fl);
   Character *clone_mobile(int nr);
   auto create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   auto create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>;
@@ -854,7 +854,7 @@ auto &operator>>(auto &in, Room &room)
         // strip off the \n after the E
         if (fread_char(in) != '\n')
         {
-          fseek(in, -1, SEEK_CUR);
+          dc_fseek(in, -1, SEEK_CUR);
         }
 
         new_new_descr = new extra_descr_data;

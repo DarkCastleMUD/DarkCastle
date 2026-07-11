@@ -177,16 +177,16 @@ void checkConsecrate(int);
 // a reboot
 int DC::write_hotboot_file(void)
 {
-  FILE *fp;
+  FILEPtr fp;
   class Connection *sd;
-  if ((fp = fopen("hotboot", "w")) == nullptr)
+  if ((fp = dc_fopen("hotboot", "w")) == nullptr)
   {
     logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, DC::LogChannel::LOG_MISC);
     return 0;
   }
   // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
   for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const int &fd)
-           { fprintf(fp, "%d\n", fd); });
+           { dc_fprintf(fp, "%d\n", fd); });
 
   for (Connection *d = descriptor_list; d; d = sd)
   {
@@ -202,7 +202,7 @@ int DC::write_hotboot_file(void)
       STATE(d) = Connection::states::PLAYING; // if editors.
       if (d->original)
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
+        dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
         if (d->original->player)
         {
           d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
@@ -212,7 +212,7 @@ int DC::write_hotboot_file(void)
       }
       else
       {
-        fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), qPrintable(d->getPeerOriginalAddress().toString()));
+        dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), qPrintable(d->getPeerOriginalAddress().toString()));
         if (d->character->player)
         {
           d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
@@ -223,7 +223,7 @@ int DC::write_hotboot_file(void)
       write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
     }
   }
-  fclose(fp);
+
   logentry(QStringLiteral("Hotboot descriptor file successfully written."), 0, DC::LogChannel::LOG_MISC);
 
   chdir("../bin/");
@@ -396,11 +396,10 @@ void DC::finish_hotboot(void)
 /* Init sockets, run game, and cleanup sockets */
 void DC::init_game(void)
 {
-  FILE *fp;
+  FILEPtr fp;
   // create boot'ing lockfile
-  if ((fp = fopen("died_in_bootup", "w")))
+  if ((fp = dc_fopen("died_in_bootup", "w")))
   {
-    fclose(fp);
   }
 
   logverbose(QStringLiteral("Attempting to load hotboot file."));

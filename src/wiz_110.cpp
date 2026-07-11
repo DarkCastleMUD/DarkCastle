@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cassert>
 #include <fstream>
 #include <iostream>

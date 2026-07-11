@@ -2018,7 +2018,7 @@ void save_slot_machines()
     {
       write_object(lf, DC::getInstance()->obj_index[x].item);
     }
-    fprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
 }
 

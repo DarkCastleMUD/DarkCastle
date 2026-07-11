@@ -25,7 +25,7 @@
 
 #include <cassert>
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
@@ -4025,13 +4025,13 @@ bool check_dodge(Character *ch, Character *victim, int attacktype, bool display_
  */
 void load_messages(char *file, int base)
 {
-  FILE *fl;
+  FILEPtr fl;
   int i, type;
   extern message_list fight_messages[MAX_MESSAGES];
   message_type *messages;
   char chk[100];
 
-  if (!(fl = fopen(file, "r")))
+  if (!(fl = dc_fopen(file, "r")))
   {
     perror("read messages");
     exit(0);
@@ -4045,11 +4045,11 @@ void load_messages(char *file, int base)
       fight_messages[i].msg2 = 0;
     }
 
-  fscanf(fl, "%s\n", chk);
+  dc_fscanf(fl, "%s\n", chk);
 
   while (*chk == 'M')
   {
-    fscanf(fl, " %d\n", &type);
+    dc_fscanf(fl, " %d\n", &type);
     //     type += base;
     for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
                 (fight_messages[i].a_type);
@@ -4095,10 +4095,8 @@ void load_messages(char *file, int base)
     messages->god_msg.attacker_msg = fread_string(fl, 0);
     messages->god_msg.victim_msg = fread_string(fl, 0);
     messages->god_msg.room_msg = fread_string(fl, 0);
-    fscanf(fl, " %s \n", chk);
+    dc_fscanf(fl, " %s \n", chk);
   }
-
-  fclose(fl);
 }
 
 void DC::free_messages_from_memory(void)

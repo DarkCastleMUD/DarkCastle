@@ -11,7 +11,7 @@
 #include <cstring>
 #include <cctype>
 #include <cstdlib>
-#include <cstdio>
+#include "DC/dcstdio.h"
 
 #include "DC/obj.h"
 #include "DC/db.h"

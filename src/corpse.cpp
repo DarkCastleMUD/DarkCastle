@@ -41,14 +41,14 @@ class Object *obj_proto;
 int16_t frozen_start_room = 1;
 
 /* Local Function Declerations */
-int count_hash_records(FILE *fl);
+int count_hash_records(FILEPtr fl);
 class Object *create_obj_new(void);
 void save_corpses(void);
-int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tree);
-int write_corpse_to_disk(FILE *fp, class Object *obj, int locate);
+int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree);
+int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate);
 void clean_string(char *buffer);
-int get_line_new(FILE *fl, char *buf);
-char *fread_string_new(FILE *fl, char *error);
+int get_line_new(FILEPtr fl, char *buf);
+char *fread_string_new(FILEPtr fl, char *error);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
 
@@ -68,7 +68,7 @@ void clean_string(char *buffer)
   }
 }
 
-int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tree)
+int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree)
 {
   /* This function basically is responsible for taking the    */
   /* supplied obj and figuring out if it has any contents. If */
@@ -107,7 +107,7 @@ int corpse_save(class Object *obj, FILE *fp, int location, bool recurse_this_tre
   return (true);
 }
 
-int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
+int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
 {
   /* This is basically Patrick's my_obj_save_to_disk function with    */
   /* a few minor tweaks to make it work for corpses. Basically it     */
@@ -126,45 +126,45 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
   }
   else
     *buf1 = 0;
-  fprintf(fp,
-          "#%llu\n"
-          "%d %d %d %d %d %u %d %d\n",
-          GET_OBJ_VNUM(obj),
-          locate,
-          GET_OBJ_VAL(obj, 0),
-          GET_OBJ_VAL(obj, 1),
-          GET_OBJ_VAL(obj, 2),
-          GET_OBJ_VAL(obj, 3),
-          GET_OBJ_EXTRA(obj),
-          GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
-          GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
+  dc_fprintf(fp,
+             "#%llu\n"
+             "%d %d %d %d %d %u %d %d\n",
+             GET_OBJ_VNUM(obj),
+             locate,
+             GET_OBJ_VAL(obj, 0),
+             GET_OBJ_VAL(obj, 1),
+             GET_OBJ_VAL(obj, 2),
+             GET_OBJ_VAL(obj, 3),
+             GET_OBJ_EXTRA(obj),
+             GET_OBJ_VROOM(obj),  /*vroom is the virtual room a corpse*/
+             GET_OBJ_TIMER(obj)); /* was created in. See make_corpse */
 
   if (!(IS_OBJ_STAT(obj, ITEM_UNIQUE_SAVE)))
   {
     return 1;
   }
-  fprintf(fp,
-          "XAP\n"
-          "%s~\n"
-          "%s~\n"
-          "%s~\n"
-          "%s~\n"
-          "%d %d %d %d %d\n",
-          !obj->Name().isEmpty() ? qPrintable(obj->Name()) : "undefined",
-          obj->short_description ? obj->short_description : "undefined",
-          obj->long_description ? obj->long_description : "undefined",
-          buf1,
-          GET_OBJ_TYPE(obj),
-          GET_OBJ_WEAR(obj).toInt(),
-          (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
-          GET_OBJ_COST(obj), obj->num_affects);
+  dc_fprintf(fp,
+             "XAP\n"
+             "%s~\n"
+             "%s~\n"
+             "%s~\n"
+             "%s~\n"
+             "%d %d %d %d %d\n",
+             !obj->Name().isEmpty() ? qPrintable(obj->Name()) : "undefined",
+             obj->short_description ? obj->short_description : "undefined",
+             obj->long_description ? obj->long_description : "undefined",
+             buf1,
+             GET_OBJ_TYPE(obj),
+             GET_OBJ_WEAR(obj).toInt(),
+             (GET_OBJ_WEIGHT(obj) < 0 ? 0 : GET_OBJ_WEIGHT(obj)),
+             GET_OBJ_COST(obj), obj->num_affects);
   /* Do we have affects? */
   for (counter = 0; counter < obj->num_affects; counter++)
     if (obj->affected[counter].modifier)
-      fprintf(fp, "A\n"
-                  "%d %d\n",
-              obj->affected[counter].location,
-              obj->affected[counter].modifier);
+      dc_fprintf(fp, "A\n"
+                     "%d %d\n",
+                 obj->affected[counter].location,
+                 obj->affected[counter].modifier);
 
   /* Do we have extra descriptions? */
   if (obj->ex_description)
@@ -178,11 +178,11 @@ int write_corpse_to_disk(FILE *fp, class Object *obj, int locate)
       }
       strcpy(buf1, ex_desc->description);
       clean_string(buf1);
-      fprintf(fp, "E\n"
-                  "%s~\n"
-                  "%s~\n",
-              ex_desc->keyword,
-              buf1);
+      dc_fprintf(fp, "E\n"
+                     "%s~\n"
+                     "%s~\n",
+                 ex_desc->keyword,
+                 buf1);
     }
   }
   return 1;
@@ -195,7 +195,7 @@ void save_corpses(void)
   /* Basically any time a corpse is manipulated in any way..either */
   /* directly or indirectly you need to call this function */
 
-  FILE *fp;
+  FILEPtr fp;
   class Object *i, *next;
   int location = 0;
   char buf1[256] = {0};
@@ -205,7 +205,7 @@ void save_corpses(void)
     return;
 
   /* Open corpse file */
-  if (!(fp = fopen(CORPSE_FILE, "w")))
+  if (!(fp = dc_fopen(CORPSE_FILE, "w")))
   {
     if (errno != ENOENT) /* if it fails, NOT because of no file */
       sprintf(buf1, "SYSERR: checking for corpse file %s : %s", CORPSE_FILE, strerror(errno));
@@ -225,13 +225,12 @@ void save_corpses(void)
       if (!corpse_save(i, fp, location, false))
       {
         perror("SYSERR: A corpse didnt save for some reason");
-        fclose(fp);
+
         return;
       }
     }
   }
   /* Close the corpse file */
-  fclose(fp);
 }
 
 void DC::load_corpses(void)
@@ -245,7 +244,7 @@ void DC::load_corpses(void)
   /* If they dont like it, screwum. They are lucky I coded this:)    */
   /* Oh, and a bunch of this code is from Patricks XAP obj's code    */
 
-  FILE *fp;
+  FILEPtr fp;
   char line[256] = {0};
   int t[15], zwei = 0;
   int num_objs = 0;
@@ -257,20 +256,20 @@ void DC::load_corpses(void)
   class Object *money;
   int debug = false;
 
-  if (!(fp = fopen(CORPSE_FILE, "r")))
+  if (!(fp = dc_fopen(CORPSE_FILE, "r")))
   {
     logverbose(QStringLiteral("Unable to open '%1").arg(CORPSE_FILE));
     return;
   }
 
-  if (!feof(fp))
+  if (!dc_feof(fp))
   {
     get_line_new(fp, line);
   }
   else
     logentry(QStringLiteral("No corpses in file to load"), 0, DC::LogChannel::LOG_MISC);
 
-  while (!feof(fp) && !end)
+  while (!dc_feof(fp) && !end)
   {
     temp = nullptr;
     /* first, we get the number. Not too hard. */
@@ -420,7 +419,7 @@ void DC::load_corpses(void)
         }
 
         get_line_new(fp, line);
-        for (zwei = 0; !zwei && !feof(fp);)
+        for (zwei = 0; !zwei && !dc_feof(fp);)
         {
           switch (*line)
           {
@@ -516,17 +515,16 @@ void DC::load_corpses(void)
       }
     }
   }
-  fclose(fp);
 }
 
-int get_line_new(FILE *fl, char *buf)
+int get_line_new(FILEPtr fl, char *buf)
 {
   char temp[256] = {0};
   int lines = 0, a = 0;
 
-  while (!feof(fl))
+  while (!dc_feof(fl))
   {
-    switch ((temp[a++] = fgetc(fl)))
+    switch ((temp[a++] = dc_fgetc(fl)))
     {
     case (char)EOF:
       return 0;
@@ -549,12 +547,12 @@ int get_line_new(FILE *fl, char *buf)
   do
   {
     lines++;
-    fgets(temp, 256, fl);
+    dc_fgets(temp, 256, fl);
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && (*temp == '*' || !*temp));
+  } while (!dc_feof(fl) && (*temp == '*' || !*temp));
 
-  if (feof(fl))
+  if (dc_feof(fl))
     return 0;
   else
   {
@@ -577,7 +575,7 @@ class Object *create_obj_new(void)
   return obj;
 }
 
-char *fread_string_new(FILE *fl, char *error)
+char *fread_string_new(FILEPtr fl, char *error)
 {
   char buf[MAX_STRING_LENGTH], tmp[512], *rslt;
   char *point;
@@ -587,7 +585,7 @@ char *fread_string_new(FILE *fl, char *error)
 
   do
   {
-    if (!fgets(tmp, 512, fl))
+    if (!dc_fgets(tmp, 512, fl))
     {
       qFatal("SYSERR: fread_string_new: format error at or near %s\n",
              error);
@@ -633,12 +631,12 @@ char *fread_string_new(FILE *fl, char *error)
   return rslt;
 }
 
-int count_hash_records(FILE *fl)
+int count_hash_records(FILEPtr fl)
 {
   char buf[128];
   int count = 0;
 
-  while (fgets(buf, 128, fl))
+  while (dc_fgets(buf, 128, fl))
     if (*buf == '#')
       count++;
 

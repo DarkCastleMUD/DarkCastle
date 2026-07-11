@@ -622,9 +622,9 @@ private slots:
     testfile.write("\n");
     testfile.close();
 
-    FILE *stream = fopen(qPrintable(testfile.fileName()), "r");
+    FILEPtr stream = dc_fopen(qPrintable(testfile.fileName()), "r");
     QVERIFY(stream);
-    QCOMPARE(ftell(stream), 0);
+    QCOMPARE(dc_ftell(stream), 0);
 
     bool error_range_over_raised = false;
     int val1 = 3333333;
@@ -638,9 +638,9 @@ private slots:
     }
     QVERIFY(error_range_over_raised);
     QCOMPARE(val1, 3333333);
-    QCOMPARE(ftell(stream), 2);
+    QCOMPARE(dc_ftell(stream), 2);
 
-    QCOMPARE(fseek(stream, 0, SEEK_SET), 0);
+    QCOMPARE(dc_fseek(stream, 0, SEEK_SET), 0);
     bool error_range_under_raised = false;
     val1 = 3333333;
     try
@@ -653,9 +653,9 @@ private slots:
     }
     QVERIFY(error_range_under_raised);
     QCOMPARE(val1, 3333333);
-    QCOMPARE(ftell(stream), 2);
+    QCOMPARE(dc_ftell(stream), 2);
 
-    QCOMPARE(fseek(stream, 0, SEEK_SET), 0);
+    QCOMPARE(dc_fseek(stream, 0, SEEK_SET), 0);
     int val2 = fread_int(stream, -10, 10);
     QCOMPARE(val2, 3);
 
@@ -671,7 +671,6 @@ private slots:
     QString str3 = fread_qstring(stream);
     QCOMPARE(str3, QStringLiteral(""));
 
-    fclose(stream);
     testfile.remove();
   }
 
@@ -753,7 +752,7 @@ private slots:
     QCOMPARE(fstream_checksum.toHex(), original_checksum.toHex());
 
     {
-      FILE *fl = fopen(qPrintable(legacyfile_filename), "r");
+      FILEPtr fl = dc_fopen(qPrintable(legacyfile_filename), "r");
       QVERIFY(fl);
 
       QFile qf(qfile_filename);

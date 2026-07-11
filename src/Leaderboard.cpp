@@ -1126,10 +1126,10 @@ void Leaderboard::check_offline(void)
 
 void Leaderboard::read_file(void)
 {
-  FILE *fl;
+  FILEPtr fl;
   int i, j;
 
-  if (!(fl = fopen(LEADERBOARD_FILE, "r")))
+  if (!(fl = dc_fopen(LEADERBOARD_FILE, "r")))
   {
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
   }
@@ -1276,8 +1276,6 @@ void Leaderboard::read_file(void)
     {
       logf(0, DC::LogChannel::LOG_BUG, "Corrupt leaderboard file '%s': negative int found where positive expected", LEADERBOARD_FILE);
     }
-
-    fclose(fl);
   }
 }
 
@@ -1298,53 +1296,52 @@ void Leaderboard::write_file(const char filename[])
     return;
   }
 
-  FILE *fl;
+  FILEPtr fl;
   int i, j;
 
-  if (!(fl = fopen(filename, "w")))
+  if (!(fl = dc_fopen(filename, "w")))
   {
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", filename);
     return;
   }
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", hpactivename[i], hpactive[i]);
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", mnactivename[i], mnactive[i]);
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", kiactivename[i], kiactive[i]);
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", pkactivename[i], pkactive[i]);
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", pdactivename[i], pdactive[i]);
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", rdactivename[i], rdactive[i]);
   for (i = 0; i < 5; i++)
-    fprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
+    dc_fprintf(fl, "%s~ %d\n", mvactivename[i], mvactive[i]);
   for (j = 0; j < CLASS_MAX - 2; j++)
   {
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", hpactiveclassname[j][i],
-              hpactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", hpactiveclassname[j][i],
+                 hpactiveclass[j][i]);
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", mnactiveclassname[j][i],
-              mnactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", mnactiveclassname[j][i],
+                 mnactiveclass[j][i]);
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", kiactiveclassname[j][i],
-              kiactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", kiactiveclassname[j][i],
+                 kiactiveclass[j][i]);
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", pkactiveclassname[j][i],
-              pkactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", pkactiveclassname[j][i],
+                 pkactiveclass[j][i]);
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", pdactiveclassname[j][i],
-              pdactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", pdactiveclassname[j][i],
+                 pdactiveclass[j][i]);
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", rdactiveclassname[j][i],
-              rdactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", rdactiveclassname[j][i],
+                 rdactiveclass[j][i]);
     for (i = 0; i < 5; i++)
-      fprintf(fl, "%s~ %d\n", mvactiveclassname[j][i],
-              mvactiveclass[j][i]);
+      dc_fprintf(fl, "%s~ %d\n", mvactiveclassname[j][i],
+                 mvactiveclass[j][i]);
   }
-  fclose(fl);
 }
 
 int Leaderboard::pdscore(Character *ch)
@@ -1361,7 +1358,7 @@ int Leaderboard::pdscore(Character *ch)
 int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 {
   class Connection *d;
-  FILE *fl;
+  FILEPtr fl;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   int i, j, k, validclass = 0;
   char *hponlinename[5], *mnonlinename[5], *kionlinename[5], *pkonlinename[5],
@@ -1448,7 +1445,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  if (!(fl = fopen(LEADERBOARD_FILE, "r")))
+  if (!(fl = dc_fopen(LEADERBOARD_FILE, "r")))
   {
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file '%s'", LEADERBOARD_FILE);
     return ReturnValue::eFAILURE;
@@ -1564,7 +1561,6 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
       }
     }
   }
-  fclose(fl);
 
   // top 5 online
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
@@ -2001,7 +1997,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 
 void Leaderboard::rename(QString oldname, QString newname)
 {
-  FILE *fl{};
+  FILEPtr fl{};
   // lines is the number of lines rewritten back to leaderboard file
   // after a rename.. must sync up with # of outputs
 
@@ -2010,7 +2006,7 @@ void Leaderboard::rename(QString oldname, QString newname)
     return;
   }
 
-  if (!(fl = fopen(LEADERBOARD_FILE, "r")))
+  if (!(fl = dc_fopen(LEADERBOARD_FILE, "r")))
   {
     logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
     abort();
@@ -2024,7 +2020,6 @@ void Leaderboard::rename(QString oldname, QString newname)
     name.insert(i, fread_string(fl, 0));
     value.insert(i, fread_int(fl, 0, 2147483467));
   }
-  fclose(fl);
 
   for (auto i = 0; i < lines; i++)
   {
@@ -2040,7 +2035,7 @@ void Leaderboard::rename(QString oldname, QString newname)
   }
   else
   {
-    if (!(fl = fopen(LEADERBOARD_FILE, "w")))
+    if (!(fl = dc_fopen(LEADERBOARD_FILE, "w")))
     {
       logf(0, DC::LogChannel::LOG_BUG, "Cannot open leaderboard file: %s", LEADERBOARD_FILE);
       abort();
@@ -2048,10 +2043,8 @@ void Leaderboard::rename(QString oldname, QString newname)
 
     for (auto i = 0; i < lines; i++)
     {
-      fprintf(fl, "%s~ %d\n", name[i].toStdString().c_str(), value[i]);
+      dc_fprintf(fl, "%s~ %d\n", name[i].toStdString().c_str(), value[i]);
     }
-
-    fclose(fl);
   }
 }
 

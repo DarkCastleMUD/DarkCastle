@@ -10,6 +10,7 @@
 #include "DC/db.h"
 #include "DC/returnvals.h"
 #include "DC/memory.h"
+#include "DC/dcstdio.h"
 
 ban_list_element *ban_list = nullptr;
 
@@ -22,7 +23,7 @@ const char *ban_types[] = {
 
 void load_banned(void)
 {
-  FILE *fl;
+  FILEPtr fl;
   int i, date;
   char site_name[BANNED_SITE_LENGTH + 1], ban_type[100];
   char name[100 + 1];
@@ -30,12 +31,12 @@ void load_banned(void)
 
   ban_list = 0;
 
-  if (!(fl = fopen("banned", "r")))
+  if (!(fl = dc_fopen("banned", "r")))
   {
     perror("Unable to open banfile 'banned'");
     return;
   }
-  while (fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
+  while (dc_fscanf(fl, " %s %s %d %s ", ban_type, site_name, &date, name) == 4)
   {
     CREATE(next_node, ban_list_element, 1);
     strncpy(next_node->site, site_name, BANNED_SITE_LENGTH);
@@ -51,8 +52,6 @@ void load_banned(void)
     next_node->next = ban_list;
     ban_list = next_node;
   }
-
-  fclose(fl);
 }
 
 void DC::free_ban_list_from_memory(void)
@@ -89,27 +88,25 @@ int isbanned(QHostAddress address)
   return i;
 }
 
-void _write_one_node(FILE *fp, ban_list_element *node)
+void _write_one_node(FILEPtr fp, ban_list_element *node)
 {
   if (node)
   {
     _write_one_node(fp, node->next);
-    fprintf(fp, "%s %s %d %s\n", ban_types[node->type], node->site, (int32_t)node->date, node->name);
+    dc_fprintf(fp, "%s %s %d %s\n", ban_types[node->type], node->site, (int32_t)node->date, node->name);
   }
 }
 
 void write_ban_list(void)
 {
-  FILE *fl;
+  FILEPtr fl;
 
-  if (!(fl = fopen("banned", "w")))
+  if (!(fl = dc_fopen("banned", "w")))
   {
     perror("write_ban_list");
     return;
   }
   _write_one_node(fl, ban_list); /* recursively write from end to start */
-  fclose(fl);
-  return;
 }
 
 int do_ban(Character *ch, char *argument, cmd_t cmd)

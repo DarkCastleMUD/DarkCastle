@@ -23,7 +23,7 @@
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
 #include <cstring>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cassert>
 #include <cstdlib>
 

@@ -9,9 +9,9 @@
 #include <QtTypes>
 quint64 i = -1ULL;
 
-#include <cstring> // strcat
-#include <cstdio>  // FILE *
-#include <cctype>  // isspace..
+#include <cstring>      // strcat
+#include "DC/dcstdio.h" // FILEPtr
+#include <cctype>       // isspace..
 #include <netinet/in.h>
 
 #include <fstream>
@@ -69,7 +69,7 @@ const char *clan_rights[] = {
 
 void boot_clans(void)
 {
-  FILE *fl;
+  FILEPtr fl;
   char buf[1024];
   clan_data *new_new_clan = nullptr;
   clan_room_data *new_new_room = nullptr;
@@ -77,23 +77,23 @@ void boot_clans(void)
   int tempint;
   bool skip_clan = false, changes_made = false;
 
-  if (!(fl = fopen("../lib/clan.txt", "r")))
+  if (!(fl = dc_fopen("../lib/clan.txt", "r")))
   {
     qCritical("Unable to open ../lib/clan.txt file for reading...");
-    fl = fopen("../lib/clan.txt", "w");
+    fl = dc_fopen("../lib/clan.txt", "w");
     if (!fl)
     {
       qFatal("Unable to open ../lib/clan.txt for writing.");
     }
-    fprintf(fl, "~\n");
-    fclose(fl);
+    dc_fprintf(fl, "~\n");
+
     abort();
   }
 
   char a;
   while ((a = fread_char(fl)) != '~')
   {
-    ungetc(a, fl);
+    dc_ungetc(a, fl);
 
     new_new_clan = new clan_data;
     new_new_clan->next = 0;
@@ -146,7 +146,7 @@ void boot_clans(void)
     while ((a = fread_char(fl)) != '~')
     {
       if (a != ' ' && a != '\n')
-        getc(fl);
+        dc_fgetc(fl);
       switch (a)
       {
       case ' ':
@@ -242,8 +242,6 @@ void boot_clans(void)
     }
   }
 
-  fclose(fl);
-
   if (changes_made)
   {
     logf(0, DC::LogChannel::LOG_BUG, "Changes made to clans. Saving ../lib/clan.txt.");
@@ -253,7 +251,7 @@ void boot_clans(void)
 
 void save_clans(void)
 {
-  FILE *fl;
+  FILEPtr fl;
   clan_data *pclan = nullptr;
   clan_room_data *proom = nullptr;
   ClanMember *pmember = nullptr;
@@ -261,7 +259,7 @@ void save_clans(void)
   char *x;
   char *targ;
 
-  if (!(fl = fopen("../lib/clan.txt", "w")))
+  if (!(fl = dc_fopen("../lib/clan.txt", "w")))
   {
     qFatal("Unable to open clan.txt for writing.\n");
   }
@@ -269,12 +267,12 @@ void save_clans(void)
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
     // print normal data
-    fprintf(fl, "%s %s %s %d\n", pclan->leader, pclan->founder, pclan->name,
-            pclan->number);
+    dc_fprintf(fl, "%s %s %s %d\n", pclan->leader, pclan->founder, pclan->name,
+               pclan->number);
     // print rooms
     for (proom = pclan->rooms; proom; proom = proom->next)
-      fprintf(fl, "R %d\n", proom->room_number);
-    fprintf(fl, "S\n");
+      dc_fprintf(fl, "R %d\n", proom->room_number);
+    dc_fprintf(fl, "S\n");
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -284,11 +282,11 @@ void save_clans(void)
     *targ = '\0';
     // handle email
     if (pclan->email)
-      fprintf(fl, "E\n%s~\n", buf);
-    //  fprintf(fl, "E\n%s~\n", pclan->email);
+      dc_fprintf(fl, "E\n%s~\n", buf);
+    //  dc_fprintf(fl, "E\n%s~\n", pclan->email);
 
     // BLAH TEMP CODE THIS BLOWS
-    // What's happening is apparently fedora's fprintf doesn't strip out
+    // What's happening is apparently fedora's dc_fprintf doesn't strip out
     // \r's like Redhat's does.  So we're writing \r\n to files.  This is
     // bad because when we read it in, fread_string replaces \n with a
     // \r\n.  So we get \n\r\r.   After a while, this is really bad.
@@ -304,8 +302,8 @@ void save_clans(void)
 
     // handle description
     if (pclan->description)
-      fprintf(fl, "D\n%s~\n", buf);
-    //       fprintf(fl, "D\n%s~\n", pclan->description);
+      dc_fprintf(fl, "D\n%s~\n", buf);
+    //       dc_fprintf(fl, "D\n%s~\n", pclan->description);
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -315,14 +313,14 @@ void save_clans(void)
     *targ = '\0';
 
     if (pclan->login_message)
-      fprintf(fl, "L\n%s~\n", buf);
-    //  fprintf(fl, "L\n%s~\n", pclan->login_message);
+      dc_fprintf(fl, "L\n%s~\n", buf);
+    //  dc_fprintf(fl, "L\n%s~\n", pclan->login_message);
 
     if (pclan->tax)
-      fprintf(fl, "T\n%d\n", pclan->tax);
+      dc_fprintf(fl, "T\n%d\n", pclan->tax);
 
     if (pclan->getBalance())
-      fprintf(fl, "B\n%llu\n", pclan->getBalance());
+      dc_fprintf(fl, "B\n%llu\n", pclan->getBalance());
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -331,8 +329,8 @@ void save_clans(void)
         *targ++ = *x;
     *targ = '\0';
     if (pclan->death_message)
-      fprintf(fl, "X\n%s~\n", buf);
-    // fprintf(fl, "X\n%s~\n", pclan->death_message);
+      dc_fprintf(fl, "X\n%s~\n", buf);
+    // dc_fprintf(fl, "X\n%s~\n", pclan->death_message);
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -341,8 +339,8 @@ void save_clans(void)
         *targ++ = *x;
     *targ = '\0';
     if (pclan->logout_message)
-      fprintf(fl, "O\n%s~\n", buf);
-    // fprintf(fl, "O\n%s~\n", pclan->logout_message);
+      dc_fprintf(fl, "O\n%s~\n", buf);
+    // dc_fprintf(fl, "O\n%s~\n", pclan->logout_message);
 
     // BLAH TEMP CODE HERE
     targ = buf;
@@ -352,21 +350,20 @@ void save_clans(void)
     *targ = '\0';
 
     if (pclan->clanmotd)
-      fprintf(fl, "C\n%s~\n", buf);
-    //       fprintf(fl, "C\n%s~\n", pclan->clanmotd);
+      dc_fprintf(fl, "C\n%s~\n", buf);
+    //       dc_fprintf(fl, "C\n%s~\n", pclan->clanmotd);
 
     for (pmember = pclan->members; pmember; pmember = pmember->next)
     {
-      fprintf(fl, "M\n%s~\n", pmember->NameC());
-      fprintf(fl, "%d %d %lld %lld %llu %d\n", pmember->Rights(), pmember->Rank(), pmember->Unused1(), pmember->Unused2(), pmember->Unused3(), pmember->TimeJoined());
-      fprintf(fl, "%s~\n", pmember->Unused4C());
+      dc_fprintf(fl, "M\n%s~\n", pmember->NameC());
+      dc_fprintf(fl, "%d %d %lld %lld %llu %d\n", pmember->Rights(), pmember->Rank(), pmember->Unused1(), pmember->Unused2(), pmember->Unused3(), pmember->TimeJoined());
+      dc_fprintf(fl, "%s~\n", pmember->Unused4C());
     }
 
     // terminate clan
-    fprintf(fl, "~\n");
+    dc_fprintf(fl, "~\n");
   }
-  fprintf(fl, "~\n");
-  fclose(fl);
+  dc_fprintf(fl, "~\n");
 
   in_port_t port1 = 0;
   if (DC::getInstance()->cf.ports.size() > 0)
@@ -376,7 +373,7 @@ void save_clans(void)
 
   std::stringstream ssbuffer;
   ssbuffer << HTDOCS_DIR << port1 << "/" << WEBCLANSLIST_FILE;
-  if (!(fl = fopen(ssbuffer.str().c_str(), "w")))
+  if (!(fl = dc_fopen(ssbuffer.str().c_str(), "w")))
   {
     logf(0, DC::LogChannel::LOG_MISC, "Unable to open web clan file \'%s\' for writing.\n", ssbuffer.str().c_str());
     return;
@@ -384,18 +381,17 @@ void save_clans(void)
 
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
-    fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
-    fprintf(fl, "$3Contact Email$R:  %s\n"
-                "$3Clan Hall$R:      %s\n"
-                "$3Clan info$R:\n"
-                "$3----------$R\n",
-            pclan->email ? pclan->email : "(No Email)",
-            pclan->rooms ? "Yes" : "No");
+    dc_fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
+    dc_fprintf(fl, "$3Contact Email$R:  %s\n"
+                   "$3Clan Hall$R:      %s\n"
+                   "$3Clan info$R:\n"
+                   "$3----------$R\n",
+               pclan->email ? pclan->email : "(No Email)",
+               pclan->rooms ? "Yes" : "No");
     // This has to be separate, or if the leader uses $'s, it comes out funky
-    fprintf(fl, "%s\n",
-            pclan->description ? pclan->description : "(No Description)\r\n");
+    dc_fprintf(fl, "%s\n",
+               pclan->description ? pclan->description : "(No Description)\r\n");
   }
-  fclose(fl);
 }
 
 void delete_clan(const clan_data *currclan)

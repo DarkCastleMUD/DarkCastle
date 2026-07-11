@@ -20,7 +20,7 @@
 // - Where is Spellcraft "reduced fireball lag" affect listed?
 //    - Apoc.
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cassert>
 #include <cstdlib>
 #include <math.h> // pow(double,double)

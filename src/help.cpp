@@ -24,17 +24,17 @@
 // Externs
 extern void skip_spaces(char **string);
 extern help_index_element_new *new_help_table;
-int get_line(FILE *fl, char *buf);
+int get_line(FILEPtr fl, char *buf);
 int is_abbrev(const char *arg1, const char *arg2);
-void help_string_to_file(FILE *f, char *string);
+void help_string_to_file(FILEPtr f, char *string);
 
 // locals
 help_index_element_new *find_help(char *keyword);
 int strn_cmp(char *arg1, char *arg2, int n);
-int count_hash_records(FILE *fl);
+int count_hash_records(FILEPtr fl);
 void show_hedit_usage(Character *ch);
 void save_help(Character *ch);
-int get_line_with_space(FILE *fl, char *buf);
+int get_line_with_space(FILEPtr fl, char *buf);
 int show_one_help_entry(int entry, Character *ch, int count);
 void show_help_header(Character *ch);
 void show_help_bar(Character *ch);
@@ -285,7 +285,7 @@ help_index_element_new *find_help(char *keyword)
 
 #define ENTRY_MAX 32384
 
-int load_new_help(FILE *fl, int reload, Character *ch)
+int load_new_help(FILEPtr fl, int reload, Character *ch)
 {
   char entry[ENTRY_MAX], line[READ_SIZE + 1], tmpentry[ENTRY_MAX], buf[256], tmpbuffer[ENTRY_MAX];
   help_index_element_new new_help;
@@ -673,22 +673,21 @@ int strn_cmp(char *arg1, char *arg2, int n)
 int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 {
 
-  FILE *new_help_fl;
+  FILEPtr new_help_fl;
   int help_rec_count = 0, ret = 0;
 
   // ch->sendln("Command disabled!");
   // return ReturnValue::eFAILURE;
 
-  if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
+  if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
   {
     logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
   }
 
   help_rec_count = count_hash_records(new_help_fl);
-  fclose(new_help_fl);
 
-  if (!(new_help_fl = fopen(NEW_HELP_FILE, "r")))
+  if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
   {
     logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
@@ -698,7 +697,6 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   DC::getInstance()->new_top_of_helpt = 0;
   CREATE(new_help_table, help_index_element_new, help_rec_count);
   ret = load_new_help(new_help_fl, 1, ch);
-  fclose(new_help_fl);
 
   if (ret == ReturnValue::eFAILURE)
   {
@@ -910,7 +908,7 @@ void save_help(Character *ch)
   LegacyFile lf(".", file, "Couldn't open help file '%1' for saving.");
   if (lf.isOpen())
   {
-    fprintf(lf.file_handle_, "@Version: 2\n");
+    dc_fprintf(lf.file_handle_, "@Version: 2\n");
 
     for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
     {
@@ -920,15 +918,15 @@ void save_help(Character *ch)
       help_string_to_file(lf.file_handle_, new_help_table[i].keyword4);
       help_string_to_file(lf.file_handle_, new_help_table[i].keyword5);
       help_string_to_file(lf.file_handle_, new_help_table[i].related);
-      fprintf(lf.file_handle_, "L: %d\n", new_help_table[i].min_level);
-      fprintf(lf.file_handle_, "E:\n");
+      dc_fprintf(lf.file_handle_, "L: %d\n", new_help_table[i].min_level);
+      dc_fprintf(lf.file_handle_, "E:\n");
       help_string_to_file(lf.file_handle_, new_help_table[i].entry);
-      fprintf(lf.file_handle_, "#\n");
-      fprintf(lf.file_handle_, "~\n");
+      dc_fprintf(lf.file_handle_, "#\n");
+      dc_fprintf(lf.file_handle_, "~\n");
     }
 
     // end file
-    fprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
   else
   {
@@ -954,16 +952,16 @@ void save_help(Character *ch)
         help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword4);
         help_string_to_file(lf_web_help.file_handle_, new_help_table[i].keyword5);
         //      help_string_to_file(lf.file_handle_ new_help_table[i].related);
-        //      fprintf(lf.file_handle_ "L: %d\n", new_help_table[i].min_level);
-        //      fprintf(lf.file_handle_ "E:\n");
+        //      dc_fprintf(lf.file_handle_ "L: %d\n", new_help_table[i].min_level);
+        //      dc_fprintf(lf.file_handle_ "E:\n");
         help_string_to_file(lf_web_help.file_handle_, new_help_table[i].entry);
-        fprintf(lf_web_help.file_handle_, "#\n");
-        //      fprintf(lf.file_handle_ "~\n");
+        dc_fprintf(lf_web_help.file_handle_, "#\n");
+        //      dc_fprintf(lf.file_handle_ "~\n");
       }
     }
 
     // end file
-    fprintf(lf.file_handle_, "$~\n");
+    dc_fprintf(lf.file_handle_, "$~\n");
   }
   else
   {
@@ -973,7 +971,7 @@ void save_help(Character *ch)
   }
 }
 
-void help_string_to_file(FILE *f, char *str)
+void help_string_to_file(FILEPtr f, char *str)
 {
   char *newbuf = new char[strlen(str) + 1];
   strcpy(newbuf, str);
@@ -992,11 +990,11 @@ void help_string_to_file(FILE *f, char *str)
   if (newbuf[strlen(newbuf) - 1] == '\n')
     newbuf[strlen(newbuf) - 1] = '\0';
 
-  fprintf(f, "%s\n", newbuf);
+  dc_fprintf(f, "%s\n", newbuf);
   delete[] newbuf;
 }
 
-int get_line_with_space(FILE *fl, char *buf)
+int get_line_with_space(FILEPtr fl, char *buf)
 {
   char temp[256];
   int lines = 0;
@@ -1004,13 +1002,13 @@ int get_line_with_space(FILE *fl, char *buf)
   do
   {
     lines++;
-    fgets(temp, 256, fl);
+    dc_fgets(temp, 256, fl);
     if (*temp)
       temp[strlen(temp) - 1] = '\0';
-  } while (!feof(fl) && *temp == '*');
-  // } while (!feof(fl) && (*temp == '*' || !*temp));
+  } while (!dc_feof(fl) && *temp == '*');
+  // } while (!dc_feof(fl) && (*temp == '*' || !*temp));
 
-  if (feof(fl))
+  if (dc_feof(fl))
     return 0;
   else
   {

@@ -127,12 +127,12 @@ command_return_t Character::check_social(QString pcomm)
   return SOCIAL_true_WITH_NOISE;
 }
 
-char *fread_social_string(FILE *fl)
+char *fread_social_string(FILEPtr fl)
 {
   char buf[MAX_STRING_LENGTH], *rslt;
 
-  fgets(buf, MAX_STRING_LENGTH, fl);
-  if (feof(fl))
+  dc_fgets(buf, MAX_STRING_LENGTH, fl);
+  if (dc_feof(fl))
   {
     logentry(QStringLiteral("Fread_social_string - unexpected EOF."), IMMORTAL, DC::LogChannel::LOG_BUG);
     exit(0);
@@ -151,15 +151,15 @@ char *fread_social_string(FILE *fl)
 // read one social
 // return true on success
 // return false on 'EOF'
-int read_social_from_file(int32_t num_social, FILE *fl)
+int read_social_from_file(int32_t num_social, FILEPtr fl)
 {
   char tmp[MAX_INPUT_LENGTH];
   int hide, min_pos;
 
-  fscanf(fl, " %s ", tmp);
-  if (feof(fl))
+  dc_fscanf(fl, " %s ", tmp);
+  if (dc_feof(fl))
     return false;
-  fscanf(fl, " %d %d \n", &hide, &min_pos);
+  dc_fscanf(fl, " %d %d \n", &hide, &min_pos);
 
   // read strings that will always be there
   soc_mess_list[num_social].name = str_dup(tmp);
@@ -220,7 +220,7 @@ int compare_social_search(const void *A, const void *B)
 
 void boot_social_messages(void)
 {
-  FILE *fl;
+  FILEPtr fl;
 
   // initialize our array
   num_socials = 0;
@@ -233,7 +233,7 @@ void boot_social_messages(void)
   soc_mess_list = (social_messg *)dc_alloc(social_array_size, sizeof(social_messg));
 #endif
 
-  if (!(fl = fopen(SOCIAL_FILE, "r")))
+  if (!(fl = dc_fopen(SOCIAL_FILE, "r")))
   {
     perror("Can't open social file in boot_social_messages");
     abort();
@@ -263,8 +263,6 @@ void boot_social_messages(void)
 
   // sort it!
   qsort(soc_mess_list, num_socials, sizeof(social_messg), compare_social_sort);
-
-  fclose(fl);
 }
 
 social_messg *find_social(QString arg)

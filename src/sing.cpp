@@ -4,7 +4,7 @@
  *                                                                        *
  **************************************************************************/
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cstring>
 #include <vector>
 

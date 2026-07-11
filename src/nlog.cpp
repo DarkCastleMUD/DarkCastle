@@ -1,10 +1,10 @@
 /* $Id: nlog.cpp,v 1.12 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <ctime>
 #include <cstring>
 #include <cstdlib>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <stdarg.h>
 
 #include "DC/connect.h"

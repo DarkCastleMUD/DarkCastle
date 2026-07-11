@@ -8,7 +8,7 @@
 #define STRUCTS_H_
 
 #include <sys/types.h>
-#include <cstdio> // FILE
+#include "DC/dcstdio.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -16,9 +16,6 @@
 #include <QString>
 
 const size_t MAX_STRING_LENGTH = 8192;
-
-// FILE * fopen(const char *filename, const char *type);
-// int fclose(FILE * fl);
 
 const size_t MAX_INPUT_LENGTH = 160;
 const size_t MAX_MESSAGES = 150;

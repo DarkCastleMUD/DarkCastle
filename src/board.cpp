@@ -40,9 +40,9 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 */
 
-#include <cstdio>  // FILE *
-#include <cstring> // memset()
-#include <cctype>  // isspace(), isdigit()
+#include "DC/dcstdio.h" // FILEPtr
+#include <cstring>      // memset()
+#include <cctype>       // isspace(), isdigit()
 #include <string>
 #include <map>
 #include <vector>
@@ -91,12 +91,12 @@ public:
 
 void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-char *fread_string(FILE *fl, int hasher);
+char *fread_string(FILEPtr fl, int hasher);
 int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
 void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
 void board_load_board();
 int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-int fwrite_string(char *buf, FILE *fl);
+int fwrite_string(char *buf, FILEPtr fl);
 void new_edit_board_unlock_board(Character *ch, int abort);
 
 #define ANY_BOARD 0
@@ -573,9 +573,9 @@ int save_boards()
 {
   std::map<std::string, BOARD_INFO>::iterator board_it;
 
-  FILE *the_file;
+  FILEPtr the_file;
 
-  the_file = fopen("board/index", "w");
+  the_file = dc_fopen("board/index", "w");
 
   if (!the_file)
   {
@@ -587,15 +587,15 @@ int save_boards()
   for (board_it = board_db.begin(); board_it != board_db.end(); board_it++)
   {
 
-    fprintf(the_file, " %d ", board_it->second.min_read_level);
-    fprintf(the_file, " %d ", board_it->second.min_write_level);
-    fprintf(the_file, " %d ", board_it->second.min_remove_level);
-    fprintf(the_file, " %d ", board_it->second.type);
-    fprintf(the_file, " %d ", board_it->second.owner);
+    dc_fprintf(the_file, " %d ", board_it->second.min_read_level);
+    dc_fprintf(the_file, " %d ", board_it->second.min_write_level);
+    dc_fprintf(the_file, " %d ", board_it->second.min_remove_level);
+    dc_fprintf(the_file, " %d ", board_it->second.type);
+    dc_fprintf(the_file, " %d ", board_it->second.owner);
     fwrite_string((char *)board_it->second.save_file.c_str(), the_file);
     fwrite_string((char *)board_it->first.c_str(), the_file);
   }
-  fclose(the_file);
+
   return ReturnValue::eSUCCESS;
 }
 
@@ -878,11 +878,11 @@ std::string remove_slashr(std::string unformatted)
 void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
 {
 
-  FILE *the_file;
+  FILEPtr the_file;
   std::string write_me;
   unsigned int ind;
 
-  the_file = fopen(board->second.save_file.c_str(), "w");
+  the_file = dc_fopen(board->second.save_file.c_str(), "w");
 
   if (!the_file)
   {
@@ -891,7 +891,7 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
     return;
   }
 
-  fprintf(the_file, " %zu ", board->second.msgs.size());
+  dc_fprintf(the_file, " %zu ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);
@@ -906,14 +906,14 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
     write_me = remove_slashr(board->second.msgs[ind].text);
     fwrite_string((char *)write_me.c_str(), the_file);
   }
-  fclose(the_file);
+
   return;
 }
 
 void board_load_board()
 {
 
-  FILE *the_file;
+  FILEPtr the_file;
   int ind;
   message curr_msg;
   int number;
@@ -925,14 +925,14 @@ void board_load_board()
     map_it->second.lock = 0;
     map_it->second.locked_for = nullptr;
 
-    the_file = fopen((*map_it).second.save_file.c_str(), "r");
+    the_file = dc_fopen((*map_it).second.save_file.c_str(), "r");
     if (!the_file)
       continue;
 
-    fscanf(the_file, " %d ", &number);
-    if (number < 0 || feof(the_file))
+    dc_fscanf(the_file, " %d ", &number);
+    if (number < 0 || dc_feof(the_file))
     {
-      fclose(the_file);
+
       continue;
     }
 
@@ -953,8 +953,6 @@ void board_load_board()
 
       map_it->second.msgs.push_back(curr_msg);
     }
-
-    fclose(the_file);
   }
 }
 
@@ -1126,7 +1124,7 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   return ReturnValue::eSUCCESS;
 }
 
-int fwrite_string(char *buf, FILE *fl)
+int fwrite_string(char *buf, FILEPtr fl)
 {
-  return (fprintf(fl, "%s~\n", buf));
+  return (dc_fprintf(fl, "%s~\n", buf));
 }

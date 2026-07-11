@@ -9,7 +9,7 @@
  ******************************************************************************/
 
 #include <cstring>
-#include <cstdio>
+#include "DC/dcstdio.h"
 
 #include "DC/obj.h"
 #include "DC/character.h"

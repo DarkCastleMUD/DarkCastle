@@ -33,148 +33,148 @@
 
 class Program
 {
-    bool is_object_{};
-    int type_{};
-    QString arglist_;
-    QString comlist_;
+  bool is_object_{};
+  int type_{};
+  QString arglist_;
+  QString comlist_;
 
 public:
-    [[nodiscard]] int type(void) const { return type_; }
-    [[nodiscard]] QString typeString(void) const
+  [[nodiscard]] int type(void) const { return type_; }
+  [[nodiscard]] QString typeString(void) const
+  {
+    if (is_object_)
+      return oprog_type_to_name(type_);
+    else
+      return mprog_type_to_name(type_);
+  }
+  [[nodiscard]] QString arglist(void) const { return arglist_; }
+  [[nodiscard]] QString comlist(void) const { return comlist_; }
+  [[nodiscard]] static QString mprog_type_to_name(int type)
+  {
+    switch (type)
     {
-        if (is_object_)
-            return oprog_type_to_name(type_);
-        else
-            return mprog_type_to_name(type_);
+    case IN_FILE_PROG:
+      return "in_file_prog";
+    case ACT_PROG:
+      return "act_prog";
+    case SPEECH_PROG:
+      return "speech_prog";
+    case RAND_PROG:
+      return "rand_prog";
+    case ARAND_PROG:
+      return "arand_prog";
+    case FIGHT_PROG:
+      return "fight_prog";
+    case HITPRCNT_PROG:
+      return "hitprcnt_prog";
+    case DEATH_PROG:
+      return "death_prog";
+    case ENTRY_PROG:
+      return "entry_prog";
+    case GREET_PROG:
+      return "greet_prog";
+    case ALL_GREET_PROG:
+      return "all_greet_prog";
+    case GIVE_PROG:
+      return "give_prog";
+    case BRIBE_PROG:
+      return "bribe_prog";
+    case CATCH_PROG:
+      return "catch_prog";
+    case ATTACK_PROG:
+      return "attack_prog";
+    case LOAD_PROG:
+      return "load_prog";
+    case CAN_SEE_PROG:
+      return "can_see_prog";
+    case DAMAGE_PROG:
+      return "damage_prog";
+    case COMMAND_PROG:
+      return "command_prog";
+    default:
+      return "ERROR_PROG";
     }
-    [[nodiscard]] QString arglist(void) const { return arglist_; }
-    [[nodiscard]] QString comlist(void) const { return comlist_; }
-    [[nodiscard]] static QString mprog_type_to_name(int type)
+  }
+  [[nodiscard]] static QString oprog_type_to_name(int type)
+  {
+    switch (type)
     {
-        switch (type)
-        {
-        case IN_FILE_PROG:
-            return "in_file_prog";
-        case ACT_PROG:
-            return "act_prog";
-        case SPEECH_PROG:
-            return "speech_prog";
-        case RAND_PROG:
-            return "rand_prog";
-        case ARAND_PROG:
-            return "arand_prog";
-        case FIGHT_PROG:
-            return "fight_prog";
-        case HITPRCNT_PROG:
-            return "hitprcnt_prog";
-        case DEATH_PROG:
-            return "death_prog";
-        case ENTRY_PROG:
-            return "entry_prog";
-        case GREET_PROG:
-            return "greet_prog";
-        case ALL_GREET_PROG:
-            return "all_greet_prog";
-        case GIVE_PROG:
-            return "give_prog";
-        case BRIBE_PROG:
-            return "bribe_prog";
-        case CATCH_PROG:
-            return "catch_prog";
-        case ATTACK_PROG:
-            return "attack_prog";
-        case LOAD_PROG:
-            return "load_prog";
-        case CAN_SEE_PROG:
-            return "can_see_prog";
-        case DAMAGE_PROG:
-            return "damage_prog";
-        case COMMAND_PROG:
-            return "command_prog";
-        default:
-            return "ERROR_PROG";
-        }
+    case ALL_GREET_PROG:
+      return "all_greet_prog";
+    case WEAPON_PROG:
+      return "weapon_prog";
+    case ARMOUR_PROG:
+      return "armour_prog";
+    case LOAD_PROG:
+      return "load_prog";
+    case COMMAND_PROG:
+      return "command_prog";
+    case ACT_PROG:
+      return "act_prog";
+    case ARAND_PROG:
+      return "arand_prog";
+    case CATCH_PROG:
+      return "catch_prog";
+    case SPEECH_PROG:
+      return "speech_prog";
+    case RAND_PROG:
+      return "rand_prog";
+    case CAN_SEE_PROG:
+      return "can_see_prog";
+    default:
+      return "ERROR_PROG";
     }
-    [[nodiscard]] static QString oprog_type_to_name(int type)
-    {
-        switch (type)
-        {
-        case ALL_GREET_PROG:
-            return "all_greet_prog";
-        case WEAPON_PROG:
-            return "weapon_prog";
-        case ARMOUR_PROG:
-            return "armour_prog";
-        case LOAD_PROG:
-            return "load_prog";
-        case COMMAND_PROG:
-            return "command_prog";
-        case ACT_PROG:
-            return "act_prog";
-        case ARAND_PROG:
-            return "arand_prog";
-        case CATCH_PROG:
-            return "catch_prog";
-        case SPEECH_PROG:
-            return "speech_prog";
-        case RAND_PROG:
-            return "rand_prog";
-        case CAN_SEE_PROG:
-            return "can_see_prog";
-        default:
-            return "ERROR_PROG";
-        }
-    }
+  }
 };
 
 typedef QSharedPointer<Program> ProgramPtr;
 
 class Programs
 {
-    bool object{};
-    QList<ProgramPtr> list_;
+  bool object{};
+  QList<ProgramPtr> list_;
 
 public:
-    friend int mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *obj, void *vo, int type, bool reverse);
-    [[nodiscard]] bool isEmpty(void) const { return list_.isEmpty(); }
-    [[nodiscard]] ProgramPtr value(qsizetype i) { return list_.value(i); }
-    [[nodiscard]] int types(void) const
+  friend int mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *obj, void *vo, int type, bool reverse);
+  [[nodiscard]] bool isEmpty(void) const { return list_.isEmpty(); }
+  [[nodiscard]] ProgramPtr value(qsizetype i) { return list_.value(i); }
+  [[nodiscard]] int types(void) const
+  {
+    int t{};
+    for (const auto &program : list_)
+      t = t | program->type();
+    return t;
+  }
+  void write(FILEPtr fl, bool mob);
+  void write(auto &fl, bool mob)
+  {
+    for (const auto &mprg : list_)
     {
-        int t{};
-        for (const auto &program : list_)
-            t = t | program->type();
-        return t;
-    }
-    void write(FILE *fl, bool mob);
-    void write(auto &fl, bool mob)
-    {
-        for (const auto &mprg : list_)
-        {
-            if (mob)
-                fl << ">" << mprg->typeString() << " ";
-            else
-                fl << "\\" << mprg->typeString() << " ";
+      if (mob)
+        fl << ">" << mprg->typeString() << " ";
+      else
+        fl << "\\" << mprg->typeString() << " ";
 
-            if (mprg->arglist().isEmpty())
-                string_to_file(fl, "Saved During Edit");
-            else
-                string_to_file(fl, mprg->arglist());
+      if (mprg->arglist().isEmpty())
+        string_to_file(fl, "Saved During Edit");
+      else
+        string_to_file(fl, mprg->arglist());
 
-            if (mprg->comlist().isEmpty())
-                string_to_file(fl, "Saved During Edit");
-            else
-                string_to_file(fl, mprg->comlist());
-        }
+      if (mprg->comlist().isEmpty())
+        string_to_file(fl, "Saved During Edit");
+      else
+        string_to_file(fl, mprg->comlist());
     }
-    QString list(void);
+  }
+  QString list(void);
 };
 
 auto &operator<<(auto &out, Programs programs)
 {
-    if (!programs.isEmpty())
-    {
-        programs.write(out, false);
-        out << "|\n";
-    }
-    return out;
+  if (!programs.isEmpty())
+  {
+    programs.write(out, false);
+    out << "|\n";
+  }
+  return out;
 }

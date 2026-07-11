@@ -19,7 +19,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <cstdio>
+#include "DC/dcstdio.h"
 #include <cctype>
 #include <cassert>
 

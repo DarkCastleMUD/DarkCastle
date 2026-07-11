@@ -27,6 +27,7 @@
 #include "DC/inventory.h"
 #include "DC/memory.h"
 #include "DC/player.h"
+#include "DC/dcstdio.h"
 
 class vault_search_parameter
 {
@@ -49,7 +50,7 @@ vault_search_parameter::~vault_search_parameter()
 }
 
 int total_vaults = 0;
-int get_line(FILE *fl, char *buf);
+int get_line(FILEPtr fl, char *buf);
 
 Character *find_owner(QString name);
 void vault_log(Character *ch, char *owner);
@@ -961,49 +962,48 @@ void DC::load_vaults(void)
   vault_items_data *items;
   class Object *obj = nullptr;
   struct stat statbuf = {};
-  FILE *fl = nullptr, *index = nullptr;
+  FILEPtr fl, index;
   int vnum = 0, full = 0, count = 0;
   quint64 gold = 0;
   char value[128] = {}, line[128] = {}, buf[MAX_STRING_LENGTH] = {}, filename[MAX_INPUT_LENGTH] = {}, type[128] = {}, tmp[10] = {};
   bool saveChanges = false;
   char src_filename[256] = {};
 
-  if (!(index = fopen(VAULT_INDEX_FILE, "r")))
+  if (!(index = dc_fopen(VAULT_INDEX_FILE, "r")))
   {
     return;
   }
-  fscanf(index, "%s\n", line);
+  dc_fscanf(index, "%s\n", line);
   while (*line != '$')
   {
     total_vaults++;
     logverbose(QStringLiteral("%1 - %2").arg(total_vaults).arg(line));
-    fscanf(index, "%s\n", line);
+    dc_fscanf(index, "%s\n", line);
   }
-  fclose(index);
 
   logverbose(QStringLiteral("boot_vaults: found [%1] player vaults to read.").arg(total_vaults));
 
   if (total_vaults)
     CREATE(vault_table, vault_data, total_vaults);
 
-  if (!(index = fopen(VAULT_INDEX_FILE, "r")))
+  if (!(index = dc_fopen(VAULT_INDEX_FILE, "r")))
   {
     logentry(QStringLiteral("boot_vaults: could not open vault index file, probably doesn't exist."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
-  fscanf(index, "%s\n", line);
+  dc_fscanf(index, "%s\n", line);
   while (*line != '$')
   {
     saveChanges = false;
 
     *line = UPPER(*line);
     sprintf(filename, "../vaults/%c/%s.vault", UPPER(*line), line);
-    if (!(fl = fopen(filename, "r")))
+    if (!(fl = dc_fopen(filename, "r")))
     {
       sprintf(buf, "boot_vaults: unable to open file [%s].", filename);
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
-      fscanf(index, "%s\n", line);
+      dc_fscanf(index, "%s\n", line);
       continue;
     }
     else
@@ -1036,11 +1036,11 @@ void DC::load_vaults(void)
         if (vault->size > 2000) {
             logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: buggy vault size of %d on %s.", vault->size, vault->owner);
 
-            FILE *oldfl;
+            FILEPtr oldfl;
             char oldfname[MAX_INPUT_LENGTH], oldtype[MAX_INPUT_LENGTH];
 
             sprintf(oldfname, "../vaults.old/%c/%s.vault", UPPER(*line), line);
-            if(!(oldfl = fopen(oldfname, "r"))) {
+            if(!(oldfl = dc_fopen(oldfname, "r"))) {
           sprintf(buf, "boot_vaults: unable to open file [%s].", oldfname);
           logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
             } else {
@@ -1053,7 +1053,7 @@ void DC::load_vaults(void)
               saveChanges = true;
           }
 
-          fclose(oldfl);
+
             }
         }
         */
@@ -1154,17 +1154,14 @@ void DC::load_vaults(void)
     vault->next = vault_table;
     vault_table = vault;
 
-    fclose(fl);
-
     if (saveChanges)
     {
       logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_vaults: Saving changes to %s's vault.", vault->owner.toStdString().c_str());
       save_vault(vault->owner);
     }
 
-    fscanf(index, "%s\n", line);
+    dc_fscanf(index, "%s\n", line);
   }
-  fclose(index);
 }
 
 void Character::remove_vault_access(QString name, vault_data *vault)
@@ -2172,15 +2169,15 @@ void Character::vault_list(QString owner)
 
 void add_new_vault(const char *name, int indexonly)
 {
-  FILE *vfl, *tvfl, *pvfl;
+  FILEPtr vfl, tvfl, pvfl;
   vault_data *vault;
   char filename[256], line[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-  if (!(vfl = fopen(VAULT_INDEX_FILE, "r")))
+  if (!(vfl = dc_fopen(VAULT_INDEX_FILE, "r")))
   {
     logentry(QStringLiteral("add_new_vault: error opening index file."), IMMORTAL, DC::LogChannel::LOG_BUG);
   }
 
-  if (!(tvfl = fopen(VAULT_INDEX_FILE_TMP, "w")))
+  if (!(tvfl = dc_fopen(VAULT_INDEX_FILE_TMP, "w")))
   {
     logentry(QStringLiteral("add_new_vault: error opening temp index file."), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
@@ -2189,21 +2186,16 @@ void add_new_vault(const char *name, int indexonly)
   if (vfl)
   {
     // read and print each line until we get to $
-    fscanf(vfl, "%s\n", line);
+    dc_fscanf(vfl, "%s\n", line);
     while (*line != '$')
     {
-      fprintf(tvfl, "%s\n", line);
-      fscanf(vfl, "%s\n", line);
+      dc_fprintf(tvfl, "%s\n", line);
+      dc_fscanf(vfl, "%s\n", line);
     }
   }
   // we found $, now add in the new name, then the $
-  fprintf(tvfl, "%s\n", name);
-  fprintf(tvfl, "$\n");
-  fclose(tvfl);
-  if (vfl)
-  {
-    fclose(vfl);
-  }
+  dc_fprintf(tvfl, "%s\n", name);
+  dc_fprintf(tvfl, "$\n");
   rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
 
   if (indexonly)
@@ -2214,18 +2206,17 @@ void add_new_vault(const char *name, int indexonly)
   Character *ch = find_owner(name);
 
   sprintf(filename, "../vaults/%c/%s.vault", UPPER(*name), name);
-  if (!(pvfl = fopen(filename, "w")))
+  if (!(pvfl = dc_fopen(filename, "w")))
   {
     logentry(QStringLiteral("add_new_vault: error opening new vault file [%1].").arg(filename), IMMORTAL, DC::LogChannel::LOG_BUG);
     return;
   }
 
   if (ch)
-    fprintf(pvfl, "S %llu\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
+    dc_fprintf(pvfl, "S %llu\n", VAULT_BASE_SIZE * MAX(ch->getLevel(), 1));
   else
-    fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
-  fprintf(pvfl, "$\n");
-  fclose(pvfl);
+    dc_fprintf(pvfl, "S %d\n", VAULT_BASE_SIZE);
+  dc_fprintf(pvfl, "$\n");
 
   sprintf(buf, "%s bought a vault.", name);
   logvault(buf, name);
@@ -2302,7 +2293,7 @@ void logvault(QString message, QString name)
 {
   tm *tm = nullptr;
   time_t ct;
-  FILE *ofile, *nfile;
+  FILEPtr ofile, nfile;
   char buf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
   char fname[256], nfname[256];
   int lines = 1;
@@ -2328,17 +2319,17 @@ void logvault(QString message, QString name)
   sprintf(fname, "../vaults/%c/%s.vault.log", name[0].toLatin1(), qPrintable(name));
   sprintf(nfname, "../vaults/%c/%s.vault.log.tmp", name[0].toLatin1(), qPrintable(name));
 
-  if (!(ofile = fopen(fname, "r")))
+  if (!(ofile = dc_fopen(fname, "r")))
   {
-    if (!(ofile = fopen(fname, "w")))
+    if (!(ofile = dc_fopen(fname, "w")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
       return;
     }
-    fprintf(ofile, "$\n");
-    fclose(ofile);
-    if (!(ofile = fopen(fname, "r")))
+    dc_fprintf(ofile, "$\n");
+
+    if (!(ofile = dc_fopen(fname, "r")))
     {
       sprintf(buf, "vault_log: could not open vault log file [%s].", fname);
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -2346,7 +2337,7 @@ void logvault(QString message, QString name)
     }
   }
 
-  if (!(nfile = fopen(nfname, "w")))
+  if (!(nfile = dc_fopen(nfname, "w")))
   {
     sprintf(buf, "vault_log: could not open vault log file [%s].", nfname);
     logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -2367,18 +2358,16 @@ void logvault(QString message, QString name)
     sprintf(hours, "%d", tm->tm_hour);
 
   sprintf(buf, "%s %d %s:%s", months[tm->tm_mon], tm->tm_mday, hours, mins);
-  fprintf(nfile, "%s :: %s\n", buf, message.toStdString().c_str());
+  dc_fprintf(nfile, "%s :: %s\n", buf, message.toStdString().c_str());
 
   get_line(ofile, line);
   while (*line != '$' && lines++ < 500)
   {
-    fprintf(nfile, "%s\n", line);
+    dc_fprintf(nfile, "%s\n", line);
     get_line(ofile, line);
   }
-  fprintf(nfile, "$\n");
+  dc_fprintf(nfile, "$\n");
 
-  fclose(nfile);
-  fclose(ofile);
   unlink(fname);
   rename(nfname, fname);
   // sprintf(cmd, "mv -f %s %s", nfname, fname);

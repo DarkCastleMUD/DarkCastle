@@ -10,7 +10,7 @@
 #include "DC/const.h"
 
 void set_golem(Character *golem, int golemtype);
-class Object *obj_store_to_char(Character *ch, FILE *fpsave, class Object *last_cont);
+class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);
 
 char_file_u4::char_file_u4()
 {
@@ -249,7 +249,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return false;
   }
 
-  FILE *fpfile = nullptr;
+  FILEPtr fpfile = nullptr;
 
   if (this->isNonPlayer() || level_ < IMMORTAL)
   {
@@ -268,7 +268,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
 
   QString path = QStringLiteral("%1/%2/").arg(FOLLOWER_DIR).arg(player_name[0]);
   QString fullpath = path + filename;
-  if (!(fpfile = fopen(fullpath.toStdString().c_str(), "r")))
+  if (!(fpfile = dc_fopen(fullpath.toStdString().c_str(), "r")))
   {
     send(QStringLiteral("No charmie save file found at '%1'.").arg(fullpath));
     return false;
@@ -282,11 +282,10 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
   }
   charmie->setLevel(1);
   class Object *last_cont = nullptr; // Last container.
-  while (!feof(fpfile))
+  while (!dc_feof(fpfile))
   {
     last_cont = obj_store_to_char(charmie, fpfile, last_cont);
   }
-  fclose(fpfile);
 
   char_to_room(charmie, in_room);
 
