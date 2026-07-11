@@ -22,3 +22,27 @@ int dc_fprintf(FILEPtr stream, QString format, ...)
   va_end(ap);
   return result;
 }
+
+int dc_fgetc(FILEPtr stream)
+{
+  return fgetc(stream.data());
+}
+
+char *dc_fgets(char *s, int size, FILEPtr stream)
+{
+  return fgets(s, size, stream.data());
+}
+
+int dc_ungetc(int c, FILEPtr stream)
+{
+  return ungetc(c, stream.data());
+}
+
+int dc_fscanf(FILEPtr stream, QString format, ...)
+{
+  va_list ap;
+  va_start(ap, format);
+  auto result = vfscanf(stream.data(), qPrintable(format), ap);
+  va_end(ap);
+  return result;
+}
