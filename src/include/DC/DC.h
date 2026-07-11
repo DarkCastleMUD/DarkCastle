@@ -504,9 +504,9 @@ public:
   void boot_db(void);
   void boot_zones(void);
   void boot_world(void);
-  void write_one_zone(FILE *fl, zone_t zone_key);
-  zone_t read_one_zone(FILE *fl, QString zone_filename);
-  bool read_one_room(FILE *fl, room_t &room_nr);
+  void write_one_zone(FILEPtr fl, zone_t zone_key);
+  zone_t read_one_zone(FILEPtr fl, QString zone_filename);
+  bool read_one_room(FILEPtr fl, room_t &room_nr);
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);
