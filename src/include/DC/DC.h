@@ -506,7 +506,7 @@ public:
   void boot_world(void);
   void write_one_zone(FILEPtr fl, zone_t zone_key);
   zone_t read_one_zone(FILEPtr fl, QString zone_filename);
-  bool read_one_room(FILEPtr fl, room_t &room_nr);
+  room_t read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_item);
   void load_hints(void);
   void save_hints(void);
   void send_hint(void);

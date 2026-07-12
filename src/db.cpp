@@ -111,10 +111,13 @@ void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const char *str, char *arg1, char *arg2);
-world_file_list_itemPtr new_mob_file_item(QString filename, vnum_t vnum);
-world_file_list_itemPtr new_obj_file_item(QString filename, vnum_t vnum);
+world_file_list_itemPtr new_mob_file_item(QString filename);
+world_file_list_itemPtr new_obj_file_item(QString filename);
 
-QString read_next_worldfile_name(FILEPtr flWorldIndex);
+QString read_next_zonefile_name(FILEPtr stream);
+QString read_next_worldfile_name(FILEPtr stream);
+QString read_next_mobfile_name(FILEPtr stream);
+QString read_next_objfile_name(FILEPtr stream);
 
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
@@ -636,7 +639,6 @@ void DC::boot_db(void)
   assign_objects();
   assign_rooms();
 
-  // DC::config &cf = DC::getInstance()->cf;
   if (cf.verbose_mode)
   {
     qInfo("\n[ Room  Room]\t{Level}\t  Author\tZone\n");
@@ -978,15 +980,14 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
   DC::getInstance()->logverbose(QStringLiteral("Opening mobile file index."));
   if (DC::getInstance()->cf.test_mobs)
   {
-    if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE_TINY, "r")))
-    {
-      logentry(QStringLiteral("Could not open index file."));
+    if (!(flMobIndex = dc_fopen(qPrintable(MOB_INDEX_FILE_TINY), "r")))
       abort();
-    }
   }
   else
   {
-    if (!(flMobIndex = dc_fopen(MOB_INDEX_FILE, "r")))
+
+    if (!(flMobIndex = dc_fopen(qPrintable(MOB_INDEX_FILE), "r")))
+
     {
       logentry(QStringLiteral("Could not open index file."));
       abort();
@@ -997,15 +998,10 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
 
   vnum_t vnum = 1;
   // note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
-  for (temp = read_next_worldfile_name(flMobIndex);
+  for (temp = read_next_mobfile_name(flMobIndex);
        temp.isEmpty() == false;
-       temp = read_next_worldfile_name(flMobIndex))
+       temp = read_next_mobfile_name(flMobIndex))
   {
-    strcpy(endfile, "mobs/");
-    strcat(endfile, temp.toStdString().c_str());
-
-    DC::config &cf = DC::getInstance()->cf;
-
     if (cf.verbose_mode)
     {
       logentry(temp, 0, DC::LogChannel::LOG_MISC);
@@ -1018,7 +1014,7 @@ void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
       abort();
     }
 
-    auto pItem = new_mob_file_item(temp, vnum);
+    auto pItem = new_mob_file_item(temp);
 
     for (;;)
     {
@@ -1276,7 +1272,8 @@ void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
   char endfile[180];
   //  if (!bport) {
 
-  if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE, "r")))
+  if (!(flObjIndex = dc_fopen(qPrintable(OBJECT_INDEX_FILE), "r")))
+
   {
     logentry(QStringLiteral("Cannot open object file index."), 0, DC::LogChannel::LOG_MISC);
     abort();
@@ -1308,7 +1305,7 @@ void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
       abort();
     }
 
-    auto pItem = new_obj_file_item(temp, vnum);
+    auto pItem = new_obj_file_item(temp);
 
     for (;;)
     {
@@ -1420,7 +1417,7 @@ void write_one_room(LegacyFile &lf, int a)
   dc_fprintf(f, "S\n");
 }
 
-bool DC::read_one_room(FILEPtr fl, room_t &room_nr)
+room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_item)
 {
   char *temp = nullptr;
   char ch = 0;
@@ -1430,6 +1427,7 @@ bool DC::read_one_room(FILEPtr fl, room_t &room_nr)
 
   ch = fread_char(fl);
 
+  room_t room_nr{};
   if (ch != '$')
   {
     room_nr = fread_int(fl, 0, 1000000);
@@ -1568,13 +1566,7 @@ bool DC::read_one_room(FILEPtr fl, room_t &room_nr)
         // strip off the \n after the E
         if (fread_char(fl) != '\n')
           dc_fseek(fl, -1, SEEK_CUR);
-#ifdef LEAK_CHECK
-        new_new_descr = (extra_descr_data *)
-            calloc(1, sizeof(extra_descr_data));
-#else
-        new_new_descr = (extra_descr_data *)
-            dc_alloc(1, sizeof(extra_descr_data));
-#endif
+        new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
         new_new_descr->keyword = fread_string(fl, 0);
         new_new_descr->description = fread_string(fl, 0);
 
@@ -1591,11 +1583,7 @@ bool DC::read_one_room(FILEPtr fl, room_t &room_nr)
       else if (ch == 'B')
       {
         deny_data *deni;
-#ifdef LEAK_CHECK
-        deni = (deny_data *)calloc(1, sizeof(deny_data));
-#else
         deni = (deny_data *)dc_alloc(1, sizeof(deny_data));
-#endif
         deni->vnum = fread_int(fl, -1, 2147483467);
 
         if (room_nr)
@@ -1620,30 +1608,45 @@ bool DC::read_one_room(FILEPtr fl, room_t &room_nr)
       }
     } // of for (;;) (get directions and extra descs)
 
-    return true;
+    return room_nr;
   } // if == $
     //  dc_free(temp); /* cleanup the area containing the terminal $  */
     // we no longer free temp, cause it's no longer used as a terminating char
-  return false;
+  return room_nr;
 }
 
-QString read_next_worldfile_name(FILEPtr flWorldIndex)
+QString read_next_filename(FILEPtr stream, QString directoryName)
 {
-  QString filename = fread_string(flWorldIndex, 0);
+  QString filename = fread_string(stream, 0);
+  while (filename.startsWith("*")) // ignore comments
+    filename = fread_string(stream, 0);
 
-  // Check for end of file marker
-  if (filename == "$")
-  {
-    return "";
-  }
+  if (filename == "$") // end of file
+    return {};
+  else if (filename.contains("/"))
+    return filename;
+  else
+    return u"%1/%2"_s.arg(directoryName).arg(filename);
+}
 
-  // Check for comments
-  if (filename.startsWith("*"))
-  {
-    filename = read_next_worldfile_name(flWorldIndex);
-  }
+QString read_next_worldfile_name(FILEPtr stream)
+{
+  return read_next_filename(stream, u"world"_s);
+}
 
-  return filename;
+QString read_next_zonefile_name(FILEPtr stream)
+{
+  return read_next_filename(stream, u"zonefiles"_s);
+}
+
+QString read_next_mobfile_name(FILEPtr stream)
+{
+  return read_next_filename(stream, u"mobs"_s);
+}
+
+QString read_next_objfile_name(FILEPtr stream)
+{
+  return read_next_filename(stream, u"objects"_s);
 }
 
 bool can_modify_this_room(Character *ch, int32_t vnum)
@@ -1856,112 +1859,72 @@ void DC::free_objs_from_memory(void)
   obj_index.clear();
 }
 
-world_file_list_itemPtr one_new_world_file_item(QString filename, room_t room_nr)
+world_file_list_itemPtr one_new_world_file_item(QString filename)
 {
-  auto curr = world_file_list_itemPtr::create();
-
-  curr->filename = filename;
-  curr->firstnum = room_nr;
-  curr->lastnum = {};
-  curr->flags = {};
-  return curr;
+  return world_file_list_itemPtr::create(filename);
 }
 
-world_file_list_itemPtr new_w_file_item(QString filename, room_t room_nr, world_file_list_t &list)
+world_file_list_itemPtr new_w_file_item(QString filename, world_file_list_t &list)
 {
-  auto curr = one_new_world_file_item(filename, room_nr);
+  auto curr = one_new_world_file_item(filename);
   list.push_back(curr);
   return curr;
 }
 
-world_file_list_itemPtr new_world_file_item(QString filename, room_t room_nr)
+world_file_list_itemPtr new_world_file_item(QString filename)
 {
-  return new_w_file_item(filename, room_nr, DC::getInstance()->world_file_list);
+  return new_w_file_item(filename, DC::getInstance()->world_file_list);
 }
 
-world_file_list_itemPtr new_mob_file_item(QString filename, vnum_t vnum)
+world_file_list_itemPtr new_mob_file_item(QString filename)
 {
-  return new_w_file_item(filename, vnum, DC::getInstance()->mob_file_list);
+  return new_w_file_item(filename, DC::getInstance()->mob_file_list);
 }
 
-world_file_list_itemPtr new_obj_file_item(QString filename, vnum_t vnum)
+world_file_list_itemPtr new_obj_file_item(QString filename)
 {
-  return new_w_file_item(filename, vnum, DC::getInstance()->obj_file_list);
+  return new_w_file_item(filename, DC::getInstance()->obj_file_list);
 }
 
 /* load the rooms */
 void DC::boot_world(void)
 {
-  FILEPtr fl;
-  FILEPtr flWorldIndex;
-  room_t room_nr = {};
-  QString temp;
-  char endfile[200]; // hopefully noone is stupid and makes a 180 char filename
 
-  DC::getInstance()->object_list = 0;
+  DC::getInstance()->object_list = {};
 
-  DC::config &cf = DC::getInstance()->cf;
-
+  auto index_filename = WORLD_INDEX_FILE;
   if (cf.test_world)
+    index_filename = WORLD_INDEX_FILE_TINY;
+
+  FILEPtr stream = dc_fopen(qPrintable(index_filename), "r");
+  auto fopen_errno = errno;
+  if (!stream)
   {
-    if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE_TINY, "r")))
-    {
-      int fopen_errno = errno;
-      logentry(QStringLiteral("boot_world: could not open tiny world index file '%1': %2.").arg(WORLD_INDEX_FILE_TINY).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
-      abort();
-    }
-  }
-  else
-  {
-    if (!(flWorldIndex = dc_fopen(WORLD_INDEX_FILE, "r")))
-    {
-      int fopen_errno = errno;
-      logentry(QStringLiteral("boot_world: could not open world index file '%1': %2.").arg(WORLD_INDEX_FILE).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
-      abort();
-    }
+    logentry(QStringLiteral("boot_world: could not open world index file '%1': %2.").arg(index_filename).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
+    abort();
   }
 
-  // logentry(QStringLiteral("Booting individual world files"), 0, DC::LogChannel::LOG_MISC);
-
-  // note, we don't worry about free'ing temp, cause it's held in the "world_file_list"
-  for (temp = read_next_worldfile_name(flWorldIndex);
-       temp.isEmpty() == false;
-       temp = read_next_worldfile_name(flWorldIndex))
+  for (auto filename = read_next_worldfile_name(stream);
+       !filename.isEmpty();
+       filename = read_next_worldfile_name(stream))
   {
-    strcpy(endfile, "world/");
-    strcat(endfile, temp.toStdString().c_str());
-
-    DC::config &cf = DC::getInstance()->cf;
     if (cf.verbose_mode)
-    {
-      logentry(temp, 0, DC::LogChannel::LOG_MISC);
-    }
+      logentry(filename, 0, DC::LogChannel::LOG_MISC);
 
-    if (!(fl = dc_fopen(endfile, "r")))
+    auto fl = dc_fopen(qPrintable(filename), "r");
+    auto fopen_errno = errno;
+    if (!fl)
     {
-      perror("dc_fopen");
-      logentry(QStringLiteral("boot_world: could not open world file."), 0, DC::LogChannel::LOG_BUG);
-      logentry(temp, 0, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("boot_world: could not open world file '%1': %2.").arg(filename).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
+
       abort();
     }
 
-    auto pItem = new_world_file_item(temp, room_nr);
-    while (read_one_room(fl, room_nr))
+    auto pItem = new_world_file_item(filename);
+    while (read_one_room(fl, pItem))
       ;
-
-    // push the first num forward until it hits a room, that way it's
-    // accurate.
-    // "pItem->firstnum < top_of_world_alloc" check is to insure we dont access memory not allocated to DC::getInstance()->rooms
-    for (; pItem->firstnum < top_of_world_alloc && !DC::getInstance()->rooms.contains(pItem->firstnum); pItem->firstnum++)
-      ;
-
-    pItem->lastnum = room_nr / 100 * 100 + 99;
-
-    room_nr++;
   }
   // logentry(QStringLiteral("World Boot done."), 0, DC::LogChannel::LOG_MISC);
-
-  top_of_world = --room_nr;
 }
 
 /* read direction data */
@@ -2461,25 +2424,24 @@ void DC::boot_zones(void)
   }
   // logentry(QStringLiteral("Booting individual zone files"), 0, DC::LogChannel::LOG_MISC);
 
-  for (QString filename = read_next_worldfile_name(flZoneIndex);
+  for (QString filename = read_next_zonefile_name(flZoneIndex);
        filename.isEmpty() == false;
-       filename = read_next_worldfile_name(flZoneIndex))
+       filename = read_next_zonefile_name(flZoneIndex))
   {
-    auto zone_filename = u"zonefiles/"_s;
-    zone_filename += filename;
-
     if (cf.verbose_mode)
     {
-      logentry(zone_filename, 0, DC::LogChannel::LOG_MISC);
+      logentry(filename, 0, DC::LogChannel::LOG_MISC);
     }
 
-    if (!(fl = dc_fopen(qPrintable(zone_filename), "r")))
+    if (!(fl = dc_fopen(qPrintable(filename), "r")))
+
     {
-      perror(qPrintable(zone_filename));
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", qPrintable(zone_filename));
+      perror(qPrintable(filename));
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "boot_zone: could not open zone file: %s", qPrintable(filename));
       abort();
     }
-    auto zone_key = read_one_zone(fl, zone_filename);
+
+    auto zone_key = read_one_zone(fl, filename);
   }
 
   // logentry(QStringLiteral("Zone Boot done."), 0, DC::LogChannel::LOG_MISC);
@@ -4454,9 +4416,7 @@ void Zone::reset(ResetType reset_type)
           }
           else
           {
-            DC::config &cf = DC::getInstance()->cf;
-
-            if (cf.test_world == false && cf.test_mobs == false && cf.test_objs == false)
+            if (dc_->cf.test_world == false && dc_->cf.test_mobs == false && dc_->cf.test_objs == false)
             {
               sprintf(buf, "Obj %llu loaded to NOWHERE. Zone %llu Cmd %d", DC::getInstance()->obj_index[cmd[reset_cmd_index]->arg1].vnum(), id_, reset_cmd_index);
               logentry(buf, IMMORTAL, DC::LogChannel::LOG_WORLD);
