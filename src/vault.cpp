@@ -682,10 +682,10 @@ void remove_vault(QString name, BACKUP_TYPE backup)
   char buf[MAX_INPUT_LENGTH];
   char h[MAX_INPUT_LENGTH];
 
-  snprintf(h, sizeof(h), "cat %s| grep -iv '^%s$' > %s", VAULT_INDEX_FILE, qPrintable(name), VAULT_INDEX_FILE_TMP);
+  snprintf(h, sizeof(h), "cat %s| grep -iv '^%s$' > %s", qPrintable(VAULT_INDEX_FILE), qPrintable(name), qPrintable(VAULT_INDEX_FILE_TMP));
   system(h);
-  unlink(VAULT_INDEX_FILE);
-  rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
+  unlink(qPrintable(VAULT_INDEX_FILE));
+  rename(qPrintable(VAULT_INDEX_FILE_TMP), qPrintable(VAULT_INDEX_FILE));
   snprintf(buf, sizeof(buf), "Deleting %s's vault.", qPrintable(name));
   logentry(buf, ANGEL, DC::LogChannel::LOG_VAULT);
 
@@ -2196,7 +2196,7 @@ void add_new_vault(const char *name, int indexonly)
   // we found $, now add in the new name, then the $
   dc_fprintf(tvfl, "%s\n", name);
   dc_fprintf(tvfl, "$\n");
-  rename(VAULT_INDEX_FILE_TMP, VAULT_INDEX_FILE);
+  rename(qPrintable(VAULT_INDEX_FILE_TMP), qPrintable(VAULT_INDEX_FILE));
 
   if (indexonly)
     return;
