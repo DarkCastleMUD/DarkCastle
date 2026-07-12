@@ -972,7 +972,7 @@ void save_shop_list()
 
   if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "w")) == nullptr)
   {
-    perror(PLAYER_SHOP_INDEX);
+    perror(qPrintable(PLAYER_SHOP_INDEX));
     exit(1);
   }
 
@@ -1020,7 +1020,7 @@ void boot_player_shops()
 
   if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
   {
-    perror(PLAYER_SHOP_INDEX);
+    perror(qPrintable(PLAYER_SHOP_INDEX));
     exit(1);
   }
 
