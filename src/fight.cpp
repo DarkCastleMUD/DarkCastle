@@ -1536,7 +1536,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   {
     dam = dam * 85 / 100;
     dam = dam + (getRealSpellDamage(ch) / 2);
-    w_type = SKILL_FLAMESLASH;
+    w_type = SKILL_ELEMENTAL_HIT;
   }
   // BACKSTAB GOES IN HERE!
   if ((type == SKILL_BACKSTAB || type == SKILL_CIRCLE) && dam < 10000)
@@ -2074,7 +2074,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   weapon_bit = get_weapon_bit(weapon_type);
   typeofdamage = damage_type(weapon_type);
   follow_type *fol;
-  if (attacktype == SKILL_FLAMESLASH)
+  if (attacktype == SKILL_ELEMENTAL_HIT)
     weapon_bit = TYPE_FIRE;
 
   if (GET_POS(victim) == position_t::DEAD)
@@ -2086,7 +2086,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
                                           attacktype == SPELL_POISON))
     return debug_retval(ch, victim, retval);
   int l = 0;
-  if (dam != 0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED && attacktype != SKILL_FLAMESLASH)
+  if (dam != 0 && attacktype && attacktype < TYPE_HIT && attacktype != TYPE_UNDEFINED && attacktype != SKILL_ELEMENTAL_HIT)
   { // Skill damages based on learned %
     l = ch->has_skill(attacktype);
     if (ch->isNonPlayer())
@@ -2448,7 +2448,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   int reduce = 0, type = 0;
   if (can_miss == 1)
   {
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_ELEMENTAL_HIT)
     {
       int retval2 = 0;
 
@@ -2632,7 +2632,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   {
     dam = 0;
     SET_BIT(retval, ReturnValue::eIMMUNE_VICTIM);
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_ELEMENTAL_HIT)
     {
       SET_BIT(modifier, COMBAT_MOD_IGNORE);
       SET_BIT(retval, ReturnValue::eEXTRA_VALUE);
@@ -2641,7 +2641,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   else if (isSet(victim->suscept, weapon_bit))
   {
     //    magic stuff is handled elsewhere
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_ELEMENTAL_HIT)
     {
       dam = (int)(dam * 1.3);
       SET_BIT(modifier, COMBAT_MOD_SUSCEPT);
@@ -2650,7 +2650,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   else if (isSet(victim->resist, weapon_bit))
   {
     //    magic stuff is handled elsewhere
-    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_FLAMESLASH)
+    if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || attacktype == SKILL_ELEMENTAL_HIT)
     {
       dam = (int)(dam * 0.7);
       SET_BIT(modifier, COMBAT_MOD_RESIST);
@@ -2714,7 +2714,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message.
-  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (ch->isNonPlayer() && ch->mobdata->vnum_ > 87 && ch->mobdata->vnum_ < 92) || attacktype == SKILL_FLAMESLASH)
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (ch->isNonPlayer() && ch->mobdata->vnum_ > 87 && ch->mobdata->vnum_ < 92) || attacktype == SKILL_ELEMENTAL_HIT)
   {
     if (ch->equipment[weapon] == nullptr)
     {
@@ -6172,7 +6172,7 @@ void dam_message(int dam, Character *ch, Character *victim,
     vp = "nicks";
   }
 
-  if (w_type != SKILL_FLAMESLASH)
+  if (w_type != SKILL_ELEMENTAL_HIT)
   {
     w_type -= TYPE_HIT;
     if (((unsigned)w_type) >= sizeof(attack_table))

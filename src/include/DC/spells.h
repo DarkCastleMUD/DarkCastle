@@ -527,7 +527,9 @@ int dam_percent(int learned, int damage);
 #define SKILL_RECALL 800
 #define INTERNAL_SLEEPING 801
 
-#define SKILL_FLAMESLASH 850 // just used internally for flameslash, do not want in skill lists etc
+// Attacktype marker for a melee swing whose damage type is elemental. The element
+// itself travels separately as weapon_type. Used internally only, not a real skill.
+#define SKILL_ELEMENTAL_HIT 850
 
 /*
  * Only for dragon breaths, not char abilities.
