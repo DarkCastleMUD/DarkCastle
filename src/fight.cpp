@@ -1409,6 +1409,11 @@ int get_weapon_element(class Object *wielded)
   if (!isSet(wielded->obj_flags.more_flags, ITEM_ELEMENTAL))
     return 0;
 
+  static constexpr int elements[] = {TYPE_MAGIC, TYPE_FIRE, TYPE_ENERGY, TYPE_ACID, TYPE_POISON, TYPE_COLD};
+  constexpr int ELEMENTAL_RANDOM = 99;
+  if (wielded->obj_flags.value[0] == ELEMENTAL_RANDOM)
+    return elements[number(0, 5)];
+
   // Called on every swing, so a misconfigured value[0] stays silent here rather
   // than flooding the bug log. 'stat' reports it as element "none" instead.
   switch (wielded->obj_flags.value[0] + TYPE_HIT)
@@ -6220,26 +6225,26 @@ void dam_message(int dam, Character *ch, Character *victim,
     switch (weapon_type)
     {
     case TYPE_FIRE:
-      attack = "$B$4flaming slash$R";
+      attack = "$B$4flaming strike$R";
       break;
     case TYPE_COLD:
-      attack = "$B$3freezing slash$R";
+      attack = "$B$3freezing strike$R";
       break;
     case TYPE_ENERGY:
-      attack = "$B$5crackling slash$R";
+      attack = "$B$5crackling strike$R";
       break;
     case TYPE_ACID:
-      attack = "$B$2searing slash$R";
+      attack = "$B$2searing strike$R";
       break;
     case TYPE_POISON:
-      attack = "$B$2venomous slash$R";
+      attack = "$B$6venomous strike$R";
       break;
     case TYPE_MAGIC:
-      attack = "$B$7arcane slash$R";
+      attack = "$B$7arcane strike$R";
       break;
     default:
       logentry(QStringLiteral("Dam_message: bad elemental weapon_type"), ANGEL, DC::LogChannel::LOG_BUG);
-      attack = "$B$7elemental slash$R";
+      attack = "$B$7elemental strike$R";
       break;
     }
 

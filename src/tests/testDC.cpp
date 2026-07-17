@@ -1744,6 +1744,27 @@ private slots:
     REMOVE_BIT(obj.obj_flags.more_flags, ITEM_TOGGLE);
     QCOMPARE(get_weapon_element(&obj), 0);
   }
+
+  void test_get_weapon_element_random()
+  {
+    // The random branch draws from DC::random_, so a DC instance must exist.
+    DC::config cf;
+    cf.sql = false;
+    DC dc(cf);
+    dc.random_ = QRandomGenerator(0);
+
+    Object obj;
+    obj.obj_flags.type_flag = ITEM_WEAPON;
+    obj.obj_flags.value[0] = 99;
+
+    // Inert until the flag is set, like any other value[0].
+    QCOMPARE(get_weapon_element(&obj), 0);
+
+    SET_BIT(obj.obj_flags.more_flags, ITEM_ELEMENTAL);
+    const QList<int> valid = {TYPE_MAGIC, TYPE_FIRE, TYPE_ENERGY, TYPE_ACID, TYPE_POISON, TYPE_COLD};
+    for (int i = 0; i < 100; i++)
+      QVERIFY(valid.contains(get_weapon_element(&obj)));
+  }
 };
 
 QTEST_MAIN(TestDC)

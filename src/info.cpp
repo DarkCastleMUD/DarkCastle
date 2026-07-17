@@ -1146,8 +1146,8 @@ bool identify(Character *ch, Object *obj)
     bits = get_weapon_damage_type(obj) - 1000;
     extern char *strs_damage_types[];
     csendf(ch, "$3Damage type$R: %s\r\n", strs_damage_types[bits]);
-    if (get_weapon_element(obj))
-      csendf(ch, "$3Deals pure $R%s$3 damage instead of physical.$R\r\n", strs_damage_types[obj->obj_flags.value[0]]);
+    if (int el = get_weapon_element(obj))
+      csendf(ch, "$3Deals pure $R%s$3 damage instead of physical.$R\r\n", strs_damage_types[el - TYPE_HIT]);
     break;
 
   case ITEM_INSTRUMENT:
