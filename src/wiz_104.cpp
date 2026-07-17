@@ -2510,7 +2510,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   DC::getInstance()->mob_index[dst].progtypes = 0;
   DC::getInstance()->mob_index[dst].vnum(vdst);
 
-  add_mobspec(dst);
+  DC::getInstance()->add_mobspec(dst);
 
   if (DC::getInstance()->mob_index[src].non_combat_func)
   {
