@@ -69,14 +69,10 @@
 #define VAULT_LOG "vault.log"
 
 #define WORLD_INDEX_FILE u"worldindex"_s
-#define OBJECT_INDEX_FILE u"objectindex"_s
-#define MOB_INDEX_FILE u"mobindex"_s
 #define ZONE_INDEX_FILE u"zoneindex"_s
 #define PLAYER_SHOP_INDEX u"playershopindex"_s
 
-#define OBJECT_INDEX_FILE_TINY u"objectindex.tiny"_s
 #define WORLD_INDEX_FILE_TINY u"worldindex.tiny"_s
-#define MOB_INDEX_FILE_TINY u"mobindex.tiny"_s
 #define ZONE_INDEX_FILE_TINY u"zoneindex.tiny"_s
 
 #define VAULT_INDEX_FILE u"../vaults/vaultindex"_s
@@ -89,6 +85,7 @@
 #include <string>
 #include <map>
 #include <expected>
+#include <type_traits>
 
 #include <QSharedPointer>
 #include <QCoreApplication>
@@ -330,17 +327,6 @@ public:
   void setLevel(level_t level) { level_ = level; }
 };
 
-using world_file_list_itemPtr = QSharedPointer<class world_file_list_item>;
-using world_file_list_t = QList<world_file_list_itemPtr>;
-
-class world_file_list_item
-{
-public:
-  QString filename;
-  vnum_t firstnum{};
-  vnum_t lastnum{};
-  int32_t flags{};
-};
 enum class create_error
 {
   unknown_error,
@@ -472,6 +458,8 @@ public:
   static QString getBuildVersion();
   static QString getBuildTime();
   static DC *getInstance();
+
+  void logmisc(QString message);
   zone_t getRoomZone(room_t room_nr);
   QString getZoneName(zone_t zone_key);
   void setZoneClanOwner(zone_t zone_key, int clan_key);
@@ -582,9 +570,95 @@ public:
   int write_hotboot_file(void);
   int load_hotboot_descs(void);
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
-  void generate_mob_indices(QMap<vnum_t, class mob_index_data> &index);
-  void generate_obj_indices(QMap<vnum_t, class obj_index_data> &index);
+  void add_mobspec(vnum_t vnum);
   Character *read_mobile(int nr, FILEPtr fl);
+  class Object *read_object(int nr, FILEPtr fl, bool zz);
+  class Object *read_object(int nr, QTextStream &fl, bool zz);
+
+  // void load_entities(QMap<vnum_t, class mob_index_data> &index);
+  // void DC::load_entities(QMap<vnum_t, class mob_index_data> &index)
+  // void DC::load_entities(QMap<vnum_t, class obj_index_data> &index)
+  template <typename T>
+  void load_entities(T &index)
+  {
+    logverbose(QStringLiteral("Opening index."));
+
+    // index::mapped_type
+    auto index_filename = T::mapped_type::indexFilename;
+    if (cf.test_mobs)
+      index_filename = index_filename + u".tiny"_s;
+
+    auto index_stream = dc_fopen(index_filename, "r");
+    if (!index_stream)
+    {
+      logmisc(QStringLiteral("Could not open index file."));
+      abort();
+    }
+    logverbose(u"Reading '%1' for list of mobile files."_s.arg(index_filename));
+
+    // note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
+    for (auto filename = T::mapped_type::read_next_file(index_stream);
+         filename.isEmpty() == false;
+         filename = T::mapped_type::read_next_file(index_stream))
+    {
+      logverbose(filename);
+
+      auto stream = dc_fopen(filename, "r");
+      if (!stream)
+      {
+        perror(qPrintable(filename));
+        logf(IMMORTAL, DC::LogChannel::LOG_BUG, "load_entities: could not open mob file: %s", qPrintable(filename));
+        abort();
+      }
+
+      auto pItem = T::mapped_type::new_file_item(filename);
+
+      for (;;)
+      {
+        vnum_t vnum{};
+        char buf[80]{};
+        if (dc_fgets(buf, 80, stream))
+        {
+          if (*buf == '#')
+          { /* allocate new_new cell */
+            sscanf(buf, "#%llu", &vnum);
+            index[vnum].vnum(vnum);
+            index[vnum].qty = 0;
+            index[vnum].non_combat_func = 0;
+            index[vnum].combat_func = 0;
+            index[vnum].mobprogs = nullptr;
+            index[vnum].mobspec = nullptr;
+            index[vnum].progtypes = 0;
+            currentVNUM(index[vnum].vnum());
+
+            if constexpr (std::is_same_v<T, QMap<vnum_t, class mob_index_data>>)
+            {
+              if (!(index[vnum].mob = read_mobile(vnum, stream)))
+                logbug(u"Unable to load mobile %1!\r\n"_s.arg(index[vnum].vnum()));
+            }
+            else if constexpr (std::is_same_v<T, QMap<vnum_t, class obj_index_data>>)
+            {
+              if (!(index[vnum].item = read_object(vnum, stream, false)))
+                logbug(u"Unable to load object %1!\r\n"_s.arg(index[vnum].vnum()));
+            }
+          }
+          else if (*buf == '$') /* EOF */
+            break;
+        }
+        else
+        {
+          logmisc(u"Bad char (%1)"_s.arg(buf));
+          abort();
+        }
+        pItem->lastnum = vnum;
+      }
+    }
+
+    for (const auto &vnum : mob_index.keys())
+      add_mobspec(vnum);
+  }
+
+  // void load_objects(QMap<vnum_t, class obj_index_data> &index);
   Character *clone_mobile(int nr);
   auto create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   auto create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>;
