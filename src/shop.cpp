@@ -987,12 +987,12 @@ void save_player_shop_world_range()
   char buf[180];
 
   const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [](const auto &entry)
-                               { return entry->firstnum == 23000; });
+                               { return entry->vnums_.contains(23000) && entry->vnums_[23000]; });
 
   if (it == DC::getInstance()->world_file_list.cend())
   {
     // panic!
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files: no world_file_list entries contain firstnum value 2300.");
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Could not find player shop range to save files: no world_file_list entries contain value 2300.");
     exit(1);
   }
   const auto &curr = *it;
@@ -1000,9 +1000,10 @@ void save_player_shop_world_range()
   LegacyFile lf("world", curr->filename, "Couldn't open room save file %1 for player shops.");
   if (lf.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
     {
-      write_one_room(lf, x);
+      if (enabled)
+        write_one_room(lf, vnum);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
   }
