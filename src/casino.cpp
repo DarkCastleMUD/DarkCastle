@@ -99,7 +99,7 @@ void free_player(player_data *plr)
   }
   if (!tbl->plr)
     reset_table(tbl);
-  dc_free(plr);
+  delete plr;
 }
 
 void nextturn(table_data *tbl)
@@ -2014,9 +2014,10 @@ void save_slot_machines()
   LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
   if (lf.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum && DC::getInstance()->obj_index.contains(x) && DC::getInstance()->obj_index[x].item; x++)
+    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
     {
-      write_object(lf, DC::getInstance()->obj_index[x].item);
+      if (enabled && DC::getInstance()->obj_index.contains(vnum) && DC::getInstance()->obj_index[vnum].item)
+        write_object(lf, DC::getInstance()->obj_index[vnum].item);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
   }
