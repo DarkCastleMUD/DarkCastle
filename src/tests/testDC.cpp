@@ -3,6 +3,7 @@
 #include <QtLogging>
 #include <qhashfunctions.h>
 
+#include "DC/Index.h"
 #include "DC/utility.h"
 #include "DC/comm.h"
 #include "DC/handler.h"
@@ -362,10 +363,11 @@ private slots:
 
     auto new_rnum = dc.create_blank_item(1);
     QCOMPARE(new_rnum.error(), create_error::entry_exists);
-    int rnum = 1;
-    Object *o1 = clone_object(rnum);
-    Object *o2 = clone_object(rnum);
-    Object *o3 = clone_object(rnum);
+    vnum_t vnum = 1;
+    assert(dc.obj_index.contains(1));
+    Object *o1 = clone_object(vnum);
+    Object *o2 = clone_object(vnum);
+    Object *o3 = clone_object(vnum);
     QVERIFY(o1);
     QVERIFY(o2);
     QVERIFY(o3);
@@ -630,7 +632,7 @@ private slots:
     int val1 = 3333333;
     try
     {
-      val1 = fread_int(stream, 0, 0);
+      val1 = fread_int(stream, 0, 0, false);
     }
     catch (error_range_over)
     {
@@ -645,7 +647,7 @@ private slots:
     val1 = 3333333;
     try
     {
-      val1 = fread_int(stream, 10, 20);
+      val1 = fread_int(stream, 10, 20, false);
     }
     catch (error_range_under)
     {
@@ -693,10 +695,10 @@ private slots:
       filename = "1-1.txt";
     }
 
-    QString legacyfile_filename = QStringLiteral("world/%1.legacyfile").arg(filename);
-    QString qfile_filename = QStringLiteral("world/%1.qfile").arg(filename);
-    QString qsavefile_filename = QStringLiteral("world/%1.qsavefile").arg(filename);
-    QString fstream_filename = QStringLiteral("world/%1.fstream").arg(filename);
+    QString legacyfile_filename = QStringLiteral("%1.legacyfile").arg(filename);
+    QString qfile_filename = QStringLiteral("%1.qfile").arg(filename);
+    QString qsavefile_filename = QStringLiteral("%1.qsavefile").arg(filename);
+    QString fstream_filename = QStringLiteral("%1.fstream").arg(filename);
     quint64 rooms_written{};
     {
       LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
@@ -714,13 +716,16 @@ private slots:
 
       if (!dc.world_file_list.isEmpty())
       {
-        for (vnum_t x = dc.world_file_list.first()->firstnum; x <= dc.world_file_list.first()->lastnum; x++)
+        for (const auto &[vnum, enabled] : dc.world_file_list.first()->vnums_.asKeyValueRange())
         {
-          write_one_room(lfw, x);
-          out << DC::getInstance()->world[x];
-          out2 << DC::getInstance()->world[x];
-          fstream_world_file << DC::getInstance()->world[x];
-          rooms_written++;
+          if (enabled)
+          {
+            write_one_room(lfw, vnum);
+            out << DC::getInstance()->world[vnum];
+            out2 << DC::getInstance()->world[vnum];
+            fstream_world_file << DC::getInstance()->world[vnum];
+            rooms_written++;
+          }
         }
       }
       else
@@ -740,7 +745,7 @@ private slots:
 
     qInfo("Wrote %llu rooms to '%s'.", rooms_written, qPrintable(legacyfile_filename));
 
-    auto original_checksum = checksumFile(QStringLiteral("world/%1").arg(filename));
+    auto original_checksum = checksumFile(filename);
     auto legacyfile_checksum = checksumFile(legacyfile_filename);
     auto qfile_checksum = checksumFile(qfile_filename);
     auto qsavefile_checksum = checksumFile(qsavefile_filename);
@@ -763,11 +768,10 @@ private slots:
       QVERIFY(fstream_world_file.is_open());
 
       QTextStream in(&qf);
-      room_t room_nr = {};
+      // room_t room_nr = {};
 
       Room original_room1 = DC::getInstance()->world[1];
-      room_t new_room_nr = DC::getInstance()->read_one_room(fl, {});
-      QCOMPARE(room_nr, 1);
+      room_t new_room_nr = DC::getInstance()->read_one_room(fl, one_new_world_file_item(legacyfile_filename));
       QCOMPARE(new_room_nr, 1);
       Room new_room1 = DC::getInstance()->world[1];
       QCOMPARE(new_room1, original_room1);
