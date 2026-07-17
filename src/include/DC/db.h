@@ -119,7 +119,7 @@ class LegacyFileWorld : public LegacyFile
 {
 public:
   LegacyFileWorld(QString filename)
-      : LegacyFile("world", filename, "Unable to open world file '%1")
+      : LegacyFile("", filename, "Unable to open world file '%1")
   {
   }
   ~LegacyFileWorld()
@@ -132,6 +132,7 @@ public:
 };
 
 /* public procedures in db.c */
+world_file_list_itemPtr one_new_world_file_item(QString filename);
 bool can_modify_this_room(Character *ch, room_t room);
 bool can_modify_room(Character *ch, room_t room);
 bool can_modify_mobile(Character *ch, room_t room);
@@ -334,7 +335,7 @@ void delete_item_from_index(vnum_t vnum);
 void delete_mob_from_index(vnum_t vnum);
 QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current line");
 
-int64_t fread_int(FILEPtr fl, int64_t minval, int64_t maxval);
+int64_t fread_int(FILEPtr fl, int64_t minval, int64_t maxval, bool warnings = true);
 int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range);
 template <class T>
 T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max());
@@ -360,14 +361,11 @@ T fread_bitvector(auto &in)
   return flags;
 }
 
-void add_mobspec(vnum_t vnum);
 void write_object_csv(Object *obj, std::ofstream &fout);
 extern skill_quest *skill_list;
 #define REAL 0
 #define VIRTUAL 1
 
-class Object *read_object(int nr, FILEPtr fl, bool zz);
-class Object *read_object(int nr, QTextStream &fl, bool zz);
 class Object *clone_object(int nr);
 void randomize_object(Object *obj);
 void string_to_file(FILEPtr fl, QString str);
