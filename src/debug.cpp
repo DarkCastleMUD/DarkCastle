@@ -244,10 +244,10 @@ int main(int argc, char **argv)
   renum_world();
 
   logentry(QStringLiteral("Generating object indices/loading all objects"), 0, DC::LogChannel::LOG_MISC);
-  debug.generate_obj_indices(debug.obj_index);
+  debug.load_entities(debug.obj_index);
 
   logentry(QStringLiteral("Generating mob indices/loading all mobiles"), 0, DC::LogChannel::LOG_MISC);
-  debug.generate_mob_indices(debug.mob_index);
+  debug.load_entities(debug.mob_index);
 
   logentry(QStringLiteral("renumbering zone table"), 0, DC::LogChannel::LOG_MISC);
   renum_zone_table();
