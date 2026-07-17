@@ -1398,6 +1398,32 @@ int get_weapon_damage_type(class Object *wielded)
   return TYPE_HIT; // should never get here
 }
 
+int get_weapon_element(class Object *wielded)
+{
+  if (!wielded || wielded->obj_flags.type_flag != ITEM_WEAPON)
+    return 0;
+
+  if (wielded->vnum_ == 30019) // Durendal converts only while lit
+    return isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE) ? TYPE_FIRE : 0;
+
+  if (!isSet(wielded->obj_flags.more_flags, ITEM_ELEMENTAL))
+    return 0;
+
+  // Called on every swing, so a misconfigured value[0] stays silent here rather
+  // than flooding the bug log. 'stat' reports it as element "none" instead.
+  switch (wielded->obj_flags.value[0] + TYPE_HIT)
+  {
+  case TYPE_MAGIC:
+  case TYPE_FIRE:
+  case TYPE_ENERGY:
+  case TYPE_ACID:
+  case TYPE_POISON:
+  case TYPE_COLD:
+    return wielded->obj_flags.value[0] + TYPE_HIT;
+  }
+  return 0;
+}
+
 int get_monk_bare_damage(Character *ch)
 {
   int dam = 0;
@@ -1493,12 +1519,11 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   if (wielded && wielded->obj_flags.type_flag == ITEM_WEAPON)
     w_type = get_weapon_damage_type(wielded);
 
-  if (wielded && wielded->vnum_ == 30019 && isSet(wielded->obj_flags.more_flags, ITEM_TOGGLE))
-  {                     // Durendal - changes damage type and other stuff
-    w_type = TYPE_FIRE; // no skill bonus
-  }
-
   check_weapon_skill_bonus(ch, w_type, wielded, weapon_skill_hit_bonus, weapon_skill_dam_bonus);
+
+  int element = get_weapon_element(wielded);
+  if (element)
+    w_type = element;
 
   weapon_type = w_type;
   if (type == SKILL_BACKSTAB)
@@ -1536,8 +1561,10 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
   {
     dam = dam * 85 / 100;
     dam = dam + (getRealSpellDamage(ch) / 2);
-    w_type = SKILL_ELEMENTAL_HIT;
   }
+
+  if (element && type != SKILL_BACKSTAB && type != SKILL_JAB)
+    w_type = SKILL_ELEMENTAL_HIT;
   // BACKSTAB GOES IN HERE!
   if ((type == SKILL_BACKSTAB || type == SKILL_CIRCLE) && dam < 10000)
   { // Bingo not affected.
@@ -2074,8 +2101,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   weapon_bit = get_weapon_bit(weapon_type);
   typeofdamage = damage_type(weapon_type);
   follow_type *fol;
-  if (attacktype == SKILL_ELEMENTAL_HIT)
-    weapon_bit = TYPE_FIRE;
+  bool elemental_weapon = (attacktype == SKILL_ELEMENTAL_HIT);
 
   if (GET_POS(victim) == position_t::DEAD)
     return (ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED);
@@ -2216,7 +2242,13 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     double mult = 0 - save; // Turns positive.
     mult = 1.0 + (double)mult / 100;
     dam = (int)(dam * mult);
-    if (reflected)
+    // An elemental weapon applies the save as flat mitigation, not a roll, and
+    // every target has a save, so the per-hit message would fire constantly.
+    // Scale the damage silently instead.
+    if (elemental_weapon)
+    {
+    }
+    else if (reflected)
     {
       strcpy(buf3, buf);
       sprintf(buf2, "s additional damage.");
@@ -2248,12 +2280,15 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       act(buf2, victim, 0, ch, TO_CHAR, 0);
     }
   }
-  else if (number(1, 101) < save && !imm)
+  else if ((elemental_weapon ? save > 0 : number(1, 101) < save) && !imm)
   {
     if (save > 50)
       save = 50;
     dam -= (int)(dam * (double)save / 100); // Save chance.
-    if (reflected)
+    if (elemental_weapon)
+    {
+    }
+    else if (reflected)
     {
       strcpy(buf3, buf);
       sprintf(buf2, "s reduced damage.");
@@ -2383,7 +2418,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
       ;
     }
 
-  if (typeofdamage == DAMAGE_TYPE_PHYSICAL)
+  if (typeofdamage == DAMAGE_TYPE_PHYSICAL || elemental_weapon)
   {
     if (isSet(ch->combat, COMBAT_BERSERK))
       dam = (int)(dam * 1.75);
@@ -2418,7 +2453,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
 
     // we do this AFTER all the multipliers but BEFORE all the reducers
     // to make it cause the smallest impact
-    if (dam) // misses turned to tickles
+    if (dam && !elemental_weapon) // misses turned to tickles
       dam = (dam * (100 - victim->melee_mitigation)) / 100;
 
     if (victim->affected_by_spell(SPELL_HOLY_AURA) && victim->affected_by_spell(SPELL_HOLY_AURA)->modifier == 50)
@@ -2429,7 +2464,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     if (victim->affected_by_spell(SPELL_HOLY_AURA) && victim->affected_by_spell(SPELL_HOLY_AURA)->modifier == 25)
       dam /= 2;
   }
-  if (typeofdamage == DAMAGE_TYPE_MAGIC && dam)
+  if (typeofdamage == DAMAGE_TYPE_MAGIC && dam && !elemental_weapon)
     dam = (dam * (100 - victim->spell_mitigation)) / 100;
   else if (typeofdamage == DAMAGE_TYPE_SONG && dam)
     dam = (dam * (100 - victim->song_mitigation)) / 100;
@@ -2718,11 +2753,11 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   {
     if (ch->equipment[weapon] == nullptr)
     {
-      dam_message(dam, ch, victim, TYPE_HIT, modifier);
+      dam_message(dam, ch, victim, TYPE_HIT, weapon_type, modifier);
     }
     else
     {
-      dam_message(dam, ch, victim, attacktype, modifier);
+      dam_message(dam, ch, victim, attacktype, weapon_type, modifier);
     }
 
     victim->removeHP(dam, ch);
@@ -6026,7 +6061,7 @@ char *elem_type[] =
         "$B$0stone fist$R"};
 
 void dam_message(int dam, Character *ch, Character *victim,
-                 int w_type, int32_t modifier)
+                 int w_type, int weapon_type, int32_t modifier)
 {
   static const char *attack_table[] =
       {
@@ -6175,16 +6210,38 @@ void dam_message(int dam, Character *ch, Character *victim,
   if (w_type != SKILL_ELEMENTAL_HIT)
   {
     w_type -= TYPE_HIT;
-    if (((unsigned)w_type) >= sizeof(attack_table))
+    if (((unsigned)w_type) >= std::size(attack_table))
     {
       logentry(QStringLiteral("Dam_message: bad w_type"), ANGEL, DC::LogChannel::LOG_BUG);
       w_type = 0;
     }
   }
   else
-  {
-    attack = "$B$4flaming slash$R";
-  }
+    switch (weapon_type)
+    {
+    case TYPE_FIRE:
+      attack = "$B$4flaming slash$R";
+      break;
+    case TYPE_COLD:
+      attack = "$B$3freezing slash$R";
+      break;
+    case TYPE_ENERGY:
+      attack = "$B$5crackling slash$R";
+      break;
+    case TYPE_ACID:
+      attack = "$B$2searing slash$R";
+      break;
+    case TYPE_POISON:
+      attack = "$B$2venomous slash$R";
+      break;
+    case TYPE_MAGIC:
+      attack = "$B$7arcane slash$R";
+      break;
+    default:
+      logentry(QStringLiteral("Dam_message: bad elemental weapon_type"), ANGEL, DC::LogChannel::LOG_BUG);
+      attack = "$B$7elemental slash$R";
+      break;
+    }
 
   // Custom damage messages.
   if (ch->isNonPlayer())

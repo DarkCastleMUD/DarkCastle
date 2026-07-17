@@ -22,6 +22,7 @@
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/memory.h"
+#include "DC/fight.h"
 
 #include <fmt/format.h>
 #include <QString>
@@ -1089,8 +1090,9 @@ void obj_stat(Character *ch, class Object *j)
     int get_weapon_damage_type(class Object * wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern char *strs_damage_types[];
-    sprintf(buf, "$3Unused(v1)$R: %d (make 0)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
+    sprintf(buf, "$3Element(v1)$R: %d (%s)\r\n$3Todam(v2)d(v3)$R: %dD%d\r\n$3Type(v4)$R: %d (%s)",
             j->obj_flags.value[0],
+            get_weapon_element(j) ? strs_damage_types[j->obj_flags.value[0]] : "none",
             j->obj_flags.value[1],
             j->obj_flags.value[2],
             j->obj_flags.value[3],

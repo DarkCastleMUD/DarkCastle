@@ -12,6 +12,7 @@
 #include "DC/vault.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
+#include "DC/fight.h"
 
 using namespace std::literals;
 
@@ -1674,6 +1675,74 @@ private slots:
     QVERIFY(CAN_WEAR(&obj, SHIELD));
     QVERIFY(!obj.obj_flags.wear_flags.testFlag(EAR));
     QCOMPARE(QFlagsToStrings(obj.obj_flags.wear_flags), QStringLiteral("TAKE SHIELD"));
+  }
+
+  void test_get_weapon_element_data()
+  {
+    QTest::addColumn<int>("value0");
+    QTest::addColumn<int>("expected");
+
+    QTest::newRow("magic") << TYPE_MAGIC - TYPE_HIT << TYPE_MAGIC;
+    QTest::newRow("fire") << TYPE_FIRE - TYPE_HIT << TYPE_FIRE;
+    QTest::newRow("energy") << TYPE_ENERGY - TYPE_HIT << TYPE_ENERGY;
+    QTest::newRow("acid") << TYPE_ACID - TYPE_HIT << TYPE_ACID;
+    QTest::newRow("poison") << TYPE_POISON - TYPE_HIT << TYPE_POISON;
+    QTest::newRow("cold") << TYPE_COLD - TYPE_HIT << TYPE_COLD;
+
+    // Physical and non-elemental damage types are not selectable as weapon elements.
+    QTest::newRow("unset") << 0 << 0;
+    QTest::newRow("slash") << TYPE_SLASH - TYPE_HIT << 0;
+    QTest::newRow("suffering") << TYPE_SUFFERING - TYPE_HIT << 0;
+    QTest::newRow("charm") << TYPE_CHARM - TYPE_HIT << 0;
+    QTest::newRow("sleep") << TYPE_SLEEP - TYPE_HIT << 0;
+    QTest::newRow("water") << TYPE_WATER - TYPE_HIT << 0;
+    QTest::newRow("negative") << -1 << 0;
+    QTest::newRow("out of range") << 9999 << 0;
+  }
+
+  void test_get_weapon_element()
+  {
+    QFETCH(int, value0);
+    QFETCH(int, expected);
+
+    Object obj;
+    obj.obj_flags.type_flag = ITEM_WEAPON;
+    obj.obj_flags.value[0] = value0;
+
+    // Without the flag the value is inert, so existing weapons cannot be
+    // retroactively turned elemental by a stray v1.
+    QCOMPARE(get_weapon_element(&obj), 0);
+
+    SET_BIT(obj.obj_flags.more_flags, ITEM_ELEMENTAL);
+    QCOMPARE(get_weapon_element(&obj), expected);
+  }
+
+  void test_get_weapon_element_non_weapon()
+  {
+    QCOMPARE(get_weapon_element(nullptr), 0);
+
+    Object obj;
+    obj.obj_flags.type_flag = ITEM_ARMOR;
+    obj.obj_flags.value[0] = TYPE_FIRE - TYPE_HIT;
+    SET_BIT(obj.obj_flags.more_flags, ITEM_ELEMENTAL);
+    QCOMPARE(get_weapon_element(&obj), 0);
+  }
+
+  void test_get_weapon_element_durendal()
+  {
+    Object obj;
+    obj.obj_flags.type_flag = ITEM_WEAPON;
+    obj.vnum_ = 30019;
+
+    // Durendal carries neither the flag nor a v1 element; its fire comes from
+    // ITEM_TOGGLE, set by its proc while lit.
+    QCOMPARE(get_weapon_element(&obj), 0);
+
+    SET_BIT(obj.obj_flags.more_flags, ITEM_TOGGLE);
+    QCOMPARE(get_weapon_element(&obj), TYPE_FIRE);
+
+    REMOVE_BIT(obj.obj_flags.more_flags, ITEM_TOGGLE);
+    QCOMPARE(get_weapon_element(&obj), 0);
   }
 };
 
