@@ -143,6 +143,7 @@ add_library(DC SHARED
     src/guild.cpp
     src/handler.cpp
     src/help.cpp
+    src/Index.cpp
     src/info.cpp
     src/innate.cpp
     src/interp.cpp
