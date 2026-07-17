@@ -111,13 +111,11 @@ void load_banned();
 void boot_world(void);
 void do_godlist();
 void half_chop(const char *str, char *arg1, char *arg2);
-world_file_list_itemPtr new_mob_file_item(QString filename);
-world_file_list_itemPtr new_obj_file_item(QString filename);
 
 QString read_next_zonefile_name(FILEPtr stream);
 QString read_next_worldfile_name(FILEPtr stream);
-QString read_next_mobfile_name(FILEPtr stream);
-QString read_next_objfile_name(FILEPtr stream);
+// QString read_next_mobfile_name(FILEPtr stream);
+// QString read_next_objfile_name(FILEPtr stream);
 
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
@@ -602,10 +600,10 @@ void DC::boot_db(void)
   funny_boot_message();
 
   logverbose(QStringLiteral("Generating mob indices/loading all mobiles"));
-  generate_mob_indices(mob_index);
+  load_entities(mob_index);
 
   logverbose(QStringLiteral("Generating object indices/loading all objects"));
-  generate_obj_indices(obj_index);
+  load_entities(obj_index);
 
   funny_boot_message();
 
@@ -967,106 +965,7 @@ void reset_time(void)
     weather_info.sky = SKY_CLOUDLESS;
 }
 
-/* generate index table for monster file */
-void DC::generate_mob_indices(QMap<vnum_t, class mob_index_data> &index)
-{
-  char buf[82];
-  char log_buf[256];
-  FILEPtr flMobIndex;
-  FILEPtr fl;
-  QString temp;
-  char endfile[180];
-
-  DC::getInstance()->logverbose(QStringLiteral("Opening mobile file index."));
-  if (DC::getInstance()->cf.test_mobs)
-  {
-    if (!(flMobIndex = dc_fopen(qPrintable(MOB_INDEX_FILE_TINY), "r")))
-      abort();
-  }
-  else
-  {
-
-    if (!(flMobIndex = dc_fopen(qPrintable(MOB_INDEX_FILE), "r")))
-
-    {
-      logentry(QStringLiteral("Could not open index file."));
-      abort();
-    }
-  }
-
-  DC::getInstance()->logverbose(QStringLiteral("Opening object files."));
-
-  vnum_t vnum = 1;
-  // note, we don't worry about free'ing temp, cause it's held in the "mob_file_list"
-  for (temp = read_next_mobfile_name(flMobIndex);
-       temp.isEmpty() == false;
-       temp = read_next_mobfile_name(flMobIndex))
-  {
-    if (cf.verbose_mode)
-    {
-      logentry(temp, 0, DC::LogChannel::LOG_MISC);
-    }
-
-    if (!(fl = dc_fopen(endfile, "r")))
-    {
-      perror(endfile);
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, "generate_mob_indices: could not open mob file: %s", endfile);
-      abort();
-    }
-
-    auto pItem = new_mob_file_item(temp);
-
-    for (;;)
-    {
-      if (dc_fgets(buf, 81, fl))
-      {
-
-        if (*buf == '#')
-        { /* allocate new_new cell */
-          sscanf(buf, "#%llu", &vnum);
-          index[vnum].vnum(vnum);
-          index[vnum].qty = 0;
-          index[vnum].non_combat_func = 0;
-          index[vnum].combat_func = 0;
-          index[vnum].mobprogs = nullptr;
-          index[vnum].mobspec = nullptr;
-          index[vnum].progtypes = 0;
-          DC::getInstance()->currentVNUM(index[vnum].vnum());
-          if (!(index[vnum].mob = read_mobile(vnum, fl)))
-          {
-
-            sprintf(log_buf, "Unable to load mobile %llu!\r\n", index[vnum].vnum());
-            logentry(log_buf, ANGEL, DC::LogChannel::LOG_BUG);
-          }
-        }
-        else if (*buf == '$') /* EOF */
-          break;
-      }
-      else
-      {
-        sprintf(endfile, "Bad char (%s)", buf);
-        logentry(endfile, 0, DC::LogChannel::LOG_MISC);
-        abort();
-      }
-    }
-
-    pItem->lastnum = vnum;
-  }
-
-  /*
-   Here the index gets processed, and mob classes gets
-   assigned. (Not done in read_mobile 'cause of
-   the fact that all mobs aren't read yet,
-   and an attempt to assign non-existant mob
-   procs would be bad).
-   */
-  for (const auto &vnum : mob_index.keys())
-  {
-    add_mobspec(vnum);
-  }
-}
-
-void add_mobspec(vnum_t vnum)
+void DC::add_mobspec(vnum_t vnum)
 {
   if (!DC::getInstance()->mob_index.contains(vnum))
     return;
@@ -1261,84 +1160,6 @@ void DC::remove_all_objs_from_world()
     extract_obj(curr);
 }
 
-/* generate index table for object file */
-void DC::generate_obj_indices(QMap<vnum_t, class obj_index_data> &index)
-{
-  char buf[82];
-  char log_buf[256];
-  FILEPtr fl;
-  FILEPtr flObjIndex;
-  QString temp;
-  char endfile[180];
-  //  if (!bport) {
-
-  if (!(flObjIndex = dc_fopen(qPrintable(OBJECT_INDEX_FILE), "r")))
-
-  {
-    logentry(QStringLiteral("Cannot open object file index."), 0, DC::LogChannel::LOG_MISC);
-    abort();
-  }
-  /*
-   } else {
-   if (!(flObjIndex = dc_fopen(OBJECT_INDEX_FILE_TINY,"r"))) {
-   logentry(QStringLiteral("Cannot open object file index.(tiny)."),0,DC::LogChannel::LOG_MISC);
-   abort();
-   }
-   }
-   */
-  logverbose(QStringLiteral("Opening object files."));
-
-  vnum_t vnum = 1UL;
-  // note, we don't worry about free'ing temp, cause it's held in the "obj_file_list"
-  for (temp = read_next_worldfile_name(flObjIndex);
-       temp.isEmpty() == false;
-       temp = read_next_worldfile_name(flObjIndex))
-  {
-    strcpy(endfile, "objects/");
-    strcat(endfile, temp.toStdString().c_str());
-    logverbose(temp);
-
-    if (!(fl = dc_fopen(endfile, "r")))
-    {
-      logentry(QStringLiteral("generate_obj_indices: could not open obj file."), 0, LogChannel::LOG_BUG);
-      logentry(temp, 0, LogChannel::LOG_BUG);
-      abort();
-    }
-
-    auto pItem = new_obj_file_item(temp);
-
-    for (;;)
-    {
-      if (dc_fgets(buf, 81, fl))
-      {
-        if (*buf == '#') /* allocate new_new cell */
-        {
-          sscanf(buf, "#%llu", &vnum);
-          index[vnum].vnum(vnum);
-          index[vnum].qty = 0;
-          index[vnum].non_combat_func = 0;
-          index[vnum].combat_func = 0;
-          index[vnum].progtypes = 0;
-          if (!(index[vnum].item = (class Object *)read_object(vnum, fl, false)))
-          {
-            sprintf(log_buf, "Unable to load object %llu!\r\n", vnum);
-            logentry(log_buf, ANGEL, LogChannel::LOG_BUG);
-          }
-        }
-        else if (*buf == '$') /* EOF */
-          break;
-      }
-      else
-      {
-        qFatal("Error in \'%s\'.\r\n", endfile);
-      }
-    } // for ;;
-
-    pItem->lastnum = vnum;
-
-  } // for next_in_file
-}
-
 void write_one_room(LegacyFile &lf, int a)
 {
   FILEPtr f = lf.file_handle_;
@@ -1419,6 +1240,7 @@ void write_one_room(LegacyFile &lf, int a)
 
 room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_item)
 {
+  assert(world_file_list_item);
   char *temp = nullptr;
   char ch = 0;
   int dir = 0;
@@ -1431,6 +1253,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
   if (ch != '$')
   {
     room_nr = fread_int(fl, 0, 1000000);
+    world_file_list_item->vnums_[room_nr] = true;
 
     if (load_debug)
     {
@@ -1639,16 +1462,6 @@ QString read_next_zonefile_name(FILEPtr stream)
   return read_next_filename(stream, u"zonefiles"_s);
 }
 
-QString read_next_mobfile_name(FILEPtr stream)
-{
-  return read_next_filename(stream, u"mobs"_s);
-}
-
-QString read_next_objfile_name(FILEPtr stream)
-{
-  return read_next_filename(stream, u"objects"_s);
-}
-
 bool can_modify_this_room(Character *ch, int32_t vnum)
 {
   if (ch->has_skill(COMMAND_RANGE))
@@ -1741,7 +1554,7 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_ite
 void DC::set_zone_modified(vnum_t vnum, world_file_list_t &list)
 {
   auto it = std::find_if(list.begin(), list.end(), [vnum](auto &entry)
-                         { return vnum >= entry->firstnum && vnum <= entry->lastnum; });
+                         { return entry->vnums_.contains(vnum) && entry->vnums_[vnum]; });
 
   if (it == list.end())
   {
@@ -1773,7 +1586,7 @@ void DC::set_zone_modified_obj(vnum_t vnum)
 void DC::set_zone_saved(room_t room, world_file_list_t &list)
 {
   auto it = std::find_if(list.begin(), list.end(), [room](auto &entry)
-                         { return room >= entry->firstnum && room <= entry->lastnum; });
+                         { return entry->vnums_.contains(room) && entry->vnums_[room]; });
 
   if (it == list.end())
   {
@@ -1874,16 +1687,6 @@ world_file_list_itemPtr new_w_file_item(QString filename, world_file_list_t &lis
 world_file_list_itemPtr new_world_file_item(QString filename)
 {
   return new_w_file_item(filename, DC::getInstance()->world_file_list);
-}
-
-world_file_list_itemPtr new_mob_file_item(QString filename)
-{
-  return new_w_file_item(filename, DC::getInstance()->mob_file_list);
-}
-
-world_file_list_itemPtr new_obj_file_item(QString filename)
-{
-  return new_w_file_item(filename, DC::getInstance()->obj_file_list);
 }
 
 /* load the rooms */
@@ -3370,7 +3173,7 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 }
 
 /* read an object from OBJ_FILE */
-class Object *read_object(int nr, QTextStream &fl, bool ignore)
+class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
 {
   int loc{}, mod{};
 
@@ -3519,7 +3322,7 @@ class Object *read_object(int nr, QTextStream &fl, bool ignore)
 }
 
 /* read an object from OBJ_FILE */
-class Object *read_object(int nr, FILEPtr fl, bool ignore)
+class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
 {
   int loc, mod;
 
@@ -5306,7 +5109,7 @@ T fread_int(QTextStream &in, T beg_range, T end_range)
  space char after the int it reads.  This can goof
  up stuff like comments in the zone file.
  */
-int64_t fread_int(FILEPtr fl, int64_t beg_range, int64_t end_range)
+int64_t fread_int(FILEPtr fl, int64_t beg_range, int64_t end_range, bool warnings)
 {
   char buf[MAX_STRING_LENGTH];
   char *pBufLast;
@@ -5365,7 +5168,8 @@ int64_t fread_int(FILEPtr fl, int64_t beg_range, int64_t end_range)
         }
         else
         {
-          logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
+          if (warnings)
+            logentry(QStringLiteral("fread_int: Bad value for range %1 - %2: %3").arg(beg_range).arg(end_range).arg(i));
 
           if (i < beg_range)
           {
