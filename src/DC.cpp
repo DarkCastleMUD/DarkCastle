@@ -404,3 +404,17 @@ auto Character::do_arena_usage(QStringList arguments) -> command_return_t
 
   return command_return_t();
 }
+
+void DC::logmisc(QString message)
+{
+  logentry(message, 0, LogChannel::LOG_MISC);
+}
+
+world_file_list_itemPtr mob_index_data::new_file_item(QString filename)
+{
+  return new_w_file_item(filename, DC::getInstance()->mob_file_list);
+}
+world_file_list_itemPtr obj_index_data::new_file_item(QString filename)
+{
+  return new_w_file_item(filename, DC::getInstance()->obj_file_list);
+}
