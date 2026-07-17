@@ -4898,7 +4898,7 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
   }
 
   const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [&ch](const auto &entry)
-                               { return entry->firstnum <= ch->in_room && entry->lastnum >= ch->in_room; });
+                               { return entry->vnums_.contains(ch->in_room) && entry->vnums_[ch->in_room]; });
   if (it == DC::getInstance()->world_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
@@ -4914,9 +4914,10 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
   LegacyFileWorld lfw(curr->filename);
   if (lfw.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
     {
-      write_one_room(lfw, x);
+      if (enabled)
+        write_one_room(lfw, vnum);
     }
   }
 
@@ -4946,7 +4947,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
   int r = v;
 
   const auto &it = std::find_if(DC::getInstance()->mob_file_list.cbegin(), DC::getInstance()->mob_file_list.cend(), [&r](const auto &entry)
-                                { return entry->firstnum <= r && entry->lastnum >= r; });
+                                { return entry->vnums_.contains(r) && entry->vnums_[r]; });
 
   if (it == DC::getInstance()->mob_file_list.cend())
   {
@@ -4964,9 +4965,10 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
   LegacyFile lf("mobs", curr->filename, "Couldn't open legacy mob save file %1.");
   if (lf.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
     {
-      write_mobile(lf, DC::getInstance()->mob_index[x].mob);
+      if (enabled && DC::getInstance()->mob_index.contains(vnum) && DC::getInstance()->mob_index[vnum].mob)
+        write_mobile(lf, DC::getInstance()->mob_index[vnum].mob);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
   }
@@ -4981,7 +4983,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
   char buf[180];
   char buf2[180];
 
-  if (ch->player->last_obj_vnum < 1)
+  if (!ch->player->last_obj_vnum)
   {
     ch->sendln("You have not recently edited an item.");
     return ReturnValue::eFAILURE;
@@ -4995,7 +4997,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
   int r = v;
 
   const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [&r](const auto &entry)
-                               { return entry->firstnum <= r && entry->lastnum >= r; });
+                               { return entry->vnums_.contains(r) && entry->vnums_[r]; });
   if (it == DC::getInstance()->obj_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
@@ -5012,9 +5014,10 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
   LegacyFile lf("objects", curr->filename, "Couldn't open legacy obj save file %1.");
   if (lf.isOpen())
   {
-    for (int x = curr->firstnum; x <= curr->lastnum; x++)
+    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
     {
-      write_object(lf, DC::getInstance()->obj_index[x].item);
+      if (enabled && DC::getInstance()->obj_index.contains(vnum) && DC::getInstance()->obj_index[vnum].item)
+        write_object(lf, DC::getInstance()->obj_index[vnum].item);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
   }
