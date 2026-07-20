@@ -481,6 +481,7 @@ void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vi
   if (stream != STDIN_FILENO)
   {
     dc_fprintf(*f, "%s :: %s\n", tmstr, qPrintable(str));
+    *f = {};
   }
 
   if (god_level >= IMMORTAL)
