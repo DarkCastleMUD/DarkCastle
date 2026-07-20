@@ -177,65 +177,69 @@ void checkConsecrate(int);
 // a reboot
 int DC::write_hotboot_file(void)
 {
-  FILEPtr fp;
   class Connection *sd;
-  if ((fp = dc_fopen("hotboot", "w")) == nullptr)
-  {
-    logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, DC::LogChannel::LOG_MISC);
-    return 0;
-  }
-  // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
-  for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const int &fd)
-           { dc_fprintf(fp, "%d\n", fd); });
 
-  for (Connection *d = descriptor_list; d; d = sd)
   {
-    sd = d->next;
-    if (STATE(d) != Connection::states::PLAYING || !d->character || d->character->getLevel() < 1)
+    auto fp = dc_fopen("hotboot", "w");
+    if (!fp)
     {
-      // Kick out anyone not currently playing in the game.
-      write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
-      close_socket(d);
+      logentry(QStringLiteral("Hotboot failed, unable to open hotboot file."), 0, DC::LogChannel::LOG_MISC);
+      return 0;
     }
-    else
+    // for_each(dc.server_descriptor_list.begin(), dc.server_descriptor_list.end(), [fp](server_descriptor_list_i i)
+    for_each(server_descriptor_list.begin(), server_descriptor_list.end(), [&fp](const int &fd)
+             { dc_fprintf(fp, "%d\n", fd); });
+
+    for (Connection *d = descriptor_list; d; d = sd)
     {
-      STATE(d) = Connection::states::PLAYING; // if editors.
-      if (d->original)
+      sd = d->next;
+      if (STATE(d) != Connection::states::PLAYING || !d->character || d->character->getLevel() < 1)
       {
-        dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
-        if (d->original->player)
-        {
-          d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
-          d->original->player->time.logon = time(0);
-        }
-        d->original->save_char_obj();
+        // Kick out anyone not currently playing in the game.
+        write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
+        close_socket(d);
       }
       else
       {
-        dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), qPrintable(d->getPeerOriginalAddress().toString()));
-        if (d->character->player)
+        STATE(d) = Connection::states::PLAYING; // if editors.
+        if (d->original)
         {
-          d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
-          d->character->player->time.logon = time(0);
+          dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
+          if (d->original->player)
+          {
+            d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
+            d->original->player->time.logon = time(0);
+          }
+          d->original->save_char_obj();
         }
-        d->character->save_char_obj();
+        else
+        {
+          dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->character), qPrintable(d->getPeerOriginalAddress().toString()));
+          if (d->character->player)
+          {
+            d->character->player->last_site = d->character->desc->getPeerOriginalAddress().toString();
+            d->character->player->time.logon = time(0);
+          }
+          d->character->save_char_obj();
+        }
+        write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
       }
-      write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
     }
+
+    logentry(QStringLiteral("Hotboot descriptor file successfully written."), 0, DC::LogChannel::LOG_MISC);
+
+    chdir("../bin/");
+
+    char *cwd = get_current_dir_name();
+    if (cwd != nullptr)
+    {
+      logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
+      free(cwd);
+    }
+
+    ssh.close();
   }
 
-  logentry(QStringLiteral("Hotboot descriptor file successfully written."), 0, DC::LogChannel::LOG_MISC);
-
-  chdir("../bin/");
-
-  char *cwd = get_current_dir_name();
-  if (cwd != nullptr)
-  {
-    logentry(QStringLiteral("Hotbooting %1 at [%2]").arg(DC::getInstance()->applicationFilePath()).arg(cwd), 108, DC::LogChannel::LOG_GOD);
-    free(cwd);
-  }
-
-  ssh.close();
   if (execv(qPrintable(applicationFilePath()), cf.argv_) == -1)
   {
     char execv_strerror[1024] = {};
@@ -396,11 +400,8 @@ void DC::finish_hotboot(void)
 /* Init sockets, run game, and cleanup sockets */
 void DC::init_game(void)
 {
-  FILEPtr fp;
-  // create boot'ing lockfile
-  if ((fp = dc_fopen("died_in_bootup", "w")))
-  {
-  }
+
+  dc_fopen("died_in_bootup", "w");
 
   logverbose(QStringLiteral("Attempting to load hotboot file."));
 
