@@ -997,16 +997,16 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       *buf = '\0';
       ch->sendln("[#  ] [OBJ #] [LV] OBJECT'S DESCRIPTION\n");
 
-      for (i = 1; (i <= DC::getInstance()->obj_index[DC::getInstance()->obj_index.lastKey()].vnum()); i++)
+      for (const auto &[vnum, index_entry] : DC::getInstance()->obj_index.asKeyValueRange())
       {
-        nr = 1;
-        if (!DC::getInstance()->obj_index.contains(nr))
+        if (!index_entry.item)
           continue;
 
-        if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[nr].item))->Name()))
+        nr = 1;
+        if (isexact(name, index_entry.item->Name()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vnum, index_entry.item->obj_flags.eq_level, index_entry.item->short_description);
           ch->send(buf);
         }
 
