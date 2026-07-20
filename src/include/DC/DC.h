@@ -629,6 +629,7 @@ public:
             index[vnum].mobprogs = nullptr;
             index[vnum].mobspec = nullptr;
             index[vnum].progtypes = 0;
+            index[vnum].source = pItem;
             currentVNUM(index[vnum].vnum());
 
             if constexpr (std::is_same_v<T, QMap<vnum_t, class mob_index_data>>)

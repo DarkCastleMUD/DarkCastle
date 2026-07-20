@@ -1559,7 +1559,6 @@ void DC::set_zone_modified(vnum_t vnum, world_file_list_t &list)
 
   if (it == list.end())
   {
-    auto world_file = findWorldFileWithVNUM(vnum);
     logbug(QStringLiteral("VNUM %1 not found in any zone in the index").arg(vnum));
     return;
   }
@@ -1575,7 +1574,8 @@ void DC::set_zone_modified_world(room_t room)
 // rnum of mob
 void DC::set_zone_modified_mob(vnum_t vnum)
 {
-  set_zone_modified(vnum, mob_file_list);
+  if (mob_index.contains(vnum) && mob_index[vnum].source)
+    SET_BIT(mob_index[vnum].source->flags, WORLD_FILE_MODIFIED);
 }
 
 // rnum of mob

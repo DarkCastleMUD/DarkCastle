@@ -32,6 +32,7 @@ public:
   class mob_prog_data *mobprogs{};
   class mob_prog_data *mobspec{};
   int progtypes{};
+  world_file_list_itemPtr source;
 
 private:
   vnum_t vnum_{};
