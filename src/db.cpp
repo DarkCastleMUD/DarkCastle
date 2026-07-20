@@ -563,6 +563,7 @@ void DC::boot_db(void)
     abort();
   }
   help_rec_count = count_hash_records(new_help_fl);
+  new_help_fl = {};
 
   if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
   {
@@ -573,7 +574,7 @@ void DC::boot_db(void)
   load_new_help(new_help_fl);
 
   // end new help files
-
+  new_help_fl = {};
   logverbose(QStringLiteral("Opening help file."));
 
   if (!(help_fl = dc_fopen(HELP_KWRD_FILE, "r")))
@@ -583,7 +584,7 @@ void DC::boot_db(void)
   }
 
   help_index = build_help_index(help_fl, &top_of_helpt);
-
+  help_fl = {};
   logverbose(QStringLiteral("Loading the zones"));
   boot_zones();
 
