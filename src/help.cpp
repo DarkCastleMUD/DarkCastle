@@ -687,6 +687,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
 
   help_rec_count = count_hash_records(new_help_fl);
 
+  new_help_fl = {};
   if (!(new_help_fl = dc_fopen(NEW_HELP_FILE, "r")))
   {
     logentry(QStringLiteral("Error opening help file for reload."), OVERSEER, DC::LogChannel::LOG_HELP);
@@ -697,6 +698,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   DC::getInstance()->new_top_of_helpt = 0;
   CREATE(new_help_table, help_index_element_new, help_rec_count);
   ret = load_new_help(new_help_fl, 1, ch);
+  new_help_fl = {};
 
   if (ret == ReturnValue::eFAILURE)
   {
