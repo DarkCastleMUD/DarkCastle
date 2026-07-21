@@ -123,6 +123,14 @@ void mobile_activity(void)
     if (ch->fighting) // that's it for monsters busy fighting
       continue;
 
+    if (ch->mobdata->return_home_timer > 0 && --ch->mobdata->return_home_timer == 0)
+    {
+      act("$n is tired of being here and misses $s home.", ch, 0, 0, TO_ROOM, 0);
+      act("$n has decided to return home.", ch, 0, 0, TO_ROOM, 0);
+      extract_char(ch, true);
+      continue;
+    }
+
     if (!AWAKE(ch))
       continue;
     if (IS_AFFECTED(ch, AFF_PARALYSIS))

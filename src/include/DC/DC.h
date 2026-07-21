@@ -409,6 +409,7 @@ public:
   static constexpr quint64 PULSE_TIME = 60 * PASSES_PER_SEC;
   static constexpr quint64 PULSE_REGEN = 15 * PASSES_PER_SEC;
   static constexpr quint64 PULSE_SHORT = 1; // Pulses all the time.
+  static constexpr int16_t PULSES_TO_RETURN_HOME = (10 * 60 * PASSES_PER_SEC) / PULSE_MOBILE;
   static constexpr level_t MAX_MORTAL_LEVEL = 60ULL;
   static constexpr quint64 PER_IP_CONNECTION_LIMIT = 20;
   static const QString HINTS_FILE_NAME;
