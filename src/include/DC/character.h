@@ -528,6 +528,7 @@ public:
   int16_t mpactnum = {};         // num
   int32_t last_room = {};        // Room rnum the mob was last in. Used
                                  // For !magic,!track changing flags.
+  int16_t return_home_timer = {}; // Mobile pulses until a mob that broke charm heads home
   threat_dataPtr threat = {};
   ResetCommandPtr reset = {};
   mob_flag_data mob_flags = {}; /* Mobile information               */

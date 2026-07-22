@@ -1671,6 +1671,9 @@ void affect_to_char(Character *ch, affected_type *af, int32_t duration_type)
   ch->affected = affected_alloc;
 
   affect_modify(ch, af->location, af->modifier, af->bitvector, true);
+
+  if ((af->bitvector & AFF_CHARM) && ch->isNonPlayer() && ch->mobdata)
+    ch->mobdata->return_home_timer = 0;
 }
 
 /* Remove an affected_type structure from a char (called when duration
@@ -1953,6 +1956,8 @@ void affect_remove(Character *ch, affected_type *af, int flags)
         ch->add_memory(ch->master->getName(), 'h');
       stop_follower(ch, follower_reasons_t::BROKE_CHARM);
     }
+    if (!(flags & SUPPRESS_CONSEQUENCES) && ch->isNonPlayer() && ch->mobdata && !IS_AFFECTED(ch, AFF_GOLEM))
+      ch->mobdata->return_home_timer = DC::PULSES_TO_RETURN_HOME;
     break;
   case SKILL_TACTICS:
     if (!(flags & SUPPRESS_MESSAGES))
