@@ -38,7 +38,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
 
   if (victim)
   {
-    if (victim->isPlayer() && (ch->getLevel() <= victim->getLevel()))
+    if (victim->isPlayer() && (ch->getLevel() <= victim->getLevel() && !DC::getInstance()->cf.isPrimaryImplementer(ch)))
     {
       act("You cast a stream of fire at $N.", ch, 0, victim, TO_CHAR, 0);
       act("$n casts a stream of fire at you.", ch, 0, victim, TO_VICT, 0);

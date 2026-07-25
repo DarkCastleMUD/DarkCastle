@@ -360,7 +360,9 @@ public:
     bool testing = false;
     QString library_directory = DEFAULT_LIBRARY_PATH;
     QString leaderboard_check;
-    QString implementer;
+    QString primary_implementer_;
+    bool isPrimaryImplementer(QString name);
+    bool isPrimaryImplementer(Character *ch);
   } cf;
 
   enum LogChannel

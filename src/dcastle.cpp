@@ -77,7 +77,7 @@ DC::config parse_arguments(int argc, char **argv)
     case 't':
       cf.testing = true;
     case 'i':
-      cf.implementer = optarg;
+      cf.primary_implementer_ = QString(optarg).trimmed();
       break;
     case 'v':
       cf.verbose_mode = true;

@@ -36,6 +36,12 @@ void DC::setup(void)
   QCoreApplication::setOrganizationName("DarkCastleMUD");
   QCoreApplication::setOrganizationDomain("dcastle.org");
   QCoreApplication::setApplicationName("DarkCastle");
+  QSettings settings;
+  if (cf.primary_implementer_.isEmpty())
+  {
+    cf.primary_implementer_ = settings.value(u"global/primary_implementer"_s).toString();
+  }
+
   if (cf.sql)
   {
     database_ = Database("dcastle");
@@ -417,4 +423,17 @@ world_file_list_itemPtr mob_index_data::new_file_item(QString filename)
 world_file_list_itemPtr obj_index_data::new_file_item(QString filename)
 {
   return new_w_file_item(filename, DC::getInstance()->obj_file_list);
+}
+
+bool DC::config::isPrimaryImplementer(QString name)
+{
+  return name.compare(primary_implementer_, Qt::CaseInsensitive) == 0;
+}
+
+bool DC::config::isPrimaryImplementer(Character *ch)
+{
+  if (!ch)
+    return false;
+
+  return ch->getName().compare(primary_implementer_, Qt::CaseInsensitive) == 0;
 }

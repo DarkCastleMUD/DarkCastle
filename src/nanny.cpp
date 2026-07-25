@@ -1725,27 +1725,23 @@ void DC::nanny(class Connection *d, std::string arg)
       // by logging in twice, and leaving one at the password: prompt
       if (ch->getLevel() > 0)
       {
-        strcpy(tmp_name, GET_NAME(ch));
         free_char(d->character, Trace("nanny Connection::states::SELECT_MENU 1"));
-        d->character = 0;
-        load_char_obj(d, tmp_name);
+        d->character = {};
+        load_char_obj(d, ch->getName());
         ch = d->character;
+      }
 
-        if (!DC::getInstance()->cf.implementer.isEmpty())
-        {
-          if (QString(GET_NAME(ch)).compare(DC::getInstance()->cf.implementer, Qt::CaseInsensitive) == 0)
-          {
-            ch->setLevel(110);
-          }
-        }
+      if (!ch)
+      {
+        write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
+        close_socket(d);
+        d = nullptr;
+        break;
+      }
 
-        if (!ch)
-        {
-          write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
-          close_socket(d);
-          d = nullptr;
-          break;
-        }
+      if (cf.isPrimaryImplementer(GET_NAME(ch)))
+      {
+        ch->setLevel(110);
       }
       unique_scan(ch);
       if (ch->getGold() > 1000000000)
