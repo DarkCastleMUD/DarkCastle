@@ -909,7 +909,8 @@ const QStringList Object::more_obj_bits =
         "NO_CUSTOM",
         "24H_NO_SELL",
         "POOF_AFTER_24H",
-        "POOF_NEVER"};
+        "POOF_NEVER",
+        "ELEMENTAL"};
 
 const char *size_bitfields[] =
     {

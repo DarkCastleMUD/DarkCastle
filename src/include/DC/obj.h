@@ -125,6 +125,7 @@ class Character;
 #define ITEM_24H_NO_SELL 1U << 15 // Item can't be sold for 24 RL hours
 #define ITEM_POOF_AFTER_24H 1U << 16
 #define ITEM_POOF_NEVER 1U << 17
+#define ITEM_ELEMENTAL 1U << 18 // Weapon deals value[0] elemental damage instead of physical.
 
 /* Bitvector for 'size' */
 #define SIZE_ANY 1U

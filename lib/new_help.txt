@@ -13427,6 +13427,34 @@ if isweappri($$n) > 7
 -
 If $$n is not wielding any weapon, there is no error.
 It simply returns false.
+===================================================
+Elemental weapons (v1 slot on stat sheet):
+-
+Set the ELEMENTAL moreflag and put one of these in v1
+to make a weapon deal 100% of that element instead of
+physical damage:
+-
+10 = magic    12 = fire     13 = energy
+14 = acid     15 = poison   17 = cold
+-
+oedit <vnum> moreflags ELEMENTAL
+oedit <vnum> v1 12
+-
+Leave v1 at 0, or omit the ELEMENTAL flag, and the
+weapon stays physical.
+-
+Set v1 to 99 for a weapon that rolls a random one of
+the six elements on every hit.  Its element (and the
+element shown by stat/identify) changes each time.
+-
+An elemental weapon is dodged, parried and blocked
+like any other, and keeps its v4 weapon-specialization
+bonus, so still set v4 correctly.  It ignores the
+target's melee and spell mitigation.  Instead the
+target's saving throw for that element reduces the
+damage directly, up to 50%; a target susceptible to
+the element (negative save) takes extra.  Immunity to
+the element stops it cold.
 #
 ~
 OEDIT AFFECTS
