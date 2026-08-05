@@ -1477,7 +1477,7 @@ bool can_modify_this_room(Character *ch, int32_t vnum)
   return true;
 }
 
-bool can_modify_room(Character *ch, int32_t vnum)
+bool can_modify_room(Character *ch, room_t vnum)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
