@@ -2002,11 +2002,15 @@ void save_slot_machines()
   char buf2[180];
 
   const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [](const auto &entry)
-                               { return entry->filename == "21900-21999.obj"; });
+                               { return entry->filename == "objects/21900-21999.obj"; });
 
   if (it == DC::getInstance()->obj_file_list.cend())
   {
-    logentry(QStringLiteral("Mess up in save_slot_machines, no object file."), IMMORTAL, DC::LogChannel::LOG_BUG);
+    logentry(QStringLiteral("Unable to find object filename 'objects/21900-21999.obj'"), IMMORTAL, DC::LogChannel::LOG_BUG);
+    for (const auto &entry : DC::getInstance()->obj_file_list)
+    {
+      logbug(entry->filename);
+    }
     return;
   }
   const auto &curr = *it;
