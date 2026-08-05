@@ -1991,15 +1991,10 @@ char *reel3[] = {
     "$B$3 Bell $R",
     "$B$5Lemon $R"};
 
-void save_slot_machines()
+void save_slot_machines(void)
 {
-  if (DC::getInstance()->cf.bport == true)
-  {
+  if (DC::getInstance()->cf.bport)
     return;
-  }
-
-  char buf[180];
-  char buf2[180];
 
   const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [](const auto &entry)
                                { return entry->filename == "objects/21900-21999.obj"; });
@@ -2015,7 +2010,7 @@ void save_slot_machines()
   }
   const auto &curr = *it;
 
-  LegacyFile lf("objects", curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
+  LegacyFile lf({}, curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
   if (lf.isOpen())
   {
     for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
