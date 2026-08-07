@@ -4871,9 +4871,20 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
     sendln(QStringLiteral("Zone %1 has not been modified. Saving anyway.").arg(zone_key));
   }
 
-  QString filename = QStringLiteral("zonefiles/%1").arg(zone.getFilename());
-  QString command = QStringLiteral("cp %1 %1.last").arg(filename);
-  system(command.toStdString().c_str());
+  auto filename = zone.getFilename();
+  auto backup_filename = u"%1.last"_s.arg(filename);
+  if (QFile(backup_filename).exists())
+    if (!QFile(backup_filename).remove())
+    {
+      logmisc(u"Unable to remove %1"_s.arg(backup_filename));
+      return eFAILURE;
+    }
+
+  if (!QFile(filename).copy(backup_filename))
+  {
+    logmisc(u"Unable to copy %1 to %2"_s.arg(filename).arg(backup_filename));
+    return eFAILURE;
+  }
 
   FILEPtr f = nullptr;
   if ((f = dc_fopen(filename.toStdString().c_str(), "w")) == nullptr)
