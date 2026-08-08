@@ -44,6 +44,15 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "RelWithDebInfo"
             }
+        },
+        {
+            "name": "iwyu",
+            "displayName": "Include What You Use",
+            "description": "Uses include-what-you-use on source to recommend #include changes",
+            "inherits": "debug",
+            "cacheVariables": {
+                "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "include-what-you-use"
+            }
         }
     ],
     "buildPresets": [
@@ -60,6 +69,11 @@
         {
             "name": "release",
             "configurePreset": "release",
+            "verbose": true
+        },
+        {
+            "name": "iwyu",
+            "configurePreset": "iwyu",
             "verbose": true
         }
     ],
@@ -152,6 +166,19 @@
                 {
                     "type": "package",
                     "name": "release"
+                }
+            ]
+        },
+        {
+            "name": "iwyu",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "iwyu"
+                },
+                {
+                    "type": "build",
+                    "name": "iwyu"
                 }
             ]
         }
