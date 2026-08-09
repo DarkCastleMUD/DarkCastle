@@ -1,5 +1,7 @@
-#ifndef TOKEN_H_
-#define TOKEN_H_
+#pragma once
+#include <string>
+class Character;
+class Object;
 /*-----------------------------------------------------------------------
 | Token section.  This section begins the Token class and methods.
 */
@@ -35,7 +37,7 @@ private:
   char *buf;   /* Holds the buffer */
   int type;    /* Holds type of buffer */
   Token *next; /* Next token in the list */
-};             // end of Token class
+}; // end of Token class
 
 class TokenList
 {
@@ -63,9 +65,8 @@ private:
   //--
   // Private variables
   //--
-  Token *head;    // Head of the list
-  Token *current; // Current token
-  std::string interp;  // Interpreted tokens
+  Token *head;        // Head of the list
+  Token *current;     // Current token
+  std::string interp; // Interpreted tokens
 
-};     // end of TokenList class
-#endif /* TOKEN_H_ */
+}; // end of TokenList class

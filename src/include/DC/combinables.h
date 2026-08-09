@@ -1,7 +1,5 @@
-#ifndef COMBINABLES_H
-#define COMBINABLES_H
-
-#include <iostream>
+#pragma once
+#include "DC/Index.h"
 
 namespace Combinables
 {
@@ -132,5 +130,3 @@ namespace Combinables
   std::map<Scribe::recipe, int> Scribe::recipes;
   bool Scribe::initialized = false;
 }
-
-#endif

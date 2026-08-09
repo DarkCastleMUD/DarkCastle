@@ -1,3 +1,7 @@
+#pragma once
+#include "DC/Index.h"
+#include "DC/common.h"
+class Character;
 void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd);
 void log_sacrifice(Character *ch, Object *obj, bool decay);
 int search_char_for_item_count(Character *ch, vnum_t vnum, bool wearonly);

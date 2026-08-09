@@ -1,6 +1,6 @@
 #ifndef GAME_PORTAL_H_
 #define GAME_PORTAL_H_
-#include <cstdint>
+#include <QtTypes>
 
 #define MAX_GAME_PORTALS 9
 #define FOREVER -5

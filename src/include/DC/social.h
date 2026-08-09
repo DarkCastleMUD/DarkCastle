@@ -1,5 +1,4 @@
-#ifndef SOCIAL_H_
-#define SOCIAL_H_
+#pragma once
 /************************************************************************
 | $Id: social.h,v 1.2 2002/06/13 04:41:15 dcastle Exp $
 | social.h
@@ -7,6 +6,7 @@
 |   social functions to work properly.
 */
 
+#include "DC/common.h"
 class social_messg
 {
 public:
@@ -30,5 +30,3 @@ public:
   char *char_auto = {};
   char *others_auto = {};
 };
-
-#endif

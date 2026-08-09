@@ -1,10 +1,9 @@
+#pragma once
 /************************************
 one liner quest shit
 ************************************/
-#ifndef QUEST_H_
-#define QUEST_H_
-
-#include "DC/character.h"
+class Character;
+class Object;
 
 #define QUEST_MAX 1         // max quests at a time
 #define QUEST_SHOW 10       // max quests shown at a time
@@ -66,5 +65,3 @@ void quest_update();
 int quest_handler(Character *, Character *, int, char *);
 int quest_master(Character *, Object *, int, char *, Character *);
 int do_quest(Character *, char *, int);
-
-#endif

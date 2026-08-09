@@ -1,5 +1,5 @@
-
-
+#pragma once
+#include <ctime>
 class news_data
 {
 public:

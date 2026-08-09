@@ -14,11 +14,11 @@
 
 #define MAX_NUM_EVT 1024
 
-typedef event_params eventParams;
-typedef event_data eventData;
-typedef event_brief eventBrief;
-typedef event_bucket eventBucket;
-typedef event_handler eventHandler;
+typedef class event_params eventParams;
+typedef class event_data eventData;
+typedef class event_brief eventBrief;
+typedef class event_bucket eventBucket;
+typedef class event_handler eventHandler;
 typedef void (*eventFunc)(eventParams *);
 typedef int (*eventKiller)(Character *, eventData *);
 
@@ -35,7 +35,7 @@ public:
 
 class event_params
 {
-  public:
+public:
   Character *ch;
   class Object *obj;
   Character *vict;
@@ -46,7 +46,7 @@ class event_params
 
 class event_data
 {
-  public:
+public:
   eventFunc func;     /* Function to call when popped              */
   char state;         /* To be used to kill/pend a bucket          */
   char timer;         /* Number of loops through till execution    */
@@ -56,14 +56,14 @@ class event_data
 
 class event_bucket
 {
-  public:
+public:
   eventData *head;
   int len;
 };
 
 class event_handler
 {
-  public:
+public:
   eventBucket events[MAX_NUM_EVT];
   int nextBucket;
 };

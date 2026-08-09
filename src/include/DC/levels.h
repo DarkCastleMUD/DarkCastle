@@ -1,9 +1,8 @@
 /* $Id: levels.h,v 1.9 2011/08/28 03:43:42 jhhudso Exp $ */
+#pragma once
+#include <QtTypes>
 /* This is purely to define god levels as #defines. */
-#ifndef LEVELS_H_
-#define LEVELS_H_
 
-#include <cstdint>
 #define MORTAL 60
 /* #define GLADIATOR */
 
@@ -39,5 +38,3 @@ const quint64 IMPLEMENTER = 110;
 #define MIN_GOD IMMORTAL
 
 #define PIRAHNA_FAKE_LVL 102
-
-#endif
