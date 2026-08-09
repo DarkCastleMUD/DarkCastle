@@ -103,6 +103,21 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network Sql HttpServ
 find_program(CLANG_TIDY NAMES "clang-tidy" REQUIRED)
 set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "-extra-arg=-std=c++26" "-extra-arg=-stdlib=libc++" "-checks=-*,modernize-*")
 
+# Based on https://iifx.dev/en/articles/457741054/cmake-and-c-core-guidelines-header-checks
+file(GLOB_RECURSE DC_HEADERS "src/include/DC/*.h")
+set(TEST_DC_HEADERS_DIR "${CMAKE_CURRENT_BINARY_DIR}/dc_header_tests")
+file(MAKE_DIRECTORY ${TEST_DC_HEADERS_DIR})
+foreach(HEADER_FILE ${DC_HEADERS})
+    get_filename_component(HEADER_NAME ${HEADER_FILE} NAME_WE)
+    set(TEST_HEADER_SOURCE_FILE "${TEST_DC_HEADERS_DIR}/test_header_${HEADER_NAME}_h.cpp")
+    file(GENERATE OUTPUT ${TEST_HEADER_SOURCE_FILE} CONTENT "#include \"${HEADER_FILE}\"\nint main(){return 0;}")
+    qt_add_executable(check_header_${HEADER_NAME} "${TEST_HEADER_SOURCE_FILE}")
+    target_compile_definitions(check_header_${HEADER_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG_BUILD>)
+    target_include_directories(check_header_${HEADER_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src/include)
+    target_link_libraries(check_header_${HEADER_NAME} PRIVATE DC Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Sql dl pthread ${TRACY})
+    add_custom_target(check_${HEADER_NAME} ALL DEPENDS check_header_${HEADER_NAME})
+endforeach()
+
 add_library(DC SHARED
     src/act_comm.cpp
     src/act.cpp
