@@ -221,7 +221,6 @@ add_library(DC SHARED
     src/include/DC/dcstdio.h
     src/include/DC/DC.h
     src/include/DC/DC_global.h
-    src/include/DC/dc_xmlrpc.h
     src/include/DC/event.h
     src/include/DC/fight.h
     src/include/DC/fileinfo.h
