@@ -524,10 +524,10 @@ public:
   QString fears_ = {}; /* will flee from ths person on sight     */
   QString hated = {};  /* List of PC's I hate */
 
-  mob_prog_act_list *mpact = {}; // list of MOBProgs
-  int16_t mpactnum = {};         // num
-  int32_t last_room = {};        // Room rnum the mob was last in. Used
-                                 // For !magic,!track changing flags.
+  mob_prog_act_list *mpact = {};  // list of MOBProgs
+  int16_t mpactnum = {};          // num
+  int32_t last_room = {};         // Room rnum the mob was last in. Used
+                                  // For !magic,!track changing flags.
   int16_t return_home_timer = {}; // Mobile pulses until a mob that broke charm heads home
   threat_dataPtr threat = {};
   ResetCommandPtr reset = {};
