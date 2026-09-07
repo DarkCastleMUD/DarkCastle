@@ -1014,7 +1014,7 @@ void DC::game_test_init(void)
 
   auto d = new Connection;
   Character *ch = new Character(this);
-  ch->setName("Debugimp");
+  ch->setName(u"Debugimp"_s);
   ch->player = new Player;
   ch->setType(Character::Type::Player);
 
