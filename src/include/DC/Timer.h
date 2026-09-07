@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Timer.h
  *
@@ -5,14 +6,11 @@
  *      Author: jhhudso
  */
 
-#ifndef TIMER_H_
-#define TIMER_H_
-
-#include <string>
-#include <map>
-#include <ctime>
-#include <cstdint>
-#include <iostream>
+#include <sys/types.h> // for suseconds_t, time_t
+#include <cstdint>     // for uint_fast64_t, uint16_t
+#include <iostream>    // for ostream
+#include <map>         // for map
+#include <string>      // for string
 
 class TimeVal
 {
@@ -57,5 +55,3 @@ extern std::map<std::string, Timer> PerfTimers;
 
 std::ostream &operator<<(std::ostream &out, Timer t);
 std::ostream &operator<<(std::ostream &out, TimeVal tv);
-
-#endif /* TIMER_H_ */

@@ -1,5 +1,7 @@
 #ifndef ACT_H_
 #define ACT_H_
+#include <qstring.h>
+#include <stdint.h>
 /************************************************************************
 | act.h
 | Written by: Morcallen
@@ -8,8 +10,13 @@
 |   act() function
 */
 #include <string>
+
 #include "DC/character.h"
 #include "DC/token.h"
+
+class Character;
+class Object;
+class TokenList;
 //--
 // Function interface
 //--

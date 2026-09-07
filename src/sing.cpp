@@ -4,15 +4,21 @@
  *                                                                        *
  **************************************************************************/
 
-#include "DC/dcstdio.h"
+#include <qdebug.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cstring>
 #include <vector>
+#include <string>
 
 #include "DC/sing.h"
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/interp.h"
 #include "DC/mobile.h"
@@ -25,8 +31,17 @@
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
-#include "DC/handler.h"
 #include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 Character *origsing = nullptr;
 

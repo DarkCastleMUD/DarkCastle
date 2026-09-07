@@ -7,12 +7,20 @@
 |   information.  It also contains information about the 'world' structs.
 */
 
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
 #include <QSharedPointer>
 #include <expected>
+
 #include "DC/structs.h" // uint8_t
 #include "DC/class.h"
 #include "DC/Zone.h"
 #include "DC/common.h"
+
+class Character;
+class Zone;
+class extra_descr_data;
 
 /* Bitvector For 'room_flags' */
 

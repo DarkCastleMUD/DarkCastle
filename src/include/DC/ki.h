@@ -8,8 +8,13 @@
 #ifndef KI_H_
 #define KI_H_
 
+#include <stdint.h>
+
 #include "DC/structs.h" // uint8_t, uint8_t, etc..
 #include "DC/character.h"
+
+enum class position_t : uint_fast8_t;
+template <typename T> class QList;
 
 typedef int KI_FUN(uint8_t level, Character *ch, char *arg, Character *vict);
 

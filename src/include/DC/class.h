@@ -1,5 +1,6 @@
 #ifndef CLASS_H
 #define CLASS_H
+#include <stdint.h>
 #include <string>
 #include <vector>
 

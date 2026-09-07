@@ -21,19 +21,59 @@
 
 int load_debug = 0;
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <errno.h>
+#include <netinet/in.h>
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qdatetime.h>
+#include <qdir.h>
+#include <qfile.h>
+#include <qfileinfo.h>
+#include <qiodevicebase.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qqueue.h>
+#include <qstack.h>
+#include <qstring.h>
+#include <qstringalgorithms.h>
+#include <qswap.h>
+#include <qtextstream.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #include <cassert>
-#include "DC/dcstdio.h"
 #include <cstring>
 #include <cctype>
 #include <ctime>
 #include <cstdlib>
-
 #include <sstream>
 #include <typeinfo>
-
 #include <QDebug>
 #include <QRegularExpression>
+#include <algorithm>
+#include <compare>
+#include <expected>
+#include <fstream>
+#include <iterator>
+#include <map>
+#include <string>
+#include <type_traits>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+#include <cmath>
 
+#include "DC/dcstdio.h"
 #include "DC/obj.h"
 #include "DC/affect.h"
 #include "DC/db.h"
@@ -42,7 +82,6 @@ int load_debug = 0;
 #include "DC/weather.h"  // s
 #include "DC/timeinfo.h" // s
 #include "DC/player.h"   // log info
-#include "DC/utility.h"  // assign..
 #include "DC/character.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
@@ -51,7 +90,6 @@ int load_debug = 0;
 #include "DC/handler.h"     // get_obj_num
 #include "DC/connect.h"     // Connection
 #include "DC/game_portal.h" // load_game_portals()
-#include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h" // command_range
 #include "DC/shop.h"
@@ -60,6 +98,16 @@ int load_debug = 0;
 #include "DC/vault.h"
 #include "DC/const.h"
 #include "DC/wizard.h"
+#include "DC/Index.h"
+#include "DC/Shops.h"
+#include "DC/Trace.h"
+#include "DC/Zone.h"
+#include "DC/class.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/sing.h"
 
 Room &World::operator[](room_t room_key)
 {

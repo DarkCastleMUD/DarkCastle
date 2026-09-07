@@ -4,9 +4,27 @@
 | Description:  Utility functions necessary for wiz commands.
 */
 #include "DC/wizard.h"
-#include "DC/character.h"
-#include "DC/utility.h"
 
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <ctype.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <time.h>
+#include <QString>
+#include <string>
+#include <tuple>
+#include <utility>
+
+#include "DC/character.h"
 #include "DC/db.h"
 #include "DC/room.h"
 #include "DC/player.h"
@@ -17,14 +35,21 @@
 #include "DC/spells.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
-#include <unistd.h>
 #include "DC/comm.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/memory.h"
-
-#include <fmt/format.h>
-#include <QString>
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/act.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 int getRealSpellDamage(Character *ch);
 

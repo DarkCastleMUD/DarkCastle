@@ -1,12 +1,15 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
+#include <qcompare.h>
+#include <qswap.h>
 #include <QSqlDatabase>
 #include <QMap>
 #include <QString>
 
 class Table;
 class Column;
+
 class Database
 {
 public:

@@ -3,19 +3,28 @@
 | Description:  Handles creation and removal of the magical portals that
 |   move throughout the game.
 */
-#include "DC/dcstdio.h"
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string>
 
+#include "DC/dcstdio.h"
 #include "DC/obj.h"
 #include "DC/game_portal.h"
 #include "DC/structs.h"
-#include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/db.h"
 #include "DC/handler.h"
-
 #include "DC/memory.h"
+#include "DC/class.h"
+#include "DC/levels.h"
+#include "DC/character.h"
 
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer);
 

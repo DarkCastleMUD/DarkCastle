@@ -20,38 +20,56 @@
  ***************************************************************************/
 /* $Id: utility.cpp,v 1.129 2014/07/04 22:00:04 jhhudso Exp $ */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <math.h>
+#include <qchar.h>
+#include <qcompilerdetection.h>
+#include <qcontainerfwd.h>
+#include <qdir.h>
+#include <qfile.h>
+#include <qhostaddress.h>
+#include <qiodevice.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qstringview.h>
+#include <qswap.h>
+#include <qtextstream.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <strings.h>
 #include <cassert>
 #include <cstddef>
-#include "DC/dcstdio.h"
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <cctype>
-#include <cstdlib>
-#include <ctime>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include <iostream>
 #include <sstream>
 #include <map>
 #include <algorithm>
-
-#include <fmt/format.h>
-#include <QRandomGenerator>
 #include <QString>
+#include <compare>
+#include <queue>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
+#include "DC/dcstdio.h"
 #include "DC/innate.h"
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/timeinfo.h"
 #include "DC/character.h"
-#include "DC/utility.h"
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/interp.h"
@@ -67,6 +85,18 @@
 #include "DC/set.h"
 #include "DC/const.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/quest.h"
+#include "DC/weather.h"
+
+class QRandomGenerator;
 
 #ifndef GZIP
 #define GZIP "gzip"

@@ -2,12 +2,18 @@
 // Licensed under LGPL
 //
 
-#include <QSqlError>
-#include <QSqlRelationalTableModel>
-#include <QSqlQuery>
-#include <QVariant>
+#include <qbytearray.h>
+#include <qcontainerfwd.h>
+#include <qfile.h>
+#include <qiodevice.h>
+#include <qlist.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
 
 #include "DC/Shops.h"
+
+class QObject;
 
 Shops::Shops(QObject *parent)
 {

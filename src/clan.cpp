@@ -7,30 +7,47 @@
 #define __STDC_LIMIT_MACROS
 #include <cstdint>
 #include <QtTypes>
+#include <cstdio>
+#include <iterator>
+#include <map>
+#include <queue>
+#include <string>
+#include <utility>
+
 quint64 i = -1ULL;
 
-#include <cstring>      // strcat
-#include "DC/dcstdio.h" // FILEPtr
-#include <cctype>       // isspace..
 #include <netinet/in.h>
-
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qcontainerfwd.h>
+#include <qdebug.h>
+#include <qiodevice.h>
+#include <qiodevicebase.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtextstream.h>
+#include <stdlib.h>
+#include <cstring> // strcat
+#include <cctype>  // isspace..
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <stack>
 #include <algorithm>
 #include <locale>
-
-#include <fmt/format.h>
 #include <QFile>
 
+#include "DC/dcstdio.h" // FILEPtr
 #include "DC/obj.h"
 #include "DC/db.h" // real_room
 #include "DC/player.h"
 #include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/connect.h"  // Connection
-#include "DC/mobile.h"   // utility.h stuff
 #include "DC/clan.h"     // duh
 #include "DC/interp.h"   // do_outcast, etc..
 #include "DC/handler.h"  // get_char_room_vis
@@ -40,8 +57,13 @@ quint64 i = -1ULL;
 #include "DC/spells.h"
 #include "DC/DC.h"
 #include "DC/Trace.h"
-#include "DC/clan.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 void addtimer(timer_data *timer);
 void delete_clan(const clan_data *currclan);

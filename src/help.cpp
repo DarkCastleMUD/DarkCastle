@@ -1,13 +1,20 @@
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cctype>
 #include <cstring>
+#include <map>
+#include <vector>
+#include <algorithm>
 
 #include "DC/structs.h"
-#include "DC/room.h"
 #include "DC/character.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
 #include "DC/connect.h"
@@ -16,10 +23,8 @@
 #include "DC/help.h"
 #include "DC/common.h"
 #include "DC/memory.h"
-
-#include <map>
-#include <vector>
-#include <algorithm>
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
 
 // Externs
 extern void skip_spaces(char **string);

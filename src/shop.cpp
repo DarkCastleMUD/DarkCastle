@@ -14,19 +14,38 @@
  ***************************************************************************/
 /* $Id: shop.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/dcstdio.h"
-#include <cstring>
 #include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <fmt/base.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qnamespace.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <cstring>
+#include <algorithm>
+#include <locale>
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
 
+#include "DC/dcstdio.h"
 #include "DC/obj.h"
 #include "DC/affect.h"
 #include "DC/character.h"
-#include "DC/utility.h"
 #include "DC/interp.h"
 #include "DC/DC.h"
 #include "DC/player.h"
 #include "DC/handler.h"
-#include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/db.h"
 #include "DC/act.h"
@@ -36,6 +55,12 @@
 #include "DC/const.h"
 #include "DC/wizard.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Shops.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 player_shop *g_playershops;
 

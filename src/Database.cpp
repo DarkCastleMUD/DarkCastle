@@ -1,8 +1,14 @@
 #include "DC/Database.h"
-#include "DC/utility.h" // logentry
+
+#include <qdebug.h>
+#include <qlist.h>
+#include <qlogging.h>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
+#include <utility>
+
+#include "DC/DC.h"
 
 Database::Database(void)
 {

@@ -4,8 +4,14 @@
 #ifndef __COMM_H__
 #define __COMM_H__
 
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
 #include <string>
 #include <QStringList>
+
 #include "DC/terminal.h"
 
 typedef int socket_t;
@@ -55,6 +61,11 @@ const QStringList cond_colorcodes = {
 #define BAN_ALL 3
 
 #include "DC/character.h"
+
+class Character;
+class Connection;
+class QByteArray;
+
 void write_to_output(const char *txt, class Connection *t);
 void write_to_output(QByteArray txt, class Connection *d);
 void write_to_output(std::string txt, class Connection *d);

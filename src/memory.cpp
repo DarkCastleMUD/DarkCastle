@@ -1,7 +1,6 @@
-#include "DC/dcstdio.h"
+#include <qlogging.h>
 #include <cstdlib>
 
-#include <QDebug>
 #include "DC/memory.h"
 
 /************************************************************************

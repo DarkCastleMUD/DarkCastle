@@ -13,31 +13,34 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 
-#include <cassert>
-#include <cstring>
+#include <fmt/base.h>
+#include <fmt/format.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <locale>
 
 #include "DC/character.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
 #include "DC/mobile.h"
-#include "DC/spells.h"
-#include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/magic.h"
-#include "DC/fight.h"
 #include "DC/DC.h"
 #include "DC/player.h"
-#include "DC/connect.h"
 #include "DC/interp.h"
 #include "DC/isr.h"
 #include "DC/race.h"
 #include "DC/db.h"
-#include "DC/sing.h"
 #include "DC/act.h"
-#include "DC/ki.h"
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/meta.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
 
 /*
 

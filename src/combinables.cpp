@@ -1,36 +1,40 @@
 // This file takes care of all the skills that make stuff by combining it
 // in it's container type.  For example, poison making.
 
+#include <qchar.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 #include <algorithm>
-#include <iostream>
 #include <fstream>
 #include <iterator>
 #include <utility>
-#include <string>
 #include <sstream>
+#include <map>
 
 #include "DC/obj.h"
 #include "DC/db.h"
-#include "DC/fight.h"
-#include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/connect.h"
 #include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/handler.h"
-#include "DC/db.h"
 #include "DC/player.h"
 #include "DC/interp.h"
 #include "DC/magic.h"
 #include "DC/act.h"
-#include "DC/mobile.h"
 #include "DC/spells.h"
-#include <cstring> // strstr()
 #include "DC/returnvals.h"
 #include "DC/combinables.h"
 #include "DC/const.h"
-#include "DC/guild.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 using namespace Combinables;
 

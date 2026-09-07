@@ -78,22 +78,46 @@
 #define VAULT_INDEX_FILE u"../vaults/vaultindex"_s
 #define VAULT_INDEX_FILE_TMP u"../vaults/vaultindex.tmp"_s
 
+#include <netinet/in.h>
+#include <qcompare.h>
+#include <math.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qhostaddress.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qrandom.h>
+#include <qswap.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+#include <qvariant.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/select.h>
 #include <set>
 #include <unordered_set>
 #include <unordered_map>
-#include <netinet/in.h>
 #include <string>
 #include <map>
 #include <expected>
 #include <type_traits>
-
 #include <QSharedPointer>
 #include <QCoreApplication>
 #include <QMap>
 #include <QString>
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
+#include <sstream>
+#include <utility>
+#include <vector>
+
 #include "DC/DC_global.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 typedef quint64 vnum_t;
 typedef quint64 rnum_t;
@@ -116,6 +140,8 @@ typedef QList<QString> hints_t;
 
 class Connection;
 class clan_data;
+class QHttpServerRequest;
+class QTextStream;
 
 using namespace Qt::StringLiterals;
 using special_function = int (*)(Character *, class Object *, cmd_t, const char *, Character *);
@@ -260,6 +286,7 @@ public:
   Object *obj;
 };
 class Character;
+
 class AuctionHouse
 {
 public:

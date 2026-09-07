@@ -4,23 +4,33 @@
 | Description:  Group related commands; join, abandon, follow, etc..
 */
 
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdio.h>
 #include <cctype>
+#include <cstring>
+#include <string>
+#include <vector>
 
 #include "DC/character.h"
 #include "DC/room.h"
 #include "DC/affect.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/clan.h"
 #include "DC/act.h"
 #include "DC/sing.h" // stop_grouped_bards
-#include <cstring>
 #include "DC/returnvals.h"
 #include "DC/terminal.h"
 #include "DC/comm.h"
 #include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/structs.h"
 
 int do_abandon(Character *ch, char *argument, cmd_t cmd)
 {

@@ -3,10 +3,18 @@
 | who.C
 | Commands for who, maybe? :P
 */
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cstring>
+#include <algorithm>
+#include <iterator>
+#include <string>
 
 #include "DC/connect.h"
-#include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/mobile.h"
 #include "DC/clan.h"
@@ -16,6 +24,11 @@
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is DC::NOWHERE near matching.

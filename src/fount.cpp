@@ -10,19 +10,16 @@
  ***************************************************************************/
 /* $Id: fount.cpp,v 1.6 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include <cstring>
-#include "DC/dcstdio.h"
-#include <cctype>
-
 #include "DC/obj.h"
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/act.h"
-#include "DC/db.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
+#include "DC/common.h"
+#include "DC/structs.h"
 
 /*************************************************************************
  * Figures out if a fountain is present in the room                       *

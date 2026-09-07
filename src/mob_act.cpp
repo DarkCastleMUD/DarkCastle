@@ -21,16 +21,25 @@
 /**************************************************************************/
 /* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/dcstdio.h"
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <expected>
+#include <map>
+#include <string>
+#include <utility>
 
 #include "DC/character.h"
 #include "DC/room.h"
 #include "DC/mobile.h"
-#include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/act.h"
 #include "DC/handler.h"
-#include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/race.h" // Race defines used in align-aggro messages.
@@ -40,6 +49,16 @@
 #include "DC/Timer.h"
 #include "DC/move.h"
 #include "DC/memory.h"
+#include "DC/Command.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/player.h"
 
 void perform_wear(Character *ch, class Object *obj_object,
                   int keyword);

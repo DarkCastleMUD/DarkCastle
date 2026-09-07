@@ -1,5 +1,8 @@
 #pragma once
+#include <qstring.h>
+#include <sys/types.h>
 #include <QSharedPointer>
+#include <cstdio>
 
 using FILEPtr = QSharedPointer<std::FILE>;
 

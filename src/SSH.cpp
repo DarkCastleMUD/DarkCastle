@@ -1,10 +1,11 @@
-#include <iostream>
-
-#include <libssh/callbacks.h>
-#include <QDebug>
+#include <libssh/libssh.h>
+#include <libssh/server.h>
+#include <limits.h>
+#include <qobject.h>
+#include <unistd.h>
 
 #include "DC/SSH.h"
-#include "DC/utility.h"
+#include "DC/DC.h"
 
 namespace SSH
 {

@@ -8,31 +8,44 @@
  *                      from charmies                                         *
  ******************************************************************************/
 
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cstring>
-#include "DC/dcstdio.h"
+#include <expected>
+#include <string>
+#include <unordered_set>
 
 #include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/affect.h"
 #include "DC/mobile.h"
-#include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/isr.h"
 #include "DC/handler.h"
 #include "DC/room.h"
 #include "DC/terminal.h"
 #include "DC/player.h"
-#include "DC/connect.h"
 #include "DC/fight.h"
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/act.h"
-#include "DC/fileinfo.h" // SAVE_DIR
 #include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/const.h"
 #include "DC/move.h"
 #include "DC/corpse.h"
+#include "DC/Command.h"
+#include "DC/DC.h"
+#include "DC/Zone.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 extern int rev_dir[];
 

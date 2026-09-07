@@ -1,5 +1,16 @@
+#include <qcompare.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+
 #include "DC/DC.h"
 #include "DC/utility.h"
+#include "DC/Zone.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/types.h"
 
 Zone::Zone(zone_t zone_key, DCPtr dc)
     : id_(zone_key), dc_(dc)

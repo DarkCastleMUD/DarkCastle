@@ -1,4 +1,14 @@
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "DC/utility.h"
+
+class Character;
+class Object;
 
 #define VAULT_UPGRADE_COST 100 // plats
 #define VAULT_BASE_SIZE 10     // weight

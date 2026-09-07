@@ -1,12 +1,14 @@
-#ifndef PLAYER_H_
-#define PLAYER_H_
+#pragma once
 /************************************************************************
 | $Id: player.h,v 1.44 2010/02/19 06:09:18 jhhudso Exp $
 | player.h
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
-#include "DC/structs.h" // uint8_t
+#include <qtypes.h> // for quint64
+#include <stdint.h> // for uint8_t
+
+class Character;    // lines 17-17
 
 /************************************************************************
 | Thirst, FULL, etc..
@@ -240,5 +242,3 @@ extern const wis_app_type wis_app[];
 
 /* Various function declarations */
 int get_saves(Character *ch, int savetype);
-
-#endif

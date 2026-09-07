@@ -12,24 +12,15 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
+#include <stdio.h>
 #include <cstring>
-#include <cctype>
 
 #include "DC/DC.h"
-#include "DC/mobile.h"
 #include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/player.h"
-#include "DC/clan.h"
-#include "DC/room.h"
-#include "DC/weather.h"
-#include "DC/handler.h"
-#include "DC/terminal.h"
-#include "DC/interp.h"
-#include "DC/connect.h"
 #include "DC/db.h" // help_index_element
-#include "DC/spells.h"
 #include "DC/returnvals.h"
+#include "DC/common.h"
+#include "DC/structs.h"
 
 /* Used for "who" */
 int max_who = 0;

@@ -14,8 +14,13 @@
  ***************************************************************************/
 /* $Id: const.cpp,v 1.336 2015/06/16 04:10:54 pirahna Exp $ */
 
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <stdint.h>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "DC/obj.h"
 #include "DC/DC.h"
@@ -23,6 +28,9 @@
 #include "DC/character.h"
 #include "DC/spells.h"
 #include "DC/mobile.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/utility.h"
 
 room_t IMM_PIRAHNA_ROOM = 25;
 

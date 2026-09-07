@@ -1,6 +1,9 @@
 #include "DC/Index.h"
+
+#include <qchar.h>
+
 #include "DC/dcstdio.h"
-#include <QStringLiteral>
+
 using namespace Qt::StringLiterals;
 
 const QString mob_index_data::indexFilename = u"mobindex"_s;

@@ -1,5 +1,16 @@
 #ifndef CONNECT_H_
 #define CONNECT_H_
+#include <qbytearray.h>
+#include <qhostaddress.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <time.h>
+#include <queue>
+#include <string>
+
 /************************************************************************
 | $Id: connect.h,v 1.14 2011/08/28 18:29:45 jhhudso Exp $
 | connect.h
@@ -9,6 +20,10 @@
 #include "DC/structs.h" // MAX_INPUT_LENGTH
 #include "DC/comm.h"
 #include "DC/common.h"
+
+class Character;
+enum class attribute_t : uint_fast8_t;
+enum class inet_protocol_family_t;
 
 int isbanned(QHostAddress address);
 

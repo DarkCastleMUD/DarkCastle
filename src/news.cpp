@@ -13,22 +13,28 @@
  *   share your changes too.  What goes around, comes around.               *
  ****************************************************************************/
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <time.h>
 #include <cstring>
 #include <cstdlib>
+
 #include "DC/structs.h"
-#include "DC/room.h"
 #include "DC/character.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
 #include "DC/connect.h"
 #include "DC/spells.h"
-#include "DC/set.h"
 #include "DC/returnvals.h"
 #include "DC/news.h"
 #include "DC/memory.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
 
 news_data *thenews = nullptr;
 void addnews(news_data *newnews)

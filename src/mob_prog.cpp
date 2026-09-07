@@ -26,18 +26,24 @@
  *  such installation can be found in INSTALL.  Enjoy...         N'Atas-Ha *
  ***************************************************************************/
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <sys/types.h>
-#include "DC/dcstdio.h"
 #include <cstring>
 #include <cstdlib>
 #include <cctype>
-
 #include <map>
 #include <string>
 #include <algorithm>
-
-#include <fmt/format.h>
 #include <QString>
+#include <utility>
 
 #include "DC/player.h"
 #include "DC/room.h"
@@ -51,6 +57,16 @@
 #include "DC/DC.h"
 #include "DC/Trace.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/obj.h"
+#include "DC/timeinfo.h"
+#include "DC/weather.h"
 
 // Extern variables
 

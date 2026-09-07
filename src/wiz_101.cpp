@@ -2,15 +2,26 @@
 | Level 101 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include <fmt/format.h>
+#include <qsharedpointer.h>
+#include <ctype.h>
+#include <qcontainerfwd.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <queue>
 #include <string>
-
-#include <fmt/format.h>
 #include <expected>
+#include <utility>
 
 #include "DC/utility.h"
-#include "DC/mobile.h"
-
 #include "DC/interp.h"
 #include "DC/room.h"
 #include "DC/DC.h"
@@ -21,6 +32,13 @@
 #include "DC/returnvals.h"
 #include "DC/spells.h"
 #include "DC/db.h"
+#include "DC/Command.h"
+#include "DC/Zone.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 std::queue<std::string> imm_history;
 std::queue<std::string> imp_history;

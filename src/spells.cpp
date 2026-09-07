@@ -22,10 +22,20 @@
  ***************************************************************************/
 /* $Id: spells.cpp,v 1.292 2015/06/14 02:38:12 pirahna Exp $ */
 
+#include <qcompare.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cstring>
-#include "DC/dcstdio.h"
 #include <cassert>
 #include <cstdlib>
+#include <map>
+#include <string>
+#include <utility>
 
 #include "DC/obj.h"
 #include "DC/character.h"
@@ -34,9 +44,7 @@
 #include "DC/magic.h"
 #include "DC/player.h"
 #include "DC/isr.h"
-#include "DC/utility.h"
 #include "DC/fight.h"
-#include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
@@ -47,6 +55,14 @@
 #include "DC/sing.h"
 #include "DC/clan.h"
 #include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 // Global data
 

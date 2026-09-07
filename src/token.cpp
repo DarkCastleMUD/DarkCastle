@@ -8,23 +8,22 @@
 */
 // Standard header files
 
+#include <qstring.h>
 #include <cstring>
-#include <cctype>
-#include <cstdlib>
-#include "DC/dcstdio.h"
+#include <string>
 
 #include "DC/obj.h"
-#include "DC/db.h"
 #include "DC/room.h"
 #include "DC/character.h" // Character
 #include "DC/DC.h"        // Object
 #include "DC/utility.h"   // GET_SHORT, GET_LEVEL, &c
 #include "DC/terminal.h"  // colors
 #include "DC/act.h"       // act flags
-#include "DC/player.h"    // Player::PLR_ANSI Player::PLR_VT100
 #include "DC/handler.h"   // fname()
 #include "DC/token.h"     // fname()
 #include "DC/connect.h"
+#include "DC/common.h"
+#include "DC/levels.h"
 
 #undef DEBUG_TOKEN
 
@@ -63,10 +62,6 @@ TokenList::TokenList(const char *str) : head(0), current(0)
 
     cur_token = new Token(temp_str);
     AddToken(cur_token);
-
-#ifdef DEBUG_TOKEN
-    // std::cerr << "Added token: " << cur_token->GetBuf() << std::endl;
-#endif
   }
 
   Reset();
@@ -188,16 +183,10 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
 
             if (current->IsText())
             {
-#ifdef DEBUG_TOKEN
-      // std::cerr << "It's a text token" << std::endl;
-#endif
               interp += current->GetBuf();
             }
             else if (current->IsAnsi() || current->IsVt100())
             {
-#ifdef DEBUG_TOKEN
-      // std::cerr << "It's ansi or vt100 code" << std::endl;
-#endif
               if (send_to->isNonPlayer() ||
                   (isSet(send_to->player->toggles, Player::PLR_ANSI) && current->IsAnsi()) ||
                   (isSet(send_to->player->toggles, Player::PLR_VT100) && current->IsVt100()))
@@ -253,9 +242,6 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             } // if it's ansi or vt100
             else if (current->IsCode())
             {
-#ifdef DEBUG_TOKEN
-      // std::cerr << "It's a special code" << std::endl;
-#endif
               switch ((current->GetBuf())[1])
               {
               case 'n':
@@ -509,17 +495,9 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
             {
               logentry(QStringLiteral("TokenList::Interpret() sent bad Token!"), OVERSEER, DC::LogChannel::LOG_BUG);
             }
-#ifdef DEBUG_TOKEN
-    // std::cerr << "Output after this loop: " << interp << std::endl;
-#endif
   } /* for loop */
 
   interp += "\r\n";
-
-#ifdef DEBUG_TOKEN
-  // std::cerr << "Finished building interp; it is:" << std::endl;
-  // std::cerr << interp << std::endl;
-#endif
 
   return interp;
 }
@@ -560,9 +538,6 @@ void Token::SetBuf(char *rhs)
   if (buf[0] != '$')
   {
     type = TEXT;
-#ifdef DEBUG_TOKEN
-    // std::cerr << buf << ": TEXT" << std::endl;
-#endif
   }
   else
   {
@@ -585,31 +560,19 @@ void Token::SetBuf(char *rhs)
     case '0':
     case '*':
       type = ANSI;
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": ANSI" << std::endl;
-#endif
       break;
     case 'B':
     case 'I':
     case 'L':
     case 'R':
       type = (VT100 | ANSI);
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": ANSI|VT100" << std::endl;
-#endif
       break;
       // we allow $$ to go through now, since it's handled in handle_ansi -pir 2/14/01
     case '$':
       type = TEXT; // buf[1] = 0;
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": TEXT" << std::endl;
-#endif
       break;
     default:
       type = CODE;
-#ifdef DEBUG_TOKEN
-      // std::cerr << buf << ": CODE" << std::endl;
-#endif
       break;
     } /* switch */
   } /* else */

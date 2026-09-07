@@ -17,8 +17,12 @@
 #ifndef INTERP_H_
 #define INTERP_H_
 
+#include <qcontainerfwd.h>
 #include <QString>
 #include <QStringList>
+#include <string>
+#include <tuple>
+#include <variant>
 
 #include "DC/common.h"
 #include "DC/character.h"

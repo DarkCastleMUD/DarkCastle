@@ -2,18 +2,36 @@
 | Level 106 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "DC/wizard.h"
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qrandom.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <tuple>
+#include <utility>
+
 #include "DC/handler.h"
 #include "DC/spells.h"
 #include "DC/utility.h"
 #include "DC/connect.h"
-
-#include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/player.h"
 #include "DC/returnvals.h"
-
-#include <fmt/format.h>
+#include "DC/DC.h"
+#include "DC/act.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/timeinfo.h"
 
 int do_plats(Character *ch, char *argument, cmd_t cmd)
 {

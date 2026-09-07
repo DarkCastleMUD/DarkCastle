@@ -1,19 +1,22 @@
-#include "DC/dcstdio.h"
+#include <fmt/format.h>
+#include <qstring.h>
+#include <stdio.h>
 #include <cctype>
 #include <cstring>
 #include <cstdlib>
+#include <string>
 
 #include "DC/connect.h" // Connection
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/interp.h"
 #include "DC/DC.h"
 #include "DC/newedit.h"
 #include "DC/memory.h"
-
-#include <string>
-#include <fmt/format.h>
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 // send_to_char("Write your note.  (/s saves /h for help)
 void new_edit_board_unlock_board(Character *ch, int abort);

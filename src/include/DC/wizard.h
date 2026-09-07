@@ -7,24 +7,12 @@
 |   for the wiz_1*.C files to consolidate the header files they
 |   need.
 */
-
-#include <cstdlib>
-#include "DC/dcstdio.h"
-#include <cstring>
-#include <cctype>
-
-#include "DC/character.h"
-#include "DC/act.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
-#include "DC/interp.h"
-#include "DC/room.h"
-#include "DC/handler.h"
-#include "DC/interp.h"
-#include "DC/terminal.h"
-#include "DC/player.h"
-#include "DC/connect.h"
-#include "DC/db.h"
+#include <qtypes.h>     // for quint64
+#include "DC/DC.h"      // for obj_list_t, room_t, zone_t
+#include "DC/dcstdio.h" // for FILEPtr
+#include "DC/interp.h"  // for command_return_t
+class Character;
+class Zone;
 
 /* Function headers */
 void display_punishes(Character *ch, Character *vict);

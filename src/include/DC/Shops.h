@@ -4,8 +4,15 @@
 #ifndef SHOPS_H
 #define SHOPS_H
 
+#include <qcontainerfwd.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qtypes.h>
 #include <QFile>
+
 #include "DC/obj.h"
+
+class QObject;
 
 typedef quint64 room_t;
 

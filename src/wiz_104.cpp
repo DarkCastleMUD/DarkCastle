@@ -1,16 +1,31 @@
-#include <vector>
 #include <fmt/format.h>
-#include <fmt/chrono.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <assert.h>
+#include <ctype.h>
+#include <qchar.h>
+#include <qdatetime.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vector>
 #include <string>
 #include <utility>
-
-#include <QTimeZone>
+#include <tuple>
 
 #include "DC/wizard.h"
-#include "DC/utility.h"
 #include "DC/connect.h"
 #include "DC/mobile.h"
-
 #include "DC/DC.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -22,6 +37,15 @@
 #include "DC/const.h"
 #include "DC/corpse.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/act.h"
+#include "DC/affect.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 int count_rooms(int start, int end)
 {

@@ -12,11 +12,20 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
+#include <qcompare.h>
+#include <qmap.h>
+#include <qswap.h>
+#include <utility>
+
 #include "DC/obj.h"
 #include "DC/db.h"
 #include "DC/room.h"
-#include "DC/player.h"
 #include "DC/utility.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/levels.h"
 
 typedef int SPEC_FUN(Character *ch, Object *obj, cmd_t cmd, const char *argument, Character *owner);
 typedef int ROOM_PROC(Character *ch, cmd_t cmd, const char *argument);

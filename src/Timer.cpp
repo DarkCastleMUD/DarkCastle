@@ -5,9 +5,14 @@
  *      Author: jhhudso
  */
 
-#include <cassert>
-#include "DC/Timer.h"
 #include <sys/time.h>
+#include <sys/types.h>
+#include <cassert>
+#include <map>
+#include <ostream>
+#include <string>
+
+#include "DC/Timer.h"
 
 std::map<std::string, Timer> PerfTimers;
 

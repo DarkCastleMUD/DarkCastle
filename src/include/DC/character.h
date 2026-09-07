@@ -1,6 +1,19 @@
-
-#ifndef CHARACTER_H_
-#define CHARACTER_H_
+#pragma once
+#include <strings.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qdatetime.h>
+#include <qlist.h>
+#include <qmetaobject.h>
+#include <qnamespace.h>
+#include <qobject.h>
+#include <qqueue.h>
+#include <qstringconverter.h>
+#include <qtextstream.h>
+#include <qtimezone.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+#include <qsharedpointer.h>
 /******************************************************************************
 | $Id: character.h,v 1.85 2014/07/26 23:21:23 jhhudso Exp $
 | Description: This file contains the header information for the character
@@ -8,17 +21,14 @@
 */
 #include <ctime>
 #include <cstdint>
-#include <strings.h>
-
 #include <map>
 #include <string>
 #include <vector>
 #include <string>
-
 #include <QString>
 #include <QMap>
+#include <expected>
 
-class Character;
 #include "DC/DC.h"
 #include "DC/affect.h"   /* MAX_AFFECTS, etc.. */
 #include "DC/structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
@@ -32,6 +42,14 @@ class Character;
 #include "DC/Zone.h"
 #include "DC/room.h"
 #include "DC/returnvals.h"
+#include "DC/Command.h"
+#include "DC/Index.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/obj.h"
+
+class Character;
+struct timeval;
 
 typedef quint64 gold_t;
 
@@ -57,6 +75,7 @@ public:
 typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
 
 class communication;
+
 typedef QQueue<communication> history_t;
 
 typedef QString player_config_key_t;
@@ -1530,5 +1549,3 @@ public:
 
 void prepare_character_for_sixty(Character *ch);
 bool isPaused(Character *mob);
-
-#endif

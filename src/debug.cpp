@@ -1,24 +1,41 @@
 #include <unistd.h>
-
+#include <qcompare.h>
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <qutf8stringview.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 #include <iostream>
 #include <map>
 #include <filesystem>
 #include <cassert>
-
-#include <QtSql/QSqlRelationalTableModel>
-#include <QtSql/QSqlRecord>
-#include <QtSql/QSqlField>
-#include <QtSql/QSqlError>
+#include <expected>
+#include <string>
+#include <tuple>
 
 #include "DC/connect.h"
 #include "DC/utility.h"
-#include "DC/db.h"
 #include "DC/DC.h"
 #include "DC/const.h"
-#include "DC/utility.h"
 #include "DC/vault.h"
-#include "DC/Leaderboard.h"
 #include "DC/interp.h"
+#include "DC/Index.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/handler.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
+
+class Leaderboard;
 
 void load_char_obj_error(FILEPtr fpsave, char strsave[MAX_INPUT_LENGTH]);
 void store_to_char(char_file_u4 *st, Character *ch);

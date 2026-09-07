@@ -12,11 +12,26 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
+#include <fmt/format.h>
+#include <ctype.h>
+#include <qchar.h>
+#include <qdebug.h>
+#include <qiodevice.h>
+#include <qiodevicebase.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtextstream.h>
+#include <qtypes.h>
+#include <stdio.h>
 #include <cassert>
 #include <cstdint>
-
-#include <fmt/format.h>
 #include <QFile>
+#include <string>
+#include <tuple>
+#include <utility>
 
 #include "DC/DC.h"
 #include "DC/character.h"
@@ -24,7 +39,6 @@
 #include "DC/terminal.h"
 #include "DC/connect.h"
 #include "DC/room.h"
-#include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/utility.h"
@@ -32,6 +46,9 @@
 #include "DC/db.h"
 #include "DC/returnvals.h"
 #include "DC/obj.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 extern bool MOBtrigger;
 

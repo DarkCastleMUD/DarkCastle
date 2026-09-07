@@ -1,18 +1,26 @@
 /* $Id: nlog.cpp,v 1.12 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/dcstdio.h"
-#include <ctime>
-#include <cstring>
-#include <cstdlib>
-#include "DC/dcstdio.h"
 #include <stdarg.h>
+#include <qcompare.h>
+#include <qbytearray.h>
+#include <qcontainerfwd.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <cstring>
+#include <string>
+#include <utility>
 
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/utility.h"
 #include "DC/terminal.h"
-#include "DC/utility.h"
 #include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/Zone.h"
+#include "DC/common.h"
+#include "DC/structs.h"
 
 /*
  * logf, str_hsh, and csendf by Sadus, others by Ysafar.

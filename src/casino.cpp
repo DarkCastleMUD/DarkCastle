@@ -6,7 +6,24 @@
 
 */
 
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cstring>
+#include <algorithm>
+#include <map>
+#include <string>
+#include <utility>
+
 #include "DC/structs.h"
 #include "DC/room.h"
 #include "DC/character.h"
@@ -17,14 +34,17 @@
 #include "DC/db.h"
 #include "DC/interp.h"
 #include "DC/act.h"
-#include "DC/set.h"
 #include "DC/returnvals.h"
 #include "DC/timeinfo.h"
 #include "DC/casino.h"
 #include "DC/obj.h"
-#include <algorithm>
-#include <fmt/format.h>
 #include "DC/memory.h"
+#include "DC/Command.h"
+#include "DC/Index.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
 
 void pulse_table_bj(table_data *tbl, int recall = 0);
 void reset_table(table_data *tbl);

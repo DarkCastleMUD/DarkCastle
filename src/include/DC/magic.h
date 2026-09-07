@@ -9,7 +9,12 @@
 #ifndef MAGIC_H_
 #define MAGIC_H_
 
+#include <qtypes.h>
+#include <stdint.h>
+
 #include "DC/structs.h" // uint8_t, etc..
+
+class Character;
 
 #define GLOBE_OF_DARKNESS_OBJECT 101
 

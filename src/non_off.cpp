@@ -8,16 +8,35 @@
 /* 12/08/2003   Onager   Revised do_tap() to prevent sacrifices in donations */
 /*****************************************************************************/
 
+#include <qcompare.h>
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qdatetime.h>
+#include <qhostaddress.h>
+#include <qlist.h>
+#include <qlocale.h>
+#include <qmap.h>
+#include <qnamespace.h>
+#include <qregularexpression.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtimezone.h>
+#include <qtypes.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cctype>
 #include <cstring>
+#include <string>
+#include <vector>
+#include <map>
+#include <utility>
 
 #include "DC/obj.h"
 #include "DC/connect.h"
 #include "DC/character.h"
 #include "DC/room.h"
 #include "DC/DC.h"
-#include "DC/mobile.h"
-#include "DC/utility.h"
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/interp.h"
@@ -27,12 +46,13 @@
 #include "DC/returnvals.h"
 #include "DC/comm.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
-#include <string>
-#include <vector>
-#include <map>
 #include "DC/memory.h"
 #include "DC/punish.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
 
 // decay variable means it's from a decaying corpse, not a player
 void log_sacrifice(Character *ch, Object *obj, bool decay = false)

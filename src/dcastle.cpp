@@ -1,12 +1,17 @@
-#include "DC/dcstdio.h"
-#include <cstdlib>
-#include <cctype>
 #include <unistd.h>
+#include <errno.h>
+#include <qfile.h>
+#include <qlogging.h>
+#include <qstring.h>
+#include <qstringalgorithms.h>
+#include <qthread.h>
+#include <stdint.h>
+#include <cstdlib>
 #include <cstring>
-#include <QCoreApplication>
+#include <iterator>
+#include <string>
+
 #include "DC/DC.h"
-#include "DC/handler.h"
-#include <iostream>
 
 uint16_t DFLT_PORT = 6667, DFLT_PORT2 = 6666, DFLT_PORT3 = 4000, DFLT_PORT4 = 6669;
 

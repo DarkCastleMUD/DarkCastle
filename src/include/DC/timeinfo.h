@@ -6,9 +6,7 @@
 | Description:  Declares the information for handling time in the game.
 */
 #include <ctime>
-
 #include <cstdint>
-
 #include <QVariant>
 
 extern class timer_data *timer_list;

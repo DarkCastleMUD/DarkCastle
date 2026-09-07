@@ -4,10 +4,23 @@
 | Functions declared primarily for the thief class; some may be used in
 |   other classes, but they are mainly thief-oriented.
 */
+#include <qcompare.h>
+#include <qbytearrayview.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <cstring>
+#include <string>
+#include <utility>
+
 #include "DC/obj.h"
 #include "DC/character.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/player.h"
 #include "DC/DC.h"
@@ -17,10 +30,15 @@
 #include "DC/fight.h"
 #include "DC/interp.h"
 #include "DC/act.h"
-#include <cstring>
 #include "DC/returnvals.h"
 #include "DC/inventory.h"
 #include "DC/punish.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
 
 extern int rev_dir[];
 

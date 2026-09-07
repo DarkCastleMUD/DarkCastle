@@ -1,7 +1,44 @@
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <assert.h>
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qcryptographichash.h>
+#include <qdebug.h>
+#include <qfile.h>
+#include <qflags.h>
+#include <qiodevicebase.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qobject.h>
+#include <qrandom.h>
+#include <qsavefile.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtestcase.h>
+#include <qtestdata.h>
+#include <qtextstream.h>
+#include <qtmetamacros.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdio.h>
+#include <string.h>
 #include <QTest>
 #include <QtLogging>
-#include <qhashfunctions.h>
+#include <cstdlib>
+#include <expected>
+#include <fstream>
+#include <initializer_list>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 #include "DC/Index.h"
 #include "DC/utility.h"
@@ -12,6 +49,19 @@
 #include "DC/vault.h"
 #include "DC/terminal.h"
 #include "DC/connect.h"
+#include "DC/DC.h"
+#include "DC/affect.h"
+#include "DC/character.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/interp.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/returnvals.h"
+#include "DC/room.h"
+#include "DC/shop.h"
+#include "DC/weather.h"
 
 using namespace std::literals;
 

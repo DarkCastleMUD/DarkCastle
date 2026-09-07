@@ -1,14 +1,21 @@
 // social.C
 // Description:  Anything to do with socials
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cstring>
 #include <cstdlib> // qsort()
+#include <string>
+#include <tuple>
 
 #include "DC/structs.h" // MAX_INPUT_LENGTH
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/social.h"
 #include "DC/act.h"
 #include "DC/db.h"
@@ -16,6 +23,10 @@
 #include "DC/returnvals.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
+#include "DC/DC.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
 
 // storage of socials
 social_messg *soc_mess_list; // head of social array

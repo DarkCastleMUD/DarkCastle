@@ -3,27 +3,42 @@
  * cl_barbarian.cpp
  * Description: Commands for the barbarian class.
  *************************************************************************/
+#include <qcompare.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <expected>
+#include <string>
+#include <utility>
+
 #include "DC/structs.h"
 #include "DC/player.h"
 #include "DC/character.h"
 #include "DC/spells.h"
-#include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/mobile.h"
 #include "DC/magic.h"
-#include "DC/connect.h"
 #include "DC/handler.h"
 #include "DC/act.h"
 #include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/room.h"
-#include "DC/db.h"
 #include "DC/clan.h"
-#include "DC/utility.h"
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/move.h"
 #include "DC/obj.h"
+#include "DC/Command.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
 
 extern int rev_dir[];
 

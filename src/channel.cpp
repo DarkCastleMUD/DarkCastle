@@ -4,22 +4,30 @@
 | Description:  All of the channel - type commands; do_say, gossip, etc..
 */
 
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <stdio.h>
+#include <time.h>
 #include <cstring> //strstr()
 #include <cctype>
 #include <string>
 #include <queue>
 #include <tuple>
-#include <fmt/format.h>
-
 #include <QQueue>
-#include <QDateTime>
+#include <utility>
 
 #include "DC/structs.h"
 #include "DC/room.h"
 #include "DC/character.h"
-#include "DC/utility.h"
 #include "DC/connect.h"
-#include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/terminal.h"
@@ -27,6 +35,12 @@
 #include "DC/returnvals.h"
 #include "DC/obj.h"
 #include "DC/punish.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
 
 QQueue<ChannelMessage> gossip_history;
 std::queue<QString> auction_history;

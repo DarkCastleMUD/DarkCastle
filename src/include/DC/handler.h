@@ -17,11 +17,22 @@
 #ifndef HANDLER_H_
 #define HANDLER_H_
 
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
 #include <map>
+#include <string>
 
 #include "DC/structs.h" // uint8_t, etc..
 #include "DC/comm.h"
 #include "DC/Trace.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+
+class Character;
+class Object;
+class affected_type;
+enum class attribute_t : uint_fast8_t;
 
 /* handling the affected-structures */
 void affect_total(Character *ch);

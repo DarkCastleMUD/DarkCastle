@@ -2,16 +2,35 @@
 | Level 108 wizard commands
 | 11/20/95 -- Azrack
 **********************/
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <string>
+
 #include "DC/interp.h"
 #include "DC/utility.h"
-
 #include "DC/mobile.h"
 #include "DC/player.h"
 #include "DC/handler.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
-#include <string>
 #include "DC/const.h"
+#include "DC/DC.h"
+#include "DC/Zone.h"
+#include "DC/character.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/db.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/room.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 int get_number(char **name);
 

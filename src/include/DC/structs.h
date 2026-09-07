@@ -1,19 +1,16 @@
+#pragma once
 /************************************************************************
 | $Id: structs.h,v 1.19 2009/01/24 19:21:29 kkoons Exp $
 | structs.h
 | Description:  This file should go away someday - it's stuff that I
 |   wasn't sure how to break up.  --Morc XXX
 */
-#ifndef STRUCTS_H_
-#define STRUCTS_H_
-
-#include <sys/types.h>
-#include "DC/dcstdio.h"
-#include <string>
-#include <vector>
-#include <map>
-#include <cstdint>
-#include <QString>
+#include <stddef.h> // for size_t
+#include <QString>  // for QString
+#include <cstdint>  // for int16_t
+#include <map>      // for map
+#include <string>   // for basic_string, string
+#include <vector>   // for vector
 
 const size_t MAX_STRING_LENGTH = 8192;
 
@@ -130,5 +127,3 @@ const size_t TO_GODS    4
 */
 typedef int16_t clan_t;
 extern void debugpoint();
-
-#endif

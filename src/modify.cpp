@@ -14,23 +14,27 @@
  ***************************************************************************/
 /* $Id: modify.cpp,v 1.33 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/dcstdio.h"
+#include <qstring.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cctype>
 #include <cstring>
-#include <ctime>
 #include <cstdlib>
+#include <string>
 
+#include "DC/dcstdio.h"
 #include "DC/obj.h"
 #include "DC/connect.h" // Connection
 #include "DC/utility.h"
 #include "DC/character.h"
-#include "DC/mobile.h"
 #include "DC/interp.h"
 #include "DC/DC.h"
 #include "DC/handler.h"
 #include "DC/db.h"
-#include <string>
 #include "DC/memory.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 // TODO - what does this do?  Nothing that I can see....let's remove it....
 #define REBOOT_AT 10 /* 0-23, time of optional reboot if -e lib/reboot */

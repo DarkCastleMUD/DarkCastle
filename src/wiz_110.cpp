@@ -2,36 +2,53 @@
 | Level 110 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <errno.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qfile.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdio.h>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include "DC/dcstdio.h"
 #include <cassert>
 #include <fstream>
-#include <iostream>
 #include <sstream>
-
-#include <fmt/format.h>
+#include <expected>
+#include <string>
+#include <utility>
 
 #include "DC/utility.h"
-
 #include "DC/player.h"
-#include "DC/mobile.h"
 #include "DC/interp.h"
 #include "DC/clan.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
-#include "DC/interp.h"
 #include "DC/const.h"
 #include "DC/db.h"
 #include "DC/Leaderboard.h"
-#include "DC/const.h"
 #include "DC/vault.h"
 #include "DC/meta.h"
+#include "DC/Command.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/handler.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 int get_max_stat_bonus(Character *ch, int attrs)
 {

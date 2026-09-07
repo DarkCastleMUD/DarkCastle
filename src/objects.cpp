@@ -5,13 +5,24 @@
 |   wear them, wield them, grab them, drink them, eat them, etc..
 */
 
+#include <qcompare.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cctype>
 #include <cstring>
+#include <string>
+#include <utility>
 
 #include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/connect.h"
-#include "DC/utility.h"
 #include "DC/room.h"
 #include "DC/spells.h"
 #include "DC/player.h"
@@ -22,13 +33,17 @@
 #include "DC/act.h"
 #include "DC/structs.h"
 #include "DC/db.h"
-#include <cassert>
-#include "DC/mobile.h" // ACT_ISNPC
 #include "DC/race.h"
 #include "DC/returnvals.h"
 #include "DC/const.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
 
 extern const char *drinks[];
 extern const char *dirs[];

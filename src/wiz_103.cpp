@@ -3,22 +3,36 @@
 | 11/20/95 -- Azrack
 **********************/
 
-#include <fmt/format.h>
+#include <qcompare.h>
+#include <ctype.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <initializer_list>
+#include <string>
+#include <tuple>
+#include <utility>
 
-#include "DC/wizard.h"
-#include "DC/utility.h"
 #include "DC/mobile.h"
-#include "DC/player.h"
 #include "DC/db.h"
 #include "DC/connect.h"
 #include "DC/interp.h"
 #include "DC/room.h"
 #include "DC/handler.h"
 #include "DC/returnvals.h"
-#include "DC/spells.h"
 #include "DC/clan.h"
 #include "DC/race.h"
 #include "DC/const.h"
+#include "DC/DC.h"
+#include "DC/act.h"
+#include "DC/affect.h"
+#include "DC/character.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/structs.h"
 
 int do_boot(Character *ch, char *arg, cmd_t cmd)
 {

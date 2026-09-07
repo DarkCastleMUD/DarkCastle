@@ -17,10 +17,17 @@
 #ifndef SPELLS_H_
 #define SPELLS_H_
 
+#include <qtypes.h>
+#include <stdint.h>
+#include <map>
+
 #include "DC/structs.h" // uint8_t, int16_t
 #include "DC/character.h"
+#include "DC/obj.h"
 
-#include <map>
+class Character;
+enum class position_t : uint_fast8_t;
+template <typename T> class QList;
 
 #define MAX_BUF_LENGTH 240
 

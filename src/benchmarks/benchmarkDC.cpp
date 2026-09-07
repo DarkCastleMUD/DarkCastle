@@ -1,7 +1,19 @@
+#include <qbenchmark.h>
+#include <qchar.h>
+#include <qobject.h>
+#include <qstring.h>
+#include <qtestcase.h>
+#include <qtestdata.h>
+#include <qtmetamacros.h>
+#include <qtpreprocessorsupport.h>
+#include <qtypeinfo.h>
 #include <QTest>
-#include "DC/utility.h"
 #include <string>
 #include <memory>
+#include <cstdlib>
+#include <string_view>
+
+#include "DC/utility.h"
 
 using namespace std::literals;
 

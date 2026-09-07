@@ -1,11 +1,17 @@
 #pragma once
+#include <qtypes.h>
 // Copyright 2023 Jared H. Hudson
 // Licensed under LGPL
 //
 #include <QString>
 #include <QSharedPointer>
 #include <QList>
+
 #include "DC/db.h"
+#include "DC/dcstdio.h"
+
+class Character;
+class Object;
 
 #define ERROR_PROG -1
 #define IN_FILE_PROG 0

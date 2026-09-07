@@ -6,7 +6,9 @@
 |   social functions to work properly.
 */
 
-#include "DC/common.h"
+#include <stdint.h>
+enum class position_t : uint_fast8_t;
+
 class social_messg
 {
 public:

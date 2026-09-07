@@ -16,6 +16,15 @@
 #ifndef OBJ_H_
 #define OBJ_H_
 
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qflags.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <time.h>
 #include <QStringList>
 #include <QMetaEnum>
 
@@ -25,6 +34,8 @@
 #include "DC/room.h"
 
 class Character;
+class extra_descr_data;
+class table_data;
 
 /* The following defs are for Object  */
 

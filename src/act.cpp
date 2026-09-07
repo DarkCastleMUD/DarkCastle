@@ -4,20 +4,26 @@
 |  the act() function work.
 */
 
+#include <qchar.h>
+#include <qstring.h>
+#include <stdint.h>
 #include <string>
 
 #include "DC/DC.h"
 #include "DC/character.h"
 #include "DC/comm.h"
 #include "DC/room.h"
-#include "DC/utility.h"
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/act.h"
-#include "DC/mobile.h"
 #include "DC/token.h"
 #include "DC/spells.h"
 #include "DC/returnvals.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+
+class Object;
 
 extern bool MOBtrigger;
 

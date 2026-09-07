@@ -2,16 +2,23 @@
 | Level 107 wizard commands
 | 11/20/95 -- Azrack
 **********************/
-#include "DC/wizard.h"
+#include <ctype.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <stdio.h>
+
 #include "DC/interp.h"
 #include "DC/utility.h"
-
-#include "DC/player.h"
-#include "DC/mobile.h"
 #include "DC/connect.h"
 #include "DC/handler.h"
 #include "DC/returnvals.h"
 #include "DC/spells.h"
+#include "DC/DC.h"
+#include "DC/act.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/levels.h"
 
 int do_archive(Character *ch, char *argument, cmd_t cmd)
 {

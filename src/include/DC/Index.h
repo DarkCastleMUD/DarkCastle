@@ -1,10 +1,14 @@
 #pragma once
-#include <stdint.h>
-#include <QSet>
-#include <QList>
-#include <QString>
-#include <DC/Command.h>
-#include "DC/dcstdio.h"
+#include <qsharedpointer.h> // for QSharedPointer
+#include <qmap.h>           // for QMap
+#include <qtypes.h>         // for quint64
+#include <stdint.h>         // for int32_t
+#include <QList>            // for QList
+#include <QString>          // for QString
+#include "DC/dcstdio.h"     // for FILEPtr
+
+class Character;
+enum class cmd_t;
 
 typedef quint64 vnum_t;
 QString read_next_filename(FILEPtr stream, QString directoryName);

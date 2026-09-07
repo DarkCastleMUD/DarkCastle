@@ -14,12 +14,19 @@
  ***************************************************************************/
 /* $Id: mob_proc2.cpp,v 1.89 2012/05/25 02:15:46 jhhudso Exp $ */
 
-#include <fmt/format.h>
+#include <qcompare.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <QString>
-#include <QStringLiteral>
-#include <QStringList>
+#include <string>
+#include <utility>
 
-#include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
 #include "DC/character.h"
@@ -33,6 +40,10 @@
 #include "DC/inventory.h"
 #include "DC/corpse.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/common.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 extern int class_restricted(Character *ch, class Object *obj);
 extern int size_restricted(Character *ch, class Object *obj);

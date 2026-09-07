@@ -3,6 +3,21 @@ one liner quest shit
 *****************************************************/
 
 #include <math.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <vector>
+#include <cstring>
+#include <string>
+#include <utility>
 
 #include "DC/obj.h"
 #include "DC/structs.h"
@@ -13,11 +28,15 @@ one liner quest shit
 #include "DC/handler.h"
 #include "DC/db.h"
 #include "DC/quest.h"
-#include <vector>
-#include <cstring>
 #include "DC/room.h"
 #include "DC/inventory.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
 
 typedef std::vector<quest_info *> quest_list_t;
 quest_list_t quest_list;

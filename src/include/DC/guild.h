@@ -1,3 +1,4 @@
+#pragma once
 /*
  * guild.h
  *
@@ -5,13 +6,10 @@
  *      Author: jhhudso
  */
 
-#ifndef GUILD_H_
-#define GUILD_H_
-
-#include "DC/const.h"
+class Character;
+class class_skill_defines;
+enum class cmd_t;
 
 int search_skills(char *arg, class_skill_defines *list_skills);
 int search_skills2(int arg, class_skill_defines *list_skills);
 int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner);
-
-#endif /* GUILD_H_ */

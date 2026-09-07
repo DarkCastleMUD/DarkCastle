@@ -1,18 +1,24 @@
 
+#include <qcompare.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdlib.h>
 #include <cstring>
+#include <map>
+#include <utility>
 
 #include "DC/structs.h"
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/interp.h"
-#include "DC/set.h"
 #include "DC/returnvals.h"
 #include "DC/MobActivity.h"
 #include "DC/const.h"
 #include "DC/memory.h"
+#include "DC/Zone.h"
+#include "DC/common.h"
 
 // Externs
 

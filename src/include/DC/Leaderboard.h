@@ -8,10 +8,15 @@
 #ifndef LEADERBOARD_H_
 #define LEADERBOARD_H_
 
-#include "DC/dcstdio.h"
+#include <qstring.h>
 #include <sstream>
 #include <string>
+
+#include "DC/dcstdio.h"
 #include "DC/character.h"
+#include "DC/class.h"
+
+class Character;
 
 class Leaderboard
 {

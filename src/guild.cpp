@@ -3,6 +3,15 @@
 | guild.C
 | This contains all the guild commands - practice, gain, etc..
 */
+#include <qlist.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "DC/character.h"
 #include "DC/structs.h"
 #include "DC/spells.h"
@@ -10,7 +19,6 @@
 #include "DC/player.h"
 #include "DC/db.h" // exp_table
 #include "DC/interp.h"
-#include <cstring>
 #include "DC/returnvals.h"
 #include "DC/ki.h"
 #include "DC/mobile.h"
@@ -19,6 +27,10 @@
 #include "DC/handler.h"
 #include "DC/const.h"
 #include "DC/guild.h"
+#include "DC/DC.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
 
 extern std::vector<profession> professions;
 

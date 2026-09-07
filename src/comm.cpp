@@ -8,22 +8,55 @@
 *  Copyright (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
-#include <cerrno>
-#include <cstring>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/resource.h>
-#include <ctime>
 #include <netinet/in.h>
-#include <netdb.h>
 #include <arpa/telnet.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <signal.h>
-#include <cctype>
 #include <sys/time.h>
+#include <qcompare.h>
+#include <qobjectdefs.h>
+#include <assert.h>
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qelapsedtimer.h>
+#include <qfile.h>
+#include <qfuture.h>
+#include <qhostaddress.h>
+#include <qhttpserverrequest.h>
+#include <qhttpserverresponse.h>
+#include <qlist.h>
+#include <qlocale.h>
+#include <qlogging.h>
+#include <qloggingcategory.h>
+#include <qminmax.h>
+#include <qqueue.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtconcurrentrun.h>
+#include <qtcpserver.h>
+#include <qtextstream.h>
+#include <qtypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/select.h>
+#include <cerrno>
+#include <cstring>
+#include <ctime>
+#include <cctype>
+#include <compare>
+#include <functional>
+#include <initializer_list>
+#include <map>
+#include <memory>
+#include <tuple>
+#include <utility>
 #ifdef TRACY_ENABLE
 #include <tracy/Tracy.hpp>
 #endif
@@ -34,21 +67,14 @@
 #include <string>
 #include <queue>
 #include <cstdint>
-
-#include <fmt/format.h>
 #include <QTimer>
 #include <QHttpServer>
-#include <QtConcurrent>
 #include <QMap>
-#include <QtNetwork>
 
 #include "DC/terminal.h"
-#include "DC/fileinfo.h"
 #include "DC/act.h"
-#include "DC/player.h"
 #include "DC/room.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
 #include "DC/connect.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
@@ -59,10 +85,17 @@
 #include "DC/shop.h"
 #include "DC/Leaderboard.h"
 #include "DC/Timer.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/timeinfo.h"
 #ifdef USE_SQL
 #include "Backend/Database.h"
 #endif
-#include "DC/Timer.h"
 #include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/CommandStack.h"
@@ -1228,7 +1261,7 @@ void telnet_echo_off(class Connection *d)
           (char)WILL,
           (char)TELOPT_ECHO,
           (char)0,
-      };
+  };
 
   SEND_TO_Q(off_string, d);
 }
@@ -1246,7 +1279,7 @@ void telnet_echo_on(class Connection *d)
           (char)TELOPT_NAOFFD,
           (char)TELOPT_NAOCRD,
           (char)0,
-      };
+  };
 
   SEND_TO_Q(on_string, d);
 }

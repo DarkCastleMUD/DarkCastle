@@ -20,14 +20,20 @@
 // - Where is Spellcraft "reduced fireball lag" affect listed?
 //    - Apoc.
 
-#include "DC/dcstdio.h"
+#include <fmt/format.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <qvariant.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cassert>
 #include <cstdlib>
-#include <math.h> // pow(double,double)
-
 #include <cstring>
-
-#include <fmt/format.h>
+#include <string>
 
 #include "DC/spells.h"
 #include "DC/obj.h"
@@ -39,7 +45,6 @@
 #include "DC/magic.h"
 #include "DC/player.h"
 #include "DC/fight.h"
-#include "DC/utility.h"
 #include "DC/structs.h"
 #include "DC/handler.h"
 #include "DC/mobile.h"
@@ -54,6 +59,13 @@
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/timeinfo.h"
 
 #define BEACON_OBJ_NUMBER 405
 

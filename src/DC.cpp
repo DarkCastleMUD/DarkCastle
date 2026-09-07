@@ -6,7 +6,35 @@
  *      Based on http://www.cplusplus.com/forum/beginner/152735/#msg792909
  */
 
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qcoreapplication.h>
+#include <qdebug.h>
+#include <qdir.h>
+#include <qhostaddress.h>
+#include <qhttpserverrequest.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qnamespace.h>
+#include <qrandom.h>
+#include <qset.h>
+#include <qsettings.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <qurlquery.h>
+#include <qvariant.h>
+#include <string.h>
+#include <unistd.h>
 #include <cassert>
+#include <expected>
+#include <string>
+#include <unordered_set>
+#include <utility>
 
 #include "DC/DC.h"
 #include "DC/db.h"
@@ -14,6 +42,12 @@
 #include "DC/character.h"
 #include "DC/connect.h"
 #include "DC/obj.h"
+#include "DC/Database.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/Zone.h"
+#include "DC/common.h"
+#include "DC/interp.h"
 
 const QString DC::DEFAULT_LIBRARY_PATH = "../lib";
 const QString DC::HINTS_FILE_NAME = "playerhints.txt";

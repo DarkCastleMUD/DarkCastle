@@ -1,18 +1,26 @@
 #
+#include <qiterator.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cstring>
-
 #include <string>
 #include <map>
 #include <list>
+#include <utility>
+#include <vector>
 
 #include "DC/DC.h"
 #include "DC/character.h"
-#include "DC/room.h"
 #include "DC/utility.h"
-#include "cassert"
-#include "DC/vault.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
+#include "DC/Zone.h"
+#include "DC/common.h"
+#include "DC/structs.h"
 
 /******************* Area start **************************************/
 enum SortState

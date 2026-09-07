@@ -40,14 +40,20 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 */
 
-#include "DC/dcstdio.h" // FILEPtr
-#include <cstring>      // memset()
-#include <cctype>       // isspace(), isdigit()
+#include <qcompare.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <cstring> // memset()
+#include <cctype>  // isspace(), isdigit()
 #include <string>
 #include <map>
 #include <vector>
+#include <compare>
 
-#include "DC/room.h"
+#include "DC/dcstdio.h" // FILEPtr
 #include "DC/DC.h"
 #include "DC/connect.h"  // Connection::states::WRITE_BOARD
 #include "DC/terminal.h" // BOLD
@@ -56,11 +62,12 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include "DC/utility.h" // false
 #include "DC/memory.h"
 #include "DC/act.h"
-#include "DC/db.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
 #include "DC/obj.h"
 #include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 #define MAX_MESSAGE_LENGTH 2048
 

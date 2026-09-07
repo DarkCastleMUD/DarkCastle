@@ -1,10 +1,12 @@
-#ifndef CONST_H
-#define CONST_H
-#include "DC/obj.h"
-#include "DC/mobile.h"
-#include "DC/db.h"
-#include "DC/character.h"
-#include "DC/DC.h"
+#pragma once
+#include <string>       // for string
+#include <vector>       // for vector
+#include "DC/DC.h"      // for room_t
+#include "DC/obj.h"     // for item_types_t
+#include "DC/structs.h" // for MAX_STRING_LENGTH
+class Character;
+class class_skill_defines;
+class race_data;
 
 extern const char *dirs[];
 extern race_data races[];
@@ -75,4 +77,3 @@ extern const char *innate_skills[];
 extern const char *reserved[];
 extern room_t IMM_PIRAHNA_ROOM;
 extern char *time_look[];
-#endif

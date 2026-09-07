@@ -6,8 +6,9 @@
  */
 
 #include "DC/CommandStack.h"
-#include "DC/player.h"  // DC::LogChannel::LOG_BUG
-#include "DC/utility.h" // logf
+
+#include "DC/DC.h"
+#include "DC/levels.h"
 
 uint32_t CommandStack::depth = 0;
 uint32_t CommandStack::max_depth = 5;

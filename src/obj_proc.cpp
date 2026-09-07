@@ -2,19 +2,28 @@
 // Usage: This file contains special procedures pertaining to objects, except
 // for the boards which are in board.C
 
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <fmt/base.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 #include <string>
 #include <sstream>
-
 #include <cstring> // strstr()
-
-#include <fmt/format.h>
+#include <expected>
+#include <locale>
+#include <utility>
 
 #include "DC/fight.h"
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/connect.h"
-#include "DC/utility.h"
 #include "DC/character.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -31,6 +40,17 @@
 #include "DC/const.h"
 #include "DC/inventory.h"
 #include "DC/memory.h"
+#include "DC/Command.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
 
 #define EMOTING_FILE "emoting-objects.txt"
 

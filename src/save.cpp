@@ -15,19 +15,33 @@
  ***************************************************************************/
 /* $Id: save.cpp,v 1.76 2015/06/15 01:06:10 pirahna Exp $ */
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <assert.h>
+#include <qchar.h>
+#include <qdebug.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qregularexpression.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdio.h>
+#include <time.h>
 #include <cstdint>
 #include <cstdlib>
-#include "DC/dcstdio.h"
 #include <cstring>
-
-#include <fmt/format.h>
 #include <memory>
+#include <new>
+#include <string>
+#include <utility>
 
+#include "DC/dcstdio.h"
 #include "DC/DC.h"
 #include "DC/room.h"
 #include "DC/character.h"
-#include "DC/mobile.h"
-#include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/player.h"
 #include "DC/db.h"
@@ -35,10 +49,22 @@
 #include "DC/handler.h"
 #include "DC/vault.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/quest.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 #ifdef USE_SQL
-#include <iostream>
 #include <libpq-fe.h>
+#include <iostream>
+
 #include "Backend/Database.h"
 
 extern Database db;

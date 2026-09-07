@@ -1,5 +1,10 @@
 #pragma once
+#include <stdint.h>
+#include <map>
+
 #include "DC/Index.h"
+
+class Character;
 
 namespace Combinables
 {

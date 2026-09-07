@@ -1,6 +1,16 @@
 #include "DC/Command.h"
+
+#include <qcompare.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <utility>
+
 #include "DC/character.h"
 #include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/room.h"
 
 QMap<QString, Command> Commands::qstring_command_map_ = {};
 QMap<cmd_t, Command> Commands::cmd_t_command_map_ = {};

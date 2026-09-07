@@ -1,13 +1,37 @@
 
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qfile.h>
+#include <qiodevice.h>
+#include <qiodevicebase.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtextstream.h>
+#include <qtypes.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+#include <time.h>
 #include <cstring>
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include <list>
-#include <fmt/format.h>
+#include <algorithm>
+#include <iterator>
+#include <map>
+#include <tuple>
+#include <vector>
 #ifdef TRACY_ENABLE
 #include <tracy/Tracy.hpp>
 #endif
@@ -25,9 +49,13 @@
 #include "DC/interp.h"
 #include "DC/clan.h" // clan right
 #include "DC/inventory.h"
-#include "DC/memory.h"
-#include "DC/player.h"
 #include "DC/dcstdio.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/character.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/player.h"
 
 class vault_search_parameter
 {

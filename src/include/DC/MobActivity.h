@@ -5,7 +5,11 @@
 */
 
 #include <map>
+
 #include "DC/character.h"
+#include "DC/DC.h"
+
+class Character;
 
 /*			 PATHFINDING 				*/
 /*			 PATHFINDING 				*/

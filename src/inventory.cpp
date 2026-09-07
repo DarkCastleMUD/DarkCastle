@@ -4,11 +4,21 @@
 |
 | Authors: DikuMUD, Pirahna, Staylor, Urizen, Rahz, Zaphod, Shane, Jhhudso, Heaven1 and others
 */
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cstring>
-
 #include <queue>
-
-#include <fmt/format.h>
+#include <string>
+#include <utility>
 
 #include "DC/obj.h"
 #include "DC/character.h"
@@ -16,7 +26,6 @@
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/interp.h"
 #include "DC/handler.h"
@@ -27,6 +36,14 @@
 #include "DC/clan.h"
 #include "DC/inventory.h"
 #include "DC/corpse.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/quest.h"
 
 /* extern variables */
 

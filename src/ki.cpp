@@ -5,27 +5,36 @@
  */
 /* $Id: ki.cpp,v 1.94 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#include "DC/dcstdio.h"
+#include <fmt/format.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <cstdlib>
 #include <cstring>
-#include <fmt/format.h>
+#include <vector>
+#include <string>
 
 #include "DC/ki.h"
 #include "DC/room.h"
 #include "DC/character.h"
 #include "DC/spells.h" // tar_char..
-#include "DC/utility.h"
 #include "DC/player.h"
 #include "DC/interp.h"
 #include "DC/mobile.h"
 #include "DC/fight.h"
 #include "DC/handler.h"
-#include "DC/connect.h"
 #include "DC/act.h"
-#include "DC/db.h"
 #include "DC/returnvals.h"
-#include <vector>
-#include "DC/handler.h"
+#include "DC/DC.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 const QList<ki_info_type> ki_info = {
     {/* 0 */

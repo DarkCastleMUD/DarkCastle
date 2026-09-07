@@ -1,15 +1,16 @@
+#pragma once
 /*
  * sing.h contains the header files for the
  * singing bard powers, although the sing structure is in
  * spells.h, so that must be included
  */
 /* $Id: sing.h,v 1.17 2012/01/11 03:28:37 jhhudso Exp $ */
-
-#ifndef SING_H_
-#define SING_H_
-
-#include "DC/structs.h" // uint8_t, uint8_t, etc..
-#include "DC/common.h"
+#include <stdint.h>                   // for int16_t, uint8_t, uint_fast8_t
+class Character;                      // lines 17-17
+class QDebug;                         // lines 18-18
+enum class position_t : uint_fast8_t; // lines 19-19
+template <typename T>
+class QList; // lines 20-20
 
 #define BARD_MAX_RATING 3
 
@@ -139,5 +140,3 @@ SING_FUN song_submariners_anthem;
 SING_FUN execute_song_submariners_anthem;
 SING_FUN pulse_submariners_chorus;
 SING_FUN intrp_submariners_chorus;
-
-#endif // SING_H_

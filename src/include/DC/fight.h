@@ -1,6 +1,9 @@
 #ifndef FIGHT_H_
 #define FIGHT_H_
 
+#include <qstring.h>
+#include <stdint.h>
+
 /************************************************************************
 | $Id: fight.h,v 1.45 2015/06/16 04:10:54 pirahna Exp $
 | fight.h
@@ -8,6 +11,10 @@
 */
 #include "DC/structs.h" // uint8_t, uint8_t, etc..
 #include "DC/character.h"
+#include "DC/obj.h"
+
+class Character;
+class follow_type;
 
 /* External prototype */
 void debug_point();

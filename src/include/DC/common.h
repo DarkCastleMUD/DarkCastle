@@ -1,173 +1,175 @@
-#ifndef COMMON_H
-#define COMMON_H
-#include <cstdint>
-#include <string>
-#include <QString>
-#include <QStringList>
+#pragma once
+#include <qcontainerfwd.h> // for QStringList
+#include <qtypes.h>        // for quint64
+#include <QString>         // for QString
+#include <cstdint>         // for uint_fast8_t
+#include <string>          // for string
+template <typename Key, typename T>
+class QMap;
 
 enum class attribute_t : uint_fast8_t
 {
-    UNDEFINED = 0,
-    STRENGTH = 1,
-    DEXTERITY = 2,
-    INTELLIGENCE = 3,
-    WISDOM = 4,
-    CONSTITUTION = 5
+  UNDEFINED = 0,
+  STRENGTH = 1,
+  DEXTERITY = 2,
+  INTELLIGENCE = 3,
+  WISDOM = 4,
+  CONSTITUTION = 5
 };
 
 enum class position_t : uint_fast8_t
 {
-    DEAD = 0,
-    STUNNED = 3,
-    SLEEPING = 4,
-    RESTING = 5,
-    SITTING = 6,
-    FIGHTING = 7,
-    STANDING = 8
+  DEAD = 0,
+  STUNNED = 3,
+  SLEEPING = 4,
+  RESTING = 5,
+  SITTING = 6,
+  FIGHTING = 7,
+  STANDING = 8
 };
 
 enum class inet_protocol_family_t
 {
-    UNKNOWN,
-    TCP4,
-    TCP6,
-    UNRECOGNIZED
+  UNKNOWN,
+  TCP4,
+  TCP6,
+  UNRECOGNIZED
 };
 
 enum class vault_search_type
 {
-    UNDEFINED,
-    KEYWORD,
-    LEVEL,
-    MIN_LEVEL,
-    MAX_LEVEL
+  UNDEFINED,
+  KEYWORD,
+  LEVEL,
+  MIN_LEVEL,
+  MAX_LEVEL
 };
 
 enum class cmd_t
 {
-    UNDEFINED,   // 0
-    NORTH,       // 1
-    EAST,        // 2
-    SOUTH,       // 3
-    WEST,        // 4
-    UP,          // 5
-    DOWN,        // 6
-    BELLOW,      // 8
-    DEFAULT,     // 9
-    TRACK,       // 10
-    PALM,        // 10
-    SAY,         // 11
-    LOOK,        // 12
-    BACKSTAB,    // 13
-    SBS,         // 14
-    ORCHESTRATE, // 15
-    REPLY,       // 16
-    WHISPER,     // 17
-    GLANCE,      // 20
-    FLEE,        // 28
-    ESCAPE,      // 29
-    PICK,        // 35
-    STOCK,       // 56
-    BUY,         // 56
-    SELL,        // 57
-    VALUE,       // 58
-    LIST,        // 59
-    ENTER,       // 60
-    CLIMB,       // 60
-    DESIGN,      // 62
-    PRICE,       // 65
-    REPAIR,      // 66
-    READ,        // 67
-    REMOVE,      // 69
-    ERASE,       // 70
-    ESTIMATE,    // 71
-    REMORT,      // 80
-    REROLL,      // 81
-    CHOOSE,      // 82
-    CONFIRM,     // 83
-    CANCEL,      // 84
-    SLIP,        // 87
-    GIVE,        // 88
-    DROP,        // 89
-    DONATE,      // 90
-    QUIT,        // 91
-    SACRIFICE,   // 92
-    PUT,         // 93
-    OPEN,        // 98
-    EDITOR,      // 100
-    FORCE,       // 123
-    WRITE,       // 128
-    WATCH,       // 155
-    PRACTICE,    // 164
-    TRAIN,       // 165
-    PROFESSION,  // 166
-    GAIN,        // 171
-    BALANCE,     // 172
-    DEPOSIT,     // 173
-    WITHDRAW,    // 174
-    CLEAN,       // 177
-    PLAY,        // 178
-    FINISH,      // 179
-    VETERNARIAN, // 180
-    FEED,        // 181
-    ASSEMBLE,    // 182
-    PAY,         // 183
-    RESTRING,    // 184
-    PUSH,        // 185
-    PULL,        // 186
-    LEAVE,       // 187
-    TREMOR,      // 188
-    BET,         // 189
-    INSURANCE,   // 190
-    DOUBLE,      // 191
-    STAY,        // 192
-    SPLIT,       // 193
-    HIT,         // 194
-    LOOT,        // 195
-    GTELL,       // 200
-    CTELL,       // 201
-    SETVOTE,     // 202
-    VOTE,        // 203
-    VEND,        // 204
-    FILTER,      // 205
-    EXAMINE,     // 206
-    GAG,         // 207
-    IMMORT,      // 208
-    IMPCHAN,     // 209
-    TELL,        // 210
-    TELLH,       // 211
-    PRIZE,       // 999
-    OTHER,       // 999
-    TELL_REPLY,  // 9999
-    GAZE,        // 1820
-    SAVE_SILENTLY,
-    ONEWAY,
-    TWOWAY,
-    MLOCATE_CHARACTER,
-    FEAR,
-    PAGING_HELP,
-    QUEST_CANCEL,
-    QUEST_START,
-    QUEST_FINISH,
-    QUEST_LIST,
-    GOLEMSCORE,
-    FSCORE,
-    REDEEM
+  UNDEFINED,   // 0
+  NORTH,       // 1
+  EAST,        // 2
+  SOUTH,       // 3
+  WEST,        // 4
+  UP,          // 5
+  DOWN,        // 6
+  BELLOW,      // 8
+  DEFAULT,     // 9
+  TRACK,       // 10
+  PALM,        // 10
+  SAY,         // 11
+  LOOK,        // 12
+  BACKSTAB,    // 13
+  SBS,         // 14
+  ORCHESTRATE, // 15
+  REPLY,       // 16
+  WHISPER,     // 17
+  GLANCE,      // 20
+  FLEE,        // 28
+  ESCAPE,      // 29
+  PICK,        // 35
+  STOCK,       // 56
+  BUY,         // 56
+  SELL,        // 57
+  VALUE,       // 58
+  LIST,        // 59
+  ENTER,       // 60
+  CLIMB,       // 60
+  DESIGN,      // 62
+  PRICE,       // 65
+  REPAIR,      // 66
+  READ,        // 67
+  REMOVE,      // 69
+  ERASE,       // 70
+  ESTIMATE,    // 71
+  REMORT,      // 80
+  REROLL,      // 81
+  CHOOSE,      // 82
+  CONFIRM,     // 83
+  CANCEL,      // 84
+  SLIP,        // 87
+  GIVE,        // 88
+  DROP,        // 89
+  DONATE,      // 90
+  QUIT,        // 91
+  SACRIFICE,   // 92
+  PUT,         // 93
+  OPEN,        // 98
+  EDITOR,      // 100
+  FORCE,       // 123
+  WRITE,       // 128
+  WATCH,       // 155
+  PRACTICE,    // 164
+  TRAIN,       // 165
+  PROFESSION,  // 166
+  GAIN,        // 171
+  BALANCE,     // 172
+  DEPOSIT,     // 173
+  WITHDRAW,    // 174
+  CLEAN,       // 177
+  PLAY,        // 178
+  FINISH,      // 179
+  VETERNARIAN, // 180
+  FEED,        // 181
+  ASSEMBLE,    // 182
+  PAY,         // 183
+  RESTRING,    // 184
+  PUSH,        // 185
+  PULL,        // 186
+  LEAVE,       // 187
+  TREMOR,      // 188
+  BET,         // 189
+  INSURANCE,   // 190
+  DOUBLE,      // 191
+  STAY,        // 192
+  SPLIT,       // 193
+  HIT,         // 194
+  LOOT,        // 195
+  GTELL,       // 200
+  CTELL,       // 201
+  SETVOTE,     // 202
+  VOTE,        // 203
+  VEND,        // 204
+  FILTER,      // 205
+  EXAMINE,     // 206
+  GAG,         // 207
+  IMMORT,      // 208
+  IMPCHAN,     // 209
+  TELL,        // 210
+  TELLH,       // 211
+  PRIZE,       // 999
+  OTHER,       // 999
+  TELL_REPLY,  // 9999
+  GAZE,        // 1820
+  SAVE_SILENTLY,
+  ONEWAY,
+  TWOWAY,
+  MLOCATE_CHARACTER,
+  FEAR,
+  PAGING_HELP,
+  QUEST_CANCEL,
+  QUEST_START,
+  QUEST_FINISH,
+  QUEST_LIST,
+  GOLEMSCORE,
+  FSCORE,
+  REDEEM
 };
 
 enum class search_error
 {
-    invalid_input,
-    not_found
+  invalid_input,
+  not_found
 };
 
 enum class load_status_t
 {
-    unknown,  // default unknown value
-    success,  // successfully loaded something
-    missing,  // not found
-    error,    // error loading
-    bad_input // bad input
+  unknown,  // default unknown value
+  success,  // successfully loaded something
+  missing,  // not found
+  error,    // error loading
+  bad_input // bad input
 };
 
 bool operator!(load_status_t ls);
@@ -183,7 +185,7 @@ typedef QMap<QString, QString> aliases_t;
 
 [[nodiscard]] inline constexpr bool isSet(auto flag, auto bit)
 {
-    return flag & bit;
+  return flag & bit;
 };
 
 command_return_t do_mscore(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
@@ -556,5 +558,3 @@ command_return_t do_zedit(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFA
 command_return_t do_zoneexits(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_editor(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_pursue(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-
-#endif

@@ -13,13 +13,17 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: mob_proc.cpp,v 1.208 2014/07/31 01:07:24 jhhudso Exp $ */
-#include <cassert>
-#include <cstring>
+#include <qchar.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string>
+#include <vector>
 
 #include "DC/character.h"
 #include "DC/structs.h"
-#include "DC/utility.h"
-#include "DC/mobile.h"
 #include "DC/spells.h"
 #include "DC/room.h"
 #include "DC/handler.h"
@@ -27,16 +31,20 @@
 #include "DC/fight.h"
 #include "DC/DC.h"
 #include "DC/player.h"
-#include "DC/connect.h"
 #include "DC/interp.h"
 #include "DC/isr.h"
 #include "DC/race.h"
 #include "DC/db.h"   // real_room
-#include "DC/sing.h" // bard skills
 #include "DC/act.h"
 #include "DC/ki.h" // monk skills
 #include "DC/returnvals.h"
 #include "DC/const.h"
+#include "DC/Command.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
 
 /*   external vars  */
 

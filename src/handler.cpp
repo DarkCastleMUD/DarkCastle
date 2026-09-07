@@ -16,29 +16,40 @@
 
 #include <qlogging.h>
 #include <sys/time.h>
-
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qflags.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <strings.h>
 #include <cstdlib>
 #include <cstring>
-#include "DC/dcstdio.h"
 #include <cctype>
 #include <cassert>
-
-#include <ctime>
 #include <algorithm>
-#include <iostream>
 #include <sstream>
 #include <map>
-
 #include <QString>
-#include <QStringList>
+#include <initializer_list>
+#include <iterator>
+#include <new>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "DC/obj.h"
 #include "DC/spells.h"
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/character.h"
-#include "DC/player.h"  // APPLY
-#include "DC/utility.h" // LOWER
+#include "DC/player.h" // APPLY
 #include "DC/clan.h"
 #include "DC/db.h"
 #include "DC/mobile.h"
@@ -56,6 +67,17 @@
 #include "DC/corpse.h"
 #include "DC/shop.h"
 #include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/Zone.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
+
+class table_data;
 
 void huntclear_item(class Object *obj);
 

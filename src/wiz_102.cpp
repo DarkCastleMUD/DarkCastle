@@ -12,15 +12,37 @@
 /*                      skills                                               */
 /*****************************************************************************/
 
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <assert.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qfile.h>
+#include <qhostaddress.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <qvariant.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <strings.h>
+#include <time.h>
 #include <cctype> // isspace
-
 #include <string>
 #include <vector>
-#include <type_traits>
 #include <tuple>
 #include <algorithm>
-
-#include <fmt/format.h>
+#include <expected>
+#include <utility>
 
 #include "DC/wizard.h"
 #include "DC/utility.h"
@@ -29,7 +51,6 @@
 #include "DC/room.h"
 #include "DC/DC.h"
 #include "DC/mobile.h"
-
 #include "DC/interp.h"
 #include "DC/handler.h"
 #include "DC/db.h"
@@ -37,12 +58,22 @@
 #include "DC/race.h"
 #include "DC/returnvals.h"
 #include "DC/vault.h"
-#include "DC/set.h"
 #include "DC/structs.h"
 #include "DC/const.h"
 #include "DC/newedit.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/Zone.h"
+#include "DC/act.h"
+#include "DC/character.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/timeinfo.h"
 
 command_return_t zedit_list(Character *ch, QStringList arguments, const Zone &zone, bool stats = false);
 

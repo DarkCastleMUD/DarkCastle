@@ -23,28 +23,41 @@
  * $Id: fight.cpp,v 1.571 2015/06/16 04:10:54 pirahna Exp $               *
  **************************************************************************/
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qchar.h>
+#include <qflags.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qnamespace.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypes.h>
+#include <qvariant.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 #include <cassert>
-
-#include "DC/dcstdio.h"
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
+#include <string>
+#include <utility>
 
+#include "DC/dcstdio.h"
 #include "DC/fight.h"
 #include "DC/race.h"
 #include "DC/player.h" // log
 #include "DC/character.h"
-#include "DC/utility.h" // log
 #include "DC/connect.h"
 #include "DC/spells.h" // weapon_spells
 #include "DC/isr.h"
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/handler.h"
-#include "DC/interp.h"  // do_flee()
-#include "DC/db.h"      // fread_string()
-#include "DC/connect.h" // Connection
-#include "DC/magic.h"   // weapon spells
+#include "DC/interp.h" // do_flee()
+#include "DC/db.h"     // fread_string()
+#include "DC/magic.h"  // weapon spells
 #include "DC/act.h"
 #include "DC/clan.h"
 #include "DC/returnvals.h"
@@ -58,6 +71,15 @@
 #include "DC/obj.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 #define MAX_CHAMP_DEATH_MESSAGE 14
 

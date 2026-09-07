@@ -14,12 +14,10 @@
  ***************************************************************************/
 /* $Id: weather.cpp,v 1.14 2012/05/06 00:55:44 jhhudso Exp $ */
 
-#include "DC/dcstdio.h"
-#include <cstring>
 #include "DC/timeinfo.h"
 #include "DC/weather.h"
-#include "DC/character.h"
 #include "DC/utility.h"
+#include "DC/DC.h"
 
 // TODO - Either rip out the pressure stuff, or make it easier to understand.
 // TODO - Add wind, and it's effects (on movement/combat etc)

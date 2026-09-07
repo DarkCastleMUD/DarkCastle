@@ -1,7 +1,8 @@
-#ifndef SHOP_H_
-#define SHOP_H_
-
-#include "DC/structs.h" // uint8_t, uint8_t, etc..
+#pragma once
+#include <qtypes.h> // for quint64
+#include <stdint.h> // for int32_t, uint32_t, uint8_t
+#include <map>      // for map
+#include <string>   // for string
 
 typedef quint64 vnum_t;
 
@@ -71,5 +72,3 @@ public:
 };
 
 extern std::map<std::string, reroll_t> reroll_sessions;
-
-#endif

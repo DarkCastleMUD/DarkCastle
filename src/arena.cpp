@@ -9,11 +9,26 @@
 /*****************************************************************************/
 /* $Id: arena.cpp,v 1.17 2009/04/24 21:50:43 shane Exp $ */
 
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+
 #include "DC/character.h"
 #include "DC/db.h"     // get_mob_room_vis
 #include "DC/spells.h" // INTERNAL_SLEEPING
 #include "DC/act.h"    // TO_ROOM
 #include "DC/punish.h"
+#include "DC/DC.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/handler.h"
+#include "DC/interp.h"
+#include "DC/returnvals.h"
+#include "DC/room.h"
+#include "DC/utility.h"
 
 auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
 {

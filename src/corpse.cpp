@@ -13,10 +13,20 @@
  *  All Rights Reserved, Copyright (C) 1999                             *
  ***********************************************************************/
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
 /* The standard includes */
 #include <cstring>
 #include <cstdlib>
 #include <cerrno>
+#include <algorithm>
+#include <string>
 
 #include "DC/obj.h"
 #include "DC/DC.h"
@@ -25,9 +35,8 @@
 #include "DC/handler.h"
 #include "DC/structs.h"
 #include "DC/db.h"
-#include <cassert>
-#include <cstddef>
-#include "DC/memory.h"
+#include "DC/Index.h"
+#include "DC/dcstdio.h"
 
 /* Set this define to wherever you want to save your corpses */
 #define CORPSE_FILE "corpse.save"

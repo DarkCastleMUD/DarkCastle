@@ -5,8 +5,20 @@
  *      Author: jhhudso
  */
 
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <netinet/in.h>
+#include <qlist.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <cstring>
 #include <sstream>
+#include <string>
+#include <tuple>
 
 #include "DC/Leaderboard.h"
 #include "DC/utility.h"
@@ -16,6 +28,12 @@
 #include "DC/interp.h"
 #include "DC/returnvals.h"
 #include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/character.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
 
 Leaderboard::Leaderboard()
 {

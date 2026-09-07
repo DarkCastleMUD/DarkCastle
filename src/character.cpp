@@ -1,6 +1,31 @@
-#include <QStringTokenizer>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <ctype.h>
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qhostaddress.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qobject.h>
+#include <qregularexpression.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtimezone.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <QFile>
 #include <QMetaEnum>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "DC/character.h"
 #include "DC/db.h"
@@ -8,6 +33,19 @@
 #include "DC/obj.h"
 #include "DC/terminal.h"
 #include "DC/const.h"
+#include "DC/DC.h"
+#include "DC/affect.h"
+#include "DC/comm.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/handler.h"
+#include "DC/interp.h"
+#include "DC/levels.h"
+#include "DC/mobile.h"
+#include "DC/room.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
+#include "DC/weather.h"
 
 void set_golem(Character *golem, int golemtype);
 class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);

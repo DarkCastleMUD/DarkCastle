@@ -16,19 +16,33 @@
 #ifndef DC_DB_H_
 #define DC_DB_H_
 
-#include "DC/dcstdio.h"
+#include <qchar.h>
+#include <qmap.h>
+#include <qobject.h>
+#include <qstring.h>
+#include <qtmetamacros.h>
+#include <qtypes.h>
+#include <stdint.h>
 #include <ctime>
-
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
-
 #include <QDateTime>
+#include <limits>
 
+#include "DC/dcstdio.h"
 #include "DC/character.h"
-#include "DC/handler.h"
 #include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/Trace.h"
+#include "DC/class.h"
+#include "DC/obj.h"
+#include "DC/room.h"
+#include "DC/structs.h"
+
+class QTextStream;
+class skill_quest;
 
 class error_eof
 {

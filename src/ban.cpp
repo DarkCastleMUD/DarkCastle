@@ -1,7 +1,17 @@
 #include <arpa/inet.h>
-#include <cstring>
 #include <fmt/format.h>
-#include <fmt/chrono.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <netinet/in.h>
+#include <qhostaddress.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <cstring>
+#include <ctime>
+#include <string>
 
 #include "DC/structs.h"
 #include "DC/character.h"
@@ -11,6 +21,9 @@
 #include "DC/returnvals.h"
 #include "DC/memory.h"
 #include "DC/dcstdio.h"
+#include "DC/DC.h"
+#include "DC/common.h"
+#include "DC/levels.h"
 
 ban_list_element *ban_list = nullptr;
 

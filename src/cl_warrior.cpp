@@ -5,14 +5,23 @@
 |   skills.
 */
 
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
 #include <algorithm>
+#include <map>
+#include <utility>
 
 #include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/character.h"
 #include "DC/player.h"
 #include "DC/fight.h"
-#include "DC/utility.h"
 #include "DC/spells.h"
 #include "DC/handler.h"
 #include "DC/mobile.h"
@@ -21,11 +30,15 @@
 #include "DC/DC.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
-#include "DC/spells.h"
 #include "DC/const.h"
 #include "DC/move.h"
 #include "DC/memory.h"
-#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+
 /************************************************************************
 | OFFENSIVE commands.  These are commands that should require the
 |   victim to retaliate.

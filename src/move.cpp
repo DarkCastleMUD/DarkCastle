@@ -8,10 +8,23 @@
  *                        noncombat_damage() for damage                  *
  *************************************************************************
  */
+#include <qcompare.h>
+#include <qchar.h>
+#include <qlist.h>
+#include <qlogging.h>
+#include <qmap.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qvariant.h>
+#include <stdio.h>
+#include <cstring>
+#include <expected>
+#include <string>
+#include <utility>
+
 #include "DC/character.h"
 #include "DC/affect.h"
 #include "DC/room.h"
-#include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/mobile.h"
 #include "DC/interp.h"
@@ -23,12 +36,20 @@
 #include "DC/act.h"
 #include "DC/race.h" // RACE_FISH
 #include "DC/clan.h" // clan_room_data
-#include <cstring>
 #include "DC/returnvals.h"
-#include "DC/innate.h"
 #include "DC/const.h"
 #include "DC/move.h"
 #include "DC/memory.h"
+#include "DC/Command.h"
+#include "DC/Index.h"
+#include "DC/Zone.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/structs.h"
+#include "DC/timeinfo.h"
 
 int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
 

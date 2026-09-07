@@ -7,12 +7,16 @@
 |   control.
 */
 
-#include <string>
-#include <QString>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fmt/base.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <string>
+#include <QString>
 
 class Character;
+class QString;
 
 void mprog_driver(char *com_list, Character *mob, Character *actor, class Object *obj, void *vo, class mprog_throw_type *thrw, Character *rndm);
 char *mprog_next_command(char *clist);

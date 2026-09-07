@@ -3,15 +3,33 @@
 | alias.C
 | Description:  Commands for the alias processor.
 */
-#include <cstring>
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qiterator.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <string>
+#include <utility>
 
 #include "DC/character.h"
-#include "DC/utility.h"
-#include "DC/player.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
-#include "DC/db.h"
 #include "DC/const.h"
+#include "DC/DC.h"
+#include "DC/Index.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/isr.h"
+#include "DC/mobile.h"
+#include "DC/structs.h"
+#include "DC/player.h"
 
 command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
 {

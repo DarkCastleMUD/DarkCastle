@@ -1,5 +1,8 @@
 #include "DC/Trace.h"
-#include <QDebug>
+
+#include <qminmax.h>
+#include <qswap.h>
+#include <ostream>
 
 Trace::Trace(QString source)
 {

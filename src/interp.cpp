@@ -18,22 +18,35 @@
 /***************************************************************************/
 /* $Id: interp.cpp,v 1.200 2015/06/14 02:38:12 pirahna Exp $ */
 
+#include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qminmax.h>
+#include <qnamespace.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <strings.h>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-#include "DC/dcstdio.h"
-#include <cassert>
-
 #include <string>
 #include <tuple>
+#include <algorithm>
+#include <expected>
+#include <utility>
 
-#include <fmt/format.h>
-#include <QStringList>
-
+#include "DC/dcstdio.h"
 #include "DC/structs.h" // MAX_STRING_LENGTH
 #include "DC/character.h"
 #include "DC/interp.h"
-#include "DC/utility.h"
 #include "DC/fight.h"
 #include "DC/spells.h" // ETHERAL consts
 #include "DC/mobile.h"
@@ -47,6 +60,12 @@
 #include "DC/Timer.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
+#include "DC/Command.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/common.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
 
 #define SKILL_HIDE 337
 

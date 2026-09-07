@@ -1,9 +1,15 @@
 #ifndef ZONE_H
 #define ZONE_H
 
+#include <qsharedpointer.h>
+#include <qcontainerfwd.h>
+#include <qtypes.h>
+#include <time.h>
 #include <QString>
 #include <QDateTime>
 #include <QList>
+#include <string>
+
 #include "DC/weather.h"
 #include "DC/types.h"
 #include "DC/dcstdio.h"

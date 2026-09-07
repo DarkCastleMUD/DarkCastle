@@ -21,13 +21,27 @@
 #ifndef UTILITY_H_
 #define UTILITY_H_
 
+#include <qbytearray.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qnamespace.h>
+#include <qrandom.h>
+#include <qstring.h>
+#include <qstringview.h>
+#include <qtypes.h>
+#include <string.h>
+#include <strings.h>
+#include <sys/types.h>
 #include <ctime>
 #include <cstdlib>
 #include <cstdint>
-
 #include <string>
 #include <vector>
 #include <queue>
+#include <concepts>
+#include <string_view>
+#include <type_traits>
 
 #include "DC/common.h"
 #include "DC/DC.h"
@@ -36,6 +50,18 @@
 #include "DC/Trace.h"
 #include "DC/spells.h"
 #include "DC/player.h"
+#include "DC/affect.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/timeinfo.h"
+#include "DC/memory.h"
+
+class Character;
+class str_app_type;
+class weather_data;
+enum class attribute_t : uint_fast8_t;
+enum class cmd_t;
 
 extern const str_app_type str_app[];
 

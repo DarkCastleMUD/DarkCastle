@@ -15,7 +15,22 @@
  ****************************************************************************/
 /* $Id: info.cpp,v 1.210 2015/06/14 02:38:12 pirahna Exp $ */
 #include <sys/time.h>
-
+#include <qcompare.h>
+#include <qchar.h>
+#include <qcontainerfwd.h>
+#include <qflags.h>
+#include <qlist.h>
+#include <qmap.h>
+#include <qmetatype.h>
+#include <qminmax.h>
+#include <qstring.h>
+#include <qstringalgorithms.h>
+#include <qswap.h>
+#include <qtypeinfo.h>
+#include <qtypes.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <time.h>
 #include <cctype>
 #include <cstring>
 #include <cassert>
@@ -23,15 +38,16 @@
 #include <map>
 #include <sstream>
 #include <fstream>
-#include <fmt/format.h>
-
 #include <algorithm>
 #include <QRegularExpression>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "DC/DC.h"
 #include "DC/structs.h"
 #include "DC/character.h"
-#include "DC/utility.h"
 #include "DC/terminal.h"
 #include "DC/player.h"
 #include "DC/mobile.h"
@@ -45,12 +61,20 @@
 #include "DC/act.h"
 #include "DC/set.h"
 #include "DC/returnvals.h"
-#include "DC/utility.h"
 #include "DC/isr.h"
-#include "DC/handler.h"
 #include "DC/const.h"
 #include "DC/vault.h"
 #include "DC/sing.h"
+#include "DC/Index.h"
+#include "DC/affect.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
+#include "DC/obj.h"
+#include "DC/room.h"
+#include "DC/timeinfo.h"
+#include "DC/weather.h"
 
 /* extern variables */
 

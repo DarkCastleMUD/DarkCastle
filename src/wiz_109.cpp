@@ -3,24 +3,38 @@
 | 11/20/95 -- Azrack
 **********************/
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <unistd.h>
-
 #include <fmt/format.h>
+#include <qcompare.h>
+#include <qsharedpointer.h>
+#include <qcontainerfwd.h>
+#include <qlist.h>
+#include <qstring.h>
+#include <qswap.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "DC/wizard.h"
 #include "DC/spells.h"
 #include "DC/connect.h"
-#include "DC/utility.h"
-
-#include "DC/mobile.h"
 #include "DC/handler.h"
 #include "DC/interp.h"
 #include "DC/db.h"
 #include "DC/returnvals.h"
 #include "DC/vault.h"
-#include "DC/utility.h"
-#include "DC/memory.h"
+#include "DC/DC.h"
+#include "DC/act.h"
+#include "DC/affect.h"
+#include "DC/character.h"
+#include "DC/class.h"
+#include "DC/common.h"
+#include "DC/dcstdio.h"
+#include "DC/levels.h"
+#include "DC/structs.h"
 
 #ifdef BANDWIDTH
 #include "DC/bandwidth.h"
