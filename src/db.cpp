@@ -2323,7 +2323,7 @@ Character *DC::read_mobile(int nr, FILEPtr fl)
 
   /***** String data *** */
 
-  mob->setName(fread_string(fl, 1));
+  mob->setName(fread_qstring(fl));
   /* set up the dc_fread debug stuff */
   DC::getInstance()->currentType("Mob");
   DC::getInstance()->currentName(mob->getName());
