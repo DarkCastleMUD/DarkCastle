@@ -28,11 +28,12 @@
             "preLaunchTask": "rebuild"
         },
         {
-            "name": "Debug dcastle -P -p6969 in lib/",
+            "name": "Debug dcastle -v -P -p6969 in lib/",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/debug/dcastle",
             "args": [
+                "-v",
                 "-P",
                 "-p 6969"
             ],
