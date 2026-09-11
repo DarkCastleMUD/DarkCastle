@@ -14,8 +14,7 @@
  ***************************************************************************/
 /* $Id: interp.h,v 1.115 2011/12/28 01:26:50 jhhudso Exp $ */
 
-#ifndef INTERP_H_
-#define INTERP_H_
+#pragma once
 
 #include <qcontainerfwd.h>
 #include <QString>
@@ -47,6 +46,7 @@ std::tuple<std::string, std::string> last_argument(std::string arguments);
 std::tuple<std::string, std::string> half_chop(std::string arguments, const char token = ' ');
 std::tuple<std::string, std::string> half_chop(const char *c_arg, const char token = ' ');
 std::tuple<QString, QString> half_chop(QString arguments, const char token = ' ');
+std::tuple<QString, QString> half_chop(QStringList arguments);
 void chop_half(char *str, char *arg1, char *arg2);
 void update_max_who(void);
 bool is_abbrev(QString abbrev, QString word);
@@ -66,5 +66,3 @@ std::string rtrim(std::string str);
  */
 typedef int DO_FUN(Character *ch, char *argument, cmd_t cmd);
 typedef int command_return_t;
-
-#endif
