@@ -117,7 +117,7 @@ void do_champ_flag_death(Character *victim)
     snprintf(buf, 200, champ_death_messages[number(0, MAX_CHAMP_DEATH_MESSAGE - 1)], victim->getNameC());
     send_info(buf);
 
-    if (obj && obj->short_description)
+    if (obj && !obj->short_description.isEmpty())
       send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\r\n").arg(victim->getName()).arg(obj->short_description));
     else
       send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\r\n").arg(victim->getName()));
@@ -610,8 +610,8 @@ int attack(Character *ch, Character *vict, int type, int weapon)
       remove_memory(vict, 't');
       stop_fighting(vict);
     }
-    do_say(ch, std::string("I'm sorry my fellow mob, I have seen the error of my ways."));
-    do_say(vict, std::string("It is okay my friend, let's go have a beer."));
+    ch->do_say(u"I'm sorry my fellow mob, I have seen the error of my ways."_s);
+    vict->do_say(u"It is okay my friend, let's go have a beer."_s);
     return ReturnValue::eFAILURE;
   }
 
@@ -1483,7 +1483,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
 
   if (ch == vict)
   {
-    do_say(ch, "What the hell am I DOING?!?!");
+    ch->do_say("What the hell am I DOING?!?!");
     stop_fighting(ch);
     return ReturnValue::eFAILURE;
   }
@@ -3040,8 +3040,7 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
 
 void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int weapon, int filter)
 {
-  extern message_list fight_messages[MAX_MESSAGES];
-  message_type *messages, *messages2;
+  message_typePtr messages, messages2;
   int i, j, nr;
   QString find, replace;
 
@@ -3087,12 +3086,12 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
 
   for (i = 0; i < MAX_MESSAGES; i++)
   {
-    if (fight_messages[i].a_type != attacktype)
+    if (DC::getInstance()->fight_messages[i].a_type != attacktype)
       continue;
 
-    nr = dice(1, fight_messages[i].number_of_attacks);
+    nr = dice(1, DC::getInstance()->fight_messages[i].number_of_attacks);
     j = 1;
-    for (messages = fight_messages[i].msg, messages2 = fight_messages[i].msg2; j < nr && messages; j++)
+    for (messages = DC::getInstance()->fight_messages[i].msg, messages2 = DC::getInstance()->fight_messages[i].msg2; j < nr && messages; j++)
     {
       messages = messages->next;
       if (messages2)
@@ -4049,8 +4048,7 @@ void load_messages(char *file, int base)
 {
   FILEPtr fl;
   int i, type;
-  extern message_list fight_messages[MAX_MESSAGES];
-  message_type *messages;
+  message_typePtr messages;
   char chk[100];
 
   if (!(fl = dc_fopen(file, "r")))
@@ -4061,10 +4059,10 @@ void load_messages(char *file, int base)
   if (base == 0)
     for (i = 0; i < MAX_MESSAGES; i++)
     {
-      fight_messages[i].a_type = 0;
-      fight_messages[i].number_of_attacks = 0;
-      fight_messages[i].msg = 0;
-      fight_messages[i].msg2 = 0;
+      DC::getInstance()->fight_messages[i].a_type = 0;
+      DC::getInstance()->fight_messages[i].number_of_attacks = 0;
+      DC::getInstance()->fight_messages[i].msg = 0;
+      DC::getInstance()->fight_messages[i].msg2 = 0;
     }
 
   dc_fscanf(fl, "%s\n", chk);
@@ -4073,8 +4071,8 @@ void load_messages(char *file, int base)
   {
     dc_fscanf(fl, " %d\n", &type);
     //     type += base;
-    for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type != type) &&
-                (fight_messages[i].a_type);
+    for (i = 0; (i < MAX_MESSAGES) && (DC::getInstance()->fight_messages[i].a_type != type) &&
+                (DC::getInstance()->fight_messages[i].a_type);
          i++)
       ;
     //     if (type == 80)
@@ -4085,25 +4083,19 @@ void load_messages(char *file, int base)
       exit(0);
     }
 
-#ifdef LEAK_CHECK
-    messages = (message_type *)
-        calloc(1, sizeof(message_type));
-#else
-    messages = (message_type *)
-        dc_alloc(1, sizeof(message_type));
-#endif
+    messages = message_typePtr::create();
     if (!base)
-      fight_messages[i].number_of_attacks++;
-    fight_messages[i].a_type = type;
+      DC::getInstance()->fight_messages[i].number_of_attacks++;
+    DC::getInstance()->fight_messages[i].a_type = type;
     if (!base)
     {
-      messages->next = fight_messages[i].msg;
-      fight_messages[i].msg = messages;
+      messages->next = DC::getInstance()->fight_messages[i].msg;
+      DC::getInstance()->fight_messages[i].msg = messages;
     }
     else
     {
-      messages->next = fight_messages[i].msg2;
-      fight_messages[i].msg2 = messages;
+      messages->next = DC::getInstance()->fight_messages[i].msg2;
+      DC::getInstance()->fight_messages[i].msg2 = messages;
     }
     messages->die_msg.attacker_msg = fread_string(fl, 0);
     messages->die_msg.victim_msg = fread_string(fl, 0);
@@ -4123,16 +4115,15 @@ void load_messages(char *file, int base)
 
 void DC::free_messages_from_memory(void)
 {
-  extern message_list fight_messages[MAX_MESSAGES];
-  message_type *next_message = nullptr;
+  message_typePtr next_message = {};
   int i;
 
-  for (i = 0; (i < MAX_MESSAGES) && (fight_messages[i].a_type); i++)
-    while (fight_messages[i].msg)
+  for (i = 0; (i < MAX_MESSAGES) && (DC::getInstance()->fight_messages[i].a_type); i++)
+    while (DC::getInstance()->fight_messages[i].msg)
     {
-      next_message = fight_messages[i].msg->next;
-      dc_free(fight_messages[i].msg);
-      fight_messages[i].msg = next_message;
+      next_message = DC::getInstance()->fight_messages[i].msg->next;
+      DC::getInstance()->fight_messages[i].msg = {};
+      DC::getInstance()->fight_messages[i].msg = next_message;
     }
 }
 
@@ -4407,8 +4398,7 @@ void make_scraps(Character *ch, class Object *obj)
   corpse->in_room = DC::NOWHERE;
   corpse->Name(QStringLiteral("scraps"));
 
-  sprintf(buf, "A pile of scraps from %s is lying here.",
-          obj->short_description);
+  sprintf(buf, "A pile of scraps from %s is lying here.", qPrintable(obj->short_description));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "a pile of scraps.");
@@ -4477,12 +4467,10 @@ void make_corpse(Character *ch)
   }
   corpse->Name(buf);
 
-  sprintf(buf, "the corpse of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+  sprintf(buf, "the corpse of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
 
-  sprintf(buf, "the corpse of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+  sprintf(buf, "the corpse of %s", (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_CONTAINER;
@@ -4766,20 +4754,14 @@ void make_husk(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
   corpse->vnum_ = 0;
   corpse->in_room = DC::NOWHERE;
   corpse->Name(QStringLiteral("husk"));
-  sprintf(buf, "The withered husk of %s, its soul drained, flutters here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+  sprintf(buf, "The withered husk of %s, its soul drained, flutters here.", (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
-  sprintf(buf, "Husk of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+  sprintf(buf, "Husk of %s", (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4807,23 +4789,18 @@ void make_head(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->vnum_ = 0;
   corpse->in_room = DC::NOWHERE;
   corpse->Name(QStringLiteral("head"));
 
-  sprintf(buf, "The head of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+  sprintf(buf, "The head of %s is lying here.", (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Head of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4853,11 +4830,7 @@ void make_arm(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->vnum_ = 0;
@@ -4865,11 +4838,11 @@ void make_arm(Character *ch)
   corpse->Name(QStringLiteral("arm"));
 
   sprintf(buf, "The arm of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Arm of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4899,11 +4872,7 @@ void make_leg(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->vnum_ = 0;
@@ -4911,11 +4880,11 @@ void make_leg(Character *ch)
   corpse->Name(QStringLiteral("leg"));
 
   sprintf(buf, "The leg of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Leg of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4945,11 +4914,7 @@ void make_bowels(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->vnum_ = 0;
@@ -4957,11 +4922,11 @@ void make_bowels(Character *ch)
   corpse->Name(QStringLiteral("bowels"));
 
   sprintf(buf, "The steaming bowels of %s is lying here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Bowels of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -4991,11 +4956,7 @@ void make_blood(Character *ch)
   class Object *corpse;
   char buf[MAX_STRING_LENGTH];
 
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->vnum_ = 0;
@@ -5003,11 +4964,11 @@ void make_blood(Character *ch)
   corpse->Name(QStringLiteral("blood"));
 
   sprintf(buf, "A pool of %s's blood is here.",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "Pooled blood of %s",
-          (ch->isNonPlayer() ? ch->short_desc : GET_NAME(ch)));
+          (ch->isNonPlayer() ? qPrintable(ch->short_desc) : GET_NAME(ch)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_TRASH;
@@ -5039,12 +5000,7 @@ void make_heart(Character *ch, Character *vict)
 
   if (!ch->hands_are_free(1))
     return;
-#ifdef LEAK_CHECK
-  corpse = (class Object *)calloc(1, sizeof(class Object));
-#else
-  corpse = (class Object *)dc_alloc(1, sizeof(class Object));
-#endif
-
+  corpse = new Object;
   clear_object(corpse);
 
   corpse->vnum_ = 0;
@@ -5052,11 +5008,11 @@ void make_heart(Character *ch, Character *vict)
   corpse->Name(QStringLiteral("heart"));
 
   sprintf(buf, "%s's heart is laying here.",
-          (vict->isNonPlayer() ? vict->short_desc : GET_NAME(vict)));
+          (vict->isNonPlayer() ? qPrintable(vict->short_desc) : GET_NAME(vict)));
   corpse->long_description = str_hsh(buf);
 
   sprintf(buf, "the heart of %s",
-          (vict->isNonPlayer() ? vict->short_desc : GET_NAME(vict)));
+          (vict->isNonPlayer() ? qPrintable(vict->short_desc) : GET_NAME(vict)));
   corpse->short_description = str_hsh(buf);
 
   corpse->obj_flags.type_flag = ITEM_FOOD;
@@ -6304,7 +6260,7 @@ void dam_message(int dam, Character *ch, Character *victim,
       }
     }
     else if (victim->equipment[WEAR_SHIELD])
-      sprintf(shield, "%s", victim->equipment[WEAR_SHIELD]->short_description);
+      sprintf(shield, "%s", qPrintable(victim->equipment[WEAR_SHIELD]->short_description));
 
     if (GET_CLASS(victim) == CLASS_MONK)
     {
@@ -6888,19 +6844,19 @@ void arena_kill(Character *ch, Character *victim, int type)
     if (type == KILL_BINGO)
     {
       sprintf(killer_message, "\r\n## %s [%s] just BINGOED %s [%s] in the arena!\r\n",
-              ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-              victim->getNameC(), get_clan_name(victim_clan));
+              ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), qPrintable(get_clan_name(ch_clan)),
+              victim->getNameC(), qPrintable(get_clan_name(victim_clan)));
     }
     else
     {
       sprintf(killer_message, "\r\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\r\n",
-              ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-              victim->getNameC(), get_clan_name(victim_clan));
+              ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), qPrintable(get_clan_name(ch_clan)),
+              victim->getNameC(), qPrintable(get_clan_name(victim_clan)));
     }
 
     logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] killed %s [%s]",
-         ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), get_clan_name(ch_clan),
-         victim->getNameC(), get_clan_name(victim_clan));
+         ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), qPrintable(get_clan_name(ch_clan)),
+         victim->getNameC(), qPrintable(get_clan_name(victim_clan)));
   }
   else if (ch)
   {
@@ -6951,9 +6907,9 @@ void arena_kill(Character *ch, Character *victim, int type)
     }
     if (eliminated)
     {
-      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", get_clan_name(victim_clan));
+      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", qPrintable(get_clan_name(victim_clan)));
       send_info(killer_message);
-      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", get_clan_name(victim_clan));
+      logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", qPrintable(get_clan_name(victim_clan)));
     }
   }
 
@@ -7057,14 +7013,14 @@ int can_be_attacked(Character *ch, Character *vict)
     {
       ch->sendln("You are already fighting someone from another clan.");
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s] was prevented from attacking %s [%s].",
-           GET_NAME(ch), get_clan_name(ch), GET_NAME(ch->fighting), get_clan_name(ch->fighting), GET_NAME(vict), get_clan_name(vict));
+           GET_NAME(ch), qPrintable(get_clan_name(ch)), GET_NAME(ch->fighting), qPrintable(get_clan_name(ch->fighting)), GET_NAME(vict), qPrintable(get_clan_name(vict)));
       return false;
     }
     else if (vict->fighting && vict->fighting != ch && !ARE_CLANNED(vict->fighting, ch))
     {
       ch->sendln("They are already fighting someone.");
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from attacking %s [%s] who was fighting %s [%s].",
-           GET_NAME(ch), get_clan_name(ch), GET_NAME(vict), get_clan_name(vict), GET_NAME(vict->fighting), get_clan_name(vict->fighting));
+           GET_NAME(ch), qPrintable(get_clan_name(ch)), GET_NAME(vict), qPrintable(get_clan_name(vict)), GET_NAME(vict->fighting), qPrintable(get_clan_name(vict->fighting)));
       return false;
     }
   }
@@ -7114,7 +7070,7 @@ int can_be_attacked(Character *ch, Character *vict)
       return false;
     if (vict->getLevel() < 5)
     {
-      do_say(ch, "I'm sorry master, I cannot do that.");
+      ch->do_say("I'm sorry master, I cannot do that.");
       return ReturnValue::eFAILURE;
     }
   }
@@ -7852,7 +7808,7 @@ void Character::send(QString buffer)
   send_to_char(buffer, this);
 }
 
-void Character::sendRaw(std::string buffer)
+void Character::sendRaw(QString buffer)
 {
   if (this->desc != nullptr)
   {

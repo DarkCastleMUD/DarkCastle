@@ -484,6 +484,7 @@ public:
   AuctionHouse TheAuctionHouse;
   QList<wizlist_info> wizlist;
   QMap<QString, redeem_t> redeem_sessions = {};
+  message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
 
   static QString getBuildVersion();
   static QString getBuildTime();
@@ -660,6 +661,7 @@ public:
             index[vnum].mobspec = nullptr;
             index[vnum].progtypes = 0;
             index[vnum].source = pItem;
+            pItem->enableVNUM(vnum);
             currentVNUM(index[vnum].vnum());
 
             if constexpr (std::is_same_v<T, QMap<vnum_t, class mob_index_data>>)
@@ -681,7 +683,6 @@ public:
           logmisc(u"Bad char (%1)"_s.arg(buf));
           abort();
         }
-        pItem->lastnum = vnum;
       }
     }
 
@@ -754,7 +755,7 @@ private:
   void game_loop(void);
   int init_socket(in_port_t port);
   int exceeded_connection_limit(Connection *new_conn);
-  void nanny(class Connection *d, std::string arg = "");
+  void nanny(class Connection *d, QString arg = u""_s);
   void object_activity(quint64 pulse_type);
 };
 void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
@@ -830,7 +831,6 @@ auto &operator>>(auto &in, Room &room)
   char *temp = nullptr;
   char ch = 0;
   int dir = 0;
-  extra_descr_data *new_new_descr{};
   zone_t zone_nr = {};
 
   ch = fread_char(in);
@@ -940,7 +940,7 @@ auto &operator>>(auto &in, Room &room)
       for (size_t tmp = 0; tmp <= 5; tmp++)
         room.dir_option[tmp] = 0;
 
-      room.ex_description = 0;
+      room.ex_descriptions = {};
     }
 
     for (;;)
@@ -962,18 +962,12 @@ auto &operator>>(auto &in, Room &room)
           dc_fseek(in, -1, SEEK_CUR);
         }
 
-        new_new_descr = new extra_descr_data;
-        new_new_descr->keyword = fread_string(in, 0);
-        new_new_descr->description = fread_string(in, 0);
+        auto keyword = fread_string(in, 0);
+        auto description = fread_string(in, 0);
 
         if (room_nr)
         {
-          new_new_descr->next = room.ex_description;
-          room.ex_description = new_new_descr;
-        }
-        else
-        {
-          delete new_new_descr;
+          room.ex_descriptions[keyword] = description;
         }
       }
       else if (ch == 'B')

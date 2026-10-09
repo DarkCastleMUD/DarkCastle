@@ -2,6 +2,7 @@
 /************************************
 one liner quest shit
 ************************************/
+#include <QString>
 class Character;
 class Object;
 
@@ -16,7 +17,7 @@ class quest_info
 public:
   int number;
   char *name;
-  char *hint1;
+  QString hint1;
   char *hint2;
   char *hint3;
   char *objshort;

@@ -106,7 +106,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
         WAIT_STATE(ch, DC::PULSE_VIOLENCE * 2);
 
         char log_buf[MAX_STRING_LENGTH] = {};
-        sprintf(log_buf, "%s looted %s[%llu] from %s", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
+        sprintf(log_buf, "%s looted %s[%llu] from %s", GET_NAME(ch), qPrintable(obj_object->short_description), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
         logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
         ch->sendln("You suddenly feel very guilty...shame on you stealing from the dead!");
@@ -881,7 +881,7 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
                   ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj_object->short_description));
 
                   char log_buf[MAX_STRING_LENGTH] = {};
-                  sprintf(log_buf, "%s poofed %s[%llu] from %s[%llu]", GET_NAME(ch), obj_object->short_description, DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()), DC::getInstance()->obj_index[sub_object->vnum_].vnum());
+                  sprintf(log_buf, "%s poofed %s[%llu] from %s[%llu]", GET_NAME(ch), qPrintable(obj_object->short_description), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()), DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                   logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
 
                   extract_obj(obj_object);
@@ -1174,12 +1174,12 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), qPrintable(tmp_object->short_description), DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                   tmp_object->short_description,
-                   loop_obj->short_description,
+                   qPrintable(tmp_object->short_description),
+                   qPrintable(loop_obj->short_description),
                    DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
 
@@ -1193,7 +1193,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
         {
           if (CAN_SEE_OBJ(ch, tmp_object, true))
           {
-            sprintf(buffer, "You can't drop %s, it must be CURSED!\r\n", tmp_object->short_description);
+            sprintf(buffer, "You can't drop %s, it must be CURSED!\r\n", qPrintable(tmp_object->short_description));
             ch->send(buffer);
             test = true;
           }
@@ -1242,12 +1242,12 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
           if (tmp_object->obj_flags.type_flag != ITEM_MONEY)
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), tmp_object->short_description, DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
+            sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), qPrintable(tmp_object->short_description), DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
             for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
-                   tmp_object->short_description,
-                   loop_obj->short_description,
+                   qPrintable(tmp_object->short_description),
+                   qPrintable(loop_obj->short_description),
                    DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
 
@@ -1389,7 +1389,7 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
             // Keyrings can only hold keys
             if (GET_ITEM_TYPE(sub_object) == ITEM_KEYRING && GET_ITEM_TYPE(obj_object) != ITEM_KEY)
             {
-              csendf(ch, "You can't put %s on a keyring.\r\n", GET_OBJ_SHORT(obj_object));
+              csendf(ch, "You can't put %s on a keyring.\r\n", qPrintable(GET_OBJ_SHORT(obj_object)));
               return ReturnValue::eFAILURE;
             }
 
@@ -1437,12 +1437,12 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                 {
                   if (ch && ch->player && isSet(ch->player->toggles, Player::PLR_NODUPEKEYS))
                   {
-                    csendf(ch, "A duplicate of %s is already on your keyring so you will not attach another one.\r\n", GET_OBJ_SHORT(obj_object));
+                    csendf(ch, "A duplicate of %s is already on your keyring so you will not attach another one.\r\n", qPrintable(GET_OBJ_SHORT(obj_object)));
                     return ReturnValue::eFAILURE;
                   }
                   else
                   {
-                    csendf(ch, "A duplicate of %s is already on your keyring but you don't care.\r\n", GET_OBJ_SHORT(obj_object));
+                    csendf(ch, "A duplicate of %s is already on your keyring but you don't care.\r\n", qPrintable(GET_OBJ_SHORT(obj_object)));
                   }
                 }
               }
@@ -1472,9 +1472,9 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   act("You attach $p to $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s attaches %s[%d] to %s[%d]",
                        ch->getNameC(),
-                       obj_object->short_description,
+                       qPrintable(obj_object->short_description),
                        DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
-                       sub_object->short_description,
+                       qPrintable(sub_object->short_description),
                        DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                 }
                 else
@@ -1483,9 +1483,9 @@ int do_put(Character *ch, char *argument, cmd_t cmd)
                   act("You put $p in $P.", ch, obj_object, sub_object, TO_CHAR, 0);
                   logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s puts %s[%d] in %s[%d]",
                        ch->getNameC(),
-                       obj_object->short_description,
+                       qPrintable(obj_object->short_description),
                        DC::getInstance()->obj_index[obj_object->vnum_].vnum(),
-                       sub_object->short_description,
+                       qPrintable(sub_object->short_description),
                        DC::getInstance()->obj_index[sub_object->vnum_].vnum());
                 }
 
@@ -1876,9 +1876,9 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->Name()).arg(GET_NAME(vict)));
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
-         obj->short_description,
+         qPrintable(obj->short_description),
          obj->vnum_,
-         loop_obj->short_description,
+         qPrintable(loop_obj->short_description),
          DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
 
   if ((vict->in_room >= 0 && vict->in_room <= DC::getInstance()->top_of_world) && vict->isMortalPlayer() &&
@@ -2622,7 +2622,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->vnum_].item);
 
-    if (o && o->short_description)
+    if (o && !o->short_description.isEmpty())
       send_info(QStringLiteral("\r\n##%1 has just picked up %2!\r\n").arg(GET_NAME(ch)).arg(o->short_description));
     else
       send_info(QStringLiteral("\r\n##%1 has just picked up the Champion Flag!\r\n").arg(GET_NAME(ch)));
@@ -2688,7 +2688,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
 
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj_object->short_description), qPrintable(loop_obj->short_description),
            DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
   else if (!sub_object && obj_object->obj_flags.type_flag != ITEM_MONEY)
@@ -2696,7 +2696,7 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     sprintf(log_buf, "%s palms %s[%llu] from room %llu", GET_NAME(ch), qPrintable(obj_object->Name()), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj_object->short_description, loop_obj->short_description,
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj_object->short_description), qPrintable(loop_obj->short_description),
            DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
 
@@ -2728,8 +2728,10 @@ int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool
     {
       int cgold = (int)((float)(obj_object->obj_flags.value[0]) * 0.1);
       obj_object->obj_flags.value[0] -= cgold;
-      csendf(ch, "Clan %s collects %d bounty, leaving %d for you.\r\n", get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name, cgold,
-             obj_object->obj_flags.value[0]);
+      ch->sendln(u"Clan %1 collects %2 bounty, leaving %3 for you."_s
+                     .arg(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).clanowner)->name)
+                     .arg(cgold)
+                     .arg(obj_object->obj_flags.value[0]));
       DC::getInstance()->zones[DC::getInstance()->world[ch->in_room].zone].addGold(cgold);
     }
 

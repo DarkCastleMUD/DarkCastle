@@ -1541,7 +1541,7 @@ int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     return ReturnValue::eFAILURE;
   }
-  do_say(ch, "just dance", cmd_t::SAY);
+  ch->do_say("just dance", cmd_t::SAY);
   if (obj->obj_flags.timer > 0)
   {
     ch->sendln("The vest remains silent.");
@@ -1559,7 +1559,7 @@ int dancevest(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
           "boogie",
           "headbang",
           "showtune" // 9
-      };
+  };
   Character *v;
   ch->sendln("As you intone the sacred words, phantom music swells around you and everyone within earshot joins in!");
   for (v = DC::getInstance()->world[ch->in_room].people; v; v = v->next_in_room)
@@ -3249,7 +3249,7 @@ int gotta_dance_boots(Character *ch, class Object *obj, cmd_t cmd, const char *a
 
   act("$n eyes widen and $e begins to shake violently.", obj->equipped_by, 0, 0, TO_ROOM, INVIS_NULL);
   obj->equipped_by->sendln("Your boots grasp violently to your legs and rhythmic urges flood your body.");
-  do_say(obj->equipped_by, "I...I.....I've gotta dance!!!!");
+  obj->equipped_by->do_say("I...I.....I've gotta dance!!!!");
   make_person_dance(obj->equipped_by);
   obj->equipped_by->sendln("You slump back down, exhausted.");
   if (obj->equipped_by->getLevel() <= MORTAL)
@@ -3300,8 +3300,7 @@ int noremove_eq(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     if (number(0, 4))
       return ReturnValue::eSUCCESS;
-    csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n",
-           obj->short_description);
+    csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n", qPrintable(obj->short_description));
     obj->obj_flags.value[3] = 5;
     return ReturnValue::eSUCCESS;
   }
@@ -3934,7 +3933,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (vict->isNonPlayer())
     {
       act("$n gets back up.", vict, 0, 0, TO_ROOM, 0);
-      do_say(vict, "HA!  Fooled ya!");
+      vict->do_say("HA!  Fooled ya!");
       extract_obj(obj);
       return ReturnValue::eSUCCESS;
     }

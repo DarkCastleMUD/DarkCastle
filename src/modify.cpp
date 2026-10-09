@@ -58,71 +58,50 @@ const char *skill_fields[] = {"learned", "recognize", "\n"};
 //  go pick it up)  Note:  There's a "CON_SEND_MAIL" already defined....not sure
 //  why...
 
-void string_hash_add(class Connection *d, char *str)
+void string_hash_add(class Connection *d, QString str)
 {
-  char *scan;
   int terminator = 0;
   Character *ch = d->character;
 
-  scan = str;
-  while (*scan)
+  auto scan = str;
+  if (scan.contains('~'))
   {
-    if ((terminator = (*scan == '~') != 0))
-    {
-      *scan = '\0';
-      break;
-    }
-    scan++;
+    scan.truncate(scan.indexOf('~'));
   }
 
-  if (!(*d->hashstr))
+  if ((*d->hashstr).isEmpty())
   {
-    if (strlen(str) > (unsigned)d->max_str)
+    if (str.size() > (unsigned)d->max_str)
     {
       d->character->sendln("String too long - Truncated.");
-      *(str + d->max_str) = '\0';
+      str.truncate(d->max_str);
       terminator = 1;
     }
-#ifdef LEAK_CHECK
-    (*d->hashstr) = (char *)calloc(strlen(str) + 3, sizeof(char));
-#else
-    (*d->hashstr) = (char *)dc_alloc(strlen(str) + 3, sizeof(char));
-#endif
-    strcpy(*d->hashstr, str);
-  }
 
+    *d->hashstr = str;
+  }
   else
   {
-    if (strlen(str) + strlen(*d->hashstr) > (unsigned)d->max_str)
+    if (str.size() + (*d->hashstr).length() > (unsigned)d->max_str)
     {
       d->character->sendln("String too long. Last line skipped.");
       terminator = 1;
     }
-
     else
     {
-      if (!(*d->hashstr = (char *)realloc(*d->hashstr, strlen(*d->hashstr) + strlen(str) + 3)))
-      {
-        perror("string_hash_add: ");
-        abort();
-      }
-
-      strcat(*d->hashstr, str);
+      *d->hashstr += str;
     }
   }
 
   if (terminator)
   {
-    scan = str_hsh(*d->hashstr);
-    dc_free(*d->hashstr);
-    *d->hashstr = scan;
-    d->hashstr = 0;
+    d->hashstr = {};
     d->connected = Connection::states::PLAYING;
     ch->sendln("Ok.");
     check_for_awaymsgs(ch);
   }
   else
-    strcat(*d->hashstr, "\r\n");
+    *d->hashstr += u"\r\n"_s;
 }
 
 // TODO - figure out what this is for...kill it if nothing
@@ -169,7 +148,6 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
   int field, type, ctr;
   Character *mob = nullptr;
   class Object *obj;
-  extra_descr_data *ed, *tmp;
 
   if (ch->isNonPlayer())
     return 1;
@@ -317,35 +295,25 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("You have to supply a keyword.");
         return 1;
       }
-      /* try to locate extra description */
-      for (ed = obj->ex_description;; ed = ed->next)
-        if (!ed)
-        { /* the field was not found. create a new_new one. */
-#ifdef LEAK_CHECK
-          ed = (extra_descr_data *)
-              calloc(1, sizeof(extra_descr_data));
-#else
-          ed = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
-#endif
-          ed->next = obj->ex_description;
-          obj->ex_description = ed;
-          ed->keyword = str_hsh(string);
-          ed->description = 0;
-          ch->desc->hashstr = &ed->description;
-          ch->sendln("New field.");
-          break;
-        }
-        else if (!str_cmp(ed->keyword, string))
+
+      if (obj->ex_descriptions.isEmpty())
+      {
+        ch->desc->hashstr = &obj->ex_descriptions[string];
+        ch->sendln("New field.");
+        break;
+      }
+
+      for (const auto &[keyword, description] : obj->ex_descriptions.asKeyValueRange())
+      {
+        if (keyword == string)
         {
-          /* the field exists */
-          ed->description = 0;
-          ch->desc->hashstr = &ed->description;
+          description = {};
+          ch->desc->hashstr = &description;
           ch->sendln("Modifying description.");
-          break;
+          ch->desc->max_str = MAX_STRING_LENGTH;
+          return 1;
         }
-      ch->desc->max_str = MAX_STRING_LENGTH;
-      /* the stndrd (see below) procedure does not apply here */
-      return 1;
+      }
       break;
     case 6:
       if (!*string)
@@ -353,28 +321,16 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("You must supply a field name.");
         return 1;
       }
-      /* try to locate field */
-      for (ed = obj->ex_description;; ed = ed->next)
-        if (!ed)
-        {
-          ch->sendln("No field with that keyword.");
-          return 1;
-        }
-        else if (!str_cmp(ed->keyword, string))
-        {
-          /* delete the entry in the desr list */
-          if (ed == obj->ex_description)
-            obj->ex_description = ed->next;
-          else
-          {
-            for (tmp = obj->ex_description; tmp->next != ed; tmp = tmp->next)
-              ;
-            tmp->next = ed->next;
-          }
-          dc_free(ed);
-          ch->sendln("Field deleted.");
-          return 1;
-        }
+      if (obj->ex_descriptions.isEmpty())
+      {
+        ch->sendln("No field with that keyword.");
+        return 1;
+      }
+
+      obj->ex_descriptions.remove(string);
+      ch->sendln("Field deleted.");
+      return 1;
+
       break;
     default:
       ch->sendln("That field is undefined for objects.");

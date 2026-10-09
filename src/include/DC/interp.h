@@ -32,7 +32,8 @@ class Character;
 char *remove_trailing_spaces(char *arg);
 int search_block(const char *arg, const char **l, bool exact);
 
-int old_search_block(const char *arg, const QStringList list, bool exact);
+qsizetype old_search_block(QString arg, QStringList list, bool exact);
+qsizetype old_search_block(QString arg, const char **list, bool exact);
 int old_search_block(const char *argument, int begin, int length, const QStringList list, int mode);
 int old_search_block(const char *argument, int begin, int length, const char **list, int mode);
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
@@ -43,6 +44,7 @@ char *one_argumentnolow(char *argument, char *first_arg);
 int fill_word(char *argument);
 void half_chop(const char *str, char *arg1, char *arg2);
 std::tuple<std::string, std::string> last_argument(std::string arguments);
+std::tuple<QString, QString> last_argument(QString arguments);
 std::tuple<std::string, std::string> half_chop(std::string arguments, const char token = ' ');
 std::tuple<std::string, std::string> half_chop(const char *c_arg, const char token = ' ');
 std::tuple<QString, QString> half_chop(QString arguments, const char token = ' ');

@@ -1069,15 +1069,13 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE))
   {
-    Object *no_trade_obj;
     int nr = 27909;
-
-    no_trade_obj = search_char_for_item(ch, nr, false);
+    auto no_trade_obj = search_char_for_item(ch, nr, false);
 
     if (!no_trade_obj)
     { // 27909 == wingding right now (notrade transfer token)
       if (nr > 0)
-        csendf(ch, "You need to have \"%s\" to buy a NO_TRADE item.\r\n", ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+        ch->sendln(u"You need to have \"%1\" to buy a NO_TRADE item."_s.arg(((DC::getInstance()->obj_index[nr].item))->short_description));
       return;
     }
     else
@@ -1109,20 +1107,18 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
   if ((vict = get_active_pc(Item_it->seller.toStdString().c_str())))
     csendf(vict, "%s just purchased your ticket of %s for %u coins.\r\n", GET_NAME(ch), Item_it->item_name.toStdString().c_str(), Item_it->price);
 
-  csendf(ch, "You have purchased %s for %u coins.\r\n", obj->short_description, Item_it->price);
+  ch->sendln(u"You have purchased %1 for %2 coins."_s.arg(obj->short_description).arg(Item_it->price));
 
   Character *tmp;
   for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if (tmp != ch)
-      csendf(tmp, "%s just purchased %s's %s\r\n", GET_NAME(ch), Item_it->seller.toStdString().c_str(), obj->short_description);
+      tmp->sendln(u"%1 just purchased %2's %3"_s.arg(GET_NAME(ch)).arg(Item_it->seller).arg(obj->short_description));
 
   Item_it->state = AUC_SOLD;
   Item_it->buyer = GET_NAME(ch);
 
   Save();
-  char log_buf[MAX_STRING_LENGTH] = {};
-  sprintf(log_buf, "VEND: %s bought %s's %s[%d] for %u coins.\r\n",
-          GET_NAME(ch), Item_it->seller.toStdString().c_str(), Item_it->item_name.toStdString().c_str(), Item_it->vitem, Item_it->price);
+  auto log_buf = u"VEND: %1 bought %2's %3[%4] for %5 coins."_s.arg(GET_NAME(ch)).arg(Item_it->seller).arg(Item_it->item_name).arg(Item_it->vitem).arg(Item_it->price);
   logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
   obj_to_char(obj, ch);
   ch->save();
@@ -1149,7 +1145,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
       return;
     }
 
-    dc_fprintf(fl, "%s purchased %s's %s~\n", GET_NAME(ch), Item_it->seller.toStdString().c_str(), obj->short_description);
+    dc_fprintf(fl, "%s purchased %s's %s~\n", GET_NAME(ch), Item_it->seller.toStdString().c_str(), qPrintable(obj->short_description));
 
     for (int j = 0; j < i; j++)
       dc_fprintf(fl, "%s~\n", buf[j]);
@@ -1489,7 +1485,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
     if (DC::getInstance()->obj_index.contains(nr))
     {
       sprintf(buf, "\r\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\r\n",
-              ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+              qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\r\n";
@@ -1547,7 +1543,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (ARE_CONTAINERS(obj) && obj->contains)
   { // non-empty containers
-    csendf(ch, "%s needs to be emptied first.\r\n", GET_OBJ_SHORT(obj));
+    csendf(ch, "%s needs to be emptied first.\r\n", qPrintable(GET_OBJ_SHORT(obj)));
     return;
   }
 
@@ -1592,7 +1588,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     return;
   }
 
-  if (strcmp(obj->short_description, ((class Object *)(DC::getInstance()->obj_index[obj->vnum_].item))->short_description))
+  if (obj->short_description != DC::getInstance()->obj_index[obj->vnum_].item->short_description)
   {
     ch->sendln("The Consignment broker informs you that he does not handle items that have been restrung.");
     return;
@@ -1652,12 +1648,10 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   Save();
 
   if (buyer.isEmpty())
-    csendf(ch, "You are now selling %s for %u coins.\r\n",
-           obj->short_description, price);
+    csendf(ch, "You are now selling %s for %u coins.\r\n", qPrintable(obj->short_description), price);
   else
   {
-    csendf(ch, "You are now selling %s to %s for %u coins.\r\n",
-           obj->short_description, buyer.toStdString().c_str(), price);
+    csendf(ch, "You are now selling %s to %s for %u coins.\r\n", qPrintable(obj->short_description), buyer.toStdString().c_str(), price);
   }
 
   if (advertise == true && NewTicket.buyer.isEmpty())
@@ -1684,11 +1678,11 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   char log_buf[MAX_STRING_LENGTH] = {};
   if (NewTicket.buyer.isEmpty())
   {
-    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\r\n", GET_NAME(ch), obj->short_description, price);
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins.\r\n", GET_NAME(ch), qPrintable(obj->short_description), price);
   }
   else
   {
-    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), obj->short_description, price, NewTicket.buyer.toStdString().c_str());
+    sprintf(log_buf, "VEND: %s just listed %s for sale for %u coins for %s.\r\n", GET_NAME(ch), qPrintable(obj->short_description), price, NewTicket.buyer.toStdString().c_str());
   }
   logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
 
@@ -1871,7 +1865,13 @@ int do_vend(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    ch->sendln("Search by what?\r\nSyntax: vend search <name | level | slot | seller | race | class>");
+    argument = one_argument(argument, buf);
+    if (*buf)
+    {
+      DC::getInstance()->TheAuctionHouse.ListItems(ch, LIST_BY_NAME, buf, 0, 0);
+    }
+
+    ch->sendln("Syntax: vend search <name | level | slot | seller | race | class>");
     return ReturnValue::eSUCCESS;
   }
 

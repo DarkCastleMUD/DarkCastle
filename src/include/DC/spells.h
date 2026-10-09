@@ -27,7 +27,8 @@
 
 class Character;
 enum class position_t : uint_fast8_t;
-template <typename T> class QList;
+template <typename T>
+class QList;
 
 #define MAX_BUF_LENGTH 240
 
@@ -44,7 +45,7 @@ class skill_quest
 {
 public:
   skill_quest *next;
-  char *message;
+  QString message;
   int num;
   int clas;
   int level;

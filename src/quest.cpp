@@ -271,9 +271,9 @@ void show_quest_info(Character *ch, int num)
              quest->number, quest->name, quest->level, quest->cost,
              quest->brownie ? "Required" : "Not Required",
              quest->reward, quest->timer, quest->mobnum,
-             DC::getInstance()->mob_index.contains(quest->mobnum) && DC::getInstance()->mob_index[quest->mobnum].mob ? DC::getInstance()->mob_index[quest->mobnum].mob->short_desc : "no current mob",
+             DC::getInstance()->mob_index.contains(quest->mobnum) && DC::getInstance()->mob_index[quest->mobnum].mob ? qPrintable(DC::getInstance()->mob_index[quest->mobnum].mob->short_desc) : "no current mob",
              quest->objnum, quest->objkey,
-             quest->objshort, quest->objlong, quest->hint1, quest->hint2, quest->hint3);
+             quest->objshort, quest->objlong, qPrintable(quest->hint1), quest->hint2, quest->hint3);
       return;
     }
   }
@@ -387,7 +387,7 @@ int show_one_quest(Character *ch, quest_info *quest, int count)
 
   csendf(ch, " $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\r\n"
              " $B$2Hint:$7 %-52s$R\r\n",
-         quest->name, quest->number, quest->hint1);
+         quest->name, quest->number, qPrintable(quest->hint1));
   if (quest->hint2)
     csendf(ch, " $B$7%-52s$R\r\n", quest->hint2);
   if (quest->hint3)
@@ -579,10 +579,10 @@ int start_quest(Character *ch, quest_info *quest)
     while (++dontwannabeinthisforever < 100)
     {
       mob = get_mob_vnum(number(1, 34000));
-      if (mob && (mob->getLevel() < 90) && DC::getInstance()->zones.value(DC::getInstance()->world[mob->in_room].zone).isNoHunt() == false && (strlen(mob->description) > 80))
+      if (mob && (mob->getLevel() < 90) && DC::getInstance()->zones.value(DC::getInstance()->world[mob->in_room].zone).isNoHunt() == false && (mob->description.size() > 80))
         break;
     }
-    quest->hint1 = str_hsh(mob->description);
+    quest->hint1 = mob->description;
   }
   else
     mob = get_mob_vnum(quest->mobnum);
@@ -915,7 +915,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
     else
     {
       sprintf(buf, "%s You have not yet completed this quest.", GET_NAME(ch));
-      do_say(qmaster, buf);
+      qmaster->do_say(buf);
     }
     break;
   default:
@@ -957,7 +957,7 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
     switch (atoi(arg))
     {
     case 1:
-      do_say(owner, "Sure, bum.");
+      owner->do_say("Sure, bum.");
       break;
     default:
       sprintf(buf, "%s I don't offer that service.", GET_NAME(ch));
@@ -1431,9 +1431,9 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     break;
   case 9: // hint1
     sprintf(field, "%s %s", value, argument);
-    csendf(ch, "Hint #1 changed from %s ", quest->hint1);
+    csendf(ch, "Hint #1 changed from %s ", qPrintable(quest->hint1));
     quest->hint1 = str_hsh(field);
-    csendf(ch, "to %s.\r\n", quest->hint1);
+    csendf(ch, "to %s.\r\n", qPrintable(quest->hint1));
     break;
   case 10: // hint2
     sprintf(field, "%s %s", value, argument);
@@ -1494,7 +1494,7 @@ int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charact
 
   if (!CAN_SEE(owner, ch))
   {
-    do_say(owner, "I don't trade with people I can't see!");
+    owner->do_say("I don't trade with people I can't see!");
     return ReturnValue::eSUCCESS;
   }
 

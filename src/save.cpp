@@ -73,7 +73,6 @@ extern Database db;
 class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);
 bool put_obj_in_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos);
 void restore_weight(class Object *obj);
-void store_to_char(char_file_u4 *st, Character *ch);
 QString fread_alias_string(FILEPtr fpsave);
 
 // return 1 on success
@@ -198,6 +197,21 @@ char *fread_var_string(FILEPtr fpsave)
   return nullptr;
 }
 
+QString fread_var_qstring(FILEPtr fpsave)
+{
+  QFile file;
+  uint16_t tmp_size = 0;
+  if (auto success = file.open(fpsave.get(), QIODevice::ReadOnly, QFileDevice::DontCloseHandle); success)
+  {
+    auto count = file.read((char *)&tmp_size, sizeof(tmp_size));
+    auto buffer = file.read(tmp_size);
+    // qWarning("count was %lld, value read was %u, next read returned [%s] (%lld)", count, tmp_size, qPrintable(buffer), buffer.length());
+    return buffer;
+  }
+
+  return {};
+}
+
 void Mobile::save(FILEPtr fpsave)
 {
   dc_fwrite(&(vnum_), sizeof(int32_t), 1, fpsave);
@@ -245,7 +259,9 @@ void fwrite_string_tilde(FILEPtr fpsave)
 }
 void Player::save(FILEPtr fpsave, time_data tmpage)
 {
-  dc_fwrite(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
+  char buffer[PASSWORD_LEN + 1] = {};
+  strncpy(buffer, qPrintable(pwd), PASSWORD_LEN + 1);
+  dc_fwrite(&buffer, sizeof(char), PASSWORD_LEN + 1, fpsave);
   save_char_aliases(fpsave);
 
   fwrite_string_tilde(fpsave);
@@ -369,12 +385,12 @@ void Player::save(FILEPtr fpsave, time_data tmpage)
   }
   if (ignoring.empty() == false)
   {
-    for (const auto &name : ignoring)
+    for (const auto &name : ignoring.asKeyValueRange())
     {
       if (name.second.ignore)
       {
         dc_fwrite("IGN", sizeof(char), 3, fpsave);
-        fwrite_var_string(name.first.c_str(), fpsave);
+        fwrite_var_string(name.first, fpsave);
         dc_fwrite(&name.second.ignored_count, sizeof(name.second.ignored_count), 1, fpsave);
       }
     }
@@ -444,7 +460,9 @@ bool Player::read(FILEPtr fpsave, Character *ch, QString filename)
   for (int j = 0; j <= QUEST_TOTAL / ASIZE; j++)
     quest_complete[j] = 0;
 
-  dc_fread(pwd, sizeof(char), PASSWORD_LEN + 1, fpsave);
+  char buffer[22] = {};
+  dc_fread(&buffer, sizeof(char), PASSWORD_LEN + 1, fpsave);
+  pwd = buffer;
   aliases_ = read_char_aliases(fpsave);
   if (ch->has_skill(NEW_SAVE))
   {
@@ -469,8 +487,8 @@ bool Player::read(FILEPtr fpsave, Character *ch, QString filename)
   poofout = fread_var_string(fpsave);
   setPrompt(fread_var_string(fpsave));
 
-  char *tmp = fread_var_string(fpsave);
-  if (!tmp || str_cmp(tmp, "NewSaveType"))
+  QString tmp = fread_var_string(fpsave);
+  if (tmp.isEmpty() || tmp != "NewSaveType")
   {
     tmp = fread_var_string(fpsave);
     tmp = fread_var_string(fpsave);
@@ -583,16 +601,12 @@ bool Player::read(FILEPtr fpsave, Character *ch, QString filename)
   }
   while (!strcmp("IGN", typeflag))
   {
-    char *var_string = fread_var_string(fpsave);
-    if (var_string != nullptr)
+    auto name_to_ignore = QString(fread_var_string(fpsave));
+    if (!name_to_ignore.isEmpty())
     {
-      std::string name = var_string;
-      if (name.empty() == false)
-      {
-        ignore_entry ie = {true, 0};
-        dc_fread(&ie.ignored_count, sizeof(ie.ignored_count), 1, fpsave);
-        ignoring[name] = ie;
-      }
+      ignore_entry ie = {true, 0};
+      dc_fread(&ie.ignored_count, sizeof(ie.ignored_count), 1, fpsave);
+      ignoring[name_to_ignore] = ie;
     }
 
     dc_fread(&typeflag, sizeof(char), 3, fpsave);
@@ -727,26 +741,47 @@ int Character::char_to_store_variable_data(FILEPtr fpsave)
   return 1;
 }
 
-void read_skill(Character *ch, FILEPtr fpsave)
+void debug_file_info(FILEPtr fpsave)
 {
+  bool eof_state = feof(fpsave.get());
+  auto file_position = ftell(fpsave.get());
+  if (!fseek(fpsave.get(), 0L, SEEK_END))
+  {
+    qWarning("Unable to seek to end of file in read_skill");
+  }
+  auto file_maxposition = ftell(fpsave.get());
+  fseek(fpsave.get(), file_position, SEEK_SET);
+  logentry(u"file position=%1, maxfile position=%2, eof=%3"_s.arg(file_position).arg(file_maxposition).arg(eof_state));
+}
+
+bool read_skill(Character *ch, FILEPtr fpsave)
+{
+  if (!fpsave || !ch)
+    return false;
+
+  QFile file;
+  auto file_is_open = file.open(fpsave.get(), QIODevice::ReadOnly);
   char_skill_data curr = {};
 
-  if (dc_fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave) != 1)
+  if (auto count = dc_fread(&(curr.skillnum), sizeof(curr.skillnum), 1, fpsave); count != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
-    return;
+    logentry(QStringLiteral("Unable to read a skill from player file for %1 count of %2 != 1.").arg(GET_NAME(ch)).arg(count), IMMORTAL, DC::LogChannel::LOG_BUG);
+    debug_file_info(fpsave);
+    return false;
   }
 
-  if (dc_fread(&(curr.learned), sizeof(curr.learned), 1, fpsave) != 1)
+  if (auto count = dc_fread(&(curr.learned), sizeof(curr.learned), 1, fpsave); count != 1)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
-    return;
+    logentry(QStringLiteral("Unable to read a skill from player file for %1 count of %2 != 1.").arg(GET_NAME(ch)).arg(count), IMMORTAL, DC::LogChannel::LOG_BUG);
+    debug_file_info(fpsave);
+    return false;
   }
 
-  if (dc_fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave) != 5)
+  if (auto count = dc_fread(&(curr.unused), sizeof(curr.unused[0]), 5, fpsave); count != 5)
   {
-    logentry(QStringLiteral("Unable to read a skill from player file for %1.").arg(GET_NAME(ch)), IMMORTAL, DC::LogChannel::LOG_BUG);
-    return;
+    logentry(QStringLiteral("Unable to read a skill from player file for %1 count of %2 != 5.").arg(GET_NAME(ch)).arg(count), IMMORTAL, DC::LogChannel::LOG_BUG);
+    debug_file_info(fpsave);
+    return false;
   }
 
   //  The above line takes care of these four.  They are here for future use
@@ -755,11 +790,12 @@ void read_skill(Character *ch, FILEPtr fpsave)
   //  dc_fread(&(curr.unused[3]), sizeof(curr.unused[3]), 1, fpsave);
   //  dc_fread(&(curr.unused[4]), sizeof(curr.unused[4]), 1, fpsave);
   ch->skills[curr.skillnum] = curr;
+  return true;
 }
 
-int Character::store_to_char_variable_data(FILEPtr fpsave)
+bool Character::store_to_char_variable_data(FILEPtr fpsave)
 {
-  char typeflag[4];
+  char typeflag[4]{};
 
   this->setName(fread_var_string(fpsave));
   this->short_desc = fread_var_string(fpsave);
@@ -915,7 +951,7 @@ void Character::save_char_obj(void)
 
   if (getName().isEmpty())
   {
-    setName("Unknown");
+    setName(u"Unknown"_s);
   }
 
   // TODO - figure out a way for mob's to save...maybe <mastername>.pet ?
@@ -996,19 +1032,17 @@ void load_char_obj_error(FILEPtr fpsave, QString strsave)
 // Load a char and inventory into a new_new ch ure.
 load_status_t DC::load_char_obj(class Connection *d, QString name)
 {
+  if (name.isEmpty())
+    return load_status_t::bad_input;
+
   FILEPtr fpsave{};
   QString strsave;
   char_file_u4 uchar;
   class Object *last_cont = nullptr;
-  Character *ch;
 
-  if (name.isEmpty())
-    return load_status_t::bad_input;
   name[0] = name[0].toUpper();
 
-  ch = new Character(this);
-  auto &free_list = DC::getInstance()->free_list;
-  free_list.erase(ch);
+  auto ch = new Character(this);
 
   if (d->character)
   {
@@ -1016,7 +1050,6 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   }
 
   d->character = ch;
-  clear_char(ch);
   ch->desc = d;
 
   if (DC::getInstance()->cf.bport)
@@ -1045,9 +1078,9 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 
   reset_char(ch);
 
-  store_to_char(&uchar, ch);
-  ch->store_to_char_variable_data(fpsave);
-  if (!read_pc_or_mob_data(ch, fpsave, strsave))
+  ch->load(&uchar);
+  if (!ch->store_to_char_variable_data(fpsave) ||
+      !read_pc_or_mob_data(ch, fpsave, strsave))
   {
     return load_status_t::error;
   }
@@ -1059,7 +1092,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   }
 
   // stored names only matter for mobs
-  if (!ch->isNonPlayer())
+  if (ch->isPlayer())
   {
     ch->setName(name);
   }
@@ -1076,8 +1109,8 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont)
 {
   class Object *obj;
-  //  extra_descr_data *new_new_descr;
-  //  extra_descr_data *ed, *next_ed;
+  //  extra_descr_dataPtr new_new_descr;
+  //  extra_descr_dataPtr ed, *next_ed;
 
   int j;
   int nr;
@@ -1521,19 +1554,19 @@ bool put_obj_in_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear
     dc_fwrite(&length, sizeof(length), 1, fpsave);
     dc_fwrite(qPrintable(obj->Name()), sizeof(char), length, fpsave);
   }
-  if (obj->long_description && strcmp(obj->long_description, standard_obj->long_description))
+  if (!obj->long_description.isEmpty() && obj->long_description != standard_obj->long_description)
   {
     dc_fwrite("DES", sizeof(char), 3, fpsave);
-    length = strlen(obj->long_description);
+    length = obj->long_description.size();
     dc_fwrite(&length, sizeof(length), 1, fpsave);
-    dc_fwrite(obj->long_description, sizeof(char), length, fpsave);
+    dc_fwrite(qPrintable(obj->long_description), sizeof(char), length, fpsave);
   }
-  if (obj->short_description && strcmp(obj->short_description, standard_obj->short_description))
+  if (!obj->short_description.isEmpty() && obj->short_description != standard_obj->short_description)
   {
     dc_fwrite("SDE", sizeof(char), 3, fpsave);
-    length = strlen(obj->short_description);
+    length = obj->short_description.size();
     dc_fwrite(&length, sizeof(length), 1, fpsave);
-    dc_fwrite(obj->short_description, sizeof(char), length, fpsave);
+    dc_fwrite(qPrintable(obj->short_description), sizeof(char), length, fpsave);
   }
   if (!obj->ActionDescription().isEmpty() && obj->ActionDescription() != standard_obj->ActionDescription())
   {
@@ -1593,65 +1626,61 @@ void restore_weight(class Object *obj)
     GET_OBJ_WEIGHT(tmp) += GET_OBJ_WEIGHT(obj);
 }
 
-void donothin() {}
 // Read shared data from pfile
-void store_to_char(char_file_u4 *st, Character *ch)
+void Character::load(char_file_u4 *st)
 {
-  int i;
+  clan = st->clan;
 
-  ch->clan = st->clan;
+  sex = st->sex;
+  c_class = st->c_class;
+  race = st->race;
+  setLevel(st->level);
 
-  GET_SEX(ch) = st->sex;
-  GET_CLASS(ch) = st->c_class;
-  GET_RACE(ch) = st->race;
-  ch->setLevel(st->level);
+  hometown = st->hometown;
+  if (getLevel() < 11)
+    hometown = START_ROOM;
 
-  ch->hometown = st->hometown;
-  if (ch->getLevel() < 11)
-    ch->hometown = START_ROOM;
+  str = raw_str = st->raw_str;
+  intel = raw_intel = st->raw_intel;
+  wis = raw_wis = st->raw_wis;
+  dex = raw_dex = st->raw_dex;
+  con = raw_con = st->raw_con;
 
-  GET_STR(ch) = GET_RAW_STR(ch) = st->raw_str;
-  GET_INT(ch) = GET_RAW_INT(ch) = st->raw_intel;
-  GET_WIS(ch) = GET_RAW_WIS(ch) = st->raw_wis;
-  GET_DEX(ch) = GET_RAW_DEX(ch) = st->raw_dex;
-  GET_CON(ch) = GET_RAW_CON(ch) = st->raw_con;
+  weight = st->weight;
+  height = st->height;
+  setGold(st->gold);
+  plat = st->plat;
+  exp = st->exp;
+  immune = st->immune;
+  resist = st->resist;
+  suscept = st->suscept;
 
-  ch->weight = st->weight;
-  ch->height = st->height;
-  ch->setGold(st->gold);
-  ch->plat = st->plat;
-  ch->exp = st->exp;
-  ch->immune = st->immune;
-  ch->resist = st->resist;
-  ch->suscept = st->suscept;
-
-  ch->setHP(st->hit);
-  GET_RAW_HIT(ch) = st->raw_hit;
-  GET_MANA(ch) = st->mana;
-  GET_RAW_MANA(ch) = st->raw_mana;
+  setHP(st->hit);
+  raw_hit = st->raw_hit;
+  mana = st->mana;
+  raw_mana = st->raw_mana;
 
   // since move and ki don't get "redone" with stat bonuses we need to set the max here
-  ch->setMove(st->move);
-  ch->max_move = GET_RAW_MOVE(ch) = st->raw_move;
-  GET_KI(ch) = st->ki;
-  GET_RAW_KI(ch) = st->raw_ki;
+  setMove(st->move);
+  max_move = raw_move = st->raw_move;
+  ki = st->ki;
+  raw_ki = st->raw_ki;
 
-  ch->alignment = st->alignment;
-  ch->misc = st->misc;
+  alignment = st->alignment;
+  misc = st->misc;
 
-  GET_HP_METAS(ch) = st->hpmetas;
-  GET_MANA_METAS(ch) = st->manametas;
-  GET_MOVE_METAS(ch) = st->movemetas;
-  GET_AC_METAS(ch) = st->acmetas;
-  GET_AGE_METAS(ch) = st->agemetas;
+  hpmetas = st->hpmetas;
+  manametas = st->manametas;
+  movemetas = st->movemetas;
+  acmetas = st->acmetas;
+  agemetas = st->agemetas;
 
-  ch->armor = st->armor;
-  ch->hitroll = st->hitroll;
-  ch->damroll = st->damroll;
-  donothin();
+  armor = st->armor;
+  hitroll = st->hitroll;
+  damroll = st->damroll;
 
-  ch->affected_by[0] = st->afected_by;
-  ch->affected_by[1] = st->afected_by2;
+  affected_by[0] = st->afected_by;
+  affected_by[1] = st->afected_by2;
 
   /*    i = 0;
       while(st->afected_by[i] != -1) {
@@ -1660,19 +1689,19 @@ void store_to_char(char_file_u4 *st, Character *ch)
       }
       st->afected_by[i] = -1;
   */
-  for (i = 0; i <= 2; i++)
-    GET_COND(ch, i) = st->conditions[i];
+  for (auto i = 0; i <= 2; i++)
+    conditions[i] = st->conditions[i];
 
   // it's ok assigning the in_room directly since do_on_login_stuff() will
   // make the actual call to "char_to_room" using this data later
-  ch->in_room = real_room(st->load_room);
+  in_room = real_room(st->load_room);
 
-  if (ch->in_room == DC::NOWHERE)
+  if (in_room == DC::NOWHERE)
   {
-    if (ch->isImmortalPlayer())
-      ch->in_room = real_room(17);
+    if (isImmortalPlayer())
+      in_room = real_room(17);
     else
-      ch->in_room = real_room(START_ROOM);
+      in_room = real_room(START_ROOM);
   }
 }
 
@@ -1680,50 +1709,47 @@ void store_to_char(char_file_u4 *st, Character *ch)
 // return 'age' of character unmodified
 void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 {
-  int i;
-  int x;
-  affected_type *af;
-  class Object *char_eq[MAX_WEAR];
+  QVector<class Object *> char_eq(MAX_WEAR);
 
   // Remove all the eq and store it in temp storage
-  for (i = 0; i < MAX_WEAR; i++)
+  for (auto i = 0; i < char_eq.size(); ++i)
   {
     if (equipment[i])
       char_eq[i] = unequip_char(i, true);
     else
-      char_eq[i] = 0;
+      char_eq[i] = {};
   }
 
   // Unaffect everything a character can be affected by spell-wise
-  for (af = affected; af; af = af->next)
+  for (auto af = affected; af; af = af->next)
   {
     affect_modify(this, af->location, af->modifier, af->bitvector, false);
   }
 
-  st->sex = GET_SEX(this);
-  st->c_class = GET_CLASS(this);
-  st->race = GET_RACE(this);
+  st->sex = sex;
+  st->c_class = c_class;
+  st->race = race;
   st->level = getLevel();
 
-  st->raw_str = GET_RAW_STR(this);
-  st->raw_intel = GET_RAW_INT(this);
-  st->raw_wis = GET_RAW_WIS(this);
-  st->raw_dex = GET_RAW_DEX(this);
-  st->raw_con = GET_RAW_CON(this);
+  st->raw_str = raw_str;
+  st->raw_intel = raw_intel;
+  st->raw_wis = raw_wis;
+  st->raw_dex = raw_dex;
+  st->raw_con = raw_con;
 
-  st->mana = GET_MANA(this);
-  st->raw_mana = GET_RAW_MANA(this);
+  st->mana = mana;
+  st->raw_mana = raw_mana;
   st->hit = getHP();
-  st->raw_hit = GET_RAW_HIT(this);
-  st->move = GET_MOVE(this);
-  st->raw_move = GET_RAW_MOVE(this);
-  st->ki = GET_KI(this);
-  st->raw_ki = GET_RAW_KI(this);
+  st->raw_hit = raw_hit;
+  st->move = move_;
+  st->raw_move = raw_move;
+  st->ki = ki;
+  st->raw_ki = raw_ki;
 
-  st->weight = GET_WEIGHT(this);
-  st->height = GET_HEIGHT(this);
-  for (i = 0; i < 3; i++)
-    st->conditions[i] = GET_COND(this, i);
+  st->weight = weight;
+  st->height = height;
+  for (auto i = 0; i < 3; ++i)
+    st->conditions[i] = conditions[i];
 
   st->hometown = hometown;
 
@@ -1732,22 +1758,22 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 
   //  st->gold      = getGold();
   st->gold = 0; // Moved
-  st->plat = GET_PLATINUM(this);
-  st->exp = GET_EXP(this);
+  st->plat = plat;
+  st->exp = exp;
   st->immune = immune;
   st->resist = resist;
   st->suscept = suscept;
   st->alignment = alignment;
   st->misc = misc;
 
-  st->hpmetas = GET_HP_METAS(this);
-  st->manametas = GET_MANA_METAS(this);
-  st->movemetas = GET_MOVE_METAS(this);
+  st->hpmetas = hpmetas;
+  st->manametas = manametas;
+  st->movemetas = movemetas;
   st->clan = clan;
 
   // make sure rest of unused are set to 0
-  for (x = 0; x < 3; x++)
-    st->extra_ints[x] = 0;
+  for (auto i = 0; i < 3; ++i)
+    st->extra_ints[i] = {};
 
   if (this->isNonPlayer())
   {
@@ -1765,7 +1791,7 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
   }
   else
   {
-    switch (GET_CLASS(this))
+    switch (c_class)
     {
     case CLASS_MAGE:
       st->armor = 150;
@@ -1808,19 +1834,19 @@ void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
     st->damroll = 0;
     st->afected_by = 0;
     st->afected_by2 = 0;
-    st->acmetas = GET_AC_METAS(this);
-    st->agemetas = GET_AGE_METAS(this);
+    st->acmetas = acmetas;
+    st->agemetas = agemetas;
     tmpage = player->time;
   }
 
   // re-affect the character with spells
-  for (af = affected; af; af = af->next)
+  for (auto af = affected; af; af = af->next)
   {
     affect_modify(this, af->location, af->modifier, af->bitvector, true);
   }
 
   // re-equip the character with his eq
-  for (i = 0; i < MAX_WEAR; i++)
+  for (auto i = 0; i < MAX_WEAR; i++)
   {
     if (char_eq[i])
       equip_char(char_eq[i], i, 1);

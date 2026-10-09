@@ -47,68 +47,67 @@ std::queue<QString> auction_history;
 std::queue<QString> newbie_history;
 std::queue<QString> trivia_history;
 
-command_return_t do_say(Character *ch, std::string argument, cmd_t cmd)
+command_return_t Character::do_say(QString arguments, cmd_t cmd)
 {
-  int i;
-  std::string buf;
-  int retval;
+  return do_say(arguments.split(' '), cmd);
+}
+
+command_return_t Character::do_say(QStringList arguments, cmd_t cmd)
+{
   extern bool MOBtrigger;
 
-  if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
+  if (!isNonPlayer() && isSet(player->punish, PUNISH_STUPID))
   {
-    ch->sendln("You try to speak but just look like an idiot!");
+    sendln("You try to speak but just look like an idiot!");
     return ReturnValue::eSUCCESS;
   }
 
-  if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
+  if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
-    ch->sendln("SHHHHHH!! Can't you see people are trying to read?");
+    sendln("SHHHHHH!! Can't you see people are trying to read?");
     return ReturnValue::eSUCCESS;
   }
 
-  Object *tmp_obj;
-  for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
+  for (auto tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
-      ch->sendln("The magical silence prevents you from speaking!");
+      sendln("The magical silence prevents you from speaking!");
       return ReturnValue::eFAILURE;
     }
 
-  argument = ltrim(argument);
-
-  if (argument.empty())
-    ch->sendln("Yes, but WHAT do you want to say?");
+  if (arguments.isEmpty())
+    sendln("Yes, but WHAT do you want to say?");
   else
   {
-    if (ch->isPlayer())
+    if (isPlayer())
       MOBtrigger = false;
 
-    if (IS_IMMORTAL(ch))
+    if (IS_IMMORTAL(this))
     {
-      argument = remove_all_codes(argument);
+      arguments = remove_all_codes(arguments.join(' ')).split(' ');
     }
 
-    buf = fmt::format("$B$7$n says '{}$B$7'$R", argument.c_str());
-    act(buf, ch, 0, 0, TO_ROOM, 0);
+    auto buf = u"$B$7$n says '%1$B$7'$R"_s.arg(arguments.join(' '));
+    act(buf, this, 0, 0, TO_ROOM, 0);
 
-    if (ch->isPlayer())
+    if (isPlayer())
       MOBtrigger = false;
 
-    buf = fmt::format("$B$7You say '{}$B$7'$R", argument.c_str());
-    act(buf, ch, 0, 0, TO_CHAR, 0);
+    buf = u"$B$7You say '%1$B$7'$R"_s.arg(arguments.join(' '));
+    act(buf, this, 0, 0, TO_CHAR, 0);
 
-    if (ch->isPlayer())
+    if (isPlayer())
     {
       MOBtrigger = true;
-      retval = ch->mprog_speech_trigger(argument.c_str());
+      auto retval = mprog_speech_trigger(qPrintable(arguments.join(' ')));
       if (SOMEONE_DIED(retval))
         return SWAP_CH_VICT(retval);
     }
 
-    if (ch->isPlayer())
+    if (isPlayer())
     {
       MOBtrigger = true;
-      retval = ch->oprog_speech_trigger(argument.c_str());
+      auto retval = oprog_speech_trigger(qPrintable(arguments.join(' ')));
       if (SOMEONE_DIED(retval))
         return SWAP_CH_VICT(retval);
     }
@@ -264,7 +263,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isNonPlayer() && ch->master)
   {
-    do_say(ch, "Why don't you just do that yourself!");
+    ch->do_say(QStringList(u"Why don't you just do that yourself!"_s));
     return ReturnValue::eSUCCESS;
   }
 
@@ -376,7 +375,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 
   if (this->isNonPlayer() && this->master)
   {
-    do_say(this, "That's okay, I'll let you do all the auctioning, master.");
+    do_say(QStringList(u"That's okay, I'll let you do all the auctioning, master."_s));
     return ReturnValue::eSUCCESS;
   }
 
@@ -473,7 +472,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isNonPlayer() && ch->master)
   {
-    return do_say(ch, "Shouting makes my throat hoarse.");
+    return ch->do_say(QStringList(u"Shouting makes my throat hoarse."_s));
   }
 
   if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
@@ -550,7 +549,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isNonPlayer() && ch->master)
   {
-    return do_say(ch, "Why don't you just do that yourself!");
+    return ch->do_say("Why don't you just do that yourself!");
   }
 
   if (ch->isPlayer())
@@ -644,7 +643,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isNonPlayer() && ch->master)
   {
-    do_say(ch, "Why don't you just do that yourself!");
+    ch->do_say("Why don't you just do that yourself!");
     return ReturnValue::eSUCCESS;
   }
   if (ch->isPlayer())
@@ -1212,7 +1211,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->isNonPlayer() && ch->master)
   {
-    return do_say(ch, "Why don't you just do that yourself!");
+    return ch->do_say("Why don't you just do that yourself!");
   }
 
   if (ch->isPlayer())

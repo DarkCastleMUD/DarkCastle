@@ -114,17 +114,17 @@ extern selfpurge_t selfpurge;
 class race_data
 {
 public:
-  char *singular_name;        /* Dwarf, Elf, etc.     */
-  std::string lowercase_name; /* dwarf, elf, etc.     */
-  char *plural_name;          /* dwarves, elves, etc. */
-  bool playable;              /* Can a player play as this race? */
-  int32_t body_parts;         /* bitvector for body parts       */
-  int32_t immune;             /* bitvector for immunities       */
-  int32_t resist;             /* bitvector for resistances      */
-  int32_t suscept;            /* bitvector for susceptibilities */
-  int32_t hate_fear;          /* bitvector for hate/fear        */
-  int32_t friendly;           /* bitvector for friendliness     */
-  int min_weight;             /* min weight */
+  char *singular_name;    /* Dwarf, Elf, etc.     */
+  QString lowercase_name; /* dwarf, elf, etc.     */
+  char *plural_name;      /* dwarves, elves, etc. */
+  bool playable;          /* Can a player play as this race? */
+  int32_t body_parts;     /* bitvector for body parts       */
+  int32_t immune;         /* bitvector for immunities       */
+  int32_t resist;         /* bitvector for resistances      */
+  int32_t suscept;        /* bitvector for susceptibilities */
+  int32_t hate_fear;      /* bitvector for hate/fear        */
+  int32_t friendly;       /* bitvector for friendliness     */
+  int min_weight;         /* min weight */
   int max_weight;
 
   int min_height;
@@ -166,7 +166,7 @@ public:
 };
 
 void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
-                     char ***valstr, int64_t **vali64, quint64 **valui64, int8_t **valb, Character *mob, Character *actor,
+                     QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb, Character *mob, Character *actor,
                      Object *obj, void *vo, Character *rndm, QString &valqstr);
 
 void save_golem_data(Character *ch);

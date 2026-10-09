@@ -50,10 +50,10 @@ class sorted_vault
 {
 public:
   // This stores the quantity of each item found in a vault
-  std::map<std::string, std::pair<Object *, uint32_t>> vault_content_qty{};
+  QMap<QString, std::pair<Object *, uint32_t>> vault_content_qty{};
 
   // This stores the order in which vault items are found
-  std::vector<std::string> vault_contents{};
+  QList<QString> vault_contents{};
 
   unsigned int weight{};
 };

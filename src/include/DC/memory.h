@@ -1,5 +1,4 @@
-#ifndef MEMORY_H_
-#define MEMORY_H_
+#pragma once
 /************************************************************************
 | $Id: memory.h,v 1.3 2002/07/28 02:04:19 pirahna Exp $
 | memory.h
@@ -10,8 +9,5 @@
 #include <cstdlib>
 
 void *dc_alloc(size_t nmemb, size_t size);
-void *dc_realloc(void * oldptr, size_t size);
-void *dc_free(void * ptr);
-
-
-#endif /* MEMORY_H_ */
+void *dc_realloc(void *oldptr, size_t size);
+void *dc_free(void *ptr);

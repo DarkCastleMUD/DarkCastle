@@ -43,6 +43,7 @@ send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, vo
 
 void send_message(const char *str, Character *to);
 void send_message(QString str, Character *to);
+void send_message(QByteArray str, Character *to);
 //--
 // Constants
 //--

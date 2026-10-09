@@ -653,7 +653,7 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
 
       if (tmp_char->fighting)
       {
-        do_say(tmp_char, "Screw this! I'm going home!");
+        tmp_char->do_say("Screw this! I'm going home!");
         if (tmp_char->fighting->fighting == tmp_char)
           stop_fighting(tmp_char->fighting);
 
@@ -1523,7 +1523,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
         victim = pal;
       }
       else
-        csendf(pal, "You sense your desecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
+        csendf(pal, "You sense your desecration of %s has been destroyed!", qPrintable(DC::getInstance()->world[obj->in_room].name));
     }
     ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has been destroyed!");
     act("The runes upon the ground shatter with a burst of magic!\r\n$n has destroyed the unholy desecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -1572,7 +1572,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
         victim = pal;
       }
       else
-        csendf(pal, "You sense your consecration of %s has been destroyed!", DC::getInstance()->world[obj->in_room].name);
+        csendf(pal, "You sense your consecration of %s has been destroyed!", qPrintable(DC::getInstance()->world[obj->in_room].name));
     }
     ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration has been destroyed!");
     act("Runes upon the ground glow brightly, then fade to nothing.\r\n$n has destroyed the holy consecration here!", ch, 0, victim, TO_ROOM, NOTVICT);
@@ -3134,23 +3134,19 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
     {
       if (i->carried_by)
       {
-        sprintf(buf, "%s carried by %s.\r\n", i->short_description,
-                PERS(i->carried_by, ch));
+        sprintf(buf, "%s carried by %s.\r\n", qPrintable(i->short_description), PERS(i->carried_by, ch));
       }
       else if (i->in_obj)
       {
-        sprintf(buf, "%s is in %s.\r\n", i->short_description,
-                i->in_obj->short_description);
+        sprintf(buf, "%s is in %s.\r\n", qPrintable(i->short_description), qPrintable(i->in_obj->short_description));
       }
       else if (i->in_room != DC::NOWHERE)
       {
-        sprintf(buf, "%s is in %s.\r\n", i->short_description,
-                DC::getInstance()->world[i->in_room].name);
+        sprintf(buf, "%s is in %s.\r\n", qPrintable(i->short_description), qPrintable(DC::getInstance()->world[i->in_room].name));
       }
       else if (i->equipped_by != nullptr)
       {
-        sprintf(buf, "%s is equipped by someone.\r\n",
-                i->short_description);
+        sprintf(buf, "%s is equipped by someone.\r\n", qPrintable(i->short_description));
       }
       else
       {

@@ -136,15 +136,15 @@ private:
 class clan_data
 {
 public:
-  char *leader;
-  char *founder;
-  char *name;
-  char *email;
-  char *description;
-  char *login_message;
-  char *death_message;
-  char *logout_message;
-  char *clanmotd;
+  QString leader;
+  QString founder;
+  QString name;
+  QString email;
+  QString description;
+  QString login_message;
+  QString death_message;
+  QString logout_message;
+  QString clanmotd;
   uint16_t tax;
   uint16_t number;
   uint16_t amt;
@@ -175,9 +175,9 @@ void clan_logout(Character *ch);
 int has_right(Character *ch, uint32_t bit);
 clan_data *get_clan(int nClan);
 clan_data *get_clan(Character *ch);
-char *get_clan_name(int nClan);
-char *get_clan_name(Character *ch);
-char *get_clan_name(clan_data *clan);
+QString get_clan_name(int nClan);
+QString get_clan_name(Character *ch);
+QString get_clan_name(clan_data *clan);
 void save_clans();
 int plr_rights(Character *ch);
 void add_clan(clan_data *new_new_clan);

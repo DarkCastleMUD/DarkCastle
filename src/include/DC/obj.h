@@ -20,6 +20,7 @@
 #include <qcontainerfwd.h>
 #include <qflags.h>
 #include <qlist.h>
+#include <qsharedpointer.h>
 #include <qstring.h>
 #include <qtmetamacros.h>
 #include <qtypes.h>
@@ -34,7 +35,6 @@
 #include "DC/room.h"
 
 class Character;
-class extra_descr_data;
 class table_data;
 
 /* The following defs are for Object  */
@@ -331,11 +331,11 @@ public:
     return true;
   }
 
-  char *long_description = {};           /* When in room                     */
-  char *short_description = {};          /* when worn/carry/in cont.         */
-  extra_descr_data *ex_description = {}; /* extra descriptions     */
-  Character *carried_by = {};            /* Carried by :NULL in room/conta   */
-  Character *equipped_by = {};           /* so I can access the player :)    */
+  QString long_description = {};          /* When in room                     */
+  QString short_description = {};         /* when worn/carry/in cont.         */
+  ex_descriptions_t ex_descriptions = {}; /* extra descriptions     */
+  Character *carried_by = {};             /* Carried by :NULL in room/conta   */
+  Character *equipped_by = {};            /* so I can access the player :)    */
 
   Object *in_obj = {};   /* In what object NULL when none    */
   Object *contains = {}; /* Contains objects                 */

@@ -86,7 +86,7 @@ int load_debug = 0;
 #include "DC/mobile.h"
 #include "DC/room.h"
 #include "DC/race.h"
-#include "DC/DC.h"          // extra_descr_data
+#include "DC/DC.h"
 #include "DC/handler.h"     // get_obj_num
 #include "DC/connect.h"     // Connection
 #include "DC/game_portal.h" // load_game_portals()
@@ -125,8 +125,7 @@ Room &World::operator[](room_t room_key)
 #ifndef SEEK_CUR
 #define SEEK_CUR 1
 #endif
-message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
-skill_quest *skill_list;                   // List of skill quests.
+skill_quest *skill_list; // List of skill quests.
 
 char webpage[MAX_STRING_LENGTH];    /* the webbrowser connect screen*/
 char greetings1[MAX_STRING_LENGTH]; /* the greeting screen          */
@@ -168,7 +167,6 @@ QString read_next_worldfile_name(FILEPtr stream);
 void fix_shopkeepers_inventory();
 int file_to_string(const char *name, char *buf);
 void reset_time(void);
-void clear_char(Character *ch);
 
 // MOBprogram locals
 int mprog_name_to_type(QString name);
@@ -260,25 +258,6 @@ bool operator==(const deny_data &dd1, const deny_data &dd2)
   return denies1 == denies2;
 }
 
-bool operator==(extra_descr_data &edd1, extra_descr_data &edd2)
-{
-  QMap<QString, QString> extra_descriptions1;
-  extra_descr_data *curr1 = &edd1;
-  do
-  {
-    extra_descriptions1.insert(curr1->keyword, curr1->description);
-  } while ((curr1 = curr1->next));
-
-  QMap<QString, QString> extra_descriptions2;
-  extra_descr_data *curr2 = &edd2;
-  do
-  {
-    extra_descriptions2.insert(curr2->keyword, curr2->description);
-  } while ((curr2 = curr2->next));
-
-  return extra_descriptions1 == extra_descriptions2;
-}
-
 bool operator==(const room_direction_data &rdd1, const room_direction_data &rdd2)
 {
   return (rdd1.bracee == rdd2.bracee &&
@@ -314,7 +293,7 @@ bool operator==(const Room &r1, const Room &r2)
           r1.denied == r2.denied &&
           QString(r1.name) == QString(r2.name) &&
           QString(r1.description) == QString(r2.description) &&
-          r1.ex_description == r2.ex_description &&
+          r1.ex_descriptions == r2.ex_descriptions &&
           r1.room_flags == r2.room_flags &&
           r1.temp_room_flags == r2.temp_room_flags &&
           r1.light == r2.light &&
@@ -510,7 +489,7 @@ int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
   }
   for (curr = skill_list; curr; curr = curr->next)
   {
-    dc_fprintf(fl, "%d %s~\n", curr->num, curr->message);
+    dc_fprintf(fl, "%d %s~\n", curr->num, qPrintable(curr->message));
     dc_fprintf(fl, "%d %d\n", curr->clas, curr->level);
   }
   dc_fprintf(fl, "0\n");
@@ -1212,8 +1191,6 @@ void DC::remove_all_objs_from_world()
 void write_one_room(LegacyFile &lf, int a)
 {
   FILEPtr f = lf.file_handle_;
-  extra_descr_data *extra;
-
   if (!DC::getInstance()->rooms.contains(a))
     return;
 
@@ -1233,7 +1210,7 @@ void write_one_room(LegacyFile &lf, int a)
     if (!(DC::getInstance()->world[a].dir_option[b]))
       continue;
     dc_fprintf(f, "D%d\n", b);
-    if (DC::getInstance()->world[a].dir_option[b]->general_description)
+    if (!DC::getInstance()->world[a].dir_option[b]->general_description.isEmpty())
       string_to_file(f, DC::getInstance()->world[a].dir_option[b]->general_description);
     else
       dc_fprintf(f, "~\n"); // print blank
@@ -1247,26 +1224,15 @@ void write_one_room(LegacyFile &lf, int a)
                DC::getInstance()->world[a].dir_option[b]->to_room);
   } /* exits */
 
-  /* extra descriptions */
-  // We push C-style linked list into QStack so we can maintain the order when writing
-  QStack<extra_descr_data *> room_extra_descriptions;
-  for (extra = DC::getInstance()->world[a].ex_description; extra; extra = extra->next)
+  for (const auto &[keyword, description] : DC::getInstance()->world[a].ex_descriptions.asKeyValueRange())
   {
-    room_extra_descriptions.push(extra);
-  }
-
-  while (!room_extra_descriptions.isEmpty())
-  {
-    extra = room_extra_descriptions.pop();
-    if (!extra)
-      break;
     dc_fprintf(f, "E\n");
-    if (extra->keyword)
-      string_to_file(f, extra->keyword);
+    if (!keyword.isEmpty())
+      string_to_file(f, keyword);
     else
       dc_fprintf(f, "~\n"); // print blank
-    if (extra->description)
-      string_to_file(f, extra->description);
+    if (!description.isEmpty())
+      string_to_file(f, description);
     else
       dc_fprintf(f, "~\n"); // print blank
   } /* extra descriptions */
@@ -1293,7 +1259,6 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
   char *temp = nullptr;
   char ch = 0;
   int dir = 0;
-  extra_descr_data *new_new_descr{};
   zone_t zone_nr = {};
 
   ch = fread_char(fl);
@@ -1302,7 +1267,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
   if (ch != '$')
   {
     room_nr = fread_int(fl, 0, 1000000);
-    world_file_list_item->vnums_[room_nr] = true;
+    world_file_list_item->enableVNUM(room_nr);
 
     if (load_debug)
     {
@@ -1419,7 +1384,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       for (size_t tmp = 0; tmp <= 5; tmp++)
         DC::getInstance()->world[room_nr].dir_option[tmp] = 0;
 
-      DC::getInstance()->world[room_nr].ex_description = 0;
+      DC::getInstance()->world[room_nr].ex_descriptions = {};
     }
 
     for (;;)
@@ -1438,18 +1403,12 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
         // strip off the \n after the E
         if (fread_char(fl) != '\n')
           dc_fseek(fl, -1, SEEK_CUR);
-        new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
-        new_new_descr->keyword = fread_string(fl, 0);
-        new_new_descr->description = fread_string(fl, 0);
+        auto keyword = fread_string(fl, 0);
+        auto description = fread_string(fl, 0);
 
         if (room_nr)
         {
-          new_new_descr->next = DC::getInstance()->world[room_nr].ex_description;
-          DC::getInstance()->world[room_nr].ex_description = new_new_descr;
-        }
-        else
-        {
-          dc_free(new_new_descr);
+          DC::getInstance()->world[room_nr].ex_descriptions[keyword] = description;
         }
       }
       else if (ch == 'B')
@@ -1603,7 +1562,7 @@ auto DC::findWorldFileWithVNUM(vnum_t vnum) -> std::expected<world_file_list_ite
 void DC::set_zone_modified(vnum_t vnum, world_file_list_t &list)
 {
   auto it = std::find_if(list.begin(), list.end(), [vnum](auto &entry)
-                         { return entry->vnums_.contains(vnum) && entry->vnums_[vnum]; });
+                         { return entry->vnums().contains(vnum) && entry->vnums()[vnum]; });
 
   if (it == list.end())
   {
@@ -1626,7 +1585,6 @@ void DC::set_zone_modified_mob(vnum_t vnum)
     SET_BIT(mob_index[vnum].source->flags, WORLD_FILE_MODIFIED);
 }
 
-// rnum of mob
 void DC::set_zone_modified_obj(vnum_t vnum)
 {
   set_zone_modified(vnum, obj_file_list);
@@ -1635,7 +1593,7 @@ void DC::set_zone_modified_obj(vnum_t vnum)
 void DC::set_zone_saved(room_t room, world_file_list_t &list)
 {
   auto it = std::find_if(list.begin(), list.end(), [room](auto &entry)
-                         { return entry->vnums_.contains(room) && entry->vnums_[room]; });
+                         { return entry->vnums().contains(room) && entry->vnums()[room]; });
 
   if (it == list.end())
   {
@@ -1664,30 +1622,11 @@ void DC::set_zone_saved_obj(vnum_t vnum)
 /* de the world */
 void DC::free_world_from_memory(void)
 {
-  extra_descr_data *curr_extra = nullptr;
   for (auto &i : rooms.keys())
   {
-    if (world[i].name)
-      dc_free(world[i].name);
-
-    if (world[i].description)
-      dc_free(world[i].description);
-
-    while (world[i].ex_description)
-    {
-      curr_extra = world[i].ex_description->next;
-      if (world[i].ex_description->keyword)
-        dc_free(world[i].ex_description->keyword);
-      if (world[i].ex_description->description)
-        dc_free(world[i].ex_description->description);
-      dc_free(world[i].ex_description);
-      world[i].ex_description = curr_extra;
-    }
-
     for (int j = 0; j < 6; j++)
       if (world[i].dir_option[j])
       {
-        dc_free(world[i].dir_option[j]->general_description);
         dc_free(world[i].dir_option[j]->keyword);
         dc_free(world[i].dir_option[j]);
       }
@@ -1789,8 +1728,6 @@ void setup_dir(FILEPtr fl, room_t room, int dir)
     char buf[200];
     sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
     logentry(buf, 0, DC::LogChannel::LOG_WORLD);
-    if (DC::getInstance()->world[room].dir_option[dir]->general_description)
-      dc_free(DC::getInstance()->world[room].dir_option[dir]->general_description);
     if (DC::getInstance()->world[room].dir_option[dir]->keyword)
       dc_free(DC::getInstance()->world[room].dir_option[dir]->keyword);
 
@@ -1876,7 +1813,7 @@ int DC::create_one_room(Character *ch, int vnum)
   rp->sector_type = 0;
   rp->room_flags = 0;
   rp->temp_room_flags = 0;
-  rp->ex_description = 0;
+  rp->ex_descriptions = {};
   for (x = 0; x <= 5; x++)
     rp->dir_option[x] = 0;
   rp->light = 0;
@@ -1885,9 +1822,8 @@ int DC::create_one_room(Character *ch, int vnum)
   rp->nTracks = 0;
   rp->tracks = 0;
   rp->last_track = 0;
-  sprintf(buf, "Room %d", vnum);
-  rp->name = (char *)str_dup(buf);
-  rp->description = (char *)str_dup("Empty description.\r\n");
+  rp->name = u"Room %1"_s.arg(vnum);
+  rp->description = u"Empty description.\r\n"_s;
   return 1;
 }
 
@@ -2315,10 +2251,6 @@ Character *DC::read_mobile(int nr, FILEPtr fl)
   i = nr;
 
   mob = new Character(this);
-  auto &free_list = DC::getInstance()->free_list;
-  free_list.erase(mob);
-
-  clear_char(mob);
   GET_RACE(mob) = 0;
 
   /***** String data *** */
@@ -2463,7 +2395,7 @@ Character *DC::read_mobile(int nr, FILEPtr fl)
     case 'S':
       break;
     default:
-      sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", mob->short_desc);
+      sprintf(buf, "Mob %s: Invalid additional flag.  (Class, S, etc)", qPrintable(mob->short_desc));
       logentry(buf, 0, DC::LogChannel::LOG_BUG);
       break;
     }
@@ -2517,19 +2449,17 @@ Character *DC::read_mobile(int nr, FILEPtr fl)
 // we write them recursively so they read in properly
 void write_mprog_recur(FILEPtr fl, mob_prog_data *mprg, bool mob)
 {
-  char *mprog_type_to_name(int type);
-
   if (mprg->next)
     write_mprog_recur(fl, mprg->next, mob);
   if (mob)
     dc_fprintf(fl, ">%s ", mprog_type_to_name(mprg->type));
   else
     dc_fprintf(fl, "\\%s ", mprog_type_to_name(mprg->type));
-  if (mprg->arglist)
+  if (!mprg->arglist.isEmpty())
     string_to_file(fl, mprg->arglist);
   else
     string_to_file(fl, "Saved During Edit");
-  if (mprg->comlist)
+  if (!mprg->comlist.isEmpty())
     string_to_file(fl, mprg->comlist);
   else
     string_to_file(fl, "Saved During Edit");
@@ -2987,10 +2917,6 @@ Character *DC::clone_mobile(int nr)
     return 0;
 
   mob = new Character(this);
-  auto &free_list = DC::getInstance()->free_list;
-  free_list.erase(mob);
-
-  clear_char(mob);
   old = DC::getInstance()->mob_index[nr].mob;
 
   *mob = *old;
@@ -3070,7 +2996,7 @@ auto DC::create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>
   obj->in_obj = 0;
   obj->contains = 0;
   obj->vnum_ = vnum;
-  obj->ex_description = 0;
+  obj->ex_descriptions = {};
 
   // insert
   DC::getInstance()->obj_index[vnum].vnum(vnum);
@@ -3089,7 +3015,6 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
 
   auto mob = new Character(this);
 
-  clear_char(mob);
   reset_char(mob);
   mob->setName("empty mob");
   mob->short_desc = str_hsh("an empty mob");
@@ -3244,9 +3169,9 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
 
   qDebug("%s", qPrintable(QStringLiteral("Object name: %1").arg(obj->Name())));
   obj->short_description = fread_string(fl, 1);
-  if (strlen(obj->short_description) >= MAX_OBJ_SDESC_LENGTH)
+  if (obj->short_description.size() >= MAX_OBJ_SDESC_LENGTH)
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_BUG, "read_object: vnum %d short_description too long.", DC::getInstance()->obj_index[nr].vnum());
+    logf(IMMORTAL, DC::LogChannel::LOG_BUG, u"read_object: vnum %1 short_description too long (%2 vs %3)."_s.arg(obj_index[nr].vnum()).arg(obj->short_description.size()).arg(MAX_OBJ_SDESC_LENGTH));
   }
 
   obj->long_description = fread_string(fl, 1);
@@ -3279,7 +3204,7 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
   /* currently not stored in object file */
   obj->obj_flags.timer = 0;
 
-  obj->ex_description = nullptr;
+  obj->ex_descriptions = {};
   obj->affected = nullptr;
   obj->num_affects = 0;
   /* *** other flags *** */
@@ -3293,28 +3218,26 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
   fl >> chk >> Qt::ws;
   qDebugQTextStreamLine(fl, "read_object(), after fl >> chk >> Qt::ws");
   qDebug() << "First chk " << chk;
-  extra_descr_data *new_new_descr{};
   qint64 current_pos{};
   QString current_line{};
   while (!chk.isEmpty() && chk != "S")
   {
     bool ok = false;
+    QString keyword, description;
     switch (chk[0].toLatin1())
     {
     case 'E':
       qDebugQTextStreamLine(fl, "Type E before first fread_string");
-      new_new_descr = new extra_descr_data;
 
-      new_new_descr->keyword = fread_string(fl, 1);
+      keyword = fread_string(fl, 1);
 
       qDebugQTextStreamLine(fl, "Type E before second fread_string");
 
-      new_new_descr->description = fread_string(fl, 1);
+      description = fread_string(fl, 1);
 
       qDebugQTextStreamLine(fl, "Type E after second fread_string");
 
-      new_new_descr->next = obj->ex_description;
-      obj->ex_description = new_new_descr;
+      obj->ex_descriptions[keyword] = description;
       break;
 
     case '\\':
@@ -3376,8 +3299,6 @@ class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
   int loc, mod;
 
   char chk;
-  extra_descr_data *new_new_descr;
-
   if (nr < 0)
   {
     return 0;
@@ -3441,7 +3362,7 @@ class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
   /* currently not stored in object file */
   obj->obj_flags.timer = 0;
 
-  obj->ex_description = nullptr;
+  obj->ex_descriptions = {};
   obj->affected = nullptr;
   obj->num_affects = 0;
   /* *** other flags *** */
@@ -3450,6 +3371,7 @@ class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
   char log_buf[MAX_STRING_LENGTH] = {};
   while (chk != 'S')
   {
+    QString keyword, description;
     switch (chk)
     {
     // skip whitespace
@@ -3457,15 +3379,9 @@ class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
     case '\n':
       break;
     case 'E':
-#ifdef LEAK_CHECK
-      new_new_descr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-#else
-      new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
-#endif
-      new_new_descr->keyword = fread_string(fl, 1);
-      new_new_descr->description = fread_string(fl, 1);
-      new_new_descr->next = obj->ex_description;
-      obj->ex_description = new_new_descr;
+      keyword = fread_string(fl, 1);
+      description = fread_string(fl, 1);
+      obj->ex_descriptions[keyword] = description;
       break;
 
     case '\\':
@@ -3524,8 +3440,6 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
   int loc, mod, nr;
 
   char chk, c;
-  extra_descr_data *new_new_descr;
-
   if (obj == nullptr)
   {
     return in;
@@ -3584,7 +3498,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
   // currently not stored in object file
   obj->obj_flags.timer = 0;
 
-  obj->ex_description = nullptr;
+  obj->ex_descriptions = {};
   obj->affected = nullptr;
   obj->num_affects = 0;
   // other flags
@@ -3594,6 +3508,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
   char log_buf[MAX_STRING_LENGTH] = {};
   while (chk != 'S')
   {
+    QString keyword, description;
     switch (chk)
     {
     // skip whitespace
@@ -3601,15 +3516,9 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
     case '\n':
       break;
     case 'E':
-#ifdef LEAK_CHECK
-      new_new_descr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-#else
-      new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
-#endif
-      new_new_descr->keyword = fread_string(in, 1);
-      new_new_descr->description = fread_string(in, 1);
-      new_new_descr->next = obj->ex_description;
-      obj->ex_description = new_new_descr;
+      keyword = fread_string(in, 1);
+      description = fread_string(in, 1);
+      obj->ex_descriptions[keyword] = description;
       break;
 
     case '\\':
@@ -3650,7 +3559,6 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 void write_object(LegacyFile &lf, Object *obj)
 {
   FILEPtr fl = lf.file_handle_;
-  extra_descr_data *currdesc;
 
   dc_fprintf(fl, "#%llu\n", obj->vnum_);
   string_to_file(fl, obj->Name());
@@ -3676,13 +3584,11 @@ void write_object(LegacyFile &lf, Object *obj)
              obj->obj_flags.cost,
              obj->obj_flags.more_flags);
 
-  currdesc = obj->ex_description;
-  while (currdesc)
+  for (const auto &[keyword, description] : obj->ex_descriptions.asKeyValueRange())
   {
     dc_fprintf(fl, "E\n");
-    string_to_file(fl, currdesc->keyword);
-    string_to_file(fl, currdesc->description);
-    currdesc = currdesc->next;
+    string_to_file(fl, keyword);
+    string_to_file(fl, description);
   }
 
   for (int i = 0; i < obj->num_affects; i++)
@@ -3723,13 +3629,11 @@ std::ofstream &operator<<(std::ofstream &out, Object *obj)
       << obj->obj_flags.cost << " "
       << obj->obj_flags.more_flags << "\n";
 
-  extra_descr_data *currdesc = obj->ex_description;
-  while (currdesc)
+  for (const auto &[keyword, description] : obj->ex_descriptions.asKeyValueRange())
   {
     out << "E\n";
-    string_to_file(out, currdesc->keyword);
-    string_to_file(out, currdesc->description);
-    currdesc = currdesc->next;
+    string_to_file(out, keyword);
+    string_to_file(out, description);
   }
 
   for (int i = 0; i < obj->num_affects; i++)
@@ -3766,6 +3670,18 @@ std::string quotequotes(std::string &s1)
   {
     s1.insert(pos, 1, '\"');
     pos = s1.find('\"', pos + 2);
+  }
+
+  return s1;
+}
+
+QString quotequotes(QString &s1)
+{
+  auto pos = s1.indexOf("\"");
+  while (pos != -1)
+  {
+    s1.insert(pos, '\"');
+    pos = s1.indexOf('\"', pos + 2);
   }
 
   return s1;
@@ -3907,15 +3823,7 @@ class Object *clone_object(int nr)
   }
 
   /* *** extra descriptions *** */
-  obj->ex_description = {};
-  for (auto descr = old->ex_description; descr; descr = descr->next)
-  {
-    auto new_new_descr = (extra_descr_data *)dc_alloc(1, sizeof(extra_descr_data));
-    new_new_descr->keyword = str_hsh(descr->keyword);
-    new_new_descr->description = str_hsh(descr->description);
-    new_new_descr->next = obj->ex_description;
-    obj->ex_description = new_new_descr;
-  }
+  obj->ex_descriptions = old->ex_descriptions;
 
   obj->affected = (obj_affected_type *)calloc(obj->num_affects, sizeof(obj_affected_type));
   for (int i = 0; i < obj->num_affects; i++)
@@ -5339,12 +5247,9 @@ void free_char(Character *ch, Trace trace)
 
   if (ch->isPlayer())
   {
-    if (ch->short_desc)
-      dc_free(ch->short_desc);
-    if (ch->long_desc)
-      dc_free(ch->long_desc);
-    if (ch->description)
-      dc_free(ch->description);
+    ch->short_desc = {};
+    ch->long_desc = {};
+    ch->description = {};
     if (ch->player)
     {
       // these won't be here if you free an unloaded char
@@ -5387,10 +5292,7 @@ void free_char(Character *ch, Trace trace)
   {
     // logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("free_char: '%1' is not PC or NPC").arg(GET_NAME(ch)).toStdString().c_str());
   }
-
-  if (ch->title)
-    dc_free(ch->title);
-  ch->title = nullptr;
+  ch->title = {};
 
   remove_memory(ch, 't');
 
@@ -5404,16 +5306,7 @@ void free_char(Character *ch, Trace trace)
 /* release memory allocated for an obj  */
 void free_obj(class Object *obj)
 {
-  extra_descr_data *ths, *next_one;
-
-  for (ths = obj->ex_description; ths; ths = next_one)
-  {
-    next_one = ths->next;
-    dc_free(ths);
-  }
-
   dc_free(obj->affected);
-
   delete obj;
 }
 
@@ -5553,23 +5446,6 @@ void reset_char(Character *ch)
   ch->guarded_by = 0;
 }
 
-/*
- * Clear but do not de-alloc.
- */
-void clear_char(Character *ch)
-{
-  if (ch == nullptr)
-  {
-    return;
-  }
-
-  *ch = Character(ch->getDC());
-  ch->in_room = DC::NOWHERE;
-  ch->setStanding();
-  GET_HOME(ch) = START_ROOM;
-  GET_AC(ch) = 100; /* Basic Armor */
-}
-
 void clear_object(class Object *obj)
 {
   if (obj == nullptr)
@@ -5589,7 +5465,7 @@ void clear_object(class Object *obj)
   obj->long_description = nullptr;
   obj->short_description = nullptr;
   obj->ActionDescription(QString());
-  obj->ex_description = nullptr;
+  obj->ex_descriptions = {};
   obj->carried_by = nullptr;
   obj->equipped_by = nullptr;
 
@@ -6044,7 +5920,6 @@ void string_to_file(QTextStream &fl, QString str)
 {
   fl << str.remove('\r') + "~\n";
 }
-
 void copySaveData(Object *target, Object *source)
 {
   int i;
@@ -6054,13 +5929,13 @@ void copySaveData(Object *target, Object *source)
       damage_eq_once(target);
   }
 
-  if (strcmp(GET_OBJ_SHORT(source), GET_OBJ_SHORT(target)))
+  if (GET_OBJ_SHORT(source) != GET_OBJ_SHORT(target))
   {
-    GET_OBJ_SHORT(target) = str_hsh(GET_OBJ_SHORT(source));
+    GET_OBJ_SHORT(target) = GET_OBJ_SHORT(source);
   }
-  if (strcmp(source->long_description, target->long_description))
+  if (source->long_description != target->long_description)
   {
-    target->long_description = str_hsh(source->long_description);
+    target->long_description = source->long_description;
   }
 
   if (source->Name() != target->Name())
@@ -6152,7 +6027,7 @@ void copySaveData(Object *target, Object *source)
 
 bool fullItemMatch(Object *obj, Object *obj2)
 {
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(obj2)))
+  if (GET_OBJ_SHORT(obj) != GET_OBJ_SHORT(obj2))
   {
     return false;
   }
@@ -6241,7 +6116,7 @@ bool verify_item(class Object **ptr_to_obj_ptr)
   if (!obj_template)
     return false;
 
-  if (!str_cmp(obj->short_description, obj_template->short_description))
+  if (obj->short_description == obj_template->short_description)
     return false;
 
   for (const auto &obj_index_entry : DC::getInstance()->obj_index)
@@ -6249,7 +6124,7 @@ bool verify_item(class Object **ptr_to_obj_ptr)
     if (!obj_index_entry.item)
       return false;
 
-    if (!str_cmp(obj->short_description, obj_index_entry.item->short_description))
+    if (obj->short_description == obj_index_entry.item->short_description)
     {
       *ptr_to_obj_ptr = clone_object(obj_index_entry.item->vnum_);
       return true;

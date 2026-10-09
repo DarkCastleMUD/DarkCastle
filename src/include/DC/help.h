@@ -1,4 +1,7 @@
 
+#pragma once
+#include <QString>
+
 #define READ_SIZE 256
 #define MAX_HELP_KEYWORD_LENGTH 20
 #define MAX_HELP_RELATED_LENGTH 60
@@ -12,7 +15,7 @@ public:
   char *keyword3;
   char *keyword4;
   char *keyword5;
-  char *entry;
+  QString entry;
   char *related;
   int min_level;
 };

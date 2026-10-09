@@ -312,8 +312,8 @@ bool Character::isTank(void)
   return false;
 }
 
-void translate_value(char *leftptr, char *rightptr, int16_t **vali,
-                     uint32_t **valui, char ***valstr, int64_t **vali64, quint64 **valui64, int8_t **valb,
+void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
+                     QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb,
                      Character *mob, Character *actor, Object *obj, void *vo,
                      Character *rndm, QString &valqstr)
 {
@@ -562,7 +562,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali,
   // more boring code. FUCK.
   int16_t *intval = nullptr;
   uint32_t *uintval = nullptr;
-  char **stringval = nullptr;
+  QString *stringval = nullptr;
   int64_t *llval = nullptr;
   quint64 *ullval = nullptr;
   int8_t *sbval = nullptr;
@@ -1440,7 +1440,6 @@ enum mprog_ifs
   eISDAYTIME,
   eISRAINING,
   eNUMOFOBJSINWORLD
-
 };
 
 std::map<std::string, mprog_ifs> load_ifchecks()
@@ -1679,7 +1678,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   int16_t *lvali = nullptr;
   uint32_t *lvalui = nullptr;
-  char **lvalstr = nullptr;
+  QString lval;
+  QString *lvalstr = &lval;
   QString lvalqstr;
   int64_t *lvali64 = nullptr;
   quint64 *lvalui64 = nullptr;
@@ -1714,7 +1714,8 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   {
     int16_t *rvali = nullptr;
     uint32_t *rvalui = nullptr;
-    char **rvalstr = nullptr;
+    QString rvalstr_buffer;
+    QString *rvalstr = &rvalstr_buffer;
     QString rvalqstr;
     int64_t *rvali64 = nullptr;
     quint64 *rvalui64 = nullptr;
@@ -1727,7 +1728,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
         return mob->mprog_seval(*lvalstr, opr, *rvalstr);
       // The rest fit in an int64_t, so let's just use that.
       if (rvalstr)
-        rval = atoi(*rvalstr);
+        rval = (*rvalstr).toInt();
       if (rvali)
         rval = *rvali;
       if (rvalui)
@@ -3345,12 +3346,12 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     break;
   case 'Z':
     if (mob->beacon)
-      strcpy(t, ((Character *)mob->beacon)->short_desc);
+      strcpy(t, qPrintable(((Character *)mob->beacon)->short_desc));
     else
       strcpy(t, "error");
     break;
   case 'I':
-    strcpy(t, mob->short_desc);
+    strcpy(t, qPrintable(mob->short_desc));
     break;
   case 'x':
     if (mob->beacon && ((Character *)mob->beacon)->fighting)
@@ -3376,12 +3377,12 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     if (actor)
       if (CAN_SEE(mob, actor))
         if (actor->isNonPlayer())
-          strcpy(t, actor->short_desc);
+          strcpy(t, qPrintable(actor->short_desc));
         else
         {
           strcpy(t, actor->getNameC());
           strcat(t, " ");
-          strcat(t, actor->title);
+          strcat(t, qPrintable(actor->title));
         }
       else
         strcpy(t, "someone");
@@ -3405,12 +3406,12 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
     if (vict)
       if (CAN_SEE(mob, vict))
         if (vict->isNonPlayer())
-          strcpy(t, vict->short_desc);
+          strcpy(t, qPrintable(vict->short_desc));
         else
         {
           strcpy(t, vict->getNameC());
           strcat(t, " ");
-          strcat(t, vict->title);
+          strcat(t, qPrintable(vict->title));
         }
       else
         strcpy(t, "someone");
@@ -3433,12 +3434,12 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
       if (CAN_SEE(mob, actor->fighting))
       {
         if (actor->fighting->isNonPlayer())
-          strcpy(t, actor->fighting->short_desc);
+          strcpy(t, qPrintable(actor->fighting->short_desc));
         else
         {
           strcpy(t, actor->fighting->getNameC());
           strcat(t, " ");
-          strcat(t, actor->fighting->title);
+          strcat(t, qPrintable(actor->fighting->title));
         }
       }
     }
@@ -3458,12 +3459,12 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
       if (CAN_SEE(mob, mob->fighting))
       {
         if (mob->fighting->isNonPlayer())
-          strcpy(t, mob->fighting->short_desc);
+          strcpy(t, qPrintable(mob->fighting->short_desc));
         else
         {
           strcpy(t, mob->fighting->getNameC());
           strcat(t, " ");
-          strcat(t, mob->fighting->title);
+          strcat(t, qPrintable(mob->fighting->title));
         }
       }
     }
@@ -3485,13 +3486,13 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
       {
         if (rndm->isNonPlayer())
         {
-          strcpy(t, rndm->short_desc);
+          strcpy(t, qPrintable(rndm->short_desc));
         }
         else
         {
           strcpy(t, rndm->getNameC());
           strcat(t, " ");
-          strcat(t, rndm->title);
+          strcat(t, qPrintable(rndm->title));
         }
       }
       else
@@ -3579,7 +3580,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
   case 'O':
     if (obj)
-      CAN_SEE_OBJ(mob, obj) ? strcpy(t, obj->short_description)
+      CAN_SEE_OBJ(mob, obj) ? strcpy(t, qPrintable(obj->short_description))
                             : strcpy(t, "something");
     break;
 
@@ -3591,7 +3592,7 @@ void mprog_translate(char ch, char *t, Character *mob, Character *actor,
 
   case 'P':
     if (v_obj)
-      CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, v_obj->short_description)
+      CAN_SEE_OBJ(mob, v_obj) ? strcpy(t, qPrintable(v_obj->short_description))
                               : strcpy(t, "something");
     break;
 
@@ -3768,7 +3769,8 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
     {
       int16_t *lvali = 0;
       uint32_t *lvalui = 0;
-      char **lvalstr = 0;
+      QString lvalstr_buffer;
+      QString *lvalstr = &lvalstr_buffer;
       QString lvalqstr;
       int64_t *lvali64 = 0;
       quint64 *lvalui64 = 0;
@@ -3786,7 +3788,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
       if (lvalui)
         sprintf(buf, "%u", *lvalui);
       if (lvalstr)
-        sprintf(buf, "%s", *lvalstr);
+        sprintf(buf, "%s", qPrintable(*lvalstr));
       if (lvali64)
         sprintf(buf, "%ld", *lvali64);
       if (lvalui64)
@@ -4036,7 +4038,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
     if (mprg->type & type)
     {
       if (!reverse)
-        strcpy(temp1, mprg->arglist);
+        strcpy(temp1, qPrintable(mprg->arglist));
       else
         strcpy(temp1, arg.toStdString().c_str());
 
@@ -4047,7 +4049,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
       if (!reverse)
         strcpy(temp2, arg.toStdString().c_str());
       else
-        strcpy(temp2, mprg->arglist);
+        strcpy(temp2, qPrintable(mprg->arglist));
 
       dupl = temp2;
       for (i = 0; i < (signed)strlen(dupl); i++)
@@ -4061,7 +4063,9 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
                                                          || *end == '.' || *end == '?' || *end == '!'))
           {
             retval = 1;
-            mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
+            auto buffer = strdup(qPrintable(mprg->comlist));
+            mprog_driver(buffer, mob, actor, obj, vo, nullptr, nullptr);
+            free(buffer);
             if (selfpurge || isSet(mprog_cur_result, ReturnValue::eCH_DIED))
               return retval;
             break;
@@ -4080,8 +4084,9 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
                                                            || *end == '.' || *end == '?' || *end == '!'))
             {
               retval = 1;
-              mprog_driver(mprg->comlist, mob, actor, obj, vo,
-                           nullptr, nullptr);
+              auto buffer = strdup(qPrintable(mprg->comlist));
+              mprog_driver(buffer, mob, actor, obj, vo, nullptr, nullptr);
+              free(buffer);
               if (selfpurge || isSet(mprog_cur_result, ReturnValue::eCH_DIED))
                 return retval;
               break;
@@ -4125,9 +4130,11 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
   {
     mprog_command_num++;
     next = mprg->next;
-    if ((mprg->type & type) && (number(0, 99) < atoi(mprg->arglist)))
+    if ((mprg->type & type) && (number(0, 99) < mprg->arglist.toInt()))
     {
-      mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, nullptr);
+      auto buffer = strdup(qPrintable(mprg->comlist));
+      mprog_driver(buffer, mob, actor, obj, vo, nullptr, nullptr);
+      free(buffer);
       if (selfpurge)
         return;
       if (type != GREET_PROG && type != ALL_GREET_PROG)
@@ -4222,9 +4229,11 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
       mprog_command_num++;
       next = mprg->next;
 
-      if ((mprg->type & BRIBE_PROG) && (amount >= atoi(mprg->arglist)))
+      if ((mprg->type & BRIBE_PROG) && (amount >= mprg->arglist.toInt()))
       {
-        mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
+        auto buffer = strdup(qPrintable(mprg->comlist));
+        mprog_driver(buffer, mob, ch, obj, nullptr, nullptr, nullptr);
+        free(buffer);
         if (selfpurge)
           return mprog_cur_result;
         break;
@@ -4264,9 +4273,11 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
       mprog_command_num++;
       next = mprg->next;
 
-      if ((mprg->type & DAMAGE_PROG) && (amount >= atoi(mprg->arglist)))
+      if ((mprg->type & DAMAGE_PROG) && (amount >= mprg->arglist.toInt()))
       {
-        mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
+        auto buffer = strdup(qPrintable(mprg->comlist));
+        mprog_driver(buffer, mob, ch, obj, nullptr, nullptr, nullptr);
+        free(buffer);
         if (selfpurge)
           return mprog_cur_result;
         break;
@@ -4324,7 +4335,7 @@ int mprog_attack_trigger(Character *mob, Character *ch)
 int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 {
 
-  char buf[MAX_INPUT_LENGTH];
+  QString buf;
   mob_prog_data *mprg{};
   mob_prog_data *next{};
   bool done = false, okay = false;
@@ -4343,11 +4354,13 @@ int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
       mprog_command_num++;
 
       next = mprg->next;
-      one_argument(mprg->arglist, buf);
-      if ((mprg->type & GIVE_PROG) && ((obj->Name() == mprg->arglist)) || (!str_cmp("all", buf)))
+      buf = mprg->arglist.split(' ').value(0);
+      if ((mprg->type & GIVE_PROG) && ((obj->Name() == mprg->arglist)) || buf == u"all"_s)
       {
         okay = true;
-        mprog_driver(mprg->comlist, mob, ch, obj, nullptr, nullptr, nullptr);
+        auto buffer = strdup(qPrintable(mprg->comlist));
+        mprog_driver(buffer, mob, ch, obj, nullptr, nullptr, nullptr);
+        free(buffer);
         if (selfpurge)
           return mprog_cur_result;
         break;
@@ -4413,9 +4426,11 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
       mprog_command_num++;
       next = mprg->next;
 
-      if ((mprg->type & HITPRCNT_PROG) && ((100 * mob->hit / mob->max_hit) < atoi(mprg->arglist)))
+      if ((mprg->type & HITPRCNT_PROG) && ((100 * mob->hit / mob->max_hit) < mprg->arglist.toInt()))
       {
-        mprog_driver(mprg->comlist, mob, ch, nullptr, nullptr, nullptr, nullptr);
+        auto buffer = strdup(qPrintable(mprg->comlist));
+        mprog_driver(buffer, mob, ch, nullptr, nullptr, nullptr, nullptr);
+        free(buffer);
         if (selfpurge)
           return mprog_cur_result;
         break;
@@ -4571,7 +4586,9 @@ int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Chara
               mob->tempVariable = eh;
             }
           }
-          mprog_driver(mprg->comlist, mob, actor, obj, vo, nullptr, rndm);
+          auto buffer = strdup(qPrintable(mprg->comlist));
+          mprog_driver(buffer, mob, actor, obj, vo, nullptr, rndm);
+          free(buffer);
           if (selfpurge)
             return mprog_cur_result;
 
@@ -4706,7 +4723,7 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
   temp->mobdata->setObject(obj);
   //  temp->master = ch;
   // dc_free(temp->short_desc);
-  temp->short_desc = str_hsh(obj->short_description);
+  temp->short_desc = obj->short_description;
   char buf[MAX_STRING_LENGTH];
   sprintf(buf, "%s", qPrintable(obj->Name()));
   for (int i = strlen(buf) - 1; i > 0; i--)
@@ -4855,7 +4872,9 @@ int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Char
             vmob->tempVariable = eh;
           }
 
-          mprog_driver(mprg->comlist, vmob, actor, obj2, vo, nullptr, rndm);
+          auto buffer = strdup(qPrintable(mprg->comlist));
+          mprog_driver(buffer, vmob, actor, obj2, vo, nullptr, rndm);
+          free(buffer);
           if (selfpurge)
             return mprog_cur_result;
           end_oproc(vmob, Trace("oprog_catch_trigger"));

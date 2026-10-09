@@ -1871,7 +1871,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    if (obj && obj->short_description)
+    if (obj && !obj->short_description.isEmpty())
       send_info(QStringLiteral("\r\n##%1 has just logged out, watch for %2 to reappear!\r\n").arg(GET_NAME(ch)).arg(obj->short_description));
     else
       send_info(QStringLiteral("\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(GET_NAME(ch)));
@@ -2799,7 +2799,7 @@ void unique_scan(Character *victim)
     logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "Player %s has duplicate unique items.", victim->getNameC());
     while (!found_items.empty())
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", found_items.front()->short_description);
+      logf(IMMORTAL, DC::LogChannel::LOG_WARNING, "%s", qPrintable(found_items.front()->short_description));
       found_items.pop();
     }
   }

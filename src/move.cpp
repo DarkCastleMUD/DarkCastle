@@ -961,7 +961,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
        ch->add_memory(GET_NAME(ch->master), 'h');
        stop_follower(ch, follower_reasons_t::BROKE_CHARM);
        //ch->add_memory(GET_NAME(ch->master), 'h');
-       do_say(ch, "Hey! You tricked me!");
+       ch->do_say("Hey! You tricked me!");
        ch->master->sendln("You lose control.");
        }
        else
@@ -1084,7 +1084,7 @@ int do_leave(Character *ch, char *arguement, cmd_t cmd)
               return ReturnValue::eFAILURE;
             }
             do_look(ch, "");
-            sprintf(buf, "%s walks out of %s.", GET_NAME(ch), k->short_description);
+            sprintf(buf, "%s walks out of %s.", GET_NAME(ch), qPrintable(k->short_description));
             act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
             return ambush(ch);
           }
@@ -1159,7 +1159,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
       {
         ch->sendln("Your master is not from that clan.");
         act("$n finds $mself unable to enter!", ch, 0, 0, TO_ROOM, 0);
-        do_say(ch, "I may not enter.");
+        ch->do_say("I may not enter.");
         return ReturnValue::eFAILURE;
       }
     }
@@ -1205,9 +1205,9 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     break;
   case 1:
   case 2:
-    sprintf(buf, "You take a bold step towards %s.\r\n", portal->short_description);
+    sprintf(buf, "You take a bold step towards %s.\r\n", qPrintable(portal->short_description));
     ch->send(buf);
-    sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), portal->short_description);
+    sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), qPrintable(portal->short_description));
     act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
     break;
   case 3:
@@ -1240,7 +1240,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     break;
   case 1:
   case 2:
-    sprintf(buf, "%s has entered %s.", GET_NAME(ch), portal->short_description);
+    sprintf(buf, "%s has entered %s.", GET_NAME(ch), qPrintable(portal->short_description));
     act(buf, ch, 0, 0, TO_ROOM, STAYHIDE);
     do_look(ch, "");
     break;
@@ -1325,7 +1325,7 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
   }
 
   act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-  sprintf(buf, "You carefully climb %s.\r\n", obj->short_description);
+  sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description));
   ch->send(buf);
   int retval = move_char(ch, real_room(dest));
 

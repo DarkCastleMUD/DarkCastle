@@ -63,6 +63,10 @@ public:
   {
     return strcasecmp(l.c_str(), r.c_str()) < 0;
   }
+  bool operator()(const QString &l, const QString &r) const
+  {
+    return !l.compare(r, Qt::CaseInsensitive);
+  }
 };
 
 class ignore_entry
@@ -72,7 +76,7 @@ public:
   quint64 ignored_count;
 };
 
-typedef std::map<std::string, ignore_entry, strcasecmp_compare> ignoring_t;
+typedef QMap<QString, ignore_entry> ignoring_t;
 
 class communication;
 
@@ -229,9 +233,52 @@ class mob_prog_data
 public:
   mob_prog_data *next{};
   int type{};
-  char *arglist{};
-  char *comlist{};
+  QString arglist{};
+  QString comlist{};
 };
+char *mprog_type_to_name(int type);
+void string_to_file(FILEPtr fl, QString str);
+void string_to_file(QTextStream &fl, QString str);
+
+void string_to_file(auto &fl, QString str)
+{
+  fl << str.remove('\r').toStdString() << "~\n";
+}
+
+void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
+{
+  if (mprg->next)
+  {
+    write_mprog_recur(fl, mprg->next, mob);
+  }
+
+  if (mob)
+  {
+    fl << ">" << mprog_type_to_name(mprg->type) << " ";
+  }
+  else
+  {
+    fl << "\\" << mprog_type_to_name(mprg->type) << " ";
+  }
+
+  if (!mprg->arglist.isEmpty())
+  {
+    string_to_file(fl, mprg->arglist);
+  }
+  else
+  {
+    string_to_file(fl, "Saved During Edit");
+  }
+
+  if (!mprg->comlist.isEmpty())
+  {
+    string_to_file(fl, mprg->comlist);
+  }
+  else
+  {
+    string_to_file(fl, "Saved During Edit");
+  }
+}
 
 #define ERROR_PROG -1
 #define IN_FILE_PROG 0
@@ -420,7 +467,7 @@ public:
   static const QList<Toggle> togglables;
   static const QStringList toggle_txt;
 
-  char pwd[PASSWORD_LEN + 1] = {};
+  QString pwd = {};
   ignoring_t ignoring = {}; /* List of ignored names */
 
   uint32_t totalpkills = {};   // total number of pkills THIS LOGIN
@@ -574,7 +621,17 @@ class Character : public Entity
 {
   Q_GADGET
 public:
-  Character(DC *dc) : dc_(dc) {}
+  Character(DC *dc) : dc_(dc)
+  {
+    if (!dc)
+      dc = dc_ = DC::getInstance();
+
+    dc->free_list.erase(this);
+    in_room = DC::NOWHERE;
+    setStanding();
+    hometown = START_ROOM;
+    armor = 100;
+  }
   enum Type
   {
     Undefined,
@@ -610,7 +667,7 @@ public:
 
   const char *getNameC(void) const;
 
-  inline QString getName(void)
+  inline QString getName(void) const
   {
     return name_;
   }
@@ -619,10 +676,10 @@ public:
     name_ = new_name;
   }
 
-  char *short_desc = nullptr;  // Action 'X hits you.'
-  char *long_desc = nullptr;   // For 'look room'
-  char *description = nullptr; // For 'look mob'
-  char *title = nullptr;
+  QString short_desc;  // Action 'X hits you.'
+  QString long_desc;   // For 'look room'
+  QString description; // For 'look mob'
+  QString title;
 
   sex_t sex = {};
 
@@ -1141,6 +1198,10 @@ public:
   command_return_t do_give(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_drink(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_eat(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_ignore(QStringList arguments, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_new_help(QStringList arguments, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_say(QStringList arguments, cmd_t cmd = cmd_t::SAY);
+  command_return_t do_say(QString arguments, cmd_t cmd = cmd_t::SAY);
   auto do_arena(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
   auto do_notitle(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT) -> command_return_t;
   auto do_arena_info(QStringList arguments) -> command_return_t;
@@ -1184,7 +1245,7 @@ public:
     send(buffer);
   }
   command_return_t tell(Character *, QString);
-  void sendRaw(std::string);
+  void sendRaw(QString);
   std::vector<Character *> getFollowers(void);
   void setPlayerLastMob(vnum_t mobvnum);
 
@@ -1210,7 +1271,7 @@ public:
 
   bool multiplyGold(double mult);
   bool removeGold(quint64 gold);
-  int store_to_char_variable_data(FILEPtr fpsave);
+  bool store_to_char_variable_data(FILEPtr fpsave);
 
   bool load_charmie_equipment(QString name, bool previous = false);
   int has_skill(skill_t skill);
@@ -1354,6 +1415,7 @@ public:
   void char_to_store(class char_file_u4 *st, time_data &tmpage);
   bool equip_char(Object *obj, int pos, bool flag = false);
   Object *unequip_char(int pos, bool flag = false);
+  void load(char_file_u4 *st);
 
 private:
   Type type_ = Type::Undefined;

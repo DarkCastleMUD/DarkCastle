@@ -285,6 +285,7 @@ private slots:
     QVERIFY(!ch->isNonPlayer());
     QVERIFY(!dc.character_list.empty());
 
+    ch->setPosition(position_t::DEAD);
     do_sing(ch, str_hsh("'flight of the bumblebee'"));
     QCOMPARE(conn->output, "Lie still; you are DEAD.\r\n");
     conn->output = {};
@@ -298,7 +299,7 @@ private slots:
     skill_results_t results = find_skills_by_name("flight_of_the_bumblebee");
     QVERIFY(!results.empty());
     QVERIFY(results.size() == 1);
-    auto skillnum = results.begin()->second;
+    auto skillnum = results.first();
     QCOMPARE(ch->has_skill(skillnum), 0);
     ch->learn_skill(skillnum, 1, 100);
     QCOMPARE(ch->has_skill(skillnum), 1);
@@ -738,7 +739,7 @@ private slots:
     QString filename;
     if (!dc.world_file_list.isEmpty())
     {
-      filename = dc.world_file_list.first()->filename;
+      filename = dc.world_file_list.first()->filename();
     }
     else
     {
@@ -753,20 +754,19 @@ private slots:
     {
       LegacyFileWorld lfw(QStringLiteral("%1.legacyfile").arg(filename));
       QFile qf(qfile_filename);
-      QSaveFile qsf(qsavefile_filename);
+      QSaveFile qsf(qsavefile_filename.split('/').last());
       std::fstream fstream_world_file;
       fstream_world_file.open(fstream_filename.toStdString(), std::ios::out);
       QVERIFY(lfw.isOpen());
       QVERIFY(qf.open(QIODeviceBase::WriteOnly));
-      QVERIFY(qsf.open(QIODeviceBase::WriteOnly));
       QVERIFY(fstream_world_file.is_open());
-
+      QVERIFY(qsf.open(QIODeviceBase::WriteOnly));
       QTextStream out(&qf);
       QTextStream out2(&qsf);
 
       if (!dc.world_file_list.isEmpty())
       {
-        for (const auto &[vnum, enabled] : dc.world_file_list.first()->vnums_.asKeyValueRange())
+        for (const auto &[vnum, enabled] : dc.world_file_list.first()->vnums().asKeyValueRange())
         {
           if (enabled)
           {
@@ -789,16 +789,16 @@ private slots:
 
       out << "$~\n";
       out2 << "$~\n";
-      qsf.commit();
+      // qWarning() << out.status();
+      // qWarning() << out2.status();
+      QVERIFY(qsf.commit());
       fstream_world_file << "$~\n";
     }
-
-    qInfo("Wrote %llu rooms to '%s'.", rooms_written, qPrintable(legacyfile_filename));
 
     auto original_checksum = checksumFile(filename);
     auto legacyfile_checksum = checksumFile(legacyfile_filename);
     auto qfile_checksum = checksumFile(qfile_filename);
-    auto qsavefile_checksum = checksumFile(qsavefile_filename);
+    auto qsavefile_checksum = checksumFile(qsavefile_filename.split('/').last());
     auto fstream_checksum = checksumFile(fstream_filename);
 
     QCOMPARE(legacyfile_checksum.toHex(), original_checksum.toHex());
@@ -835,7 +835,7 @@ private slots:
 
     QVERIFY(QFile(legacyfile_filename).remove());
     QVERIFY(QFile(qfile_filename).remove());
-    QVERIFY(QFile(qsavefile_filename).remove());
+    QVERIFY(QFile(qsavefile_filename.split('/').last()).remove());
     QVERIFY(QFile(fstream_filename).remove());
   }
 
@@ -911,9 +911,9 @@ private slots:
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
     rc = ch->do_auction({QStringLiteral("test")});
-    QCOMPARE(conn->output, "");
+    QCOMPARE(conn->output, "You auction 'test'\r\n");
     conn->output = {};
-    QCOMPARE(conn2->output, "");
+    QCOMPARE(conn2->output, "Testvend auctions 'test'\r\n");
     conn2->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
 
@@ -975,10 +975,11 @@ private slots:
     QCOMPARE(conn2->output, "");
     rc = do_vend(ch, str_hsh("sell item 1000000"));
     QCOMPARE(conn->output, "You are now selling a reflecty test item for 1000000 coins.\r\n"
+                           "The Consignment Broker auctions 'Testvend is selling \"a reflecty test item\" for 1000000 gold.'\r\n"
                            "Saving Testvend.\r\n");
     conn->output = {};
     QCOMPARE(rc, ReturnValue::eSUCCESS);
-    QCOMPARE(conn2->output, "");
+    QCOMPARE(conn2->output, "The Consignment Broker auctions 'Testvend is selling \"a reflecty test item\" for 1000000 gold.'\r\n");
 
     rc = do_vend(ch, str_hsh("list mine"));
     QCOMPARE(conn->output, "Ticket-Buyer--------Price------Status--T--Item---------------------------\r\n\r\n"
@@ -1592,7 +1593,7 @@ private slots:
     auto spell = find_skills_by_name("create_golem");
     QVERIFY(!spell.empty());
 
-    p1->learn_skill(spell.begin()->second, 100, 100);
+    p1->learn_skill(spell.first(), 100, 100);
     QCOMPARE(p1->desc->output, "");
 
     p1->desc->output = {};
@@ -1717,7 +1718,6 @@ private slots:
     QCOMPARE(QFlagsToStrings<ObjectPositions>().last(), QStringLiteral("EAR"));
     Object obj;
     obj.obj_flags.wear_flags = {TAKE, SHIELD};
-    qDebug() << obj.obj_flags.wear_flags;
     QVERIFY(obj.obj_flags.wear_flags.testFlag(TAKE));
     QVERIFY(CAN_WEAR(&obj, TAKE));
     QVERIFY(obj.obj_flags.wear_flags.testFlag(SHIELD));

@@ -36,9 +36,9 @@ public:
 class time_data
 {
 public:
-  int32_t birth;  /* This represents the characters age                */
-  int32_t logon;  /* Time of the last logon (used to calculate played) */
-  int32_t played; /* This is the total accumulated time played in secs */
+  int32_t birth{};  /* This represents the characters age                */
+  int32_t logon{};  /* Time of the last logon (used to calculate played) */
+  int32_t played{}; /* This is the total accumulated time played in secs */
 };
 
 #endif

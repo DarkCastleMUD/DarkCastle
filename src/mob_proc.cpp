@@ -34,7 +34,7 @@
 #include "DC/interp.h"
 #include "DC/isr.h"
 #include "DC/race.h"
-#include "DC/db.h"   // real_room
+#include "DC/db.h" // real_room
 #include "DC/act.h"
 #include "DC/ki.h" // monk skills
 #include "DC/returnvals.h"
@@ -89,10 +89,10 @@ int call_for_help_in_room(Character *ch, int iFriendId)
 
       if (!friends)
       {
-        do_say(ch, "This guy is beating the hell out of me!  HELP!!", cmd_t::DEFAULT);
+        ch->do_say("This guy is beating the hell out of me!  HELP!!", cmd_t::DEFAULT);
         friends = 1;
       }
-      do_say(ally, "I shall come to your aid!", cmd_t::DEFAULT);
+      ally->do_say("I shall come to your aid!", cmd_t::DEFAULT);
       attack(ally, ch->fighting, TYPE_UNDEFINED);
     }
   }
@@ -130,7 +130,7 @@ int protect(Character *ch, int iFriendId)
     if (iFriendId == ally->mobdata->vnum_)
     {
       // obscure whitney houston joke
-      do_say(ch, "and IiiiIIiiii will always, looove yooooou!", cmd_t::DEFAULT);
+      ch->do_say("and IiiiIIiiii will always, looove yooooou!", cmd_t::DEFAULT);
       // do join
       retval = attack(ch, ally->fighting, TYPE_UNDEFINED);
       if (SOMEONE_DIED(retval))
@@ -563,7 +563,7 @@ int poet(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if ((unsigned)x < POET_SAY_TEXT_SIZE)
   {
-    do_say(ch, poetSayText[x]);
+    ch->do_say(poetSayText[x]);
     return ReturnValue::eSUCCESS;
   }
 
@@ -840,7 +840,7 @@ int francis_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
   if (DC::getInstance()->world[ch->in_room].number == 7077)
   {
-    do_say(owner, "Oh no you don't!", cmd_t::DEFAULT);
+    owner->do_say("Oh no you don't!", cmd_t::DEFAULT);
     attack(owner, ch, 0);
     return ReturnValue::eSUCCESS;
   }
@@ -928,7 +928,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
           auto obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying);
-          if (obj && obj->short_description)
+          if (obj && !obj->short_description.isEmpty())
             ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description));
           else
             ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"));
@@ -961,7 +961,7 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
           auto obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying);
-          if (obj && obj->short_description)
+          if (obj && !obj->short_description.isEmpty())
           {
             act("The guard humiliates $n, and blocks $s way because they have $p.", ch, obj, 0, TO_ROOM, 0);
             ch->sendln(QStringLiteral("The guard humiliates you, and blocks your way because you have %1.").arg(obj->short_description));
@@ -2077,10 +2077,10 @@ int adept(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     cast_armor(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, tch, 0, ch->getLevel());
     return ReturnValue::eSUCCESS;
   case 4:
-    do_say(ch, "Finish school.  Don't drop out.");
+    ch->do_say("Finish school.  Don't drop out.");
     return ReturnValue::eSUCCESS;
   case 5:
-    do_say(ch, "Move it.  Others want to go to this school.");
+    ch->do_say("Move it.  Others want to go to this school.");
     return ReturnValue::eSUCCESS;
   default:
     return ReturnValue::eFAILURE;
@@ -2123,32 +2123,32 @@ int mud_school_adept(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   switch (number(0, 20))
   {
   case 15:
-    do_say(ch, "What are you staring at?");
+    ch->do_say("What are you staring at?");
     break;
   case 18:
-    do_say(ch, "Hi, I'm your friend.");
+    ch->do_say("Hi, I'm your friend.");
     break;
   case 3:
-    do_say(ch, "Isn't this a fine school?");
+    ch->do_say("Isn't this a fine school?");
     break;
   case 12:
-    do_say(ch, "Finish school.  Dont drop out.");
+    ch->do_say("Finish school.  Dont drop out.");
     break;
   case 5:
-    do_say(ch, "Move it.  Others want to go to this school.");
+    ch->do_say("Move it.  Others want to go to this school.");
     break;
   case 6:
-    do_say(ch, "Be careful, don't get killed by those monsters!");
+    ch->do_say("Be careful, don't get killed by those monsters!");
     break;
   case 7:
-    do_say(ch, "Don't forget to wear your clothes, young students!");
+    ch->do_say("Don't forget to wear your clothes, young students!");
     break;
   case 8:
-    do_say(ch, "What are you doing just STANDING there?!?!!?");
-    do_say(ch, "GET going!");
+    ch->do_say("What are you doing just STANDING there?!?!!?");
+    ch->do_say("GET going!");
     break;
   case 9:
-    do_say(ch, "Hello....Hello, are you listening to me?");
+    ch->do_say("Hello....Hello, are you listening to me?");
     break;
   default:
     return ReturnValue::eFAILURE;
@@ -2235,8 +2235,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
     ch->sendln("Available pets are:");
     for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
     {
-      sprintf(buf, "%8ld - %s\r\n",
-              3 * GET_EXP(pet), pet->short_desc);
+      sprintf(buf, "%8ld - %s\r\n", 3 * GET_EXP(pet), qPrintable(pet->short_desc));
       ch->send(buf);
     }
     return ReturnValue::eSUCCESS;
@@ -2282,7 +2281,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
 
       sprintf(buf, "%sA small sign on a chain around the neck "
                    "says 'My Name is %s'\r\n",
-              pet->description, pet_name);
+              qPrintable(pet->description), pet_name);
       pet->description = str_hsh(buf);
     }
 
@@ -2431,7 +2430,7 @@ int humaneater(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         if (GET_RACE(tch) != RACE_HUMAN)
           continue;
 
-        do_say(ch, "Ahh...more humans have come to feed our hunger!!\r\n");
+        ch->do_say("Ahh...more humans have come to feed our hunger!!\r\n");
         return attack(ch, tch, TYPE_UNDEFINED);
       }
   }
@@ -2500,7 +2499,7 @@ int pir_slut(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   x = number((quint64)0, (quint64)PIR_SAY_TEXT_SIZE * 6);
   if ((unsigned)x < PIR_SAY_TEXT_SIZE)
   {
-    do_say(ch, pir_slutSayText[x], cmd_t::DEFAULT);
+    ch->do_say(pir_slutSayText[x], cmd_t::DEFAULT);
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
@@ -2637,9 +2636,9 @@ int doorcloser(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       (EXIT(ch, 3) && !isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
     if (number(0, 1))
-      do_say(ch, "How the hell do these doors keep opening?", cmd_t::DEFAULT);
+      ch->do_say("How the hell do these doors keep opening?", cmd_t::DEFAULT);
     else
-      do_say(ch, "I coulda sworn I just closed this....", cmd_t::DEFAULT);
+      ch->do_say("I coulda sworn I just closed this....", cmd_t::DEFAULT);
 
     do_close(ch, "cell e", cmd_t::DEFAULT);
     do_close(ch, "cell w", cmd_t::DEFAULT);
@@ -2664,9 +2663,9 @@ int panicprisoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if ((vict = ch->get_char_room_vis("guard")))
   {
     if (number(0, 1))
-      do_say(ch, "Run!  It's the fuzz!", cmd_t::DEFAULT);
+      ch->do_say("Run!  It's the fuzz!", cmd_t::DEFAULT);
     else
-      do_say(ch, "Uh oh, guard.  I'm off like a prom dress!", cmd_t::DEFAULT);
+      ch->do_say("Uh oh, guard.  I'm off like a prom dress!", cmd_t::DEFAULT);
     do_flee(ch, "");
     return ReturnValue::eSUCCESS;
   }
@@ -2680,9 +2679,9 @@ int panicprisoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       (EXIT(ch, 3) && isSet(EXIT(ch, 3)->exit_info, EX_CLOSED)))
   {
     if (number(0, 1))
-      do_say(ch, "I must free my fellow prisoners!", cmd_t::DEFAULT);
+      ch->do_say("I must free my fellow prisoners!", cmd_t::DEFAULT);
     else
-      do_say(ch, "Viva la resistance!", cmd_t::DEFAULT);
+      ch->do_say("Viva la resistance!", cmd_t::DEFAULT);
 
     do_open(ch, "cell e", cmd_t::DEFAULT);
     do_open(ch, "cell w", cmd_t::DEFAULT);
@@ -2718,7 +2717,7 @@ int bounder(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eSUCCESS;
   }
 
-  do_say(ch, "I hope you land in enfan hell!", cmd_t::DEFAULT);
+  ch->do_say("I hope you land in enfan hell!", cmd_t::DEFAULT);
   act("$n recites a bound scroll.", ch, 0, vict, TO_ROOM,
       INVIS_NULL);
   return cast_teleport(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
@@ -3239,7 +3238,7 @@ int shogura_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (GET_HIT(ch->fighting) < 5000)
   {
-    do_say(ch, "It's time to finish this, little one.", cmd_t::DEFAULT);
+    ch->do_say("It's time to finish this, little one.", cmd_t::DEFAULT);
     return ki_punch(ch->getLevel(), ch, "", ch->fighting);
   }
 
@@ -3262,7 +3261,7 @@ int shogura_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   case 2:
     // summon all mobs 8668
-    do_say(ch, "Multi-form technique!", cmd_t::DEFAULT);
+    ch->do_say("Multi-form technique!", cmd_t::DEFAULT);
     if (!find_mob_in_room(ch, 8668))
       summon_all_of_mob_to_room(ch, 8668);
     break;
@@ -3676,6 +3675,6 @@ int startrek_miles(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::PUSH)
     return ReturnValue::eFAILURE;
 
-  do_say(owner, "Don't push anything.  This is highly sophisticated equipment.\r\n", cmd_t::DEFAULT);
+  owner->do_say("Don't push anything.  This is highly sophisticated equipment.\r\n", cmd_t::DEFAULT);
   return ReturnValue::eSUCCESS;
 }

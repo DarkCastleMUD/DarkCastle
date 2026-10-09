@@ -126,8 +126,8 @@ void extract_char(Character *ch, bool pull, Trace t = Trace("unknown"));
 /* wiz_102.cpp */
 int find_skill_num(char *name);
 
-typedef std::map<std::string, quint64> skill_results_t;
-skill_results_t find_skills_by_name(std::string name);
+typedef QMap<QString, quint64> skill_results_t;
+skill_results_t find_skills_by_name(QString name);
 Character *get_pc_vis(Character *ch, std::string name);
 
 /* Generic Find */

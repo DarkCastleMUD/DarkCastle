@@ -183,10 +183,10 @@ void DC::object_activity(quint64 pulse_type)
     {
       obj_index[item_number].non_combat_func(nullptr, obj, cmd_t::UNDEFINED, "", nullptr);
     }
-    else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && obj->ex_description && obj->obj_flags.value[0]-- == 0)
+    else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && !obj->ex_descriptions.isEmpty() && obj->obj_flags.value[0]-- == 0)
     {
       obj->obj_flags.value[0] = ((Object *)obj_index[item_number].item)->obj_flags.value[1];
-      send_to_room(obj->ex_description->description, obj->in_room, true);
+      send_to_room(obj->ex_descriptions.value(0), obj->in_room, true);
     }
     else
     {
@@ -494,7 +494,7 @@ void set_movement_trap(Character *ch, class Object *obj)
   char buf[200];
   class Object *trap_obj = nullptr;
 
-  sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", obj->short_description);
+  sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", qPrintable(obj->short_description));
   ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -515,7 +515,7 @@ void set_exit_trap(Character *ch, class Object *obj, char *arg)
   char buf[200];
   class Object *trap_obj = nullptr;
 
-  sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", obj->short_description);
+  sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", qPrintable(obj->short_description));
   ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -585,7 +585,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   for (int i = 0; i < 4; i++)
     trap_obj->obj_flags.value[i] = obj->obj_flags.value[i];
 
-  do_say(ch, "Fire in the hole!");
+  ch->do_say("Fire in the hole!");
   act("$n sets off $o with a flash and bang!.", ch, obj, 0, TO_ROOM, 0);
   ch->sendln("You set off the device with a loud bang.");
 
@@ -614,7 +614,7 @@ void set_catstink(Character *ch, class Object *obj)
   char buf[200];
   extern const char *sector_types[];
 
-  sprintf(buf, "You sprinkle the %s all around you.\r\n", obj->short_description);
+  sprintf(buf, "You sprinkle the %s all around you.\r\n", qPrintable(obj->short_description));
   ch->send(buf);
   act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -629,7 +629,7 @@ void set_catstink(Character *ch, class Object *obj)
     }
 
     sprintf(buf, "It probably won't work, since %s was designed for the smells of a %s",
-            obj->short_description, sector_types[obj->obj_flags.value[1]]);
+            qPrintable(obj->short_description), sector_types[obj->obj_flags.value[1]]);
     ch->send(buf);
 
     // small chance of success
@@ -902,14 +902,10 @@ int do_name(Character *ch, char *arg, cmd_t cmd)
       strcat(buf, _convert);
   }
 
-  // only free PC short descs
-  if (GET_SHORT_ONLY(ch) && ch->isPlayer())
-    dc_free(GET_SHORT_ONLY(ch));
-
   if (ch->isNonPlayer())
-    GET_SHORT_ONLY(ch) = str_hsh(buf);
+    GET_SHORT_ONLY(ch) = buf;
   else
-    GET_SHORT_ONLY(ch) = str_dup(buf);
+    GET_SHORT_ONLY(ch) = buf;
   ch->sendln("Ok.");
   return ReturnValue::eSUCCESS;
 }
@@ -1616,9 +1612,9 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   if (problem)
   {
     if (add)
-      csendf(ch, "Wearing that would cause your %s to no longer fit!\r\n", ch->equipment[j]->short_description);
+      csendf(ch, "Wearing that would cause your %s to no longer fit!\r\n", qPrintable(ch->equipment[j]->short_description));
     else
-      csendf(ch, "Removing that would cause your %s to no longer fit!\r\n", ch->equipment[j]->short_description);
+      csendf(ch, "Removing that would cause your %s to no longer fit!\r\n", qPrintable(ch->equipment[j]->short_description));
 
     return true;
   }
@@ -1999,7 +1995,7 @@ void wear(Character *ch, class Object *obj_object, int keyword)
       else if (IS_AFFECTED(ch, AFF_CHARM))
       {
         ch->sendln("Sorry, charmies can't wield stuff anymore:(");
-        do_say(ch, "I'm sorry my master, I lack the dexterity.");
+        ch->do_say("I'm sorry my master, I lack the dexterity.");
       }
       else
       {
@@ -2522,7 +2518,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             obj_object = ch->equipment[j];
             if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
-              sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", obj_object->short_description);
+              sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description));
               send_to_char(arg1, ch);
               continue;
             }
@@ -2565,7 +2561,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
         {
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
-            sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", obj_object->short_description);
+            sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description));
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
@@ -2677,7 +2673,7 @@ bool fullSave(Object *obj)
     return 1;
   }
 
-  if (strcmp(GET_OBJ_SHORT(obj), GET_OBJ_SHORT(tmp_obj)))
+  if (GET_OBJ_SHORT(obj) != GET_OBJ_SHORT(tmp_obj))
     return 1;
 
   if (obj->Name() != tmp_obj->Name()) // GL. and stuff.

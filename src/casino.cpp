@@ -2017,28 +2017,40 @@ void save_slot_machines(void)
     return;
 
   const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [](const auto &entry)
-                               { return entry->filename == "objects/21900-21999.obj"; });
+                               { return entry->filename() == "objects/21900-21999.obj"; });
 
   if (it == DC::getInstance()->obj_file_list.cend())
   {
     logentry(QStringLiteral("Unable to find object filename 'objects/21900-21999.obj'"), IMMORTAL, DC::LogChannel::LOG_BUG);
     for (const auto &entry : DC::getInstance()->obj_file_list)
     {
-      logbug(entry->filename);
+      logbug(entry->filename());
     }
     return;
   }
   const auto &curr = *it;
 
-  LegacyFile lf({}, curr->filename, "Couldn't open obj save file %1 for save_slot_machines.");
+  LegacyFile lf({}, curr->filename(), "Couldn't open obj save file %1 for save_slot_machines.");
   if (lf.isOpen())
   {
-    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
+    auto objs_enabled = 0ULL;
+    auto objs_disabled = 0ULL;
+    auto objs_written = 0ULL;
+    for (const auto &[vnum, enabled] : curr->vnums().asKeyValueRange())
     {
+      if (enabled)
+        objs_enabled++;
+      else
+        objs_disabled++;
+
       if (enabled && DC::getInstance()->obj_index.contains(vnum) && DC::getInstance()->obj_index[vnum].item)
+      {
         write_object(lf, DC::getInstance()->obj_index[vnum].item);
+        objs_written++;
+      }
     }
     dc_fprintf(lf.file_handle_, "$~\n");
+    // qDebug("%llu objects written to disk out of enabled=%llu disabled=%llu", objs_written, objs_enabled, objs_disabled);
   }
 }
 
@@ -2192,9 +2204,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
         sprintf(buf, "A slot machine which displays '$R$BJackpot: %d %s!$1' sits here.", (int)machine->jackpot, machine->gold ? "coins" : "plats");
         // if(!ishashed(machine->obj->long_description)) dc_free(machine->obj->long_description);
         machine->obj->long_description = str_dup(buf);
-        if (!ishashed((DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description))
-          dc_free((DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description);
-        (DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description = str_dup(buf);
+        (DC::getInstance()->obj_index[machine->obj->vnum_].item)->long_description = buf;
       }
     }
 

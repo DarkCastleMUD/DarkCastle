@@ -63,18 +63,18 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
 
   if (!decay)
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just sacrificed %s[%d] in room %d\n", GET_NAME(ch), qPrintable(GET_OBJ_SHORT(obj)), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(ch->in_room));
   }
   else
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", GET_OBJ_SHORT((Object *)ch), GET_OBJ_SHORT(obj), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", qPrintable(GET_OBJ_SHORT((Object *)ch)), qPrintable(GET_OBJ_SHORT(obj)), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
   for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
-         GET_OBJ_SHORT(obj),
-         GET_OBJ_SHORT(loop_obj),
+         qPrintable(GET_OBJ_SHORT(obj)),
+         qPrintable(GET_OBJ_SHORT(loop_obj)),
          GET_OBJ_VNUM(loop_obj));
   }
 }
@@ -242,7 +242,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", GET_NAME(ch), obj->short_description);
+        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", GET_NAME(ch), qPrintable(obj->short_description));
         send_info(buf);
 
         affected_type af;
@@ -270,7 +270,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", GET_NAME(ch), obj->short_description);
+        sprintf(buf, "%s had %s, but no AFF_CHAMPION.", GET_NAME(ch), qPrintable(obj->short_description));
         logentry(buf, IMMORTAL, DC::LogChannel::LOG_BUG);
         return ReturnValue::eFAILURE;
       }
@@ -329,7 +329,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
     sprintf(log_buf, "%s donates %s[%llu]", GET_NAME(ch), qPrintable(obj->Name()), obj->vnum_);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
     for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", obj->short_description, loop_obj->short_description, DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
+      logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description), qPrintable(loop_obj->short_description), DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
 
   location = real_room(room);
@@ -398,9 +398,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  if (ch->title) // this should always be true, but why not check anyway?
-    dc_free(ch->title);
-  ch->title = str_dup(argument);
+  ch->title = argument;
   sprintf(buf, "Your title is now: %s\r\n", argument);
   ch->send(buf);
   return ReturnValue::eSUCCESS;

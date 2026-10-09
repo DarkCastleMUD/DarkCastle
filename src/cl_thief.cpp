@@ -888,7 +888,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    return do_say(ch, "Nice try, silly thief.");
+    return ch->do_say("Nice try, silly thief.");
   }
 
   if (victim->fighting)
@@ -1020,10 +1020,10 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           if (victim->isPlayer())
           {
             char log_buf[MAX_STRING_LENGTH] = {};
-            sprintf(log_buf, "%s stole %s[%llu] from %s", GET_NAME(ch), obj->short_description, obj->vnum_, victim->getNameC());
+            sprintf(log_buf, "%s stole %s[%llu] from %s", GET_NAME(ch), qPrintable(obj->short_description), obj->vnum_, victim->getNameC());
             logentry(log_buf, ANGEL, DC::LogChannel::LOG_MORTAL);
             for (loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
-              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%llu]", obj->short_description, loop_obj->short_description, DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
+              logf(ANGEL, DC::LogChannel::LOG_MORTAL, "The %s contained %s[%llu]", qPrintable(obj->short_description), qPrintable(loop_obj->short_description), DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
           }
           if (obj->vnum_ != 76)
           {
@@ -1048,8 +1048,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
               if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                   (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
               {
-                csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n",
-                       loop_obj->short_description, obj->short_description);
+                csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n", qPrintable(loop_obj->short_description), qPrintable(obj->short_description));
                 extract_obj(loop_obj);
               }
             }
@@ -1187,7 +1186,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         sprintf(buf, "You receive %d exps.\r\n", _exp);
         ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
-                GET_NAME(ch), obj->short_description, victim->getNameC());
+                GET_NAME(ch), qPrintable(obj->short_description), victim->getNameC());
         logentry(buf, ANGEL, DC::LogChannel::LOG_MORTAL);
         if (!victim->isNonPlayer())
         {
@@ -1242,8 +1241,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
             if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                 (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
             {
-              csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\r\n",
-                     loop_obj->short_description, obj->short_description);
+              csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\r\n", qPrintable(loop_obj->short_description), qPrintable(obj->short_description));
               extract_obj(loop_obj);
             }
           }
@@ -1342,7 +1340,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
 
   if (IS_AFFECTED(ch, AFF_CHARM))
   {
-    return do_say(ch, "Nice try.");
+    return ch->do_say("Nice try.");
   }
 
   if (victim->fighting)

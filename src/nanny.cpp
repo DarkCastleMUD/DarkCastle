@@ -98,20 +98,20 @@ extern char imotd[MAX_STRING_LENGTH];
 extern Object *object_list;
 
 int _parse_email(char *arg);
-bool check_deny(class Connection *d, char *name);
+bool check_deny(class Connection *d, const char *name);
 void isr_set(Character *ch);
 bool check_reconnect(class Connection *d, QString name, bool fReconnect);
 bool check_playing(class Connection *d, QString name);
 char *str_str(char *first, char *second);
 bool apply_race_attributes(Character *ch, int race = 0);
 bool check_race_attributes(Character *ch, int race = 0);
-bool handle_get_race(Connection *d, std::string arg);
+bool handle_get_race(Connection *d, QString arg);
 void show_question_race(Connection *d);
 void show_question_class(Connection *d);
-bool handle_get_class(Connection *d, std::string arg);
+bool handle_get_class(Connection *d, QString arg);
 int is_clss_race_compat(Character *ch, int clss);
 void show_question_stats(Connection *d);
-bool handle_get_stats(Connection *d, std::string arg);
+bool handle_get_stats(Connection *d, QString arg);
 
 int is_race_eligible(Character *ch, int race)
 {
@@ -778,7 +778,7 @@ int DC::exceeded_connection_limit(class Connection *new_conn)
 
     for (const auto &d : to_close_list)
     {
-      logsocket(QStringLiteral("Closing socket %1 from IP %2 due to > %3 connections.").arg(d->desc_num).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
+      logsocket(QStringLiteral("Closing descriptor %1 from IP %2 due to > %3 connections.").arg(d->descriptor).arg(d->getPeerOriginalAddress().toString()).arg(getConnectionLimit()));
       close_socket(d);
     }
     return true;
@@ -823,24 +823,23 @@ void Character::set_hw(void)
 }
 
 // Deal with sockets that haven't logged in yet.
-void DC::nanny(class Connection *d, std::string arg)
+void DC::nanny(class Connection *d, QString arg)
 {
-  char buf[MAX_STRING_LENGTH];
-  std::stringstream str_tmp;
-  char tmp_name[20];
-  char *password;
-  Character *ch;
-  int y;
+  bool ok = false;
+  unsigned selection{};
+  int y{};
   char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
-  unsigned selection = 0;
-  auto &character_list = DC::getInstance()->character_list;
-  char log_buf[MAX_STRING_LENGTH] = {};
+  Character *ch{};
+  QString buf;
+  QString str_tmp;
+  QString password;
+  QString log_buf;
   QString buffer;
 
   ch = d->character;
-  arg.erase(0, arg.find_first_not_of(' '));
+  arg = arg.trimmed();
 
-  if (!str_prefix("help", arg.c_str()) &&
+  if (!str_prefix("help", qPrintable(arg)) &&
       (STATE(d) == Connection::states::OLD_GET_CLASS ||
        STATE(d) == Connection::states::OLD_GET_RACE ||
        STATE(d) == Connection::states::OLD_CHOOSE_STATS ||
@@ -848,8 +847,8 @@ void DC::nanny(class Connection *d, std::string arg)
        STATE(d) == Connection::states::GET_RACE ||
        STATE(d) == Connection::states::GET_STATS))
   {
-    arg.erase(0, 4);
-    do_new_help(d->character, arg.data(), cmd_t::PAGING_HELP);
+    arg.remove(0, 4);
+    d->character->do_new_help(arg.split(" "), cmd_t::PAGING_HELP);
     return;
   }
 
@@ -912,7 +911,7 @@ void DC::nanny(class Connection *d, std::string arg)
     STATE(d) = Connection::states::GET_NAME;
 
     // if they have already entered their name, drop through.  Otherwise stop and wait for input
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       break;
     }
@@ -923,14 +922,14 @@ void DC::nanny(class Connection *d, std::string arg)
 
     // If first line of text is a proxy header then construct Proxy
     // otherwise assume it's a name.
-    if (QString(arg.c_str()).indexOf("PROXY ") == 0)
+    if (arg.indexOf("PROXY ") == 0)
     {
-      d->proxy = Proxy(arg.c_str());
+      d->proxy = Proxy(arg);
       return;
     }
   case Connection::states::GET_NAME:
 
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       SEND_TO_Q("Empty name.  Disconnecting...", d);
       close_socket(d);
@@ -938,18 +937,17 @@ void DC::nanny(class Connection *d, std::string arg)
     }
 
     // Capitlize first letter, lowercase rest
-    arg[0] = UPPER(arg[0]);
-    for (y = 1; arg[y] != '\0'; y++)
-      arg[y] = LOWER(arg[y]);
+    arg = arg.toLower();
+    arg[0] = arg[0].toUpper();
 
-    if (_parse_name(arg.c_str(), tmp_name))
+    if (!is_valid_name(arg))
     {
       SEND_TO_Q("Illegal name, try another.\r\nName: ", d);
       telnet_ga(d);
       return;
     }
 
-    if (check_deny(d, tmp_name))
+    if (check_deny(d, qPrintable(arg)))
       return;
 
     // Uncomment this if you think a playerfile may be crashing the mud. -pir
@@ -957,11 +955,11 @@ void DC::nanny(class Connection *d, std::string arg)
     //    logentry(str_tmp, 0, DC::LogChannel::LOG_MISC);
 
     // ch is allocated in load_char_obj
-    ls = load_char_obj(d, tmp_name);
+    ls = load_char_obj(d, arg);
     if (ls == load_status_t::missing)
     {
-      str_tmp << "../archive/" << tmp_name << ".gz";
-      if (file_exists(str_tmp.str().c_str()))
+      str_tmp = u"../archive/%1.gz"_s.arg(arg);
+      if (file_exists(str_tmp))
       {
         SEND_TO_Q("That character is archived.\r\nPlease mail "
                   "imps@dcastle.org to request it be restored.\r\n",
@@ -975,12 +973,12 @@ void DC::nanny(class Connection *d, std::string arg)
     // This is needed for "check_reconnect"  we free it later during load_char_obj
     // TODO - this is memoryleaking ch->getNameC().  Check if ch->getNameC() is not there before
     // doing it to fix it.  (No time to verify this now, so i'll do it later)
-    ch->setName(str_dup(tmp_name));
+    ch->setName(arg);
 
     // if (isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()))
     // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
 
-    if (!check_reconnect(d, tmp_name, false) && wizlock && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
+    if (!check_reconnect(d, arg, false) && wizlock && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
     {
       SEND_TO_Q("The game is wizlocked.\r\n", d);
       close_socket(d);
@@ -1003,15 +1001,14 @@ void DC::nanny(class Connection *d, std::string arg)
         return;
       }
       /* New player */
-      sprintf(buf, "Did I get that right, %s (y/n)? ", tmp_name);
-      SEND_TO_Q(buf, d);
+      SEND_TO_Q(u"Did I get that right, %1 (y/n)? "_s.arg(arg), d);
       telnet_ga(d);
       STATE(d) = Connection::states::CONFIRM_NEW_NAME;
       return;
     }
     else
     {
-      SEND_TO_Q(QStringLiteral("There was an error loading %1").arg(tmp_name), d);
+      SEND_TO_Q(QStringLiteral("There was an error loading %1").arg(arg), d);
       close_socket(d);
       return;
     }
@@ -1040,23 +1037,23 @@ void DC::nanny(class Connection *d, std::string arg)
       }
     }
 
-    if (std::string(crypt(arg.c_str(), password)) != password)
+    if (QString(crypt(qPrintable(arg), qPrintable(password))) != password)
     {
       SEND_TO_Q("Wrong password.\r\n", d);
-      sprintf(log_buf, "%s wrong password: %s", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
+      log_buf = u"%1 wrong password: %2"_s.arg(ch->getName()).arg(d->getPeerOriginalAddress().toString());
       logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
       if ((ch = get_pc(GET_NAME(d->character))))
       {
-        sprintf(log_buf, "$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
-                         //           "Attempt was from %s.$R\r\n"
-                         "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let a god know.)\r\n");
+        log_buf = u"$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
+                  //           "Attempt was from %s.$R\r\n"
+                  "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let an immortal know.)\r\n"_s;
         ch->send(log_buf);
       }
       else
       {
         if (d->character->player->bad_pw_tries > 100)
         {
-          sprintf(log_buf, "%s has 100+ bad pw tries...", GET_NAME(d->character));
+          log_buf = u"%1 has 100+ bad pw tries..."_s.arg(d->character->getName());
           logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
         }
         else
@@ -1088,7 +1085,7 @@ void DC::nanny(class Connection *d, std::string arg)
       d->character->send(imotd);
 
     clan_data *clan;
-    if ((clan = get_clan(ch->clan)) && clan->clanmotd)
+    if ((clan = get_clan(ch->clan)) && !clan->clanmotd.isEmpty())
     {
       ch->sendln("$B----------------------------------------------------------------------$R");
       ch->send(clan->clanmotd);
@@ -1100,7 +1097,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
     if (d->character->player->bad_pw_tries)
     {
-      sprintf(buf, "\r\n\r\n$4$BYou have had %d wrong passwords entered since your last complete login.$R\r\n\r\n", d->character->player->bad_pw_tries);
+      buf = u"\r\n\r\n$4$BYou have had %1 wrong passwords entered since your last complete login.$R\r\n\r\n"_s.arg(d->character->player->bad_pw_tries);
       SEND_TO_Q(buf, d);
     }
     DC::getInstance()->TheAuctionHouse.CheckForSoldItems(d->character);
@@ -1108,22 +1105,21 @@ void DC::nanny(class Connection *d, std::string arg)
     break;
 
   case Connection::states::CONFIRM_NEW_NAME:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       SEND_TO_Q("Please type y or n: ", d);
       telnet_ga(d);
       break;
     }
 
-    switch (arg[0])
+    switch (arg[0].toLatin1())
     {
     case 'y':
     case 'Y':
 
       if (isbanned(d->getPeerOriginalAddress()) >= BAN_NEW)
       {
-        sprintf(buf, "Request for new character %s denied from [%s] (siteban)",
-                GET_NAME(d->character), d->getPeerOriginalAddress().toString().toStdString().c_str());
+        buf = u"Request for new character %1 denied from [%2] (siteban)"_s.arg(d->character->getName()).arg(d->getPeerOriginalAddress().toString());
         logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
         SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
                   "Questions may be directed to imps@dcastle.org\r\n",
@@ -1131,7 +1127,7 @@ void DC::nanny(class Connection *d, std::string arg)
         STATE(d) = Connection::states::CLOSE;
         return;
       }
-      sprintf(buf, "New character.\r\nGive me a password for %s: ", GET_NAME(ch));
+      buf = u"New character.\r\nGive me a password for %1: "_s.arg(ch->getName());
       SEND_TO_Q(buf, d);
       telnet_ga(d);
       STATE(d) = Connection::states::GET_NEW_PASSWORD;
@@ -1170,8 +1166,7 @@ void DC::nanny(class Connection *d, std::string arg)
       return;
     }
 
-    strncpy(ch->player->pwd, crypt(arg.c_str(), ch->getNameC()), PASSWORD_LEN);
-    ch->player->pwd[PASSWORD_LEN] = '\0';
+    ch->player->pwd = crypt(qPrintable(arg), qPrintable(ch->getName()));
     SEND_TO_Q("Please retype password: ", d);
     telnet_ga(d);
     STATE(d) = Connection::states::CONFIRM_NEW_PASSWORD;
@@ -1180,7 +1175,7 @@ void DC::nanny(class Connection *d, std::string arg)
   case Connection::states::CONFIRM_NEW_PASSWORD:
     SEND_TO_Q("\r\n", d);
 
-    if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+    if (QString(crypt(qPrintable(arg), qPrintable(ch->player->pwd))) != ch->player->pwd)
     {
       SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
       telnet_ga(d);
@@ -1195,13 +1190,13 @@ void DC::nanny(class Connection *d, std::string arg)
     break;
 
   case Connection::states::GET_ANSI:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       STATE(d) = Connection::states::QUESTION_ANSI;
       return;
     }
 
-    switch (arg[0])
+    switch (arg[0].toLatin1())
     {
     case 'y':
     case 'Y':
@@ -1226,14 +1221,14 @@ void DC::nanny(class Connection *d, std::string arg)
     break;
 
   case Connection::states::GET_NEW_SEX:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       SEND_TO_Q("That's not a sex.\r\n", d);
       STATE(d) = Connection::states::QUESTION_SEX;
       break;
     }
 
-    switch (arg[0])
+    switch (arg[0].toLatin1())
     {
     case 'm':
     case 'M':
@@ -1288,14 +1283,11 @@ void DC::nanny(class Connection *d, std::string arg)
     break;
 
   case Connection::states::GET_STAT_METHOD:
-    try
-    {
-      selection = stoul(arg);
-    }
-    catch (...)
-    {
+  {
+    bool ok = false;
+    selection = arg.toUInt(&ok);
+    if (!ok)
       selection = 0;
-    }
 
     if (selection == 1)
     {
@@ -1309,7 +1301,8 @@ void DC::nanny(class Connection *d, std::string arg)
     {
       STATE(d) = Connection::states::QUESTION_STAT_METHOD;
     }
-    break;
+  }
+  break;
 
   case Connection::states::NEW_STAT_METHOD:
     STATE(d) = Connection::states::QUESTION_RACE;
@@ -1388,15 +1381,10 @@ void DC::nanny(class Connection *d, std::string arg)
     }
 
     // first time, this has the m/f from sex and goes right through
-
-    try
-    {
-      selection = stoul(arg);
-    }
-    catch (...)
-    {
+    ok = false;
+    selection = arg.toUInt(&ok);
+    if (!ok)
       selection = 0;
-    }
 
     if (selection >= 1 && selection <= 5)
     {
@@ -1408,12 +1396,19 @@ void DC::nanny(class Connection *d, std::string arg)
       delete ch->desc->stats;
       ch->desc->stats = nullptr;
       SEND_TO_Q("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
-      sprintf(buf, "  %c1: Human\r\n  %c2: Elf\r\n  %c3: Dwarf\r\n"
-                   "  %c4: Hobbit\r\n  %c5: Pixie\r\n  %c6: Ogre\r\n"
-                   "  %c7: Gnome\r\n  %c8: Orc\r\n  %c9: Troll\r\n"
-                   "\r\nSelect a race(Type help <race> for more information)-> ",
-              is_race_eligible(ch, 1) ? '*' : ' ', is_race_eligible(ch, 2) ? '*' : ' ', is_race_eligible(ch, 3) ? '*' : ' ', is_race_eligible(ch, 4) ? '*' : ' ', is_race_eligible(ch, 5) ? '*' : ' ', is_race_eligible(ch, 6) ? '*' : ' ',
-              is_race_eligible(ch, 7) ? '*' : ' ', is_race_eligible(ch, 8) ? '*' : ' ', is_race_eligible(ch, 9) ? '*' : ' ');
+      buf = u"  %11: Human\r\n  %22: Elf\r\n  %33: Dwarf\r\n"
+            "  %44: Hobbit\r\n  %55: Pixie\r\n  %66: Ogre\r\n"
+            "  %77: Gnome\r\n  %88: Orc\r\n  %99: Troll\r\n"
+            "\r\nSelect a race(Type help <race> for more information)-> "_s
+                .arg(is_race_eligible(ch, 1) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 2) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 3) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 4) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 5) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 6) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 7) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 8) ? '*' : ' ')
+                .arg(is_race_eligible(ch, 9) ? '*' : ' ');
 
       SEND_TO_Q(buf, d);
       telnet_ga(d);
@@ -1424,14 +1419,10 @@ void DC::nanny(class Connection *d, std::string arg)
     break;
 
   case Connection::states::OLD_GET_RACE:
-    try
-    {
-      selection = stoul(arg);
-    }
-    catch (...)
-    {
+    ok = false;
+    selection = arg.toUInt(&ok);
+    if (!ok)
       selection = 0;
-    }
 
     switch (selection)
     {
@@ -1567,45 +1558,39 @@ void DC::nanny(class Connection *d, std::string arg)
 
     ch->set_hw();
     SEND_TO_Q("\r\nA '*' denotes a class that fits your chosen stats.\r\n", d);
-    sprintf(buf, " %c 1: Warrior\r\n"
-                 " %c 2: Cleric\r\n"
-                 " %c 3: Mage\r\n"
-                 " %c 4: Thief\r\n"
-                 " %c 5: Anti-Paladin\r\n"
-                 " %c 6: Paladin\r\n"
-                 " %c 7: Barbarian \r\n"
-                 " %c 8: Monk\r\n"
-                 " %c 9: Ranger\r\n"
-                 " %c 10: Bard\r\n"
-                 " %c 11: Druid\r\n"
-                 "\r\nSelect a class(Type help <class> for more information) > ",
-            //           (is_clss_eligible(ch, CLASS_WARRIOR) ? '*' : ' '),
-            '*',
-            (is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_THIEF) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_ANTI_PAL) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_PALADIN) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_BARBARIAN) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_MONK) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_RANGER) ? '*' : ' '),
-            //            '*',
-            (is_clss_eligible(ch, CLASS_BARD) ? '*' : ' '),
-            (is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' '));
+    buf = u" %1 1: Warrior\r\n"
+          " %2 2: Cleric\r\n"
+          " %3 3: Mage\r\n"
+          " %4 4: Thief\r\n"
+          " %5 5: Anti-Paladin\r\n"
+          " %6 6: Paladin\r\n"
+          " %7 7: Barbarian \r\n"
+          " %8 8: Monk\r\n"
+          " %9 9: Ranger\r\n"
+          " %10 10: Bard\r\n"
+          " %11 11: Druid\r\n"
+          "\r\nSelect a class(Type help <class> for more information) > "_s
+              .arg('*')
+              .arg(is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_THIEF) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_ANTI_PAL) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_PALADIN) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_BARBARIAN) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_MONK) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_RANGER) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_BARD) ? '*' : ' ')
+              .arg(is_clss_eligible(ch, CLASS_DRUID) ? '*' : ' ');
     SEND_TO_Q(buf, d);
     telnet_ga(d);
     STATE(d) = Connection::states::OLD_GET_CLASS;
     break;
 
   case Connection::states::OLD_GET_CLASS:
-    try
-    {
-      selection = stoul(arg);
-    }
-    catch (...)
-    {
+    ok = false;
+    selection = arg.toUInt(&ok);
+    if (!ok)
       selection = 0;
-    }
 
     switch (selection)
     {
@@ -1712,7 +1697,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
     init_char(ch);
 
-    sprintf(log_buf, "%s@%s new player.", GET_NAME(ch), d->getPeerOriginalAddress().toString().toStdString().c_str());
+    log_buf = u"%1@%2 new player."_s.arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString());
     logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
     SEND_TO_Q("\r\n", d);
     SEND_TO_Q(motd, d);
@@ -1729,14 +1714,14 @@ void DC::nanny(class Connection *d, std::string arg)
     break;
 
   case Connection::states::SELECT_MENU:
-    if (arg.empty())
+    if (arg.isEmpty())
     {
       SEND_TO_Q(menu, d);
       telnet_ga(d);
       break;
     }
 
-    switch (arg[0])
+    switch (arg[0].toLatin1())
     {
     case '0':
       close_socket(d);
@@ -1748,10 +1733,12 @@ void DC::nanny(class Connection *d, std::string arg)
       // by logging in twice, and leaving one at the password: prompt
       if (ch->getLevel() > 0)
       {
+        auto name = ch->getName();
         free_char(d->character, Trace("nanny Connection::states::SELECT_MENU 1"));
         d->character = {};
-        load_char_obj(d, ch->getName());
-        ch = d->character;
+        ch = {};
+        if (load_char_obj(d, name) == load_status_t::success)
+          ch = d->character;
       }
 
       if (!ch)
@@ -1769,12 +1756,12 @@ void DC::nanny(class Connection *d, std::string arg)
       unique_scan(ch);
       if (ch->getGold() > 1000000000)
       {
-        sprintf(log_buf, "%s has more than a billion gold. Bugged?", GET_NAME(ch));
+        log_buf = u"%1 has more than a billion gold. Bugged?"_s.arg(GET_NAME(ch));
         logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
       if (GET_BANK(ch) > 1000000000)
       {
-        sprintf(log_buf, "%s has more than a billion gold in the bank. Rich fucker or bugged.", GET_NAME(ch));
+        log_buf = u"%1 has more than a billion gold in the bank. Rich fucker or bugged."_s.arg(GET_NAME(ch));
         logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
       ch->sendln("\r\nWelcome to Dark Castle.");
@@ -1792,8 +1779,8 @@ void DC::nanny(class Connection *d, std::string arg)
         clan_login(ch);
 
       act("$n has entered the game.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-      if (!GET_SHORT_ONLY(ch))
-        GET_SHORT_ONLY(ch) = str_dup(GET_NAME(ch));
+      if (!GET_SHORT_ONLY(ch).isEmpty())
+        GET_SHORT_ONLY(ch) = GET_NAME(ch);
       DC::getInstance()->update_wizlist(ch);
       ch->check_maxes(); // Check skill maxes.
 
@@ -1803,11 +1790,11 @@ void DC::nanny(class Connection *d, std::string arg)
       if (ch->getLevel() == 0)
       {
         do_start(ch);
-        do_new_help(ch, "new");
+        ch->do_new_help({u"new"_s});
       }
       do_look(ch, "");
       {
-        if (ch->getLevel() >= 40 && DC::getInstance()->DCVote.IsActive() && !DC::getInstance()->DCVote.HasVoted(ch))
+        if (ch->getLevel() >= 40 && DCVote.IsActive() && !DCVote.HasVoted(ch))
         {
           send_to_char("\r\nThere is an active vote in which you have not yet voted.\r\n"
                        "Enter \"vote\" to see details\r\n\r\n",
@@ -1822,19 +1809,11 @@ void DC::nanny(class Connection *d, std::string arg)
       SEND_TO_Q("Enter a text you'd like others to see when they look at you.\r\n"
                 "Terminate with '/s' on a new line.\r\n",
                 d);
-      if (ch->description)
+      if (!ch->description.isEmpty())
       {
         SEND_TO_Q("Old description:\r\n", d);
         SEND_TO_Q(ch->description, d);
-        dc_free(ch->description);
       }
-#ifdef LEAK_CHECK
-      ch->description = (char *)calloc(540, sizeof(char));
-#else
-      ch->description = (char *)dc_alloc(540, sizeof(char));
-#endif
-
-      // TODO - what happens if I get to this point, then disconnect, and reconnect?  memory leak?
 
       d->strnew = &ch->description;
       d->max_str = 539;
@@ -1874,11 +1853,11 @@ void DC::nanny(class Connection *d, std::string arg)
   case Connection::states::ARCHIVE_CHAR:
     if (arg == "ARCHIVE ME")
     {
-      str_tmp << GET_NAME(d->character);
+      str_tmp = GET_NAME(d->character);
       SEND_TO_Q("\r\nCharacter Archived.\r\n", d);
       DC::getInstance()->update_wizlist(d->character);
       close_socket(d);
-      util_archive(str_tmp.str().c_str(), 0);
+      util_archive(qPrintable(str_tmp), 0);
     }
     else
     {
@@ -1890,7 +1869,7 @@ void DC::nanny(class Connection *d, std::string arg)
   case Connection::states::DELETE_CHAR:
     if (arg == "ERASE ME")
     {
-      sprintf(buf, "%s just deleted themself.", d->character->getNameC());
+      buf = u"%1 just deleted themself."_s.arg(d->character->getName());
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_MORTAL);
 
       DC::getInstance()->TheAuctionHouse.HandleDelete(d->character->getName());
@@ -1918,7 +1897,7 @@ void DC::nanny(class Connection *d, std::string arg)
 
   case Connection::states::CONFIRM_PASSWORD_CHANGE:
     SEND_TO_Q("\r\n", d);
-    if (std::string(crypt(arg.c_str(), ch->player->pwd)) == ch->player->pwd)
+    if (ch->player->pwd == crypt(qPrintable(arg), qPrintable(ch->player->pwd)))
     {
       SEND_TO_Q("Enter a new password: ", d);
       telnet_ga(d);
@@ -1942,8 +1921,7 @@ void DC::nanny(class Connection *d, std::string arg)
       telnet_ga(d);
       return;
     }
-    strncpy(ch->player->pwd, crypt(arg.c_str(), ch->getNameC()), PASSWORD_LEN);
-    ch->player->pwd[PASSWORD_LEN] = '\0';
+    ch->player->pwd = crypt(qPrintable(arg), qPrintable(ch->getName()));
     SEND_TO_Q("Please retype password: ", d);
     telnet_ga(d);
     STATE(d) = Connection::states::CONFIRM_RESET_PASSWORD;
@@ -1952,7 +1930,7 @@ void DC::nanny(class Connection *d, std::string arg)
   case Connection::states::CONFIRM_RESET_PASSWORD:
     SEND_TO_Q("\r\n", d);
 
-    if (std::string(crypt(arg.c_str(), ch->player->pwd)) != ch->player->pwd)
+    if (ch->player->pwd != crypt(qPrintable(arg), qPrintable(ch->player->pwd)))
     {
       SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
       telnet_ga(d);
@@ -1965,17 +1943,17 @@ void DC::nanny(class Connection *d, std::string arg)
     STATE(d) = Connection::states::SELECT_MENU;
     if (ch->getLevel() > 1)
     {
-      char blah1[50], blah2[50];
+      QString blah1, blah2;
       // this prevents a dupe bug
-      strcpy(blah1, GET_NAME(ch));
-      strcpy(blah2, ch->player->pwd);
+      blah1 = GET_NAME(ch);
+      blah2 = ch->player->pwd;
       free_char(d->character, Trace("nanny Connection::states::CONFIRM_RESET_PASSWORD"));
       d->character = 0;
       load_char_obj(d, blah1);
       ch = d->character;
-      strcpy(ch->player->pwd, blah2);
+      ch->player->pwd = blah2;
       ch->save_char_obj();
-      sprintf(log_buf, "%s password changed", GET_NAME(ch));
+      log_buf = u"%1 password changed"_s.arg(GET_NAME(ch));
       logentry(log_buf, SERAPH, DC::LogChannel::LOG_SOCKET);
     }
 
@@ -2002,31 +1980,23 @@ int _parse_email(char *arg)
 }
 
 // Parse a name for acceptability.
-int _parse_name(const char *arg, char *name)
+bool is_valid_name(QString name)
 {
-  int i;
+  if (name.size() < 3 || name.size() >= MAX_NAME_LENGTH)
+    return false;
 
-  /* skip whitespaces */
-  for (; isspace(*arg); arg++)
-    ;
+  for (auto &c : name)
+    if (!c.isLetter())
+      return false;
 
-  for (i = 0; (name[i] = arg[i]) != '\0'; i++)
-  {
-    if (name[i] < 0 || !isalpha(name[i]) || i >= MAX_NAME_LENGTH)
-      return 1;
-  }
+  if (on_forbidden_name_list(qPrintable(name)))
+    return false;
 
-  if (i < 3)
-    return 1;
-
-  if (on_forbidden_name_list(name))
-    return 1;
-
-  return 0;
+  return true;
 }
 
 // Check for denial of service.
-bool check_deny(class Connection *d, char *name)
+bool check_deny(class Connection *d, const char *name)
 {
   FILEPtr fpdeny = nullptr;
   char strdeny[MAX_INPUT_LENGTH];
@@ -2330,14 +2300,14 @@ void checkConsecrate(int pulseType)
               if (spl == SPELL_CONSECRATE)
               {
                 if (ch->in_room != obj->in_room)
-                  csendf(ch, "You sense your consecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
+                  csendf(ch, "You sense your consecration of %s has ended.\r\n", qPrintable(DC::getInstance()->world[obj->in_room].name));
                 else
                   ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.");
               }
               else
               {
                 if (ch->in_room != obj->in_room)
-                  csendf(ch, "You sense your desecration of %s has ended.\r\n", DC::getInstance()->world[obj->in_room].name);
+                  csendf(ch, "You sense your desecration of %s has ended.\r\n", qPrintable(DC::getInstance()->world[obj->in_room].name));
                 else
                   ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.");
               }
@@ -2552,16 +2522,21 @@ void show_question_race(Connection *d)
   }
 
   Character *ch = d->character;
-  std::string buffer, races_buffer;
+  QString buffer, races_buffer;
   buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
   buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
   for (int race = 1; race <= 9; race++)
   {
     if (races[race].singular_name != nullptr)
     {
-      buffer += fmt::format("{}. {:6} {:3} {:3} {:3} {:3} {:3}\r\n", race, races[race].singular_name,
-                            races[race].mod_str, races[race].mod_dex, races[race].mod_con, races[race].mod_int,
-                            races[race].mod_wis);
+      buffer += u"%1. %2 %3 %4 %5 %6 %7\r\n"_s
+                    .arg(race)
+                    .arg(races[race].singular_name, 6)
+                    .arg(races[race].mod_str, 3)
+                    .arg(races[race].mod_dex, 3)
+                    .arg(races[race].mod_con, 3)
+                    .arg(races[race].mod_int, 3)
+                    .arg(races[race].mod_wis, 3);
       races_buffer += races[race].lowercase_name;
       if (race < MAX_PC_RACE)
       {
@@ -2570,19 +2545,19 @@ void show_question_race(Connection *d)
     }
     ch->undo_race_saves();
   }
-  buffer += "Type 1-" + std::to_string(MAX_PC_RACE) + "," + races_buffer + " or help <keyword>: ";
-  SEND_TO_Q(buffer.c_str(), d);
+  buffer += u"Type 1-%1,%2 or help <keyword>: "_s.arg(MAX_PC_RACE).arg(races_buffer);
+  SEND_TO_Q(buffer, d);
   telnet_ga(d);
 }
 
-bool handle_get_race(Connection *d, std::string arg)
+bool handle_get_race(Connection *d, QString arg)
 {
-  if (d == nullptr || d->character == nullptr || arg == "")
+  if (!d || !d->character || arg.isEmpty())
   {
     return false;
   }
 
-  for (unsigned race = 1; race <= 9; race++)
+  for (auto race = 1U; race <= MAX_PC_RACE; race++)
   {
     if (races[race].lowercase_name == arg)
     {
@@ -2592,14 +2567,10 @@ bool handle_get_race(Connection *d, std::string arg)
   }
 
   uint32_t race = 0;
-  try
-  {
-    race = stoul(arg);
-  }
-  catch (...)
-  {
+  bool ok = false;
+  race = arg.toUInt(&ok);
+  if (!ok)
     return false;
-  }
 
   if (race < 1 || race > MAX_PC_RACE)
   {

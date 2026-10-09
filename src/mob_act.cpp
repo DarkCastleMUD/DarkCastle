@@ -624,23 +624,23 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
   switch (number(0, 6))
   {
   case 0:
-    do_say(ch, "What do you think you are doing?!");
+    ch->do_say("What do you think you are doing?!");
     break;
   case 1:
-    do_say(ch, "Mess with the best?  Die like the rest!");
+    ch->do_say("Mess with the best?  Die like the rest!");
     break;
   case 2:
     do_emote(ch, " looks around for a moment, confused.");
-    do_say(ch, "YOU!!");
+    ch->do_say("YOU!!");
     break;
   case 3:
-    do_say(ch, "Foolish.");
+    ch->do_say("Foolish.");
     break;
   case 4:
-    do_say(ch, "I'm going to treat you like a baby treats a diaper.");
+    ch->do_say("I'm going to treat you like a baby treats a diaper.");
     break;
   case 5:
-    do_say(ch, "Here comes the pain baby!");
+    ch->do_say("Here comes the pain baby!");
     break;
   case 6:
     do_emote(ch, " wiggles its bottom.");

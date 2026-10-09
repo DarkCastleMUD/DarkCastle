@@ -60,7 +60,6 @@
 #include "DC/vault.h"
 #include "DC/structs.h"
 #include "DC/const.h"
-#include "DC/newedit.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
 #include "DC/Index.h"
@@ -127,8 +126,8 @@ int do_check(Character *ch, char *arg, cmd_t cmd)
 
     redo_hitpoints(vict);
     redo_mana(vict);
-    if (!GET_TITLE(vict))
-      GET_TITLE(vict) = str_dup("is a virgin");
+    if (GET_TITLE(vict).isEmpty())
+      GET_TITLE(vict) = "is a virgin";
     if (GET_CLASS(vict) == CLASS_MONK)
       GET_AC(vict) -= vict->getLevel() * 3;
     isr_set(vict);
@@ -259,9 +258,10 @@ int do_find(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(type, "%30s -- %s [%d]\r\n", GET_SHORT(vict),
-          DC::getInstance()->world[vict->in_room].name, DC::getInstance()->world[vict->in_room].number);
-  ch->send(type);
+  ch->sendln(u"%1 -- %2 [%3]"_s
+                 .arg(GET_SHORT(vict), 30)
+                 .arg(DC::getInstance()->world[vict->in_room].name)
+                 .arg(DC::getInstance()->world[vict->in_room].number));
   return ReturnValue::eSUCCESS;
 }
 
@@ -358,8 +358,8 @@ int do_stat(Character *ch, char *arg, cmd_t cmd)
 
     redo_hitpoints(vict);
     redo_mana(vict);
-    if (!GET_TITLE(vict))
-      GET_TITLE(vict) = str_dup("is a virgin");
+    if (GET_TITLE(vict).isEmpty())
+      GET_TITLE(vict) = "is a virgin";
     if (GET_CLASS(vict) == CLASS_MONK)
       GET_AC(vict) -= vict->getLevel() * 3;
     isr_set(vict);
@@ -1333,11 +1333,11 @@ int do_zedit(Character *ch, char *argument, cmd_t cmd)
 
 int do_sedit(Character *ch, char *argument, cmd_t cmd)
 {
-  std::string buf;
-  std::string select;
-  std::string target;
-  std::string text;
-  std::string value;
+  QString buf;
+  QString select;
+  QString target;
+  QString text;
+  QString value;
   Character *vict = nullptr;
   char_skill_data *skill = nullptr;
   char_skill_data *lastskill = nullptr;
@@ -1346,12 +1346,11 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
   int16_t learned = 0;
   int i = 0;
 
-  const char *sedit_values[] = {
-      "add",
-      "remove",
-      "set",
-      "list",
-      "\n"};
+  const QStringList sedit_values = {
+      u"add"_s,
+      u"remove"_s,
+      u"set"_s,
+      u"list"_s};
 
   if (!ch->has_skill(COMMAND_SEDIT))
   {
@@ -1359,12 +1358,12 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  std::tie(target, text) = half_chop(argument);
+  std::tie(target, text) = half_chop(QString(argument));
   std::tie(select, text) = half_chop(text);
   // at this point target is the character's name
   // select is the field, and text is any args
 
-  if (select.empty() || target.empty())
+  if (select.isEmpty() || target.isEmpty())
   {
     send_to_char("$3Usage$R: sedit <character> <field> [args]\r\n"
                  "Use a field with no args to get help on that field.\r\n"
@@ -1374,9 +1373,9 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!(vict = get_char_vis(ch, target.c_str())))
+  if (!(vict = get_char_vis(ch, target)))
   {
-    ch->send(fmt::format("Cannot find player '{}'.\r\n", target));
+    ch->send(u"Cannot find player '%1'."_s.arg(target));
     return ReturnValue::eFAILURE;
   }
 
@@ -1386,7 +1385,7 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  field = old_search_block(select.c_str(), 0, select.length(), sedit_values, 1);
+  field = old_search_block(select, sedit_values, true);
   if (field < 0)
   {
     ch->sendln("That field not recognized.");
@@ -1405,31 +1404,31 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
 
     if (results.empty())
     {
-      ch->send(fmt::format("Cannot find skill '{}' in master skill list.\r\n", text));
+      ch->send(u"Cannot find skill '%1' in master skill list.\r\n"_s.arg(text));
       return ReturnValue::eFAILURE;
     }
 
     if (results.size() > 1)
     {
-      ch->send(fmt::format("Skill '{}' is too ambiguous. Please specify one of the following:\r\n", text));
-      for (const auto &result : results)
+      ch->send(u"Skill '{}' is too ambiguous. Please specify one of the following:\r\n"_s.arg(text));
+      for (const auto &[key, result] : results.asKeyValueRange())
       {
-        ch->send(fmt::format("{}\r\n", result.first));
+        ch->sendln(u"%1"_s.arg(key));
       }
       ch->send("\r\n");
 
       return ReturnValue::eFAILURE;
     }
 
-    skillnum = results.begin()->second;
-    text = results.begin()->first;
+    skillnum = results.first();
+    text = results.firstKey();
   }
 
   switch (field)
   {
   case 0: /* add */
   {
-    if (text.empty())
+    if (text.isEmpty())
     {
       ch->send("$3Usage$R: sedit <character> add <skillname>\r\n"
                "This will give the skill to the character at learning 1.\r\n");
@@ -1439,20 +1438,20 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
 
     if (vict->has_skill(skillnum))
     {
-      ch->send(fmt::format("'{}' already has '{}'.\r\n", GET_NAME(vict), text));
+      ch->send(u"'%1' already has '%2'.\r\n"_s.arg(GET_NAME(vict)).arg(text));
       return ReturnValue::eFAILURE;
     }
 
     vict->learn_skill(skillnum, 1, 1);
 
-    buf = fmt::format("'{}' has been given skill '{}' ({}) by {}.", GET_NAME(vict), text, skillnum, GET_NAME(ch));
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    ch->send(fmt::format("'{}' has been given skill '{}' ({}) by {}.\r\n", GET_NAME(vict), text, skillnum, GET_NAME(ch)));
+    buf = u"'%1' has been given skill '%2' (%3) by %4."_s.arg(GET_NAME(vict)).arg(text).arg(skillnum).arg(GET_NAME(ch));
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->sendln(u"'%1' has been given skill '%2' (%3) by %4."_s.arg(GET_NAME(vict)).arg(text).arg(skillnum).arg(GET_NAME(ch)));
     break;
   }
   case 1: /* remove */
   {
-    if (text.empty())
+    if (text.isEmpty())
     {
       ch->send("$3Usage$R: sedit <character> remove <skillname>\r\n"
                "This will remove the skill from the character.\r\n");
@@ -1463,20 +1462,20 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
     {
       ch->skills.erase(skillnum);
 
-      buf = fmt::format("Skill '{}' ({}) removed from {} by {}.", text, skillnum, GET_NAME(vict), GET_NAME(ch));
-      logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-      ch->send(fmt::format("Skill '{}' ({}) removed from {}.\r\n", text, skillnum, GET_NAME(vict)));
+      buf = u"Skill '%1' (%2) removed from %3 by %4."_s.arg(text).arg(skillnum).arg(GET_NAME(vict)).arg(GET_NAME(ch));
+      logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+      ch->send(u"Skill '%1' (%2) removed from %3.\r\n"_s.arg(text).arg(skillnum).arg(GET_NAME(vict)));
     }
     else
     {
-      ch->send(fmt::format("Cannot find skill '{}' on '{}'.\r\n", text, GET_NAME(vict)));
+      ch->send(u"Cannot find skill '%1' on '%2'.\r\n"_s.arg(text).arg(GET_NAME(vict)));
       return ReturnValue::eFAILURE;
     }
     break;
   }
   case 2: /* set */
   {
-    if (text.empty())
+    if (text.isEmpty())
     {
       ch->send("$3Usage$R: sedit <character> set <skillname> <amount>\r\n"
                "This will set the character's skill to amount.\r\n");
@@ -1484,10 +1483,10 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
     }
     if (!(learned = vict->has_skill(skillnum)))
     {
-      ch->send(fmt::format("'{}' does not have skill '{}'.\r\n", GET_NAME(vict), text));
+      ch->send(u"'%1' does not have skill '%2'.\r\n"_s.arg(GET_NAME(vict)).arg(text));
       return ReturnValue::eFAILURE;
     }
-    if (!check_range_valid_and_convert(i, value.c_str(), 1, 100))
+    if (!check_range_valid_and_convert(i, value, 1, 100))
     {
       ch->sendln("Invalid skill amount.  Must be 1 - 100.");
       return ReturnValue::eFAILURE;
@@ -1495,9 +1494,9 @@ int do_sedit(Character *ch, char *argument, cmd_t cmd)
 
     vict->learn_skill(skillnum, i, i);
 
-    buf = fmt::format("'{}'s skill '{}' set to {} from {} by {}.", GET_NAME(vict), text, i, learned, GET_NAME(ch));
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
-    ch->send(fmt::format("'{}' skill '{}' set to {} from {}.\r\n", GET_NAME(vict), text, i, learned));
+    buf = u"'%1's skill '%2' set to %3 from %4 by %5."_s.arg(GET_NAME(vict)).arg(text).arg(i).arg(learned).arg(GET_NAME(ch));
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->send(u"'%1' skill '%2' set to %3 from %4.\r\n"_s.arg(GET_NAME(vict)).arg(text).arg(i).arg(learned));
     break;
   }
   case 3: /* list */
@@ -1551,9 +1550,6 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   Object *obj = nullptr;
   int num;
 
-  extra_descr_data *curr = nullptr;
-  extra_descr_data *curr2 = nullptr;
-
   const char *fields[] =
       {
           "new",
@@ -1578,8 +1574,11 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
                  ch);
     ch->display_string_list(fields);
     ch->sendln("\r\n$3Current Descs$R:");
-    for (x = 1, curr = obj->ex_description; curr; x++, curr = curr->next)
-      csendf(ch, "$3%d$R) %s\r\n%s\r\n", x, curr->keyword, curr->description);
+
+    x = 1;
+    for (const auto &[keyword, description] : obj->ex_descriptions.asKeyValueRange())
+      ch->sendln(u"$3%1$R) %2\r\n3"_s.arg(x++).arg(keyword).arg(description));
+
     return ReturnValue::eFAILURE;
   }
 
@@ -1593,7 +1592,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     if (is_abbrev(type, fields[x]))
       break;
   }
-
+  QString keyword, description;
   switch (x)
   {
   // new
@@ -1606,11 +1605,9 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
                    ch);
       return ReturnValue::eFAILURE;
     }
-    curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-    curr->keyword = str_hsh(select);
-    curr->description = str_hsh("Empty desc.\r\n");
-    curr->next = obj->ex_description;
-    obj->ex_description = curr;
+    keyword = select;
+    description = "Empty desc.\r\n";
+    obj->ex_descriptions[keyword] = description;
     ch->sendln("New desc created.");
     break;
   }
@@ -1620,40 +1617,18 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
   {
     if (!*select)
     {
-      send_to_char("$3Syntax$R: oedit [item_num] exdesc delete <number>\r\n"
-                   "This removes desc <number> from the list permanently.\r\n",
+      send_to_char("$3Syntax$R: oedit [item_num] exdesc delete <keyword>\r\n"
+                   "This removes the extended description for <keyword> from the list permanently.\r\n",
                    ch);
       return ReturnValue::eFAILURE;
     }
-    if (!check_range_valid_and_convert(num, select, 1, 50))
+    if (!obj->ex_descriptions.contains(buf))
     {
-      ch->sendln("You must select a valid number.");
-      return ReturnValue::eFAILURE;
-    }
-    x = 1;
-    curr2 = nullptr;
-    for (curr = obj->ex_description; x < num && curr; curr = curr->next)
-    {
-      curr2 = curr;
-      x++;
-    }
-
-    if (!curr)
-    {
-      ch->sendln("There is no desc for that number.");
+      ch->sendln("There is no extended description for that keyword.");
       return ReturnValue::eFAILURE;
     }
 
-    if (!curr2)
-    { // first one
-      obj->ex_description = curr->next;
-      dc_free(curr);
-    }
-    else
-    {
-      curr2->next = curr->next;
-      dc_free(curr);
-    }
+    obj->ex_descriptions.remove(buf);
     ch->sendln("Deleted.");
     break;
   }
@@ -1673,15 +1648,13 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
       ch->sendln("You must select a valid number.");
       return ReturnValue::eFAILURE;
     }
-    for (curr = obj->ex_description, x = 1; x < num && curr; curr = curr->next)
-      x++;
 
-    if (!curr)
+    if (num < 1 || num > obj->ex_descriptions.size())
     {
       ch->sendln("There is no desc for that number.");
       return ReturnValue::eFAILURE;
     }
-    curr->keyword = str_hsh(value);
+    // obj->ex_descriptions[num - 1]->keyword = value;
     ch->sendln("New keyword set.");
     break;
   }
@@ -1701,10 +1674,8 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
       ch->sendln("You must select a valid number.");
       return ReturnValue::eFAILURE;
     }
-    for (curr = obj->ex_description, x = 1; x < num && curr; curr = curr->next)
-      x++;
 
-    if (!curr)
+    if (num < 1 || num > obj->ex_descriptions.size())
     {
       ch->sendln("There is no desc for that number.");
       return ReturnValue::eFAILURE;
@@ -1716,7 +1687,7 @@ int oedit_exdesc(Character *ch, int item_num, char *buf)
     //        curr->description = 0;
 
     ch->desc->connected = Connection::states::EDITING;
-    ch->desc->strnew = &(curr->description);
+    ch->desc->strnew = &obj->ex_descriptions[select];
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     break;
@@ -2576,23 +2547,22 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
   }
   break;
   case 22:
-    extra_descr_data *curr;
-    for (curr = (DC::getInstance()->obj_index[rnum].item)->ex_description; curr; curr = curr->next)
-      if (!str_cmp(curr->keyword, qPrintable((DC::getInstance()->obj_index[rnum].item)->Name())))
-        break;
-    if (!curr)
+  {
+    if ((DC::getInstance()->obj_index[rnum].item)->ex_descriptions.isEmpty())
     { // None existing;
-      curr = (extra_descr_data *)calloc(1, sizeof(extra_descr_data));
-      curr->keyword = str_dup(qPrintable((DC::getInstance()->obj_index[rnum].item)->Name()));
-      curr->description = str_dup("");
-      curr->next = (DC::getInstance()->obj_index[rnum].item)->ex_description;
-      (DC::getInstance()->obj_index[rnum].item)->ex_description = curr;
+      auto keyword = DC::getInstance()->obj_index[rnum].item->Name();
+
+      DC::getInstance()->obj_index[rnum].item->ex_descriptions[keyword] = {};
     }
+
+    if (DC::getInstance()->obj_index[rnum].item->ex_descriptions.contains(DC::getInstance()->obj_index[rnum].item->Name()))
+      desc->strnew = &DC::getInstance()->obj_index[rnum].item->ex_descriptions[DC::getInstance()->obj_index[rnum].item->Name()];
+
     sendln("Write your object's description. End with /s.");
     desc->connected = Connection::states::EDITING;
-    desc->strnew = &(curr->description);
     desc->max_str = MAX_MESSAGE_LENGTH;
-    break;
+  }
+  break;
   default:
     sendln("Illegal value, tell a coder.");
     break;
@@ -2788,9 +2758,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
       DC::getInstance()->mob_index[mob_num].mobprogs = currprog->next;
 
     currprog->type = 0;
-    dc_free(currprog->arglist);
-    dc_free(currprog->comlist);
-    dc_free(currprog);
+    delete currprog;
 
     update_mobprog_bits(mob_num);
 
@@ -2935,8 +2903,7 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    dc_free(currprog->arglist);
-    currprog->arglist = strdup(buf3);
+    currprog->arglist = buf3;
 
     ch->sendln("Mob program arglist changed.");
   }
@@ -2984,9 +2951,9 @@ int do_procedit(Character *ch, char *argument, cmd_t cmd)
                    "   |--------------------------------------------------------------------------------|\r\n",
                    ch);
 
-      if (currprog->comlist)
+      if (!currprog->comlist.isEmpty())
       {
-        ch->desc->backstr = str_dup(currprog->comlist);
+        ch->desc->backstr = currprog->comlist;
         if (ch->desc->backstr != nullptr)
         {
           ch->send(double_dollars(QString(ch->desc->backstr)));
@@ -4109,8 +4076,6 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
 {
   std::string buf, remainder_args;
   int x, a, b, c, d = 0;
-  extra_descr_data *extra;
-  extra_descr_data *ext;
 
   const char *return_directions[] =
       {
@@ -4186,8 +4151,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("$3Syntax$R: redit name <Room Name>");
       return ReturnValue::eFAILURE;
     }
-    dc_free(DC::getInstance()->world[ch->in_room].name);
-    DC::getInstance()->world[ch->in_room].name = str_dup(remainder_args.c_str());
+    DC::getInstance()->world[ch->in_room].name = remainder_args.c_str();
     ch->sendln("Ok.");
   }
   break;
@@ -4198,8 +4162,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     if (!remainder_args.empty())
     {
       std::string description = remainder_args + "\r\n";
-      dc_free(DC::getInstance()->world[ch->in_room].description);
-      DC::getInstance()->world[ch->in_room].description = str_dup(description.c_str());
+      DC::getInstance()->world[ch->in_room].description = description.c_str();
       ch->sendln("Ok.");
       return ReturnValue::eFAILURE;
     }
@@ -4434,16 +4397,16 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
                  "redit extra <keywords ...>    - add or edit keywords.\r\n"
                  "redit extra delete <keyword>  - delete extra descriptions linked to keyword.\r\n\r\n");
       bool found = false;
-      for (extra = DC::getInstance()->world[ch->in_room].ex_description; extra != nullptr; extra = extra->next)
+      for (const auto &[keyword, description] : DC::getInstance()->world[ch->in_room].ex_descriptions.asKeyValueRange())
       {
-        if (extra->keyword != nullptr)
+        if (!keyword.isEmpty())
         {
           if (found == false)
           {
             found = true;
             ch->sendln("Extra description keywords:");
           }
-          ch->send(QStringLiteral("%1\r\n").arg(extra->keyword));
+          ch->send(QStringLiteral("%1\r\n").arg(keyword));
         }
       }
       if (found == false)
@@ -4463,87 +4426,32 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       std::tie(arg3, remainder_args) = half_chop(remainder_args);
 
       bool deleted = false;
-      extra_descr_data *prev = nullptr;
-      for (extra = DC::getInstance()->world[ch->in_room].ex_description; extra != nullptr; prev = extra, extra = extra->next)
-      {
-        if (arg3 == std::string(extra->keyword))
-        {
-          if (prev == nullptr)
-          {
-            DC::getInstance()->world[ch->in_room].ex_description = extra->next;
-          }
-          else
-          {
-            prev->next = extra->next;
-          }
-          ch->send(QStringLiteral("Extra description with keyword '%1' deleted.\r\n").arg(extra->keyword));
-          FREE(extra);
-          deleted = true;
-          // break out of for loop
-          break;
-        }
-      }
-      if (deleted == false)
-      {
-        csendf(ch, "Extra description with keyword '%s' not found.\r\n", arg3.c_str());
-      }
+
+      if (DC::getInstance()->world[ch->in_room].ex_descriptions.remove(arg3.c_str()))
+        ch->sendln(u"Extra description with keyword '%1' deleted."_s.arg(arg3.c_str()));
+      else
+        ch->sendln(u"Extra description with keyword '%1' not found."_s.arg(arg3.c_str()));
+
       // break out of switch case
       break;
     }
 
-    for (extra = DC::getInstance()->world[ch->in_room].ex_description;; extra = extra->next)
-    {
-      if (!extra)
-      {
-        // No matching extra description found so make a new one
-        csendf(ch, "Creating new extra description for keyword '%s'.\r\n", arg2.c_str());
-        CREATE(extra, extra_descr_data, 1);
-        extra->next = nullptr;
+    csendf(ch, "Creating new extra description for keyword '%s'.\r\n", arg2.c_str());
+    DC::getInstance()->world[ch->in_room].ex_descriptions[arg2.c_str()] = {};
 
-        if (!(DC::getInstance()->world[ch->in_room].ex_description))
-        {
-          // The room has no pre-existing extra descriptions so this will be its first
-          DC::getInstance()->world[ch->in_room].ex_description = extra;
-        }
-        else
-        {
-          // The room has pre-existing extra descriptions so we will find the end of
-          // this linked list and append our new extra description to it
-          for (ext = DC::getInstance()->world[ch->in_room].ex_description;; ext = ext->next)
-          {
-            if (ext->next == nullptr)
-            {
-              ext->next = extra;
-              break;
-            }
-          }
-        }
-
-        break;
-      }
-      else if (arg2 == std::string(extra->keyword))
-      {
-        // A pre-existing extra description was found
-        csendf(ch, "Modifying extra description for keyword '%s'.\r\n", arg2.c_str());
-        break;
-      }
-    }
-
-    FREE(extra->keyword);
-    extra->keyword = str_dup(arg2.c_str());
     ch->sendln("Write your extra description. (/s saves /h for help)");
-    ch->desc->strnew = &extra->description;
+    ch->desc->strnew = &DC::getInstance()->world[ch->in_room].ex_descriptions[arg2.c_str()];
     ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = Connection::states::EDITING;
-    if (ch->desc->strnew != nullptr && *ch->desc->strnew != nullptr && **ch->desc->strnew != '\0')
+    if (ch->desc->strnew && !ch->desc->strnew->isEmpty())
     {
       // There's already an existing extra description so let's show it
-      parse_action(parse_t::LIST_NUM, "", ch->desc);
+      ch->desc->parse_action(parse_t::LIST_NUM, "");
     }
   }
   break;
 
-    /* redit exdesc */
+  /* redit exdesc */
   case 4:
   {
     if (remainder_args.empty())
@@ -4715,8 +4623,6 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 {
   int x;
   char buf[50], buf2[50];
-  extra_descr_data *i, *extra;
-
   half_chop(arg, buf, buf2);
 
   if (!*buf)
@@ -4760,34 +4666,15 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
 
   else if (is_abbrev(buf, "extra"))
   {
-    for (i = DC::getInstance()->world[ch->in_room].ex_description;; i = i->next)
+
+    if (!DC::getInstance()->world[ch->in_room].ex_descriptions.contains(buf2))
     {
-      if (i == nullptr)
-      {
-        ch->sendln("There is nothing there to remove.");
-        return ReturnValue::eFAILURE;
-      }
-      if (isexact(buf2, i->keyword))
-        break;
+      ch->sendln("There is nothing there to remove.");
+      return ReturnValue::eFAILURE;
     }
 
-    if (DC::getInstance()->world[ch->in_room].ex_description == i)
-    {
-      DC::getInstance()->world[ch->in_room].ex_description = i->next;
-      dc_free(i);
-      ch->sendln("You remove the extra description.");
-    }
-    else
-    {
-      for (extra = DC::getInstance()->world[ch->in_room].ex_description;; extra = extra->next)
-        if (extra->next == i)
-        {
-          extra->next = i->next;
-          dc_free(i);
-          ch->sendln("You remove the extra description.");
-          break;
-        }
-    }
+    ch->sendln("You remove the extra description.");
+    DC::getInstance()->world[ch->in_room].ex_descriptions.remove(buf2);
   }
 
   else if (is_abbrev(buf, "exdesc"))
@@ -4815,16 +4702,14 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (!(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description))
+    if (DC::getInstance()->world[ch->in_room].dir_option[x]->general_description.isEmpty())
     {
       ch->sendln("There's no description there to delete.");
       return ReturnValue::eFAILURE;
     }
-
     else
     {
-      dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->general_description);
-      DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = 0;
+      DC::getInstance()->world[ch->in_room].dir_option[x]->general_description = {};
       ch->sendln("Ok.");
     }
   }
@@ -4940,7 +4825,7 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
   }
 
   const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [&ch](const auto &entry)
-                               { return entry->vnums_.contains(ch->in_room) && entry->vnums_[ch->in_room]; });
+                               { return entry->vnums().contains(ch->in_room) && entry->vnums()[ch->in_room]; });
   if (it == DC::getInstance()->world_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
@@ -4953,10 +4838,10 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  LegacyFileWorld lfw(curr->filename);
+  LegacyFileWorld lfw(curr->filename());
   if (lfw.isOpen())
   {
-    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
+    for (const auto &[vnum, enabled] : curr->vnums().asKeyValueRange())
     {
       if (enabled)
         write_one_room(lfw, vnum);
@@ -4989,7 +4874,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
   int r = v;
 
   const auto &it = std::find_if(DC::getInstance()->mob_file_list.cbegin(), DC::getInstance()->mob_file_list.cend(), [&r](const auto &entry)
-                                { return entry->vnums_.contains(r) && entry->vnums_[r]; });
+                                { return entry->vnums().contains(r) && entry->vnums()[r]; });
 
   if (it == DC::getInstance()->mob_file_list.cend())
   {
@@ -5004,10 +4889,10 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  LegacyFile lf("mobs", curr->filename, "Couldn't open legacy mob save file %1.");
+  LegacyFile lf("mobs", curr->filename(), "Couldn't open legacy mob save file %1.");
   if (lf.isOpen())
   {
-    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
+    for (const auto &[vnum, enabled] : curr->vnums().asKeyValueRange())
     {
       if (enabled && DC::getInstance()->mob_index.contains(vnum) && DC::getInstance()->mob_index[vnum].mob)
         write_mobile(lf, DC::getInstance()->mob_index[vnum].mob);
@@ -5016,7 +4901,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
   }
 
   ch->sendln("Saved.");
-  DC::getInstance()->set_zone_saved_mob(curr->firstnum);
+  DC::getInstance()->set_zone_saved_mob(curr->firstnum());
   return ReturnValue::eSUCCESS;
 }
 
@@ -5039,7 +4924,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
   int r = v;
 
   const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [&r](const auto &entry)
-                               { return entry->vnums_.contains(r) && entry->vnums_[r]; });
+                               { return entry->vnums().contains(r) && entry->vnums()[r]; });
   if (it == DC::getInstance()->obj_file_list.cend())
   {
     ch->sendln("That range doesn't seem to exist...tell an imp.");
@@ -5053,10 +4938,10 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  LegacyFile lf("objects", curr->filename, "Couldn't open legacy obj save file %1.");
+  LegacyFile lf("objects", curr->filename(), "Couldn't open legacy obj save file %1.");
   if (lf.isOpen())
   {
-    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
+    for (const auto &[vnum, enabled] : curr->vnums().asKeyValueRange())
     {
       if (enabled && DC::getInstance()->obj_index.contains(vnum) && DC::getInstance()->obj_index[vnum].item)
         write_object(lf, DC::getInstance()->obj_index[vnum].item);
@@ -5065,7 +4950,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
   }
 
   ch->sendln("Saved.");
-  DC::getInstance()->set_zone_saved_obj(curr->firstnum);
+  DC::getInstance()->set_zone_saved_obj(curr->firstnum());
   return ReturnValue::eSUCCESS;
 }
 
@@ -5195,7 +5080,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
         if (!obj->in_obj)
         {
           dc_fprintf(fl, "O 0 %llu %d %d", obj->vnum_, count, DC::getInstance()->world[room].number);
-          sprintf(buf, "           %s\n", obj->short_description);
+          sprintf(buf, "           %s\n", qPrintable(obj->short_description));
           string_to_file(fl, buf);
 
           if (obj->contains)
@@ -5213,7 +5098,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
               }
 
               dc_fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
-              sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
+              sprintf(buf, "     %s placed inside %s\n", qPrintable(tmp_obj->short_description), qPrintable(obj->short_description));
               string_to_file(fl, buf);
             } /*  for loop */
           } /* end of the object's contents... */
@@ -5252,7 +5137,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
         }
 
         dc_fprintf(fl, "M 0 %llu %d %d", mob->mobdata->vnum_, count, DC::getInstance()->world[room].number);
-        sprintf(buf, "           %s\n", mob->short_desc);
+        sprintf(buf, "           %s\n", qPrintable(mob->short_desc));
         string_to_file(fl, buf);
 
         for (pos = 0; pos < MAX_WEAR; pos++)
@@ -5273,7 +5158,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             if (!obj->in_obj)
             {
               dc_fprintf(fl, "E 1 %llu %d %d", obj->vnum_, count, pos);
-              sprintf(buf, "      Equip %s with %s\n", mob->short_desc, obj->short_description);
+              sprintf(buf, "      Equip %s with %s\n", qPrintable(mob->short_desc), qPrintable(obj->short_description));
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5291,7 +5176,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   }
 
                   dc_fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
-                  sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
+                  sprintf(buf, "     %s placed inside %s\n", qPrintable(tmp_obj->short_description), qPrintable(obj->short_description));
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5316,7 +5201,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
             if (!obj->in_obj)
             {
               dc_fprintf(fl, "G 1 %llu %d", obj->vnum_, count);
-              sprintf(buf, "      Give %s %s\n", mob->short_desc, obj->short_description);
+              sprintf(buf, "      Give %s %s\n", qPrintable(mob->short_desc), qPrintable(obj->short_description));
               string_to_file(fl, buf);
 
               if (obj->contains)
@@ -5334,7 +5219,7 @@ int do_instazone(Character *ch, char *arg, cmd_t cmd)
                   }
 
                   dc_fprintf(fl, "P 1 %llu %d %llu", DC::getInstance()->obj_index[tmp_obj->vnum_].vnum(), count, obj->vnum_);
-                  sprintf(buf, "     %s placed inside %s\n", tmp_obj->short_description, obj->short_description);
+                  sprintf(buf, "     %s placed inside %s\n", qPrintable(tmp_obj->short_description), qPrintable(obj->short_description));
                   string_to_file(fl, buf);
                 } /*  for loop */
               }
@@ -5359,7 +5244,6 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   Room *rm = 0;
   Character *k = 0;
   class Object *j = 0;
-  extra_descr_data *desc;
   int i, x, loc;
 
   if (ch->isNonPlayer())
@@ -5390,7 +5274,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     logentry(buf, PATRON, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
-  sprintf(buf, "Room name: %s, Of zone : %llu. V-Number : %d, R-number : %llu\r\n", rm->name, rm->zone, rm->number, ch->in_room);
+  sprintf(buf, "Room name: %s, Of zone : %llu. V-Number : %d, R-number : %llu\r\n", qPrintable(rm->name), rm->zone, rm->number, ch->in_room);
   ch->send(buf);
 
   sprinttype(rm->sector_type, sector_types, buf2);
@@ -5410,12 +5294,12 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   ch->send(rm->description);
 
   strcpy(buf, "Extra description keywords(s): ");
-  if (rm->ex_description)
+  if (!rm->ex_descriptions.isEmpty())
   {
     strcat(buf, "\r\n");
-    for (desc = rm->ex_description; desc; desc = desc->next)
+    for (const auto &[keyword, description] : rm->ex_descriptions.asKeyValueRange())
     {
-      strcat(buf, desc->keyword);
+      strcat(buf, qPrintable(keyword));
       strcat(buf, "\r\n");
     }
     strcat(buf, "\r\n");
@@ -5435,7 +5319,7 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
     if (!DC::getInstance()->mob_index.contains(d->vnum))
       ch->send(QStringLiteral("UNKNOWN(%1)\r\n").arg(d->vnum));
     else
-      csendf(ch, "%s(%d)\r\n", (DC::getInstance()->mob_index[d->vnum].mob)->short_desc, d->vnum);
+      csendf(ch, "%s(%d)\r\n", qPrintable((DC::getInstance()->mob_index[d->vnum].mob)->short_desc), d->vnum);
     a++;
   }
   ch->sendln("");
@@ -5473,8 +5357,8 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
               dirs[i], rm->dir_option[i]->keyword);
       ch->send(buf);
       strcpy(buf, "Description:\r\n  ");
-      if (rm->dir_option[i]->general_description)
-        strcat(buf, rm->dir_option[i]->general_description);
+      if (!rm->dir_option[i]->general_description.isEmpty())
+        strcat(buf, qPrintable(rm->dir_option[i]->general_description));
       else
         strcat(buf, "UNDEFINED\r\n");
       ch->send(buf);

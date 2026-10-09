@@ -4712,28 +4712,24 @@ class Object *get_obj_vis(Character *ch, const char *name, bool loc)
 
 class Object *create_money(int amount)
 {
-  class Object *obj;
-  extra_descr_data *new_new_descr;
-
   if (amount <= 0)
   {
     logentry(QStringLiteral("ERROR: Try to create negative money."), ANGEL, DC::LogChannel::LOG_BUG);
     return (0);
   }
 
-  obj = new Object;
-  new_new_descr = new extra_descr_data;
-
+  auto obj = new Object;
   clear_object(obj);
 
+  QString keyword, description;
   if (amount == 1)
   {
     obj->Name(QStringLiteral("coin gold"));
     obj->short_description = str_hsh("a gold coin");
     obj->long_description = str_hsh("One miserable gold coin.");
 
-    new_new_descr->keyword = str_hsh("coin gold");
-    new_new_descr->description = str_hsh("One miserable gold coin.");
+    keyword = "coin gold";
+    description = "One miserable gold coin.";
   }
   else
   {
@@ -4741,12 +4737,11 @@ class Object *create_money(int amount)
     obj->short_description = str_hsh("gold coins");
     obj->long_description = str_hsh("A pile of gold coins.");
 
-    new_new_descr->keyword = str_hsh("coins gold");
-    new_new_descr->description = str_hsh("They look like coins...of gold...duh.");
+    keyword = "coins gold";
+    description = "They look like coins...of gold...duh.";
   }
 
-  new_new_descr->next = 0;
-  obj->ex_description = new_new_descr;
+  obj->ex_descriptions[keyword] = description;
 
   obj->obj_flags.type_flag = ITEM_MONEY;
   obj->obj_flags.wear_flags = {TAKE};
@@ -4812,9 +4807,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
     {
       if (verbose)
       {
-        if ((*tar_ch)->short_desc)
+        if (!(*tar_ch)->short_desc.isEmpty())
         {
-          csendf(ch, "You find %s in this room.\r\n", (*tar_ch)->short_desc);
+          csendf(ch, "You find %s in this room.\r\n", qPrintable((*tar_ch)->short_desc));
         }
         else if (!(*tar_ch)->getName().isEmpty())
         {
@@ -4836,9 +4831,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
     {
       if (verbose)
       {
-        if ((*tar_ch)->short_desc)
+        if (!(*tar_ch)->short_desc.isEmpty())
         {
-          csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_ch)->short_desc);
+          csendf(ch, "You find %s somewhere in the world.\r\n", qPrintable((*tar_ch)->short_desc));
         }
         else if (!(*tar_ch)->getName().isEmpty())
         {
@@ -4860,7 +4855,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
     {
       if (verbose)
       {
-        if ((*tar_obj)->short_description)
+        if (!(*tar_obj)->short_description.isEmpty())
         {
           ch->sendln(QStringLiteral("You find %1 in your inventory.").arg((*tar_obj)->short_description));
         }
@@ -4891,9 +4886,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
     {
       if (verbose)
       {
-        if ((*tar_obj)->short_description)
+        if (!(*tar_obj)->short_description.isEmpty())
         {
-          csendf(ch, "You find %s among your equipment.\r\n", (*tar_obj)->short_description);
+          csendf(ch, "You find %s among your equipment.\r\n", qPrintable((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
@@ -4915,9 +4910,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
     {
       if (verbose)
       {
-        if ((*tar_obj)->short_description)
+        if (!(*tar_obj)->short_description.isEmpty())
         {
-          csendf(ch, "You find %s in this room.\r\n", (*tar_obj)->short_description);
+          csendf(ch, "You find %s in this room.\r\n", qPrintable((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
@@ -4939,9 +4934,9 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
     {
       if (verbose)
       {
-        if ((*tar_obj)->short_description)
+        if (!(*tar_obj)->short_description.isEmpty())
         {
-          csendf(ch, "You find %s somewhere in the world.\r\n", (*tar_obj)->short_description);
+          csendf(ch, "You find %s somewhere in the world.\r\n", qPrintable((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
@@ -5130,7 +5125,7 @@ bool Character::charge_moves(int skill, double modifier)
   return true;
 }
 
-MatchType add_matching_results(skill_results_t &results, const std::string &name, const std::string &key, quint64 value)
+MatchType add_matching_results(skill_results_t &results, const QString &name, const QString &key, quint64 value)
 {
   auto match = str_n_nosp_cmp_begin(name, key);
   // If this is an exact match we want only a single result
@@ -5147,11 +5142,11 @@ MatchType add_matching_results(skill_results_t &results, const std::string &name
   return match;
 }
 
-skill_results_t find_skills_by_name(std::string name)
+skill_results_t find_skills_by_name(QString name)
 {
   skill_results_t results = {};
 
-  if (name.empty())
+  if (name.isEmpty())
   {
     return results;
   }
@@ -5185,7 +5180,7 @@ skill_results_t find_skills_by_name(std::string name)
   // try songs
   for (auto i = 0; i < Character::song_names.length(); ++i)
   {
-    if (add_matching_results(results, name, Character::song_names[i].toStdString(), i + SKILL_SONG_BASE) == MatchType::Exact)
+    if (add_matching_results(results, name, Character::song_names[i], i + SKILL_SONG_BASE) == MatchType::Exact)
     {
       return results;
     }
@@ -5201,7 +5196,7 @@ skill_results_t find_skills_by_name(std::string name)
   }
 
   // timers/other stuff
-  switch (LOWER(name[0]))
+  switch (name[0].toLower().toLatin1())
   {
   case 'b':
     if (add_matching_results(results, name, "blood fury reuse timer", SKILL_BLOOD_FURY) == MatchType::Exact)

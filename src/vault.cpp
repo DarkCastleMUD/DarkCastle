@@ -39,6 +39,7 @@
 #include "DC/structs.h"
 #include "DC/db.h"
 #include "DC/utility.h"
+#include "DC/memory.h"
 #include "DC/vault.h"
 #include "DC/room.h"
 #include "DC/DC.h"
@@ -81,7 +82,7 @@ int total_vaults = 0;
 int get_line(FILEPtr fl, char *buf);
 
 Character *find_owner(QString name);
-void vault_log(Character *ch, char *owner);
+void vault_log(Character *ch, QString owner);
 QString clanVName(quint64 clan_id);
 void vault_search_usage(Character *ch);
 
@@ -338,14 +339,9 @@ int do_vault(Character *ch, char *argument, cmd_t cmd)
         }
 
         // Clan leader or a clan member with the vaultlog right can view log.
-        if ((clan->leader && !strcmp(clan->leader, GET_NAME(ch))) || has_right(ch, CLAN_RIGHTS_VAULTLOG))
+        if ((!clan->leader.isEmpty() && clan->leader == GET_NAME(ch)) || has_right(ch, CLAN_RIGHTS_VAULTLOG))
         {
-          std::stringstream clanName;
-
-          clanName << "clan" << clan->number;
-          sprintf(arg1, "%s", clanName.str().c_str());
-
-          vault_log(ch, arg1);
+          vault_log(ch, u"clan%1"_s.arg(clan->number));
         }
         else
         {
@@ -2291,30 +2287,27 @@ Character *find_owner(QString name)
   return nullptr;
 }
 
-void vault_log(Character *ch, char *owner)
+void vault_log(Character *ch, QString owner)
 {
-  char buf[MAX_STRING_LENGTH];
-  char fname[256];
+  if (owner.isEmpty())
+    return;
+  owner = owner.toLower();
+  owner[0] = owner[0].toUpper();
 
-  if (!strcmp(owner, clanVName(ch->clan).toStdString().c_str()))
+  QString buffer;
+  if (owner == clanVName(ch->clan))
   {
-    strncpy(buf, "The following are your clan's most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
+    buffer = u"The following are your clan's most recent vault log entries (Times are UTC):\r\n"_s;
   }
   else
-  {
-    strncpy(buf, "The following are your most recent vault log entries (Times are UTC):\r\n", MAX_STRING_LENGTH);
-  }
+    buffer = u"The following are your most recent vault log entries (Times are UTC):\r\n"_s;
 
-  owner[0] = UPPER(owner[0]);
+  QFile vlogfile(u"../vaults/%1/%2.vault.log"_s.arg(owner.at(0)).arg(owner));
+  if (!vlogfile.open(QIODevice::ReadOnly | QIODevice::Text))
+    return;
+  buffer += vlogfile.readAll();
 
-  snprintf(fname, 256, "../vaults/%c/%s.vault.log", *owner, owner);
-
-  std::ifstream fin(fname);
-  std::stringstream buffer;
-  buffer << buf;
-  buffer << fin.rdbuf();
-
-  page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
+  page_string(ch->desc, const_cast<char *>(qPrintable(buffer)), 1);
 }
 
 void logvault(QString message, QString name)
@@ -2735,10 +2728,10 @@ int vault_search(Character *ch, const char *args)
         objects_found += count;
         if (count > 1)
         {
-          ch->send(fmt::format("[$5{}$R] ", count));
+          ch->send(u"[$5%1$R] "_s.arg(count));
         }
 
-        ch->send(fmt::format("{}$R", GET_OBJ_SHORT(obj)));
+        ch->send(u"%1$R"_s.arg(GET_OBJ_SHORT(obj)));
 
         if (obj->obj_flags.type_flag == ITEM_ARMOR ||
             obj->obj_flags.type_flag == ITEM_WEAPON ||
@@ -2749,14 +2742,14 @@ int vault_search(Character *ch, const char *args)
             obj->obj_flags.type_flag == ITEM_WAND ||
             obj->obj_flags.type_flag == ITEM_LIGHT)
         {
-          ch->send(fmt::format("{} $3Lvl: {}$R", item_condition(obj), obj->obj_flags.eq_level));
+          ch->send(u"%1 $3Lvl: %2$R"_s.arg(item_condition(obj)).arg(obj->obj_flags.eq_level));
         }
 
         if (ch->getLevel() > IMMORTAL && DC::getInstance()->obj_index.contains(obj->vnum_))
         {
-          ch->send(fmt::format(" [{}]", obj->vnum_));
+          ch->send(u" [%1]"_s.arg(obj->vnum_));
         }
-        ch->send("\r\n");
+        ch->sendln();
       } // for loop of objects
     } // if we have access to vault
   } // for loop of vaults

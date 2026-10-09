@@ -329,19 +329,17 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         IS_AFFECTED(i, AFF_PARALYSIS) ||
         (isSet(DC::getInstance()->world[i->in_room].room_flags, SAFE) && !ch->isPlayerCantQuit()))
     {
-      sprintf(buf, "I see you %s but I can't do anything about it!", GET_SHORT(ch));
-      do_say(i, buf);
+      i->do_say(u"I see you %1 but I can't do anything about it!"_s.arg(GET_SHORT(ch)));
       break;
     }
 
     if (i == ch)
     {
-      do_say(i, "Wait, I didn't mean to move .... crap.");
+      i->do_say("Wait, I didn't mean to move .... crap.");
     }
     else
     {
-      sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
-      do_say(i, buf);
+      i->do_say(u"I see movement!!!  It's %1!"_s.arg(ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch)));
       set_fighting(i, ch);
       set_fighting(ch, i);
       retval = attack(i, ch, TYPE_UNDEFINED);
@@ -381,7 +379,7 @@ int check_ethereal_focus(Character *ch, int trigger_type)
         {
           // Get um!
           sprintf(buf, "I see movement!!!  It's %s!", ch->isNonPlayer() ? GET_SHORT(ch) : GET_NAME(ch));
-          do_say(ally, buf);
+          ally->do_say(buf);
           set_fighting(ally, ch);
           set_fighting(ch, ally);
           retval = attack(ally, ch, TYPE_UNDEFINED);

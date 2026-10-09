@@ -79,6 +79,7 @@ size_t dc_fread(void *ptr, size_t size, size_t n, FILEPtr stream)
 
 size_t dc_fwrite(const void *ptr, size_t size, size_t n, FILEPtr stream)
 {
+  assert(stream);
   return fwrite(ptr, size, n, stream.data());
 }
 

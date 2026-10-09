@@ -89,7 +89,7 @@ void golem_gain_exp(Character *ch)
     ch->incrementLevel();
     advance_golem_level(ch);
     ch->master->save(cmd_t::SAVE_SILENTLY);
-    do_say(ch, "Errrrrhhgg...");
+    ch->do_say("Errrrrhhgg...");
   }
 }
 
@@ -140,7 +140,7 @@ int verify_existing_components(Character *ch, int golemtype)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
-          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", curr->short_description);
+          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", qPrintable(curr->short_description));
           ch->send(buf);
           obj_from_char(curr);
           extract_obj(curr);
@@ -148,7 +148,7 @@ int verify_existing_components(Character *ch, int golemtype)
         }
         else
         {
-          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", curr->short_description);
+          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", qPrintable(curr->short_description));
           ch->send(buf);
           break;
         }

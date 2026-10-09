@@ -350,9 +350,7 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  strncpy(victim->player->pwd, (char *)crypt((char *)name, (char *)victim->getNameC()), PASSWORD_LEN);
-  victim->player->pwd[PASSWORD_LEN] = '\0';
-
+  victim->player->pwd = crypt(name, qPrintable(victim->getName()));
   ch->sendln("Ok.");
   return ReturnValue::eSUCCESS;
 }
@@ -584,7 +582,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   if (!(victim = get_pc(newname)))
   {
-    this->sendln("Major problem...coudn't find target after pfile copied.  Notify Urizen immediatly.");
+    this->sendln("Major problem...coudn't find target after pfile copied.  Notify Julian immediately.");
     return ReturnValue::eFAILURE;
   }
   do_name(victim, " %");
@@ -894,7 +892,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
     for (int z = 0; z < obj->num_affects; z++)
       if (obj->affected[z].location == APPLY_ARMOR)
         ac += obj->affected[z].modifier;
-    sprintf(buf, "$B%s%d. %-50s Vnum: %llu AC Apply: %d\r\n$R", o % 2 == 0 ? "$2" : "$3", o, obj->short_description, DC::getInstance()->obj_index[r].vnum(), ac);
+    sprintf(buf, "$B%s%d. %-50s Vnum: %llu AC Apply: %d\r\n$R", o % 2 == 0 ? "$2" : "$3", o, qPrintable(obj->short_description), DC::getInstance()->obj_index[r].vnum(), ac);
     ch->send(buf);
     o++;
     if (o == 150)
@@ -995,8 +993,6 @@ int do_export(Character *ch, char *args, cmd_t cmd)
 
     fout << "affects" << std::endl;
 
-    //  world_file_list_itemPtr curr = DC::getInstance()->obj_file_list;
-
     for (const auto &obj_index_entry : DC::getInstance()->obj_index)
     {
       if (obj_index_entry.item)
@@ -1024,19 +1020,19 @@ command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
   {
     for (const auto &world : DC::getInstance()->world_file_list)
     {
-      QString potential_filename = u"%1-%2.txt"_s.arg(world->firstnum).arg(world->lastnum);
-      if (world->filename != potential_filename)
+      QString potential_filename = u"%1-%2.txt"_s.arg(world->firstnum()).arg(world->lastnum());
+      if (world->filename() != potential_filename)
       {
-        ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename).arg(world->firstnum).arg(world->lastnum).arg(world->flags));
-        ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename).arg(potential_filename));
+        ch->send(QStringLiteral("filename: %1 firstnum: %2 lastnum: %3 flag: %4\r\n").arg(world->filename()).arg(world->firstnum()).arg(world->lastnum()).arg(world->flags));
+        ch->send(QStringLiteral("Renaming %1 to %2\r\n").arg(world->filename()).arg(potential_filename));
 
-        if (rename(world->filename.toStdString().c_str(), potential_filename.toStdString().c_str()) == -1)
+        if (rename(qPrintable(world->filename()), qPrintable(potential_filename)) == -1)
         {
           auto rename_errno = errno;
           char *errStr = strerror(rename_errno);
           if (errStr != nullptr)
           {
-            ch->send(QStringLiteral("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename).arg(potential_filename).arg(rename_errno).arg(errStr));
+            ch->send(QStringLiteral("Error renaming %1 to %2 was %3 %4\r\n").arg(world->filename()).arg(potential_filename).arg(rename_errno).arg(errStr));
           }
         }
       }

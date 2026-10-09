@@ -73,8 +73,8 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 
   redo_hitpoints(new_new);
   redo_mana(new_new);
-  if (!GET_TITLE(new_new))
-    GET_TITLE(new_new) = str_dup("is a virgin");
+  if (GET_TITLE(new_new).isEmpty())
+    GET_TITLE(new_new) = u"is a virgin"_s;
   if (GET_CLASS(new_new) == CLASS_MONK)
     GET_AC(new_new) -= new_new->getLevel() * 3;
   isr_set(new_new);
@@ -118,7 +118,7 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
   tmp = fread_string(fl, 0);
 
   ch->send(tmp);
-  FREE(tmp);
+  free(tmp);
   return ReturnValue::eSUCCESS;
 }
 
@@ -587,12 +587,14 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
 
 int do_testuser(Character *ch, char *argument, cmd_t cmd)
 {
-  char arg1[MAX_INPUT_LENGTH];
-  char arg2[MAX_INPUT_LENGTH];
-  char savefile[255];
-  char bsavefile[255];
-  char command[512];
-  char username[20];
+  QString savefile;
+  QString bsavefile;
+  QString command;
+  QString username;
+
+  auto arguments = QString(argument).split(' ');
+  auto arg1 = arguments.value(0);
+  auto arg2 = arguments.value(1);
 
   if (ch == nullptr)
   {
@@ -605,29 +607,22 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  argument = one_argument(argument, arg1);
-  one_argument(argument, arg2);
-
-  if (*arg1 == 0 || *arg2 == 0)
+  if (arg1.isEmpty() || arg2.isEmpty())
   {
     ch->sendln("testuser <user> <on|off>\r\n");
     return ReturnValue::eFAILURE;
   }
 
-  if (strlen(arg1) > 19 || _parse_name(arg1, username))
+  if (!is_valid_name(arg1))
   {
     ch->sendln("Invalid username passed.");
     return ReturnValue::eFAILURE;
   }
+  username = arg1.toLower();
+  username[0] = username[0].toUpper();
 
-  username[0] = UPPER(username[0]);
-  for (unsigned int i = 1; i < strlen(username); i++)
-  {
-    username[i] = LOWER(username[i]);
-  }
-
-  snprintf(savefile, 255, "../save/%c/%s", UPPER(username[0]), username);
-  snprintf(bsavefile, 255, "/srv/dcastle3/save/%c/%s", UPPER(username[0]), username);
+  savefile = u"../save/%1/%2"_s.arg(username[0]).arg(username);
+  bsavefile = u"/srv/dcastle3/save/%1/%2"_s.arg(username[0]).arg(username);
 
   if (!file_exists(savefile))
   {
@@ -635,13 +630,13 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!str_cmp(arg2, "on"))
+  if (arg2 == "on")
   {
-    sprintf(command, "cp %s %s", savefile, bsavefile);
+    command = u"cp '%1' '%2'"_s.arg(savefile).arg(bsavefile);
   }
-  else if (!str_cmp(arg2, "off"))
+  else if (arg2 == "off")
   {
-    sprintf(command, "rm %s", bsavefile);
+    command = u"rm '%1'"_s.arg(bsavefile);
   }
   else
   {
@@ -649,9 +644,9 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), command);
+  logf(110, DC::LogChannel::LOG_GOD, "testuser: %s initiated %s", ch->getNameC(), qPrintable(command));
 
-  if (system(command))
+  if (system(qPrintable(command)))
   {
     ch->sendln("Error occurred.");
   }

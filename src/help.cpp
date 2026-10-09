@@ -31,10 +31,10 @@ extern void skip_spaces(char **string);
 extern help_index_element_new *new_help_table;
 int get_line(FILEPtr fl, char *buf);
 int is_abbrev(const char *arg1, const char *arg2);
-void help_string_to_file(FILEPtr f, char *string);
+void help_string_to_file(FILEPtr f, QString helpstr);
 
 // locals
-help_index_element_new *find_help(char *keyword);
+help_index_element_new *find_help(QString keyword);
 int strn_cmp(char *arg1, char *arg2, int n);
 int count_hash_records(FILEPtr fl);
 void show_hedit_usage(Character *ch);
@@ -61,13 +61,13 @@ public:
   }
 };
 
-int levenshtein(const char *s, const char *t)
+int levenshtein(QString s, QString t)
 {
   unsigned int i, j, n, m, cost;
   unsigned int d[MAX_INPUT_LENGTH + 1][MAX_HELP_KEYWORD_LENGTH + 1];
 
-  m = strlen(s);
-  n = strlen(t);
+  m = s.size();
+  n = t.size();
 
   // Zero Matrix
   for (i = 0; i <= m; i++)
@@ -83,7 +83,7 @@ int levenshtein(const char *s, const char *t)
   for (i = 1; i <= m; i++)
     for (j = 1; j <= n; j++)
     {
-      if (tolower(s[i]) == tolower(t[j]))
+      if (s[i].toLower() == t[j].toLower())
         cost = 0;
       else
         cost = 1;
@@ -95,54 +95,48 @@ int levenshtein(const char *s, const char *t)
   return d[m][n];
 }
 
-int do_new_help(Character *ch, char *argument, cmd_t cmd)
+command_return_t Character::do_new_help(QStringList arguments, cmd_t cmd)
 {
-  char buf[256];
   extern char new_help[MAX_STRING_LENGTH];
   extern char new_ihelp[MAX_STRING_LENGTH];
-  help_index_element_new *this_help;
-  char entry[MAX_STRING_LENGTH];
-  char key1[256], key2[256], key3[256], key4[256], key5[256], rec_level[256];
+  help_index_element_new *this_help{};
+  QString entry;
+  QString key1, key2, key3, key4, key5, rec_level;
 
-  if (!ch->desc)
+  if (!desc)
     return ReturnValue::eFAILURE;
 
-  skip_spaces(&argument);
-
-  if (!*argument)
+  if (arguments.isEmpty())
   {
-    if (!ch->isImmortalPlayer())
-      ch->send(new_help);
+    if (isMortalPlayer())
+      send(new_help);
     else
-      ch->send(new_ihelp);
+      send(new_ihelp);
     return ReturnValue::eFAILURE;
   }
 
   if (!new_help_table)
   {
-    ch->sendln("No help available.");
+    sendln("No help available.");
     return ReturnValue::eFAILURE;
   }
 
-  char *upper_argument = str_dup(argument);
-  upper_argument = remove_trailing_spaces(upper_argument);
+  auto arg1 = arguments.at(0);
 
-  if (!(this_help = find_help(upper_argument)))
+  if (auto this_help = find_help(arg1); !this_help)
   {
-    snprintf(buf, 256, "There is no help entry for \'%s\'.\r\n",
-             upper_argument);
-    ch->send(buf);
+    sendln(u"There is no help entry for \'%1\'."_s.arg(arg1));
 
     // Find similar help entries based on the Levenshtein distance
     // between keywords.
 
     int h;
     unsigned int l;
-    unsigned int argSize = strlen(argument);
-    std::multimap<unsigned int, char *, ltstr> ltable;
-    std::multimap<unsigned int, char *, ltstr>::iterator cur;
+    unsigned int argSize = arg1.length();
+    std::multimap<unsigned int, QString, ltstr> ltable;
+    std::multimap<unsigned int, QString, ltstr>::iterator cur;
 
-    int level = ch->getLevel() == 0 ? 1 : ch->getLevel();
+    int level = getLevel() == 0 ? 1 : getLevel();
 
     for (h = 0; h < DC::getInstance()->new_top_of_helpt; h++)
     {
@@ -153,32 +147,32 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
 
       if (new_help_table[h].keyword1)
       {
-        l = levenshtein(argument, new_help_table[h].keyword1);
-        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword1));
+        l = levenshtein(arg1, new_help_table[h].keyword1);
+        ltable.insert(std::pair<unsigned int, QString>(l, new_help_table[h].keyword1));
       }
 
       if (new_help_table[h].keyword2)
       {
-        l = levenshtein(argument, new_help_table[h].keyword2);
-        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword2));
+        l = levenshtein(arg1, new_help_table[h].keyword2);
+        ltable.insert(std::pair<unsigned int, QString>(l, new_help_table[h].keyword2));
       }
 
       if (new_help_table[h].keyword3)
       {
-        l = levenshtein(argument, new_help_table[h].keyword3);
-        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword3));
+        l = levenshtein(arg1, new_help_table[h].keyword3);
+        ltable.insert(std::pair<unsigned int, QString>(l, new_help_table[h].keyword3));
       }
 
       if (new_help_table[h].keyword4)
       {
-        l = levenshtein(argument, new_help_table[h].keyword4);
-        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword4));
+        l = levenshtein(arg1, new_help_table[h].keyword4);
+        ltable.insert(std::pair<unsigned int, QString>(l, new_help_table[h].keyword4));
       }
 
       if (new_help_table[h].keyword5)
       {
-        l = levenshtein(argument, new_help_table[h].keyword5);
-        ltable.insert(std::pair<int, char *>(l, new_help_table[h].keyword5));
+        l = levenshtein(arg1, new_help_table[h].keyword5);
+        ltable.insert(std::pair<unsigned int, QString>(l, new_help_table[h].keyword5));
       }
     }
 
@@ -186,7 +180,7 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
     {
     }
 
-    std::vector<char *> results;
+    std::vector<QString> results;
     for (cur = ltable.begin(); cur != ltable.end(); cur++)
     {
       if (find(results.begin(), results.end(), (*cur).second) == results.end())
@@ -197,92 +191,85 @@ int do_new_help(Character *ch, char *argument, cmd_t cmd)
 
         if (results.size() == 0)
         {
-          ch->send("Suggested help entries: ");
+          send("Suggested help entries: ");
         }
 
         results.push_back((*cur).second);
-        csendf(ch, "%s", (*cur).second);
+        send((*cur).second);
 
         if (results.size() >= 5)
         {
-          ch->sendln("");
+          sendln("");
           break;
         }
         else
         {
-          ch->send(", ");
+          send(", ");
         }
       }
     }
 
-    sprintf(buf, "'%s' has no help entry.  %s just tried to call it.",
-            upper_argument, GET_NAME(ch));
-    logentry(buf, IMMORTAL, DC::LogChannel::LOG_HELP);
-
-    dc_free(upper_argument);
+    logentry(u"'%1' has no help entry.  %2 just tried to call it."_s.arg(arg1).arg(getName()), IMMORTAL, DC::LogChannel::LOG_HELP);
     return ReturnValue::eFAILURE;
   }
 
-  dc_free(upper_argument);
-  int a = ch->getLevel() == 0 ? 1 : ch->getLevel();
+  int a = getLevel() == 0 ? 1 : getLevel();
   if (this_help->min_level > a)
   {
-    ch->sendln("There is no help on that word.");
+    sendln("There is no help on that word.");
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(key1, "'%s'", this_help->keyword1);
-  sprintf(key2, "'%s'", this_help->keyword2);
-  sprintf(key3, "'%s'", this_help->keyword3);
-  sprintf(key4, "'%s'", this_help->keyword4);
-  sprintf(key5, "'%s'", this_help->keyword5);
+  key1 = u"'%1'"_s.arg(this_help->keyword1);
+  key2 = u"'%1'"_s.arg(this_help->keyword2);
+  key3 = u"'%1'"_s.arg(this_help->keyword3);
+  key4 = u"'%1'"_s.arg(this_help->keyword4);
+  key5 = u"'%1'"_s.arg(this_help->keyword5);
 
-  sprintf(buf, "%s %s %s %s %s", key1,
-          ((this_help->keyword2 && strcmp(key2, "'NONE'")) ? key2 : " "),
-          ((this_help->keyword3 && strcmp(key3, "'NONE'")) ? key3 : " "),
-          ((this_help->keyword3 && strcmp(key4, "'NONE'")) ? key4 : " "),
-          ((this_help->keyword3 && strcmp(key5, "'NONE'")) ? key5 : " "));
+  auto buf = u"%1 %2 %3 %4 %5"_s
+                 .arg(key1)
+                 .arg(this_help->keyword2 && key2 != u"'NONE'"_s ? key2 : u" "_s)
+                 .arg(this_help->keyword3 && key3 != u"'NONE'"_s ? key3 : u" "_s)
+                 .arg(this_help->keyword3 && key4 != u"'NONE'"_s ? key4 : u" "_s)
+                 .arg(this_help->keyword3 && key5 != u"'NONE'"_s ? key5 : u" "_s);
 
-  sprintf(rec_level, "\r\nLevel Required: %d", this_help->min_level);
-  sprintf(entry,
+  rec_level = u"\r\nLevel Required: %1"_s.arg(this_help->min_level);
+  entry = u"$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
+          "$1$B| | $B$5Help For: $B$7%1 $1$B| |\r\n"
           "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$1$B| | $B$5Help For: $B$7%-61.61s $1$B| |\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$B$7%s%s$R"
+          "$B$7%2%3$R"
           "\r\n"
-          "$R%s"
+          "$R%4"
           "\r\n"
           "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$1$B| | $B$5Related Help: $B$7%-57.57s $1$B| |\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R",
-          buf, ch->isImmortalPlayer() ? rec_level : " ",
-          ((this_help->min_level < IMMORTAL) ? " " : "\r\nImmortal-only command.\r\n"),
-          this_help->entry, this_help->related);
+          "$1$B| | $B$5Related Help: $B$7%5 $1$B| |\r\n"
+          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R"_s
+              .arg(buf, 61)
+              .arg(isImmortalPlayer() ? rec_level : u" "_s)
+              .arg(this_help->min_level < IMMORTAL ? u" "_s : u"\r\nImmortal-only command.\r\n"_s)
+              .arg(this_help->entry)
+              .arg(this_help->related, 57);
 
   if (cmd != cmd_t::UNDEFINED)
-    page_string(ch->desc, entry, 1);
+    page_string(desc, qPrintable(entry), 1);
   else
-    ch->send(entry);
+    send(entry);
 
   return ReturnValue::eSUCCESS;
 }
 
-help_index_element_new *find_help(char *keyword)
+help_index_element_new *find_help(QString keyword)
 {
-  int i;
+  keyword = keyword.toUpper();
+  if (keyword == "NONE")
+    return {};
 
-  if (!strcmp(keyword, "NONE"))
-    return nullptr;
-
-  for (i = 0; i < (int)strlen(keyword); i++)
-    keyword[i] = UPPER(keyword[i]);
-
-  for (i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
-    if (!strcmp(keyword, new_help_table[i].keyword1) ||
-        !strcmp(keyword, new_help_table[i].keyword2) ||
-        !strcmp(keyword, new_help_table[i].keyword3) ||
-        !strcmp(keyword, new_help_table[i].keyword4) ||
-        !strcmp(keyword, new_help_table[i].keyword5))
+  for (auto i = 0; i < DC::getInstance()->new_top_of_helpt; i++)
+    if (keyword == new_help_table[i].keyword1 ||
+        keyword == new_help_table[i].keyword2 ||
+        keyword == new_help_table[i].keyword3 ||
+        keyword == new_help_table[i].keyword4 ||
+        keyword == new_help_table[i].keyword5)
       return (new_help_table + i);
 
   return nullptr;
@@ -364,7 +351,8 @@ int load_new_help(FILEPtr fl, int reload, Character *ch)
     if (strlen(tmpentry) > MAX_HELP_LENGTH)
       tmpentry[MAX_HELP_LENGTH - 1] = '\0';
 
-    if (!(new_help.entry = str_hsh(tmpentry)))
+    new_help.entry = tmpentry;
+    if (new_help.entry.isEmpty())
       new_help.entry = str_hsh("Error reading help entry. Please notify an Immortal!\n");
 
     new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
@@ -392,7 +380,7 @@ int load_new_help(FILEPtr fl, int reload, Character *ch)
 int do_areas(Character *ch, char *arg, cmd_t cmd)
 {
   strcpy(arg, "areas");
-  return do_new_help(ch, arg, cmd);
+  return ch->do_new_help(QString(arg).split(' '), cmd);
 }
 
 char help_buf[MAX_STRING_LENGTH * 4];
@@ -869,9 +857,9 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
       send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
                    "   |--------------------------------------------------------------------------------|\r\n",
                    ch);
-      if (new_help_table[help_id].entry)
+      if (!new_help_table[help_id].entry.isEmpty())
       {
-        ch->desc->backstr = str_dup(new_help_table[help_id].entry);
+        ch->desc->backstr = new_help_table[help_id].entry;
         ch->send(ch->desc->backstr);
       }
 

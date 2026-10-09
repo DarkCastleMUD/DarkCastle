@@ -147,8 +147,7 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
       ch->sendln("Shit a mob is missing from game!!!");
       continue;
     }
-    snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5d %s\r\n", get_mob_vnum(mobs->name)->short_desc,
-             mobs->howmany, mobs->howmany < 2 ? "time" : "times");
+    snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5d %s\r\n", qPrintable(get_mob_vnum(mobs->name)->short_desc), mobs->howmany, mobs->howmany < 2 ? "time" : "times");
     csendf(ch, buf);
   }
   page_string(ch->desc, output_buf.c_str(), 1);

@@ -173,7 +173,7 @@ void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
 char *calc_color(int hit, int max_hit);
-std::string get_from_q(std::queue<std::string> &input_queue);
+QByteArray get_from_q(std::queue<QByteArray> &input_queue);
 void signal_setup(void);
 int new_descriptor(int s);
 int process_input(class Connection *t);
@@ -193,7 +193,7 @@ void food_update(void);  /* In limits.c */
 void mobile_activity(void);
 void object_activity(quint64 pulse_type);
 void update_corpses_and_portals(void);
-void string_hash_add(class Connection *d, char *str);
+void string_hash_add(class Connection *d, QString str);
 void perform_violence(void);
 void time_update();
 void weather_update();
@@ -226,7 +226,7 @@ int DC::write_hotboot_file(void)
     for (Connection *d = descriptor_list; d; d = sd)
     {
       sd = d->next;
-      if (STATE(d) != Connection::states::PLAYING || !d->character || d->character->getLevel() < 1)
+      if (!d->character || d->character->getLevel() < 1)
       {
         // Kick out anyone not currently playing in the game.
         write_to_descriptor(d->descriptor, "We are rebooting, come back in a minute.");
@@ -341,8 +341,8 @@ int DC::load_hotboot_descs(void)
       d->wait = 1;
       d->prompt_mode = 1;
       d->output = {};
-      d->input = std::queue<std::string>();
-      d->output = qPrintable(character_name); // store it for later
+      d->input = std::queue<QByteArray>();
+      d->output = character_name.toUtf8(); // store it for later
       d->login_time = time(0);
       d->setPeerAddress(QHostAddress(address));
       d->descriptor = descriptor;
@@ -613,9 +613,7 @@ void DC::game_loop(void)
     last_execution.start();
   }
 
-  // comm must be much longer than MAX_INPUT_LENGTH since we allow aliases in-game
-  // otherwise an alias'd command could easily overrun the buffer
-  std::string comm = {};
+  QString comm = {};
   char buf[128] = {};
   class Connection *d = {};
   int maxdesc = {};
@@ -796,15 +794,15 @@ void DC::game_loop(void)
       d->prompt_mode = 1;
 
       if (d->showstr_count) /* reading something w/ pager     */
-        show_string(d, comm.data());
+        show_string(d, qPrintable(comm));
       //	else if (d->str)		/* writing boards, mail, etc.     */
       //	  string_add(d, comm);
       else if (d->strnew && STATE(d) == Connection::states::EXDSCR)
-        new_string_add(d, comm.data());
+        d->editor_parse_line(comm);
       else if (d->hashstr)
-        string_hash_add(d, comm.data());
+        string_hash_add(d, comm);
       else if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
-        new_string_add(d, comm.data());
+        d->editor_parse_line(comm);
       else if (d->connected != Connection::states::PLAYING) /* in menus, etc. */
         nanny(d, comm);
       else
@@ -813,18 +811,18 @@ void DC::game_loop(void)
           d->prompt_mode = 0;
         else if (d && d->character && d->character->player)
         {
-          comm = d->character->player->perform_alias(comm.c_str()).toStdString();
+          comm = d->character->player->perform_alias(comm);
         }
         PerfTimers["command"].start();
         // Azrack's a chode.  Don't forget to check
         // ->snooping before you check snooping->char:P
-        if (!comm.empty() && comm[0] == '%' && d->snooping && d->snooping->character)
+        if (!comm.isEmpty() && comm[0] == '%' && d->snooping && d->snooping->character)
         {
-          d->snooping->character->command_interpreter(comm.substr(1).c_str());
+          d->snooping->character->command_interpreter(comm.sliced(1));
         }
         else
         {
-          d->character->command_interpreter(comm.c_str()); /* send it to interpreter */
+          d->character->command_interpreter(comm); /* send it to interpreter */
         }
         PerfTimers["command"].stop();
 
@@ -1500,7 +1498,7 @@ Character *get_charmie(Character *ch)
   return nullptr;
 }
 
-void write_to_q(const std::string txt, std::queue<std::string> &input_queue)
+void write_to_q(QByteArray txt, std::queue<QByteArray> &input_queue)
 {
 #ifdef DEBUG_INPUT
   // std::cerr << "Writing to queue '" << txt << "'" << std::endl;
@@ -1508,14 +1506,14 @@ void write_to_q(const std::string txt, std::queue<std::string> &input_queue)
   input_queue.push(txt);
 }
 
-std::string get_from_q(std::queue<std::string> &input_queue)
+QByteArray get_from_q(std::queue<QByteArray> &input_queue)
 {
   if (input_queue.empty())
   {
-    return std::string();
+    return {};
   }
 
-  std::string dest = input_queue.front();
+  auto dest = input_queue.front();
   input_queue.pop();
 
   return dest;
@@ -1524,7 +1522,7 @@ std::string get_from_q(std::queue<std::string> &input_queue)
 /* Empty the queues before closing connection */
 void flush_queues(class Connection *d)
 {
-  while (!get_from_q(d->input).empty())
+  while (!get_from_q(d->input).isEmpty())
     ;
   if (!d->output.isEmpty())
   {
@@ -1619,10 +1617,8 @@ int new_descriptor(int s)
 {
   socket_t desc = {};
   socklen_t i = {};
-  static int last_desc = 0; /* last descriptor number */
   class Connection *newd = {};
   struct sockaddr_in peer = {};
-  char buf[MAX_STRING_LENGTH] = {};
 
   /* accept the new connection */
   i = sizeof(peer);
@@ -1672,13 +1668,7 @@ int new_descriptor(int s)
   newd->next = DC::getInstance()->descriptor_list;
   newd->login_time = time(0);
   newd->astr = 0;
-  if (++last_desc == 1000)
-    last_desc = 1;
-  newd->desc_num = last_desc;
-
-  /* prepend to list */
   DC::getInstance()->descriptor_list = newd;
-
   newd->connected = Connection::states::PRE_DISPLAY_ENTRANCE;
   return 0;
 }
@@ -1738,9 +1728,9 @@ int Connection::process_output(void)
   /* handle snooping: prepend "% " and send to snooper */
   if (snoop_by)
   {
-    SEND_TO_Q("% ", snoop_by);
-    SEND_TO_Q(output, snoop_by);
-    SEND_TO_Q("%%", snoop_by);
+    snoop_by->write_to_output("% ");
+    snoop_by->write_to_output(output);
+    snoop_by->write_to_output("%%");
   }
 
   output = {};
@@ -2064,19 +2054,19 @@ int process_input(class Connection *t)
         if (pipe_pos != buffer.npos)
         {
           std::string new_buffer = buffer.substr(0, pipe_pos);
-          write_to_q(new_buffer, t->input);
+          write_to_q(new_buffer.c_str(), t->input);
 
           buffer.erase(0, pipe_pos + 1);
         }
         else
         {
-          write_to_q(buffer, t->input);
+          write_to_q(buffer.c_str(), t->input);
         }
       } while (pipe_pos != buffer.npos);
     }
     else
     {
-      write_to_q(buffer, t->input);
+      write_to_q(buffer.c_str(), t->input);
     }
   } while (t->inbuf.find('\n') != t->inbuf.npos || t->inbuf.find('\r') != t->inbuf.npos);
 
@@ -2230,7 +2220,7 @@ int perform_subst(class Connection *t, char *orig, char *subst)
 // return 0 if we quit everyone out at the bottom
 int close_socket(class Connection *d)
 {
-  char buf[128], idiotbuf[128];
+  QString buf;
   class Connection *temp;
   // int32_t target_idnum = -1;
   if (!d)
@@ -2251,17 +2241,17 @@ int close_socket(class Connection *d)
     SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
     d->snoop_by->snooping = nullptr;
   }
+
+  // Force descriptors to send tilde (~) or "/s" to finish in-progress edits
   if (d->hashstr)
   {
-    strcpy(idiotbuf, "\r\n~\r\n");
-    strcat(idiotbuf, "\0");
+    auto idiotbuf = u"\r\n~\r\n"_s;
     string_hash_add(d, idiotbuf);
   }
   if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
-    strcpy(idiotbuf, "/s\r\n");
-    strcat(idiotbuf, "\0");
-    new_string_add(d, idiotbuf);
+    auto idiotbuf = u"/s\r\n"_s;
+    d->editor_parse_line(idiotbuf);
   }
   if (d->character)
   {
@@ -2291,25 +2281,17 @@ int close_socket(class Connection *d)
     }
     else
     {
-      sprintf(buf, "Losing player: %s.",
-              GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
+      auto buf = u"Losing player: %1."_s
+                     .arg(GET_NAME(d->character) ? GET_NAME(d->character) : "<null>");
       logentry(buf, 111, DC::LogChannel::LOG_SOCKET);
-      if (d->isEditing())
-      {
-        //		sprintf(buf, "Suspicious: %s.",
-        //			GET_NAME(d->character));
-        //		logentry(buf, 110, LOG_HMM);
-      }
       free_char(d->character, Trace("close_socket"));
+      d->character = {};
     }
   }
-  //   Removed this log caues it's so fricken annoying
-  //   else
-  //    logentry(QStringLiteral("Losing descriptor without char."), ANGEL, DC::LogChannel::LOG_SOCKET);
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
   if (d->original && d->original->desc)
-    d->original->desc = nullptr;
+    d->original->desc = {};
 
   // if we're closing the socket that is next to be processed, we want to
   // go ahead and move on to the next one
@@ -2324,7 +2306,7 @@ int close_socket(class Connection *d)
     dc_free(d->showstr_vector);
 
   delete d;
-  d = nullptr;
+  d = {};
 
   /*  if(DC::getInstance()->descriptor_list == nullptr)
   {

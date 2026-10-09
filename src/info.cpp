@@ -194,15 +194,13 @@ class Object *Character::get_object_in_equip_vis(char *arg, class Object *equipm
   return (0);
 }
 
-char *find_ex_description(char *word, extra_descr_data *list)
+QString find_ex_description(QString word, ex_descriptions_t list)
 {
-  extra_descr_data *i;
+  for (const auto &[keyword, description] : list.asKeyValueRange())
+    if (isexact(word, keyword))
+      return description;
 
-  for (i = list; i; i = i->next)
-    if (isexact(word, i->keyword))
-      return (i->description);
-
-  return (0);
+  return {};
 }
 
 const char *item_condition(class Object *object)
@@ -227,8 +225,8 @@ const char *item_condition(class Object *object)
 
 void Character::show_obj_to_char(class Object *object, int mode)
 {
-  char buffer[MAX_STRING_LENGTH];
-  char flagbuf[MAX_STRING_LENGTH];
+  QString buffer;
+  QString flagbuf;
   int found = 0;
   //   int percent;
 
@@ -237,21 +235,22 @@ void Character::show_obj_to_char(class Object *object, int mode)
       (this->player && !this->player->holyLite))
     return;
 
-  buffer[0] = '\0';
-  if ((mode == 0) && object->long_description)
-    strcpy(buffer, object->long_description);
-  else if (object->short_description && ((mode == 1) ||
-                                         (mode == 2) || (mode == 3) || (mode == 4)))
-    strcpy(buffer, object->short_description);
+  if ((mode == 0) && !object->long_description.isEmpty())
+    buffer = object->long_description;
+  else if (!object->short_description.isEmpty() && ((mode == 1) ||
+                                                    (mode == 2) ||
+                                                    (mode == 3) ||
+                                                    (mode == 4)))
+    buffer = object->short_description;
   else if (mode == 5)
   {
     if (object->obj_flags.type_flag == ITEM_NOTE)
     {
       if (!object->ActionDescription().isEmpty())
       {
-        strncpy(buffer, "There is something written upon it:\r\n\r\n", sizeof(buffer) - 1);
-        strncat(buffer, object->ActionDescription().toStdString().c_str(), sizeof(buffer) - 1);
-        page_string(this->desc, buffer, 1);
+        buffer = u"There is something written upon it:\r\n\r\n"_s;
+        buffer += object->ActionDescription();
+        page_string(this->desc, qPrintable(buffer), 1);
       }
       else
         act("It's blank.", this, 0, 0, TO_CHAR, 0);
@@ -259,65 +258,65 @@ void Character::show_obj_to_char(class Object *object, int mode)
     }
     else if ((object->obj_flags.type_flag != ITEM_DRINKCON))
     {
-      strcpy(buffer, "You see nothing special.");
+      buffer = u"You see nothing special."_s;
     }
     else /* ITEM_TYPE == ITEM_DRINKCON */
     {
-      strcpy(buffer, "It looks like a drink container.");
+      buffer = u"It looks like a drink container."_s;
     }
   }
 
   if (mode != 3)
   {
-    if (mode == 0)          // 'look'
-      strcat(buffer, "$R"); // setup color background
+    if (mode == 0)       // 'look'
+      buffer += u"$R"_s; // setup color background
 
-    strcpy(flagbuf, " $B($R");
+    flagbuf = u" $B($R"_s;
 
     if (IS_OBJ_STAT(object, ITEM_INVISIBLE))
     {
-      strcat(flagbuf, "Invisible");
+      flagbuf += u"Invisible"_s;
       found++;
     }
     if (IS_OBJ_STAT(object, ITEM_MAGIC) && IS_AFFECTED(this, AFF_DETECT_MAGIC))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "Blue Glow");
+        flagbuf += u"$B/$R"_s;
+      flagbuf += u"Blue Glow"_s;
       found++;
     }
     if (IS_OBJ_STAT(object, ITEM_GLOW))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "Glowing");
+        flagbuf += u"$B/$R"_s;
+      flagbuf += u"Glowing"_s;
       found++;
     }
     if (IS_OBJ_STAT(object, ITEM_HUM))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "Humming");
+        flagbuf += u"$B/$R"_s;
+      flagbuf += u"Humming"_s;
       found++;
     }
     if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NONOTICE))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "NO_NOTICE");
+        flagbuf += u"$B/$R"_s;
+      flagbuf += u"NO_NOTICE"_s;
       found++;
     }
     if (mode == 0 && isSet(object->obj_flags.more_flags, ITEM_NOSEE))
     {
       if (found)
-        strcat(flagbuf, "$B/$R");
-      strcat(flagbuf, "NO_SEE");
+        flagbuf += u"$B/$R"_s;
+      flagbuf += u"NO_SEE"_s;
       found++;
     }
     if (found)
     {
-      strcat(flagbuf, "$B)$R");
-      strcat(buffer, flagbuf);
+      flagbuf += u"$B)$R"_s;
+      buffer += flagbuf;
     }
 
     /* show object's condition if is an armor...  */
@@ -331,7 +330,7 @@ void Character::show_obj_to_char(class Object *object, int mode)
         object->obj_flags.type_flag == ITEM_STAFF ||
         object->obj_flags.type_flag == ITEM_LIGHT)
     {
-      strcat(buffer, item_condition(object)); /*
+      buffer += item_condition(object); /*
             percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
 
             if (percent >= 100)
@@ -355,21 +354,15 @@ void Character::show_obj_to_char(class Object *object, int mode)
       time_t expires = object->save_expiration;
       if (expires == 0)
       {
-        strcat(buffer, " $R($B$0unsaved$R)");
+        buffer += u" $R($B$0unsaved$R)"_s;
       }
       else if (now >= expires)
       {
-        strcat(buffer, " $R($B$0expired$R)");
+        buffer += u" $R($B$0expired$R)"_s;
       }
       else
       {
-        char timebuffer[100];
-#if __x86_64__
-        snprintf(timebuffer, 100, " $R($B$0%lu secs left$R)", expires - now);
-#else
-        snprintf(timebuffer, 100, " $R($B$0%llu secs left$R)", expires - now);
-#endif
-        strcat(buffer, timebuffer);
+        buffer += u" $R($B$0%1 secs left$R)"_s.arg(expires - now);
       }
     }
 
@@ -379,17 +372,11 @@ void Character::show_obj_to_char(class Object *object, int mode)
       time_t expires = object->no_sell_expiration;
       if (now >= expires || expires == 0)
       {
-        strcat(buffer, " $R($B$0sellable$R)");
+        buffer += u" $R($B$0sellable$R)"_s;
       }
       else
       {
-        char timebuffer[101] = {};
-#if __x86_64__
-        snprintf(timebuffer, 100, " $R($B$0No sell for %lu secs$R)", expires - now);
-#else
-        snprintf(timebuffer, 100, " $R($B$0No sell for %llu secs$R)", expires - now);
-#endif
-        strcat(buffer, timebuffer);
+        buffer += u" $R($B$0No sell for %1 secs$R)"_s.arg(expires - now);
       }
     }
 
@@ -397,18 +384,16 @@ void Character::show_obj_to_char(class Object *object, int mode)
     {
       if (object->obj_flags.timer)
       {
-        char timebuffer[101] = {};
-        snprintf(timebuffer, 100, " $R($B$0%hd ticks left$R)", object->obj_flags.timer);
-        strcat(buffer, timebuffer);
+        buffer += u" $R($B$0%1 ticks left$R)"_s.arg(object->obj_flags.timer);
       }
     }
 
-    if (mode == 0)            // 'look'
-      strcat(buffer, "$B$1"); // setup color background
+    if (mode == 0)         // 'look'
+      buffer += u"$B$1"_s; // setup color background
   }
 
-  strcat(buffer, "\r\n");
-  page_string(this->desc, buffer, 1);
+  buffer += u"\r\n"_s;
+  page_string(this->desc, qPrintable(buffer), 1);
 }
 
 void Character::list_obj_to_char(class Object *list, int mode, bool show)
@@ -515,12 +500,12 @@ void show_spells(Character *i, Character *ch)
 
 void show_char_to_char(Character *i, Character *ch, int mode)
 {
-  std::string buffer;
+  QString buffer;
   int j, found, percent;
   class Object *tmp_obj;
-  char buf2[MAX_STRING_LENGTH];
+  QString buf2;
   clan_data *clan;
-  char buf[200];
+  QString buf;
 
   if (mode == 0)
   {
@@ -535,7 +520,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
     }
     ch->send("$B$3");
 
-    if (!(i->long_desc) || (i->isNonPlayer() && (GET_POS(i) != i->mobdata->default_pos)))
+    if (i->long_desc.isEmpty() || (i->isNonPlayer() && (GET_POS(i) != i->mobdata->default_pos)))
     {
       /* A char without long descr, or not in default pos. */
       if (i->isPlayer())
@@ -552,13 +537,12 @@ void show_char_to_char(Character *i, Character *ch, int mode)
         {
           if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_BRIEF))
           {
-            sprintf(buf, " %s [%s]", GET_TITLE(i), clan->name);
+            buf = u" %1 [%2]"_s.arg(GET_TITLE(i)).arg(clan->name);
             buffer.append(buf);
           }
           else
           {
-            sprintf(buf, " the %s [%s]",
-                    races[(int)GET_RACE(i)].singular_name, clan->name);
+            buf = u" the %1 [%2]"_s.arg(races[(int)GET_RACE(i)].singular_name).arg(clan->name);
             buffer.append(buf);
           }
         }
@@ -572,7 +556,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
           else
           {
             buffer.append(" the ");
-            sprintf(buf2, "%s", races[(int)GET_RACE(i)].singular_name);
+            buf2 = u"%1"_s.arg(races[(int)GET_RACE(i)].singular_name);
             buffer.append(buf2);
           }
         }
@@ -581,7 +565,8 @@ void show_char_to_char(Character *i, Character *ch, int mode)
       if (i->isNonPlayer())
       {
         buffer = i->short_desc;
-        buffer[0] = toupper(buffer[0]);
+        if (!buffer.isEmpty())
+          buffer[0] = buffer[0].toUpper();
       }
 
       switch (GET_POS(i))
@@ -649,7 +634,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
         buffer.append(" $B$4(Champion) ");
 
       buffer.append("$R\r\n");
-      send_to_char(buffer.c_str(), ch);
+      send_to_char(buffer, ch);
 
       show_spells(i, ch);
     }
@@ -675,7 +660,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
       buffer.append(i->long_desc);
 
-      send_to_char(buffer.c_str(), ch);
+      send_to_char(buffer, ch);
 
       show_spells(i, ch);
       ch->send("$R$7");
@@ -685,7 +670,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
   {
     if (mode == 1)
     {
-      if (i->description)
+      if (!i->description.isEmpty())
       {
         ch->send(i->description);
       }
@@ -708,8 +693,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
 
     buffer = GET_SHORT(i);
 
-    sprintf(buf, " the %s",
-            races[(int)GET_RACE(i)].singular_name);
+    buf = u" the %1"_s.arg(races[(int)GET_RACE(i)].singular_name);
 
     buffer.append(buf);
 
@@ -730,7 +714,7 @@ void show_char_to_char(Character *i, Character *ch, int mode)
     else
       buffer.append(" is suffering from a slow death.\r\n");
 
-    send_to_char(buffer.c_str(), ch);
+    send_to_char(buffer, ch);
 
     if (mode == 3)
     { // If it was a glance, show spells then get out
@@ -880,7 +864,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
 
     if (nr >= 0)
     {
-      csendf(this, "[%4dms] [%5d] [%s]\r\n", ms, DC::getInstance()->mob_index[nr].vnum(), DC::getInstance()->mob_index[nr].mob->short_desc);
+      csendf(this, "[%4dms] [%5d] [%s]\r\n", ms, DC::getInstance()->mob_index[nr].vnum(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
     }
   }
 
@@ -957,7 +941,7 @@ void try_to_peek_into_container(Character *vict, Character *ch,
   }
 
   char buf[200];
-  sprintf(buf, "You attempt to peek into the %s.\r\n", cont->short_description);
+  sprintf(buf, "You attempt to peek into the %s.\r\n", qPrintable(cont->short_description));
   ch->send(buf);
 
   if (isSet(cont->obj_flags.value[1], CONT_CLOSED))
@@ -1049,7 +1033,7 @@ bool identify(Character *ch, Object *obj)
     return false;
   }
 
-  if (obj->short_description)
+  if (!obj->short_description.isEmpty())
   {
     ch->send(QStringLiteral("$3Short description: $R%1\r\n").arg(obj->short_description));
   }
@@ -1335,7 +1319,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
   bool found = 0;
   class Object *tmp_object = nullptr, *found_object = nullptr;
   Character *tmp_char = nullptr;
-  char *tmp_desc = nullptr;
+  QString tmp_desc;
   static const char *keywords[] = {"north", "east", "south", "west", "up", "down",
                                    "in", "at", "out", "through", "", /* Look at '' case */
                                    "\n"};
@@ -1387,17 +1371,16 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
     case 5:
     {
       /* Check if there is an extra-desc with "up"(or whatever) and use that instead */
-      tmp_desc = find_ex_description(arg1,
-                                     DC::getInstance()->world[ch->in_room].ex_description);
-      if (tmp_desc)
+      tmp_desc = find_ex_description(arg1, DC::getInstance()->world[ch->in_room].ex_descriptions);
+      if (!tmp_desc.isEmpty())
       {
-        page_string(ch->desc, tmp_desc, 0);
+        page_string(ch->desc, qPrintable(tmp_desc), 0);
         return ReturnValue::eSUCCESS;
       }
 
       if (EXIT(ch, keyword_no))
       {
-        if (EXIT(ch, keyword_no)->general_description && strlen(EXIT(ch, keyword_no)->general_description))
+        if (!EXIT(ch, keyword_no)->general_description.isEmpty())
         {
           send_to_char(EXIT(ch, keyword_no)->general_description, ch);
         }
@@ -1591,11 +1574,10 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
         /* Extra description in room?? */
         if (!found)
         {
-          tmp_desc = find_ex_description(arg2,
-                                         DC::getInstance()->world[ch->in_room].ex_description);
-          if (tmp_desc)
+          tmp_desc = find_ex_description(arg2, DC::getInstance()->world[ch->in_room].ex_descriptions);
+          if (!tmp_desc.isEmpty())
           {
-            page_string(ch->desc, tmp_desc, 0);
+            page_string(ch->desc, qPrintable(tmp_desc), 0);
             return ReturnValue::eSUCCESS; /* RETURN SINCE IT WAS ROOM DESCRIPTION */
                                           /* Old system was: found = true; */
           }
@@ -1613,11 +1595,10 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
             {
               if (CAN_SEE_OBJ(ch, ch->equipment[j]))
               {
-                tmp_desc = find_ex_description(arg2,
-                                               ch->equipment[j]->ex_description);
-                if (tmp_desc)
+                tmp_desc = find_ex_description(arg2, ch->equipment[j]->ex_descriptions);
+                if (!tmp_desc.isEmpty())
                 {
-                  page_string(ch->desc, tmp_desc, 1);
+                  page_string(ch->desc, qPrintable(tmp_desc), 1);
                   return ReturnValue::eSUCCESS;
                   //                              found = true;
                 }
@@ -1635,11 +1616,10 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           {
             if (CAN_SEE_OBJ(ch, tmp_object))
             {
-              tmp_desc = find_ex_description(arg2,
-                                             tmp_object->ex_description);
-              if (tmp_desc)
+              tmp_desc = find_ex_description(arg2, tmp_object->ex_descriptions);
+              if (!tmp_desc.isEmpty())
               {
-                page_string(ch->desc, tmp_desc, 1);
+                page_string(ch->desc, qPrintable(tmp_desc), 1);
                 return ReturnValue::eSUCCESS;
                 //                           found = true;
               }
@@ -1657,11 +1637,10 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           {
             if (CAN_SEE_OBJ(ch, tmp_object))
             {
-              tmp_desc = find_ex_description(arg2,
-                                             tmp_object->ex_description);
-              if (tmp_desc)
+              tmp_desc = find_ex_description(arg2, tmp_object->ex_descriptions);
+              if (!tmp_desc.isEmpty())
               {
-                page_string(ch->desc, tmp_desc, 1);
+                page_string(ch->desc, qPrintable(tmp_desc), 1);
                 return ReturnValue::eSUCCESS;
                 //                           found = true;
               }
@@ -1722,9 +1701,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
             {
               if (tmp_object->isPortalTypePlayer() || tmp_object->isPortalTypePermanentNoLook())
               {
-                sprintf(tmpbuf,
-                        "You look through %s but it seems to be opaque.\r\n",
-                        tmp_object->short_description);
+                sprintf(tmpbuf, "You look through %s but it seems to be opaque.\r\n", qPrintable(tmp_object->short_description));
                 ch->send(tmpbuf);
                 return ReturnValue::eFAILURE;
               }
@@ -1916,7 +1893,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
 
     if (!ch->isNonPlayer() && ch->player->holyLite)
       sprintf(buf + strlen(buf), "%s - %s [%d]\r\n", exits[door],
-              DC::getInstance()->world[EXIT(ch, door)->to_room].name,
+              qPrintable(DC::getInstance()->world[EXIT(ch, door)->to_room].name),
               DC::getInstance()->world[EXIT(ch, door)->to_room].number);
     else if (isSet(EXIT(ch, door)->exit_info, EX_CLOSED))
     {
@@ -1929,7 +1906,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
     else
       sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],
-              DC::getInstance()->world[EXIT(ch, door)->to_room].name);
+              qPrintable(DC::getInstance()->world[EXIT(ch, door)->to_room].name));
   }
 
   ch->sendln("You scan around the exits to see where they lead.");
@@ -2689,15 +2666,14 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
     count++;
 
     if (in_room != DC::NOWHERE)
-      sprintf(buf, "[%2d] %-26s %d", count, k->short_description, in_room);
+      sprintf(buf, "[%2d] %-26s %d", count, qPrintable(k->short_description), in_room);
     else
-      sprintf(buf, "[%2d] %-26s %s", count, k->short_description,
-              "(Item at DC::NOWHERE.)");
+      sprintf(buf, "[%2d] %-26s %s", count, qPrintable(k->short_description), "(Item at DC::NOWHERE.)");
 
     if (k->in_obj)
     {
       strcat(buf, " in ");
-      strcat(buf, k->in_obj->short_description);
+      strcat(buf, qPrintable(k->in_obj->short_description));
       if (k->in_obj->carried_by)
       {
         strcat(buf, " carried by ");
@@ -2780,7 +2756,7 @@ int do_mlocate(Character *ch, char *name, cmd_t cmd)
     *buf = '\0';
     sprintf(buf, "[%2d] %-26s %d\r\n",
             count,
-            i->short_desc,
+            qPrintable(i->short_desc),
             DC::getInstance()->world[i->in_room].number);
     if (strlen(buf) + strlen(buf2) + 3 >= MAX_STRING_LENGTH)
     {
@@ -3200,7 +3176,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
           "above you",
           "below you",
           "\n",
-      };
+  };
 
   if (!ch->decrementMove(2, "You are to tired to scan right now."))
   {
@@ -4608,7 +4584,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
                       { return (search_item.getType() == Search::types::O_SHORT_DESCRIPTION); }))
     {
       // Because the color codes make the std::string longer then it visually appears, we calculate that color code difference and add it to our max_short_description_size to get alignment right
-      custom_columns += QStringLiteral(" [%1]").arg(obj->short_description, -(strlen(obj->short_description) - nocolor_strlen(obj->short_description) + max_short_description_size));
+      custom_columns += QStringLiteral(" [%1]").arg(obj->short_description, -(obj->short_description.size()) - nocolor_strlen(obj->short_description) + max_short_description_size);
     }
 
     // Needed to show details or affects below

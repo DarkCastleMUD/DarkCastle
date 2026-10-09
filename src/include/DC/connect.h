@@ -16,6 +16,7 @@
 | connect.h
 | Description: State of connectedness information.
 */
+#include "DC/newedit.h"
 #include "DC/character.h"
 #include "DC/structs.h" // MAX_INPUT_LENGTH
 #include "DC/comm.h"
@@ -129,10 +130,8 @@ public:
 
   Proxy proxy = {};
 
-  int descriptor = {}; /* file descriptor for socket	*/
-  int desc_num = {};
-  char *name = {};       /* Copy of the player name	*/
-  states connected = {}; /* mode of 'connectedness'	*/
+  qintptr descriptor = {}; /* file descriptor for socket	*/
+  states connected = {};   /* mode of 'connectedness'	*/
   int web_connected = {};
   int wait = {};           /* wait for how many loops	*/
   char *showstr_head = {}; /* for paging through texts	*/
@@ -141,29 +140,29 @@ public:
   int showstr_page = {};
   bool new_newline = {}; /* prepend newline in output	*/
   //  char	**str;			/* for the modify-str system	*/
-  char **hashstr = {};
+  QString *hashstr = {};
   char *astr = {};
   int max_str = {};
   std::string buf = {};        /* buffer for raw input	*/
   std::string last_input = {}; /* the last input	*/
   QByteArray output = {};      /* output buffer for writing to connection	*/
   std::string inbuf = {};
-  std::queue<std::string> input = {}; /* queue of unprocessed input	*/
-  Character *character = {};          /* linked to char		*/
-  Character *original = {};           /* for switch / return		*/
-  class Connection *snooping = {};    /* Who is this char snooping       */
-  class Connection *snoop_by = {};    /* And who is snooping this char   */
-  class Connection *next = {};        /* link to next descriptor	*/
-  int tick_wait = {};                 /* # ticks desired to wait	*/
-  int reallythere = {};               /* Goddamm #&@$*% sig 13 (hack) */
+  std::queue<QByteArray> input = {}; /* queue of unprocessed input	*/
+  Character *character = {};         /* linked to char		*/
+  Character *original = {};          /* for switch / return		*/
+  class Connection *snooping = {};   /* Who is this char snooping       */
+  class Connection *snoop_by = {};   /* And who is snooping this char   */
+  class Connection *next = {};       /* link to next descriptor	*/
+  int tick_wait = {};                /* # ticks desired to wait	*/
+  int reallythere = {};              /* Goddamm #&@$*% sig 13 (hack) */
   int prompt_mode = {};
   uint8_t idle_tics = {};
   time_t login_time = {};
   stat_data *stats = {}; // for rolling up a char
 
-  char **strnew = {}; /* for the modify-str system	*/
+  QString *strnew = {}; /* for the modify-str system	*/
   QString qstrnew = {};
-  char *backstr = {};
+  QString backstr = {};
   int idle_time = {}; // How long the descriptor has been idle, overall.
   bool color = {};
   bool server_size_echo = false;
@@ -226,6 +225,12 @@ public:
   void setOutput(QString output_buffer);
   void appendOutput(QString output_buffer);
   QByteArray getOutput(void) const;
+  void editor_parse_line(QString str);
+  void parse_action(parse_t action, QString str);
+  void write_to_output(auto txt)
+  {
+    ::write_to_output(txt, this);
+  }
 
 private:
   QHostAddress peer_address_ = {};

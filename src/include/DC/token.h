@@ -1,5 +1,6 @@
 #pragma once
-#include <string>
+#include <qcontainerfwd.h>
+#include <QByteArray>
 class Character;
 class Object;
 /*-----------------------------------------------------------------------
@@ -48,7 +49,7 @@ public:
 
   TokenList(const char *);
   ~TokenList();
-  std::string Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags);
+  QByteArray Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags);
 
 private:
   //--
@@ -65,8 +66,8 @@ private:
   //--
   // Private variables
   //--
-  Token *head;        // Head of the list
-  Token *current;     // Current token
-  std::string interp; // Interpreted tokens
+  Token *head;       // Head of the list
+  Token *current;    // Current token
+  QByteArray interp; // Interpreted tokens
 
 }; // end of TokenList class

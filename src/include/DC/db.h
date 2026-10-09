@@ -13,9 +13,7 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: db.h,v 1.40 2012/02/08 22:54:25 jhhudso Exp $ */
-#ifndef DC_DB_H_
-#define DC_DB_H_
-
+#pragma once
 #include <qchar.h>
 #include <qmap.h>
 #include <qobject.h>
@@ -159,51 +157,9 @@ void write_mprog_recur(FILEPtr fl, mob_prog_data *mprg, bool mob);
 int load_new_help(FILEPtr fl, int reload = 0, Character *ch = nullptr);
 int count_hash_records(FILEPtr fl);
 void load_hints();
-char *mprog_type_to_name(int type);
 void write_wizlist(std::stringstream &filename);
 void write_wizlist(std::string filename);
 void write_wizlist(const char filename[]);
-void string_to_file(QTextStream &fl, QString str);
-
-void string_to_file(auto &fl, QString str)
-{
-  fl << str.remove('\r').toStdString() << "~\n";
-}
-
-void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
-{
-  if (mprg->next)
-  {
-    write_mprog_recur(fl, mprg->next, mob);
-  }
-
-  if (mob)
-  {
-    fl << ">" << mprog_type_to_name(mprg->type) << " ";
-  }
-  else
-  {
-    fl << "\\" << mprog_type_to_name(mprg->type) << " ";
-  }
-
-  if (mprg->arglist)
-  {
-    string_to_file(fl, mprg->arglist);
-  }
-  else
-  {
-    string_to_file(fl, "Saved During Edit");
-  }
-
-  if (mprg->comlist)
-  {
-    string_to_file(fl, mprg->comlist);
-  }
-  else
-  {
-    string_to_file(fl, "Saved During Edit");
-  }
-}
 
 auto &operator<<(auto &out, const obj_flag_data &of)
 {
@@ -213,14 +169,13 @@ auto &operator<<(auto &out, const obj_flag_data &of)
   return out;
 }
 
-auto &operator<<(auto &out, extra_descr_data *currdesc)
+auto &operator<<(auto &out, ex_descriptions_t ex_descriptions)
 {
-  while (currdesc)
+  for (const auto &[keyword, description] : ex_descriptions.asKeyValueRange())
   {
     out << "E\n";
-    string_to_file(out, currdesc->keyword);
-    string_to_file(out, currdesc->description);
-    currdesc = currdesc->next;
+    string_to_file(out, keyword);
+    string_to_file(out, description);
   }
   return out;
 }
@@ -252,7 +207,7 @@ void write_object(Object *obj, auto &out)
   string_to_file(out, obj->long_description);
   string_to_file(out, obj->ActionDescription());
   out << obj->obj_flags;
-  out << obj->ex_description;
+  out << obj->ex_descriptions;
   affects_to_file(out, obj);
   out << DC::getInstance()->obj_index[obj->vnum_].mobprogs;
   out << "S\n";
@@ -266,7 +221,6 @@ auto &operator<<(auto &out, const Room &room)
     REMOVE_BIT(temp_room_flags, room.iFlags);
   }
 
-  extra_descr_data *extra;
   if (!DC::getInstance()->rooms.contains(room.number))
     return out;
 
@@ -282,7 +236,7 @@ auto &operator<<(auto &out, const Room &room)
     if (!(room.dir_option[b]))
       continue;
     out << "D" << b << "\n";
-    if (room.dir_option[b]->general_description)
+    if (!room.dir_option[b]->general_description.isEmpty())
       string_to_file(out, room.dir_option[b]->general_description);
     else
       out << "~\n"; // print blank
@@ -294,17 +248,15 @@ auto &operator<<(auto &out, const Room &room)
   } /* exits */
 
   /* extra descriptions */
-  for (extra = room.ex_description; extra; extra = extra->next)
+  for (const auto &[keyword, description] : room.ex_descriptions.asKeyValueRange())
   {
-    if (!extra)
-      break;
     out << "E\n";
-    if (extra->keyword)
-      string_to_file(out, extra->keyword);
+    if (!keyword.isEmpty())
+      string_to_file(out, keyword);
     else
       out << "~\n"; // print blank
-    if (extra->description)
-      string_to_file(out, extra->description);
+    if (!description.isEmpty())
+      string_to_file(out, description);
     else
       out << "~\n"; // print blank
   } /* extra descriptions */
@@ -333,7 +285,6 @@ void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
 void init_char(Character *ch);
-void clear_char(Character *ch);
 void clear_object(class Object *obj);
 void reset_char(Character *ch);
 void free_char(Character *ch, Trace trace = Trace("Unknown"));
@@ -382,8 +333,6 @@ extern skill_quest *skill_list;
 
 class Object *clone_object(int nr);
 void randomize_object(Object *obj);
-void string_to_file(FILEPtr fl, QString str);
-void string_to_file(QTextStream &fl, QString str);
 std::ofstream &operator<<(std::ofstream &out, Object *obj);
 std::ifstream &operator>>(std::ifstream &in, Object *obj);
 std::string lf_to_crlf(std::string &s1);
@@ -421,4 +370,5 @@ extern int exp_table[61 + 1];
 #define WORLD_FILE_READY 1 << 2
 #define WORLD_FILE_APPROVED 1 << 3
 
-#endif
+int fwrite_string(char *buf, FILEPtr fl);
+int fwrite_string(QString buf, FILEPtr fl);

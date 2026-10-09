@@ -1171,7 +1171,7 @@ void stop_follower(Character *ch, follower_reasons_t reason)
     }
     if (ch->fighting && ch->fighting != ch->master)
     {
-      do_say(ch, "Screw this, I'm going home!");
+      ch->do_say("Screw this, I'm going home!");
       stop_fighting(ch->fighting);
       stop_fighting(ch);
     }
@@ -2544,7 +2544,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             {
               ch->sendln("You can't cast that spell on someone from another clan in a prize arena.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), get_clan_name(tar_char));
+                   GET_NAME(ch), qPrintable(get_clan_name(ch)), get_skill_name(spl).toStdString().c_str(), GET_NAME(tar_char), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
 
@@ -2552,20 +2552,20 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
             {
               ch->sendln("You can't cast that because you're in a fight with someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s], whom was fighting %s [%s], was prevented from casting '%s' on %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch),
-                   GET_NAME(ch->fighting), get_clan_name(ch->fighting),
+                   GET_NAME(ch), qPrintable(get_clan_name(ch)),
+                   GET_NAME(ch->fighting), qPrintable(get_clan_name(ch->fighting)),
                    get_skill_name(spl).toStdString().c_str(),
-                   GET_NAME(tar_char), get_clan_name(tar_char));
+                   GET_NAME(tar_char), qPrintable(get_clan_name(tar_char)));
               return ReturnValue::eFAILURE;
             }
             else if (tar_char->fighting && tar_char->fighting != ch && !ARE_CLANNED(tar_char->fighting, ch) && isSet(spell_info[spl].targets(), TAR_FIGHT_VICT))
             {
               ch->sendln("You can't cast that because they are fighting someone else.");
               logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s [%s] was prevented from casting '%s' on %s [%s] who was fighting %s [%s].",
-                   GET_NAME(ch), get_clan_name(ch),
+                   GET_NAME(ch), qPrintable(get_clan_name(ch)),
                    get_skill_name(spl).toStdString().c_str(),
-                   GET_NAME(tar_char), get_clan_name(tar_char),
-                   GET_NAME(tar_char->fighting), get_clan_name(tar_char->fighting));
+                   GET_NAME(tar_char), qPrintable(get_clan_name(tar_char)),
+                   GET_NAME(tar_char->fighting), qPrintable(get_clan_name(tar_char->fighting)));
               return ReturnValue::eFAILURE;
             }
           }

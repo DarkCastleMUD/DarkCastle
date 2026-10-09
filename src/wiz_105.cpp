@@ -623,14 +623,10 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
           clas = x;
       }
 
-#ifdef LEAK_CHECK
-    newOne = (skill_quest *)calloc(1, sizeof(skill_quest));
-#else
-    newOne = (skill_quest *)dc_alloc(1, sizeof(skill_quest));
-#endif
+    newOne = new skill_quest;
     newOne->num = i;
     newOne->level = 1;
-    newOne->message = str_dup("New skillquest.");
+    newOne->message = u"New skillquest."_s;
     newOne->clas = (1 << (clas - 1));
     newOne->next = skill_list;
     skill_list = newOne;
@@ -646,13 +642,12 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
         else
           skill_list = curren->next;
         ch->sendln("Deleted.");
-        dc_free(curren->message);
-        dc_free(curren);
+        delete curren;
         return ReturnValue::eSUCCESS;
       }
       last = curren;
     }
-    ch->sendln("Error in sqedit. Tell Urizen.");
+    ch->sendln("Error in sqedit. Tell Julian.");
     break;
     break;
   case 2:
@@ -705,7 +700,11 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Class modified.");
     break;
   case 5: // show
-    csendf(ch, "$3Skill$R: %s\r\n$3Message$R: %s\r\n$3Class$R: %s\r\n$3Level$R: %d\r\n", get_skill_name(skill->num).toStdString().c_str(), skill->message, print_classes(skill->clas), skill->level);
+    ch->sendln(u"$3Skill$R: %1\r\n$3Message$R: %2\r\n$3Class$R: %3\r\n$3Level$R: %4"_s
+                   .arg(get_skill_name(skill->num))
+                   .arg(skill->message)
+                   .arg(print_classes(skill->clas))
+                   .arg(skill->level));
     break;
   case 6:
     int l;
@@ -876,7 +875,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
       {
         if (last_vnum[a][i] == -1)
           continue;
-        sprintf(buf1, "%s %s(%llu)   ", buf1, DC::getInstance()->obj_index[last_vnum[a][i]].item->short_description, last_vnum[a][i]);
+        sprintf(buf1, "%s %s(%llu)   ", buf1, qPrintable(DC::getInstance()->obj_index[last_vnum[a][i]].item->short_description), last_vnum[a][i]);
         //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);

@@ -42,42 +42,36 @@ board.c version 1.2 - Jun 1991 by Twilight.
 
 #include <qcompare.h>
 #include <qstring.h>
+#include <qstringview.h>
 #include <qswap.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <cstring> // memset()
-#include <cctype>  // isspace(), isdigit()
-#include <string>
 #include <map>
 #include <vector>
-#include <compare>
 
 #include "DC/dcstdio.h" // FILEPtr
 #include "DC/DC.h"
-#include "DC/connect.h"  // Connection::states::WRITE_BOARD
-#include "DC/terminal.h" // BOLD
+#include "DC/connect.h" // Connection::states::WRITE_BOARD
 #include "DC/clan.h"
 #include "DC/character.h"
 #include "DC/utility.h" // false
-#include "DC/memory.h"
 #include "DC/act.h"
 #include "DC/returnvals.h"
 #include "DC/interp.h"
 #include "DC/obj.h"
 #include "DC/common.h"
 #include "DC/levels.h"
-#include "DC/structs.h"
+#include "DC/db.h"
 
 #define MAX_MESSAGE_LENGTH 2048
 
 class message
 {
 public:
-  std::string date;
-  std::string title;
-  std::string author;
-  std::string text;
+  QString date;
+  QString title;
+  QString author;
+  QString text;
 };
 
 class BOARD_INFO
@@ -90,21 +84,22 @@ public:
   int min_remove_level = {};
   int type = {};
   int owner = {};
-  std::string save_file;
-  std::vector<message> msgs;
+  QString save_file;
+  QList<message> msgs;
 };
+using boards_t = std::map<QString, BOARD_INFO>;
 
 // These are the binary files in which to save/load messages
+void board_do_write(Character *ch, QStringList arg, boards_t::iterator board);
+int board_do_read(Character *ch, QStringList arg, boards_t::iterator board);
+int board_do_erase(Character *ch, QStringList arg, boards_t::iterator board);
+int board_do_look(Character *ch, QStringList arg, boards_t::iterator board);
 
-void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-char *fread_string(FILEPtr fl, int hasher);
-int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-void board_save_board(std::map<std::string, BOARD_INFO>::iterator board);
+void board_save_board(boards_t::iterator board);
 void board_load_board();
-int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board);
-int fwrite_string(char *buf, FILEPtr fl);
 void new_edit_board_unlock_board(Character *ch, int abort);
+
+char *fread_string(FILEPtr fl, int hasher);
 
 #define ANY_BOARD 0
 #define CLASS_BOARD 1
@@ -147,9 +142,9 @@ void new_edit_board_unlock_board(Character *ch, int abort);
 class RESERVATION_DATA
 {
 public:
-  char *buf;
+  QString buf;
   message new_post;
-  std::map<std::string, BOARD_INFO>::iterator board;
+  boards_t::iterator board;
 };
 
 // std::map to hold callback information for writing
@@ -158,9 +153,9 @@ std::map<Character *, RESERVATION_DATA *> wait_for_write;
 /*
 Function to populate the board_db with all of the current clan info
 */
-std::map<std::string, BOARD_INFO> populate_boards()
+boards_t populate_boards()
 {
-  std::map<std::string, BOARD_INFO> board_tmp;
+  boards_t board_tmp;
   BOARD_INFO board_struct = {};
 
   board_struct.min_read_level = 0;
@@ -574,19 +569,32 @@ std::map<std::string, BOARD_INFO> populate_boards()
   return board_tmp;
 }
 
-std::map<std::string, BOARD_INFO> board_db = populate_boards();
+boards_t board_db = populate_boards();
 
 int save_boards()
 {
-  std::map<std::string, BOARD_INFO>::iterator board_it;
+  boards_t::iterator board_it;
 
   FILEPtr the_file;
 
-  the_file = dc_fopen("board/index", "w");
+  if (QDir::current().dirName() == u"lib"_s && !QDir(u"board"_s).exists())
+  {
+    if (!QDir::current().mkdir("board"))
+    {
+      qWarning("Error creating missing '%s/board' directory.", qPrintable(QDir::currentPath()));
+    }
+    else
+    {
+      qWarning("Created missing '%s/board' directory.", qPrintable(QDir::currentPath()));
+    }
+  }
+
+  auto filename = u"board/index"_s;
+  the_file = dc_fopen(filename, "w");
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for bulletin board index"), ANGEL,
+    logentry(u"Unable to create save file for bulletin board index at '%1'"_s.arg(QDir::currentPath() + "/" + filename), ANGEL,
              DC::LogChannel::LOG_BUG);
     return ReturnValue::eFAILURE;
   }
@@ -599,8 +607,8 @@ int save_boards()
     dc_fprintf(the_file, " %d ", board_it->second.min_remove_level);
     dc_fprintf(the_file, " %d ", board_it->second.type);
     dc_fprintf(the_file, " %d ", board_it->second.owner);
-    fwrite_string((char *)board_it->second.save_file.c_str(), the_file);
-    fwrite_string((char *)board_it->first.c_str(), the_file);
+    fwrite_string(board_it->second.save_file, the_file);
+    fwrite_string(board_it->first, the_file);
   }
 
   return ReturnValue::eSUCCESS;
@@ -610,18 +618,22 @@ int save_boards()
 Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
-int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+
+int board(Character *ch, class Object *obj, cmd_t cmd, const char *c_arguments, Character *invoker)
 {
+  auto arguments = QString(c_arguments).split(' ');
+  auto arg1 = arguments.value(0);
+
   static int has_loaded = 0;
 
-  std::map<std::string, BOARD_INFO>::iterator board;
+  boards_t::iterator board;
 
   if (cmd != cmd_t::LOOK && cmd != cmd_t::READ && cmd != cmd_t::WRITE && cmd != cmd_t::ERASE)
   {
     return ReturnValue::eFAILURE;
   }
 
-  if (!arg)
+  if (arg1.isEmpty())
     return ReturnValue::eFAILURE;
 
   if (!ch->desc)
@@ -643,31 +655,28 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   if (board == board_db.end())
     return ReturnValue::eFAILURE;
 
-  char arg1[MAX_INPUT_LENGTH];
-  one_argument(arg, arg1);
-
   if (!isexact(arg1, obj->Name()) && cmd == cmd_t::LOOK)
     return ReturnValue::eFAILURE;
 
   switch (cmd)
   {
   case cmd_t::LOOK: // look
-    return (board_show_board(ch, arg, board));
+    return (board_do_look(ch, arguments, board));
   case cmd_t::WRITE: // write
     if (GET_INT(ch) < 9)
     {
-      ch->sendln("You are too stupid to know how to write!");
+      ch->sendln("Your intelligence is too low to write!");
       return ReturnValue::eSUCCESS;
     }
-    board_write_msg(ch, arg, board);
+    board_do_write(ch, arguments, board);
     return ReturnValue::eSUCCESS;
   case cmd_t::READ: // read
     if (GET_INT(ch) < 9)
     {
-      ch->sendln("You are too stupid to know how to read!");
+      ch->sendln("Your intelligence is too low to read!");
       return ReturnValue::eSUCCESS;
     }
-    board_display_msg(ch, arg, board);
+    board_do_read(ch, arguments, board);
     return ReturnValue::eSUCCESS;
   case cmd_t::ERASE: /* erase */
     if (GET_INT(ch) < 9)
@@ -682,7 +691,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
       return ReturnValue::eSUCCESS;
       // added this for Uruk'hai board so only members can remove posts
     }
-    board_remove_msg(ch, arg, board);
+    board_do_erase(ch, arguments, board);
     return ReturnValue::eSUCCESS;
   default:
     return ReturnValue::eFAILURE;
@@ -693,7 +702,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
 This function acts as a callback from edit_new
 function call new_add_string()
 It notifies us when the user is done writing the post
-and we can copy the std::string to the board
+and we can copy the QString to the board
 */
 void new_edit_board_unlock_board(Character *ch, int abort)
 {
@@ -701,14 +710,14 @@ void new_edit_board_unlock_board(Character *ch, int abort)
   message new_msg;
 
   new_msg.text = reserve->buf;
-  dc_free(reserve->buf);
+  // qWarning("[%s]", qPrintable(reserve->buf));
   new_msg.date = reserve->new_post.date;
   new_msg.author = reserve->new_post.author;
   new_msg.title = reserve->new_post.title;
 
-  if (new_msg.date.empty()) // means they were editing Topic
+  if (new_msg.date.isEmpty()) // means they were editing Topic
   {
-    if (!new_msg.text.empty() && !new_msg.title.empty())
+    if (!new_msg.text.isEmpty() && !new_msg.title.isEmpty())
     {
       reserve->board->second.msgs[0].text = new_msg.text;
       reserve->board->second.msgs[0].title = new_msg.title;
@@ -719,11 +728,12 @@ void new_edit_board_unlock_board(Character *ch, int abort)
   delete reserve;
 }
 
-void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+void board_do_write(Character *ch, QStringList arguments, boards_t::iterator board)
 {
-  char buf[MAX_STRING_LENGTH];
+  auto arg = arguments.value(0);
+  QString buf;
   time_t timep; // clock time
-  char *tmstr;
+  QString tmstr;
 
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
@@ -754,13 +764,11 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   }
 
   // skip blanks
+  arg = arg.trimmed();
 
-  for (; isspace(*arg); arg++)
-    ;
-
-  if (!*arg)
+  if (arg.isEmpty())
   {
-    ch->sendln("Need a header, fool.");
+    ch->sendln("Need a header.");
     return;
   }
 
@@ -772,25 +780,22 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
 
   timep = time(0);
   tmstr = asctime(localtime(&timep));
-  *(tmstr + strlen(tmstr) - 1) = '\0';
-  sprintf(buf, "%.10s", tmstr);
+  buf = tmstr;
+  reserve->new_post.date = QDateTime::currentDateTime().toString(Qt::RFC2822Date);
 
-  reserve->new_post.date = buf;
-
-  send_to_char("        Write your message and stay within the line.  (/s saves /h for help)\r\n"
-               "   |--------------------------------------------------------------------------------|\r\n",
-               ch);
+  ch->sendln(u"        Write your message and stay within the line.  (/s saves /h for help)\r\n"
+             "   --------------------------------------------------------------------------"_s);
 
   act("$n starts to write a message.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   // if the title is Topic, this clears the date to let us know that
   // during the callback the topic will need updated.
-  if (!(strcmp("Topic", arg)) && ch->getLevel() > IMMORTAL)
+  if (arg == u"Topic"_s && ch->getLevel() > IMMORTAL)
   {
     reserve->new_post.date.clear();
   }
 
-  reserve->buf = 0;
+  reserve->buf = {};
   reserve->board = board;
   wait_for_write[ch] = reserve;
   ch->desc->connected = Connection::states::WRITE_BOARD;
@@ -798,18 +803,11 @@ void board_write_msg(Character *ch, const char *arg, std::map<std::string, BOARD
   ch->desc->max_str = MAX_MESSAGE_LENGTH;
 }
 
-int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_do_erase(Character *ch, QStringList arguments, boards_t::iterator board)
 {
-  unsigned int ind, tmessage;
-  char buf[256], number[MAX_INPUT_LENGTH + 1];
-
-  one_argument(arg, number);
-
-  if (!*number || !isdigit(*number))
-    return ReturnValue::eFAILURE;
-
-  if (!(tmessage = atoi(number)))
-    return ReturnValue::eFAILURE;
+  auto arg1 = arguments.value(0);
+  bool ok = false;
+  auto tmessage = arg1.toUInt(&ok);
 
   if (board->second.msgs.empty())
   {
@@ -817,13 +815,23 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
     return ReturnValue::eSUCCESS;
   }
 
-  if (tmessage == 0 || tmessage >= board->second.msgs.size())
+  if (board->second.msgs.size() == 1 && (!ok || tmessage != 0))
   {
-    ch->sendln("That message exists only in your imagination..");
-    return ReturnValue::eSUCCESS;
+    ch->sendln(u"ID '%1' not valid. The only valid ID is 0."_s.arg(arg1));
+    return ReturnValue::eFAILURE;
   }
 
-  ind = tmessage;
+  if (!ok || tmessage > board->second.msgs.size() - 1)
+  {
+    ch->sendln(u"ID '%1' not valid. Valid IDs are %2-%3"_s.arg(arg1.trimmed()).arg(0).arg(board->second.msgs.size() - 1));
+    return ReturnValue::eFAILURE;
+  }
+
+  if (tmessage == 0 && board->second.msgs.size() != 1)
+  {
+    ch->sendln("You can't erase ID 0 until it's the last ID.");
+    return ReturnValue::eSUCCESS;
+  }
 
   // if clan board
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
@@ -833,7 +841,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
       ch->sendln("You aren't in the right clan bucko.");
       return ReturnValue::eSUCCESS;
     }
-    if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[ind].author.compare(GET_NAME(ch)))
+    if (!has_right(ch, CLAN_RIGHTS_B_REMOVE) && board->second.msgs[tmessage].author.compare(GET_NAME(ch)))
     {
       ch->sendln("You don't have the right!  Talk to your clan leader.");
       return ReturnValue::eSUCCESS;
@@ -844,7 +852,7 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
     ch->sendln("You do not understand the writings written on this board.");
     return ReturnValue::eSUCCESS;
   }
-  else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[ind].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
+  else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[tmessage].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
   {
     send_to_char("You try and grab one of the notes of the board but "
                  "get a nasty\r\nshock. Maybe you'd better leave it "
@@ -853,25 +861,23 @@ int board_remove_msg(Character *ch, const char *arg, std::map<std::string, BOARD
     return ReturnValue::eSUCCESS;
   }
 
-  board->second.msgs.erase(board->second.msgs.begin() + ind);
+  board->second.msgs.remove(tmessage);
 
   ch->sendln("Message erased.");
-  sprintf(buf, "$n just erased message %d.", tmessage);
-
-  // Removal message also repaired
+  auto buf = u"$n just erased message %1."_s.arg(tmessage);
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   board_save_board(board);
   return ReturnValue::eSUCCESS;
 }
 
-std::string remove_slashr(std::string unformatted)
+QString remove_slashr(QString unformatted)
 {
-  if (unformatted.empty())
+  if (unformatted.isEmpty())
     return "";
 
-  std::string write_me = unformatted;
-  std::string::iterator slashr;
+  QString write_me = unformatted;
+  QString::iterator slashr;
 
   for (slashr = write_me.end(); slashr != write_me.begin(); slashr--)
     if (*slashr == '\r')
@@ -882,18 +888,31 @@ std::string remove_slashr(std::string unformatted)
   return write_me;
 }
 
-void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
+void board_save_board(boards_t::iterator board)
 {
 
   FILEPtr the_file;
-  std::string write_me;
+  QString write_me;
   unsigned int ind;
 
-  the_file = dc_fopen(board->second.save_file.c_str(), "w");
+  if (QDir::current().dirName() == u"lib"_s && !QDir(u"board"_s).exists())
+  {
+    if (!QDir::current().mkdir("board"))
+    {
+      qWarning("Error creating missing '%s/board' directory.", qPrintable(QDir::currentPath()));
+    }
+    else
+    {
+      qWarning("Created missing '%s/board' directory.", qPrintable(QDir::currentPath()));
+    }
+  }
+
+  auto filename = QString(board->second.save_file);
+  the_file = dc_fopen(filename, "w");
 
   if (!the_file)
   {
-    logentry(QStringLiteral("Unable to open/create save file for bulletin board"), ANGEL,
+    logentry(u"Unable to create save file for bulletin board index at '%1'"_s.arg(QDir::currentPath() + "/" + filename), ANGEL,
              DC::LogChannel::LOG_BUG);
     return;
   }
@@ -902,16 +921,16 @@ void board_save_board(std::map<std::string, BOARD_INFO>::iterator board)
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
     write_me = remove_slashr(board->second.msgs[ind].title);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me, the_file);
 
     write_me = remove_slashr(board->second.msgs[ind].author);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me, the_file);
 
     write_me = remove_slashr(board->second.msgs[ind].date);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me, the_file);
 
     write_me = remove_slashr(board->second.msgs[ind].text);
-    fwrite_string((char *)write_me.c_str(), the_file);
+    fwrite_string(write_me, the_file);
   }
 
   return;
@@ -925,14 +944,14 @@ void board_load_board()
   message curr_msg;
   int number;
 
-  std::map<std::string, BOARD_INFO>::iterator map_it;
+  boards_t::iterator map_it;
 
   for (map_it = board_db.begin(); map_it != board_db.end(); map_it++)
   {
     map_it->second.lock = 0;
     map_it->second.locked_for = nullptr;
 
-    the_file = dc_fopen((*map_it).second.save_file.c_str(), "r");
+    the_file = dc_fopen((*map_it).second.save_file, "r");
     if (!the_file)
       continue;
 
@@ -963,16 +982,13 @@ void board_load_board()
   }
 }
 
-int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_do_read(Character *ch, QStringList arguments, boards_t::iterator board)
 {
-  char buf[MAX_STRING_LENGTH], number[MAX_INPUT_LENGTH + 1];
-  std::string board_msg;
-  one_argument(arg, number);
-  unsigned int tmessage;
-
+  QString buf, board_msg;
+  auto numberStr = arguments.value(0);
   if (ch->isNonPlayer())
   {
-    if (!*number)
+    if (numberStr.isEmpty())
     {
       ch->sendln("Sorry, mobs have to specify the number of the post they want to read.");
       return ReturnValue::eFAILURE;
@@ -980,20 +996,20 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
   }
   else
   {
-    if (!*number && ch->player->last_mess_read > 0)
+    if (numberStr.isEmpty() && ch->player->last_mess_read > 0)
     {
       ch->player->last_mess_read++;
-      sprintf(number, "%i", ch->player->last_mess_read);
+      numberStr = QString::number(ch->player->last_mess_read);
     }
   }
 
-  if (!*number || !isdigit(*number))
+  bool ok = false;
+  unsigned int tmessage = numberStr.toUInt(&ok);
+  if (numberStr.isEmpty() || !ok)
   {
     ch->sendln("Read what?");
     return ReturnValue::eFAILURE;
   }
-  if (!(tmessage = atoi(number)))
-    return ReturnValue::eFAILURE;
 
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
@@ -1019,8 +1035,7 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     send_to_char("You try and look at the messages on the board but"
                  " you\r\ncannot comprehend their meaning.\r\n\r\n",
                  ch);
-    act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
-        TO_ROOM, INVIS_NULL);
+    act("$n tries to read the board, but looks bewildered.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
   }
 
@@ -1030,44 +1045,63 @@ int board_display_msg(Character *ch, const char *arg, std::map<std::string, BOAR
     return ReturnValue::eSUCCESS;
   }
 
-  if (tmessage == 0 || tmessage >= board->second.msgs.size())
+  if (tmessage >= board->second.msgs.size())
   {
-    ch->sendln("That message doesn't exist, moron.");
+    ch->sendln(u"That message with ID %1 doesn't exist."_s.arg(tmessage));
+    switch (board->second.msgs.size())
+    {
+    case 0:
+      ch->sendln(u"There are no messages."_s);
+      break;
+    case 1:
+      ch->sendln(u"0 is the only valid ID."_s);
+      break;
+    default:
+      ch->sendln(u"Valid IDs are %2-%3."_s.arg(tmessage).arg(0).arg(board->second.msgs.size() - 1));
+      break;
+    }
+
     return ReturnValue::eSUCCESS;
   }
 
-  if (!ch->isNonPlayer())
+  if (ch->isPlayer())
     ch->player->last_mess_read = tmessage;
 
-  sprintf(buf, "$n reads message %d titled: %s", tmessage, board->second.msgs[tmessage].title.c_str());
+  buf = u"$n reads message %1 titled: %2"_s.arg(tmessage).arg(board->second.msgs[tmessage].title);
   act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
   {
-    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): " RED BOLD "%-14s " YELLOW "- %s" NTEXT,
-             tmessage, board->second.msgs[tmessage].date.c_str(),
-             board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+    buf = u"Message %1 (%2): $4$B%3 $5- %4$R"_s
+              .arg(tmessage)
+              .arg(board->second.msgs[tmessage].date)
+              .arg(board->second.msgs[tmessage].author)
+              .arg(board->second.msgs[tmessage].title);
     board_msg += buf;
   }
   else
   {
-    snprintf(buf, MAX_STRING_LENGTH, "Message %2d (%s): %-14s - %s", tmessage, board->second.msgs[tmessage].date.c_str(),
-             board->second.msgs[tmessage].author.c_str(), board->second.msgs[tmessage].title.c_str());
+    buf = u"Message %1 (%2): %3 - %4"_s
+              .arg(tmessage)
+              .arg(board->second.msgs[tmessage].date)
+              .arg(board->second.msgs[tmessage].author)
+              .arg(board->second.msgs[tmessage].title);
     board_msg += buf;
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "\r\n----------\r\n" CYAN "%s" NTEXT, board->second.msgs[tmessage].text.c_str());
+  buf = u"\r\n----------\r\n$3%1$R"_s.arg(board->second.msgs[tmessage].text);
   board_msg += buf;
 
-  page_string(ch->desc, board_msg.c_str(), 1);
+  page_string(ch->desc, qPrintable(board_msg), 1);
   return ReturnValue::eSUCCESS;
 }
 
-int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD_INFO>::iterator board)
+int board_do_look(Character *ch, QStringList arguments, boards_t::iterator board)
 {
-  int i;
-  std::string board_msg;
-  char buf[MAX_STRING_LENGTH];
+  int i{};
+  QString board_msg;
+  QString buf;
+  auto arg = arguments.value(0);
   if (board->second.type == CLAN_BOARD && ch->getLevel() < OVERSEER)
   {
     if (ch->clan != board->second.owner)
@@ -1100,38 +1134,55 @@ int board_show_board(Character *ch, const char *arg, std::map<std::string, BOARD
   act("$n studies the board.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   ch->sendln("This is a bulletin board. Usage: READ/ERASE <mesg #>, WRITE <header>");
-  if (board->second.msgs.empty())
+
+  if (board->second.msgs.isEmpty())
+  {
     ch->sendln("The board is empty.");
+  }
   else
   {
-    csendf(ch, "There are %d messages on the board.\r\n", board->second.msgs.size());
-    ;
+    ch->sendln(u"There are %1 messages on the board."_s.arg(board->second.msgs.size() - 1));
+    ch->sendln(u"Board Topic: %1"_s.arg(board->second.msgs[0].text));
+  }
 
-    csendf(ch, "Board Topic:\r\n%s------------\r\n", board->second.msgs[0].text.c_str());
-    std::vector<message>::reverse_iterator msg_it;
-    i = board->second.msgs.size() - 1;
-    for (msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
-      if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
-      {
-        snprintf(buf, MAX_STRING_LENGTH, "(%s) " YELLOW "%-14s " RED "%2d: " GREEN "%.47s" NTEXT "\r\n",
-                 msg_it->date.c_str(), msg_it->author.c_str(), i--, msg_it->title.c_str());
-        board_msg += buf;
-        //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n", msg_it->date.c_str(),
-        //                    msg_it->author.c_str(),i--, msg_it->title.c_str());
-      }
-      else
-      {
-        snprintf(buf, MAX_STRING_LENGTH, "(%s) %-14s %2d: %.47s\r\n", msg_it->date.c_str(),
-                 msg_it->author.c_str(), i--, msg_it->title.c_str());
-        board_msg += buf;
-      }
+  i = board->second.msgs.size() - 1;
+  for (auto msg_it = board->second.msgs.rbegin(); (i > 0) && (msg_it < board->second.msgs.rend()); ++msg_it)
+  {
+    auto truncated_date = msg_it->date;
+    truncated_date.truncate(11);
+
+    if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
+    {
+      buf = u"(%1) $5%2 $4%3: $2%4$R\r\n"_s
+                .arg(truncated_date)
+                .arg(msg_it->author, -14)
+                .arg(i--, 2)
+                .arg(msg_it->title, -47);
+      board_msg += buf;
+      //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n", msg_it->date,
+      //                    msg_it->author,i--, msg_it->title);
+    }
+    else
+    {
+      buf = u"(%1) %2 %3: %4\r\n"_s
+                .arg(truncated_date)
+                .arg(msg_it->author, -14)
+                .arg(i--, 2)
+                .arg(msg_it->title, -47);
+      board_msg += buf;
+    }
   }
   board_save_board(board);
-  page_string(ch->desc, board_msg.c_str(), 1);
+  page_string(ch->desc, qPrintable(board_msg), 1);
   return ReturnValue::eSUCCESS;
 }
 
 int fwrite_string(char *buf, FILEPtr fl)
 {
-  return (dc_fprintf(fl, "%s~\n", buf));
+  return dc_fprintf(fl, "%s~\n", buf);
+}
+
+int fwrite_string(QString buf, FILEPtr fl)
+{
+  return dc_fprintf(fl, "%s~\n", qPrintable(buf));
 }

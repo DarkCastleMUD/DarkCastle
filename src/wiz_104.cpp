@@ -191,7 +191,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
       {
         cnt++;
-        sprintf(buf, "[%3d] [%5llu] %s\r\n", cnt, x, ((class Object *)(DC::getInstance()->obj_index[num].item))->short_description);
+        sprintf(buf, "[%3d] [%5llu] %s\r\n", cnt, x, qPrintable(((class Object *)(DC::getInstance()->obj_index[num].item))->short_description));
         ch->send(buf);
       }
 
@@ -805,7 +805,7 @@ void show_legacy_files(Character *ch, const world_file_list_t &list)
       file_modified = "MODIFIED";
     }
 
-    ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename, -30).arg(curr->firstnum, -6).arg(curr->lastnum, -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
+    ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename(), -30).arg(curr->firstnum(), -6).arg(curr->lastnum(), -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
   }
 }
 
@@ -893,7 +893,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->mob_index.contains(begin))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, DC::getInstance()->mob_index[nr].mob->getLevel(), DC::getInstance()->mob_index[nr].mob->short_desc);
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
           ch->send(buf);
         }
       }
@@ -906,7 +906,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, DC::getInstance()->mob_index[nr].mob->getLevel(), DC::getInstance()->mob_index[nr].mob->short_desc);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
           ch->send(buf);
 
           if (count > 200)
@@ -931,7 +931,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (isexact(name, vch.mob->getNameC()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vch.vnum(), vch.mob->getLevel(), vch.mob->short_desc);
+          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vch.vnum(), vch.mob->getLevel(), qPrintable(vch.mob->short_desc));
           ch->send(buf);
 
           if (count > 200)
@@ -992,7 +992,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->obj_index.contains(nr))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
           ch->send(buf);
         }
       }
@@ -1005,7 +1005,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
           ch->send(buf);
 
           if (count > 200)
@@ -1030,7 +1030,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (isexact(name, index_entry.item->Name()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vnum, index_entry.item->obj_flags.eq_level, index_entry.item->short_description);
+          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vnum, index_entry.item->obj_flags.eq_level, qPrintable(index_entry.item->short_description));
           ch->send(buf);
         }
 
@@ -1083,7 +1083,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (DC::getInstance()->rooms.contains(begin))
         {
           sprintf(buf, "[  1] [%5d] %s\r\n", begin,
-                  DC::getInstance()->world[begin].name);
+                  qPrintable(DC::getInstance()->world[begin].name));
           ch->send(buf);
         }
       }
@@ -1094,7 +1094,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
           if (!DC::getInstance()->rooms.contains(i))
             continue;
           count++;
-          sprintf(buf, "[%3d] [%5d] %s\r\n", count, i, DC::getInstance()->world[i].name);
+          sprintf(buf, "[%3d] [%5d] %s\r\n", count, i, qPrintable(DC::getInstance()->world[i].name));
           ch->send(buf);
 
           if (count > 200)
@@ -1207,7 +1207,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       if (sector)
         if (DC::getInstance()->world[i].sector_type != sector)
           continue;
-      sprintf(buf, "[%3d] %s\r\n", i, DC::getInstance()->world[i].name);
+      sprintf(buf, "[%3d] %s\r\n", i, qPrintable(DC::getInstance()->world[i].name));
       ch->send(buf);
     }
   }
@@ -1403,7 +1403,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, DC::getInstance()->mob_index[nr].mob->getLevel(), DC::getInstance()->mob_index[nr].mob->short_desc);
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
       ch->send(buf);
     eheh:
       continue;
@@ -1726,7 +1726,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, ((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description);
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
       ch->send(buf);
     endLoop:
       continue;
@@ -2065,7 +2065,7 @@ void opstat(Character *ch, vnum_t vnum)
     ch->send(buf);
     send_to_char(oprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
+    sprintf(buf, "$B$5%s$R\r\n", qPrintable(mprg->arglist));
     ch->send(buf);
     if (mprg->comlist != nullptr)
     {
@@ -2209,8 +2209,6 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       DC::getInstance()->obj_index[num].mobprogs = currprog->next;
 
     currprog->type = 0;
-    dc_free(currprog->arglist);
-    dc_free(currprog->comlist);
     delete currprog;
 
     update_objprog_bits(num);
@@ -2310,8 +2308,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("Invalid prog number.");
       return ReturnValue::eFAILURE;
     }
-    dc_free(currprog->arglist);
-    currprog->arglist = strdup(argument + 1);
+    currprog->arglist = argument + 1;
 
     ch->sendln("Arglist changed.");
     return ReturnValue::eSUCCESS;
@@ -2352,9 +2349,9 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
                    "|--------------------------------------------------------------------------------|\r\n",
                    ch);
 
-      if (currprog->comlist)
+      if (!currprog->comlist.isEmpty())
       {
-        ch->desc->backstr = str_dup(currprog->comlist);
+        ch->desc->backstr = currprog->comlist;
         ch->send(ch->desc->backstr);
       }
     }
@@ -2431,7 +2428,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
     }
   */
 
-  csendf(ch, "Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).\r\n", v1, (DC::getInstance()->obj_index[v1].item)->short_description, v2, (DC::getInstance()->obj_index[v2].item)->short_description);
+  csendf(ch, "Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).\r\n", v1, qPrintable((DC::getInstance()->obj_index[v1].item)->short_description), v2, qPrintable((DC::getInstance()->obj_index[v2].item)->short_description));
 
   DC::getInstance()->object_list = DC::getInstance()->object_list->next;
   otmp = DC::getInstance()->obj_index[r2].item;
@@ -2521,8 +2518,8 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   }
 
   csendf(ch, "Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
-         vsrc, (DC::getInstance()->mob_index[src].mob)->short_desc,
-         vdst, (DC::getInstance()->mob_index[dst].mob)->short_desc);
+         vsrc, qPrintable((DC::getInstance()->mob_index[src].mob)->short_desc),
+         vdst, qPrintable((DC::getInstance()->mob_index[dst].mob)->short_desc));
 
   // Overwrite old mob with new mob
   DC::getInstance()->mob_index[dst].mob = mob;

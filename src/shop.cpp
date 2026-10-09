@@ -69,8 +69,6 @@ extern time_info_data time_info;
 int max_shop;
 
 // extern function
-int fwrite_string(char *buf, FILEPtr fl);
-
 std::map<std::string, reroll_t> reroll_sessions = {};
 
 /*
@@ -85,7 +83,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   // If not, let's use the AFF bit for something useful....
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
-    do_say(keeper, "Go away before I call the guards!!");
+    keeper->do_say("Go away before I call the guards!!");
     sprintf(buf, "%s the KILLER is over here!\r\n", GET_SHORT(ch));
     do_shout(keeper, buf);
     return false;
@@ -96,7 +94,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
    */
   if (!CAN_SEE(keeper, ch))
   {
-    do_say(keeper, "I don't trade with someone I can't see!");
+    keeper->do_say("I don't trade with someone I can't see!");
     return false;
   }
 
@@ -105,7 +103,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
    */
   if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open1)
   {
-    do_say(keeper, "Come back later!");
+    keeper->do_say("Come back later!");
     return false;
   }
 
@@ -115,7 +113,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   }
   else if (time_info.hours < DC::getInstance()->shop_index[shop_nr].open2)
   {
-    do_say(keeper, "Come back later!");
+    keeper->do_say("Come back later!");
     return false;
   }
   else if (time_info.hours <= DC::getInstance()->shop_index[shop_nr].close2)
@@ -124,7 +122,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   }
   else
   {
-    do_say(keeper, "Sorry, come back tomorrow.");
+    keeper->do_say("Sorry, come back tomorrow.");
     return false;
   }
 
@@ -441,37 +439,37 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Well, %s is able to be used by ", obj->short_description);
+        sprintf(buf, "Well, %s is able to be used by ", qPrintable(obj->short_description));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "and it can be wielded by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "The damage dice are '%dD%d'", obj->obj_flags.value[1], obj->obj_flags.value[2]);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_HITROLL && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "It increases your hit roll by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf);
+            keeper->do_say(buf);
           }
           if (obj->affected[i].location == APPLY_DAMROLL && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "It increases your damage by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf);
+            keeper->do_say(buf);
           }
         }
       }
       else
-        do_say(keeper, "This weapon is unknown to me.");
+        keeper->do_say("This weapon is unknown to me.");
     }
     else
-      do_say(keeper, "I'm a weapons expert, that is all.");
+      keeper->do_say("I'm a weapons expert, that is all.");
   }
   if (keeper->mobdata->vnum_ == 3004)
   { // if the armourer in town
@@ -490,32 +488,32 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
+        sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf);
+            keeper->do_say(buf);
             if (obj->affected[i].modifier < 0)
-              do_say(keeper, "Don't worry, this is a good thing.");
+              keeper->do_say("Don't worry, this is a good thing.");
           }
         }
       }
       else
-        do_say(keeper, "This armor is crafted using too advanced techniques for me.");
+        keeper->do_say("This armor is crafted using too advanced techniques for me.");
     }
     else
-      do_say(keeper, "I deal with armor exclusively.");
+      keeper->do_say("I deal with armor exclusively.");
   }
   if (keeper->mobdata->vnum_ == 3000)
   { // if the wizard in town
@@ -534,8 +532,8 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.value[0] < 20)
       {
-        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", obj->short_description, obj->obj_flags.value[0]);
-        do_say(keeper, buf);
+        sprintf(buf, "Excellent, %s has been imbued with energies of the %dth level.", qPrintable(obj->short_description), obj->obj_flags.value[0]);
+        keeper->do_say(buf);
         if (GET_ITEM_TYPE(obj) == ITEM_WAND || GET_ITEM_TYPE(obj) == ITEM_STAFF)
         {
           if (obj->obj_flags.value[3] >= 1)
@@ -543,14 +541,14 @@ void shopping_value(const char *arg, Character *ch,
             sprintf(buf, "It is eminating the aura of ");
             sprinttype(obj->obj_flags.value[3] - 1, spells, buf2);
             strcat(buf, buf2);
-            do_say(keeper, buf);
+            keeper->do_say(buf);
           }
           if (obj->obj_flags.value[1] == obj->obj_flags.value[2])
-            do_say(keeper, "It's fully charged as well.");
+            keeper->do_say("It's fully charged as well.");
           else if (obj->obj_flags.value[2] == 0)
-            do_say(keeper, "Though unfortunately, there are no more charges left.");
+            keeper->do_say("Though unfortunately, there are no more charges left.");
           else
-            do_say(keeper, "It looks like it has been used some.");
+            keeper->do_say("It looks like it has been used some.");
         }
         else
         {
@@ -559,19 +557,19 @@ void shopping_value(const char *arg, Character *ch,
             sprintf(buf, "I can easily identify the signatures of ");
             sprinttype(obj->obj_flags.value[1] - 1, spells, buf2);
             strcat(buf, buf2);
-            do_say(keeper, buf);
+            keeper->do_say(buf);
           }
           if (obj->obj_flags.value[2] >= 1)
           {
-            do_say(keeper, "There are more enchantments held within, but I'm rather busy.");
+            keeper->do_say("There are more enchantments held within, but I'm rather busy.");
           }
         }
       }
       else
-        do_say(keeper, "This item contains magics too powerful for me to discern.");
+        keeper->do_say("This item contains magics too powerful for me to discern.");
     }
     else
-      do_say(keeper, "I only know the properties of scrolls, potions, staves, and wands.");
+      keeper->do_say("I only know the properties of scrolls, potions, staves, and wands.");
   }
 
   if (keeper->mobdata->vnum_ == 3010 && keeperhas)
@@ -582,32 +580,32 @@ void shopping_value(const char *arg, Character *ch,
     {
       if (obj->obj_flags.eq_level < 20)
       {
-        sprintf(buf, "Ah yes, %s can be worn by ", obj->short_description);
+        sprintf(buf, "Ah yes, %s can be worn by ", qPrintable(obj->short_description));
         sprintbit(obj->obj_flags.size, Object::size_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "and it can be worn by these classes: ");
         sprintbit(obj->obj_flags.extra_flags, Object::extra_bits, buf2);
         strcat(buf, buf2);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         sprintf(buf, "The minimum level necessary to use it is %llu.", obj->obj_flags.eq_level);
-        do_say(keeper, buf);
+        keeper->do_say(buf);
         for (int i = 0; i < obj->num_affects; i++)
         {
           if (obj->affected[i].location == APPLY_AC && obj->affected[i].modifier != 0)
           {
             sprintf(buf, "Your armor class will change by %d.", obj->affected[i].modifier);
-            do_say(keeper, buf);
+            keeper->do_say(buf);
             if (obj->affected[i].modifier < 0)
-              do_say(keeper, "Don't worry, this is a good thing.");
+              keeper->do_say("Don't worry, this is a good thing.");
           }
         }
       }
       else
-        do_say(keeper, "This armor is crafted using too advanced techniques for me.");
+        keeper->do_say("This armor is crafted using too advanced techniques for me.");
     }
     else
-      do_say(keeper, "I don't know anything about this item, actually.");
+      keeper->do_say("I don't know anything about this item, actually.");
   }
 
   if (!trade_with(obj, shop_nr) || obj->obj_flags.cost < 1)
@@ -1012,7 +1010,7 @@ void save_player_shop_world_range()
   char buf[180];
 
   const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [](const auto &entry)
-                               { return entry->vnums_.contains(23000) && entry->vnums_[23000]; });
+                               { return entry->vnums().contains(23000) && entry->vnums()[23000]; });
 
   if (it == DC::getInstance()->world_file_list.cend())
   {
@@ -1022,10 +1020,10 @@ void save_player_shop_world_range()
   }
   const auto &curr = *it;
 
-  LegacyFile lf("world", curr->filename, "Couldn't open room save file %1 for player shops.");
+  LegacyFile lf("world", curr->filename(), "Couldn't open room save file %1 for player shops.");
   if (lf.isOpen())
   {
-    for (const auto &[vnum, enabled] : curr->vnums_.asKeyValueRange())
+    for (const auto &[vnum, enabled] : curr->vnums().asKeyValueRange())
     {
       if (enabled)
         write_one_room(lf, vnum);
@@ -1363,9 +1361,8 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       ch->sendln("That room name is too long (60 chars max).");
       return;
     }
-    dc_free(DC::getInstance()->world[shop->room_num].name);
-    DC::getInstance()->world[shop->room_num].name = str_dup(text);
-    csendf(ch, "Room name set to '%s'.\r\n", DC::getInstance()->world[shop->room_num].name);
+    DC::getInstance()->world[shop->room_num].name = text;
+    csendf(ch, "Room name set to '%s'.\r\n", qPrintable(DC::getInstance()->world[shop->room_num].name));
     save_player_shop_world_range();
     break;
 
@@ -1660,7 +1657,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       char cost_buf[1024] = {};
       if (eddie[i].item_vnum > 0)
       {
-        strncpy(item_buf, (DC::getInstance()->obj_index[eddie[i].item_vnum].item)->short_description, 1024);
+        strncpy(item_buf, qPrintable((DC::getInstance()->obj_index[eddie[i].item_vnum].item)->short_description), 1024);
       }
       else
       {
@@ -1669,7 +1666,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
       if (eddie[i].cost_vnum > 0)
       {
-        strncpy(cost_buf, (DC::getInstance()->obj_index[eddie[i].cost_vnum].item)->short_description, 1024);
+        strncpy(cost_buf, qPrintable((DC::getInstance()->obj_index[eddie[i].cost_vnum].item)->short_description), 1024);
       }
       else if (eddie[i].cost_exp > 0)
       {

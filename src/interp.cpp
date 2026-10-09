@@ -317,7 +317,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       {
         if ((IS_AFFECTED(this, AFF_FAMILIAR) || IS_AFFECTED(this, AFF_CHARM)) && !found->isCharmieAllowed())
         {
-          retval = do_say(this, "I'm sorry master, I cannot do that.");
+          retval = do_say("I'm sorry master, I cannot do that.");
           return logcmd.setReturn(retval, QStringLiteral("familiar/charmie not allowed"));
         }
       }
@@ -517,6 +517,27 @@ int old_search_block(const char *arg, const char **list, bool exact)
   }
 
   return (-1);
+}
+
+qsizetype old_search_block(QString arg, QStringList list, bool exact)
+{
+  if (arg.isEmpty())
+    return -1;
+
+  if (exact)
+  {
+    for (qsizetype i = 0; i < list.size(); ++i)
+      if (!arg.compare(list[i], Qt::CaseInsensitive))
+        return i;
+  }
+  else
+  {
+    for (qsizetype i = 0; i < list.size(); ++i)
+      if (!arg.compare(list[i].first(arg.size()), Qt::CaseInsensitive))
+        return i;
+  }
+
+  return -1;
 }
 
 int old_search_block(const char *arg, const QStringList list, bool exact)
@@ -854,7 +875,7 @@ const char *one_argument_long(const char *argument, char *first_arg)
   return argument + begin;
 }
 
-/* find the first sub-argument of a std::string, return pointer to first char in
+/* find the first sub-argument of a string, return pointer to first char in
    primary argument, following the sub-arg                      */
 char *one_argument(char *argument, char *first_arg)
 {
@@ -1006,6 +1027,21 @@ std::string rtrim(std::string str)
 
   return str;
 }
+
+std::tuple<QString, QString> half_chop(QStringList namelist)
+{
+  if (namelist.isEmpty())
+  {
+    return std::tuple<QString, QString>(QString(), QString());
+  }
+
+  QString arg1 = namelist.at(0);
+  namelist.pop_front();
+  QString remainder = namelist.join(' ').trimmed();
+
+  return std::tuple<QString, QString>(arg1, remainder);
+}
+
 std::tuple<QString, QString> half_chop(QString arguments, const char token)
 {
   QStringList namelist = arguments.trimmed().split(token);

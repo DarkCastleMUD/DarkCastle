@@ -10,6 +10,7 @@
 
 #include <qstring.h>
 #include <cstring>
+#include <qstringview.h>
 #include <string>
 
 #include "DC/obj.h"
@@ -132,7 +133,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the std::string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags)
+QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags)
 {
 
   // Reset the std::string
@@ -392,13 +393,13 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += obj->short_description;
+                    interp += obj->short_description.toUtf8();
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += obj->short_description;
+                  interp += obj->short_description.toUtf8();
                 }
                 break;
               case 'P':
@@ -412,13 +413,13 @@ std::string TokenList::Interpret(Character *from, Object *obj, void *vict_obj, C
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += ((Object *)vict_obj)->short_description;
+                    interp += ((Object *)vict_obj)->short_description.toUtf8();
                   else
                     interp += "something";
                 }
                 else
                 {
-                  interp += ((Object *)vict_obj)->short_description;
+                  interp += ((Object *)vict_obj)->short_description.toUtf8();
                 }
                 break;
               case 'a':

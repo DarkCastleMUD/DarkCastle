@@ -113,14 +113,6 @@ void loadnews()
     nnews->time = i;
     nnews->addedby = fread_string(fl, 0);
     nnews->news = fread_string(fl, 0);
-    int i, v = 0;
-    char buf[MAX_STRING_LENGTH];
-    for (i = 0; i < (int)strlen(nnews->news); i++)
-    {
-      buf[v++] = *(nnews->news + i);
-    }
-    buf[v] = '\0';
-    nnews->news = str_dup(buf);
     addnews(nnews);
   }
 }
@@ -154,37 +146,35 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
   else
     up = !isSet(ch->player->toggles, Player::PLR_NEWS);
   news_data *tnews;
-  char buf[MAX_STRING_LENGTH * 2], old[MAX_STRING_LENGTH * 2];
-  char timez[15];
-  buf[0] = '\0';
+  QString buf, old;
+  QString timez;
   time_t thetime;
-  char arg[MAX_INPUT_LENGTH];
-  one_argument(argument, arg);
-  if (str_cmp(arg, "all"))
+  QStringList arguments = QString(argument).split(' ');
+  QString arg = arguments.value(0);
+  if (arg == "all")
     thetime = time(nullptr) - 604800;
   else
     thetime = 0;
 
   for (tnews = thenews; tnews; tnews = tnews->next)
   {
-    if (!tnews->news || *tnews->news == '\0')
+    if (tnews->news.isEmpty())
       continue;
     if (tnews->time < thetime)
       continue;
+    char timez[10];
     strftime(&timez[0], 10, "%d/%b/%y", gmtime(&tnews->time));
 
-    strcpy(old, buf);
-    const char *newsstring = tnews->news;
+    old = buf;
+    QString newsstring = tnews->news;
     if (up)
-      sprintf(buf, "%s$B$4[ $3%-9s $4] \r\n$R%s\r\n", old, timez,
-              newsstring);
+      buf = u"%1$B$4[ $3%2 $4] \r\n$R%3\r\n"_s.arg(old).arg(timez).arg(newsstring);
     else
-      sprintf(buf, "$B$4[ $3%-9s$4 ] \r\n$R%s\r\n%s", timez, newsstring,
-              old);
-    if (strlen(buf) > MAX_STRING_LENGTH - 1000)
+      buf = u"$B$4[ $3%1$4 ] \r\n$R%2\r\n%3"_s.arg(timez).arg(newsstring).arg(old);
+    if (buf.size() > MAX_STRING_LENGTH - 1000)
       break;
   }
-  page_string(ch->desc, buf, 1);
+  page_string(ch->desc, qPrintable(buf), 1);
   if (QString(buf).isEmpty())
   {
     if (QString(argument) == QStringLiteral("all"))
@@ -270,7 +260,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
     nnews->news = nullptr;
   }
   ch->sendln("        Enter news item.  (/s saves /h for help)");
-  if (nnews->news)
+  if (!nnews->news.isEmpty())
     ch->send(nnews->news);
   //  nnews->news = str_dup("Temporary data.\r\n");
   ch->desc->connected = Connection::states::EDITING;

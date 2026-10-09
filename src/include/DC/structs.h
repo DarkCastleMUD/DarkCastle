@@ -11,6 +11,7 @@
 #include <map>      // for map
 #include <string>   // for basic_string, string
 #include <vector>   // for vector
+#include <QSharedPointer>
 
 const size_t MAX_STRING_LENGTH = 8192;
 
@@ -34,15 +35,15 @@ public:
 typedef class txt_q
 {
 public:
-  txt_block *head;
-  txt_block *tail;
+  txt_block *head{};
+  txt_block *tail{};
 } TXT_Q;
 
 class snoop_data
 {
 public:
-  class Character *snooping;
-  class Character *snoop_by;
+  class Character *snooping{};
+  class Character *snoop_by{};
 };
 
 class msg_type
@@ -53,24 +54,25 @@ public:
   QString room_msg;     /* message to room     */
 };
 
+using message_typePtr = QSharedPointer<class message_type>;
 class message_type
 {
 public:
-  msg_type die_msg;       /* messages when death            */
-  msg_type miss_msg;      /* messages when miss             */
-  msg_type hit_msg;       /* messages when hit              */
-  msg_type sanctuary_msg; /* messages when hit on sanctuary */
-  msg_type god_msg;       /* messages when hit on god       */
-  message_type *next;     /* to next messages of ths kind.*/
+  msg_type die_msg{};       /* messages when death            */
+  msg_type miss_msg{};      /* messages when miss             */
+  msg_type hit_msg{};       /* messages when hit              */
+  msg_type sanctuary_msg{}; /* messages when hit on sanctuary */
+  msg_type god_msg{};       /* messages when hit on god       */
+  message_typePtr next{};   /* to next messages of ths kind.*/
 };
 
 class message_list
 {
 public:
-  int a_type;            /* Attack type				*/
-  int number_of_attacks; /* # messages to chose from		*/
-  message_type *msg;     /* List of messages			*/
-  message_type *msg2;    /* List of messages with toggle damage ON */
+  int a_type{};            /* Attack type				*/
+  int number_of_attacks{}; /* # messages to chose from		*/
+  message_typePtr msg{};   /* List of messages			*/
+  message_typePtr msg2{};  /* List of messages with toggle damage ON */
 };
 
 class SVoteData
@@ -107,13 +109,7 @@ private:
   std::map<std::string, bool> char_voted;
 };
 
-class extra_descr_data
-{
-public:
-  char *keyword = {};          /* Keyword in look/examine          */
-  char *description = {};      /* What to see                      */
-  extra_descr_data *next = {}; /* Next in list                     */
-};
+using ex_descriptions_t = QMap<QString, QString>;
 
 /*
  * TO types for act() output.

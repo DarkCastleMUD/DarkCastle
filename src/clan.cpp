@@ -289,53 +289,27 @@ void save_clans(void)
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
     // print normal data
-    dc_fprintf(fl, "%s %s %s %d\n", pclan->leader, pclan->founder, pclan->name,
-               pclan->number);
+    dc_fprintf(fl, "%s %s %s %d\n", qPrintable(pclan->leader), qPrintable(pclan->founder), qPrintable(pclan->name), pclan->number);
     // print rooms
     for (proom = pclan->rooms; proom; proom = proom->next)
       dc_fprintf(fl, "R %d\n", proom->room_number);
     dc_fprintf(fl, "S\n");
 
-    // BLAH TEMP CODE HERE
-    targ = buf;
-    for (x = pclan->email; x && *x != '\0'; x++)
-      if (*x != '\r')
-        *targ++ = *x;
-    *targ = '\0';
+    pclan->email.remove('\r');
     // handle email
-    if (pclan->email)
-      dc_fprintf(fl, "E\n%s~\n", buf);
+    if (!pclan->email.isEmpty())
+      dc_fprintf(fl, "E\n%s~\n", qPrintable(pclan->email));
     //  dc_fprintf(fl, "E\n%s~\n", pclan->email);
 
-    // BLAH TEMP CODE THIS BLOWS
-    // What's happening is apparently fedora's dc_fprintf doesn't strip out
-    // \r's like Redhat's does.  So we're writing \r\n to files.  This is
-    // bad because when we read it in, fread_string replaces \n with a
-    // \r\n.  So we get \n\r\r.   After a while, this is really bad.
-    // So this is some crap code to strip out \r's before we save
-    // I just did this REALLY fast so please rewrite this
-    // Does it for L X O too but C and D were the hardcore ones so i temp
-    // fixed those since those are the ones that got long enough to crash us
-    targ = buf;
-    for (x = pclan->description; x && *x != '\0'; x++)
-      if (*x != '\r')
-        *targ++ = *x;
-    *targ = '\0';
-
+    pclan->description.remove('\r');
     // handle description
-    if (pclan->description)
-      dc_fprintf(fl, "D\n%s~\n", buf);
+    if (!pclan->description.isEmpty())
+      dc_fprintf(fl, "D\n%s~\n", qPrintable(pclan->description));
     //       dc_fprintf(fl, "D\n%s~\n", pclan->description);
 
-    // BLAH TEMP CODE HERE
-    targ = buf;
-    for (x = pclan->login_message; x && *x != '\0'; x++)
-      if (*x != '\r')
-        *targ++ = *x;
-    *targ = '\0';
-
-    if (pclan->login_message)
-      dc_fprintf(fl, "L\n%s~\n", buf);
+    pclan->login_message.remove('\r');
+    if (!pclan->login_message.isEmpty())
+      dc_fprintf(fl, "L\n%s~\n", qPrintable(pclan->login_message));
     //  dc_fprintf(fl, "L\n%s~\n", pclan->login_message);
 
     if (pclan->tax)
@@ -344,35 +318,18 @@ void save_clans(void)
     if (pclan->getBalance())
       dc_fprintf(fl, "B\n%llu\n", pclan->getBalance());
 
-    // BLAH TEMP CODE HERE
-    targ = buf;
-    for (x = pclan->death_message; x && *x != '\0'; x++)
-      if (*x != '\r')
-        *targ++ = *x;
-    *targ = '\0';
-    if (pclan->death_message)
-      dc_fprintf(fl, "X\n%s~\n", buf);
-    // dc_fprintf(fl, "X\n%s~\n", pclan->death_message);
+    pclan->death_message.remove('\r');
+    if (!pclan->death_message.isEmpty())
+      dc_fprintf(fl, "X\n%s~\n", qPrintable(pclan->death_message));
 
-    // BLAH TEMP CODE HERE
-    targ = buf;
-    for (x = pclan->logout_message; x && *x != '\0'; x++)
-      if (*x != '\r')
-        *targ++ = *x;
-    *targ = '\0';
-    if (pclan->logout_message)
-      dc_fprintf(fl, "O\n%s~\n", buf);
+    pclan->logout_message.remove('\r');
+    if (!pclan->logout_message.isEmpty())
+      dc_fprintf(fl, "O\n%s~\n", qPrintable(pclan->logout_message));
     // dc_fprintf(fl, "O\n%s~\n", pclan->logout_message);
 
-    // BLAH TEMP CODE HERE
-    targ = buf;
-    for (x = pclan->clanmotd; x && *x != '\0'; x++)
-      if (*x != '\r')
-        *targ++ = *x;
-    *targ = '\0';
-
-    if (pclan->clanmotd)
-      dc_fprintf(fl, "C\n%s~\n", buf);
+    pclan->clanmotd.remove('\r');
+    if (!pclan->clanmotd.isEmpty())
+      dc_fprintf(fl, "C\n%s~\n", qPrintable(pclan->clanmotd));
     //       dc_fprintf(fl, "C\n%s~\n", pclan->clanmotd);
 
     for (pmember = pclan->members; pmember; pmember = pmember->next)
@@ -403,16 +360,15 @@ void save_clans(void)
 
   for (pclan = DC::getInstance()->clan_list; pclan; pclan = pclan->next)
   {
-    dc_fprintf(fl, "%s %s %d\n", pclan->name, pclan->leader, pclan->number);
+    dc_fprintf(fl, "%s %s %d\n", qPrintable(pclan->name), qPrintable(pclan->leader), pclan->number);
     dc_fprintf(fl, "$3Contact Email$R:  %s\n"
                    "$3Clan Hall$R:      %s\n"
                    "$3Clan info$R:\n"
                    "$3----------$R\n",
-               pclan->email ? pclan->email : "(No Email)",
+               !pclan->email.isEmpty() ? qPrintable(pclan->email) : "(No Email)",
                pclan->rooms ? "Yes" : "No");
     // This has to be separate, or if the leader uses $'s, it comes out funky
-    dc_fprintf(fl, "%s\n",
-               pclan->description ? pclan->description : "(No Description)\r\n");
+    dc_fprintf(fl, "%s\n", !pclan->description.isEmpty() ? qPrintable(pclan->description) : "(No Description)\r\n");
   }
 }
 
@@ -434,17 +390,6 @@ void delete_clan(const clan_data *currclan)
     next_member = curr_member->next;
     free_member(curr_member);
   }
-  if (currclan->description)
-    dc_free(currclan->description);
-  if (currclan->email)
-    dc_free(currclan->email);
-  if (currclan->login_message)
-    dc_free(currclan->login_message);
-  if (currclan->logout_message)
-    dc_free(currclan->logout_message);
-  if (currclan->death_message)
-    dc_free(currclan->death_message);
-
   delete currclan;
 }
 
@@ -704,16 +649,6 @@ void delete_clan(clan_data *dead_clan)
         }
       }
 
-      if (dead_clan->email)
-        dc_free(dead_clan->email);
-      if (dead_clan->login_message)
-        dc_free(dead_clan->login_message);
-      if (dead_clan->logout_message)
-        dc_free(dead_clan->logout_message);
-      if (dead_clan->death_message)
-        dc_free(dead_clan->death_message);
-      if (dead_clan->description)
-        dc_free(dead_clan->description);
       delete dead_clan;
       return;
     }
@@ -787,7 +722,7 @@ clan_data *get_clan(Character *ch)
   return nullptr;
 }
 
-char *get_clan_name(int nClan)
+QString get_clan_name(int nClan)
 {
 
   clan_data *clan = get_clan(nClan);
@@ -798,7 +733,7 @@ char *get_clan_name(int nClan)
   return "no clan";
 }
 
-char *get_clan_name(Character *ch)
+QString get_clan_name(Character *ch)
 {
   clan_data *clan = get_clan(ch);
 
@@ -808,7 +743,7 @@ char *get_clan_name(Character *ch)
   return "no clan";
 }
 
-char *get_clan_name(clan_data *clan)
+QString get_clan_name(clan_data *clan)
 {
   if (clan)
     return clan->name;
@@ -816,11 +751,11 @@ char *get_clan_name(clan_data *clan)
   return "no clan";
 }
 
-void message_to_clan(Character *ch, char buf[])
+void message_to_clan(Character *ch, QString buf)
 {
-  Character *pch;
+  Character *pch{};
 
-  for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
+  for (auto d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
     if (d->connected || !(pch = d->character))
       continue;
@@ -844,10 +779,7 @@ void clan_death(Character *ch, Character *killer)
   if (!ch || ch->clan == 0)
     return;
 
-  char buf[400];
-  char secondbuf[400];
   clan_data *clan;
-  char *curr = nullptr;
 
   if (!(clan = get_clan(ch->clan)))
   {
@@ -855,33 +787,30 @@ void clan_death(Character *ch, Character *killer)
     return;
   }
 
-  if (!clan->death_message)
+  if (clan->death_message.isEmpty())
     return;
 
   // Don't give away any imms listening in
   if (ch->isImmortalPlayer())
     return;
 
-  if (!(curr = strstr(clan->death_message, "%")))
+  if (!clan->death_message.contains("%"))
   {
     ch->sendln("Error:  clan with illegal death_message.  Contact a god.");
     return;
   }
 
-  *curr = '\0';
-  sprintf(buf, "%s%s%s", clan->death_message, GET_SHORT(ch), curr + 1);
-  *curr = '%';
+  auto buf = clan->death_message;
+  buf.replace('%', GET_SHORT(ch));
 
-  if (!(curr = strstr(buf, "#")))
+  if (!buf.contains("#"))
   {
     ch->sendln("Error:  clan with illegal death_message.  Contact a god.");
     return;
   }
+  buf.replace('#', killer ? GET_SHORT(killer) : "unknown");
 
-  *curr = '\0';
-  sprintf(secondbuf, "%s%s%s", buf, (killer ? GET_SHORT(killer) : "unknown"), curr + 1);
-
-  message_to_clan(ch, secondbuf);
+  message_to_clan(ch, qPrintable(buf));
 }
 
 void clan_login(Character *ch)
@@ -889,7 +818,6 @@ void clan_login(Character *ch)
   if (ch->clan == 0)
     return;
 
-  char buf[400];
   clan_data *clan;
   char *curr = nullptr;
 
@@ -913,18 +841,17 @@ void clan_login(Character *ch)
     return;
   }
 
-  if (!clan->login_message)
+  if (clan->login_message.isEmpty())
     return;
 
-  if (!(curr = strstr(clan->login_message, "%")))
+  if (!clan->login_message.contains("%"))
   {
     ch->sendln("Error:  clan with illegal login_message.  Contact a god.");
     return;
   }
 
-  *curr = '\0';
-  sprintf(buf, "%s%s%s", clan->login_message, GET_NAME(ch), curr + 1);
-  *curr = '%';
+  auto buf = clan->login_message;
+  buf.replace("%", GET_NAME(ch));
 
   message_to_clan(ch, buf);
 }
@@ -934,7 +861,6 @@ void clan_logout(Character *ch)
   if (ch->clan == 0)
     return;
 
-  char buf[400];
   clan_data *clan;
   char *curr = nullptr;
 
@@ -950,20 +876,16 @@ void clan_logout(Character *ch)
     return;
   }
 
-  if (!clan->logout_message)
+  if (clan->logout_message.isEmpty())
     return;
 
-  if (!(curr = strstr(clan->logout_message, "%")))
+  if (!clan->logout_message.contains("%"))
   {
     ch->sendln("Error:  clan with illegal logout_message.  Contact a god.");
     return;
   }
 
-  *curr = '\0';
-  sprintf(buf, "%s%s%s", clan->logout_message, GET_NAME(ch), curr + 1);
-  *curr = '%';
-
-  message_to_clan(ch, buf);
+  message_to_clan(ch, QString(clan->logout_message).replace("%", GET_NAME(ch)));
 }
 
 int do_accept(Character *ch, char *arg, cmd_t cmd)
@@ -987,7 +909,7 @@ int do_accept(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (strcmp(clan->leader, GET_NAME(ch)) && !has_right(ch, CLAN_RIGHTS_ACCEPT))
+  if (clan->leader != GET_NAME(ch) && !has_right(ch, CLAN_RIGHTS_ACCEPT))
   {
     ch->sendln("You aren't the leader of your clan!");
     return ReturnValue::eFAILURE;
@@ -1016,11 +938,11 @@ int do_accept(Character *ch, char *arg, cmd_t cmd)
   victim->clan = ch->clan;
   add_clan_member(clan, victim);
   save_clans();
-  sprintf(buf, "You are now a member of %s.\r\n", clan->name);
+  sprintf(buf, "You are now a member of %s.\r\n", qPrintable(clan->name));
   ch->sendln("Your clan now has a new member.");
   victim->send(buf);
 
-  sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), clan->name);
+  sprintf(buf, "%s just joined clan [%s].", victim->getNameC(), qPrintable(clan->name));
   logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
 
   add_totem_stats(victim);
@@ -1082,13 +1004,13 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (strcmp(clanPtr->leader, getNameC()) && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
+  if (clanPtr->leader != getName() && victim != this && !has_right(this, CLAN_RIGHTS_OUTCAST))
   {
     this->sendln("You don't have the right to outcast people from your clan!");
     return ReturnValue::eFAILURE;
   }
 
-  if (!strcmp(clanPtr->leader, victim->getNameC()))
+  if (clanPtr->leader == victim->getName())
   {
     this->sendln("You can't outcast the clan leader!");
     return ReturnValue::eFAILURE;
@@ -1175,45 +1097,36 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
                  ch);
     return ReturnValue::eFAILURE;
   }
-  if (clan->leader)
-    dc_free(clan->leader);
-  clan->leader = str_dup(victim->getNameC());
+  clan->leader = victim->getName();
 
   save_clans();
 
-  sprintf(buf, "You are now the leader of %s.\r\n", clan->name);
+  sprintf(buf, "You are now the leader of %s.\r\n", qPrintable(clan->name));
   ch->sendln("Your clan now has a new leader.");
   victim->send(buf);
 
-  sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), clan->name);
+  sprintf(buf, "%s just cpromoted by %s as leader of clan [%s].", victim->getNameC(), GET_NAME(ch), qPrintable(clan->name));
   logentry(buf, IMPLEMENTER, DC::LogChannel::LOG_CLAN);
   return ReturnValue::eSUCCESS;
 }
 
 int clan_desc(Character *ch, char *arg)
 {
-  clan_data *clan = 0;
+  auto argumentsStr = QString(arg);
+  auto arguments = argumentsStr.split(' ');
+  auto arg1 = arguments.value(0);
+  auto clan = get_clan(ch);
 
-  char buf[MAX_STRING_LENGTH];
-  char text[MAX_INPUT_LENGTH];
-
-  clan = get_clan(ch);
-  arg = one_argumentnolow(arg, text);
-
-  if (!strncmp(text, "delete", 6))
+  if (arg1 == "delete")
   {
-    if (clan->description)
-      dc_free(clan->description);
-    clan->description = nullptr;
+    clan->description = {};
     ch->sendln("Clan description removed.");
     return 1;
   }
 
-  if (strcmp(text, "change"))
+  if (arg1 != "change")
   {
-    sprintf(buf, "$3Syntax$R:  clans description change\r\n\r\nCurrent description: %s\r\n",
-            clan->description ? clan->description : "(No Description)");
-    ch->send(buf);
+    ch->sendln(u"$3Syntax$R:  clans description change\r\n\r\nCurrent description: %1"_s.arg(!clan->description.isEmpty() ? clan->description : "(No Description)"));
     ch->sendln("To not have any description use:  clans description delete");
     return 0;
   }
@@ -1231,9 +1144,9 @@ int clan_desc(Character *ch, char *arg)
   send_to_char("        Write your description and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n",
                ch);
-  if (clan->description)
+  if (!clan->description.isEmpty())
   {
-    ch->desc->backstr = str_dup(clan->description);
+    ch->desc->backstr = clan->description;
     ch->send(ch->desc->backstr);
   }
 
@@ -1245,28 +1158,21 @@ int clan_desc(Character *ch, char *arg)
 
 int clan_motd(Character *ch, char *arg)
 {
-  clan_data *clan = 0;
+  auto argumentsStr = QString(arg);
+  auto arguments = argumentsStr.split(' ');
+  auto arg1 = arguments.value(0);
+  auto clan = get_clan(ch);
 
-  char buf[MAX_STRING_LENGTH];
-  char text[MAX_INPUT_LENGTH];
-
-  clan = get_clan(ch);
-  arg = one_argumentnolow(arg, text);
-
-  if (!strncmp(text, "delete", 6))
+  if (arg1 == "delete")
   {
-    if (clan->clanmotd)
-      dc_free(clan->clanmotd);
-    clan->clanmotd = nullptr;
+    clan->clanmotd = {};
     ch->sendln("Clan motd removed.");
     return 1;
   }
 
-  if (strcmp(text, "change"))
+  if (arg1 != "change")
   {
-    sprintf(buf, "$3Syntax$R:  clans motd change\r\n\r\nCurrent motd: %s\r\n",
-            clan->clanmotd ? clan->clanmotd : "(No Motd)");
-    ch->send(buf);
+    ch->sendln(u"$3Syntax$R:  clans motd change\r\n\r\nCurrent motd: %1"_s.arg(!clan->clanmotd.isEmpty() ? clan->clanmotd : "(No Motd)"));
     ch->sendln("To not have any motd use:  clans motd delete");
     return 0;
   }
@@ -1285,9 +1191,9 @@ int clan_motd(Character *ch, char *arg)
   send_to_char("        Write your motd and stay within the line.  (/s saves /h for help)\r\n"
                "   |--------------------------------------------------------------------------------|\r\n",
                ch);
-  if (clan->clanmotd)
+  if (!clan->clanmotd.isEmpty())
   {
-    ch->desc->backstr = str_dup(clan->clanmotd);
+    ch->desc->backstr = clan->clanmotd;
     ch->send(ch->desc->backstr);
   }
 
@@ -1299,7 +1205,10 @@ int clan_motd(Character *ch, char *arg)
 
 int clan_death_message(Character *ch, char *arg)
 {
-  clan_data *clan = 0;
+  auto argumentsStr = QString(arg);
+  auto arguments = argumentsStr.split(' ');
+  auto arg1 = arguments.value(0);
+  auto clan = get_clan(ch);
 
   char buf[MAX_STRING_LENGTH];
 
@@ -1307,7 +1216,7 @@ int clan_death_message(Character *ch, char *arg)
   if (!*arg)
   {
     sprintf(buf, "$3Syntax$R:  clans death <new message>\r\n\r\nCurrent message: %s\r\n",
-            clan->death_message);
+            qPrintable(clan->death_message));
     ch->send(buf);
     ch->sendln("To not have any message use:  clans death delete");
     return 0;
@@ -1317,9 +1226,7 @@ int clan_death_message(Character *ch, char *arg)
   if (!strncmp(buf, "delete", 6))
   {
     ch->sendln("Clan death message removed.");
-    if (clan->death_message)
-      dc_free(clan->death_message);
-    clan->death_message = nullptr;
+    clan->death_message = {};
     return 1;
   }
 
@@ -1355,168 +1262,135 @@ int clan_death_message(Character *ch, char *arg)
     return 0;
   }
 
-  if (clan->death_message)
-    dc_free(clan->death_message);
+  clan->death_message = arg;
 
-  clan->death_message = str_dup(arg);
-
-  sprintf(buf, "Clan death message changed to: %s\r\n", clan->death_message);
-  ch->send(buf);
+  ch->sendln(u"Clan death message changed to: %1"_s.arg(clan->death_message));
   return 1;
 }
 
 int clan_logout_message(Character *ch, char *arg)
 {
-  clan_data *clan = 0;
+  auto argumentsStr = QString(arg);
+  auto arguments = argumentsStr.split(' ');
+  auto arg1 = arguments.value(0);
+  auto clan = get_clan(ch);
 
-  char buf[MAX_STRING_LENGTH];
-
-  clan = get_clan(ch);
-  if (!*arg)
+  if (arguments.isEmpty())
   {
-    sprintf(buf, "$3Syntax$R:  clans logout <new message>\r\n\r\nCurrent message: %s\r\n",
-            clan->logout_message);
-    ch->send(buf);
+    ch->sendln(u"$3Syntax$R:  clans logout <new message>\r\n\r\nCurrent message: %1"_s.arg(clan->logout_message));
     ch->sendln("To not have any message use:  clans logout delete");
     return 0;
   }
-
-  one_argument(arg, buf);
-  if (!strncmp(buf, "delete", 6))
+  if (arg1 == "delete")
   {
     ch->sendln("Clan logout message removed.");
-    if (clan->logout_message)
-      dc_free(clan->logout_message);
-    clan->logout_message = nullptr;
+    clan->logout_message = {};
     return 1;
   }
 
-  if (strstr(arg, "~"))
+  if (argumentsStr.contains("~"))
   {
-    ch->sendln("No ~s fatt butt!");
+    ch->sendln("No tilde (~) characters allowed!");
     return 0;
   }
 
-  char *curr;
-
-  if (!(curr = strstr(arg, "%")))
+  if (!argumentsStr.contains("%"))
   {
     ch->sendln("You must include a '%' to represent the person's name.");
     return 0;
   }
 
-  if (strstr(curr + 1, "%"))
+  if (argumentsStr.count("%") > 1)
   {
     ch->sendln("You may only have one '%' in the message.");
     return 0;
   }
 
-  if (clan->logout_message)
-    dc_free(clan->logout_message);
+  clan->logout_message = argumentsStr;
 
-  clan->logout_message = str_dup(arg);
-
-  sprintf(buf, "Clan logout message changed to: %s\r\n", clan->logout_message);
-  ch->send(buf);
+  ch->sendln(u"Clan logout message changed to: %1"_s.arg(clan->logout_message));
   return 1;
 }
 
 int clan_login_message(Character *ch, char *arg)
 {
-  clan_data *clan = 0;
-
-  char buf[MAX_STRING_LENGTH];
-
-  clan = get_clan(ch);
+  auto argumentsStr = QString(arg);
+  auto arguments = argumentsStr.split(' ');
+  auto arg1 = arguments.value(0);
+  auto clan = get_clan(ch);
   if (!*arg)
   {
-    sprintf(buf, "$3Syntax$R:  clans login <new message>\r\n\r\nCurrent message: %s\r\n",
-            clan->login_message);
-    ch->send(buf);
+
+    ch->sendln(u"$3Syntax$R:  clans login <new message>\r\n\r\nCurrent message: %1"_s.arg(clan->login_message));
     ch->sendln("To not have any message use:  clans login delete");
     return 0;
   }
 
-  one_argument(arg, buf);
-  if (!strncmp(buf, "delete", 6))
+  if (arg1 == "delete")
   {
     ch->sendln("Clan login message removed.");
-    if (clan->login_message)
-      dc_free(clan->login_message);
     clan->login_message = nullptr;
     return 1;
   }
 
-  if (strstr(arg, "~"))
+  if (argumentsStr.contains("~"))
   {
-    ch->sendln("No ~s fatt butt!");
+    ch->sendln("No tilde (~) characters allowed!");
     return 0;
   }
 
-  char *curr;
-
-  if (!(curr = strstr(arg, "%")))
+  if (!argumentsStr.contains("%"))
   {
     ch->sendln("You must include a '%' to represent the person's name.");
     return 0;
   }
 
-  if (strstr(curr + 1, "%"))
+  if (argumentsStr.count("%") > 1)
   {
     ch->sendln("You may only have one '%' in the message.");
     return 0;
   }
 
-  if (clan->login_message)
-    dc_free(clan->login_message);
+  clan->login_message = argumentsStr;
 
-  clan->login_message = str_dup(arg);
-
-  sprintf(buf, "Clan login message changed to: %s\r\n", clan->login_message);
-  ch->send(buf);
+  ch->sendln(u"Clan login message changed to: %1"_s.arg(clan->login_message));
   return 1;
 }
 
 int clan_email(Character *ch, char *arg)
 {
-  clan_data *clan = 0;
+  auto argumentsStr = QString(arg);
+  auto arguments = argumentsStr.split(' ');
+  auto arg1 = arguments.value(0);
+  auto clan = get_clan(ch);
 
-  char buf[MAX_STRING_LENGTH];
-  char text[MAX_INPUT_LENGTH];
-
-  clan = get_clan(ch);
-  arg = one_argumentnolow(arg, text);
-  if (!*text)
+  if (arguments.isEmpty())
   {
-    sprintf(buf, "$3Syntax$R:  clans email <new address>\r\n\r\nCurrent address: %s\r\n", clan->email);
-    ch->send(buf);
+    ch->sendln(u"$3Syntax$R:  clans email <new address>\r\n\r\nCurrent address: %1"_s.arg(clan->email));
     ch->sendln("To not have any email use:  clans email delete");
     return 0;
   }
 
-  if (!strncmp(text, "delete", 6))
+  if (arg1 == "delete")
   {
-    if (clan->email)
-      dc_free(clan->email);
-    clan->email = nullptr;
+    clan->email = {};
     ch->sendln("Clan email address removed.");
     return 1;
   }
 
-  if (strstr(text, "~") || strstr(text, "<") || strstr(text, ">") ||
-      strstr(text, "&") || strstr(text, "$"))
+  if (argumentsStr.contains("~") ||
+      argumentsStr.contains("<") ||
+      argumentsStr.contains(">") ||
+      argumentsStr.contains("&") ||
+      argumentsStr.contains("$"))
   {
-    ch->sendln("We both know those characters aren't legal in email addresses....");
+    ch->sendln("We both know those characters (~ < > & $) aren't legal in email addresses....");
     return 0;
   }
 
-  if (clan->email)
-    dc_free(clan->email);
+  clan->email = argumentsStr;
 
-  clan->email = str_dup(text);
-
-  sprintf(buf, "Clan email changed to: %s\r\n", clan->email);
-  ch->send(buf);
+  ch->sendln(u"Clan email changed to: %1"_s.arg(clan->email));
   return 1;
 }
 
@@ -1618,9 +1492,6 @@ int do_ctell(Character *ch, char *arg, cmd_t cmd)
 
 void do_clan_list(Character *ch)
 {
-  clan_data *clan = 0;
-  std::string buf, buf2;
-
   if (ch->getLevel() > 103)
   {
     ch->sendln("$B$7## Clan                 Leader           Tax   $B$5Gold$7 Balance$R");
@@ -1631,15 +1502,24 @@ void do_clan_list(Character *ch)
   }
 
   // std::locale("en_US.UTF-8");
-  for (clan = DC::getInstance()->clan_list; clan; clan = clan->next)
+  QString buf;
+  for (auto clan = DC::getInstance()->clan_list; clan; clan = clan->next)
   {
     if (ch->getLevel() > 103)
     {
-      buf = fmt::format("{:2} {:<20}$R {:<16} {:3} {:16L}\r\n", clan->number, clan->name, clan->leader, clan->tax, clan->getBalance());
+      buf = u"%1 %2$R %3 %4 %5\r\n"_s
+                .arg(clan->number, 2)
+                .arg(clan->name, 20)
+                .arg(clan->leader, 16)
+                .arg(clan->tax, 3)
+                .arg(clan->getBalance(), 16);
     }
     else
     {
-      buf = fmt::format("{:2} {:<20}$R {:<16}\r\n", clan->number, clan->name, clan->leader);
+      buf = u"%1 %2$R %3\r\n"_s
+                .arg(clan->number, 2)
+                .arg(clan->name, 20)
+                .arg(clan->leader, 16);
     }
     ch->send(buf);
   }
@@ -1691,7 +1571,7 @@ int is_clan_leader(Character *ch)
   if (!ch || !(pclan = get_clan(ch->clan)))
     return 0;
 
-  return (!(strcmp(GET_NAME(ch), pclan->leader)));
+  return (!(strcmp(GET_NAME(ch), qPrintable(pclan->leader))));
 }
 
 void do_clan_rights(Character *ch, char *arg)
@@ -1869,7 +1749,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
     clan->rooms = 0;
     clan->next = 0;
     clan->email = nullptr;
-    clan->description = nullptr;
+    clan->description = {};
     add_clan(clan);
     ch->sendln("New clan created.");
     break;
@@ -1899,7 +1779,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
       return;
     }
 
-    strcpy(tarclan->name, last);
+    tarclan->name = last;
     ch->sendln("Clan name changed.");
     break;
   }
@@ -1928,9 +1808,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
       return;
     }
 
-    if (tarclan->leader)
-      dc_free(tarclan->leader);
-    tarclan->leader = str_dup(last);
+    tarclan->leader = last;
 
     ch->sendln("Clan leader name changed.");
     break;
@@ -2641,7 +2519,7 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
   }
 
   if (ch->clan && (clan = get_clan(ch)) &&
-      (!strcmp(GET_NAME(ch), clan->leader) || needs_clan_command(ch)))
+      (GET_NAME(ch) == clan->leader || needs_clan_command(ch)))
   {
     do_leader_clans(ch, arg, cmd);
     return ReturnValue::eSUCCESS;
@@ -2677,30 +2555,34 @@ int do_cinfo(Character *ch, char *arg, cmd_t cmd)
                "$3Clan Hall$R:      %s\r\n"
                "$3Clan info$R:\r\n"
                "$3----------$R\r\n",
-          clan->name, nClan,
-          clan->leader,
-          clan->email ? clan->email : "(No Email)",
+          qPrintable(clan->name),
+          nClan,
+          qPrintable(clan->leader),
+          !clan->email.isEmpty() ? qPrintable(clan->email) : "(No Email)",
           clan->rooms ? "Yes" : "No");
   ch->send(buf);
 
   // This has to be separate, or if the leader uses $'s, it comes out funky
-  sprintf(buf, "%s\r\n",
-          clan->description ? clan->description : "(No Description)\r\n");
+  sprintf(buf, "%s\r\n", !clan->description.isEmpty() ? qPrintable(clan->description) : "(No Description)\r\n");
   ch->send(buf);
 
-  if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
-      (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MESSAGES)))
+  if (ch->getLevel() >= POWER ||
+      (nClan == ch->clan &&
+           clan->leader == GET_NAME(ch) ||
+       has_right(ch, CLAN_RIGHTS_MESSAGES)))
   {
     sprintf(buf, "$3Login$R:          %s\r\n"
                  "$3Logout$R:         %s\r\n"
                  "$3Death$R:          %s\r\n",
-            clan->login_message ? clan->login_message : "(No Message)",
-            clan->logout_message ? clan->logout_message : "(No Message)",
-            clan->death_message ? clan->death_message : "(No Message)");
+            !clan->login_message.isEmpty() ? qPrintable(clan->login_message) : "(No Message)",
+            !clan->logout_message.isEmpty() ? qPrintable(clan->logout_message) : "(No Message)",
+            !clan->death_message.isEmpty() ? qPrintable(clan->death_message) : "(No Message)");
     ch->send(buf);
   }
-  if (ch->getLevel() >= POWER || (!strcmp(clan->leader, GET_NAME(ch)) && nClan == ch->clan) ||
-      (nClan == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
+  if (ch->getLevel() >= POWER ||
+      (nClan == ch->clan &&
+           clan->leader == GET_NAME(ch) ||
+       has_right(ch, CLAN_RIGHTS_MEMBER_LIST)))
   {
     sprintf(buf, "$3Balance$R:         %llu coins\r\n", clan->getBalance());
     ch->send(buf);
@@ -2741,13 +2623,13 @@ int do_whoclan(Character *ch, char *arg, cmd_t cmd)
         continue;
       if (found == 0)
       {
-        sprintf(buf, "$3Clan %s$R:\r\n", clan->name);
+        sprintf(buf, "$3Clan %s$R:\r\n", qPrintable(clan->name));
         ch->send(buf);
       }
       if (clan->number == ch->clan && has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
-        sprintf(buf, "  %s %s %s\r\n", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""), isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
+        sprintf(buf, "  %s %s %s\r\n", GET_SHORT(pch), (GET_NAME(pch) == clan->leader) ? "$3($RLeader$3)$R" : "", isSet(GET_TOGGLES(pch), Player::PLR_NOTAX) ? "(NT)" : "(T)");
       else
-        sprintf(buf, "  %s %s\r\n", GET_SHORT(pch), (!strcmp(GET_NAME(pch), clan->leader) ? "$3($RLeader$3)$R" : ""));
+        sprintf(buf, "  %s %s\r\n", GET_SHORT(pch), (GET_NAME(pch) == clan->leader) ? "$3($RLeader$3)$R" : "");
       ch->send(buf);
       found++;
     }
@@ -2765,7 +2647,7 @@ int do_cmotd(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!clan->clanmotd)
+  if (clan->clanmotd.isEmpty())
   {
     ch->sendln("There is no motd for your clan currently.");
     return ReturnValue::eSUCCESS;
@@ -3133,10 +3015,10 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
       //      DC::getInstance()->zones.value(zone).gold = 0;
       if (clan)
         sprintf(buf, "\r\n##Clan %s has broken clan %s's control of%s!\r\n",
-                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).NameC());
+                qPrintable(get_clan(clan)->name), qPrintable(get_clan(clan2)->name), qPrintable(DC::getInstance()->zones.value(zone).Name()));
       else
         sprintf(buf, "\r\n##Clan %s's control of%s has been broken!\r\n",
-                get_clan(clan2)->name, DC::getInstance()->zones.value(zone).NameC());
+                qPrintable(get_clan(clan2)->name), qPrintable(DC::getInstance()->zones.value(zone).Name()));
 
       takeover_pause(clan2, zone);
     }
@@ -3145,17 +3027,17 @@ void claimArea(int clan, bool defend, bool challenge, int clan2, int zone)
       takeover_pause(clan2, zone);
       if (clan2)
         sprintf(buf, "\r\n##Clan %s has defended against clan %s's challenge for control of%s!\r\n",
-                get_clan(clan)->name, get_clan(clan2)->name, DC::getInstance()->zones.value(zone).NameC());
+                qPrintable(get_clan(clan)->name), qPrintable(get_clan(clan2)->name), DC::getInstance()->zones.value(zone).NameC());
       else
         sprintf(buf, "\r\n##Clan %s has defended their control of%s!\r\n",
-                get_clan(clan)->name, DC::getInstance()->zones.value(zone).NameC());
+                qPrintable(get_clan(clan)->name), qPrintable(DC::getInstance()->zones.value(zone).Name()));
     }
   }
   else
   {
     if (clan)
       snprintf(buf, sizeof(buf), "\r\n##%s has been claimed by clan %s!\r\n",
-               DC::getInstance()->zones.value(zone).Name().toStdString().c_str(), get_clan(clan)->name);
+               DC::getInstance()->zones.value(zone).Name().toStdString().c_str(), qPrintable(get_clan(clan)->name));
 
     //     DC::getInstance()->zones.value(zone).gold = 0;
   }
@@ -3251,7 +3133,7 @@ void check_quitter(varg_t arg1, void *arg2, void *arg3)
         {
           //			DC::getInstance()->zones.value(a].gold = 0;
           zone.clanowner = 0;
-          sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n", get_clan(clan)->name, zone.NameC());
+          sprintf(buf, "\r\n##Clan %s has lost control of%s!\r\n", qPrintable(get_clan(clan)->name), qPrintable(zone.Name()));
           send_info(buf);
           return;
         }
@@ -3441,7 +3323,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     if (DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner > 0)
     {
       csendf(this, "This area is claimed by %s, you need to challenge to obtain ownership.\r\n",
-             get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner)->name);
+             qPrintable(get_clan(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).clanowner)->name));
 
       return ReturnValue::eFAILURE;
     }
@@ -3496,7 +3378,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       }
     this->sendln("You yield the area on behalf of your clan.");
     char buf[MAX_STRING_LENGTH];
-    sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n", get_clan(clan)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
+    sprintf(buf, "\r\n##Clan %s has yielded control of%s!\r\n", qPrintable(get_clan(clan)->name), DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
     send_info(buf);
     DC::getInstance()->setZoneClanOwner(DC::getInstance()->world[in_room].zone, 0);
 
@@ -3542,7 +3424,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
       {
         if (++z == 1)
           csendf(this, "$BAreas Claimed by %s:$R\r\n",
-                 get_clan(this)->name);
+                 qPrintable(get_clan(this)->name));
         csendf(this, "%d)%s\r\n", z, DC::getInstance()->zones.value(i).NameC());
       }
 
@@ -3613,9 +3495,9 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
     pulse_list = pl;
     char buf[MAX_STRING_LENGTH];
     if (!clanless_challenge)
-      sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n", get_clan(this)->name, get_clan(pl->clan1)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
+      sprintf(buf, "\r\n##Clan %s has challenged clan %s for control of%s!\r\n", qPrintable(get_clan(this)->name), qPrintable(get_clan(pl->clan1)->name), qPrintable(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).Name()));
     else
-      sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n", get_clan(pl->clan1)->name, DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).NameC());
+      sprintf(buf, "\r\n##Clan %s's control of%s is being challenged!\r\n", qPrintable(get_clan(pl->clan1)->name), qPrintable(DC::getInstance()->zones.value(DC::getInstance()->world[in_room].zone).Name()));
     send_info(buf);
     return ReturnValue::eSUCCESS;
   }

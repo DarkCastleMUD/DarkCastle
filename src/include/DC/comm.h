@@ -80,7 +80,6 @@ void send_info(QString messg);
 void send_info(std::string messg);
 void send_info(const char *messg);
 bool is_multi(Character *ch);
-void new_string_add(class Connection *d, char *str);
 void telnet_ga(Connection *d);
 void telnet_sga(Connection *d);
 void telnet_echo_off(class Connection *d);

@@ -31,6 +31,7 @@
 #include "DC/obj.h"
 #include "DC/DC.h"
 #include "DC/utility.h"
+#include "DC/memory.h"
 #include "DC/room.h"
 #include "DC/handler.h"
 #include "DC/structs.h"
@@ -75,6 +76,11 @@ void clean_string(char *buffer)
     if (*ptr == '\r')
       ptr++;
   }
+}
+
+QString clean_string(QString buffer)
+{
+  return buffer.remove('\r');
 }
 
 int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree)
@@ -124,7 +130,6 @@ int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
   /* It can handle regular obj's and XAP objects.                     */
 
   int counter;
-  extra_descr_data *ex_desc;
   char buf1[MAX_STRING_LENGTH + 1]{};
   // char buf2[256];
 
@@ -160,8 +165,8 @@ int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
              "%s~\n"
              "%d %d %d %d %d\n",
              !obj->Name().isEmpty() ? qPrintable(obj->Name()) : "undefined",
-             obj->short_description ? obj->short_description : "undefined",
-             obj->long_description ? obj->long_description : "undefined",
+             !obj->short_description.isEmpty() ? qPrintable(obj->short_description) : "undefined",
+             !obj->long_description.isEmpty() ? qPrintable(obj->long_description) : "undefined",
              buf1,
              GET_OBJ_TYPE(obj),
              GET_OBJ_WEAR(obj).toInt(),
@@ -176,22 +181,22 @@ int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
                  obj->affected[counter].modifier);
 
   /* Do we have extra descriptions? */
-  if (obj->ex_description)
+  if (!obj->ex_descriptions.isEmpty())
   { /*. Yep, save them too . */
-    for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next)
+    for (const auto &[keyword, description] : obj->ex_descriptions.asKeyValueRange())
     {
       /*. Sanity check to prevent nasty protection faults . */
-      if (!*ex_desc->keyword || !*ex_desc->description)
+      if (keyword.isEmpty() || description.isEmpty())
       {
         continue;
       }
-      strcpy(buf1, ex_desc->description);
-      clean_string(buf1);
+      auto buf1 = description;
+      buf1 = clean_string(buf1);
       dc_fprintf(fp, "E\n"
                      "%s~\n"
                      "%s~\n",
-                 ex_desc->keyword,
-                 buf1);
+                 qPrintable(keyword),
+                 qPrintable(buf1));
     }
   }
   return 1;
@@ -259,7 +264,6 @@ void DC::load_corpses(void)
   int num_objs = 0;
   vnum_t nr{};
   class Object *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
-  extra_descr_data *new_descr;
   char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = false;
   class Object *money;
@@ -359,7 +363,7 @@ void DC::load_corpses(void)
         {
           if (debug == 1)
           {
-            sprintf(buf3, "   -SHORT: %s\n", temp->short_description);
+            sprintf(buf3, "   -SHORT: %s\n", qPrintable(temp->short_description));
             logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
@@ -372,7 +376,7 @@ void DC::load_corpses(void)
         {
           if (debug == 1)
           {
-            sprintf(buf3, "   -DESC: %s\n", temp->long_description);
+            sprintf(buf3, "   -DESC: %s\n", qPrintable(temp->long_description));
             logentry(buf3, 0, DC::LogChannel::LOG_MISC);
           }
         }
@@ -422,22 +426,17 @@ void DC::load_corpses(void)
         /* You have to null out the extradescs when you're parsing a xap_obj.
          This is done right before the extradescs are read. */
 
-        if (temp->ex_description)
-        {
-          temp->ex_description = nullptr;
-        }
-
+        temp->ex_descriptions = {};
         get_line_new(fp, line);
         for (zwei = 0; !zwei && !dc_feof(fp);)
         {
+          QString keyword, description;
           switch (*line)
           {
           case 'E':
-            CREATE(new_descr, extra_descr_data, 1);
-            new_descr->keyword = fread_string_new(fp, buf2);
-            new_descr->description = fread_string_new(fp, buf2);
-            new_descr->next = temp->ex_description;
-            temp->ex_description = new_descr;
+            keyword = fread_string_new(fp, buf2);
+            description = fread_string_new(fp, buf2);
+            temp->ex_descriptions[keyword] = description;
             get_line_new(fp, line);
             break;
           case 'A':

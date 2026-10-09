@@ -159,6 +159,20 @@ act_return act(
 |   with no interpretation and no checks.
 */
 
+void send_message(QByteArray str, Character *to)
+{
+  if (str.isEmpty())
+    return;
+
+  if (!to)
+    return;
+
+  if (!to->desc)
+    return;
+
+  SEND_TO_Q(str, to->desc);
+}
+
 void send_message(QString str, Character *to)
 {
   if (str.isEmpty())
@@ -194,12 +208,12 @@ void send_message(std::string str, Character *to)
 send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to)
 {
   int retval = 0;
-  QString buf = tokens->Interpret(ch, obj, vict_obj, to, flags).c_str();
+  QByteArray buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
 
   // Uppercase first letter of sentence.
-  if (buf.isEmpty() == false && buf[0] != 0)
+  if (!buf.isEmpty())
   {
-    buf[0] = buf[0].toUpper();
+    buf[0] = QChar(buf[0]).toUpper().toLatin1();
   }
   send_message(buf, to);
 

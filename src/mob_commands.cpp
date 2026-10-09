@@ -84,8 +84,6 @@ extern int mprog_command_num; // From mob_prog.cpp
  * Local functions.
  */
 
-char *mprog_type_to_name(int type);
-
 /* This routine transfers between alpha and numeric forms of the
  *  mob_prog bitvector types. It allows the words to show up in mpstat to
  *  make it just a hair bit easier to see what a mob should be doing.
@@ -154,8 +152,8 @@ void mpstat(Character *ch, Character *victim)
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
-          victim->short_desc,
-          victim->long_desc ? victim->long_desc : "(nullptr)");
+          qPrintable(victim->short_desc),
+          !victim->long_desc.isEmpty() ? qPrintable(victim->long_desc) : "(unknown)");
   ch->send(buf);
 
   if (!(DC::getInstance()->mob_index[victim->mobdata->vnum_].progtypes))
@@ -171,9 +169,9 @@ void mpstat(Character *ch, Character *victim)
     ch->send(buf);
     send_to_char(mprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\r\n", mprg->arglist);
+    sprintf(buf, "$B$5%s$R\r\n", qPrintable(mprg->arglist));
     ch->send(buf);
-    ch->sendRaw(std::string(mprg->comlist) + "\r\n");
+    ch->sendRaw(mprg->comlist + u"\r\n"_s);
   }
 }
 
@@ -2113,7 +2111,7 @@ char *expand_data(Character *ch, char *orig)
 
     int16_t *lvali = nullptr;
     uint32_t *lvalui = nullptr;
-    char **lvalstr = nullptr;
+    QString *lvalstr = new QString;
     QString lvalqstr;
     int64_t *lvali64 = nullptr;
     quint64 *lvalui64 = nullptr;
@@ -2123,6 +2121,7 @@ char *expand_data(Character *ch, char *orig)
     if (!lvali && !lvalui && !lvalb)
     {
       ch->prog_error(QStringLiteral("Mpsetmath - Expand_data - Accessing unknown data."));
+      delete lvalstr;
       return nullptr;
     }
 
@@ -2143,6 +2142,7 @@ char *expand_data(Character *ch, char *orig)
     strcat(buf, tmp);
     i += strlen(tmp);
     z = (ptr - orig) + r + 1;
+    delete lvalstr;
   }
 
   for (o = z;; o++)
@@ -2191,7 +2191,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
 
   int16_t *lvali = nullptr;
   uint32_t *lvalui = nullptr;
-  char **lvalstr = nullptr;
+  QString *lvalstr = new QString;
   QString lvalqstr;
   int64_t *lvali64 = nullptr;
   quint64 *lvalui64 = nullptr;
@@ -2224,9 +2224,11 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
     if (!nw[0])
     {
       ch->prog_error(QStringLiteral("Mpsetmath - Invalid string."));
+      delete lvalstr;
       return ReturnValue::eFAILURE;
     }
     *lvalstr = str_dup(nw);
+    delete lvalstr;
     return ReturnValue::eSUCCESS;
   }
   if (!lvalui && !lvali && !lvalb)

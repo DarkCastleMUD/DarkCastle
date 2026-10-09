@@ -1081,7 +1081,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
   }
 
   char buf[MAX_STRING_LENGTH];
-  strcpy(buf, victim->short_desc);
+  strcpy(buf, qPrintable(victim->short_desc));
 
   retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP);
   if (isSet(retval, ReturnValue::eCH_DIED))
@@ -1397,7 +1397,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
     dam /= 2;
   }
   char buf[MAX_STRING_LENGTH];
-  strcpy(buf, victim->short_desc);
+  strcpy(buf, qPrintable(victim->short_desc));
   retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF);
   if (isSet(retval, ReturnValue::eCH_DIED))
     return retval;
@@ -1921,7 +1921,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
   {
     // Die bard!
     ch->sendln("Uh oh.");
-    do_say(victim, "Die you spoony bard!");
+    victim->do_say("Die you spoony bard!");
     retval = attack(victim, ch, TYPE_UNDEFINED);
     retval = SWAP_CH_VICT(retval);
     return retval;
@@ -2221,7 +2221,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
   if (target->affected_by_spell(SPELL_DETECT_MAGIC) && target->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
     target->sendln("You sense you are the target of scrying.");
 
-  sprintf(buf, "%s%s.\r\n", buf, DC::getInstance()->world[target->in_room].name);
+  sprintf(buf, "%s%s.\r\n", buf, qPrintable(DC::getInstance()->world[target->in_room].name));
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2863,7 +2863,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
   act("$N blinks and shakes its head, clearing its thoughts.", ch, 0, target, TO_ROOM, NOTVICT);
   if (target->fighting)
   {
-    do_say(target, "Hey, this sucks. I'm goin' home!");
+    target->do_say("Hey, this sucks. I'm goin' home!");
     if (target->fighting->fighting == target)
       stop_fighting(target->fighting);
     stop_fighting(target);
@@ -3359,7 +3359,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
 
   bool ispc = victim->isPlayer();
   char buf[MAX_STRING_LENGTH];
-  strcpy(buf, victim->short_desc);
+  strcpy(buf, qPrintable(victim->short_desc));
 
   retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO);
   if (isSet(retval, ReturnValue::eCH_DIED))

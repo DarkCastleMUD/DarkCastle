@@ -141,7 +141,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     act("$n draws up a swirling column of dust and breathes life into it.",
         ch, 0, 0, TO_ROOM, 0);
     act("$n has created $N!", ch, 0, mob, TO_ROOM, 0);
-    sprintf(buf, "You create %i %s!\r\n", cnt, mob->short_desc);
+    sprintf(buf, "You create %i %s!\r\n", cnt, qPrintable(mob->short_desc));
     ch->send(buf);
     if (cnt > 1)
     {
@@ -149,9 +149,9 @@ void do_mload(Character *ch, int rnum, int cnt)
                GET_NAME(ch),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
-               mob->short_desc,
+               qPrintable(mob->short_desc),
                DC::getInstance()->world[ch->in_room].number,
-               DC::getInstance()->world[ch->in_room].name);
+               qPrintable(DC::getInstance()->world[ch->in_room].name));
     }
     else
     {
@@ -159,9 +159,9 @@ void do_mload(Character *ch, int rnum, int cnt)
                GET_NAME(ch),
                cnt,
                DC::getInstance()->mob_index[rnum].vnum(),
-               mob->short_desc,
+               qPrintable(mob->short_desc),
                DC::getInstance()->world[ch->in_room].number,
-               DC::getInstance()->world[ch->in_room].name);
+               qPrintable(DC::getInstance()->world[ch->in_room].name));
     }
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
   }
@@ -172,7 +172,7 @@ void do_mload(Character *ch, int rnum, int cnt)
              cnt,
              DC::getInstance()->mob_index[rnum].vnum(),
              DC::getInstance()->world[ch->in_room].number,
-             DC::getInstance()->world[ch->in_room].name);
+             qPrintable(DC::getInstance()->world[ch->in_room].name));
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
     ch->sendln("You load the mob(s) but they immediatly destroy themselves.");
   }
@@ -211,18 +211,18 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
     }
   }
 
-  ch->send(fmt::format("You create {} {}{}.\r\n", cnt, random ? "randomized " : "", obj->short_description));
+  ch->send(u"You create %1 %2%3.\r\n"_s.arg(cnt).arg(random ? "randomized " : "").arg(obj->short_description));
 
-  buf = fmt::format("{} loads {} {}{} of obj {} ({}) at room {} ({}).",
-                    GET_NAME(ch),
-                    cnt,
-                    random ? "randomized " : "",
-                    cnt > 1 ? "copies" : "copy",
-                    GET_OBJ_VNUM(obj),
-                    obj->short_description,
-                    DC::getInstance()->world[ch->in_room].number,
-                    DC::getInstance()->world[ch->in_room].name);
-  logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+  auto buffer = u"%1 loads %2 %3%4 of obj %5 (%6) at room %7 (%8)."_s
+                    .arg(GET_NAME(ch))
+                    .arg(cnt)
+                    .arg(random ? "randomized " : "")
+                    .arg(cnt > 1 ? "copies" : "copy")
+                    .arg(GET_OBJ_VNUM(obj))
+                    .arg(obj->short_description)
+                    .arg(DC::getInstance()->world[ch->in_room].number)
+                    .arg(DC::getInstance()->world[ch->in_room].name);
+  logentry(buffer, ch->getLevel(), DC::LogChannel::LOG_GOD);
 
   return obj_list;
 }
@@ -259,7 +259,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
     }
   }
 
-  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", obj->short_description);
+  snprintf(buf, MAX_STRING_LENGTH, "You create %i %s%s.\r\n", cnt, random ? "randomized " : "", qPrintable(obj->short_description));
 
   ch->send(buf);
   if (cnt > 1)
@@ -269,9 +269,9 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              cnt,
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
-             obj->short_description,
+             qPrintable(obj->short_description),
              DC::getInstance()->world[ch->in_room].number,
-             DC::getInstance()->world[ch->in_room].name);
+             qPrintable(DC::getInstance()->world[ch->in_room].name));
   }
   else
   {
@@ -280,9 +280,9 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
              cnt,
              random ? "randomized " : "",
              GET_OBJ_VNUM(obj),
-             obj->short_description,
+             qPrintable(obj->short_description),
              DC::getInstance()->world[ch->in_room].number,
-             DC::getInstance()->world[ch->in_room].name);
+             qPrintable(DC::getInstance()->world[ch->in_room].name));
   }
   logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
 }
@@ -319,11 +319,11 @@ void boro_mob_stat(Character *ch, Character *k)
           (k->in_room == DC::NOWHERE ? 0 : DC::getInstance()->world[k->in_room].number),
           /* end of first line */
 
-          (k->short_desc ? k->short_desc : "None"),
+          (!k->short_desc.isEmpty() ? qPrintable(k->short_desc) : "None"),
           (int32_t)(k->isNonPlayer() ? k->mobdata->vnum_ : 0),
           /* end of second line */
 
-          (k->long_desc ? k->long_desc : "None"),
+          (!k->long_desc.isEmpty() ? qPrintable(k->long_desc) : "None"),
           /* end of third line */
 
           (k->fighting ? GET_NAME(k->fighting) : "Nobody"),
@@ -492,13 +492,13 @@ void boro_mob_stat(Character *ch, Character *k)
   ch->send(buf);
 
   strcpy(buf, "$3Title$R: ");
-  strcat(buf, (k->title ? k->title : "None"));
+  strcat(buf, (!k->title.isEmpty() ? qPrintable(k->title) : "None"));
   strcat(buf, "\r\n");
   ch->send(buf);
 
   // Description
   ch->sendln("$3Detailed description$R:");
-  if (k->description)
+  if (!k->description.isEmpty())
     ch->send(k->description);
   else
     ch->send("None");
@@ -634,22 +634,22 @@ command_return_t mob_stat(Character *ch, Character *k)
   ch->send(buf);
 
   strcpy(buf, "$3Short description$R: ");
-  strcat(buf, (k->short_desc ? k->short_desc : "None"));
+  strcat(buf, (!k->short_desc.isEmpty() ? qPrintable(k->short_desc) : "None"));
   strcat(buf, "\r\n");
   ch->send(buf);
 
   strcpy(buf, "$3Title$R: ");
-  strcat(buf, (k->title ? k->title : "None"));
+  strcat(buf, (!k->title.isEmpty() ? qPrintable(k->title) : "None"));
   strcat(buf, "\r\n");
   ch->send(buf);
 
   ch->send("$3Long description$R: ");
-  if (k->long_desc)
+  if (!k->long_desc.isEmpty())
     ch->send(k->long_desc);
   else
     ch->send("None");
   ch->sendln("$3Detailed description$R:");
-  if (k->description)
+  if (!k->description.isEmpty())
     ch->send(k->description);
   else
     ch->send("None");
@@ -989,7 +989,6 @@ void obj_stat(Character *ch, class Object *j)
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
   char buf4[MAX_STRING_LENGTH];
-  extra_descr_data *desc;
   bool found;
   int i;
 
@@ -1012,15 +1011,15 @@ void obj_stat(Character *ch, class Object *j)
   ch->send(buf);
 
   sprintf(buf, "$3Short description$R: %s\r\n$3Long description$R:\r\n%s\r\n",
-          ((j->short_description) ? j->short_description : "None"),
-          ((j->long_description) ? j->long_description : "None"));
+          ((!j->short_description.isEmpty()) ? qPrintable(j->short_description) : "None"),
+          ((!j->long_description.isEmpty()) ? qPrintable(j->long_description) : "None"));
   ch->send(buf);
-  if (j->ex_description)
+  if (!j->ex_descriptions.isEmpty())
   {
     strcpy(buf, "$3Extra description keyword(s)$R:\r\n----------\r\n");
-    for (desc = j->ex_description; desc; desc = desc->next)
+    for (const auto &keyword : j->ex_descriptions.keys())
     {
-      strcat(buf, desc->keyword);
+      strcat(buf, qPrintable(keyword));
       strcat(buf, "\r\n");
     }
     strcat(buf, "----------\r\n");
@@ -1520,10 +1519,10 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
 
     if (i->player->possesing)
       sprintf(buf, "%14s -- [%d] %s  *possessing*\r\n", GET_NAME(i),
-              (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+              (int32_t)(DC::getInstance()->world[i->in_room].number), qPrintable((DC::getInstance()->world[i->in_room].name)));
     else
       sprintf(buf, "%14s -- [%d] %s\r\n", GET_NAME(i),
-              (int32_t)(DC::getInstance()->world[i->in_room].number), (DC::getInstance()->world[i->in_room].name));
+              (int32_t)(DC::getInstance()->world[i->in_room].number), qPrintable((DC::getInstance()->world[i->in_room].name)));
     ch->send(buf);
   }
 
@@ -1676,7 +1675,7 @@ public:
   hunt_items *next;
   hunt_data *hunt;
   class Object *obj;
-  char *mobname;
+  QString mobname;
 };
 
 hunt_data *hunt_list = nullptr;
@@ -1701,8 +1700,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
           hunt_items_list = in;
 
         extract_obj(i->obj);
-        dc_free(i->mobname);
-        dc_free(i);
+        delete i;
         continue;
       }
       else
@@ -1725,9 +1723,9 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       else
       {
         if (h->time <= 0)
-          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description);
+          sprintf(buf, "\r\n## The time limit on the hunt for '%s' has expired and all unrecovered prizes have been removed.\r\n", qPrintable((DC::getInstance()->obj_index[h->itemnum].item)->short_description));
         else
-          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description);
+          sprintf(buf, "\r\n## All prizes have been recovered on the hunt for '%s'\r\n", qPrintable((DC::getInstance()->obj_index[h->itemnum].item)->short_description));
       }
     }
     else
@@ -1738,7 +1736,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       }
       else
       {
-        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description);
+        sprintf(buf, "\r\n## The hunt for '%s' has been ended.\r\n", qPrintable((DC::getInstance()->obj_index[h->itemnum].item)->short_description));
       }
     }
     send_info(buf);
@@ -1757,7 +1755,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
       p = hl;
     }
     dc_free(h->huntname);
-    dc_free(h);
+    delete h;
   }
 }
 
@@ -1797,8 +1795,7 @@ void huntclear_item(class Object *obj)
         hip->next = hin;
       else
         hunt_items_list = hin;
-      dc_free(hi->mobname);
-      dc_free(hi);
+      delete hi;
       continue; // Hopefully there's not two in the list, but just in case.
     }
     hip = hi;
@@ -1950,22 +1947,17 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
       if (DC::getInstance()->zones.value(DC::getInstance()->world[vict->in_room].zone).isNoHunt())
         continue;
 
-      if (strlen(vict->short_desc) > 34)
+      if (vict->short_desc.size() > 34)
         continue; // They suck
 
       break;
     }
     class Object *obj = clone_object(rnum);
     obj_to_char(obj, vict);
-    hunt_items *ni;
-#ifdef LEAK_CHECK
-    ni = (hunt_items *)calloc(1, sizeof(hunt_items));
-#else
-    ni = (hunt_items *)dc_alloc(1, sizeof(hunt_items));
-#endif
+    auto ni = new hunt_items;
     ni->hunt = n;
     ni->obj = obj;
-    ni->mobname = str_dup(vict->short_desc);
+    ni->mobname = vict->short_desc;
     ni->next = hunt_items_list;
     hunt_items_list = ni;
   }
@@ -1986,8 +1978,10 @@ void pick_up_item(Character *ch, class Object *obj)
       else
         hunt_items_list = in;
       int vnum = obj->vnum_;
-      sprintf(buf, "\r\n## %s has been recovered from %s by %s!\r\n", obj->short_description, i->mobname, ch->getNameC());
-      send_info(buf);
+      send_info(u"\r\n## %1 has been recovered from %2 by %3!\r\n"_s
+                    .arg(obj->short_description)
+                    .arg(i->mobname)
+                    .arg(ch->getName()));
       hunt_data *h = i->hunt;
       class Object *oitem = nullptr, *citem;
       int r1 = 0;
@@ -2001,10 +1995,10 @@ void pick_up_item(Character *ch, class Object *obj)
         {
           oitem = clone_object(r1);
           sprintf(buf, "As if by magic, %s transforms into %s!\r\n",
-                  obj->short_description, oitem->short_description);
+                  qPrintable(obj->short_description), qPrintable(oitem->short_description));
           ch->send(buf);
           sprintf(buf, "## %s turned into %s!\r\n",
-                  obj->short_description, oitem->short_description);
+                  qPrintable(obj->short_description), qPrintable(oitem->short_description));
           send_info(buf);
           if (isSet(oitem->obj_flags.more_flags, ITEM_UNIQUE))
           {
@@ -2046,8 +2040,7 @@ void pick_up_item(Character *ch, class Object *obj)
       case 27917:
       case 27918:
         gold = obj->obj_flags.value[0];
-        sprintf(buf, "As if by magic, %s transform into %d gold!\r\n",
-                obj->short_description, gold);
+        sprintf(buf, "As if by magic, %s transform into %d gold!\r\n", qPrintable(obj->short_description), gold);
         ch->send(buf);
 
         ch->addGold(gold);
@@ -2055,8 +2048,7 @@ void pick_up_item(Character *ch, class Object *obj)
         obj_to_room(obj, 6345);
         break;
       }
-      dc_free(i->mobname);
-      dc_free(i);
+      delete i;
       check_end_of_hunt(h);
       continue;
     }
@@ -2117,11 +2109,16 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
   {
     if (h->huntname)
     {
-      ch->send(fmt::format("\r\n{} for '{}'({} minutes remaining):\r\n", h->huntname, (DC::getInstance()->obj_index[h->itemnum].item)->short_description, h->time));
+      ch->send(u"\r\n%1 for '%2'(%3 minutes remaining):\r\n"_s
+                   .arg(h->huntname)
+                   .arg((DC::getInstance()->obj_index[h->itemnum].item)->short_description)
+                   .arg(h->time));
     }
     else
     {
-      ch->send(fmt::format("\r\nThe hunt for '{}'({} minutes remaining):\r\n", (DC::getInstance()->obj_index[h->itemnum].item)->short_description, h->time));
+      ch->send(u"\r\nThe hunt for '%1'(%2 minutes remaining):\r\n"_s
+                   .arg((DC::getInstance()->obj_index[h->itemnum].item)->short_description)
+                   .arg(h->time));
     }
 
     int itemsleft = 0;
@@ -2133,11 +2130,11 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
       }
 
       itemsleft++;
-      ch->send(fmt::format("{}| {:35}  ", buf, hi->mobname));
+      ch->send(u"%1| %2  "_s.arg(buf).arg(hi->mobname, 35));
 
       if ((itemsleft % 2) == 0)
       {
-        ch->send(fmt::format("{}|\r\n", buf));
+        ch->send(u"%1|\r\n"_s.arg(buf));
       }
     }
   }

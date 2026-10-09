@@ -287,10 +287,10 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
     // If they're in a clan
     ch_clan_name[0] = '\0';
     if ((ch_clan = get_clan(i)))
-      snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", ch_clan->name);
+      snprintf(ch_clan_name, CLANTAG_LEN, "[%s]", qPrintable(ch_clan->name));
 
     if ((victim_clan = get_clan(i->fighting)))
-      snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", victim_clan->name);
+      snprintf(victim_clan_name, CLANTAG_LEN, "[%s]", qPrintable(victim_clan->name));
 
     snprintf(buf, 80, "%s %s fighting %s %s (%d)\r\n",
              GET_NAME(i), ch_clan_name,

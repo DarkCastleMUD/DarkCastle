@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #include <QString>
 #include <string>
-#include <utility>
-
 #include "DC/DC.h"
 #include "DC/utility.h"
 #include "DC/character.h"
@@ -50,26 +48,23 @@ extern int size_restricted(Character *ch, class Object *obj);
 
 void repair_shop_fix_eq(Character *ch, Character *owner, int price, Object *obj)
 {
-  char buf[256];
 
   ch->removeGold(price);
   eq_remove_damage(obj);
-  sprintf(buf, "It will cost you %d coins to repair %s.", price, obj->short_description);
-  do_say(owner, buf);
+  auto buf = u"It will cost you %1 coins to repair %2."_s.arg(price).arg(obj->short_description);
+  owner->do_say(buf);
   act("You watch $N fix $p...", ch, obj, owner, TO_CHAR, 0);
   act("You watch $N fix $p...", ch, obj, owner, TO_ROOM, 0);
-  do_say(owner, "All fixed!");
+  owner->do_say("All fixed!");
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
 void repair_shop_complain_no_cash(Character *ch, Character *owner, int price, Object *obj)
 {
-  char buf[256];
-
-  do_say(owner, "Trying to sucker me for a free repair job?");
-  sprintf(buf, "It would cost %d coins to repair %s, which you don't have!", price, obj->short_description);
-  do_say(owner, buf);
+  owner->do_say("Trying to sucker me for a free repair job?");
+  auto buf = u"It would cost %1 coins to repair %2, which you don't have!"_s.arg(price).arg(obj->short_description);
+  owner->do_say(buf);
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
@@ -78,8 +73,8 @@ void repair_shop_price_check(Character *ch, Character *owner, int price, Object 
 {
   char buf[256];
 
-  sprintf(buf, "It will only cost you %d coins to repair %s.'", price, obj->short_description);
-  do_say(owner, buf);
+  sprintf(buf, "It will only cost you %d coins to repair %s.'", price, qPrintable(obj->short_description));
+  owner->do_say(buf);
   act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
@@ -122,7 +117,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -132,7 +127,7 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
   if (eqdam <= 0)
   {
-    do_say(owner, "Looks fine to me.");
+    owner->do_say("Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -195,7 +190,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     return ReturnValue::eSUCCESS;
   }
 
@@ -208,7 +203,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (eqdam <= 0)
   {
-    do_say(owner, "Looks fine to me.");
+    owner->do_say("Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -233,7 +228,7 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   else
   {
     // Dunno how to repair non-weapons/armor
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -296,7 +291,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     return ReturnValue::eSUCCESS;
   }
 
@@ -309,7 +304,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 
   if (eqdam <= 0)
   {
-    do_say(owner, "Looks fine to me.");
+    owner->do_say("Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -339,7 +334,7 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   else
   {
     // Dunno how to repair non-weapons/armor
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -446,7 +441,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       cost = corpse_cost(obj);
       cost /= 20000;
       cost = MAX(cost, 30);
-      sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, obj->short_description, cost);
+      sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, qPrintable(obj->short_description), cost);
       ch->send(buf);
     }
     send_to_char("$RIf any corpses were listed, they are still where you left them.  This\r\n"
@@ -678,7 +673,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
   {
     if (!CAN_SEE(owner, ch))
     {
-      do_say(owner, "I don't trade with people I can't see!");
+      owner->do_say("I don't trade with people I can't see!");
       return ReturnValue::eSUCCESS;
     }
 
@@ -708,7 +703,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
   {
     if (!CAN_SEE(owner, ch))
     {
-      do_say(owner, "I don't trade with people I can't see!");
+      owner->do_say("I don't trade with people I can't see!");
       return ReturnValue::eSUCCESS;
     }
 
@@ -763,7 +758,7 @@ int godload_sales(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
     if (!CAN_SEE(owner, ch))
     {
-      do_say(owner, "I don't trade with people I can't see!");
+      owner->do_say("I don't trade with people I can't see!");
       return ReturnValue::eSUCCESS;
     }
     if (!obj)
@@ -828,7 +823,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR))
   {
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     return ReturnValue::eSUCCESS;
   }
 
@@ -841,7 +836,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (eqdam <= 0)
   {
-    do_say(owner, "Looks fine to me.");
+    owner->do_say("Looks fine to me.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -853,7 +848,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (!isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
-    do_say(owner, "I don't repair this kind of junk.");
+    owner->do_say("I don't repair this kind of junk.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -876,7 +871,7 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   else
   {
     // Dunno how to repair non-weapons/armor
-    do_say(owner, "I can't repair this.");
+    owner->do_say("I can't repair this.");
     act("$N gives you $p.", ch, obj, owner, TO_CHAR, 0);
     act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;

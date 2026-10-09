@@ -594,7 +594,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
         if (tmp->room().isArena() && !isSet(DC::getInstance()->world[tmp->in_room].room_flags, NO_WHERE))
         {
           if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
-            csendf(ch, "%-20s - [%s$R]\r\n", GET_NAME(tmp), clan->name);
+            csendf(ch, "%-20s - [%s$R]\r\n", GET_NAME(tmp), qPrintable(clan->name));
           else
             csendf(ch, "%-20s\r\n", GET_NAME(tmp));
           count++;
@@ -619,7 +619,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
         if ((tmp->clan) && (clan = get_clan(tmp)) && tmp->isMortalPlayer())
           csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d - [%s$R]\r\n",
                  GET_NAME(tmp),
-                 tmp->getLevel(), tmp->getHP(), tmp->in_room, clan->name);
+                 tmp->getLevel(), tmp->getHP(), tmp->in_room, qPrintable(clan->name));
         else
           csendf(ch, "%-20s  Level: %-3d  Hit: %-5d  Room: %-5d\r\n",
                  GET_NAME(tmp),
@@ -651,13 +651,15 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
       {
         if (d->original)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), qPrintable(DC::getInstance()->world[d->character->in_room].name),
                  DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
         }
         else
         {
-          csendf(ch, "%-20s - %s$R [%d]\r\n",
-                 d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+          ch->sendln(u"%1 - %2$R [%3]"_s
+                         .arg(d->character->getName(), -20)
+                         .arg(DC::getInstance()->world[d->character->in_room].name)
+                         .arg(DC::getInstance()->world[d->character->in_room].number));
         }
       }
     } // for
@@ -673,16 +675,21 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
         { // If switched
           if (is_abbrev(buf, d->original->getName()))
           {
-            csendf(ch, "%-20s - %s$R [%d] In body of %s\r\n", d->original->getNameC(), DC::getInstance()->world[d->character->in_room].name,
-                   DC::getInstance()->world[d->character->in_room].number, fname(d->character->getName()).toStdString().c_str());
+            ch->sendln(u"%1 - %2$R [%3] In body of %4"_s
+                           .arg(d->original->getName(), -20)
+                           .arg(DC::getInstance()->world[d->character->in_room].name)
+                           .arg(DC::getInstance()->world[d->character->in_room].number)
+                           .arg(fname(d->character->getName())));
           }
         }
         else
         {
           if (is_abbrev(buf, d->character->getNameC()))
           {
-            csendf(ch, "%-20s - %s$R [%d]\r\n",
-                   d->character->getNameC(), DC::getInstance()->world[d->character->in_room].name, DC::getInstance()->world[d->character->in_room].number);
+            ch->sendln(u"%1 - %2$R [%3]"_s
+                           .arg(d->character->getName(), -20)
+                           .arg(DC::getInstance()->world[d->character->in_room].name)
+                           .arg(DC::getInstance()->world[d->character->in_room].number));
           }
         }
       }
@@ -701,8 +708,9 @@ int do_where(Character *ch, char *argument, cmd_t cmd)
           CAN_SEE(ch, d->character) && !d->character->isNonPlayer() /*Don't show snooped mobs*/)
       {
         if (DC::getInstance()->world[d->character->in_room].zone == zonenumber)
-          csendf(ch, "%-20s - %s$R\r\n", d->character->getNameC(),
-                 DC::getInstance()->world[d->character->in_room].name);
+          ch->sendln(u"%1 - %2$R"_s
+                         .arg(d->character->getName(), -20)
+                         .arg(DC::getInstance()->world[d->character->in_room].name));
       }
     }
   }

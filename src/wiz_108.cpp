@@ -254,10 +254,8 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
       }
       if (vict != nullptr)
       {
-        csendf(ch, "You purloin %s from %s.\r\n",
-               k->short_description, GET_NAME(vict));
-        logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s",
-             GET_NAME(ch), k->short_description, GET_NAME(vict));
+        csendf(ch, "You purloin %s from %s.\r\n", qPrintable(k->short_description), GET_NAME(vict));
+        logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s", GET_NAME(ch), qPrintable(k->short_description), GET_NAME(vict));
       }
       else
       {

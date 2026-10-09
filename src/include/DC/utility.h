@@ -55,7 +55,6 @@
 #include "DC/levels.h"
 #include "DC/obj.h"
 #include "DC/timeinfo.h"
-#include "DC/memory.h"
 
 class Character;
 class str_app_type;
@@ -222,7 +221,7 @@ bool IS_DARK(room_t room);
 #define GET_POS(ch) ((ch)->getPosition())
 #define GET_COND(ch, i) ((ch)->conditions[(i)])
 #define GET_NAME(ch) ((ch)->getNameC())
-#define GET_SHORT(ch) ((ch)->short_desc ? (ch)->short_desc : (ch)->getNameC())
+#define GET_SHORT(ch) ((ch)->short_desc.isEmpty() ? qPrintable((ch)->getName()) : qPrintable((ch)->short_desc))
 #define GET_SHORT_ONLY(ch) ((ch)->short_desc)
 #define GET_TITLE(ch) ((ch)->title)
 
@@ -660,7 +659,7 @@ void send_to_char_nosp(QString messg, Character *ch);
 void send_to_room(QString messg, room_t room, bool awakeonly = false, Character *nta = nullptr);
 void record_track_data(Character *ch, cmd_t cmd);
 int write_to_descriptor_fd(int desc, char *txt);
-void write_to_q(const std::string txt, std::queue<std::string> &queue);
+void write_to_q(QByteArray txt, std::queue<QByteArray> &queue);
 int use_mana(Character *ch, int sn);
 void automail(char *name);
 bool file_exists(const char *);
@@ -721,7 +720,7 @@ int contents_cause_unique_problem(Object *obj, Character *vict);
 bool check_make_camp(room_t);
 int get_leadership_bonus(Character *);
 void update_make_camp_and_leadership(void);
-int _parse_name(const char *arg, char *name);
+bool is_valid_name(QString name);
 
 void mob_suprised_sayings(Character *ch, Character *aggressor);
 

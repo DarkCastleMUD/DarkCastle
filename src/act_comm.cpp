@@ -384,34 +384,29 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
+command_return_t Character::do_ignore(QStringList arguments, cmd_t cmd)
 {
-  if (ch == nullptr)
+  if (isNonPlayer())
   {
+    sendln("You're a mob! You can't ignore people.");
     return ReturnValue::eFAILURE;
   }
 
-  if (ch->isNonPlayer())
+  if (arguments.isEmpty())
   {
-    ch->send("You're a mob! You can't ignore people.\r\n");
-    return ReturnValue::eFAILURE;
-  }
-
-  if (args.empty())
-  {
-    if (ch->player->ignoring.empty())
+    if (player->ignoring.empty())
     {
-      ch->send("Ignore who?\r\n");
+      sendln("Ignore who?");
       return ReturnValue::eSUCCESS;
     }
 
     // convert ignoring std::map into "char1 char2 char3" format
-    std::string ignoreString = {};
-    for (const auto &ignore : ch->player->ignoring)
+    QString ignoreString;
+    for (const auto &ignore : player->ignoring.asKeyValueRange())
     {
       if (ignore.second.ignore)
       {
-        if (ignoreString.empty())
+        if (ignoreString.isEmpty())
         {
           ignoreString = ignore.first;
         }
@@ -421,29 +416,29 @@ command_return_t do_ignore(Character *ch, std::string args, cmd_t cmd)
         }
       }
     }
-    ch->send(fmt::format("Ignoring: {}\r\n", ignoreString));
+    sendln(u"Ignoring: %1"_s.arg(ignoreString));
 
     return ReturnValue::eSUCCESS;
   }
 
-  std::string arg1 = {}, remainder_args = {};
-  std::tie(arg1, remainder_args) = half_chop(args);
-  if (arg1.empty())
+  QString arg1 = {}, remainder_args = {};
+  std::tie(arg1, remainder_args) = half_chop(arguments);
+  if (arg1.isEmpty())
   {
-    ch->send("Ignore who?\r\n");
+    send("Ignore who?\r\n");
     return ReturnValue::eFAILURE;
   }
-  arg1[0] = toupper(arg1[0]);
+  arg1[0] = arg1[0].toUpper();
 
-  if (ch->player->ignoring.contains(arg1) == false)
+  if (player->ignoring.contains(arg1) == false)
   {
-    ch->player->ignoring[arg1] = {true, 0};
-    ch->send(fmt::format("You now ignore anyone named {}.\r\n", arg1));
+    player->ignoring[arg1] = {true, 0};
+    sendln(u"You now ignore anyone named %1."_s.arg(arg1));
   }
   else
   {
-    ch->player->ignoring.erase(arg1);
-    ch->send(fmt::format("You stop ignoring {}.\r\n", arg1));
+    player->ignoring.remove(arg1);
+    sendln(u"You stop ignoring %1."_s.arg(arg1));
   }
   return ReturnValue::eSUCCESS;
 }
@@ -467,10 +462,10 @@ int is_ignoring(const Character *const ch, const Character *const i)
 
   // Since it didn't match the whole name, see if it matches one of
   // the name keywords used for a mob name
-  std::string names = GET_NAME(i);
-  std::string name1 = {}, remainder_names = {};
+  auto names = i->getName();
+  QString name1 = {}, remainder_names = {};
   std::tie(name1, remainder_names) = half_chop(names);
-  while (name1.empty() == false)
+  while (!name1.isEmpty())
   {
     if (ch->player->ignoring.contains(name1))
     {

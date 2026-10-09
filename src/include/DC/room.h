@@ -20,7 +20,6 @@
 
 class Character;
 class Zone;
-class extra_descr_data;
 
 /* Bitvector For 'room_flags' */
 
@@ -119,12 +118,12 @@ const auto SECT_MAX_SECT = 15; // update this if you add more
 class room_direction_data
 {
 public:
-  char *general_description; /* When look DIR.                  */
-  char *keyword;             /* for open/close                  */
-  int16_t exit_info;         /* Exit info                       */
-  Character *bracee;         /* This is who is bracing the door */
-  int16_t key;               /* Key's number (-1 for no key)    */
-  int16_t to_room;           /* Where direction leeds (NOWHERE) */
+  QString general_description; /* When look DIR.                  */
+  char *keyword;               /* for open/close                  */
+  int16_t exit_info;           /* Exit info                       */
+  Character *bracee;           /* This is who is bracing the door */
+  int16_t key;                 /* Key's number (-1 for no key)    */
+  int16_t to_room;             /* Where direction leeds (NOWHERE) */
 };
 
 class room_track_data
@@ -165,9 +164,9 @@ public:
   QSharedPointer<Zone> zonePtr = {};
   int sector_type = {}; // sector type (move/hide)
   deny_data *denied = {};
-  char *name = {};                                // Rooms name 'You are ...'
-  char *description = {};                         // Shown when entered
-  extra_descr_data *ex_description = {};          // for examine/look
+  QString name = {};                              // Rooms name 'You are ...'
+  QString description = {};                       // Shown when entered
+  ex_descriptions_t ex_descriptions = {};         // for examine/look
   room_direction_data *dir_option[MAX_DIRS] = {}; // Directions
   uint32_t room_flags = {};                       // DEATH, DARK ... etc
   constexpr auto isDark() const -> bool { return isSet(room_flags, DARK); }

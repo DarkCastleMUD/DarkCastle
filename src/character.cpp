@@ -1149,7 +1149,7 @@ QString Character::calc_name(bool use_color)
 
   if (isPlayer())
     name += getName();
-  else if (short_desc)
+  else if (!short_desc.isEmpty())
     name += short_desc;
   else
     name += QStringLiteral("unknown");

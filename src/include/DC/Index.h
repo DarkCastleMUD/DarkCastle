@@ -15,12 +15,38 @@ QString read_next_filename(FILEPtr stream, QString directoryName);
 
 class world_file_list_item
 {
-public:
-  QString filename{};
-  vnum_t firstnum{};
-  vnum_t lastnum{};
   QMap<vnum_t, bool> vnums_{};
+  QString filename_{};
+
+public:
   int32_t flags{};
+
+  world_file_list_item(QString filename) : filename_(filename) {}
+  const QMap<vnum_t, bool> &vnums(void) { return vnums_; }
+  void disableVNUM(vnum_t vnum)
+  {
+    if (vnums_.contains(vnum))
+      vnums_[vnum] = false;
+  }
+  void enableVNUM(vnum_t vnum)
+  {
+    vnums_[vnum] = true;
+  }
+  QString filename(void) { return filename_; }
+  vnum_t firstnum(void)
+  {
+    if (vnums_.isEmpty())
+      return {};
+    else
+      return vnums_.firstKey();
+  }
+  vnum_t lastnum(void)
+  {
+    if (vnums_.isEmpty())
+      return {};
+    else
+      return vnums_.lastKey();
+  }
 };
 using world_file_list_itemPtr = QSharedPointer<class world_file_list_item>;
 using world_file_list_t = QList<world_file_list_itemPtr>;
