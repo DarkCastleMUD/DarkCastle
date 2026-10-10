@@ -177,9 +177,7 @@ bool is_hiding(Character *ch, Character *vict);
 
 #define IS_AFFECTED(ch, skill) (ISSET((ch)->affected_by, (skill)))
 
-int DARK_AMOUNT(room_t room);
-bool IS_DARK(room_t room);
-#define IS_LIGHT(room) (!IS_DARK(room))
+#define IS_LIGHT(room) (!DC::getInstance()->world[room].isDark())
 
 #define IS_ARENA(room) (isSet(DC::getInstance()->world[room].room_flags, ARENA))
 

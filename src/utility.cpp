@@ -1041,19 +1041,18 @@ bool ARE_CLANNED(Character *sub, Character *obj)
   return true;
 }
 
-int DARK_AMOUNT(room_t room)
+int Room::darkAmount(void)
 {
-  int glow = DC::getInstance()->world[room].light;
+  auto glow = light;
 
   // indoors and cities are always lit
-  if (DC::getInstance()->world[room].sector_type == SECT_INSIDE ||
-      DC::getInstance()->world[room].sector_type == SECT_CITY)
+  if (sector_type == SECT_INSIDE || sector_type == SECT_CITY)
     glow += 3;
 
-  if (isSet(DC::getInstance()->world[room].room_flags, DARK))
+  if (isSet(room_flags, DARK))
     glow -= 2;
 
-  if (isSet(DC::getInstance()->world[room].room_flags, LIGHT_ROOM))
+  if (isSet(room_flags, LIGHT_ROOM))
     glow += 2;
 
   if (weather_info.sunlight == SUN_DARK)
@@ -1066,11 +1065,9 @@ int DARK_AMOUNT(room_t room)
 // 0 to + is light
 // -1 to - is dark
 // SUN_DARK = -1
-bool IS_DARK(room_t room)
+bool Room::isDark(void)
 {
-  int glow = DARK_AMOUNT(room);
-
-  if (glow < 0)
+  if (darkAmount() < 0)
     return true;
 
   return false;
@@ -1183,14 +1180,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
     return false;
   }
 
-  try
-  {
-    if (DC::getInstance()->world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
-    {
-      return false;
-    }
-  }
-  catch (...)
+  if (DC::getInstance()->world[obj->in_room].sector_type == SECT_FOREST && IS_AFFECTED(obj, AFF_FOREST_MELD) && IS_AFFECTED(obj, AFF_HIDE))
   {
     return false;
   }
@@ -1290,7 +1280,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   if (IS_OBJ_STAT(obj, ITEM_INVISIBLE) && !IS_AFFECTED(sub, AFF_DETECT_INVISIBLE))
     return false;
 
-  if (IS_DARK(sub->in_room) && !IS_AFFECTED(sub, AFF_INFRARED) && !IS_OBJ_STAT(obj, ITEM_GLOW))
+  if (DC::getInstance()->world[sub->in_room].isDark() && !IS_AFFECTED(sub, AFF_INFRARED) && !IS_OBJ_STAT(obj, ITEM_GLOW))
     return false;
 
   return true;

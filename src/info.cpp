@@ -904,7 +904,7 @@ void Character::list_char_to_char(Character *list, int mode)
         this->player->lastseen->insert(std::pair<int, std::pair<timeval, timeval>>(i->mobdata->vnum_, std::pair<timeval, timeval>(tv, tv_zero)));
       }
     }
-    else if (IS_DARK(this->in_room))
+    else if (DC::getInstance()->world[in_room].isDark())
     {
       if (known && skill_success(nullptr, SKILL_BLINDFIGHTING))
         this->sendln("Your blindfighting awareness alerts you to a presense in the area.");
@@ -1336,7 +1336,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
     ansi_color(GREY, ch);
     return ReturnValue::eSUCCESS;
   }
-  else if (IS_DARK(ch->in_room) && (!ch->isNonPlayer() && !ch->player->holyLite))
+  else if (DC::getInstance()->world[ch->in_room].isDark() && (!ch->isNonPlayer() && !ch->player->holyLite))
   {
     ch->sendln("It is pitch black...");
     ch->list_char_to_char(DC::getInstance()->world[ch->in_room].people, 0);
@@ -1746,7 +1746,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
                    sector_buf);
         sprintbit((int32_t)DC::getInstance()->world[ch->in_room].room_flags, room_bits,
                   rflag_buf);
-        csendf(ch, "\r\nLight[%d] <%s> [ %s]", DARK_AMOUNT(ch->in_room), sector_buf, rflag_buf);
+        csendf(ch, "\r\nLight[%d] <%s> [ %s]", DC::getInstance()->world[ch->in_room].darkAmount(), sector_buf, rflag_buf);
         if (DC::getInstance()->world[ch->in_room].temp_room_flags)
         {
           sprintbit((int32_t)DC::getInstance()->world[ch->in_room].temp_room_flags, temp_room_bits,
@@ -1902,7 +1902,7 @@ int do_exits(Character *ch, char *argument, cmd_t cmd)
       else
         sprintf(buf + strlen(buf), "%s - (Closed)\r\n", exits[door]);
     }
-    else if (IS_DARK(EXIT(ch, door)->to_room))
+    else if (DC::getInstance()->world[EXIT(ch, door)->to_room].isDark())
       sprintf(buf + strlen(buf), "%s - Too dark to tell\r\n", exits[door]);
     else
       sprintf(buf + strlen(buf), "%s leads to %s.\r\n", exits[door],

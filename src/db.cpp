@@ -111,15 +111,13 @@ int load_debug = 0;
 
 Room &World::operator[](room_t room_key)
 {
-  static Room generic_room = {};
+  auto i = DC::getInstance()->rooms.find(room_key);
+  if (i != DC::getInstance()->rooms.end())
+    return *i;
 
-  if (room_key > DC::getInstance()->top_of_world || room_key == DC::NOWHERE || !DC::getInstance()->rooms.contains(room_key))
-  {
-    generic_room = {};
-    return generic_room;
-  }
-
-  return DC::getInstance()->rooms[room_key];
+  static Room nonexistent_room;
+  nonexistent_room = {};
+  return nonexistent_room;
 }
 
 #ifndef SEEK_CUR
@@ -153,7 +151,6 @@ weather_data weather_info; /* the infomation about the weather */
 vault_data *vault_table = 0;
 
 /* local procedures */
-void setup_dir(FILEPtr fl, room_t room, int dir);
 void load_banned();
 void boot_world(void);
 void do_godlist();
@@ -1267,6 +1264,10 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
   if (ch != '$')
   {
     room_nr = fread_int(fl, 0, 1000000);
+    if (room_nr)
+      rooms[room_nr] = {};
+
+    auto &room = world[room_nr];
     world_file_list_item->enableVNUM(room_nr);
 
     if (load_debug)
@@ -1279,9 +1280,9 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
 
     if (room_nr)
     {
-      DC::getInstance()->currentVNUM(room_nr);
-      DC::getInstance()->currentType("Room");
-      DC::getInstance()->currentName(temp);
+      currentVNUM(room_nr);
+      currentType("Room");
+      currentName(temp);
 
       /* a new_new record to be read */
 
@@ -1293,35 +1294,33 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       if (top_of_world < room_nr)
         top_of_world = room_nr;
 
-      DC::getInstance()->rooms[room_nr] = {};
-
-      DC::getInstance()->world[room_nr].paths = 0;
-      DC::getInstance()->world[room_nr].number = room_nr;
-      DC::getInstance()->world[room_nr].name = temp;
+      room.paths = 0;
+      room.number = room_nr;
+      room.name = temp;
     }
     char *description = fread_string(fl, 0);
     if (room_nr)
     {
-      DC::getInstance()->world[room_nr].description = description;
-      DC::getInstance()->world[room_nr].nTracks = 0;
-      DC::getInstance()->world[room_nr].tracks = 0;
-      DC::getInstance()->world[room_nr].last_track = 0;
-      DC::getInstance()->world[room_nr].denied = 0;
-      DC::getInstance()->total_rooms++;
+      room.description = description;
+      room.nTracks = 0;
+      room.tracks = 0;
+      room.last_track = 0;
+      room.denied = 0;
+      total_rooms++;
     }
     // Ignore recorded zone number since it may not longer be valid
     fread_int(fl, -1, 64000); // zone nr
 
     if (room_nr)
     {
-      // Go through the zone table until DC::getInstance()->world[room_nr].number is
+      // Go through the zone table until room.number is
       // in the current zone.
 
       bool found = false;
       zone_t zone_nr = {};
-      for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
+      for (auto [zone_key, zone] : zones.asKeyValueRange())
       {
-        if (zone.getBottom() <= DC::getInstance()->world[room_nr].number && zone.getTop() >= DC::getInstance()->world[room_nr].number)
+        if (zone.getBottom() <= room.number && zone.getTop() >= room.number)
         {
           found = true;
           zone_nr = zone_key;
@@ -1336,7 +1335,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       }
       else
       {
-        auto &zone = DC::getInstance()->zones[zone_nr];
+        auto &zone = zones[zone_nr];
         if (room_nr >= zone.getBottom() && room_nr <= zone.getTop())
         {
           if (room_nr < zone.getRealBottom() || zone.getRealBottom() == 0)
@@ -1348,7 +1347,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
             zone.setRealTop(room_nr);
           }
         }
-        DC::getInstance()->world[room_nr].zone = zone_nr;
+        room.zone = zone_nr;
       }
     }
 
@@ -1356,35 +1355,35 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
 
     if (room_nr)
     {
-      DC::getInstance()->world[room_nr].room_flags = room_flags;
-      if (isSet(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL))
-        REMOVE_BIT(DC::getInstance()->world[room_nr].room_flags, NO_ASTRAL);
+      room.room_flags = room_flags;
+      if (isSet(room.room_flags, NO_ASTRAL))
+        REMOVE_BIT(room.room_flags, NO_ASTRAL);
 
       // This bitvector is for runtime and not stored in the files, so just initialize it to 0
-      DC::getInstance()->world[room_nr].temp_room_flags = 0;
+      room.temp_room_flags = 0;
     }
 
     int sector_type = fread_int(fl, -1, 64000);
 
     if (room_nr)
     {
-      DC::getInstance()->world[room_nr].sector_type = sector_type;
+      room.sector_type = sector_type;
 
       if (load_debug)
       {
-        printf("Flags are %llu %d %d\n", zone_nr, DC::getInstance()->world[room_nr].room_flags, DC::getInstance()->world[room_nr].sector_type);
+        printf("Flags are %llu %d %d\n", zone_nr, room.room_flags, room.sector_type);
         fflush(stdout);
       }
 
-      DC::getInstance()->world[room_nr].funct = 0;
-      DC::getInstance()->world[room_nr].contents = 0;
-      DC::getInstance()->world[room_nr].people = 0;
-      DC::getInstance()->world[room_nr].light = 0; /* Zero light sources */
+      room.funct = 0;
+      room.contents = 0;
+      room.people = 0;
+      room.light = 0; /* Zero light sources */
 
       for (size_t tmp = 0; tmp <= 5; tmp++)
-        DC::getInstance()->world[room_nr].dir_option[tmp] = 0;
+        room.dir_option[tmp] = 0;
 
-      DC::getInstance()->world[room_nr].ex_descriptions = {};
+      room.ex_descriptions = {};
     }
 
     for (;;)
@@ -1395,7 +1394,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       if (ch == 'D')
       {
         dir = fread_int(fl, 0, 5);
-        setup_dir(fl, room_nr, dir);
+        room.setup_dir(fl, dir);
       }
       /* extra description field */
       else if (ch == 'E')
@@ -1403,12 +1402,12 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
         // strip off the \n after the E
         if (fread_char(fl) != '\n')
           dc_fseek(fl, -1, SEEK_CUR);
-        auto keyword = fread_string(fl, 0);
-        auto description = fread_string(fl, 0);
+        auto keyword = fread_qstring(fl);
+        auto description = fread_qstring(fl);
 
         if (room_nr)
         {
-          DC::getInstance()->world[room_nr].ex_descriptions[keyword] = description;
+          room.ex_descriptions[keyword] = description;
         }
       }
       else if (ch == 'B')
@@ -1419,8 +1418,8 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
 
         if (room_nr)
         {
-          deni->next = DC::getInstance()->world[room_nr].denied;
-          DC::getInstance()->world[room_nr].denied = deni;
+          deni->next = room.denied;
+          room.denied = deni;
         }
         else
         {
@@ -1434,7 +1433,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
         int c_class = fread_int(fl, 0, CLASS_MAX);
         if (room_nr)
         {
-          DC::getInstance()->world[room_nr].allow_class[c_class] = true;
+          room.allow_class[c_class] = true;
         }
       }
     } // of for (;;) (get directions and extra descs)
@@ -1719,53 +1718,35 @@ void DC::boot_world(void)
 }
 
 /* read direction data */
-void setup_dir(FILEPtr fl, room_t room, int dir)
+void Room::setup_dir(FILEPtr fl, int dir)
 {
   int tmp;
 
-  if (room && DC::getInstance()->world[room].dir_option[dir])
+  if (dir_option[dir])
   {
     char buf[200];
-    sprintf(buf, "Room %d attemped to created two exits in the same direction.", DC::getInstance()->world[room].number);
+    sprintf(buf, "Room %d attemped to created two exits in the same direction.", number);
     logentry(buf, 0, DC::LogChannel::LOG_WORLD);
-    if (DC::getInstance()->world[room].dir_option[dir]->keyword)
-      dc_free(DC::getInstance()->world[room].dir_option[dir]->keyword);
+    if (dir_option[dir]->keyword)
+      dc_free(dir_option[dir]->keyword);
 
-    dc_free(DC::getInstance()->world[room].dir_option[dir]);
+    dc_free(dir_option[dir]);
   }
 
-  if (room)
-  {
-#ifdef LEAK_CHECK
-    DC::getInstance()->world[room].dir_option[dir] = (room_direction_data *)
-        calloc(1, sizeof(room_direction_data));
-#else
-    DC::getInstance()->world[room].dir_option[dir] = (room_direction_data *)
-        dc_alloc(1, sizeof(room_direction_data));
-#endif
-  }
-  char *general_description = fread_string(fl, 0);
+  dir_option[dir] = (room_direction_data *)dc_alloc(1, sizeof(room_direction_data));
+  auto general_description = fread_qstring(fl);
 
-  if (room)
-    DC::getInstance()->world[room].dir_option[dir]->general_description = general_description;
+  dir_option[dir]->general_description = general_description;
 
-  char *keyword = fread_string(fl, 0);
-  if (room)
-    DC::getInstance()->world[room].dir_option[dir]->keyword = keyword;
+  auto keyword = fread_qstring(fl);
+  dir_option[dir]->keyword = keyword;
 
   tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
 
-  if (room)
-  {
-    DC::getInstance()->world[room].dir_option[dir]->exit_info = tmp;
-    DC::getInstance()->world[room].dir_option[dir]->bracee = nullptr;
-  }
-
+  dir_option[dir]->exit_info = tmp;
+  dir_option[dir]->bracee = nullptr;
   int16_t key = fread_int(fl, -62000, 62000);
-  if (room)
-  {
-    DC::getInstance()->world[room].dir_option[dir]->key = key;
-  }
+  dir_option[dir]->key = key;
 
   int16_t to_room = DC::NOWHERE;
   try
@@ -1776,8 +1757,7 @@ void setup_dir(FILEPtr fl, room_t room, int dir)
   {
   }
 
-  if (room)
-    DC::getInstance()->world[room].dir_option[dir]->to_room = to_room;
+  dir_option[dir]->to_room = to_room;
 }
 
 // return true for success
@@ -4626,7 +4606,7 @@ QString fread_qstring(FILEPtr stream, bool *ok)
 /* read and allocate space for a '~'-terminated std::string from a given file */
 char *fread_string(FILEPtr fl, int hasher)
 {
-  char buf[MAX_STRING_LENGTH]{};
+  char buf[MAX_STRING_LENGTH];
   char *pAlloc{};
   char *pBufLast{};
   char *temp{};

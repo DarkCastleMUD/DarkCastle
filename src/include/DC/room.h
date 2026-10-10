@@ -119,7 +119,7 @@ class room_direction_data
 {
 public:
   QString general_description; /* When look DIR.                  */
-  char *keyword;               /* for open/close                  */
+  QString keyword;             /* for open/close                  */
   int16_t exit_info;           /* Exit info                       */
   Character *bracee;           /* This is who is bracing the door */
   int16_t key;                 /* Key's number (-1 for no key)    */
@@ -221,6 +221,9 @@ public:
   void AddTrackItem(room_track_data *newTrack);
   room_track_data *TrackItem(int nIndex);
   void FreeTracks();
+  int darkAmount(void);
+  bool isDark(void);
+  void setup_dir(FILEPtr fl, int dir);
 
   enum class room_errors_t
   {

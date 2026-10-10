@@ -749,7 +749,7 @@ void food_update(void)
     { // i'm hungry
       if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
       {
-        if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+        if (DC::getInstance()->world[i->in_room].isDark() && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
           i->sendln("It's too dark to see what's safe to eat!");
         else if (FOUNTAINisPresent(i))
           i->do_drink({QStringLiteral("fountain")});
@@ -765,7 +765,7 @@ void food_update(void)
     { // i'm thirsty
       if (!i->isNonPlayer() && isSet(i->player->toggles, Player::PLR_AUTOEAT) && (GET_POS(i) > position_t::SLEEPING))
       {
-        if (IS_DARK(i->in_room) && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
+        if (DC::getInstance()->world[i->in_room].isDark() && !i->isNonPlayer() && !i->player->holyLite && !i->affected_by_spell(SPELL_INFRAVISION))
           i->sendln("It's too dark to see if there's any potable liquid around!");
         else if (FOUNTAINisPresent(i))
           i->do_drink({QStringLiteral("fountain")});
