@@ -3273,11 +3273,7 @@ int random_dir_boots(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   act("$n boots just keep on going!", obj->equipped_by, 0, 0, TO_ROOM, INVIS_NULL);
   obj->equipped_by->sendln("Your boots just keep on running!");
 
-  char dothis[32];
-
-  strcpy(dothis, dirs[number(0, 5)]);
-
-  return obj->equipped_by->command_interpreter(dothis);
+  return obj->equipped_by->command_interpreter(DC::dirs[number(0, 5)]);
 }
 
 // WARNING - uses obj_flags.value[3] to store stuff

@@ -847,6 +847,17 @@ int consttype(char *search_str, const char *names[])
   return -1;
 }
 
+int consttype(QString search_str, QStringList names)
+{
+  int nr;
+
+  for (nr = 0; nr < names.size(); nr++)
+    if (is_abbrev(search_str, names[nr]))
+      return nr;
+
+  return -1;
+}
+
 QString constindex(const qsizetype index, const QStringList names)
 {
   if (names.size() > index)

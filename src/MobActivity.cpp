@@ -114,14 +114,14 @@ bool Path::findRoom(room_t from, room_t to, int steps, int leastSteps, char *buf
 
     if (DC::getInstance()->world[from].dir_option[i]->to_room == to)
     {
-      *buf = dirs[i][0];
+      *buf = DC::dirs[i][0].toLatin1();
       *(buf + 1) = '\0';
       return true;
     }
 
     if (findRoom(DC::getInstance()->world[from].dir_option[i]->to_room, to, steps + 1, leastSteps, buf + 1))
     {
-      *buf = dirs[i][0];
+      *buf = DC::dirs[i][0].toLatin1();
       return true;
     }
   }
@@ -492,13 +492,13 @@ int find_closest_path(int from, int steps, char *buf, std::map<int, int> z)
 
     if (DC::getInstance()->world[DC::getInstance()->world[from].dir_option[i]->to_room].paths)
     {
-      *buf = *dirs[i];
+      *buf = DC::dirs[i][0].toLatin1();
       *(buf + 1) = '\0';
       return DC::getInstance()->world[from].dir_option[i]->to_room;
     }
     if ((zenew = find_closest_path(DC::getInstance()->world[from].dir_option[i]->to_room, steps + 1, buf + 1, z)) != 0)
     {
-      *buf = *dirs[i];
+      *buf = DC::dirs[i][0].toLatin1();
       return zenew;
     }
   }

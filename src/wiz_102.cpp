@@ -4206,16 +4206,16 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
       std::tie(direction, remainder_args) = half_chop(remainder_args);
       for (x = 0; x <= 6; x++)
       {
-        if (is_abbrev(direction.c_str(), dirs[x]))
+        if (is_abbrev(direction.c_str(), DC::dirs[x]))
         {
           if (DC::getInstance()->world[ch->in_room].dir_option[x] == nullptr)
           {
-            csendf(ch, "There is no %s exit.\r\n", dirs[x]);
+            csendf(ch, "There is no %s exit.\r\n", qPrintable(DC::dirs[x]));
             return ReturnValue::eFAILURE;
           }
 
           int16_t destination_room = DC::getInstance()->world[ch->in_room].dir_option[x]->to_room;
-          csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[x], ch->in_room, destination_room);
+          csendf(ch, "Deleting %s exit from room %d to %d.\r\n", qPrintable(DC::dirs[x]), ch->in_room, destination_room);
           free(DC::getInstance()->world[ch->in_room].dir_option[x]);
           DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
 
@@ -4227,7 +4227,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
               // and that reverse exit points to us then we can delete it too
               if (DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]->to_room == ch->in_room)
               {
-                csendf(ch, "Deleting %s exit from room %d to %d.\r\n", dirs[reverse_number[x]], destination_room, ch->in_room);
+                csendf(ch, "Deleting %s exit from room %d to %d.\r\n", qPrintable(DC::dirs[reverse_number[x]]), destination_room, ch->in_room);
                 free(DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]);
                 DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = nullptr;
                 return ReturnValue::eSUCCESS;
@@ -4235,7 +4235,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
               else
               {
                 csendf(ch, "Reverse %s exit in room %d does not point to room %d.\r\n",
-                       dirs[reverse_number[x]],
+                       qPrintable(DC::dirs[reverse_number[x]]),
                        destination_room,
                        ch->in_room);
                 return ReturnValue::eSUCCESS;
@@ -4244,13 +4244,13 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
             else
             {
               csendf(ch, "Reverse %s exit in room %d does not exist.\r\n",
-                     dirs[reverse_number[x]],
+                     qPrintable(DC::dirs[reverse_number[x]]),
                      destination_room);
               return ReturnValue::eSUCCESS;
             }
           } // end of check if Player::PLR_ONEWAY is toggled
           return ReturnValue::eSUCCESS;
-        } // end of is_abbred for dirs
+        } // end of is_abbred for DC::dirs
       } // end of for loop through directions
 
       ch->sendln("Missing direction you want to delete.");
@@ -4264,12 +4264,12 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("No such direction.");
         return ReturnValue::eFAILURE;
       }
-      if (is_abbrev(arg2.c_str(), dirs[x]))
+      if (is_abbrev(arg2.c_str(), DC::dirs[x]))
         break;
     }
     if (remainder_args.empty())
     {
-      csendf(ch, "Missing vnum of room you want to have %s exit connect to.\r\n", dirs[x]);
+      csendf(ch, "Missing vnum of room you want to have %s exit connect to.\r\n", qPrintable(DC::dirs[x]));
       return ReturnValue::eFAILURE;
     }
 
@@ -4356,9 +4356,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
     DC::getInstance()->world[ch->in_room].dir_option[x]->to_room = c;
     if (!remainder_args.empty())
     {
-      if (DC::getInstance()->world[ch->in_room].dir_option[x]->keyword)
-        dc_free(DC::getInstance()->world[ch->in_room].dir_option[x]->keyword);
-      DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = str_dup(remainder_args.c_str());
+      DC::getInstance()->world[ch->in_room].dir_option[x]->keyword = remainder_args.c_str();
     }
 
     ch->sendln("Ok.");
@@ -4469,7 +4467,7 @@ int do_redit(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("No such direction.");
         return ReturnValue::eFAILURE;
       }
-      if (is_abbrev(arg3.c_str(), dirs[x]))
+      if (is_abbrev(arg3.c_str(), DC::dirs[x]))
         break;
     }
 
@@ -4648,7 +4646,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("No such direction.");
         return ReturnValue::eFAILURE;
       }
-      if (is_abbrev(buf2, dirs[x]))
+      if (is_abbrev(buf2, DC::dirs[x]))
         break;
     }
 
@@ -4661,7 +4659,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
     DC::getInstance()->world[ch->in_room].dir_option[x] = 0;
     csendf(ch, "You stretch forth your hands and remove "
                "the %s exit.\r\n",
-           dirs[x]);
+           qPrintable(DC::dirs[x]));
   }
 
   else if (is_abbrev(buf, "extra"))
@@ -4692,7 +4690,7 @@ int do_rdelete(Character *ch, char *arg, cmd_t cmd)
         ch->sendln("No such direction.");
         return ReturnValue::eFAILURE;
       }
-      if (is_abbrev(buf, dirs[x]))
+      if (is_abbrev(buf, DC::dirs[x]))
         break;
     }
 
@@ -5353,21 +5351,15 @@ int do_rstat(Character *ch, char *argument, cmd_t cmd)
   {
     if (rm->dir_option[i])
     {
-      sprintf(buf, "Direction %s . Keyword : %s\r\n",
-              dirs[i], rm->dir_option[i]->keyword);
-      ch->send(buf);
-      strcpy(buf, "Description:\r\n  ");
+      ch->sendln(u"Direction %1 . Keyword : %2"_s.arg(DC::dirs[i]).arg(rm->dir_option[i]->keyword));
+      ch->send(u"Description:\r\n  "_s);
       if (!rm->dir_option[i]->general_description.isEmpty())
-        strcat(buf, qPrintable(rm->dir_option[i]->general_description));
+        ch->send(rm->dir_option[i]->general_description);
       else
-        strcat(buf, "UNDEFINED\r\n");
-      ch->send(buf);
+        ch->send("UNDEFINED\r\n");
+
       sprintbit(rm->dir_option[i]->exit_info, exit_bits, buf2);
-      sprintf(buf,
-              "Exit flag: %s \r\nKey no: %d\r\nTo room (V-Number): %d\r\n",
-              buf2, rm->dir_option[i]->key,
-              rm->dir_option[i]->to_room);
-      ch->send(buf);
+      ch->send(u"Exit flag: %1 \r\nKey no: %2\r\nTo room (V-Number): %3\r\n"_s.arg(buf2).arg(rm->dir_option[i]->key).arg(rm->dir_option[i]->to_room));
     }
   }
   return ReturnValue::eSUCCESS;

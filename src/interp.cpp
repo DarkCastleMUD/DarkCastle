@@ -609,6 +609,41 @@ int search_block(const char *orig_arg, const char **list, bool exact)
   return (-1);
 }
 
+int search_block(QString needle, QStringList list, bool exact)
+{
+  needle = needle.toLower();
+
+  if (exact)
+  {
+    for (auto i = 0; i < list.size(); i++)
+    {
+      auto haystack = list[i];
+      if (needle == haystack)
+      {
+        return (i);
+      }
+    }
+  }
+  else
+  {
+    for (auto i = 0; i < list.size(); i++)
+    {
+      auto haystack = list[i];
+      if (haystack.size() == 0 && needle.size() == 0)
+      {
+        return i;
+      }
+
+      if (needle.size() > 0 && !haystack.compare(needle))
+      {
+        return i;
+      }
+    }
+  }
+
+  return -1;
+}
+
 int search_blocknolow(char *arg, const char **list, bool exact)
 {
   int i;

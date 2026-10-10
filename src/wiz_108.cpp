@@ -85,7 +85,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (curExits->to_room > 0 && DC::getInstance()->world[curExits->to_room].zone != curZone)
         {
-          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3llu (%s)\r\n", i, dirs[dir], curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
+          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3llu (%s)\r\n", i, qPrintable(DC::dirs[dir]), curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
 
           output += buf;
         }

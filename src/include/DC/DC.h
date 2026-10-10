@@ -444,6 +444,7 @@ public:
   static const QString HINTS_FILE_NAME;
   static const QString DEFAULT_LIBRARY_PATH;
   static const QStringList connected_states;
+  static const QStringList dirs;
   static QList<bestowable_god_commands_type> bestowable_god_commands;
 
   Connection *descriptor_list = nullptr; /* master desc list */

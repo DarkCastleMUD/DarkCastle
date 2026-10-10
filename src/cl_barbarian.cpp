@@ -928,7 +928,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
 
   for (int i = 0; i < 6; i++)
   {
-    if (!str_prefix(direction, dirs[i]))
+    if (!str_prefix(direction, DC::dirs[i]))
     {
       dir = i + 1;
       break;
@@ -1183,7 +1183,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     {
       for (int i = 0; i < 6; i++)
       {
-        if (!str_prefix(where, dirs[i]))
+        if (!str_prefix(where, DC::dirs[i]))
         {
           dir = i + 1;
           break;
@@ -1267,17 +1267,17 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     else
     {
       sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
-      sprintf(buf2, "Your smash for | damage sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
-      sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), dirs[dir]);
+      sprintf(buf2, "Your smash for | damage sends %s reeling %s.", GET_SHORT(victim), qPrintable(DC::dirs[dir]));
+      sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), qPrintable(DC::dirs[dir]));
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
-      sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
-      sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), dirs[dir]);
+      sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", GET_NAME(ch), qPrintable(DC::dirs[dir]));
+      sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), qPrintable(DC::dirs[dir]));
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
 
       if (selfpurge)
         return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
-      sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
-      sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), dirs[dir]);
+      sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), qPrintable(DC::dirs[dir]));
+      sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), qPrintable(DC::dirs[dir]));
       send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
 
       if (victim->fighting)

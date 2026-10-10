@@ -3478,10 +3478,10 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, cmd_t cmd, const ch
     }
     int dir;
 
-    for (dir = 0; *dirs[dir] != '\n'; dir++)
-      if (!str_cmp(dirs[dir], arg2))
+    for (dir = 0; dir < DC::dirs.size(); dir++)
+      if (DC::dirs[dir] == arg2)
         break;
-    if (*dirs[dir] == '\n' || !DC::getInstance()->world[ch->in_room].dir_option[dir])
+    if (!DC::getInstance()->world[ch->in_room].dir_option[dir])
     {
       ch->sendln("In what direction did you say?");
       return ReturnValue::eSUCCESS;

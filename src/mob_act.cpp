@@ -86,6 +86,7 @@ void mobile_activity(void)
   extern int mprog_cur_result;
 
   /* Examine all mobs. */
+  qDebug("%lu", DC::getInstance()->character_list.size());
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &ch : character_list)
   {

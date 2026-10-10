@@ -7538,7 +7538,7 @@ int do_flee(Character *ch, char *argument, cmd_t cmd)
         ch->setStanding();
         ;
 
-        QString tempcommand = dirs[attempt];
+        QString tempcommand = DC::dirs[attempt];
 
         // we do this so that any spec procs overriding movement can take effect
         SET_BIT(ch->combat, COMBAT_FLEEING);

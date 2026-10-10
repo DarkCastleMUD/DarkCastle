@@ -240,7 +240,7 @@ auto &operator<<(auto &out, const Room &room)
       string_to_file(out, room.dir_option[b]->general_description);
     else
       out << "~\n"; // print blank
-    if (room.dir_option[b]->keyword)
+    if (!room.dir_option[b]->keyword.isEmpty())
       string_to_file(out, room.dir_option[b]->keyword);
     else
       out << "~\n"; // print blank

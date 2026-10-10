@@ -2093,14 +2093,14 @@ int find_door(Character *ch, char *type, char *dir)
 
   if (*dir) /* a direction was specified */
   {
-    if ((door = search_block(dir, dirs, false)) == -1) /* Partial Match */
+    if ((door = search_block(dir, DC::dirs, false)) == -1) /* Partial Match */
     {
       ch->sendln("That's not a direction.");
       return (-1);
     }
 
     if (EXIT(ch, door))
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
         if (isexact(type, EXIT(ch, door)->keyword))
           return (door);
         else
@@ -2118,7 +2118,7 @@ int find_door(Character *ch, char *type, char *dir)
   {
     for (door = 0; door <= 5; door++)
       if (EXIT(ch, door))
-        if (EXIT(ch, door)->keyword)
+        if (!EXIT(ch, door)->keyword.isEmpty())
           if (isexact(type, EXIT(ch, door)->keyword))
             return (door);
 
@@ -2222,10 +2222,10 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
 
       if (isSet(EXIT(ch, door)->exit_info, EX_HIDDEN))
       {
-        if (EXIT(ch, door)->keyword)
+        if (!EXIT(ch, door)->keyword.isEmpty())
         {
           act("$n reveals a hidden $F!", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
-          csendf(ch, "You reveal a hidden %s!\r\n", fname((char *)EXIT(ch, door)->keyword).toStdString().c_str());
+          csendf(ch, "You reveal a hidden %s!\r\n", qPrintable(fname(EXIT(ch, door)->keyword)));
         }
         else
         {
@@ -2235,7 +2235,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        if (EXIT(ch, door)->keyword)
+        if (!EXIT(ch, door)->keyword.isEmpty())
           act("$n opens the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
         else
         {
@@ -2250,7 +2250,7 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
           if (back->to_room == ch->in_room)
           {
             REMOVE_BIT(back->exit_info, EX_CLOSED);
-            if ((back->keyword) && !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
+            if ((!back->keyword.isEmpty()) && !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               sprintf(buf, "The %s is opened from the other side.\r\n", fname(back->keyword).toStdString().c_str());
               send_to_room(buf, EXIT(ch, door)->to_room, true);
@@ -2347,7 +2347,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
     else
     {
       SET_BIT(EXIT(ch, door)->exit_info, EX_CLOSED);
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
         act("$n closes the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
       else
         act("$n closes the door.", ch, 0, 0, TO_ROOM, 0);
@@ -2358,8 +2358,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
           if (back->to_room == ch->in_room)
           {
             SET_BIT(back->exit_info, EX_CLOSED);
-            if ((back->keyword) &&
-                !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
+            if ((!back->keyword.isEmpty()) && !isSet(DC::getInstance()->world[EXIT(ch, door)->to_room].room_flags, QUIET))
             {
               sprintf(buf, "The %s closes quietly.\r\n", fname(back->keyword).toStdString().c_str());
               send_to_room(buf, EXIT(ch, door)->to_room, true);
@@ -2483,7 +2482,7 @@ int do_lock(Character *ch, char *argument, cmd_t cmd)
     else
     {
       SET_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
         act("$n locks the $F.", ch, 0, EXIT(ch, door)->keyword,
             TO_ROOM, 0);
       else
@@ -2557,7 +2556,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
     else
     {
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
         act("$n unlocks the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
       else
         act("$n unlocks the door.", ch, 0, 0, TO_ROOM, 0);
@@ -2569,7 +2568,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
             REMOVE_BIT(back->exit_info, EX_LOCKED);
 
       QString door_keyword = QStringLiteral("door");
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
       {
         door_keyword = fname(EXIT(ch, door)->keyword);
       }

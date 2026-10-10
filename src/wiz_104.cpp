@@ -1770,7 +1770,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
           {
             csendf(ch,
                    " $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n",
-                   DC::getInstance()->rooms[i].number, dirs[nr],
+                   DC::getInstance()->rooms[i].number, qPrintable(DC::dirs[nr]),
                    DC::getInstance()->rooms[i].dir_option[nr]->key);
           }
         }

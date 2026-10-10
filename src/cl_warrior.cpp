@@ -310,7 +310,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
   // a direction to retreat.
   one_argument(argument, buf);
 
-  if ((attempt = consttype(buf, dirs)) == -1)
+  if ((attempt = consttype(buf, DC::dirs)) == -1)
   {
     send_to_char("You are supposed to retreat towards a specific "
                  "direction...\r\n",

@@ -1389,7 +1389,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
           ch->sendln("You see nothing special.");
         }
 
-        if (isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (EXIT(ch, keyword_no)->keyword))
+        if (isSet(EXIT(ch, keyword_no)->exit_info, EX_CLOSED) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) && (!EXIT(ch, keyword_no)->keyword.isEmpty()))
         {
           sprintf(buffer, "The %s is closed.\r\n", fname(EXIT(ch, keyword_no)->keyword).toStdString().c_str());
           ch->send(buffer);
@@ -1397,7 +1397,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
         else
         {
           if (isSet(EXIT(ch, keyword_no)->exit_info, EX_ISDOOR) && !isSet(EXIT(ch, keyword_no)->exit_info, EX_HIDDEN) &&
-              EXIT(ch, keyword_no)->keyword)
+              !EXIT(ch, keyword_no)->keyword.isEmpty())
           {
             sprintf(buffer, "The %s is open.\r\n", fname(EXIT(ch, keyword_no)->keyword).toStdString().c_str());
             ch->send(buffer);

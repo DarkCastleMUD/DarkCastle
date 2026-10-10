@@ -1211,7 +1211,7 @@ void write_one_room(LegacyFile &lf, int a)
       string_to_file(f, DC::getInstance()->world[a].dir_option[b]->general_description);
     else
       dc_fprintf(f, "~\n"); // print blank
-    if (DC::getInstance()->world[a].dir_option[b]->keyword)
+    if (!DC::getInstance()->world[a].dir_option[b]->keyword.isEmpty())
       string_to_file(f, DC::getInstance()->world[a].dir_option[b]->keyword);
     else
       dc_fprintf(f, "~\n"); // print blank
@@ -1623,12 +1623,9 @@ void DC::free_world_from_memory(void)
 {
   for (auto &i : rooms.keys())
   {
-    for (int j = 0; j < 6; j++)
+    for (auto j = 0; j < 6; j++)
       if (world[i].dir_option[j])
-      {
-        dc_free(world[i].dir_option[j]->keyword);
-        dc_free(world[i].dir_option[j]);
-      }
+        world[i].dir_option[j] = {};
 
     world[i].FreeTracks();
   }
@@ -1727,10 +1724,7 @@ void Room::setup_dir(FILEPtr fl, int dir)
     char buf[200];
     sprintf(buf, "Room %d attemped to created two exits in the same direction.", number);
     logentry(buf, 0, DC::LogChannel::LOG_WORLD);
-    if (dir_option[dir]->keyword)
-      dc_free(dir_option[dir]->keyword);
-
-    dc_free(dir_option[dir]);
+    dir_option[dir] = {};
   }
 
   dir_option[dir] = (room_direction_data *)dc_alloc(1, sizeof(room_direction_data));

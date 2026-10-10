@@ -8,7 +8,6 @@ class Character;
 class class_skill_defines;
 class race_data;
 
-extern const char *dirs[];
 extern race_data races[];
 extern const char *spells[];
 extern const char *apply_types[];

@@ -1562,7 +1562,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
       }
 
       REMOVE_BIT(EXIT(ch, door)->exit_info, EX_LOCKED);
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
       {
         act("$n skillfully picks the lock of the $F.", ch, 0, EXIT(ch, door)->keyword, TO_ROOM, 0);
       }
@@ -1586,7 +1586,7 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
       }
 
       QString door_keyword = QStringLiteral("door");
-      if (EXIT(ch, door)->keyword)
+      if (!EXIT(ch, door)->keyword.isEmpty())
       {
         door_keyword = fname(EXIT(ch, door)->keyword);
       }

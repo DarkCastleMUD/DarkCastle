@@ -31,6 +31,7 @@ class Character;
 
 char *remove_trailing_spaces(char *arg);
 int search_block(const char *arg, const char **l, bool exact);
+int search_block(QString needle, QStringList list, bool exact);
 
 qsizetype old_search_block(QString arg, QStringList list, bool exact);
 qsizetype old_search_block(QString arg, const char **list, bool exact);

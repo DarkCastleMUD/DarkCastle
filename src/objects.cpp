@@ -597,7 +597,7 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
   }
   else
   {
-    sprintf(buf, "It flies with great speed %sward.\r\n", dirs[dir]);
+    sprintf(buf, "It flies with great speed %sward.\r\n", qPrintable(DC::dirs[dir]));
     send_to_room(buf, ch->in_room);
     sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
     send_to_room(buf, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);

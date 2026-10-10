@@ -679,7 +679,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   // Everyone
   if (!IS_AFFECTED(ch, AFF_SNEAK) && !IS_AFFECTED(ch, AFF_FOREST_MELD))
   {
-    sprintf(tmp, "$n leaves %s.", dirs[dir]);
+    sprintf(tmp, "$n leaves %s.", qPrintable(DC::dirs[dir]));
     act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
   }
   // Sneaking
@@ -688,12 +688,12 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     char tmp[100];
     if (!skill_success(ch, nullptr, SKILL_SNEAK))
     {
-      sprintf(tmp, "$n leaves %s.", dirs[dir]);
+      sprintf(tmp, "$n leaves %s.", qPrintable(DC::dirs[dir]));
       act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
     }
     else
     {
-      sprintf(tmp, "$n sneaks %s.", dirs[dir]);
+      sprintf(tmp, "$n sneaks %s.", qPrintable(DC::dirs[dir]));
       act(tmp, ch, 0, 0, TO_GROUP, INVIS_NULL);
       act(tmp, ch, 0, 0, TO_ROOM, GODS);
     }
@@ -703,14 +703,14 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   {
     if (DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_FOREST && DC::getInstance()->world[DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room].sector_type != SECT_SWAMP)
     {
-      sprintf(tmp, "$n leaves %s.", dirs[dir]);
+      sprintf(tmp, "$n leaves %s.", qPrintable(DC::dirs[dir]));
       REMBIT(ch->affected_by, AFF_FOREST_MELD);
       ch->sendln("You detach yourself from the forest.");
       act(tmp, ch, 0, 0, TO_ROOM, INVIS_NULL);
     }
     else
     {
-      sprintf(tmp, "$n sneaks %s.", dirs[dir]);
+      sprintf(tmp, "$n sneaks %s.", qPrintable(DC::dirs[dir]));
       act(tmp, ch, 0, 0, TO_ROOM, GODS);
     }
   }
@@ -915,7 +915,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
   {
     if (isSet(EXIT(ch, dir)->exit_info, EX_HIDDEN))
       ch->sendln("You can't go that way.");
-    else if (EXIT(ch, dir)->keyword)
+    else if (!EXIT(ch, dir)->keyword.isEmpty())
       csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, dir)->keyword).toStdString().c_str());
     else
       ch->sendln("It seems to be closed.");
@@ -1022,11 +1022,9 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
           strcpy(tmp, "You follow someone.\r\n\r\n");
         k->follower->send(tmp);
         // do_move(k->follower, "", cmd + 1);
-        char tempcommand[32];
-        strcpy(tempcommand, dirs[dir]);
         if (k->follower->fighting)
           stop_fighting(k->follower);
-        k->follower->command_interpreter(tempcommand);
+        k->follower->command_interpreter(DC::dirs[dir]);
       }
       else
       {

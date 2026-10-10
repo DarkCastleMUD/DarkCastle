@@ -564,6 +564,7 @@ void sprinttype(T type, QStringList names, char *result)
 std::string sprinttype(int type, std::vector<const char *>);
 
 int consttype(char *search_str, const char *names[]);
+int consttype(QString search_str, QStringList names);
 QString constindex(const qsizetype index, const QStringList names);
 time_info_data mud_time_passed(time_t t2, time_t t1);
 bool circle_follow(Character *ch, Character *victim);
@@ -835,6 +836,7 @@ T remove_non_color_codes(T input)
 }
 
 bool str_prefix(const char *astr, const char *bstr);
+bool str_prefix(QString astr, QString bstr);
 bool str_infix(QString astr, QString bstr);
 
 extern const char menu[];

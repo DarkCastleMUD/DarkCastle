@@ -12885,7 +12885,7 @@ int spell_lighted_path(uint8_t level, Character *ch, char *arg, int type, Charac
     sprintf(buf, "A %s called %s headed %s...\r\n",
             races[ptrack->race].singular_name,
             ptrack->trackee.toStdString().c_str(),
-            dirs[ptrack->direction]);
+            qPrintable(DC::dirs[ptrack->direction]));
     ch->send(buf);
     ptrack = ptrack->next;
   }
