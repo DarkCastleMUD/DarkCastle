@@ -15,6 +15,7 @@ vaults/vaultindex
 gcm.cache/
 _deps/
 .cache/
+callgrind.out.*
 
 # Local dev tooling (not part of the project)
 CLAUDE.md
