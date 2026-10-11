@@ -168,7 +168,10 @@ typedef QMap<zone_t, Zone> zones_t;
 
 class World
 {
+  DCPtr dc_{};
+
 public:
+  World(DCPtr dc) : dc_(dc) {}
   Room &operator[](room_t room_key);
 };
 
@@ -467,7 +470,7 @@ public:
   fd_set null_set = {};
   zones_t zones = {};
   QMap<room_t, Room> rooms;
-  class World world;
+  class World world = World(this);
   clan_data *clan_list{};
   clan_data *end_clan_list{};
   QMap<vnum_t, class obj_index_data> obj_index;

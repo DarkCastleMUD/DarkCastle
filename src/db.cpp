@@ -111,8 +111,8 @@ int load_debug = 0;
 
 Room &World::operator[](room_t room_key)
 {
-  auto i = DC::getInstance()->rooms.find(room_key);
-  if (i != DC::getInstance()->rooms.end())
+  auto i = dc_->rooms.find(room_key);
+  if (i != dc_->rooms.end())
     return *i;
 
   static Room nonexistent_room;
