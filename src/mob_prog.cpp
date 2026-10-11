@@ -4120,11 +4120,6 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
     mprg = DC::getInstance()->mob_index[mob->mobdata->vnum_].mobspec;
   }
 
-  if (mob->mobdata->vnum_ == 30013)
-  {
-    debugpoint();
-  }
-
   mprog_command_num = 0;
   for (; mprg != nullptr; mprg = next)
   {

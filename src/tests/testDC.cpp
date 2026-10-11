@@ -821,7 +821,7 @@ private slots:
       // room_t room_nr = {};
 
       Room original_room1 = DC::getInstance()->world[1];
-      room_t new_room_nr = DC::getInstance()->read_one_room(fl, one_new_world_file_item(legacyfile_filename));
+      room_t new_room_nr = DC::getInstance()->read_one_room(in, one_new_world_file_item(legacyfile_filename));
       QCOMPARE(new_room_nr, 1);
       Room new_room1 = DC::getInstance()->world[1];
       QCOMPARE(new_room1, original_room1);

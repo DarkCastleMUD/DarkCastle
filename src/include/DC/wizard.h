@@ -17,7 +17,6 @@ class Zone;
 /* Function headers */
 void display_punishes(Character *ch, Character *vict);
 char *str_str(char *first, char *second);
-void setup_dir(FILEPtr fl, room_t room, int dir);
 int real_roomb(int virt);
 void save_ban_list(void);
 void save_nonew_new_list(void);

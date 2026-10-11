@@ -223,7 +223,7 @@ public:
   void FreeTracks();
   int darkAmount(void);
   bool isDark(void);
-  void setup_dir(FILEPtr fl, int dir);
+  void setup_dir(QTextStream &fl, int dir);
 
   enum class room_errors_t
   {

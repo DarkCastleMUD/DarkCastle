@@ -302,11 +302,16 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message = "Current li
 
 int64_t fread_int(FILEPtr fl, int64_t minval, int64_t maxval, bool warnings = true);
 int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range);
-template <class T>
-T fread_int(QTextStream &in, T minval = std::numeric_limits<T>::min(), T maxval = std::numeric_limits<T>::max());
+template <typename T>
+T fread_int(QTextStream &in)
+{
+  T number;
+  in >> number >> Qt::ws;
+  return number;
+}
 
 quint64 fread_uint(FILEPtr fl, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max());
-quint64 fread_uint(auto &in, quint64 minval = std::numeric_limits<quint64>::min(), quint64 maxval = std::numeric_limits<quint64>::max())
+quint64 fread_uint(auto &in)
 {
   quint64 val;
   in >> val;

@@ -1250,10 +1250,9 @@ void write_one_room(LegacyFile &lf, int a)
   dc_fprintf(f, "S\n");
 }
 
-room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_item)
+room_t DC::read_one_room(QTextStream &fl, world_file_list_itemPtr world_file_list_item)
 {
   assert(world_file_list_item);
-  char *temp = nullptr;
   char ch = 0;
   int dir = 0;
   zone_t zone_nr = {};
@@ -1263,7 +1262,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
   room_t room_nr{};
   if (ch != '$')
   {
-    room_nr = fread_int(fl, 0, 1000000);
+    room_nr = fread_int<room_t>(fl);
     if (room_nr)
       rooms[room_nr] = {};
 
@@ -1276,7 +1275,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       fflush(stdout);
     }
 
-    temp = fread_string(fl, 0);
+    auto temp = fread_qstring(fl);
 
     if (room_nr)
     {
@@ -1298,7 +1297,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       room.number = room_nr;
       room.name = temp;
     }
-    char *description = fread_string(fl, 0);
+    auto description = fread_qstring(fl);
     if (room_nr)
     {
       room.description = description;
@@ -1309,7 +1308,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       total_rooms++;
     }
     // Ignore recorded zone number since it may not longer be valid
-    fread_int(fl, -1, 64000); // zone nr
+    fread_int<int>(fl); // zone nr
 
     if (room_nr)
     {
@@ -1351,7 +1350,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       }
     }
 
-    uint32_t room_flags = fread_bitvector(fl, -1, 2147483467);
+    uint32_t room_flags = fread_int<uint32_t>(fl);
 
     if (room_nr)
     {
@@ -1363,7 +1362,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       room.temp_room_flags = 0;
     }
 
-    int sector_type = fread_int(fl, -1, 64000);
+    int sector_type = fread_int<int>(fl);
 
     if (room_nr)
     {
@@ -1393,7 +1392,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       /* direction field */
       if (ch == 'D')
       {
-        dir = fread_int(fl, 0, 5);
+        dir = fread_int<int>(fl);
         room.setup_dir(fl, dir);
       }
       /* extra description field */
@@ -1401,7 +1400,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       {
         // strip off the \n after the E
         if (fread_char(fl) != '\n')
-          dc_fseek(fl, -1, SEEK_CUR);
+          fl.seek(-1);
         auto keyword = fread_qstring(fl);
         auto description = fread_qstring(fl);
 
@@ -1414,7 +1413,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
       {
         deny_data *deni;
         deni = (deny_data *)dc_alloc(1, sizeof(deny_data));
-        deni->vnum = fread_int(fl, -1, 2147483467);
+        deni->vnum = fread_int<vnum_t>(fl);
 
         if (room_nr)
         {
@@ -1430,7 +1429,7 @@ room_t DC::read_one_room(FILEPtr fl, world_file_list_itemPtr world_file_list_ite
         break;
       else if (ch == 'C')
       {
-        int c_class = fread_int(fl, 0, CLASS_MAX);
+        int c_class = fread_int<int>(fl);
         if (room_nr)
         {
           room.allow_class[c_class] = true;
@@ -1696,16 +1695,18 @@ void DC::boot_world(void)
        filename = read_next_worldfile_name(stream))
   {
     if (cf.verbose_mode)
+    {
       logentry(filename, 0, DC::LogChannel::LOG_MISC);
+    }
 
-    auto fl = dc_fopen(qPrintable(filename), "r");
-    auto fopen_errno = errno;
-    if (!fl)
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
       logentry(QStringLiteral("boot_world: could not open world file '%1': %2.").arg(filename).arg(strerror(fopen_errno)), 0, DC::LogChannel::LOG_BUG);
 
       abort();
     }
+    QTextStream fl(&file);
 
     auto pItem = new_world_file_item(filename);
     while (read_one_room(fl, pItem))
@@ -1715,7 +1716,7 @@ void DC::boot_world(void)
 }
 
 /* read direction data */
-void Room::setup_dir(FILEPtr fl, int dir)
+void Room::setup_dir(QTextStream &fl, int dir)
 {
   int tmp;
 
@@ -1735,21 +1736,15 @@ void Room::setup_dir(FILEPtr fl, int dir)
   auto keyword = fread_qstring(fl);
   dir_option[dir]->keyword = keyword;
 
-  tmp = fread_bitvector(fl, -1, 300); /* tjs hack - not the right range */
+  tmp = fread_int<int>(fl);
 
   dir_option[dir]->exit_info = tmp;
   dir_option[dir]->bracee = nullptr;
-  int16_t key = fread_int(fl, -62000, 62000);
+  int16_t key = fread_int<int16_t>(fl);
   dir_option[dir]->key = key;
 
-  int16_t to_room = DC::NOWHERE;
-  try
-  {
-    to_room = fread_int(fl, 0, 62000);
-  }
-  catch (...)
-  {
-  }
+  room_t to_room = DC::NOWHERE;
+  to_room = fread_int<room_t>(fl);
 
   dir_option[dir]->to_room = to_room;
 }
@@ -3170,7 +3165,7 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
   obj->obj_flags.value[1] = fread_int<object_value_t>(fl);
   obj->obj_flags.value[2] = fread_int<object_value_t>(fl);
   obj->obj_flags.value[3] = fread_int<object_value_t>(fl);
-  obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(fl, 0, IMPLEMENTER);
+  obj->obj_flags.eq_level = fread_int<decltype(obj->obj_flags.eq_level)>(fl);
 
   obj->obj_flags.weight = fread_int<decltype(obj->obj_flags.weight)>(fl);
   obj->obj_flags.cost = fread_int<decltype(obj->obj_flags.cost)>(fl);
@@ -3232,7 +3227,7 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
     case 'A':
       // these are only two members of obj_affected_type, so nothing else needs initializing
       loc = fread_int<decltype(loc)>(fl);
-      mod = fread_int<decltype(mod)>(fl, -1000, 1000);
+      mod = fread_int<decltype(mod)>(fl);
       add_obj_affect(obj, loc, mod);
       break;
 
@@ -3456,7 +3451,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 
   obj->obj_flags.type_flag = fread_int(in, -1000, 2147483467);
 
-  obj->obj_flags.extra_flags = fread_bitvector(in, 0, 2147483467);
+  obj->obj_flags.extra_flags = fread_uint(in);
   obj->obj_flags.wear_flags = fread_bitvector<ObjectPositions>(in);
   obj->obj_flags.size = fread_bitvector(in, 0, 2147483467);
 
@@ -4032,15 +4027,18 @@ quint64 countMobsInRoom(quint64 vnum, room_t room_id)
 
 quint64 countMobsInWorld(quint64 vnum)
 {
-  quint64 count = {};
-  for (const auto ch : DC::getInstance()->character_list)
-  {
-    if (ch->mobdata && ch->mobdata->vnum_ == vnum && ch->in_room != DC::NOWHERE)
+  return DC::getInstance()->mob_index.value(vnum).qty;
+
+  /*  quint64 count = {};
+    for (const auto ch : DC::getInstance()->character_list)
     {
-      count++;
+      if (ch->mobdata && ch->mobdata->vnum_ == vnum && ch->in_room != DC::NOWHERE)
+      {
+        count++;
+      }
     }
-  }
-  return count;
+    return count;
+    */
 }
 
 /* execute the reset command table of a given zone */
@@ -4495,7 +4493,7 @@ QString fread_qstring(QTextStream &stream, bool *ok)
   assert(stream.status() == QTextStream::Status::Ok);
   QString buffer;
 
-  qDebugQTextStreamLine(stream, "before fread_string()");
+  // qDebugQTextStreamLine(stream, "before fread_string()");
   do
   {
     QString line = stream.readLine();
@@ -4507,8 +4505,8 @@ QString fread_qstring(QTextStream &stream, bool *ok)
         *ok = true;
       }
       assert(stream.status() == QTextStream::Status::Ok);
-      qDebug() << "fread_string returning" << buffer + line << (buffer + line).length();
-      qDebugQTextStreamLine(stream, "after fread_string()");
+      // qDebug() << "fread_qstring returning" << buffer + line << (buffer + line).length();
+      // qDebugQTextStreamLine(stream, "after fread_qstring()");
       return buffer + line;
     }
     else
@@ -4523,8 +4521,8 @@ QString fread_qstring(QTextStream &stream, bool *ok)
     *ok = false;
   }
   assert(stream.status() == QTextStream::Status::Ok);
-  qDebug() << "fread_string returning" << buffer << buffer.length();
-  qDebugQTextStreamLine(stream, "after fread_string()");
+  // qDebug() << "fread_qstring returning" << buffer << buffer.length();
+  // qDebugQTextStreamLine(stream, "after fread_qstring()");
   return buffer;
 }
 
@@ -4981,60 +4979,6 @@ int64_t fread_int(std::ifstream &in, int64_t beg_range, int64_t end_range)
   return number;
 }
 
-template <typename T>
-T fread_int(QTextStream &in, T beg_range, T end_range)
-{
-  T number;
-
-  QString line = qDebugQTextStreamLine(in, "");
-  QStringList namelist = line.split(' ');
-  QString arg1 = namelist.value(0);
-  in >> number >> Qt::ws;
-
-  bool ok = false;
-  if (std::is_signed<T>::value)
-  {
-    if (arg1.toLongLong(&ok) != number && ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
-    }
-    else if (!ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> arg2.toLongLong not ok.").arg(typeid(beg_range).name()));
-    }
-  }
-  else if (std::is_unsigned<T>::value)
-  {
-    if (arg1.toULongLong(&ok) != number && ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> value %2 from \"%3\" != %4").arg(typeid(beg_range).name()).arg(arg1.toULongLong(&ok)).arg(arg1).arg(number));
-    }
-    else if (!ok)
-    {
-      logentry(QStringLiteral("fread_int<%1> arg2.toULongLong not ok.").arg(typeid(beg_range).name()));
-    }
-  }
-  else
-  {
-    qFatal("arg1 neither signed nor unsigned");
-  }
-
-  if (number < beg_range)
-  {
-    qDebug("increasing number");
-    number = beg_range;
-  }
-  else if (number > end_range)
-  {
-    qDebug("decreasing number");
-    number = end_range;
-  }
-
-  // qDebug() << "fread_int returning" << number;
-  // qDebugQTextStreamLine(in, "After fread_int");
-  return number;
-}
-
 /*
  fread_int has the nasty habit of reading on white
  space char after the int it reads.  This can goof
@@ -5136,7 +5080,7 @@ char fread_char(QTextStream &fl)
   }
 
   char c;
-  fl >> c;
+  fl >> c >> Qt::ws;
 
   return c;
 }
@@ -5251,6 +5195,12 @@ void free_char(Character *ch, Trace trace)
   }
   else if (ch->mobdata != nullptr)
   {
+    if (ch->mobdata->vnum_ &&
+        DC::getInstance()->mob_index.contains(ch->mobdata->vnum_) &&
+        DC::getInstance()->mob_index[ch->mobdata->vnum_].qty)
+    {
+      DC::getInstance()->mob_index[ch->mobdata->vnum_].qty--;
+    }
     remove_memory(ch, 'f');
     remove_memory(ch, 'h');
     while (ch->mobdata->mpact)
