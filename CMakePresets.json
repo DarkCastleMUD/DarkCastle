@@ -37,6 +37,15 @@
             }
         },
         {
+            "name": "profile",
+            "displayName": "Profile Config",
+            "description": "profile build using Ninja generator",
+            "inherits": "debug",
+            "cacheVariables": {
+                "CMAKE_CXX_FLAGS": "-Wno-write-strings -fprofile-instr-generate -fcoverage-mapping"
+            }
+        },
+        {
             "name": "release",
             "displayName": "Release Config",
             "description": "release build using Ninja generator",
@@ -67,6 +76,11 @@
             "verbose": true
         },
         {
+            "name": "profile",
+            "configurePreset": "profile",
+            "verbose": true
+        },
+        {
             "name": "release",
             "configurePreset": "release",
             "verbose": true
@@ -92,6 +106,17 @@
         {
             "name": "debugtracy",
             "configurePreset": "debugtracy",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "profile",
+            "configurePreset": "profile",
             "output": {
                 "outputOnFailure": true
             },
@@ -145,6 +170,19 @@
                 {
                     "type": "build",
                     "name": "debugtracy"
+                }
+            ]
+        },
+        {
+            "name": "profile",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "profile"
+                },
+                {
+                    "type": "build",
+                    "name": "profile"
                 }
             ]
         },
