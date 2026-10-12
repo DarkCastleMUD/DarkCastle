@@ -881,7 +881,9 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   int o = 1;
   Object *obj;
   char buf[MAX_STRING_LENGTH];
-  for (auto r = DC::getInstance()->obj_index.firstKey(); r <= DC::getInstance()->obj_index.lastKey(); r++)
+  auto obj_index_vnums = DC::getInstance()->obj_index.keys();
+  std::ranges::sort(obj_index_vnums);
+  for (auto r = obj_index_vnums.first(); r <= obj_index_vnums.last(); r++)
   {
     obj = DC::getInstance()->obj_index[r].item;
     if (GET_ITEM_TYPE(obj) != ITEM_ARMOR)

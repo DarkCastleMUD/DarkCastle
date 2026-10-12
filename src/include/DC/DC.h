@@ -473,8 +473,8 @@ public:
   class World world = World(this);
   clan_data *clan_list{};
   clan_data *end_clan_list{};
-  QMap<vnum_t, class obj_index_data> obj_index;
-  QMap<vnum_t, class mob_index_data> mob_index;
+  QHash<vnum_t, class obj_index_data> obj_index;
+  QHash<vnum_t, class mob_index_data> mob_index;
   world_file_list_t world_file_list{}; // List of the world files
   world_file_list_t mob_file_list{};   // List of the mob files
   world_file_list_t obj_file_list{};   // List of the obj files

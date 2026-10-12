@@ -1915,13 +1915,18 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   if (rnum < 0)
     return;
 
+  auto mob_index_vnums = DC::getInstance()->mob_index.keys();
+  if (mob_index_vnums.isEmpty())
+    return;
+
   for (int i = 0; i < amount; i++)
   {
     vnum_t mob = {};
     Character *vict;
     while (1)
     {
-      mob = number<vnum_t>(1, DC::getInstance()->mob_index.lastKey());
+      // pick a random mob vnum
+      mob = mob_index_vnums.value(number<vnum_t>(0, mob_index_vnums.size() - 1));
       vnum_t vnum = DC::getInstance()->mob_index[mob].vnum(); // debug
       if (!(DC::getInstance()->mob_index[mob].vnum() > 300 &&
             (DC::getInstance()->mob_index[mob].vnum() < 2300 || DC::getInstance()->mob_index[mob].vnum() > 2499) &&

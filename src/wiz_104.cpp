@@ -899,7 +899,10 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        for (i = begin; i <= DC::getInstance()->mob_index.last().vnum() && i <= end; i++)
+        auto mob_index_vnums = DC::getInstance()->mob_index.keys();
+        std::ranges::sort(mob_index_vnums);
+
+        for (i = begin; i <= mob_index_vnums.last() && i <= end; i++)
         {
           nr = i;
           if (!DC::getInstance()->mob_index.contains(i))
@@ -998,7 +1001,9 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       }
       else
       {
-        for (i = begin; i <= DC::getInstance()->obj_index[DC::getInstance()->obj_index.lastKey()].vnum() && i <= end; i++)
+        auto obj_index_vnums = DC::getInstance()->obj_index.keys();
+        std::ranges::sort(obj_index_vnums);
+        for (i = begin; i <= obj_index_vnums.last() && i <= end; i++)
         {
           nr = i;
           if (!DC::getInstance()->obj_index.contains(nr))
@@ -1358,7 +1363,9 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("No valid search supplied.");
       return ReturnValue::eFAILURE;
     }
-    for (c = 0; c < DC::getInstance()->mob_index.last().vnum(); c++)
+    auto mob_index_vnums = DC::getInstance()->mob_index.keys();
+    std::ranges::sort(mob_index_vnums);
+    for (c = 0; c < mob_index_vnums.last(); c++)
     {
       nr = c;
       if (!DC::getInstance()->mob_index.contains(c))
@@ -1629,7 +1636,9 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eSUCCESS;
     }
 
-    for (c = 0; c < DC::getInstance()->obj_index[DC::getInstance()->obj_index.lastKey()].vnum(); c++)
+    auto obj_index_vnums = DC::getInstance()->obj_index.keys();
+    std::ranges::sort(obj_index_vnums);
+    for (c = 0; c < obj_index_vnums.last(); c++)
     {
       found = false;
       nr = c;
