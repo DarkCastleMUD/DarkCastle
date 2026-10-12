@@ -469,7 +469,7 @@ public:
   fd_set exc_set = {};
   fd_set null_set = {};
   zones_t zones = {};
-  QMap<room_t, Room> rooms;
+  QHash<room_t, Room> rooms;
   class World world = World(this);
   clan_data *clan_list{};
   clan_data *end_clan_list{};
