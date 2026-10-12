@@ -610,9 +610,9 @@ public:
   class Object *read_object(int nr, FILEPtr fl, bool zz);
   class Object *read_object(int nr, QTextStream &fl, bool zz);
 
-  // void load_entities(QMap<vnum_t, class mob_index_data> &index);
-  // void DC::load_entities(QMap<vnum_t, class mob_index_data> &index)
-  // void DC::load_entities(QMap<vnum_t, class obj_index_data> &index)
+  // void load_entities(QHash<vnum_t, class mob_index_data> &index);
+  // void DC::load_entities(QHash<vnum_t, class mob_index_data> &index)
+  // void DC::load_entities(QHash<vnum_t, class obj_index_data> &index)
   template <typename T>
   void load_entities(T &index)
   {
@@ -668,12 +668,12 @@ public:
             pItem->enableVNUM(vnum);
             currentVNUM(index[vnum].vnum());
 
-            if constexpr (std::is_same_v<T, QMap<vnum_t, class mob_index_data>>)
+            if constexpr (std::is_same_v<T, QHash<vnum_t, class mob_index_data>>)
             {
               if (!(index[vnum].mob = read_mobile(vnum, stream)))
                 logbug(u"Unable to load mobile %1!\r\n"_s.arg(index[vnum].vnum()));
             }
-            else if constexpr (std::is_same_v<T, QMap<vnum_t, class obj_index_data>>)
+            else if constexpr (std::is_same_v<T, QHash<vnum_t, class obj_index_data>>)
             {
               if (!(index[vnum].item = read_object(vnum, stream, false)))
                 logbug(u"Unable to load object %1!\r\n"_s.arg(index[vnum].vnum()));
@@ -694,7 +694,7 @@ public:
       add_mobspec(vnum);
   }
 
-  // void load_objects(QMap<vnum_t, class obj_index_data> &index);
+  // void load_objects(QHash<vnum_t, class obj_index_data> &index);
   Character *clone_mobile(int nr);
   auto create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   auto create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>;
