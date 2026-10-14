@@ -709,6 +709,7 @@ public:
   int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
   int oprog_rand_trigger(Object *item);
   int oprog_arand_trigger(Object *item);
+  void mobile_activity(void);
 
   ~DC(void)
   {

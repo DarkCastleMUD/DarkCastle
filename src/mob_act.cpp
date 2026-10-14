@@ -12,14 +12,6 @@
  *  This is free software and you are benefitting.  We hope that you       *
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
-/**************************************************************************/
-/* Revision History                                                       */
-/* 12/05/2003   Onager   Created is_protected() to break out PFE/PFG code */
-/* 12/05/2003   Onager   Created scavenge() to simplify mobile_activity() */
-/* 12/06/2003   Onager   Modified mobile_activity() to prevent charmie    */
-/*                       scavenging                                       */
-/**************************************************************************/
-/* $Id: mob_act.cpp,v 1.52 2014/07/04 22:00:04 jhhudso Exp $ */
 
 #include <qcompare.h>
 #include <qsharedpointer.h>
@@ -74,7 +66,7 @@ bool is_r_denied(Character *ch, room_t room)
       return true;
   return false;
 }
-void mobile_activity(void)
+void DC::mobile_activity(void)
 {
   Character *tmp_ch, *pch;
   class Object *obj, *best_obj;
@@ -86,8 +78,7 @@ void mobile_activity(void)
   extern int mprog_cur_result;
 
   /* Examine all mobs. */
-  qDebug("%lu", DC::getInstance()->character_list.size());
-  const auto &character_list = DC::getInstance()->character_list;
+  qDebug("before grand loop %lu", character_list.size());
   for (const auto &ch : character_list)
   {
     if (ch->isDead() || ch->isNowhere())
@@ -106,12 +97,10 @@ void mobile_activity(void)
     if (isSet(ch->combat, COMBAT_SHOCKED) || isSet(ch->combat, COMBAT_SHOCKED2))
       continue;
 
-    if ((isSet(ch->combat, COMBAT_STUNNED)) ||
-        (isSet(ch->combat, COMBAT_STUNNED2)))
+    if ((isSet(ch->combat, COMBAT_STUNNED)) || (isSet(ch->combat, COMBAT_STUNNED2)))
       continue;
 
-    if ((isSet(ch->combat, COMBAT_BASH1)) ||
-        (isSet(ch->combat, COMBAT_BASH2)))
+    if ((isSet(ch->combat, COMBAT_BASH1)) || (isSet(ch->combat, COMBAT_BASH2)))
       continue;
 
     retval = ReturnValue::eSUCCESS;
@@ -129,11 +118,11 @@ void mobile_activity(void)
       continue;
     }
 
-    if (DC::getInstance()->mob_index.contains(ch->mobdata->vnum_) && DC::getInstance()->mob_index[ch->mobdata->vnum_].non_combat_func)
+    if (mob_index.value(ch->mobdata->vnum_).non_combat_func)
     {
 
       PerfTimers["mprog"].start();
-      retval = ((*DC::getInstance()->mob_index[ch->mobdata->vnum_].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
+      retval = ((*mob_index[ch->mobdata->vnum_].non_combat_func)(ch, 0, cmd_t::UNDEFINED, "", ch));
       PerfTimers["mprog"].stop();
 
       if (!isSet(retval, ReturnValue::eFAILURE) || SOMEONE_DIED(retval) || ch->isDead() || ch->isNowhere())
@@ -164,7 +153,7 @@ void mobile_activity(void)
     // Only activate mprog random triggers if someone is in the zone
     try
     {
-      if (DC::getInstance()->zones.value(DC::getInstance()->world[ch->in_room].zone).players)
+      if (zones.value(world[ch->in_room].zone).players)
       {
         retval = mprog_random_trigger(ch);
         if (isSet(retval, ReturnValue::eCH_DIED) || ch->isDead() || ch->isNowhere())
@@ -181,7 +170,7 @@ void mobile_activity(void)
     }
     catch (...)
     {
-      logentry(QStringLiteral("error in mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
+      logentry(QStringLiteral("error in DC::mobile_activity. dumping core."), IMMORTAL, DC::LogChannel::LOG_BUG);
       produce_coredump(ch);
     }
 
@@ -217,7 +206,7 @@ void mobile_activity(void)
     // TODO - this really should be cleaned up and put into functions look at it and you'll
     //    see what I mean.
 
-    if (DC::getInstance()->world[ch->in_room].contents &&
+    if (world[ch->in_room].contents &&
         ISSET(ch->mobdata->actflags, ACT_SCAVENGER) &&
         !IS_AFFECTED(ch, AFF_CHARM) &&
         number(0, 2) == 0)
@@ -232,11 +221,11 @@ void mobile_activity(void)
     // into the above SCAVENGER if statement, and streamline them both to be more effecient
 
     // Scavenge
-    if (ISSET(ch->mobdata->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && DC::getInstance()->world[ch->in_room].contents && number(0, 4) == 0)
+    if (ISSET(ch->mobdata->actflags, ACT_SCAVENGER) && !IS_AFFECTED(ch, AFF_CHARM) && world[ch->in_room].contents && number(0, 4) == 0)
     {
       max = 1;
       best_obj = 0;
-      for (obj = DC::getInstance()->world[ch->in_room].contents; obj; obj = obj->next_content)
+      for (obj = world[ch->in_room].contents; obj; obj = obj->next_content)
       {
         if (CAN_GET_OBJ(ch, obj) && obj->obj_flags.cost > max)
         {
@@ -269,13 +258,13 @@ void mobile_activity(void)
           logf(IMMORTAL, DC::LogChannel::LOG_BUG, "Error: Room %d has exit %d to room %d", ch->in_room, door, room_nr_past_door);
           continue;
         }
-        Room room_past_door = DC::getInstance()->world[room_nr_past_door];
-        if (!isSet(room_past_door.room_flags, NO_MOB) && !isSet(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !isSet(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == DC::getInstance()->world[ch->in_room].zone))
+        Room room_past_door = world[room_nr_past_door];
+        if (!isSet(room_past_door.room_flags, NO_MOB) && !isSet(room_past_door.room_flags, CLAN_ROOM) && (IS_AFFECTED(ch, AFF_FLYING) || !isSet(room_past_door.room_flags, (FALL_UP | FALL_SOUTH | FALL_NORTH | FALL_EAST | FALL_WEST | FALL_DOWN))) && (!ISSET(ch->mobdata->actflags, ACT_STAY_ZONE) || room_past_door.zone == world[ch->in_room].zone))
         {
           if (!is_r_denied(ch, EXIT(ch, door)->to_room) && ch->mobdata->last_direction == door)
             ch->mobdata->last_direction = -1;
           else if (!is_r_denied(ch, EXIT(ch, door)->to_room) && (!ISSET(ch->mobdata->actflags, ACT_STAY_NO_TOWN) ||
-                                                                 !DC::getInstance()->zones.value(DC::getInstance()->world[EXIT(ch, door)->to_room].zone).isTown()))
+                                                                 !zones.value(world[EXIT(ch, door)->to_room].zone).isTown()))
           {
             ch->mobdata->last_direction = door;
             auto cmd_dir = getCommandFromDirection(door);
@@ -298,7 +287,7 @@ void mobile_activity(void)
       //      Character *temp = get_char(get_random_hate(ch));
       done = 0;
 
-      for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = next_blah)
+      for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_blah)
       {
         next_blah = tmp_ch->next_in_room;
 
@@ -309,7 +298,7 @@ void mobile_activity(void)
         act("Checking $N", ch, 0, tmp_ch, TO_CHAR, 0);
         if (isexact(GET_NAME(tmp_ch), ch->mobdata->hated)) // use isname since hated is a list
         {
-          if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+          if (isSet(world[ch->in_room].room_flags, SAFE))
           {
             act("You growl at $N.", ch, 0, tmp_ch, TO_CHAR, 0);
             act("$n growls at YOU!.", ch, 0, tmp_ch, TO_VICT, 0);
@@ -357,7 +346,7 @@ void mobile_activity(void)
     /* Aggress */
     if (!ch->fighting) // don't aggro more than one person
       if (ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
-          !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
+          !isSet(world[ch->in_room].room_flags, SAFE))
       {
         Character *next_aggro;
         int targets = 1;
@@ -373,7 +362,7 @@ void mobile_activity(void)
         while (!done && targets)
         {
           targets = 0;
-          for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = next_aggro)
+          for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_aggro)
           {
             if (!tmp_ch || !ch)
             {
@@ -437,7 +426,7 @@ void mobile_activity(void)
           ISSET(ch->mobdata->actflags, ACT_AGGR_EVIL) ||
           ISSET(ch->mobdata->actflags, ACT_AGGR_NEUT) ||
           ISSET(ch->mobdata->actflags, ACT_AGGR_GOOD))
-        for (tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = pch)
+        for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = pch)
         {
           pch = tmp_ch->next_in_room;
 
@@ -481,7 +470,7 @@ void mobile_activity(void)
           //           continue;
 
           if ((tmp_ch->isPlayer() && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
-               !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE) &&
+               !isSet(world[ch->in_room].room_flags, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
               (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
                ))
@@ -614,7 +603,9 @@ void mobile_activity(void)
     // it just ends here.
 
   } // for() all mobs
-  DC::getInstance()->removeDead();
+  qDebug("after grand loop %lu", character_list.size());
+  removeDead();
+  qDebug("after removing dead %lu", character_list.size());
 }
 
 // Just a function to have mobs say random stuff when they are "suprised"

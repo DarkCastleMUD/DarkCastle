@@ -190,7 +190,6 @@ void pulse_takeover(void);
 void zone_update(void);
 void point_update(void); /* In limits.c */
 void food_update(void);  /* In limits.c */
-void mobile_activity(void);
 void object_activity(quint64 pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, QString str);
@@ -1093,6 +1092,7 @@ void DC::heartbeat(void)
     PerfTimers["mobile"].start();
     mobile_activity();
     PerfTimers["mobile"].stop();
+    qDebug("%lus %6luμs", PerfTimers["mobile"].getDiff().tv_sec, PerfTimers["mobile"].getDiff().tv_usec);
 
     PerfTimers["object"].start();
     object_activity(DC::PULSE_MOBILE);
