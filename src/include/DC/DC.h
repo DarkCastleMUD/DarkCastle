@@ -444,7 +444,7 @@ public:
   static constexpr int16_t PULSES_TO_RETURN_HOME = (10 * 60 * PASSES_PER_SEC) / PULSE_MOBILE;
   static constexpr level_t MAX_MORTAL_LEVEL = 60ULL;
   static constexpr quint64 PER_IP_CONNECTION_LIMIT = 20;
-  static constexpr auto MAX_MOBS_SAME_VNUM = 60U;
+  static constexpr auto MAX_MOBS_SAME_VNUM = 100U;
   static const QString HINTS_FILE_NAME;
   static const QString DEFAULT_LIBRARY_PATH;
   static const QStringList connected_states;
