@@ -78,7 +78,7 @@ void DC::mobile_activity(void)
   extern int mprog_cur_result;
 
   /* Examine all mobs. */
-  qDebug("before grand loop %lu", character_list.size());
+  // qDebug("before grand loop %lu", character_list.size());
   for (const auto &ch : character_list)
   {
     if (ch->isDead() || ch->isNowhere())
@@ -603,9 +603,9 @@ void DC::mobile_activity(void)
     // it just ends here.
 
   } // for() all mobs
-  qDebug("after grand loop %lu", character_list.size());
+  // qDebug("after grand loop %lu", character_list.size());
   removeDead();
-  qDebug("after removing dead %lu", character_list.size());
+  // qDebug("after removing dead %lu", character_list.size());
 }
 
 // Just a function to have mobs say random stuff when they are "suprised"
