@@ -2879,6 +2879,12 @@ void handle_automatic_mob_settings(Character *mob)
 
 Character *DC::clone_mobile(int nr)
 {
+  if (mob_index[nr].qty >= MAX_MOBS_SAME_VNUM)
+  {
+    logbug(u"Stopped attempt to clone mob %1 more than %2 times"_s.arg(nr).arg(MAX_MOBS_SAME_VNUM));
+    return {};
+  }
+
   int i;
   Character *mob, *old;
 
