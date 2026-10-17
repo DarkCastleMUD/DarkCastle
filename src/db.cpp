@@ -2877,37 +2877,30 @@ void handle_automatic_mob_settings(Character *mob)
   mob->max_hit = mob->raw_hit = mob->hit = mob_matrix[baselevel].hitpoints + ((mob_matrix[baselevel].hitpoints / 100) * percent);
 }
 
-Character *DC::clone_mobile(int nr)
+Character *DC::clone_mobile(vnum_t vnum)
 {
-  if (mob_index[nr].qty >= MAX_MOBS_SAME_VNUM)
+  if (!vnum)
+    return {};
+
+  if (mob_index[vnum].qty >= MAX_MOBS_SAME_VNUM)
   {
-    logbug(u"Stopped attempt to clone mob %1 more than %2 times"_s.arg(nr).arg(MAX_MOBS_SAME_VNUM));
+    logbug(u"Stopped attempt to clone mob %1 more than %2 times"_s.arg(vnum).arg(MAX_MOBS_SAME_VNUM));
     return {};
   }
 
-  int i;
-  Character *mob, *old;
-
-  if (nr < 0)
-    return 0;
-
-  mob = new Character(this);
-  old = DC::getInstance()->mob_index[nr].mob;
-
+  auto mob = new Character(this);
+  auto old = mob_index[vnum].mob;
   *mob = *old;
-
   mob->mobdata = MobilePtr::create(old->mobdata);
 
-  for (i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
+  for (auto i = 0; i < MAX_WEAR; i++) /* Initialisering Ok */
     mob->equipment[i] = 0;
 
-  mob->mobdata->vnum_ = nr;
+  mob->mobdata->vnum_ = vnum;
   mob->desc = 0;
   mob->mobdata->reset = {};
-
-  auto &character_list = DC::getInstance()->character_list;
   character_list.insert(mob);
-  DC::getInstance()->mob_index[nr].qty++;
+  mob_index[vnum].qty++;
   mob->next_in_room = 0;
 
   handle_automatic_mob_settings(mob);
@@ -2940,7 +2933,7 @@ Character *DC::clone_mobile(int nr)
   mob->mobdata->damsizedice = (int16_t)(mob->mobdata->damsizedice * mult);
   mob->damroll = (int16_t)(mob->damroll * mult);
   mob->hometown = old->in_room;
-  return (mob);
+  return mob;
 }
 
 // add a new item to the index.  To do this, we need to update ALL the
