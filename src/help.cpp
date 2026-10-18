@@ -99,7 +99,6 @@ command_return_t Character::do_new_help(QStringList arguments, cmd_t cmd)
 {
   extern char new_help[MAX_STRING_LENGTH];
   extern char new_ihelp[MAX_STRING_LENGTH];
-  help_index_element_new *this_help{};
   QString entry;
   QString key1, key2, key3, key4, key5, rec_level;
 
@@ -123,7 +122,8 @@ command_return_t Character::do_new_help(QStringList arguments, cmd_t cmd)
 
   auto arg1 = arguments.at(0);
 
-  if (auto this_help = find_help(arg1); !this_help)
+  auto this_help = find_help(arg1);
+  if (!this_help)
   {
     sendln(u"There is no help entry for \'%1\'."_s.arg(arg1));
 
