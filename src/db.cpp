@@ -1468,16 +1468,16 @@ QString read_next_zonefile_name(FILEPtr stream)
   return read_next_filename(stream, u"zonefiles"_s);
 }
 
-bool can_modify_this_room(Character *ch, int32_t vnum)
+bool can_modify_this_room(Character *ch, room_t room)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
 
   if (ch->player->buildLowVnum <= 0 || ch->player->buildHighVnum <= 0)
     return false;
-  if (ch->player->buildLowVnum > vnum)
+  if (ch->player->buildLowVnum > room)
     return false;
-  if (ch->player->buildHighVnum < vnum)
+  if (ch->player->buildHighVnum < room)
     return false;
   return true;
 }
