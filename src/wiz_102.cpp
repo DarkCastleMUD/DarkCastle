@@ -3057,7 +3057,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     mob_num = atoll(buf);
     mobvnum = mob_num;
-    if (!DC::getInstance()->mob_index.contains(mobvnum))
+    if (!DC::getInstance()->mob_index.contains(mobvnum) && strcmp(buf, "new") && strcmp(buf3, "new"))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", buf));
       return ReturnValue::eFAILURE;
@@ -3067,7 +3067,7 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
   {
     mobvnum = ch->player->last_mob_edit;
     mob_num = mobvnum;
-    if (!DC::getInstance()->mob_index.contains(mobvnum) && strcmp(buf, "new"))
+    if (!DC::getInstance()->mob_index.contains(mobvnum) && strcmp(buf, "new") && strcmp(buf3, "new"))
     {
       ch->send(fmt::format("{} is an invalid mob vnum.\r\n", mobvnum));
       return ReturnValue::eFAILURE;
@@ -3917,22 +3917,11 @@ int do_medit(Character *ch, char *argument, cmd_t cmd)
     // New
   case 30:
   {
-    if (!*buf4)
+    if (!can_modify_mobile(ch, mob_num))
     {
-      ch->sendln("$3Syntax$R: medit new [number]");
+      ch->sendln(u"You cannot create an NPC with vnum %1."_s.arg(mob_num));
       return ReturnValue::eFAILURE;
     }
-    if (!check_range_valid_and_convert(intval, buf4, 0, 35000))
-    {
-      ch->sendln("Please specifiy a valid number.");
-      return ReturnValue::eFAILURE;
-    }
-    if (!can_modify_mobile(ch, intval))
-    {
-      ch->sendln("You cannot create mobiles in that range.");
-      return ReturnValue::eFAILURE;
-    }
-    mob_num = intval;
     auto rc = ch->getDC()->create_blank_mobile(mob_num);
     if (!rc)
     {
