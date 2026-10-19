@@ -2967,11 +2967,11 @@ auto DC::create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>
   obj->ex_descriptions = {};
 
   // insert
-  DC::getInstance()->obj_index[vnum].vnum(vnum);
-  DC::getInstance()->obj_index[vnum].qty = 0;
-  DC::getInstance()->obj_index[vnum].non_combat_func = 0;
-  DC::getInstance()->obj_index[vnum].combat_func = 0;
-  DC::getInstance()->obj_index[vnum].item = obj;
+  obj_index[vnum].vnum(vnum);
+  obj_index[vnum].qty = 0;
+  obj_index[vnum].non_combat_func = 0;
+  obj_index[vnum].combat_func = 0;
+  obj_index[vnum].item = obj;
 
   return vnum;
 }
@@ -3016,34 +3016,34 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   mob->misc = 0;
 
   // insert
-  DC::getInstance()->mob_index[vnum].vnum(vnum);
-  DC::getInstance()->mob_index[vnum].qty = 0;
-  if (DC::getInstance()->mob_non_combat_functions.contains(vnum))
+  mob_index[vnum].vnum(vnum);
+  mob_index[vnum].qty = 0;
+  if (mob_non_combat_functions.contains(vnum))
   {
-    DC::getInstance()->mob_index[vnum].non_combat_func = DC::getInstance()->mob_non_combat_functions[vnum];
+    mob_index[vnum].non_combat_func = mob_non_combat_functions[vnum];
   }
   else
   {
-    DC::getInstance()->mob_index[vnum].non_combat_func = nullptr;
+    mob_index[vnum].non_combat_func = nullptr;
   }
 
-  if (DC::getInstance()->mob_combat_functions.contains(vnum))
+  if (mob_combat_functions.contains(vnum))
   {
-    DC::getInstance()->mob_index[vnum].combat_func = DC::getInstance()->mob_combat_functions[vnum];
+    mob_index[vnum].combat_func = mob_combat_functions[vnum];
   }
   else
   {
-    DC::getInstance()->mob_index[vnum].combat_func = nullptr;
+    mob_index[vnum].combat_func = nullptr;
   }
 
-  DC::getInstance()->mob_index[vnum].mob = mob;
+  mob_index[vnum].mob = mob;
 
-  DC::getInstance()->mob_index[vnum].mobprogs = 0;
-  DC::getInstance()->mob_index[vnum].mobspec = 0;
-  DC::getInstance()->mob_index[vnum].progtypes = 0;
+  mob_index[vnum].mobprogs = 0;
+  mob_index[vnum].mobspec = 0;
+  mob_index[vnum].progtypes = 0;
 
   // update index of all mobiles in game
-  // const auto &character_list = DC::getInstance()->character_list;
+  // const auto &character_list = character_list;
   // for_each(character_list.begin(), character_list.end(),
   //         [&vnum](Character *const &curr)
   //         {
@@ -3059,8 +3059,8 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   //   int i;
   for (i = 0; i < MAX_SHOP; i++)
   {
-    if (DC::getInstance()->shop_index[i].keeper >= vnum)
-      DC::getInstance()->shop_index[i].keeper++;
+    if (shop_index[i].keeper >= vnum)
+      shop_index[i].keeper++;
   }
   return vnum;
 }
