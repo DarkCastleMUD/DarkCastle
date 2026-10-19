@@ -1687,11 +1687,23 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   //  int type = 0;
 
   if (!traditional)
+  {
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+      qDebug("%s vs %s", buf, arg);
     translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+      qDebug("%s vs %s", buf, arg);
+  }
   else
+  {
     // switch order of traditional so it'd be $n(ispc), to conform with
     // new ifchecks
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+      qDebug("%s vs %s", arg, buf);
     translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+      qDebug("%s vs %s", arg, buf);
+  }
 
   if (val2[0] == '\0')
   {
@@ -3032,10 +3044,6 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
 
   *null = '\0';
 
-  Character *ur = nullptr;
-  if (ur)
-    ur->sendln("\r\nProg initiated.");
-
   if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
   {
     /* check for trueness of the ifcheck */
@@ -3046,8 +3054,6 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
       else
         return null;
     }
-    if (ur)
-      csendf(ur, "%d>%d\r\n", ifpos - 1, legal);
   }
   else
   {
@@ -3057,8 +3063,6 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
       flag = true;
     else if (legal < 0)
       return nullptr;
-    if (ur)
-      csendf(ur, "%d>-%d\r\n", thrw->cPos - 1, legal);
   }
 
   while (loopdone == false) /*scan over any existing or statements */
@@ -3085,8 +3089,6 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
           else
             return null;
         }
-        if (ur)
-          csendf(ur, "%d<%d\r\n", ifpos - 1, legal);
       }
       else
       {
@@ -3096,8 +3098,6 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
           flag = true;
         else if (legal < 0)
           return nullptr;
-        if (ur)
-          csendf(ur, "%d<-%d\r\n", thrw->cPos - 1, legal);
       }
     }
     else
@@ -3109,6 +3109,8 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
     {
       if (!str_cmp(buf, "if"))
       {
+        if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+          qDebug("here!!");
         com_list = mprog_process_if(morebuf, com_list, mob, actor, obj, vo, rndm, thrw);
         if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
           return null;
@@ -3260,8 +3262,12 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
     {
       if (!str_cmp(buf, "if"))
       {
-        com_list = mprog_process_if(morebuf, com_list, mob, actor,
-                                    obj, vo, rndm, thrw);
+        if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+          qDebug("mprog_process_if(morebuf=%s,com_list=%s", morebuf, com_list);
+        com_list = mprog_process_if(morebuf, com_list, mob, actor, obj, vo, rndm, thrw);
+        if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925)
+          qDebug("mprog_process_if(morebuf=%s,com_list=%s", morebuf, com_list);
+
         if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
           return null;
         while (*cmnd == ' ')
