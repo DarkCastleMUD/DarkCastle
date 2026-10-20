@@ -1117,15 +1117,30 @@ private slots:
 
     rc = do_look(ch, str_hsh(""));
     QCOMPARE(rc, ReturnValue::eSUCCESS);
-    QCOMPARE(conn->output, "Sadus' House of Fish and Pastries\r\n"
-                           "   You are standing inside a small bakery, filled with the aromatic smells of\r\n"
-                           "baking bread and sweet rolls.  Pastries and cakes are arranged behind a large\r\n"
-                           "glass walled counter.  A rack along the east wall holds an assortment of smoked\r\n"
-                           "fish and frozen pizzas.  A small sign sits on the counter, next to the large\r\n"
-                           "brass-keyed cash register, which gleams beneath its dusting of flour.\r\n"
-                           "Bob Baker is here, wiping flour from his face with one hand.\r\n"
-                           "-Bob Baker has: aura! flying!\r\n"
-                           "Exits: south \r\n");
+    auto expected = "Sadus' House of Fish and Pastries\r\n"
+                    "   You are standing inside a small bakery, filled with the aromatic smells of\r\n"
+                    "baking bread and sweet rolls.  Pastries and cakes are arranged behind a large\r\n"
+                    "glass walled counter.  A rack along the east wall holds an assortment of smoked\r\n"
+                    "fish and frozen pizzas.  A small sign sits on the counter, next to the large\r\n"
+                    "brass-keyed cash register, which gleams beneath its dusting of flour.\r\n"
+                    "Bob Baker is here, wiping flour from his face with one hand.\r\n"
+                    "-Bob Baker has: aura! flying!\r\n"
+                    "Exits: south \r\n"_ba;
+
+    // Debug code usable for finding exact character difference
+    //
+    // qDebug("%lld vs %lld", conn->output.size(), expected.size());
+    //
+    // for (auto i = 0LL; i < conn->output.size(); i++)
+    // {
+    //   if (conn->output[i] != expected[i])
+    //   {
+    //     qDebug("%lld different (%d)vs(%d)", i, conn->output[i], expected[i]);
+    //     break;
+    //   }
+    // }
+
+    QCOMPARE(conn->output, expected);
     conn->output = {};
 
     QCOMPARE(ch->command_interpreter("list"), ReturnValue::eSUCCESS);
