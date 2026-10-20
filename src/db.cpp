@@ -4506,7 +4506,7 @@ QString fread_qstring(QTextStream &stream, bool *ok)
       assert(stream.status() == QTextStream::Status::Ok);
       // qDebug() << "fread_qstring returning" << buffer + line << (buffer + line).length();
       // qDebugQTextStreamLine(stream, "after fread_qstring()");
-      return buffer + line;
+      return lf_to_crlf(buffer + line);
     }
     else
     {
@@ -4522,7 +4522,7 @@ QString fread_qstring(QTextStream &stream, bool *ok)
   assert(stream.status() == QTextStream::Status::Ok);
   // qDebug() << "fread_qstring returning" << buffer << buffer.length();
   // qDebugQTextStreamLine(stream, "after fread_qstring()");
-  return buffer;
+  return lf_to_crlf(buffer);
 }
 
 char *fread_string(QTextStream &in, bool hasher, bool *ok)
