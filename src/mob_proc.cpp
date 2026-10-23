@@ -685,7 +685,7 @@ int backstabber(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
           if (tch->fighting)
           {
 
-            act("$n circles around $s target....\r\n", ch, 0, 0, TO_ROOM,
+            act("$n circles around $s target....\n", ch, 0, 0, TO_ROOM,
                 INVIS_NULL);
             SET_BIT(ch->combat, COMBAT_CIRCLE);
           }
@@ -922,31 +922,31 @@ int guild_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       {
         if (ch->isPlayerObjectThief() || ch->isPlayerGoldThief())
         {
-          ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln("Despite your crimes, the guard allows you to go through because you're an immortal.\n");
           return ReturnValue::eFAILURE;
         }
         else if (IS_AFFECTED(ch, AFF_CHAMPION))
         {
           auto obj = get_obj_in_list_num(CHAMPION_ITEM, ch->carrying);
           if (obj && !obj->short_description.isEmpty())
-            ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\r\n").arg(obj->short_description));
+            ch->sendln(QStringLiteral("Despite having %1, the guard allows you to go through because you're an immortal.\n").arg(obj->short_description));
           else
-            ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\r\n"));
+            ch->sendln(QStringLiteral("Despite having the Champion Flag, the guard allows you to go through because you're an immortal.\n"));
           return ReturnValue::eFAILURE;
         }
         else if (GET_CLASS(ch) != clas)
         {
-          ch->sendln("Despite having the wrong class, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln("Despite having the wrong class, the guard allows you to go through because you're an immortal.\n");
           return ReturnValue::eFAILURE;
         }
         else if (align == 1 && !IS_EVIL(ch))
         {
-          ch->sendln("Despite not being evil, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln("Despite not being evil, the guard allows you to go through because you're an immortal.\n");
           return ReturnValue::eFAILURE;
         }
         else if (align == 3 && !IS_GOOD(ch))
         {
-          ch->sendln("Despite not being good, the guard allows you to go through because you're an immortal.\r\n");
+          ch->sendln("Despite not being good, the guard allows you to go through because you're an immortal.\n");
           return ReturnValue::eFAILURE;
         }
       }
@@ -2235,7 +2235,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
     ch->sendln("Available pets are:");
     for (pet = DC::getInstance()->world[pet_room].people; pet; pet = pet->next_in_room)
     {
-      sprintf(buf, "%8ld - %s\r\n", 3 * GET_EXP(pet), qPrintable(pet->short_desc));
+      sprintf(buf, "%8ld - %s\n", 3 * GET_EXP(pet), qPrintable(pet->short_desc));
       ch->send(buf);
     }
     return ReturnValue::eSUCCESS;
@@ -2280,7 +2280,7 @@ int pet_shops(Character *ch, cmd_t cmd, char const *arg)
       pet->setName(buf);
 
       sprintf(buf, "%sA small sign on a chain around the neck "
-                   "says 'My Name is %s'\r\n",
+                   "says 'My Name is %s'\n",
               qPrintable(pet->description), pet_name);
       pet->description = str_hsh(buf);
     }
@@ -2430,7 +2430,7 @@ int humaneater(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         if (GET_RACE(tch) != RACE_HUMAN)
           continue;
 
-        ch->do_say("Ahh...more humans have come to feed our hunger!!\r\n");
+        ch->do_say("Ahh...more humans have come to feed our hunger!!\n");
         return attack(ch, tch, TYPE_UNDEFINED);
       }
   }
@@ -2904,10 +2904,10 @@ int iasenko_combat(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   case 2:
     // earthquake
     act("$n utters the words, 'kao naga chi'", ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act("$n makes the earth tremble and shiver.\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     dam = number(6, 400);
     damage_all_players_in_room(ch, dam);
-    act("$n makes the earth tremble and shiver.\r\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
+    act("$n makes the earth tremble and shiver.\nYou fall, and hit yourself!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     dam = number(6, 400);
     damage_all_players_in_room(ch, dam);
     break;
@@ -3314,7 +3314,7 @@ int druid_elemental(Character *ch, class Object *obj,
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, "creates an elemental gateway and steps through.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "creates an elemental gateway and steps through.\n", cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
       act("An elemental gateway shimmers into existance and $n emerges.", ch, 0, 0, TO_ROOM, 0);
       return ReturnValue::eSUCCESS;
@@ -3348,7 +3348,7 @@ int gremlinthing(Character *ch)
     Character *gol = ch->master->player->golem;
     if (gol->hit < gol->max_hit)
     {
-      do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "climbs up its master's golem, hammering, tweaking and repairing.\n", cmd_t::DEFAULT);
       gol->hit += number(40, 60);
       if (gol->hit > gol->max_hit)
         gol->hit = gol->max_hit;
@@ -3381,9 +3381,9 @@ int mage_familiar_gremlin_non(Character *ch, class Object *obj,
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, "looks around, glances at its watch then skitters out of the room.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "looks around, glances at its watch then skitters out of the room.\n", cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "skitters into the room, anxiously looking for its master.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "skitters into the room, anxiously looking for its master.\n", cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
@@ -3439,9 +3439,9 @@ int mage_familiar_imp_non(Character *ch, class Object *obj, cmd_t cmd, const cha
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "looks around for its master, then *eep*'s quietly and dissolves into shadow.\n", cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "steps out of a nearby shadow relieved to be back in its master's presence.\n", cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
@@ -3527,9 +3527,9 @@ int druid_familiar_owl_non(Character *ch, class Object *obj, cmd_t cmd, const ch
     {
       if (ch->in_room != ch->master->in_room)
       {
-        do_emote(ch, "lifts from its perch and flies out of the room.\r\n", cmd_t::DEFAULT);
+        do_emote(ch, "lifts from its perch and flies out of the room.\n", cmd_t::DEFAULT);
         move_char(ch, ch->master->in_room);
-        do_emote(ch, "swoops into the room perching itself high up, watching its master.\r\n", cmd_t::DEFAULT);
+        do_emote(ch, "swoops into the room perching itself high up, watching its master.\n", cmd_t::DEFAULT);
         return ReturnValue::eFAILURE;
       }
 
@@ -3573,9 +3573,9 @@ int druid_familiar_chipmunk_non(Character *ch, class Object *obj, cmd_t cmd, con
   {
     if (ch->in_room != ch->master->in_room)
     {
-      do_emote(ch, "looks around for its master than runs off.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "looks around for its master than runs off.\n", cmd_t::DEFAULT);
       move_char(ch, ch->master->in_room);
-      do_emote(ch, "runs in and drops by its masters feet, obviously tired.\r\n", cmd_t::DEFAULT);
+      do_emote(ch, "runs in and drops by its masters feet, obviously tired.\n", cmd_t::DEFAULT);
       return ReturnValue::eFAILURE;
     }
 
@@ -3675,6 +3675,6 @@ int startrek_miles(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::PUSH)
     return ReturnValue::eFAILURE;
 
-  owner->do_say("Don't push anything.  This is highly sophisticated equipment.\r\n", cmd_t::DEFAULT);
+  owner->do_say("Don't push anything.  This is highly sophisticated equipment.\n", cmd_t::DEFAULT);
   return ReturnValue::eSUCCESS;
 }

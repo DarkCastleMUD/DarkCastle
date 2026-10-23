@@ -153,7 +153,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
 
   if (!(victim = ch->get_char_room_vis(vict.c_str())))
   {
-    ch->send(QStringLiteral("You see noone that goes by '%1' here.\r\n").arg(vict.c_str()));
+    ch->send(QStringLiteral("You see noone that goes by '%1' here.\n").arg(vict.c_str()));
     return ReturnValue::eSUCCESS;
   }
 
@@ -223,7 +223,7 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\r\n", GET_NAME(ch), arg);
+  sprintf(buf1, "\a$4$B**$R$5 %s prays: %s $4$B**$R\n", GET_NAME(ch), arg);
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
@@ -278,7 +278,7 @@ int do_gossip(Character *ch, char *argument, cmd_t cmd)
     if (!ch->isNonPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\r\n",
+                   "you find yourself unable to!\n",
                    ch);
       return ReturnValue::eSUCCESS;
     }
@@ -362,14 +362,14 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
-    send("SHHHHHH!! Can't you see people are trying to read?\r\n");
+    send("SHHHHHH!! Can't you see people are trying to read?\n");
     return ReturnValue::eSUCCESS;
   }
 
   for (tmp_obj = DC::getInstance()->world[in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
-      send("The magical silence prevents you from speaking!\r\n");
+      send("The magical silence prevents you from speaking!\n");
       return ReturnValue::eFAILURE;
     }
 
@@ -384,7 +384,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
     if (!this->isNonPlayer() && isSet(this->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\r\n",
+                   "you find yourself unable to!\n",
                    this);
       return ReturnValue::eSUCCESS;
     }
@@ -478,7 +478,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
   if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_SILENCED))
   {
     send_to_char("You must have somehow offended the gods, for you "
-                 "find yourself unable to!\r\n",
+                 "find yourself unable to!\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
@@ -490,7 +490,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
   if (ch->isPlayer() && ch->getLevel() < 3)
   {
     send_to_char("Due to misuse, you must be of at least 3rd level "
-                 "to shout.\r\n",
+                 "to shout.\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
@@ -557,7 +557,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\r\n",
+                   "you find yourself unable to!\n",
                    ch);
       return ReturnValue::eSUCCESS;
     }
@@ -569,7 +569,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
     if (ch->getLevel() < 3)
     {
       send_to_char("You must be at least 3rd level to participate in "
-                   "trivia.\r\n",
+                   "trivia.\n",
                    ch);
       return ReturnValue::eSUCCESS;
     }
@@ -650,7 +650,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\r\n",
+                   "you find yourself unable to!\n",
                    ch);
       return ReturnValue::eSUCCESS;
     }
@@ -685,8 +685,8 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("It must not have been that great!!");
   else
   {
-    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\r\n", GET_SHORT(ch), argument);
-    sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\r\n", argument);
+    sprintf(buf1, "$6%s dreams '$B$1%s$R$6'$R\n", GET_SHORT(ch), argument);
+    sprintf(buf2, "$6You dream '$B$1%s$R$6'$R\n", argument);
     send_to_char(buf2, ch);
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
     {
@@ -724,12 +724,12 @@ command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
     if (tell_history_timestamp == "0" || tell_history_timestamp.isEmpty())
     {
       ch->player->config->insert("tell.history.timestamp", "1");
-      ch->send(fmt::format("tell history timestamp turned on\r\n"));
+      ch->send(fmt::format("tell history timestamp turned on\n"));
     }
     else if (tell_history_timestamp == "1")
     {
       ch->player->config->insert("tell.history.timestamp", "0");
-      ch->send(fmt::format("tell history timestamp turned off\r\n"));
+      ch->send(fmt::format("tell history timestamp turned off\n"));
     }
 
     ch->save();
@@ -816,7 +816,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       this->sendln("That person is busy right now.");
       this->sendln("Your message has been saved.");
 
-      buf = fmt::format("$2$B{} told you, '{}'$R\r\n", PERS(this, vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$B{} told you, '{}'$R\n", PERS(this, vict), message.toStdString()).c_str();
       record_msg(buf, vict);
 
       buf = fmt::format("$2$B{} told you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
@@ -860,7 +860,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       }
     if (is_ignoring(vict, this))
     {
-      csendf(this, "%s is ignoring you right now.\r\n", GET_SHORT(vict));
+      csendf(this, "%s is ignoring you right now.\n", GET_SHORT(vict));
       return ReturnValue::eSUCCESS;
     }
     if (is_busy(vict) && level_ >= OVERSEER)
@@ -987,11 +987,11 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
     ch->sendln("Reply what?");
     if ((vict = get_char(ch->player->last_tell)) && CAN_SEE(ch, vict))
     {
-      ch->send(fmt::format("Last tell was from {}.\r\n", ch->player->last_tell.toStdString().c_str()));
+      ch->send(fmt::format("Last tell was from {}.\n", ch->player->last_tell.toStdString().c_str()));
     }
     else
     {
-      ch->send("Last tell was from someone you cannot currently see.\r\n");
+      ch->send("Last tell was from someone you cannot currently see.\n");
     }
 
     return ReturnValue::eSUCCESS;
@@ -1219,7 +1219,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
     if (isSet(ch->player->punish, PUNISH_SILENCED))
     {
       send_to_char("You must have somehow offended the gods, for "
-                   "you find yourself unable to!\r\n",
+                   "you find yourself unable to!\n",
                    ch);
       return ReturnValue::eSUCCESS;
     }

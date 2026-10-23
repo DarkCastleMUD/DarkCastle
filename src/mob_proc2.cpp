@@ -112,8 +112,8 @@ int repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   if (IS_OBJ_STAT(obj, ITEM_NOREPAIR) || obj->obj_flags.type_flag != ITEM_ARMOR || isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
   {
@@ -196,8 +196,8 @@ int super_repair_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
@@ -297,8 +297,8 @@ int repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Ch
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 
@@ -424,7 +424,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   if (cmd == cmd_t::LIST) // list
   {
     sprintf(buf, "%s_consent", GET_NAME(ch));
-    ch->send("Available corpses (freshest first):\r\n$B");
+    ch->send("Available corpses (freshest first):\n$B");
     for (obj = DC::getInstance()->object_list; obj; obj = obj->next)
     {
       if (GET_ITEM_TYPE(obj) != ITEM_CONTAINER || obj->obj_flags.value[3] != 1) // only look at corpses
@@ -441,14 +441,14 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       cost = corpse_cost(obj);
       cost /= 20000;
       cost = MAX(cost, 30);
-      sprintf(buf, "%d) %-21s %d Platinum coins.\r\n", ++count, qPrintable(obj->short_description), cost);
+      sprintf(buf, "%d) %-21s %d Platinum coins.\n", ++count, qPrintable(obj->short_description), cost);
       ch->send(buf);
     }
-    send_to_char("$RIf any corpses were listed, they are still where you left them.  This\r\n"
-                 "list is therefore always changing.  If you purchase one, it will be\r\n"
-                 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\r\n"
-                 "Use 'value' to find how much your eq would cost with what you\r\n"
-                 "have on you now.\r\n",
+    send_to_char("$RIf any corpses were listed, they are still where you left them.  This\n"
+                 "list is therefore always changing.  If you purchase one, it will be\n"
+                 "placed at your feet. Use \"buy <number>\" to purchase a corpse.\n"
+                 "Use 'value' to find how much your eq would cost with what you\n"
+                 "have on you now.\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
@@ -458,7 +458,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     cost = corpse_cost(ch);
     cost /= 20000;
     cost = MAX(cost, 30);
-    ch->send(QStringLiteral("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\r\n").arg(cost));
+    ch->send(QStringLiteral("The Undertaker takes a look at you and estimates your corpse would cost around %1 platinum coins.\n").arg(cost));
     return ReturnValue::eSUCCESS;
   }
 
@@ -466,7 +466,7 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
   if ((which = atoi(arg)) == 0)
   {
     send_to_char("Try \"buy <number>\", or \"list\" for a list of "
-                 "available corpses.\r\n",
+                 "available corpses.\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
@@ -497,8 +497,8 @@ int mortician(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     }
     move_obj(obj, ch->in_room);
     REMOVE_BIT(obj->obj_flags.extra_flags, ITEM_INVISIBLE);
-    send_to_char("The mortician goes into his freezer and returns with a corpse, which he\r\n"
-                 "places at your feet.\r\n",
+    send_to_char("The mortician goes into his freezer and returns with a corpse, which he\n"
+                 "places at your feet.\n",
                  ch);
     GET_PLATINUM(ch) -= cost;
     ch->save();
@@ -558,7 +558,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
       if (length > 79)
       {
-        buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf3);
+        buf = QStringLiteral("%1\n    %2").arg(buf).arg(buf3);
       }
       else
       {
@@ -583,7 +583,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
       length = nocolor_strlen(potential_buffer.sliced(starting_point));
       if (length > 79)
       {
-        buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf2);
+        buf = QStringLiteral("%1\n    %2").arg(buf).arg(buf2);
       }
       else
       {
@@ -611,7 +611,7 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
       if (length > 79)
       {
-        buf = QStringLiteral("%1\r\n    $4[%2").arg(buf).arg(buf2);
+        buf = QStringLiteral("%1\n    $4[%2").arg(buf).arg(buf2);
       }
       else
       {
@@ -639,14 +639,14 @@ char *gl_item(Object *obj, int number, Character *ch, bool platinum = true)
 
   if (length > 79)
   {
-    buf = QStringLiteral("%1\r\n    %2").arg(buf).arg(buf2);
+    buf = QStringLiteral("%1\n    %2").arg(buf).arg(buf2);
   }
   else
   {
     buf = potential_buffer;
   }
 
-  buf += "\r\n";
+  buf += "\n";
   return str_dup(buf.toStdString().c_str());
 }
 
@@ -829,8 +829,8 @@ int gl_repair_shop(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   act("You give $N $p.", ch, obj, owner, TO_CHAR, 0);
   act("$n gives $p to $N.", ch, obj, owner, TO_ROOM, INVIS_NULL);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
-  act("\r\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
+  act("\n$N examines $p...", ch, obj, owner, TO_CHAR, 0);
+  act("\n$N examines $p...", ch, obj, owner, TO_ROOM, INVIS_NULL);
 
   eqdam = eq_current_damage(obj);
 

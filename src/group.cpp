@@ -66,7 +66,7 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
 
   k = ch->master;
 
-  sprintf(buf, "You abandon: %s\r\n", k->group_name);
+  sprintf(buf, "You abandon: %s\n", k->group_name);
   ch->send(buf);
   sprintf(buf, "%s abandons: %s", GET_SHORT(ch), k->group_name);
   act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -121,7 +121,7 @@ int do_found(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->group_name = str_dup(argument);
-  sprintf(buf, "You found: %s\r\n", argument);
+  sprintf(buf, "You found: %s\n", argument);
   ch->send(buf);
   sprintf(buf, "%s founds: %s", GET_SHORT(ch), argument);
   act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -147,13 +147,13 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    send("Split what?\r\n");
+    send("Split what?\n");
     return ReturnValue::eFAILURE;
   }
 
   if (isPlayerGoldThief())
   {
-    send("Nobody wants any part of your stolen booty!\r\n");
+    send("Nobody wants any part of your stolen booty!\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -163,20 +163,20 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   const qulonglong amount = number.toULongLong(&ok);
   if (ok == false)
   {
-    send("Invalid value.\r\n");
-    send(QStringLiteral("Valid values are %1 to %2.\r\n").arg(1).arg(static_cast<quint64>(-1)));
+    send("Invalid value.\n");
+    send(QStringLiteral("Valid values are %1 to %2.\n").arg(1).arg(static_cast<quint64>(-1)));
     return ReturnValue::eFAILURE;
   }
 
   if (amount == 0)
   {
-    send("You hand out zero coins to everyone, but no one notices.\r\n");
+    send("You hand out zero coins to everyone, but no one notices.\n");
     return ReturnValue::eSUCCESS;
   }
 
   if (getGold() < amount)
   {
-    send("You don't have that much gold!\r\n");
+    send("You don't have that much gold!\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -187,7 +187,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 
   if ((!IS_AFFECTED(k, AFF_GROUP)) || (!IS_AFFECTED(this, AFF_GROUP)))
   {
-    send("You are not grouped. You must be grouped to split your money!\r\n");
+    send("You are not grouped. You must be grouped to split your money!\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -206,7 +206,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 
   if (no_members == 0) // should be impossible
   {
-    send("You got a divide by 0.  Tell a god how.\r\n");
+    send("You got a divide by 0.  Tell a god how.\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -215,18 +215,18 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   removeGold(amount);
   save(cmd_t::SAVE_SILENTLY);
 
-  send(QStringLiteral("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\r\n").arg(amount).arg(share + extra));
+  send(QStringLiteral("You split %L1 $B$5gold$R coins. Your share is %L2 gold coins.\n").arg(amount).arg(share + extra));
   addGold(share + extra);
 
   if (k != this && k->in_room == in_room)
   {
-    k->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
+    k->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\n").arg(GET_SHORT(this)).arg(amount).arg(share));
     int lost = 0;
     if (k->clan && get_clan(k)->tax && !isSet(GET_TOGGLES(k), Player::PLR_NOTAX) &&
         (k->clan != clan || (k->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
     {
       lost = (int)((float)share * (float)((float)get_clan(k)->tax / 100));
-      k->send(QStringLiteral("Your clan taxes %L1 $B$5gold$R of your share.\r\n").arg(lost));
+      k->send(QStringLiteral("Your clan taxes %L1 $B$5gold$R of your share.\n").arg(lost));
       get_clan(k)->cdeposit(lost);
       save_clans();
     }
@@ -239,13 +239,13 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
         f->follower != this &&
         !f->follower->isNonPlayer())
     {
-      f->follower->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\r\n").arg(GET_SHORT(this)).arg(amount).arg(share));
+      f->follower->send(QStringLiteral("%1 splits %L2 $B$5gold$R coins. Your share is %L3 $B$5gold$R coins.\n").arg(GET_SHORT(this)).arg(amount).arg(share));
       int lost = 0;
       if (f->follower->clan && get_clan(f->follower)->tax && !isSet(GET_TOGGLES(f->follower), Player::PLR_NOTAX) &&
           (f->follower->clan != clan || (f->follower->clan == clan && isSet(GET_TOGGLES(this), Player::PLR_NOTAX))))
       {
         lost = (int)((float)share * (float)((float)get_clan(f->follower)->tax / 100));
-        f->follower->send(QStringLiteral("Your clan taxes %L1 gold of your share.\r\n").arg(lost));
+        f->follower->send(QStringLiteral("Your clan taxes %L1 gold of your share.\n").arg(lost));
         get_clan(f->follower)->cdeposit(lost);
         save_clans();
       }
@@ -470,7 +470,7 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You truly must have an EGO the size of the Tarrasque!");
     send_to_char("You are already the group leader! Maybe you SHOULD "
-                 "step down?\r\n",
+                 "step down?\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -487,15 +487,15 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You step down, appointing %s as the new leader.\r\n",
+  sprintf(buf, "You step down, appointing %s as the new leader.\n",
           GET_SHORT(new_new_leader));
   ch->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints YOU as "
-               "the New Leader of: %s\r\n",
+  sprintf(buf, "%s steps down as leader of: %s\n%s appoints YOU as "
+               "the New Leader of: %s\n",
           GET_SHORT(ch), ch->group_name,
           GET_SHORT(ch), ch->group_name);
   new_new_leader->send(buf);
-  sprintf(buf, "%s steps down as leader of: %s\r\n%s appoints %s as "
+  sprintf(buf, "%s steps down as leader of: %s\n%s appoints %s as "
                "the New Leader of: %s",
           GET_SHORT(ch), ch->group_name,
           GET_SHORT(ch), GET_SHORT(new_new_leader), ch->group_name);
@@ -742,14 +742,14 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
   {
     if (ch->player->joining.empty())
     {
-      ch->send("You are not configured to auto-joining anyone.\r\n");
+      ch->send("You are not configured to auto-joining anyone.\n");
     }
     else
     {
-      ch->send(QStringLiteral("You are configured to auto-join: %1\r\n").arg(ch->player->getJoining()));
+      ch->send(QStringLiteral("You are configured to auto-join: %1\n").arg(ch->player->getJoining()));
     }
 
-    ch->send("Syntax: autojoin <player1> <player2> <player3> ...\r\n");
+    ch->send("Syntax: autojoin <player1> <player2> <player3> ...\n");
 
     return ReturnValue::eFAILURE;
   }
@@ -757,7 +757,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
   else if (arguments == "clear")
   {
     ch->player->joining.clear();
-    ch->send("Auto-join list cleared.\r\n");
+    ch->send("Auto-join list cleared.\n");
     return ReturnValue::eSUCCESS;
   }
 
@@ -767,7 +767,7 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
     ch->player->toggleJoining(i);
   }
 
-  ch->send(QStringLiteral("You are now autojoining: %1\r\n").arg(ch->player->getJoining()));
+  ch->send(QStringLiteral("You are now autojoining: %1\n").arg(ch->player->getJoining()));
   return ReturnValue::eSUCCESS;
 }
 

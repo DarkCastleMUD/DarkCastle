@@ -231,11 +231,11 @@ send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, vo
     return str;
   }
 
-  if (buf.endsWith("\r\n") || buf.endsWith("\r\n"))
+  if (buf.endsWith("\n") || buf.endsWith("\n"))
   {
     buf = buf.chopped(2);
   }
-  if (buf.endsWith("\n") || buf.endsWith("\r"))
+  if (buf.endsWith("\n") || buf.endsWith(""))
   {
     buf = buf.chopped(1);
   }

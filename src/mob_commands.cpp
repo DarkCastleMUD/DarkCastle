@@ -148,10 +148,10 @@ void mpstat(Character *ch, Character *victim)
   mob_prog_data *mprg{};
   int i;
 
-  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %llu.\r\n", victim->getNameC(), victim->mobdata->vnum_);
+  sprintf(buf, "$3Name$R: %s  $3Vnum$R: %llu.\n", victim->getNameC(), victim->mobdata->vnum_);
   ch->send(buf);
 
-  sprintf(buf, "$3Short description$R: %s\r\n$3Long  description$R: %s\r\n",
+  sprintf(buf, "$3Short description$R: %s\n$3Long  description$R: %s\n",
           qPrintable(victim->short_desc),
           !victim->long_desc.isEmpty() ? qPrintable(victim->long_desc) : "(unknown)");
   ch->send(buf);
@@ -169,9 +169,9 @@ void mpstat(Character *ch, Character *victim)
     ch->send(buf);
     send_to_char(mprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\r\n", qPrintable(mprg->arglist));
+    sprintf(buf, "$B$5%s$R\n", qPrintable(mprg->arglist));
     ch->send(buf);
-    ch->sendRaw(mprg->comlist + u"\r\n"_s);
+    ch->sendRaw(mprg->comlist + u"\n"_s);
   }
 }
 
@@ -833,7 +833,7 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   {
     if (!DC::getInstance()->rooms.contains(1))
     {
-      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\r\n").arg(location));
+      ch->send(QStringLiteral("mpat - Room %1 invalid. Tried room 1 but it's invalid too.\n").arg(location));
       return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
     }
     else
@@ -890,12 +890,12 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
   if (reward < 0)
     if ((GET_EXP(vict) + reward) < 0)
     {
-      csendf(vict, "You lose %d exps.\r\n", (-1 * reward));
+      csendf(vict, "You lose %d exps.\n", (-1 * reward));
       GET_EXP(vict) = 0;
       return ReturnValue::eSUCCESS;
     }
 
-  vict->send(QStringLiteral("You receive %1 exps.\r\n").arg(reward));
+  vict->send(QStringLiteral("You receive %1 exps.\n").arg(reward));
   gain_exp(vict, reward);
   return ReturnValue::eSUCCESS;
 }
@@ -1172,7 +1172,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
 
   if (victim->has_skill(skillnum))
   {
-    csendf(victim, "You already know the basics of %s!\r\n", skillname.isEmpty() ? "Unknown" : skillname.toStdString().c_str());
+    csendf(victim, "You already know the basics of %s!\n", skillname.isEmpty() ? "Unknown" : skillname.toStdString().c_str());
     return ReturnValue::eFAILURE;
   }
 
@@ -1186,12 +1186,12 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
   int index = search_skills2(skillnum, skilllist);
   if (victim->getLevel() < skilllist[index].levelavailable)
   {
-    victim->send(QStringLiteral("You try to learn the basics of %1, but it is too advanced for you right now.\r\n").arg(skillname));
+    victim->send(QStringLiteral("You try to learn the basics of %1, but it is too advanced for you right now.\n").arg(skillname));
     return ReturnValue::eFAILURE;
   }
 
   if (!skillname.isEmpty())
-    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\r\n", skillname.toStdString().c_str());
+    snprintf(skill, sizeof(skill), "$BYou have learned the basics of %s.$R\n", skillname.toStdString().c_str());
   else
   {
     victim->sendln("I just tried to teach you an invalid skill.  Tell a god.");
@@ -1884,7 +1884,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("You find yourself unable to.");
     if (ch != victim)
     {
-      snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\r\n", GET_SHORT(ch));
+      snprintf(buf, MAX_INPUT_LENGTH, "%s just tried to teleport you.\n", GET_SHORT(ch));
       victim->send(buf);
     }
     return ReturnValue::eFAILURE;
@@ -2039,7 +2039,7 @@ int process_math(Character *ch, char *string)
       }
       curr = 0;
     }
-    if (*string == '\0' || *string == '\r' || *string == '\n')
+    if (*string == '\0' || *string == '\n')
       break;
     switch (*string)
     {
@@ -2172,9 +2172,9 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   }
 
   Character *vict;
-  //  if (activeActor) activeActor->send(QStringLiteral("{%1}\r\n").arg(arg));
+  //  if (activeActor) activeActor->send(QStringLiteral("{%1}\n").arg(arg));
   //  vict = get_pc("Urizen");
-  //  if (vict) vict->send(QStringLiteral("{%1}\r\n").arg(arg));
+  //  if (vict) vict->send(QStringLiteral("{%1}\n").arg(arg));
 
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
@@ -2270,7 +2270,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
     //  r, i, ch->mobdata->vnum_ );
   }
 
-  /*  csendf(vict, "%d\r\n%d\r\n%d\r\n%d\r\n",
+  /*  csendf(vict, "%d\n%d\n%d\n%d\n",
       process_math(ch, "1+1-3+5*10"),
       process_math(ch, "1-3+5*10/2"),
       process_math(ch, "1+101-34+5*10*2/8"),

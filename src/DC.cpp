@@ -375,7 +375,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
   if (!strcmp(arg4, "chaos"))
   {
     arena.type = CHAOS; // -2
-    sprintf(buf, "## Only clan members can join the bloodbath!\r\n");
+    sprintf(buf, "## Only clan members can join the bloodbath!\n");
     send_info(buf);
     logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "%s started a Clan Chaos arena.", GET_NAME(ch));
   }
@@ -383,14 +383,14 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
   if (!strcmp(arg4, "potato"))
   {
     arena.type = POTATO; // -3
-    sprintf(buf, "##$4$B Special POTATO Arena!!$R\r\n");
+    sprintf(buf, "##$4$B Special POTATO Arena!!$R\n");
     send_info(buf);
   }
 
   if (!strcmp(arg4, "prize"))
   {
     arena.type = PRIZE; // -3
-    sprintf(buf, "##$4$B Prize Arena!!$R\r\n");
+    sprintf(buf, "##$4$B Prize Arena!!$R\n");
     send_info(buf);
   }
 
@@ -406,7 +406,7 @@ auto Character::do_arena_start(QStringList arguments) -> command_return_t
           arena.hplimit = 1000;
 
     arena.type = HP; // -4
-    sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\r\n", arena.hplimit);
+    sprintf(buf, "##$4$B HP LIMIT Arena!!$R  Any more than %d raw hps, and you have to sit this one out!!\n", arena.hplimit);
     send_info(buf);
   }
 }

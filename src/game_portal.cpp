@@ -250,7 +250,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   obj_to_room(from_portal, real_room(from_room));
 
   send_to_room("There is a violent flash of light as a portal "
-               "shimmers into existence.\r\n",
+               "shimmers into existence.\n",
                real_room(from_room));
 
   /* Success - presumably */
@@ -277,7 +277,7 @@ void find_and_remove_player_portal(Character *ch)
     // at this point, the portal belongs to the person that quit
     if (k->in_room < DC::getInstance()->top_of_world && k->in_room > DC::NOWHERE && DC::getInstance()->rooms.contains(k->in_room))
     {
-      send_to_room("Its creator gone, the portal fades away prematurely.\r\n", k->in_room);
+      send_to_room("Its creator gone, the portal fades away prematurely.\n", k->in_room);
     }
 
     obj_from_room(k);

@@ -313,7 +313,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
   if ((attempt = consttype(buf, DC::dirs)) == -1)
   {
     send_to_char("You are supposed to retreat towards a specific "
-                 "direction...\r\n",
+                 "direction...\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -332,10 +332,10 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
   // failure
   if (!skill_success(ch, nullptr, SKILL_RETREAT))
   {
-    act("$n tries to retreat, but pays a heavy price for $s hesitancy.\r\n"
+    act("$n tries to retreat, but pays a heavy price for $s hesitancy.\n"
         "$n falls to the ground!",
         ch, 0, 0, TO_ROOM, INVIS_NULL);
-    act("You try to retreat, but pay a heavy price for your hesitancy.\r\n"
+    act("You try to retreat, but pay a heavy price for your hesitancy.\n"
         "You fall to the ground!",
         ch, 0, 0, TO_CHAR, INVIS_NULL);
     ch->setSitting();
@@ -456,7 +456,7 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   if (IS_AFFECTED(ch, AFF_CHARM))
     return ReturnValue::eFAILURE;
 
-  if (!ch->canPerform(SKILL_BASH, "You don't know how to bash!\r\n"))
+  if (!ch->canPerform(SKILL_BASH, "You don't know how to bash!\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -633,7 +633,7 @@ int do_redirect(Character *ch, char *argument, cmd_t cmd)
   Character *victim;
   char name[256];
 
-  if (!ch->canPerform(SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\r\n"))
+  if (!ch->canPerform(SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\n"))
     return ReturnValue::eFAILURE;
 
   one_argument(argument, name);
@@ -756,7 +756,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
     }
     if (DC::getInstance()->obj_index[ch->equipment[WEAR_WIELD]->vnum_].vnum() == 27997)
     {
-      send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\r\n", ch->in_room);
+      send_to_room("$B$7Ghaerad, Sword of Legends says, 'Sneaky! Sneaky! But you can't catch me!'$R\n", ch->in_room);
       return ReturnValue::eSUCCESS;
     }
     act("$n disarms $mself!", ch, nullptr, victim, TO_ROOM, NOTVICT);
@@ -945,7 +945,7 @@ int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
     act("$n forms a defensive wall of swinging weapons around $mself.", ch, 0, 0, TO_ROOM, NOTVICT);
     send_to_char("The world around you slows to a crawl, the weapons around you swing as if through water.  "
                  "Your mind clears of all but thrust angles as your body and mind enter completely into the "
-                 "blade shield technique.\r\n",
+                 "blade shield technique.\n",
                  ch);
     SET_BIT(ch->combat, COMBAT_BLADESHIELD1);
   }
@@ -1061,7 +1061,7 @@ void stop_guarding_me(Character *victim)
 
   while (curr)
   {
-    sprintf(buf, "You stop trying to guard %s.\r\n", GET_SHORT(victim));
+    sprintf(buf, "You stop trying to guard %s.\n", GET_SHORT(victim));
     curr->follower->send(buf);
     curr->follower->guarding = nullptr;
     last = curr;
@@ -1119,7 +1119,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   }
 
   start_guarding(ch, victim);
-  sprintf(name, "You begin trying to guard %s.\r\n", GET_SHORT(victim));
+  sprintf(name, "You begin trying to guard %s.\n", GET_SHORT(victim));
   ch->send(name);
   return ReturnValue::eSUCCESS;
 }
@@ -1264,11 +1264,11 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
 
   if (!skill_success(ch, 0, SKILL_MAKE_CAMP))
   {
-    send_to_room("The area does not yet feel secure enough to rest.\r\n", ch->in_room);
+    send_to_room("The area does not yet feel secure enough to rest.\n", ch->in_room);
   }
   else
   {
-    send_to_room("The area feels secure enough to get some rest.\r\n", ch->in_room);
+    send_to_room("The area feels secure enough to get some rest.\n", ch->in_room);
 
     af.type = SKILL_MAKE_CAMP_TIMER;
     af.duration = 2 + learned / 9;

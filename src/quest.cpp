@@ -210,7 +210,7 @@ int do_add_quest(Character *ch, char *name)
 
   quest_list.push_back(quest);
 
-  ch->send(QStringLiteral("Quest number %1 added.\r\n\r\n").arg(quest->number));
+  ch->send(QStringLiteral("Quest number %1 added.\n\n").arg(quest->number));
   show_quest_info(ch, quest->number);
 
   return ReturnValue::eSUCCESS;
@@ -228,7 +228,7 @@ void list_quests(Character *ch, int lownum, int highnum)
     if (quest->number <= highnum && quest->number >= lownum)
     {
       // Create a format std::string based on a space offset that takes color codes into account
-      snprintf(buffer, MAX_STRING_LENGTH, "%%3d. $B$2Name:$7 %%-%zus$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\r\n", 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
+      snprintf(buffer, MAX_STRING_LENGTH, "%%3d. $B$2Name:$7 %%-%zus$R Cost: %%-4d%%1s Reward: %%-4d Lvl: %%d\n", 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
       csendf(ch, buffer, quest->number, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward, quest->level);
     }
@@ -248,26 +248,26 @@ void show_quest_info(Character *ch, int num)
     if (quest->number == num)
     {
       csendf(ch,
-             "$3Quest Info for #$R%d\r\n"
-             "$3========================================$R\r\n"
-             "$3Name:$R   %s\r\n"
-             "$3Level:$R  %d\r\n"
-             "$3Cost:$R   %d plats\r\n"
-             "$3Brownie:$R%s\r\n"
-             "$3Reward:$R %d qpoints\r\n"
-             "$3Timer:$R  %d\r\n"
-             "$3----------------------------------------$R\r\n"
-             "$3Quest Mob Vnum:$R %d (%s)\r\n"
-             "$3----------------------------------------$R\r\n"
-             "$3Quest Object Vnum:$R %d\r\n"
-             "$3Keywords:$R          %s\r\n"
-             "$3Short description:$R %s\r\n"
-             "$3Long description:$R  %s\r\n"
-             "$3----------------------------------------$R\r\n"
-             "$3Hints:$R\r\n"
-             "$31.$R %s\r\n"
-             "$32.$R %s\r\n"
-             "$33.$R %s\r\n",
+             "$3Quest Info for #$R%d\n"
+             "$3========================================$R\n"
+             "$3Name:$R   %s\n"
+             "$3Level:$R  %d\n"
+             "$3Cost:$R   %d plats\n"
+             "$3Brownie:$R%s\n"
+             "$3Reward:$R %d qpoints\n"
+             "$3Timer:$R  %d\n"
+             "$3----------------------------------------$R\n"
+             "$3Quest Mob Vnum:$R %d (%s)\n"
+             "$3----------------------------------------$R\n"
+             "$3Quest Object Vnum:$R %d\n"
+             "$3Keywords:$R          %s\n"
+             "$3Short description:$R %s\n"
+             "$3Long description:$R  %s\n"
+             "$3----------------------------------------$R\n"
+             "$3Hints:$R\n"
+             "$31.$R %s\n"
+             "$32.$R %s\n"
+             "$33.$R %s\n",
              quest->number, quest->name, quest->level, quest->cost,
              quest->brownie ? "Required" : "Not Required",
              quest->reward, quest->timer, quest->mobnum,
@@ -321,20 +321,20 @@ int get_quest_price(quest_info *quest)
 
 void show_quest_header(Character *ch)
 {
-  csendf(ch, "  .-------------------------------------------------------------------------.\r\n"
-             " /.-.                                                                     .-.\\\r\n"
-             "[/   \\                                                                   /   \\]\r\n"
-             "[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]\r\n"
-             "[\\  ! /                                                                 \\ !  /]\r\n"
-             "[ `--'                                                                   `--' ]\r\n"
-             "[-----------------------------------------------------------------------------]\r\n\r\n");
+  csendf(ch, "  .-------------------------------------------------------------------------.\n"
+             " /.-.                                                                     .-.\\\n"
+             "[/   \\                                                                   /   \\]\n"
+             "[\\__. !                    $B$2Dark Castle Quest System$R                     ! ._/]\n"
+             "[\\  ! /                                                                 \\ !  /]\n"
+             "[ `--'                                                                   `--' ]\n"
+             "[-----------------------------------------------------------------------------]\n\n");
   return;
 }
 
 void show_quest_amount(Character *ch, int remaining)
 {
   csendf(ch,
-         "\r\n $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n", quest_list.size() - remaining, remaining, quest_list.size());
+         "\n $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n", quest_list.size() - remaining, remaining, quest_list.size());
   return;
 }
 
@@ -374,7 +374,7 @@ void show_quest_footer(Character *ch)
   }
 
   csendf(ch,
-         "\r\n $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\r\n",
+         "\n $B$2Attempting: $7%-4d $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n",
          attempting, completed, total - completed - attempting, total);
 
   ch->sendln("[-----------------------------------------------------------------------------]");
@@ -385,13 +385,13 @@ int show_one_quest(Character *ch, quest_info *quest, int count)
 {
   int i, amount = 0;
 
-  csendf(ch, " $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\r\n"
-             " $B$2Hint:$7 %-52s$R\r\n",
+  csendf(ch, " $B$2Name:$7 %-35s    $B$2Quest Number:$7 %d$R\n"
+             " $B$2Hint:$7 %-52s$R\n",
          quest->name, quest->number, qPrintable(quest->hint1));
   if (quest->hint2)
-    csendf(ch, " $B$7%-52s$R\r\n", quest->hint2);
+    csendf(ch, " $B$7%-52s$R\n", quest->hint2);
   if (quest->hint3)
-    csendf(ch, " $B$7%-52s$R\r\n", quest->hint3);
+    csendf(ch, " $B$7%-52s$R\n", quest->hint3);
   if (quest->timer)
   {
     for (i = 0; i < QUEST_MAX; i++)
@@ -406,13 +406,13 @@ int show_one_quest(Character *ch, quest_info *quest, int count)
         logentry(QStringLiteral("Somebody passed a quest into here that they don't really have."), IMMORTAL, DC::LogChannel::LOG_BUG);
       }
 
-      csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\r\n\r\n",
+      csendf(ch, " $B$2Level:$7 %d  $2Time remaining:$7 %-7ld  $2Reward:$7 %-5d$R\n\n",
              quest->level, amount, quest->reward);
     }
   }
   else
   {
-    csendf(ch, " $B$2Level:$7 %d  $2Reward:$7 %-5d$R\r\n\r\n",
+    csendf(ch, " $B$2Level:$7 %d  $2Reward:$7 %-5d$R\n\n",
            quest->level, quest->reward);
   }
   return ++count;
@@ -420,7 +420,7 @@ int show_one_quest(Character *ch, quest_info *quest, int count)
 
 int show_one_complete_quest(Character *ch, quest_info *quest, int count)
 {
-  ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\r\n").arg(quest->name, -35).arg(quest->reward, -5));
+  ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\n").arg(quest->name, -35).arg(quest->reward, -5));
   return ++count;
 }
 
@@ -428,7 +428,7 @@ int show_one_available_quest(Character *ch, quest_info *quest, int count)
 {
   char buffer[MAX_STRING_LENGTH];
   // Create a format std::string based on a space offset that takes color codes into account
-  snprintf(buffer, MAX_STRING_LENGTH, "$B$7%3d. $2Name:$7 %%-%zus$R Cost: %%-4d%%1s Reward: %%-4d\r\n", quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
+  snprintf(buffer, MAX_STRING_LENGTH, "$B$7%3d. $2Name:$7 %%-%zus$R Cost: %%-4d%%1s Reward: %%-4d\n", quest->number, 35 + (strlen(quest->name) - nocolor_strlen(quest->name)));
 
   csendf(ch, buffer, quest->name, quest->cost, quest->brownie ? "$5*$R" : "", quest->reward);
   return ++count;
@@ -558,7 +558,7 @@ int start_quest(Character *ch, quest_info *quest)
   price = quest->cost;
   if (GET_PLATINUM(ch) < price)
   {
-    ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\r\n").arg(price));
+    ch->send(QStringLiteral("You need %1 platinum coins to start this quest, which you don't have!\n").arg(price));
     return ReturnValue::eEXTRA_VAL2;
   }
 
@@ -567,7 +567,7 @@ int start_quest(Character *ch, quest_info *quest)
     brownie = get_obj_in_list_num(27906, ch->carrying);
     if (!brownie)
     {
-      csendf(ch, "You need a brownie point to start this quest!\r\n", price);
+      csendf(ch, "You need a brownie point to start this quest!\n", price);
       return ReturnValue::eEXTRA_VAL2;
     }
   }
@@ -625,11 +625,11 @@ int start_quest(Character *ch, quest_info *quest)
 
   if (quest->brownie)
   {
-    csendf(ch, "%s takes a brownie point from you.\r\n", GET_SHORT(qmaster));
+    csendf(ch, "%s takes a brownie point from you.\n", GET_SHORT(qmaster));
     obj_from_char(brownie);
   }
 
-  csendf(ch, "%s takes %d platinum from you.\r\n", GET_SHORT(qmaster), price);
+  csendf(ch, "%s takes %d platinum from you.\n", GET_SHORT(qmaster), price);
   GET_PLATINUM(ch) -= price;
 
   return ReturnValue::eSUCCESS;
@@ -783,7 +783,7 @@ void quest_update()
 
               logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s ran out of time on quest %d (%s).", GET_NAME(i), quest->number, quest->name);
 
-              i->send(QStringLiteral("Time has expired for %1.  This quest has ended.\r\n").arg(quest->name));
+              i->send(QStringLiteral("Time has expired for %1.  This quest has ended.\n").arg(quest->name));
             }
             i->player->quest_current_ticksleft[j]--;
             break;
@@ -1091,9 +1091,9 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    csendf(ch, "%s takes 2000 platinum from you.\r\n", GET_SHORT(qmaster));
+    csendf(ch, "%s takes 2000 platinum from you.\n", GET_SHORT(qmaster));
     GET_PLATINUM(ch) -= 2000;
-    csendf(ch, "%s takes a brownie point from you.\r\n", GET_SHORT(qmaster));
+    csendf(ch, "%s takes a brownie point from you.\n", GET_SHORT(qmaster));
     obj_from_char(brownie);
 
     stop_all_quests(ch);
@@ -1109,16 +1109,16 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   }
   else
   {
-    csendf(ch, "Usage: quest current            (lists current quests)\r\n"
-               "       quest completed          (lists completed quests)\r\n"
-               "       quest canceled           (lists canceled quests)\r\n\r\n"
-               "The following commands may only be used at the Quest Master.\r\n"
-               "       quest list               (lists available quests)\r\n"
-               "       quest cancel <name or #> (cancel the current quest)\r\n"
-               "       quest start <name or #>  (starts a new quest)\r\n"
-               "       quest finish <name or #> (finishes a current quest)\r\n"
-               "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\r\n"
-               "\r\n");
+    csendf(ch, "Usage: quest current            (lists current quests)\n"
+               "       quest completed          (lists completed quests)\n"
+               "       quest canceled           (lists canceled quests)\n\n"
+               "The following commands may only be used at the Quest Master.\n"
+               "       quest list               (lists available quests)\n"
+               "       quest cancel <name or #> (cancel the current quest)\n"
+               "       quest start <name or #>  (starts a new quest)\n"
+               "       quest finish <name or #> (finishes a current quest)\n"
+               "       quest reset              (reset all quests. costs 2k plats, 1 brownie)\n"
+               "\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -1141,17 +1141,17 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
 
   if (!*arg)
   {
-    csendf(ch, "Usage: qedit list                      (list all quest names and numbers)\r\n"
-               "       qedit list <lownum> <highnum>   (lists names and numbers between)\r\n"
-               "       qedit show <number>             (show detailed information)\r\n"
-               "       qedit <number> <field> <value>  (edit a quest)\r\n"
-               "       qedit new <name>                (add a quest)\r\n"
-               "       qedit save                      (saves all quests)\r\n"
-               "       qedit stat <playername>         (show player's current qpoints)\r\n"
-               "       qedit set <playername> <value>  (alter player's current qpoints)\r\n"
-               "       qedut reset <playername>\r\n"
-               "\r\n"
-               "Valid qedit fields:\r\n");
+    csendf(ch, "Usage: qedit list                      (list all quest names and numbers)\n"
+               "       qedit list <lownum> <highnum>   (lists names and numbers between)\n"
+               "       qedit show <number>             (show detailed information)\n"
+               "       qedit <number> <field> <value>  (edit a quest)\n"
+               "       qedit new <name>                (add a quest)\n"
+               "       qedit save                      (saves all quests)\n"
+               "       qedit stat <playername>         (show player's current qpoints)\n"
+               "       qedit set <playername> <value>  (alter player's current qpoints)\n"
+               "       qedut reset <playername>\n"
+               "\n"
+               "Valid qedit fields:\n");
 
     // Display all of qedit's valid fields in rows of 4 columns
     //
@@ -1225,7 +1225,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
 
-      csendf(ch, "%s's quest points: %d\r\n", GET_NAME(vict), vict->player->quest_points);
+      csendf(ch, "%s's quest points: %d\n", GET_NAME(vict), vict->player->quest_points);
     }
     return ReturnValue::eSUCCESS;
   }
@@ -1248,7 +1248,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
       memset(vict->player->quest_cancel, 0, sizeof(vict->player->quest_cancel));
       memset(vict->player->quest_complete, 0, sizeof(vict->player->quest_complete));
 
-      ch->send(QStringLiteral("Reset quests for player %1\r\n").arg(GET_NAME(vict)));
+      ch->send(QStringLiteral("Reset quests for player %1\n").arg(GET_NAME(vict)));
       vict->save(cmd_t::SAVE_SILENTLY);
       return ReturnValue::eSUCCESS;
     }
@@ -1275,7 +1275,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
 
       logf(IMMORTAL, DC::LogChannel::LOG_QUEST, "%s set %s's quest points from %d to %d.", GET_NAME(ch), GET_NAME(vict),
            vict->player->quest_points, atoi(value));
-      csendf(ch, "Setting %s's quest points from %d to %d.\r\n", GET_NAME(vict),
+      csendf(ch, "Setting %s's quest points from %d to %d.\n", GET_NAME(vict),
              vict->player->quest_points, atoi(value));
 
       vict->player->quest_points = atoi(value);
@@ -1383,74 +1383,74 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
     {
       ch->send(QStringLiteral("Name changed from %1 ").arg(quest->name));
       quest->name = str_hsh(field);
-      ch->send(QStringLiteral("to %1.\r\n").arg(quest->name));
+      ch->send(QStringLiteral("to %1.\n").arg(quest->name));
     }
     break;
   case 1: // level
     ch->send(QStringLiteral("Level changed from %1 ").arg(quest->level));
     quest->level = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->level));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->level));
     break;
   case 2: // objnum
     ch->send(QStringLiteral("Objnum changed from %1 ").arg(quest->objnum));
     quest->objnum = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objnum));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->objnum));
     break;
   case 3: // objshort
     ch->send(QStringLiteral("Objshort changed from %1 ").arg(quest->objshort));
     sprintf(field, "%s %s", value, argument);
     quest->objshort = str_hsh(field);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objshort));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->objshort));
     break;
   case 4: // objlong
     ch->send(QStringLiteral("Objlong changed from %1 ").arg(quest->objlong));
     sprintf(field, "%s %s", value, argument);
     quest->objlong = str_hsh(field);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objlong));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->objlong));
     break;
   case 5: // objkey
     ch->send(QStringLiteral("Objkey changed from %1 ").arg(quest->objkey));
     sprintf(field, "%s %s", value, argument);
     quest->objkey = str_hsh(field);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->objkey));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->objkey));
     break;
   case 6: // mobnum
     ch->send(QStringLiteral("Mobnum changed from %1 ").arg(quest->mobnum));
     quest->mobnum = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->mobnum));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->mobnum));
     break;
   case 7: // timer
     ch->send(QStringLiteral("Timer changed from %1 ").arg(quest->timer));
     quest->timer = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->timer));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->timer));
     break;
   case 8: // reward
     ch->send(QStringLiteral("Reward changed from %1 ").arg(quest->reward));
     quest->reward = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->reward));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->reward));
     break;
   case 9: // hint1
     sprintf(field, "%s %s", value, argument);
     csendf(ch, "Hint #1 changed from %s ", qPrintable(quest->hint1));
     quest->hint1 = str_hsh(field);
-    csendf(ch, "to %s.\r\n", qPrintable(quest->hint1));
+    csendf(ch, "to %s.\n", qPrintable(quest->hint1));
     break;
   case 10: // hint2
     sprintf(field, "%s %s", value, argument);
     csendf(ch, "Hint #2 changed from %s ", quest->hint2);
     quest->hint2 = str_hsh(field);
-    csendf(ch, "to %s.\r\n", quest->hint2);
+    csendf(ch, "to %s.\n", quest->hint2);
     break;
   case 11: // hint3
     sprintf(field, "%s %s", value, argument);
     csendf(ch, "Hint #3 changed from %s ", quest->hint3);
     quest->hint3 = str_hsh(field);
-    csendf(ch, "to %s.\r\n", quest->hint3);
+    csendf(ch, "to %s.\n", quest->hint3);
     break;
   case 12: // cost
     ch->send(QStringLiteral("Cost changed from %1 ").arg(quest->cost));
     quest->cost = atoi(value);
-    ch->send(QStringLiteral("to %1.\r\n").arg(quest->cost));
+    ch->send(QStringLiteral("to %1.\n").arg(quest->cost));
     break;
   case 13: // brownie
     if (quest->brownie)

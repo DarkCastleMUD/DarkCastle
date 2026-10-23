@@ -148,7 +148,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->canPerform(SKILL_TAME, "Try learning HOW to tame first.\r\n"))
+  if (!ch->canPerform(SKILL_TAME, "Try learning HOW to tame first.\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -309,7 +309,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
 
   act("$n walks about slowly, searching for signs of $s quarry", this, 0, 0, TO_ROOM, INVIS_NULL);
-  this->sendln("You search for signs of your quarry...\r\n");
+  this->sendln("You search for signs of your quarry...\n");
 
   if (learned)
     skill_increase_check(SKILL_TRACK, learned, SKILL_INCREASE_MEDIUM);
@@ -370,7 +370,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
         this->add_memory(pScent->trackee, 't');
         ansi_color(RED, this);
         ansi_color(BOLD, this);
-        csendf(this, "You sense traces of your quarry to the %s.\r\n", qPrintable(DC::dirs[y]));
+        csendf(this, "You sense traces of your quarry to the %s.\n", qPrintable(DC::dirs[y]));
         ansi_color(NTEXT, this);
 
         if (this->isNonPlayer())
@@ -512,7 +512,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
     if (x == 1)
       this->sendln("Freshest scents first...");
 
-    sprintf(buf, "The scent of a%s%s%s%s leads %s.\r\n",
+    sprintf(buf, "The scent of a%s%s%s%s leads %s.\n",
             weight,
             condition,
             sex,
@@ -898,14 +898,14 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
   case 1:
     if (dir < 0)
     {
-      sprintf(buf, "%s wizzes by.\r\n", qPrintable(found->short_description));
+      sprintf(buf, "%s wizzes by.\n", qPrintable(found->short_description));
       victim->send(buf);
       sprintf(buf, "%s wizzes by.", qPrintable(found->short_description));
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
-      sprintf(buf, "%s wizzes by from the %s.\r\n", qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]));
+      sprintf(buf, "%s wizzes by from the %s.\n", qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]));
       victim->send(buf);
       sprintf(buf, "%s wizzes by from the %s.",
               qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]));
@@ -923,14 +923,14 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
   case 3:
     if (dir < 0)
     {
-      sprintf(buf, "%s narrowly misses your head.\r\n", qPrintable(found->short_description));
+      sprintf(buf, "%s narrowly misses your head.\n", qPrintable(found->short_description));
       victim->send(buf);
       sprintf(buf, "%s narrowly misses $n.", qPrintable(found->short_description));
       act(buf, victim, nullptr, ch, TO_ROOM, NOTVICT);
     }
     else
     {
-      sprintf(buf, "%s from the %s narrowly misses your head.\r\n",
+      sprintf(buf, "%s from the %s narrowly misses your head.\n",
               qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]));
       victim->send(buf);
       sprintf(buf, "%s from the %s narrowly misses $n.",
@@ -1060,9 +1060,9 @@ int do_arrow_damage(Character *ch, Character *victim,
    switch(number(1,2))
    {
     case 1:
-    sprintf(buf, "Your shot impales %s through the heart!\r\n", GET_SHORT(victim));
+    sprintf(buf, "Your shot impales %s through the heart!\n", GET_SHORT(victim));
     ch->send(buf);
-    sprintf(buf, "%s from the %s drives full force into your chest!\r\n",
+    sprintf(buf, "%s from the %s drives full force into your chest!\n",
        qPrintable(found->short_description), DC::dirs[rev_dir[dir]]);
     victim->send(buf);
     sprintf(buf, "%s from the %s impales $n through the chest!",
@@ -1071,13 +1071,13 @@ int do_arrow_damage(Character *ch, Character *victim,
     break;
 
     case 2:
-    sprintf(buf, "Your %s drives through the eye of %s ending their life.\r\n",
+    sprintf(buf, "Your %s drives through the eye of %s ending their life.\n",
        qPrintable(found->short_description), GET_SHORT(victim));
     ch->send(buf);
-    sprintf(buf, "%s drives right through your left eye!\r\nThe last thing through your mind is.........an arrowhead.\r\n",
+    sprintf(buf, "%s drives right through your left eye!\nThe last thing through your mind is.........an arrowhead.\n",
        qPrintable(found->short_description));
     victim->send(buf);
-    sprintf(buf, "%s from the %s lands with a solid 'thunk.'\r\n$n falls to the ground, an arrow sticking from $s left eye.",
+    sprintf(buf, "%s from the %s lands with a solid 'thunk.'\n$n falls to the ground, an arrow sticking from $s left eye.",
        qPrintable(found->short_description), DC::dirs[rev_dir[dir]]);
     act(buf, victim, nullptr, 0, TO_ROOM, 0);
     break;
@@ -1085,7 +1085,7 @@ int do_arrow_damage(Character *ch, Character *victim,
   }
   else  // they have enough to survive the arrow..lucky bastard
   {
-    sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
+    sprintf(buf, "You hit %s with %s!\n", GET_SHORT(victim),
        qPrintable(found->short_description));
     ch->send(buf);
     sprintf(buf, "You get shot with %s from the %s.  Ouch.",
@@ -1097,9 +1097,9 @@ int do_arrow_damage(Character *ch, Character *victim,
 
     switch(artype)
     {
-      case 1: send_to_room("It was flaming hot!\r\n", victim->in_room);
+      case 1: send_to_room("It was flaming hot!\n", victim->in_room);
               break;
-      case 2: send_to_room("It was icy cold!\r\n", victim->in_room);
+      case 2: send_to_room("It was icy cold!\n", victim->in_room);
               break;
       default: break;
     }
@@ -1486,7 +1486,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
 
     if (dir >= 0)
       send_to_room(
-          "An arrow flies into the room with incredible speed!\r\n",
+          "An arrow flies into the room with incredible speed!\n",
           victroom);
 
     retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);
@@ -1498,17 +1498,17 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       case 1:
         if (dir < 0)
         {
-          sprintf(buf, "The %s impales %s through the heart!\r\n",
+          sprintf(buf, "The %s impales %s through the heart!\n",
                   qPrintable(found->short_description), victname);
           send_to_room(buf, victroom);
         }
         else
         {
-          sprintf(buf, "Your shot impales %s through the heart!\r\n",
+          sprintf(buf, "Your shot impales %s through the heart!\n",
                   victname);
           ch->send(buf);
           sprintf(buf,
-                  "%s from the %s impales %s through the chest!\r\n",
+                  "%s from the %s impales %s through the chest!\n",
                   qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]),
                   victname);
           send_to_room(buf, victroom);
@@ -1518,18 +1518,18 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
         if (dir < 0)
         {
           sprintf(buf,
-                  "%s drives through the eye of %s, ending %s life.\r\n",
+                  "%s drives through the eye of %s, ending %s life.\n",
                   qPrintable(found->short_description), victname, victhshr);
           send_to_room(buf, victroom);
         }
         else
         {
           sprintf(buf,
-                  "Your %s drives through the eye of %s ending %s life.\r\n",
+                  "Your %s drives through the eye of %s ending %s life.\n",
                   qPrintable(found->short_description), victname, victhshr);
           ch->send(buf);
           sprintf(buf,
-                  "%s from the %s lands with a solid 'thunk.'\r\n%s falls to the ground, an arrow sticking from %s left eye.\r\n",
+                  "%s from the %s lands with a solid 'thunk.'\n%s falls to the ground, an arrow sticking from %s left eye.\n",
                   qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]),
                   victname, victhshr);
           send_to_room(buf, victroom);
@@ -1539,18 +1539,18 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
         if (dir < 0)
         {
           sprintf(buf,
-                  "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\r\n",
+                  "The %s rips through %s's throat.  Blood spouts as %s expires with a final gurgle.\n",
                   qPrintable(found->short_description), victname, HSSH(victim));
           send_to_room(buf, victroom);
         }
         else
         {
           sprintf(buf,
-                  "Your shot rips through the throat of %s ending their life with a gurgle.\r\n",
+                  "Your shot rips through the throat of %s ending their life with a gurgle.\n",
                   victname);
           ch->send(buf);
           sprintf(buf,
-                  "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\r\n",
+                  "%s from the %s ripes through the throat of %s!  Blood spouts as %s expires with a final gurgle.\n",
                   qPrintable(found->short_description), qPrintable(DC::dirs[rev_dir[dir]]),
                   victname, HSSH(victim));
           send_to_room(buf, victroom);
@@ -1567,13 +1567,13 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
         act(buf, victim, 0, 0, TO_CHAR, 0);
         sprintf(buf, "%s hits $n!", qPrintable(found->short_description));
         act(buf, victim, 0, ch, TO_ROOM, NOTVICT);
-        sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
+        sprintf(buf, "You hit %s with %s!\n", GET_SHORT(victim),
                 qPrintable(found->short_description));
         ch->send(buf);
       }
       else
       {
-        sprintf(buf, "You hit %s with %s!\r\n", GET_SHORT(victim),
+        sprintf(buf, "You hit %s with %s!\n", GET_SHORT(victim),
                 qPrintable(found->short_description));
         ch->send(buf);
         sprintf(buf, "You get shot with %s from the %s.  Ouch.",
@@ -1782,7 +1782,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
 
   if (!target->isNonPlayer())
   {
-    sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\r\n", GET_SHORT(target));
+    sprintf(buf, "Ewwwww gross!!!  %s is imagining you naked on all fours!\n", GET_SHORT(target));
     ch->send(buf);
     return ReturnValue::eFAILURE;
   }
@@ -1791,10 +1791,10 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
   ch->sendln(QStringLiteral("%1 seems to hate... %2.").arg(GET_SHORT(target)).arg(ch->mobdata->hated.isEmpty() ? "Noone!" : ch->mobdata->hated));
 
   if (ch->master)
-    sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
+    sprintf(buf, "%s seems to really like... %s.\n", GET_SHORT(target),
             GET_SHORT(ch->master));
   else
-    sprintf(buf, "%s seems to really like... %s.\r\n", GET_SHORT(target),
+    sprintf(buf, "%s seems to really like... %s.\n", GET_SHORT(target),
             "Noone!");
   ch->send(buf);
   return ReturnValue::eSUCCESS;
@@ -1869,7 +1869,7 @@ int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
   af.bitvector = -1;
   affect_to_char(ch, &af);
 
-  csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\r\n", races[i].singular_name);
+  csendf(ch, "You study the habits of the %s race and select them as your enemy of choice.\n", races[i].singular_name);
 
   return ReturnValue::eSUCCESS;
 }

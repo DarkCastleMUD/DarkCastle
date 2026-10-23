@@ -46,7 +46,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
 
   one_argument(argument, victim_name);
 
-  if (!ch->canPerform(SKILL_HARM_TOUCH, "You dunno even HOW to harm touch.\r\n"))
+  if (!ch->canPerform(SKILL_HARM_TOUCH, "You dunno even HOW to harm touch.\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -139,7 +139,7 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
   int duration = 24;
   one_argument(argument, victim_name);
 
-  if (!ch->canPerform(SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\r\n"))
+  if (!ch->canPerform(SKILL_LAY_HANDS, "You aren't skilled enough to lay a two-dollar whore with three bucks.\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -217,7 +217,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
 
   one_argument(argument, buf);
 
-  if (!ch->canPerform(SKILL_BEHEAD, "The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\r\n"))
+  if (!ch->canPerform(SKILL_BEHEAD, "The closest you'll ever get to 'beheading' is at a brit milah. Mazal tov!\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -277,7 +277,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   if (enemy_hp < 0.3) // covered is 0.3
   {
     chance += (ch->has_skill(SKILL_TWO_HANDED_WEAPONS) / 6);
-    // csendf(ch, "BEHEAD chance increased by %d\r\n", ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
+    // csendf(ch, "BEHEAD chance increased by %d\n", ch->has_skill( SKILL_TWO_HANDED_WEAPONS) / 6);
   }
   else
     chance >>= 1; // halving the chance if less than covered (nerf)
@@ -288,7 +288,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
   if (chance < 0)
     chance = 0;
 
-  // csendf(ch, "behead chance: %d, enemy hp%: %f\r\n", chance, enemy_hp);
+  // csendf(ch, "behead chance: %d, enemy hp%: %f\n", chance, enemy_hp);
 
   if ((number(0, 99) < chance) && !isSet(vict->immune, ISR_SLASH) && !isSet(vict->immune, ISR_PHYSICAL))
   {

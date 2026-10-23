@@ -966,7 +966,7 @@ void util_archive(const char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful archive: %s", char_name);
     if (caller)
-      caller->send(QStringLiteral("%1\r\n").arg(buf));
+      caller->send(QStringLiteral("%1\n").arg(buf));
     else
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
@@ -976,7 +976,7 @@ void util_archive(const char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character archived: %s", char_name);
   if (caller)
-    caller->send(QStringLiteral("%1\r\n").arg(buf));
+    caller->send(QStringLiteral("%1\n").arg(buf));
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
@@ -1020,7 +1020,7 @@ void util_unarchive(char *char_name, Character *caller)
   {
     sprintf(buf, "Unsuccessful unarchive: %s", char_name);
     if (caller)
-      caller->send(QStringLiteral("%1\r\n").arg(buf));
+      caller->send(QStringLiteral("%1\n").arg(buf));
     else
       logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
     return;
@@ -1030,7 +1030,7 @@ void util_unarchive(char *char_name, Character *caller)
   rename(buf, buf2);
   sprintf(buf, "Character unarchived: %s", char_name);
   if (caller)
-    caller->send(QStringLiteral("%1\r\n").arg(buf));
+    caller->send(QStringLiteral("%1\n").arg(buf));
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
@@ -1550,7 +1550,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (!ARE_GROUPED(this, victim) && !ARE_CLANNED(this, victim))
     {
-      send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\r\n").arg(victim->getNameC()));
+      send(QStringLiteral("You are not grouped or clanned with %1 so you cannot recall them.\n").arg(victim->getNameC()));
       return ReturnValue::eFAILURE;
     }
   }
@@ -1676,7 +1676,7 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 
     if (this->getGold() < (uint32_t)cost)
     {
-      this->send(QStringLiteral("You don't have %1 gold!\r\n").arg(cost));
+      this->send(QStringLiteral("You don't have %1 gold!\n").arg(cost));
       return ReturnValue::eFAILURE;
     }
 
@@ -1873,9 +1873,9 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     affect_to_char(ch, &af);
 
     if (obj && !obj->short_description.isEmpty())
-      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for %2 to reappear!\r\n").arg(GET_NAME(ch)).arg(obj->short_description));
+      send_info(QStringLiteral("\n##%1 has just logged out, watch for %2 to reappear!\n").arg(GET_NAME(ch)).arg(obj->short_description));
     else
-      send_info(QStringLiteral("\r\n##%1 has just logged out, watch for the Champion flag to reappear!\r\n").arg(GET_NAME(ch)));
+      send_info(QStringLiteral("\n##%1 has just logged out, watch for the Champion flag to reappear!\n").arg(GET_NAME(ch)));
   }
   find_and_remove_player_portal(ch);
   stop_all_quests(ch);
@@ -1928,7 +1928,7 @@ command_return_t Character::save(cmd_t cmd)
 
   if (cmd != cmd_t::SAVE_SILENTLY)
   {
-    send(QStringLiteral("Saving %1.\r\n").arg(GET_NAME(this)));
+    send(QStringLiteral("Saving %1.\n").arg(GET_NAME(this)));
   }
 
   if (this->isPlayer())
@@ -1964,7 +1964,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
     {
       if (arguments.at(0) == "hints")
       {
-        send("Saving hints.\r\n");
+        send("Saving hints.\n");
         DC::getInstance()->save_hints();
         return ReturnValue::eSUCCESS;
       }
@@ -1986,7 +1986,7 @@ int do_home(Character *ch, char *argument, cmd_t cmd)
         ch->room().isArena())
     {
       send_to_char("This place doesn't sit right with you...not enough "
-                   "security.\r\n",
+                   "security.\n",
                    ch);
       return ReturnValue::eFAILURE;
     }
@@ -2034,13 +2034,13 @@ command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
   switch (cmd)
   {
   case cmd_t::SELL:
-    send("You can't sell anything here!\r\n");
+    send("You can't sell anything here!\n");
     break;
   case cmd_t::ERASE:
-    send("You can't erase anything here!\r\n");
+    send("You can't erase anything here!\n");
     break;
   default:
-    send("Sorry, but you cannot do that here!\r\n");
+    send("Sorry, but you cannot do that here!\n");
     break;
   }
 
@@ -2120,12 +2120,12 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         if (ISSET(value, x + 1))
         {
           REMBIT(value, x + 1);
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+          csendf(ch, "%s flag REMOVED.\n", bits[x]);
         }
         else
         {
           SETBIT(value, x + 1);
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+          csendf(ch, "%s flag ADDED.\n", bits[x]);
         }
         found = true;
         break;
@@ -2151,7 +2151,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
         REMOVE_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(bits.value(x)));
+          ch->send(QStringLiteral("%1 flag REMOVED.\n").arg(bits.value(x)));
         }
       }
       else
@@ -2159,7 +2159,7 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
         SET_BIT(value, (1 << x));
         if (ch != nullptr)
         {
-          ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(bits.value(x)));
+          ch->send(QStringLiteral("%1 flag ADDED.\n").arg(bits.value(x)));
         }
       }
       found = true;
@@ -2211,12 +2211,12 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+          csendf(ch, "%s flag REMOVED.\n", bits[x]);
         }
         else
         {
           SET_BIT(value, (1 << x));
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+          csendf(ch, "%s flag ADDED.\n", bits[x]);
         }
         found = true;
         break;
@@ -2272,12 +2272,12 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
         if (isSet(value, (1 << x)))
         {
           REMOVE_BIT(value, (1 << x));
-          csendf(ch, "%s flag REMOVED.\r\n", bits[x]);
+          csendf(ch, "%s flag REMOVED.\n", bits[x]);
         }
         else
         {
           SET_BIT(value, (1 << x));
-          csendf(ch, "%s flag ADDED.\r\n", bits[x]);
+          csendf(ch, "%s flag ADDED.\n", bits[x]);
         }
         found = true;
         break;
@@ -2674,7 +2674,7 @@ void update_make_camp_and_leadership(void)
                  if (i->affected_by_spell(SKILL_MAKE_CAMP))
                  {
                    affect_from_char(i, SKILL_MAKE_CAMP);
-                   send_to_room("The camp has been disturbed.\r\n", i->in_room);
+                   send_to_room("The camp has been disturbed.\n", i->in_room);
                  }
                  if (i->affected_by_spell(SPELL_FARSIGHT) && i->affected_by_spell(SPELL_FARSIGHT)->modifier == 111)
                    affect_from_char(i, SPELL_FARSIGHT);
@@ -3137,7 +3137,7 @@ void Character::setPlayerLastMob(vnum_t mob_vnum)
 
   if (mob_vnum != this->player->last_mob_edit)
   {
-    send(fmt::format("Changing last mob vnum from {} to {}.\r\n", this->player->last_mob_edit, mob_vnum));
+    send(fmt::format("Changing last mob vnum from {} to {}.\n", this->player->last_mob_edit, mob_vnum));
     this->player->last_mob_edit = mob_vnum;
   }
 }

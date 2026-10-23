@@ -74,21 +74,21 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   if (arg1[0] == '\0')
   {
     // Show list of available professions based on player's class type
-    csendf(ch, "As a %s you can pick from the following professions:\r\n", pc_clss_types3[GET_CLASS(ch)]);
+    csendf(ch, "As a %s you can pick from the following professions:\n", pc_clss_types3[GET_CLASS(ch)]);
 
     for (std::vector<profession>::iterator i = professions.begin(); i != professions.end(); ++i)
     {
       if ((*i).c_class == GET_CLASS(ch))
       {
-        csendf(ch, "%s\r\n", (*i).Name.c_str());
+        csendf(ch, "%s\n", (*i).Name.c_str());
       }
     }
 
-    csendf(ch, "\r\n"
-               "Syntax: profession [profession name]\r\n"
-               "        profession reset\r\n"
-               "\r\n"
-               "Resetting your profession costs 10000 platinum.\r\n");
+    csendf(ch, "\n"
+               "Syntax: profession [profession name]\n"
+               "        profession reset\n"
+               "\n"
+               "Resetting your profession costs 10000 platinum.\n");
 
     return ReturnValue::eSUCCESS;
   }
@@ -113,7 +113,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
 
   if (found == false)
   {
-    csendf(ch, "%s not a valid profession.\r\n", arg1);
+    csendf(ch, "%s not a valid profession.\n", arg1);
     return ReturnValue::eFAILURE;
   }
 
@@ -520,7 +520,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
       if (last_profession != skilllist[i].group)
       {
         last_profession = skilllist[i].group;
-        csendf(this, "\r\n$B%s Profession Skills:$R\r\n", qPrintable(find_profession(c_class, skilllist[i].group)));
+        csendf(this, "\n$B%s Profession Skills:$R\n", qPrintable(find_profession(c_class, skilllist[i].group)));
         sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
         sendln("--------------------------------------------------------------------------------");
       }
@@ -649,16 +649,16 @@ int Character::skills_guild(const char *arg, Character *owner)
 
   if (!*arg) // display skills that can be learned
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", player->practices);
+    sprintf(buf, "You have %d practice sessions left.\n", player->practices);
     send(buf);
-    sendln("You can practice any of these skills:\r\n");
+    sendln("You can practice any of these skills:\n");
 
     sendln("$BUniversal skills:$R");
     sendln(" Ability:                Current/Practice/Autolearn  Cost:     Group:");
     sendln("--------------------------------------------------------------------------------");
     output_praclist(g_skills);
 
-    sprintf(buf, "\r\n$B%c%s skills:$R\r\n", UPPER(*pc_clss_types[GET_CLASS(this)]), (1 + pc_clss_types[GET_CLASS(this)]));
+    sprintf(buf, "\n$B%c%s skills:$R\n", UPPER(*pc_clss_types[GET_CLASS(this)]), (1 + pc_clss_types[GET_CLASS(this)]));
     send(buf);
 
     if (GET_CLASS(this) != CLASS_MONK)
@@ -739,7 +739,7 @@ int Character::skills_guild(const char *arg, Character *owner)
     // If this is a profession-specific skill and we are a mortal without that profession, disallow
     if (skilllist[skillnumber].group && this->isPlayer() && skilllist[skillnumber].group != player->profession)
     {
-      csendf(this, "You must join the %s profession in order to learn that.\r\n", qPrintable(find_profession(c_class, skilllist[skillnumber].group)));
+      csendf(this, "You must join the %s profession in order to learn that.\n", qPrintable(find_profession(c_class, skilllist[skillnumber].group)));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -916,7 +916,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
     {
       x = (int)(exp_needed - GET_EXP(ch));
 
-      ch->send(QStringLiteral("You need %1 experience to level.\r\n").arg(x));
+      ch->send(QStringLiteral("You need %1 experience to level.\n").arg(x));
       return ReturnValue::eSUCCESS;
     }
 
@@ -942,7 +942,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
         sprintf(buf, "Well done master %s, the guild has collected a tithe to reward your continued support of our profession.", pc_clss_types3[GET_CLASS(ch)]);
 
         owner->do_say(buf);
-        sprintf(buf, "Your guildmaster gives you %d platinum coins.\r\n", bonus);
+        sprintf(buf, "Your guildmaster gives you %d platinum coins.\n", bonus);
         ch->send(buf);
         GET_PLATINUM(ch) += bonus;
       }
@@ -1087,7 +1087,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
   {
     char buf[MAX_STRING_LENGTH];
 
-    snprintf(buf, sizeof(buf), "This is what is available:\r\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\r\n", get_skill_name(skl).toStdString().c_str());
+    snprintf(buf, sizeof(buf), "This is what is available:\n[2000 platinum] %s (type $B$2buy questskill$R to purchase it)\n", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);
     return ReturnValue::eSUCCESS;
   }
@@ -1121,14 +1121,14 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 
     extern void prepare_character_for_sixty(Character * ch);
     prepare_character_for_sixty(ch);
-    snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", get_skill_name(skl).toStdString().c_str());
+    snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);
 
     switch (GET_CLASS(ch))
     {
     case CLASS_DRUID:
       ch->learn_skill(SPELL_RELEASE_ELEMENTAL, 1, 1);
-      snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\r\n", get_skill_name(SPELL_RELEASE_ELEMENTAL).toStdString().c_str());
+      snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n", get_skill_name(SPELL_RELEASE_ELEMENTAL).toStdString().c_str());
       ch->send(buf);
       break;
     }
@@ -1137,7 +1137,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
 
   if (!*arg)
   {
-    sprintf(buf, "You have %d practice sessions left.\r\n", ch->player->practices);
+    sprintf(buf, "You have %d practice sessions left.\n", ch->player->practices);
     ch->send(buf);
     ch->sendln("You can practice any of these skills:");
     for (i = 0; *g_skills[i].skillname != '\n'; i++)
@@ -1145,7 +1145,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
       int known = ch->has_skill(g_skills[i].skillnum);
       if (ch->getLevel() < g_skills[i].levelavailable)
         continue;
-      sprintf(buf, " %-20s%14s   (Level %2llu)\r\n", g_skills[i].skillname,
+      sprintf(buf, " %-20s%14s   (Level %2llu)\n", g_skills[i].skillname,
               how_good(known), g_skills[i].levelavailable);
       ch->send(buf);
     }
@@ -1427,7 +1427,7 @@ void Character::skill_increase_check(int skill, int learned, int difficulty)
 
   if (skillname.isEmpty())
   {
-    send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\r\n").arg(skill));
+    send(QStringLiteral("Attempt to increase an unknown skill %1.  Tell a god. (bug)\n").arg(skill));
     logf(IMMORTAL, DC::LogChannel::LOG_BUG, "skill_increase_check(%s, skill=%d, learned=%d, difficulty=%d): Attempt to increase an unknown skill.", GET_NAME(this), skill, learned, difficulty);
     return;
   }

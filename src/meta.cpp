@@ -464,45 +464,45 @@ void Character::meta_list_stats(void)
   plat_cost = meta_get_stat_plat_cost(attribute_t::STRENGTH);
   max_stat = get_max_stat(this, attribute_t::STRENGTH);
   if (this->raw_str >= max_stat)
-    this->send(QStringLiteral("$B$31)$R Str:       Your strength is already %1.\r\n").arg(max_stat));
+    this->send(QStringLiteral("$B$31)$R Str:       Your strength is already %1.\n").arg(max_stat));
   else
-    csendf(this, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \r\n",
+    csendf(this, "$B$31)$R Str: %d        Cost: %d exp + %d Platinum coins. \n",
            (this->raw_str + 1), xp_price, plat_cost);
 
   xp_price = meta_get_stat_exp_cost(attribute_t::DEXTERITY);
   plat_cost = meta_get_stat_plat_cost(attribute_t::DEXTERITY);
   max_stat = get_max_stat(this, attribute_t::DEXTERITY);
   if (this->raw_dex >= max_stat)
-    this->send(QStringLiteral("$B$32)$R Dex:       Your dexterity is already %1.\r\n").arg(max_stat));
+    this->send(QStringLiteral("$B$32)$R Dex:       Your dexterity is already %1.\n").arg(max_stat));
   else
-    csendf(this, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\r\n",
+    csendf(this, "$B$32)$R Dex: %d        Cost: %d exp + %d Platinum coins.\n",
            (this->raw_dex + 1), xp_price, plat_cost);
 
   xp_price = meta_get_stat_exp_cost(attribute_t::CONSTITUTION);
   plat_cost = meta_get_stat_plat_cost(attribute_t::CONSTITUTION);
   max_stat = get_max_stat(this, attribute_t::CONSTITUTION);
   if (this->raw_con >= max_stat)
-    this->send(QStringLiteral("$B$33)$R Con:       Your constitution is already %1.\r\n").arg(max_stat));
+    this->send(QStringLiteral("$B$33)$R Con:       Your constitution is already %1.\n").arg(max_stat));
   else
-    csendf(this, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\r\n",
+    csendf(this, "$B$33)$R Con: %d        Cost: %d exp + %d Platinum coins.\n",
            (this->raw_con + 1), xp_price, plat_cost);
 
   xp_price = meta_get_stat_exp_cost(attribute_t::INTELLIGENCE);
   plat_cost = meta_get_stat_plat_cost(attribute_t::INTELLIGENCE);
   max_stat = get_max_stat(this, attribute_t::INTELLIGENCE);
   if (this->raw_intel >= max_stat)
-    this->send(QStringLiteral("$B$34)$R Int:       Your intelligence is already %1.\r\n").arg(max_stat));
+    this->send(QStringLiteral("$B$34)$R Int:       Your intelligence is already %1.\n").arg(max_stat));
   else
-    csendf(this, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\r\n",
+    csendf(this, "$B$34)$R Int: %d        Cost: %d exp + %d Platinum coins.\n",
            (this->raw_intel + 1), xp_price, plat_cost);
 
   xp_price = meta_get_stat_exp_cost(attribute_t::WISDOM);
   plat_cost = meta_get_stat_plat_cost(attribute_t::WISDOM);
   max_stat = get_max_stat(this, attribute_t::WISDOM);
   if (this->raw_wis >= max_stat)
-    this->send(QStringLiteral("$B$35)$R Wis:       Your wisdom is already %1.\r\n").arg(max_stat));
+    this->send(QStringLiteral("$B$35)$R Wis:       Your wisdom is already %1.\n").arg(max_stat));
   else
-    csendf(this, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\r\n",
+    csendf(this, "$B$35)$R Wis: %d        Cost: %d exp + %d Platinum coins.\n",
            (this->raw_wis + 1), xp_price, plat_cost);
 }
 
@@ -671,7 +671,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (ch->getLevel() < 10)
   {
     send_to_char("$B$2The Meta-physician tells you, 'You're too low level for$R "
-                 "$B$2me to waste my time on you.$R\r\n"
+                 "$B$2me to waste my time on you.$R\n"
                  "$B$2Prove to me you are gonna stick around first!'$R.",
                  ch);
     return ReturnValue::eSUCCESS;
@@ -736,7 +736,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       break;
     }
     expcost = platcost * 51523;
-    csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \r\n", platcost, expcost);
+    csendf(ch, "$B$2The Meta-physician tells you, 'That would cost you %ld platinum and %ld experience.'$R \n", platcost, expcost);
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::LIST)
@@ -749,42 +749,42 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     ch->sendln("$BStatistic Meta:$R");
     if (hit_exp && hit_cost)
       csendf(ch, "$B$36)$R Add 5 points to your hit points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
+                 " Platinum coins.\n",
              hit_exp, hit_cost);
     else
       ch->sendln("$B$36)$R Add to your hit points:   You cannot do ch.");
 
     if (hit_exp && hit_cost)
       csendf(ch, "$B$37)$R Add 1 point to your hit points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
+                 " Platinum coins.\n",
              (int64_t)(hit_exp / 5 * 1.1), (int64_t)(hit_cost / 5 * 1.1));
     else
       ch->sendln("$B$37)$R Add to your hit points:   You cannot do ch.");
 
     if (mana_exp && mana_cost)
       csendf(ch, "$B$38)$R Add 5 points to your mana points:  %ld experience points and %ld"
-                 " Platinum coins.\r\n",
+                 " Platinum coins.\n",
              mana_exp, mana_cost);
     else
       ch->sendln("$B$38)$R Add to your mana points:  You cannot do ch.");
 
     if (mana_exp && mana_cost)
       csendf(ch, "$B$39)$R Add 1 point to your mana points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
+                 " Platinum coins.\n",
              (int64_t)(mana_exp / 5 * 1.1), (int64_t)(mana_cost / 5 * 1.1));
     else
       ch->sendln("$B$39)$R Add to your mana points:   You cannot do ch.");
 
     if (move_exp && move_cost)
       csendf(ch, "$B$310)$R Add 5 points to your movement points: %ld experience points and %ld"
-                 " Platinum coins.\r\n",
+                 " Platinum coins.\n",
              move_exp, move_cost);
     else
       ch->sendln("$B$310)$R Add to your movement points:  You cannot do ch.");
 
     if (move_exp && move_cost)
       csendf(ch, "$B$311)$R Add 1 points to your movement points:   %ld experience points and %ld"
-                 " Platinum coins.\r\n",
+                 " Platinum coins.\n",
              (int64_t)(move_exp / 5 * 1.1), (int64_t)(move_cost / 5 * 1.1));
     else
       ch->sendln("$B$311)$R Add to your movement points:   You cannot do ch.");
@@ -793,26 +793,26 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
     if (!ch->isNonPlayer() && ki_cost && ki_exp)
     { // mobs can't meta ki
-      csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\r\n", ki_exp, ki_cost);
+      csendf(ch, "$B$312)$R Add a point of ki:        %ld experience points and %ld Platinum.\n", ki_exp, ki_cost);
     }
     else if (!ch->isNonPlayer())
       ch->sendln("$B$312)$R Add a point of ki:        You cannot do ch.");
 
     ch->sendln("$BMonetary Exchange:$R");
     send_to_char(
-        "$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\r\n"
-        "$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\r\n"
-        "$B$315)$R 250 Platinum coins        Cost: 5,000,000 Gold Coins.\r\n"
-        "$B$316)$R 100,000 Gold Coins        Cost: Five (5) Platinum coins.\r\n"
-        "$B$317)$R 5,000,000 Gold Coins      Cost: 250 Platinum coins.\r\n"
-        "$BOther Services:$R\r\n"
-        "$B$318)$R Convert experience to gold. (100mil Exp. = 500000 Gold.)\r\n"
-        "$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\r\n"
-        "$B$320)$R Buy a practice session for 25 plats.\r\n",
+        "$B$313)$R One (1) Platinum coin     Cost: 20,000 Gold Coins.\n"
+        "$B$314)$R Five (5) Platinum coins   Cost: 100,000 Gold Coins.\n"
+        "$B$315)$R 250 Platinum coins        Cost: 5,000,000 Gold Coins.\n"
+        "$B$316)$R 100,000 Gold Coins        Cost: Five (5) Platinum coins.\n"
+        "$B$317)$R 5,000,000 Gold Coins      Cost: 250 Platinum coins.\n"
+        "$BOther Services:$R\n"
+        "$B$318)$R Convert experience to gold. (100mil Exp. = 500000 Gold.)\n"
+        "$B$319)$R A deep blue potion of healing. Cost: 25 Platinum coins.\n"
+        "$B$320)$R Buy a practice session for 25 plats.\n",
         ch);
     if (!ch->isNonPlayer())
     {
-      csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\r\n", GET_AC_METAS(ch));
+      csendf(ch, "$B$321)$R Add -2 points of AC for 10 qpoints. (-250 Max) (current -%d)\n", GET_AC_METAS(ch));
       ch->sendln("$B$322)$R Add 2,000,000 experience for 1 qpoint.");
     }
 
@@ -895,7 +895,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", statplatprice, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", statplatprice, GET_PLATINUM(ch)));
 
       // affect the stat by 0 to reflect the new raw stat
       affect_modify(ch, APPLY_STR, 0, -1, true);
@@ -930,7 +930,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_HP_METAS(ch) += 5;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -958,7 +958,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_HP_METAS(ch) += 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", hit_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", hit_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -985,7 +985,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_MANA_METAS(ch) += 5;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -1014,7 +1014,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_MANA_METAS(ch) += 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", mana_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", mana_cost, GET_PLATINUM(ch)));
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
     }
@@ -1039,7 +1039,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_MOVE_METAS(ch) += 5;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
@@ -1068,7 +1068,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       GET_MOVE_METAS(ch) += 1;
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", move_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", move_cost, GET_PLATINUM(ch)));
       redo_hitpoints(ch);
       redo_mana(ch);
       return ReturnValue::eSUCCESS;
@@ -1099,7 +1099,7 @@ int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       redo_ki(ch);
       act("The Meta-physician touches $n.", ch, 0, 0, TO_ROOM, 0);
       act("The Meta-physician touches you.", ch, 0, 0, TO_CHAR, 0);
-      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", ki_cost, GET_PLATINUM(ch)));
+      ch->send(fmt::format(std::locale("en_US.UTF-8"), "The Meta-physician takes {:L} platinum from you, leaving you with {:L} platinum.\n", ki_cost, GET_PLATINUM(ch)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1594,41 +1594,41 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
 {
   if (cmd == cmd_t::LIST) // list
   {
-    ch->sendln("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\r\nEnter \"buy <number>\" to make a selection.\r\n");
-    ch->sendln("$BRace Change:$R\r\n(Remember a race change will reduce your base attributes by 2 points each.)");
+    ch->sendln("$B$2Cardinal Thelonius tells you, 'Here's what I can do for you...'$R\nEnter \"buy <number>\" to make a selection.\n");
+    ch->sendln("$BRace Change:$R\n(Remember a race change will reduce your base attributes by 2 points each.)");
 
     for (int i = 1; i <= MAX_PC_RACE; i++)
-      csendf(ch, "$B$3%d)$R  %-32s - %s\r\n", i, races[i].singular_name, ch->race_message(i));
+      csendf(ch, "$B$3%d)$R  %-32s - %s\n", i, races[i].singular_name, ch->race_message(i));
 
     ch->sendln("$BOther Services:$R");
 
-    csendf(ch, "$B$3%d)$R %-32s - 1000 platinum coins.\r\n", MAX_PC_RACE + 1, "Sex Change");
-    csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\r\n", MAX_PC_RACE + 2, "A deep red vial of mana");
+    csendf(ch, "$B$3%d)$R %-32s - 1000 platinum coins.\n", MAX_PC_RACE + 1, "Sex Change");
+    csendf(ch, "$B$3%d)$R %-32s - 50 platinum coins.\n", MAX_PC_RACE + 2, "A deep red vial of mana");
 
     ch->sendln("$BHeight/Weight Change:$R");
     ch->heightweight(false);
     if (ch->height < races[ch->race].max_height)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 3, "Increase your height by 1");
+      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\n", MAX_PC_RACE + 3, "Increase your height by 1");
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 3, "You cannot increase your height further");
+      csendf(ch, "$B$3%d)$R %-32s.\n", MAX_PC_RACE + 3, "You cannot increase your height further");
 
     if (ch->height > races[ch->race].min_height)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 4, "Decrease your height by 1");
+      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\n", MAX_PC_RACE + 4, "Decrease your height by 1");
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 4, "You cannot decrease your height further");
+      csendf(ch, "$B$3%d)$R %-32s.\n", MAX_PC_RACE + 4, "You cannot decrease your height further");
 
     if (ch->weight < races[ch->race].max_weight)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 5, "Increase your weight by 1");
+      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\n", MAX_PC_RACE + 5, "Increase your weight by 1");
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 5, "You cannot increase your weight further");
+      csendf(ch, "$B$3%d)$R %-32s.\n", MAX_PC_RACE + 5, "You cannot increase your weight further");
 
     if (ch->weight > races[ch->race].min_weight)
-      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\r\n", MAX_PC_RACE + 6, "Decrease your weight by 1");
+      csendf(ch, "$B$3%d)$R %-32s - 250 platinum coins.\n", MAX_PC_RACE + 6, "Decrease your weight by 1");
     else
-      csendf(ch, "$B$3%d)$R %-32s.\r\n", MAX_PC_RACE + 6, "You cannot decrease your weight further");
+      csendf(ch, "$B$3%d)$R %-32s.\n", MAX_PC_RACE + 6, "You cannot decrease your weight further");
     ch->heightweight(true);
-    csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 7, "Increase your age by 1 (500 max)");
-    csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\r\n", MAX_PC_RACE + 8, "Decrease your age by 1  (18 min)");
+    csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\n", MAX_PC_RACE + 7, "Increase your age by 1 (500 max)");
+    csendf(ch, "$B$3%d)$R %-32s - 5 quest points.\n", MAX_PC_RACE + 8, "Decrease your age by 1  (18 min)");
 
     return ReturnValue::eSUCCESS;
   }
@@ -1703,7 +1703,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
       }
       else
       {
-        ch->send(QStringLiteral("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\r\n").arg(choice));
+        ch->send(QStringLiteral("$BYou must enter 'buy %1 CONFIRM' if you are positive you wish to make ch change!\n").arg(choice));
         ch->sendln("$4NOTE$R$B: Your attributes will be adjusted to fit ch new race and then lowered by 2 points each.$R");
       }
       return ReturnValue::eSUCCESS;
@@ -1719,7 +1719,7 @@ int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, 
         newsex = Character::sex_t::FEMALE;
       else
       {
-        csendf(ch, "Syntax: buy %d m/f/n\r\n", MAX_PC_RACE + 1);
+        csendf(ch, "Syntax: buy %d m/f/n\n", MAX_PC_RACE + 1);
         return ReturnValue::eSUCCESS;
       }
       if (GET_SEX(ch) == newsex)

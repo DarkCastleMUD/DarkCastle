@@ -242,7 +242,7 @@ void string_to_file(QTextStream &fl, QString str);
 
 void string_to_file(auto &fl, QString str)
 {
-  fl << str.remove('\r').toStdString() << "~\n";
+  fl << str.toStdString() << "~\n";
 }
 
 void write_mprog_recur(auto &fl, mob_prog_data *mprg, bool mob)
@@ -1241,7 +1241,7 @@ public:
   void send(QString buffer);
   void sendln(QString buffer = {})
   {
-    buffer = buffer.append("\r\n");
+    buffer = buffer.append("\n");
     send(buffer);
   }
   command_return_t tell(Character *, QString);
@@ -1444,13 +1444,13 @@ T parse_bitstrings(QString arg1, Character *ch = nullptr, T value = {})
         // value
         value.setFlag(obj_position, false);
         if (ch)
-          ch->send(QStringLiteral("%1 flag REMOVED.\r\n").arg(metaEnum.key(x)));
+          ch->send(QStringLiteral("%1 flag REMOVED.\n").arg(metaEnum.key(x)));
       }
       else
       {
         value.setFlag(obj_position);
         if (ch)
-          ch->send(QStringLiteral("%1 flag ADDED.\r\n").arg(metaEnum.key(x)));
+          ch->send(QStringLiteral("%1 flag ADDED.\n").arg(metaEnum.key(x)));
       }
       found = true;
       break;

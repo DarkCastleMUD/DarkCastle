@@ -84,7 +84,7 @@ int is_ok(Character *keeper, Character *ch, int shop_nr)
   if (ISSET(ch->affected_by, AFF_KILLER))
   {
     keeper->do_say("Go away before I call the guards!!");
-    sprintf(buf, "%s the KILLER is over here!\r\n", GET_SHORT(ch));
+    sprintf(buf, "%s the KILLER is over here!\n", GET_SHORT(ch));
     do_shout(keeper, buf);
     return false;
   }
@@ -258,7 +258,7 @@ void shopping_buy(const char *arg, Character *ch,
 
   act("$n buys $p.", ch, obj, 0, TO_ROOM, 0);
   keeper->do_tell(shop.message_buy.arg(GET_NAME(ch)).arg(QString::number(cost)).split(' '));
-  ch->send(QStringLiteral("You now have %1.\r\n").arg(obj->short_description));
+  ch->send(QStringLiteral("You now have %1.\n").arg(obj->short_description));
   ch->removeGold(cost);
   keeper->addGold(cost);
 
@@ -370,7 +370,7 @@ void shopping_sell(const char *arg, Character *ch,
 
   act("$n sells $p.", ch, obj, 0, TO_ROOM, 0);
   keeper->do_tell(DC::getInstance()->shop_index[shop_nr].message_sell.arg(GET_NAME(ch)).arg(QString::number(cost)).split(' '));
-  ch->send(QStringLiteral("The shopkeeper now has %1.\r\n").arg(obj->short_description));
+  ch->send(QStringLiteral("The shopkeeper now has %1.\n").arg(obj->short_description));
   ch->addGold(cost);
   keeper->removeGold(cost);
 
@@ -673,7 +673,7 @@ void shopping_list(const char *arg, Character *ch,
         a++;
     /*        if ( GET_ITEM_TYPE(obj) == ITEM_DRINKCON && obj->obj_flags.value[1] )
             {
-                sprintf( buf, "[%3d] [%7d] %s of %s.\r\n",
+                sprintf( buf, "[%3d] [%7d] %s of %s.\n",
                     a, cost, obj->short_description,
                     drinks[obj->obj_flags.value[2]] );
             }
@@ -1273,7 +1273,7 @@ void player_shopping_withdraw(const char *arg, Character *ch, Character *keeper)
 
   shop->money_on_hand -= value;
   ch->addGold(value);
-  ch->send(QStringLiteral("You take %1 $B$5gold$R out of the till.\r\n").arg(QString::number(value)));
+  ch->send(QStringLiteral("You take %1 $B$5gold$R out of the till.\n").arg(QString::number(value)));
   write_one_player_shop(shop);
 }
 
@@ -1309,8 +1309,8 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
 
   if (!(*select))
   {
-    send_to_char("$3Usage$R: design <field> <correct arguments>\r\n"
-                 "Fields are the following.\r\n",
+    send_to_char("$3Usage$R: design <field> <correct arguments>\n"
+                 "Fields are the following.\n",
                  ch);
     ch->display_string_list(pdesign_values);
     return;
@@ -1332,8 +1332,8 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
   case 0: // sellmessage
     if (!*text)
     {
-      send_to_char("$3Syntax$R: design sellmessage <message>\r\n"
-                   "  Put 'none' if you want no special message.\r\n",
+      send_to_char("$3Syntax$R: design sellmessage <message>\n"
+                   "  Put 'none' if you want no special message.\n",
                    ch);
       return;
     }
@@ -1346,7 +1346,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       *shop->sell_message = '\0';
     else
       strcpy(shop->sell_message, text);
-    ch->send(QStringLiteral("Shop sell message changed to '%1'.\r\n").arg(shop->sell_message));
+    ch->send(QStringLiteral("Shop sell message changed to '%1'.\n").arg(shop->sell_message));
     write_one_player_shop(shop); // save it
     break;
 
@@ -1362,7 +1362,7 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
       return;
     }
     DC::getInstance()->world[shop->room_num].name = text;
-    csendf(ch, "Room name set to '%s'.\r\n", qPrintable(DC::getInstance()->world[shop->room_num].name));
+    csendf(ch, "Room name set to '%s'.\n", qPrintable(DC::getInstance()->world[shop->room_num].name));
     save_player_shop_world_range();
     break;
 
@@ -1371,8 +1371,8 @@ void player_shopping_design(const char *arg, Character *ch, Character *keeper)
     break;
 
   default:
-    send_to_char("$3Usage$R: design <field> <correct arguments>\r\n"
-                 "Fields are the following.\r\n",
+    send_to_char("$3Usage$R: design <field> <correct arguments>\n"
+                 "Fields are the following.\n",
                  ch);
     ch->display_string_list(pdesign_values);
     break;
@@ -1399,8 +1399,8 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
     ch->sendln("Invalid player shop keeper.  Let a god know.");
     return;
   }
-  send_to_char("Item                                          Price\r\n"
-               "------------------------------------------------------\r\n",
+  send_to_char("Item                                          Price\n"
+               "------------------------------------------------------\n",
                ch);
 
   if (!shop->sale_list)
@@ -1412,13 +1412,13 @@ void player_shopping_list(const char *arg, Character *ch, Character *keeper)
       count++;
       robj = item->item_vnum;
       if (robj < 0)
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\n").arg(QString::number(count), -3).arg("INVALID ITEM NUMBER", -40).arg(QString::number(item->price)));
       else
-        ch->send(QStringLiteral("%1$3)$R %2 %3\r\n").arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(QString::number(item->price)));
+        ch->send(QStringLiteral("%1$3)$R %2 %3\n").arg(QString::number(count), -3).arg((DC::getInstance()->obj_index[robj].item)->short_description, -40).arg(QString::number(item->price)));
     }
 
   if (!strcmp(shop->owner, GET_NAME(ch)))
-    ch->send(QStringLiteral("\r\nYour shop has %1 cash in the till.\r\n").arg(QString::number(shop->money_on_hand)));
+    ch->send(QStringLiteral("\nYour shop has %1 cash in the till.\n").arg(QString::number(shop->money_on_hand)));
 }
 
 int player_shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
@@ -1490,8 +1490,8 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
   arg = one_argumentnolow(arg, select);
 
   if(!(*select)) {
-    send_to_char("$3Usage$R: pshopedit <field> <correct arguments>\r\n"
-                 "Fields are the following.\r\n"
+    send_to_char("$3Usage$R: pshopedit <field> <correct arguments>\n"
+                 "Fields are the following.\n"
                  , ch);
     display_string_list(pshopedit_values, ch);
     return ReturnValue::eFAILURE;
@@ -1512,9 +1512,9 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
     case 0: // new
       half_chop(arg, buf, text);
       if(!*buf || !*text) {
-         send_to_char("$3Syntax$R: pshopedit new <Playername> <roomnum>\r\n"
-                      "  Make sure that your CAPITALIZE the player name or\r\n"
-                      "  they won't be able to use it.\r\n", ch);
+         send_to_char("$3Syntax$R: pshopedit new <Playername> <roomnum>\n"
+                      "  Make sure that your CAPITALIZE the player name or\n"
+                      "  they won't be able to use it.\n", ch);
          return ReturnValue::eFAILURE;
       }
       i = atoi(text);
@@ -1532,7 +1532,7 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
       g_playershops = shop;
       save_shop_list();
       write_one_player_shop(shop);
-      csendf(ch, "Shop created for player '%s' in room %d.\r\n", shop->owner, shop->room_num);
+      csendf(ch, "Shop created for player '%s' in room %d.\n", shop->owner, shop->room_num);
       break;
 
     case 1: // delete
@@ -1541,16 +1541,16 @@ int do_pshopedit(Character * ch, char * arg, cmd_t cmd)
       break;
 
     case 2: // list
-      ch->sendln("Player Shops\r\n-------------------------");
+      ch->sendln("Player Shops\n-------------------------");
       if(!g_playershops)
          ch->sendln("No current shops.");
       else for(i = 1, shop = g_playershops; shop; shop = shop->next, i++)
-        csendf(ch, "%2d$3)$R %-15s $3Room$R: %5d\r\n", i, shop->owner, shop->room_num);
+        csendf(ch, "%2d$3)$R %-15s $3Room$R: %5d\n", i, shop->owner, shop->room_num);
       break;
 
     default:
-      send_to_char("$3Usage$R: pshopedit <field> <correct arguments>\r\n"
-                 "Fields are the following.\r\n"
+      send_to_char("$3Usage$R: pshopedit <field> <correct arguments>\n"
+                 "Fields are the following.\n"
                  , ch);
       display_string_list(pshopedit_values, ch);
       break;
@@ -1637,7 +1637,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (IS_AFFECTED(ch, AFF_BLIND))
   {
-    ch->send("You're too blind to do that!\r\n");
+    ch->send("You're too blind to do that!\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -1646,7 +1646,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (cmd == cmd_t::LIST)
   {
-    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\r\n$R", GET_SHORT(owner));
+    csendf(ch, "$B$2%s tells you, 'This is what I can do for you...\n$R", GET_SHORT(owner));
     ch->sendln("  | Item                              | Cost                                   |");
     ch->sendln("--------------------------------------------------------------------------------");
     int last_vnum = 0;
@@ -1692,17 +1692,17 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       // setup format specifier based length of item short descriptions
       if (cost_qty > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus|%%2d x %%-%zus|\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus|%%2d x %%-%zus|\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_qty, cost_buf);
       }
       else if (cost_plats > 0)
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| $B%%-%zus$R    |\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| $B%%-%zus$R    |\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
       else
       {
-        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\r\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
+        snprintf(buf, 1024, "$B$3%%2d$R|%%2d x %%-%zus| %%-%zus    |\n", 30 + (strlen(item_buf) - nocolor_strlen(item_buf)), 35 + (strlen(cost_buf) - nocolor_strlen(cost_buf)));
         csendf(ch, buf, i + 1, item_qty, item_buf, cost_buf);
       }
     }
@@ -1744,7 +1744,7 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
     int choice = atoi(arg1);
     if (choice < 1 || choice > MAX_EDDIE_ITEMS)
     {
-      ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\r\n").arg(QString::number(MAX_EDDIE_ITEMS)));
+      ch->send(QStringLiteral("Invalid number. Choose between 1 and %1.\n").arg(QString::number(MAX_EDDIE_ITEMS)));
       return ReturnValue::eSUCCESS;
     }
 
@@ -1753,11 +1753,11 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       if (GET_EXP(ch) >= eddie[choice - 1].cost_exp)
       {
         GET_EXP(ch) -= eddie[choice - 1].cost_exp;
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} experience from you, leaving you with {:L} experience.\r\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} experience from you, leaving you with {:L} experience.\n", eddie[choice - 1].cost_exp, GET_EXP(ch)));
       }
       else
       {
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\r\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} experience to pay for that item. You need {:L} more experience.\n", eddie[choice - 1].cost_exp, eddie[choice - 1].cost_exp - GET_EXP(ch)));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1766,11 +1766,11 @@ int eddie_shopkeeper(Character *ch, class Object *obj, cmd_t cmd, const char *ar
       if (GET_PLATINUM(ch) >= eddie[choice - 1].cost_plats)
       {
         GET_PLATINUM(ch) -= eddie[choice - 1].cost_plats;
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\r\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "Eddie takes {:L} platinum from you, leaving you with {:L} platinum.\n", eddie[choice - 1].cost_plats, GET_PLATINUM(ch)));
       }
       else
       {
-        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\r\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
+        ch->send(fmt::format(std::locale("en_US.UTF-8"), "You do not have the {:L} platinum to pay for that item. You need {:L} more platinum.\n", eddie[choice - 1].cost_plats, eddie[choice - 1].cost_plats - GET_PLATINUM(ch)));
         return ReturnValue::eSUCCESS;
       }
     }
@@ -1972,7 +1972,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send("An error occurred. The object is missing.\n");
       }
 
       obj = r.orig_obj;
@@ -1983,14 +1983,14 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
         {
           owner->tell(ch, "Choice 1 is:");
           identify(ch, o);
-          ch->send("\r\n");
+          ch->send("\n");
           r.choice1_obj = o;
         }
         else if (r.choice2_obj == nullptr)
         {
           owner->tell(ch, "Choice 2 is:");
           identify(ch, o);
-          ch->send("\r\n");
+          ch->send("\n");
           r.choice2_obj = o;
         }
         r.state = reroll_t::reroll_states_t::REROLLED;
@@ -2025,7 +2025,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send("An error occurred. The object is missing.\n");
       }
       obj_from(r.choice2_obj);
       obj_from(r.orig_obj);
@@ -2042,7 +2042,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send("An error occurred. The object is missing.\n");
       }
 
       obj_from(r.choice1_obj);
@@ -2060,7 +2060,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
       }
       else
       {
-        ch->send("An error occurred. The object is missing.\r\n");
+        ch->send("An error occurred. The object is missing.\n");
       }
       obj_from(r.choice1_obj);
       obj_from(r.choice2_obj);
@@ -2088,7 +2088,7 @@ int reroll_trader(Character *ch, Object *obj, cmd_t cmd, const char *arg, Charac
     }
     else
     {
-      ch->send("An error occurred. The object is missing.\r\n");
+      ch->send("An error occurred. The object is missing.\n");
     }
     reroll_sessions.erase(GET_NAME(ch));
     break;

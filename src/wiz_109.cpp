@@ -143,14 +143,14 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 
   if (!isSet(victim->player->toggles, Player::PLR_GUIDE))
   {
-    send(QStringLiteral("%1 is now a guide.\r\n").arg(victim->getNameC()));
+    send(QStringLiteral("%1 is now a guide.\n").arg(victim->getNameC()));
     victim->sendln("You have been selected to be a DC Guide!");
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE);
     SET_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
   }
   else
   {
-    send(QStringLiteral("%1 is no longer a guide.\r\n").arg(victim->getNameC()));
+    send(QStringLiteral("%1 is no longer a guide.\n").arg(victim->getNameC()));
     victim->sendln("You have been removed as a DC guide.");
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE);
     REMOVE_BIT(victim->player->toggles, Player::PLR_GUIDE_TOG);
@@ -244,13 +244,13 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->sendln("You feel generous.");
-  act("$n makes some strange gestures.\r\nA strange feeling comes upon you,"
-      "like a giant hand. Light comes\r\ndown from above, grabbing your "
-      "body, which begins to pulse\r\nwith coloured lights from inside.\r\nYo"
-      "ur head seems to be filled with deamons\r\nfrom another plane as your"
-      " body dissolves\r\nto the elements of time and space itself.\r\nSudde"
-      "nly a silent explosion of light snaps\r\nyou back to reality. You fee"
-      "l slightly\r\ndifferent.",
+  act("$n makes some strange gestures.\nA strange feeling comes upon you,"
+      "like a giant hand. Light comes\ndown from above, grabbing your "
+      "body, which begins to pulse\nwith coloured lights from inside.\nYo"
+      "ur head seems to be filled with deamons\nfrom another plane as your"
+      " body dissolves\nto the elements of time and space itself.\nSudde"
+      "nly a silent explosion of light snaps\nyou back to reality. You fee"
+      "l slightly\ndifferent.",
       ch, 0, victim, TO_VICT, 0);
 
   sprintf(buf, "%s advances %s to level %d.", GET_NAME(ch),
@@ -281,8 +281,8 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 
   if (name.isEmpty())
   {
-    send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
-                 "lower than you.\r\n",
+    send_to_char("Zap who??\nOh, BTW this deletes anyone "
+                 "lower than you.\n",
                  this);
     return ReturnValue::eFAILURE;
   }
@@ -309,7 +309,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     if (victim->isPlayer())
     {
       victim->sendln(QString("A massive bolt of lightning arcs down from the "
-                             "heavens, striking you\r\nbetween the eyes. You have "
+                             "heavens, striking you\nbetween the eyes. You have "
                              "been utterly destroyed by %1.")
                          .arg(GET_SHORT(this)));
     }
@@ -317,8 +317,8 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     room = victim->in_room;
 
     QString buf = QString("A massive bolt of lightning arcs down from the heavens,"
-                          " striking\r\n%1 between the eyes.\r\n  %2 has been utterly"
-                          " destroyed by %3.\r\n")
+                          " striking\n%1 between the eyes.\n  %2 has been utterly"
+                          " destroyed by %3.\n")
                       .arg(victim->getName())
                       .arg(GET_SHORT(victim))
                       .arg(GET_SHORT(this));
@@ -339,14 +339,14 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
     remove_character(victim->getName(), ZAPPED);
 
     send_to_room(buf, room);
-    send_to_all("You hear an ominous clap of thunder in the distance.\r\n");
-    logentry(QStringLiteral("%1 has deleted %2.\r\n").arg(getName()).arg(victim->getName()), ANGEL, DC::LogChannel::LOG_GOD);
+    send_to_all("You hear an ominous clap of thunder in the distance.\n");
+    logentry(QStringLiteral("%1 has deleted %2.\n").arg(getName()).arg(victim->getName()), ANGEL, DC::LogChannel::LOG_GOD);
   }
 
   else
   {
-    send_to_char("Zap who??\r\nOh, BTW this deletes anyone "
-                 "lower than you.\r\n",
+    send_to_char("Zap who??\nOh, BTW this deletes anyone "
+                 "lower than you.\n",
                  this);
   }
 
@@ -369,7 +369,7 @@ int do_global(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("What message do you want to send to all players?");
   else
   {
-    sprintf(buf, "\r\n%s\r\n", argument + i);
+    sprintf(buf, "\n%s\n", argument + i);
     for (point = DC::getInstance()->descriptor_list; point; point = point->next)
       if (!point->connected && point->character)
         point->character->send(buf);
@@ -397,23 +397,23 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty())
   {
-    send_to_char("Syntax:  shutdown [sub command] [options ...]\r\n"
-                 " Sub Commands:\r\n"
-                 "--------------\r\n"
-                 "   hot - Rerun current DC filename and keep players' links active.\r\n"
-                 "         Options: [path/dc executable] [dc options ...]\r\n"
-                 "  cold - Go ahead and kill the links.\r\n"
-                 " crash - Crash the mud by referencing an invalid pointer.\r\n"
-                 "  core - Produce a core file.\r\n"
-                 "  auto - Toggle auto-hotboot on crash setting.\r\n"
-                 "   die - Kill boot script and crash mud so it won't reboot.\r\n",
+    send_to_char("Syntax:  shutdown [sub command] [options ...]\n"
+                 " Sub Commands:\n"
+                 "--------------\n"
+                 "   hot - Rerun current DC filename and keep players' links active.\n"
+                 "         Options: [path/dc executable] [dc options ...]\n"
+                 "  cold - Go ahead and kill the links.\n"
+                 " crash - Crash the mud by referencing an invalid pointer.\n"
+                 "  core - Produce a core file.\n"
+                 "  auto - Toggle auto-hotboot on crash setting.\n"
+                 "   die - Kill boot script and crash mud so it won't reboot.\n",
                  this);
     return ReturnValue::eFAILURE;
   }
 
   if (arg1 == "cold")
   {
-    QString buffer = QStringLiteral("Shutdown by %1.\r\n").arg(GET_SHORT(this));
+    QString buffer = QStringLiteral("Shutdown by %1.\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     _shutdown = 1;
@@ -432,7 +432,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
           {
             if (follower->carrying != nullptr)
             {
-              send(QStringLiteral("Player %1 has charmie %2 with equipment.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+              send(QStringLiteral("Player %1 has charmie %2 with equipment.\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
               return ReturnValue::eFAILURE;
             }
           }
@@ -441,7 +441,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     }
 
     do_not_save_corpses = 1;
-    QString buffer = QStringLiteral("Hot reboot by %1.\r\n").arg(GET_SHORT(this));
+    QString buffer = QStringLiteral("Hot reboot by %1.\n").arg(GET_SHORT(this));
     send_to_all(buffer);
     logentry(buffer, ANGEL, DC::LogChannel::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
@@ -506,7 +506,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
             {
               if (follower->carrying != nullptr || follower->equipment[0] != nullptr)
               {
-                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\r\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
+                send(QStringLiteral("Player %1 has charmie %2 with equipment. Use Force to override.\n").arg(victim->getNameC()).arg(GET_NAME(follower)));
                 return ReturnValue::eFAILURE;
               }
             }
@@ -514,7 +514,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
         }
       }
     }
-    send("Ok.\r\n");
+    send("Ok.\n");
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eSUCCESS;
@@ -553,7 +553,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
 
   if (*arg1 == 0)
   {
-    ch->sendln("testport <start | stop>\r\n");
+    ch->sendln("testport <start | stop>\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -609,7 +609,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 
   if (arg1.isEmpty() || arg2.isEmpty())
   {
-    ch->sendln("testuser <user> <on|off>\r\n");
+    ch->sendln("testuser <user> <on|off>\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -661,7 +661,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 #ifdef BANDWIDTH
 int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 {
-  csendf(ch, "Bytes sent in %ld seconds: %ld\r\n",
+  csendf(ch, "Bytes sent in %ld seconds: %ld\n",
          get_bandwidth_start(), get_bandwidth_amount());
   return ReturnValue::eSUCCESS;
 }
@@ -676,8 +676,8 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
 
   if (!(*argument))
   {
-    send_to_char("Syntax:  skilledit <character> <action> <value>\r\n"
-                 "Possible actions are:  list, add, delete\r\n",
+    send_to_char("Syntax:  skilledit <character> <action> <value>\n"
+                 "Possible actions are:  list, add, delete\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -694,14 +694,14 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
   {
     if (victim->skills.empty())
     {
-      ch->send(fmt::format("{} has no skills.\r\n", victim->getNameC()));
+      ch->send(fmt::format("{} has no skills.\n", victim->getNameC()));
       return ReturnValue::eSUCCESS;
     }
 
-    ch->send(fmt::format("Skills for {}:\r\n", victim->getNameC()));
+    ch->send(fmt::format("Skills for {}:\n", victim->getNameC()));
     for (const auto &curr : ch->skills)
     {
-      ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\r\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
+      ch->send(fmt::format("  {}  -  {}  [{}] [{}] [{}] [{}] [{}]\n", curr.first, curr.second.learned, curr.second.unused[0], curr.second.unused[1], curr.second.unused[2], curr.second.unused[3], curr.second.unused[4]));
     }
   }
   else if (isexact(type, "add"))
@@ -712,7 +712,7 @@ int do_skilledit(Character *ch, char *argument, cmd_t cmd)
   }
   else
   {
-    ch->send(fmt::format("Invalid action '{}'.  Must be 'list', 'add', or 'delete'.\r\n", type));
+    ch->send(fmt::format("Invalid action '{}'.  Must be 'list', 'add', or 'delete'.\n", type));
   }
 
   return ReturnValue::eSUCCESS;

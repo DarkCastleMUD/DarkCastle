@@ -101,7 +101,7 @@ void AreaData::SortAreaData(Character *ch, SortState state)
     {
       i++;
       snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())), "%s", DC::getInstance()->zones.value(lit->area).NameC());
-      snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%zus $5%%15lld$R xps\r\n", 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
+      snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%zus $5%%15lld$R xps\n", 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
       csendf(ch, buf2, i, buf, lit->xps);
     }
   }
@@ -113,7 +113,7 @@ void AreaData::SortAreaData(Character *ch, SortState state)
       i++;
       snprintf(buf, 35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())), "%s",
                DC::getInstance()->zones.value(lit->area).NameC());
-      snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%zus $5%%15lld$R gold\r\n",
+      snprintf(buf2, MAX_STRING_LENGTH, "%%3d)%%-%zus $5%%15lld$R gold\n",
                35 + (strlen(DC::getInstance()->zones.value(lit->area).NameC()) - nocolor_strlen(DC::getInstance()->zones.value(lit->area).NameC())));
       csendf(ch, buf2, i, buf, lit->gold);
     }
@@ -132,12 +132,12 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
 
   if (DC::getInstance()->zones.contains(area) == false)
   {
-    ch->send("Area number is outside the limits\r\n");
+    ch->send("Area number is outside the limits\n");
     return;
   }
-  snprintf(buf, MAX_STRING_LENGTH, "%llu)%30s -- $5%12ld$R xps -- $5%12ld$R gold\r\n", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
+  snprintf(buf, MAX_STRING_LENGTH, "%llu)%30s -- $5%12ld$R xps -- $5%12ld$R gold\n", area, DC::getInstance()->zones.value(area).NameC(), areaStats[area].xps, areaStats[area].gold);
   csendf(ch, buf);
-  snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5s\r\n", "Mob Name", "Killed");
+  snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5s\n", "Mob Name", "Killed");
   csendf(ch, buf);
   for (mobs = areaStats[area].mobKills.begin(); mobs != areaStats[area].mobKills.end(); mobs++)
   {
@@ -147,7 +147,7 @@ void AreaData::DisplaySingleArea(Character *ch, zone_t area)
       ch->sendln("Shit a mob is missing from game!!!");
       continue;
     }
-    snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5d %s\r\n", qPrintable(get_mob_vnum(mobs->name)->short_desc), mobs->howmany, mobs->howmany < 2 ? "time" : "times");
+    snprintf(buf, MAX_STRING_LENGTH, "%-30s %-5d %s\n", qPrintable(get_mob_vnum(mobs->name)->short_desc), mobs->howmany, mobs->howmany < 2 ? "time" : "times");
     csendf(ch, buf);
   }
   page_string(ch->desc, output_buf.c_str(), 1);
@@ -160,7 +160,7 @@ void AreaData::DisplayAreaData(Character *ch)
   {
     if (areaStats[zone_key].xps == 0)
       continue;
-    buf = QStringLiteral("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\r\n").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
+    buf = QStringLiteral("%%3d)%%-%1s|$5%%12lld$R xps|$5%%12lld$R gold|\n").arg(35 + zone.Name().length() - nocolor_strlen(zone.Name()));
     ch->send(buf.arg(zone_key).arg(zone.Name()).arg(areaStats[zone_key].xps).arg(areaStats[zone_key].gold));
   }
   return;

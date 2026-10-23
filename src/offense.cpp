@@ -229,7 +229,7 @@ int do_slay(Character *ch, char *argument, cmd_t cmd)
     if (victim->getLevel() >= IMPLEMENTER)
     {
       ch->sendln("You no make ME into chop suey!");
-      sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
+      sprintf(buf, "%s just tried to kill you.\n", GET_NAME(ch));
       victim->send(buf);
       if (ch->getLevel() > IMMORTAL)
       {
@@ -296,7 +296,7 @@ int do_kill(Character *ch, char *argument, cmd_t cmd)
       if (victim->getLevel() >= IMPLEMENTER)
       {
         ch->sendln("You no make ME into chop suey!");
-        sprintf(buf, "%s just tried to kill you.\r\n", GET_NAME(ch));
+        sprintf(buf, "%s just tried to kill you.\n", GET_NAME(ch));
         victim->send(buf);
         if (ch->getLevel() > IMMORTAL)
         {

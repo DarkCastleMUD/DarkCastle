@@ -56,32 +56,10 @@ class Object *create_obj_new(void);
 void save_corpses(void);
 int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree);
 int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate);
-void clean_string(char *buffer);
 int get_line_new(FILEPtr fl, char *buf);
 char *fread_string_new(FILEPtr fl, char *error);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
-
-void clean_string(char *buffer)
-{
-  char *ptr, *str;
-
-  ptr = buffer;
-  str = ptr;
-
-  while ((*str = *ptr))
-  {
-    str++;
-    ptr++;
-    if (*ptr == '\r')
-      ptr++;
-  }
-}
-
-QString clean_string(QString buffer)
-{
-  return buffer.remove('\r');
-}
 
 int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree)
 {
@@ -136,7 +114,6 @@ int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
   if (!obj->ActionDescription().isEmpty())
   {
     strncpy(buf1, obj->ActionDescription().toStdString().c_str(), sizeof(buf1) - 1);
-    clean_string(buf1);
   }
   else
     *buf1 = 0;
@@ -191,7 +168,6 @@ int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
         continue;
       }
       auto buf1 = description;
-      buf1 = clean_string(buf1);
       dc_fprintf(fp, "E\n"
                      "%s~\n"
                      "%s~\n",
@@ -598,7 +574,7 @@ char *fread_string_new(FILEPtr fl, char *error)
       qFatal("SYSERR: fread_string_new: format error at or near %s\n",
              error);
     }
-    /* If there is a '~', end the std::string; else put an "\r\n" over the '\n'. */
+    /* If there is a '~', end the std::string; else put an "\n" over the '\n'. */
     if ((point = strchr(tmp, '~')) != nullptr)
     {
       *point = '\0';
@@ -607,7 +583,6 @@ char *fread_string_new(FILEPtr fl, char *error)
     else
     {
       point = tmp + strlen(tmp) - 1;
-      *(point++) = '\r';
       *(point++) = '\n';
       *point = '\0';
     }

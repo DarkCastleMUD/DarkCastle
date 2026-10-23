@@ -672,12 +672,12 @@ public:
             if constexpr (std::is_same_v<T, QHash<vnum_t, class mob_index_data>>)
             {
               if (!(index[vnum].mob = read_mobile(vnum, stream)))
-                logbug(u"Unable to load mobile %1!\r\n"_s.arg(index[vnum].vnum()));
+                logbug(u"Unable to load mobile %1!\n"_s.arg(index[vnum].vnum()));
             }
             else if constexpr (std::is_same_v<T, QHash<vnum_t, class obj_index_data>>)
             {
               if (!(index[vnum].item = read_object(vnum, stream, false)))
-                logbug(u"Unable to load object %1!\r\n"_s.arg(index[vnum].vnum()));
+                logbug(u"Unable to load object %1!\n"_s.arg(index[vnum].vnum()));
             }
           }
           else if (*buf == '$') /* EOF */
@@ -1007,23 +1007,6 @@ auto &operator>>(auto &in, Room &room)
   } // if == $
 
   return in;
-}
-
-template <typename T>
-T check_returns(T in_str)
-{
-  T new_string;
-  for (auto checker = in_str.begin(); checker != in_str.end(); checker++)
-  {
-    if (*checker == '\n')
-    {
-      if (checker + 1 != in_str.end() && *(checker + 1) != '\r')
-        new_string.push_back('\r');
-    }
-    new_string.push_back(*checker);
-  }
-
-  return new_string;
 }
 
 struct VNUM_Range

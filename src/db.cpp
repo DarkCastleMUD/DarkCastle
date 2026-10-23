@@ -369,88 +369,88 @@ void Character::remove_from_bard_list(void)
 
 char *funnybootmessages[] =
     {
-        "Booting mobs...\r\n",
-        "Booting objs...\r\n",
-        "Booting clans...\r\n",
-        "Booting booter...\r\n",
-        "Booting linkdeads...\r\n",
-        "Booting world...\r\n",
-        "Booting feet...\r\n",
-        "Reassigning room pointers...\r\n",
-        "Rebuilding virtual exits...\r\n",
-        "Decoding human genome...\r\n",
-        "Loading help entries...\r\n",
-        "Booting shops...\r\n",
-        "Generating dynamic areas...\r\n",
-        "Assigning mobile process pointers...\r\n",
-        "Synchronizing threads...\r\n",
-        "Initializing mob AI engine...\r\n",
-        "True Randomization(tm) of backstab generator...\r\n",
-        "Managing swap file access...\r\n",
-        "Determining best way to break...\r\n",
-        "Corrupting random pfiles...\r\n",
-        "Booting socials...\r\n",
-        "Booting spell message...\r\n",
-        "Assigning skills matrix...\r\n",
-        "Blanking object trees...\r\n",
-        "Compensating for effect of sunspot radiation...\r\n",
-        "Wonder-twin powers activate...\r\n",
-        "><(((:>...\r\n",
-        "Syncronizing zone timers...\r\n",
-        "End-game violence generation...\r\n",
-        "Mutex/semaphore initialization complete...\r\n",
-        "Hitting alt-f4 makes this go faster...\r\n",
-        "Adding commands to radix...\r\n",
-        "Loading static text files...\r\n",
-        "Generating winning Keno numbers...\r\n",
-        "Solving linear mob alignment....\r\n",
-        "Verifying little endian alignment...\r\n",
-        "Initializing logic gates...\r\n",
-        "Consulting Magic 8-ball...\r\n",
-        "Connecting logical circuit...\r\n",
-        "Binding proper ports....\r\n",
-        "Creating obj references...\r\n",
-        "Cacheing zone connection std::map...\r\n",
-        "Feeding mean llamas...\r\n",
-        "Breeding squirrels...\r\n",
-        "Graphing optimization lines...\r\n",
-        "Strict defining template arrays...\r\n",
-        "All your base are belong to us...\r\n",
-        "Importing external consts...\r\n",
-        "Configuring alt.binaries.erotica.asian.senior-citizen.sheep downloader...\r\n",
-        "Configuring configurator...\r\n",
-        "Planing valid edge queue...\r\n",
-        "Verifying void alignment...\r\n",
-        "Initializing BFS search parameters...\r\n",
-        "Shaving fuzzy logic...\r\n",
-        "Upgrading RAM...\r\n",
-        "Good eq-load detected..\r\nPurging world..\r\nAll mobs repopped with moss eq..\r\n",
-        "Checking code for tpyos...\r\n",
-        "Generating loot tables..\r\n",
-        "Giving barbarians fireshield...\r\n",
-        "Processing signal handling...\r\n",
-        "Sneaking in random PokeMUD code...\r\n",
-        "Defining mob track vectors...\r\n",
-        "Locking doors...\r\n",
-        "Boosting random mob stats...\r\n",
-        "Finding something fun in game to remove...\r\n",
-        "Determining array dope vectors...\r\n",
-        "Divide By Cucumber Error. Please Reinstall Universe And Reboot\r\n",
-        "Removing crash bugs...\r\n",
-        "Cooking Swedish meatballs...\r\n",
-        "Brewing Canadian beer...\r\n",
-        "Searching for intelligent players....searching....searching....searching\r\n",
-        "Coding bug...\r\n",
-        "Uploading Urizen's ABBA mp3s...\r\n",
-        "09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\r\n",
-        "Redecorating the tavern...\r\n",
-        "Putting cover sheets on TPS reports.\r\n",
-        "Nerfing <insert class>...\r\n",
-        "Smash forehead on keyboard to continue.\r\n",
-        "Enter any 11-digit prime number to continue.\r\n",
-        "Error saving file! Format drive now? (Y/Y)\r\n",
-        "User Error: Replace user.\r\n",
-        "Windows found. Delete? (Y/N)\r\n"};
+        "Booting mobs...\n",
+        "Booting objs...\n",
+        "Booting clans...\n",
+        "Booting booter...\n",
+        "Booting linkdeads...\n",
+        "Booting world...\n",
+        "Booting feet...\n",
+        "Reassigning room pointers...\n",
+        "Rebuilding virtual exits...\n",
+        "Decoding human genome...\n",
+        "Loading help entries...\n",
+        "Booting shops...\n",
+        "Generating dynamic areas...\n",
+        "Assigning mobile process pointers...\n",
+        "Synchronizing threads...\n",
+        "Initializing mob AI engine...\n",
+        "True Randomization(tm) of backstab generator...\n",
+        "Managing swap file access...\n",
+        "Determining best way to break...\n",
+        "Corrupting random pfiles...\n",
+        "Booting socials...\n",
+        "Booting spell message...\n",
+        "Assigning skills matrix...\n",
+        "Blanking object trees...\n",
+        "Compensating for effect of sunspot radiation...\n",
+        "Wonder-twin powers activate...\n",
+        "><(((:>...\n",
+        "Syncronizing zone timers...\n",
+        "End-game violence generation...\n",
+        "Mutex/semaphore initialization complete...\n",
+        "Hitting alt-f4 makes this go faster...\n",
+        "Adding commands to radix...\n",
+        "Loading static text files...\n",
+        "Generating winning Keno numbers...\n",
+        "Solving linear mob alignment....\n",
+        "Verifying little endian alignment...\n",
+        "Initializing logic gates...\n",
+        "Consulting Magic 8-ball...\n",
+        "Connecting logical circuit...\n",
+        "Binding proper ports....\n",
+        "Creating obj references...\n",
+        "Cacheing zone connection std::map...\n",
+        "Feeding mean llamas...\n",
+        "Breeding squirrels...\n",
+        "Graphing optimization lines...\n",
+        "Strict defining template arrays...\n",
+        "All your base are belong to us...\n",
+        "Importing external consts...\n",
+        "Configuring alt.binaries.erotica.asian.senior-citizen.sheep downloader...\n",
+        "Configuring configurator...\n",
+        "Planing valid edge queue...\n",
+        "Verifying void alignment...\n",
+        "Initializing BFS search parameters...\n",
+        "Shaving fuzzy logic...\n",
+        "Upgrading RAM...\n",
+        "Good eq-load detected..\nPurging world..\nAll mobs repopped with moss eq..\n",
+        "Checking code for tpyos...\n",
+        "Generating loot tables..\n",
+        "Giving barbarians fireshield...\n",
+        "Processing signal handling...\n",
+        "Sneaking in random PokeMUD code...\n",
+        "Defining mob track vectors...\n",
+        "Locking doors...\n",
+        "Boosting random mob stats...\n",
+        "Finding something fun in game to remove...\n",
+        "Determining array dope vectors...\n",
+        "Divide By Cucumber Error. Please Reinstall Universe And Reboot\n",
+        "Removing crash bugs...\n",
+        "Cooking Swedish meatballs...\n",
+        "Brewing Canadian beer...\n",
+        "Searching for intelligent players....searching....searching....searching\n",
+        "Coding bug...\n",
+        "Uploading Urizen's ABBA mp3s...\n",
+        "09 F9 11 02 9D 74 E3 5B D8 41 56 C5 63 56 88 C0\n",
+        "Redecorating the tavern...\n",
+        "Putting cover sheets on TPS reports.\n",
+        "Nerfing <insert class>...\n",
+        "Smash forehead on keyboard to continue.\n",
+        "Enter any 11-digit prime number to continue.\n",
+        "Error saving file! Format drive now? (Y/Y)\n",
+        "User Error: Replace user.\n",
+        "Windows found. Delete? (Y/N)\n"};
 
 void funny_boot_message()
 {
@@ -743,7 +743,7 @@ void DC::do_godlist(void)
     assert(wizlist.length() < 1000);
   } while (true);
 
-  logverbose(QStringLiteral("Done!\r\n"));
+  logverbose(QStringLiteral("Done!\n"));
   wizlist_file.close();
 }
 
@@ -865,7 +865,7 @@ int do_wizlist(Character *ch, char *argument, cmd_t cmd)
     sp = 79 - line_length;
     sp /= 2;
     space[sp + 1] = '\0';
-    sprintf(buf + strlen(buf), "\r\n%s%s\r\n", space,
+    sprintf(buf + strlen(buf), "\n%s%s\n", space,
             names[current_level - IMMORTAL]);
     space[sp + 1] = ' ';
 
@@ -878,8 +878,7 @@ int do_wizlist(Character *ch, char *argument, cmd_t cmd)
         if (*lines)
         {
           line_length = strlen(lines) - 2;
-          lines[strlen(lines) - 2] = '\n';
-          lines[strlen(lines) - 1] = '\r';
+          lines[strlen(lines) - 1] = '\n';
           sp = 79 - line_length;
           sp /= 2;
           space[sp + 1] = '\0';
@@ -897,7 +896,7 @@ int do_wizlist(Character *ch, char *argument, cmd_t cmd)
         sprintf(lines + strlen(lines), "%s, ", qPrintable(DC::getInstance()->wizlist[x].getName()));
       else
       {
-        sprintf(lines + strlen(lines), "%s\r\n", qPrintable(DC::getInstance()->wizlist[x].getName()));
+        sprintf(lines + strlen(lines), "%s\n", qPrintable(DC::getInstance()->wizlist[x].getName()));
         line_length = strlen(lines) - 2;
         sp = 79 - line_length;
         sp /= 2;
@@ -1792,7 +1791,7 @@ int DC::create_one_room(Character *ch, int vnum)
   rp->tracks = 0;
   rp->last_track = 0;
   rp->name = u"Room %1"_s.arg(vnum);
-  rp->description = u"Empty description.\r\n"_s;
+  rp->description = u"Empty description.\n"_s;
   return 1;
 }
 
@@ -2986,7 +2985,7 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   reset_char(mob);
   mob->setName("empty mob");
   mob->short_desc = str_hsh("an empty mob");
-  mob->long_desc = str_hsh("an empty mob description\r\n");
+  mob->long_desc = str_hsh("an empty mob description\n");
   mob->description = str_hsh("");
   mob->title = 0;
   mob->fighting = 0;
@@ -3650,30 +3649,6 @@ QString quotequotes(QString &s1)
   {
     s1.insert(pos, '\"');
     pos = s1.indexOf('\"', pos + 2);
-  }
-
-  return s1;
-}
-
-QString lf_to_crlf(QString s1)
-{
-  qsizetype pos = s1.indexOf('\n'); // @suppress("Ambiguous problem")
-  while (pos != -1)
-  {
-    s1.insert(pos, '\r');
-    pos = s1.indexOf('\n', pos + 2);
-  }
-
-  return s1;
-}
-
-std::string lf_to_crlf(std::string &s1)
-{
-  size_t pos = s1.find('\n'); // @suppress("Ambiguous problem")
-  while (pos != std::string::npos)
-  {
-    s1.insert(pos, 1, '\r');
-    pos = s1.find('\n', pos + 2);
   }
 
   return s1;
@@ -4506,7 +4481,7 @@ QString fread_qstring(QTextStream &stream, bool *ok)
       assert(stream.status() == QTextStream::Status::Ok);
       // qDebug() << "fread_qstring returning" << buffer + line << (buffer + line).length();
       // qDebugQTextStreamLine(stream, "after fread_qstring()");
-      return lf_to_crlf(buffer + line);
+      return buffer + line;
     }
     else
     {
@@ -4522,7 +4497,7 @@ QString fread_qstring(QTextStream &stream, bool *ok)
   assert(stream.status() == QTextStream::Status::Ok);
   // qDebug() << "fread_qstring returning" << buffer << buffer.length();
   // qDebugQTextStreamLine(stream, "after fread_qstring()");
-  return lf_to_crlf(buffer);
+  return buffer;
 }
 
 char *fread_string(QTextStream &in, bool hasher, bool *ok)
@@ -4562,8 +4537,8 @@ char *fread_string(std::ifstream &in, int hasher)
   in.exceptions(orig_exceptions);
 
   std::string orig_str(buffer);
-  // Change \n into \r\n
-  std::string swapstr = lf_to_crlf(orig_str);
+  // Change \n into \n
+  std::string swapstr = orig_str;
 
   char *retval;
   if (hasher)
@@ -4591,7 +4566,7 @@ QString fread_qstring(FILEPtr stream, bool *ok)
   dc_fseek(stream, 1, SEEK_CUR);
   // qDebug("%d [%s]", bytes_read, lineptr);
 
-  return lf_to_crlf(QString(lineptr));
+  return QString(lineptr);
 }
 
 /* read and allocate space for a '~'-terminated std::string from a given file */
@@ -4614,7 +4589,6 @@ char *fread_string(FILEPtr fl, int hasher)
     case '\n':
       while (pBufLast > buf && isspace(pBufLast[-1]))
         pBufLast--;
-      *pBufLast++ = '\r';
       *pBufLast++ = '\n';
       break;
 
@@ -5256,15 +5230,12 @@ int file_to_string(const char *name, char *buf)
     {
       if (strlen(buf) + strlen(tmp) + 2 > MAX_STRING_LENGTH)
       {
-        logentry(QStringLiteral("fl->strng: std::string too big (db.c, file_to_string)"),
-                 0, DC::LogChannel::LOG_BUG);
+        logbug(u"fl->strng: string too big (db.cpp, file_to_string"_s);
         *buf = '\0';
         return (-1);
       }
 
       strcat(buf, tmp);
-      *(buf + strlen(buf) + 1) = '\0';
-      *(buf + strlen(buf)) = '\r';
     }
   } while (!dc_feof(fl));
 
@@ -5836,12 +5807,12 @@ void mprog_read_programs(QTextStream &fp, int32_t i, bool ignore)
 
 void string_to_file(FILEPtr f, QString str)
 {
-  dc_fprintf(f, "%s~\n", str.remove('\r').toStdString().c_str());
+  dc_fprintf(f, "%s~\n", qPrintable(str));
 }
 
 void string_to_file(QTextStream &fl, QString str)
 {
-  fl << str.remove('\r') + "~\n";
+  fl << str + "~\n";
 }
 void copySaveData(Object *target, Object *source)
 {

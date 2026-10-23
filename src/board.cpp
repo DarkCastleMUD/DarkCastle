@@ -681,7 +681,7 @@ int board(Character *ch, class Object *obj, cmd_t cmd, const char *c_arguments, 
   case cmd_t::ERASE: /* erase */
     if (GET_INT(ch) < 9)
     {
-      ch->sendln("You are too stupid to read them!\r\nDon't erase them they might be important!");
+      ch->sendln("You are too stupid to read them!\nDon't erase them they might be important!");
       return ReturnValue::eSUCCESS;
     }
     if (
@@ -757,8 +757,8 @@ void board_do_write(Character *ch, QStringList arguments, boards_t::iterator boa
   if ((ch->getLevel() < board->second.min_write_level))
   {
     send_to_char("You pick up a quill to write, but realize "
-                 "you're not powerful enough\r\nto submit "
-                 "intelligent material to this board.\r\n",
+                 "you're not powerful enough\nto submit "
+                 "intelligent material to this board.\n",
                  ch);
     return;
   }
@@ -783,7 +783,7 @@ void board_do_write(Character *ch, QStringList arguments, boards_t::iterator boa
   buf = tmstr;
   reserve->new_post.date = QDateTime::currentDateTime().toString(Qt::RFC2822Date);
 
-  ch->sendln(u"        Write your message and stay within the line.  (/s saves /h for help)\r\n"
+  ch->sendln(u"        Write your message and stay within the line.  (/s saves /h for help)\n"
              "   --------------------------------------------------------------------------"_s);
 
   act("$n starts to write a message.", ch, 0, 0, TO_ROOM, INVIS_NULL);
@@ -855,8 +855,8 @@ int board_do_erase(Character *ch, QStringList arguments, boards_t::iterator boar
   else if ((ch->getLevel() < board->second.min_remove_level && board->second.msgs[tmessage].author.compare(GET_NAME(ch))) && ch->getLevel() < OVERSEER)
   {
     send_to_char("You try and grab one of the notes of the board but "
-                 "get a nasty\r\nshock. Maybe you'd better leave it "
-                 "alone.\r\n",
+                 "get a nasty\nshock. Maybe you'd better leave it "
+                 "alone.\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
@@ -869,23 +869,6 @@ int board_do_erase(Character *ch, QStringList arguments, boards_t::iterator boar
 
   board_save_board(board);
   return ReturnValue::eSUCCESS;
-}
-
-QString remove_slashr(QString unformatted)
-{
-  if (unformatted.isEmpty())
-    return "";
-
-  QString write_me = unformatted;
-  QString::iterator slashr;
-
-  for (slashr = write_me.end(); slashr != write_me.begin(); slashr--)
-    if (*slashr == '\r')
-      write_me.erase(slashr);
-
-  if (*slashr == '\r')
-    write_me.erase(slashr);
-  return write_me;
 }
 
 void board_save_board(boards_t::iterator board)
@@ -920,16 +903,16 @@ void board_save_board(boards_t::iterator board)
   dc_fprintf(the_file, " %zu ", board->second.msgs.size());
   for (ind = 0; ind < board->second.msgs.size(); ind++)
   {
-    write_me = remove_slashr(board->second.msgs[ind].title);
+    write_me = board->second.msgs[ind].title;
     fwrite_string(write_me, the_file);
 
-    write_me = remove_slashr(board->second.msgs[ind].author);
+    write_me = board->second.msgs[ind].author;
     fwrite_string(write_me, the_file);
 
-    write_me = remove_slashr(board->second.msgs[ind].date);
+    write_me = board->second.msgs[ind].date;
     fwrite_string(write_me, the_file);
 
-    write_me = remove_slashr(board->second.msgs[ind].text);
+    write_me = board->second.msgs[ind].text;
     fwrite_string(write_me, the_file);
   }
 
@@ -966,16 +949,9 @@ void board_load_board()
     {
 
       curr_msg.title = fread_string(the_file, 27);
-      curr_msg.title = check_returns(curr_msg.title);
-
       curr_msg.author = fread_string(the_file, 27);
-      curr_msg.author = check_returns(curr_msg.author);
-
       curr_msg.date = fread_string(the_file, 27);
-      curr_msg.date = check_returns(curr_msg.date);
-
       curr_msg.text = fread_string(the_file, 27);
-      curr_msg.text = check_returns(curr_msg.text);
 
       map_it->second.msgs.push_back(curr_msg);
     }
@@ -1033,7 +1009,7 @@ int board_do_read(Character *ch, QStringList arguments, boards_t::iterator board
   if ((ch->getLevel() < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board but"
-                 " you\r\ncannot comprehend their meaning.\r\n\r\n",
+                 " you\ncannot comprehend their meaning.\n\n",
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     return ReturnValue::eSUCCESS;
@@ -1089,7 +1065,7 @@ int board_do_read(Character *ch, QStringList arguments, boards_t::iterator board
     board_msg += buf;
   }
 
-  buf = u"\r\n----------\r\n$3%1$R"_s.arg(board->second.msgs[tmessage].text);
+  buf = u"\n----------\n$3%1$R"_s.arg(board->second.msgs[tmessage].text);
   board_msg += buf;
 
   page_string(ch->desc, qPrintable(board_msg), 1);
@@ -1124,7 +1100,7 @@ int board_do_look(Character *ch, QStringList arguments, boards_t::iterator board
   if ((ch->getLevel() < board->second.min_read_level))
   {
     send_to_char("You try and look at the messages on the board "
-                 "but you\r\ncannot comprehend their meaning.\r\n",
+                 "but you\ncannot comprehend their meaning.\n",
                  ch);
     act("$n tries to read the board, but looks bewildered.", ch, 0, 0,
         TO_ROOM, INVIS_NULL);
@@ -1153,18 +1129,18 @@ int board_do_look(Character *ch, QStringList arguments, boards_t::iterator board
 
     if (ch->isNonPlayer() || isSet(ch->player->toggles, Player::PLR_ANSI))
     {
-      buf = u"(%1) $5%2 $4%3: $2%4$R\r\n"_s
+      buf = u"(%1) $5%2 $4%3: $2%4$R\n"_s
                 .arg(truncated_date)
                 .arg(msg_it->author, -14)
                 .arg(i--, 2)
                 .arg(msg_it->title, -47);
       board_msg += buf;
-      //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\r\n", msg_it->date,
+      //         csendf(ch, "(%s) "YELLOW"%-14s "RED"%2d: "GREEN"%.47s"NTEXT"\n", msg_it->date,
       //                    msg_it->author,i--, msg_it->title);
     }
     else
     {
-      buf = u"(%1) %2 %3: %4\r\n"_s
+      buf = u"(%1) %2 %3: %4\n"_s
                 .arg(truncated_date)
                 .arg(msg_it->author, -14)
                 .arg(i--, 2)

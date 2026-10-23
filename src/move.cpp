@@ -323,7 +323,7 @@ int do_fall(Character *ch, short dir)
   do_look(ch, "\0");
 
   sprintf(damage, "%s's fall from %d was lethal and it killed them.", GET_NAME(ch), DC::getInstance()->world[ch->in_room].number);
-  retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\r\n", "$n plummets into the room and hits the ground with a wet-sounding splat!",
+  retval = noncombat_damage(ch, dam, "Luckily the ground breaks your fall.\n", "$n plummets into the room and hits the ground with a wet-sounding splat!",
                             damage, KILL_FALL);
 
   if (SOMEONE_DIED(retval))
@@ -372,7 +372,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   if (ch == nullptr || ch->in_room < 1 || !valid_dir || DC::getInstance()->world[ch->in_room].dir_option[dir] == nullptr || DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room < 1)
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Error in room %d.", ch->in_room);
-    ch->send("There was an error performing that movement.\r\n");
+    ch->send("There was an error performing that movement.\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -893,7 +893,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 
   if (ch->brace_at)
   {
-    csendf(ch, "You can't move and brace the %s at the same time!\r\n", fname(ch->brace_at->keyword).toStdString().c_str());
+    csendf(ch, "You can't move and brace the %s at the same time!\n", fname(ch->brace_at->keyword).toStdString().c_str());
     return ReturnValue::eFAILURE;
   }
 
@@ -916,7 +916,7 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
     if (isSet(EXIT(ch, dir)->exit_info, EX_HIDDEN))
       ch->sendln("You can't go that way.");
     else if (!EXIT(ch, dir)->keyword.isEmpty())
-      csendf(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, dir)->keyword).toStdString().c_str());
+      csendf(ch, "The %s seems to be closed.\n", fname(EXIT(ch, dir)->keyword).toStdString().c_str());
     else
       ch->sendln("It seems to be closed.");
     return ReturnValue::eFAILURE;
@@ -1017,9 +1017,9 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
           continue;
         }
         if (CAN_SEE(k->follower, ch))
-          sprintf(tmp, "You follow %s.\r\n\r\n", GET_SHORT(ch));
+          sprintf(tmp, "You follow %s.\n\n", GET_SHORT(ch));
         else
-          strcpy(tmp, "You follow someone.\r\n\r\n");
+          strcpy(tmp, "You follow someone.\n\n");
         k->follower->send(tmp);
         // do_move(k->follower, "", cmd + 1);
         if (k->follower->fighting)
@@ -1203,7 +1203,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
     break;
   case 1:
   case 2:
-    sprintf(buf, "You take a bold step towards %s.\r\n", qPrintable(portal->short_description));
+    sprintf(buf, "You take a bold step towards %s.\n", qPrintable(portal->short_description));
     ch->send(buf);
     sprintf(buf, "%s boldly walks toward %s and disappears.", GET_NAME(ch), qPrintable(portal->short_description));
     act(buf, ch, 0, 0, TO_ROOM, INVIS_NULL | STAYHIDE);
@@ -1233,7 +1233,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   case 0:
     do_look(ch, "");
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    ch->sendln("\r\nYou are momentarily dazed from the dimensional shift.");
+    ch->sendln("\nYou are momentarily dazed from the dimensional shift.");
     act("The portal glows brighter for a second as $n appears beside you.", ch, 0, 0, TO_ROOM, 0);
     break;
   case 1:
@@ -1323,7 +1323,7 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
   }
 
   act("$n carefully climbs $p.", ch, obj, 0, TO_ROOM, INVIS_NULL);
-  sprintf(buf, "You carefully climb %s.\r\n", qPrintable(obj->short_description));
+  sprintf(buf, "You carefully climb %s.\n", qPrintable(obj->short_description));
   ch->send(buf);
   int retval = move_char(ch, real_room(dest));
 

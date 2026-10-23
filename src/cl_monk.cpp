@@ -34,7 +34,7 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
   time_t time_raw_format;
   struct tm *ptr_time;
 
-  if (!ch->canPerform(SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\r\n"))
+  if (!ch->canPerform(SKILL_EAGLE_CLAW, "Yooo are not pepared to use thees skeel, grasshoppa.\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -129,7 +129,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   int dam, retval;
   int duration = 100;
 
-  if (!ch->canPerform(SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\r\n"))
+  if (!ch->canPerform(SKILL_QUIVERING_PALM, "Stick to palming yourself for now bucko.\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -137,7 +137,7 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   if (ch->affected_by_spell(SKILL_QUIVERING_PALM))
   {
     send_to_char("You can't perform such an ancient power more than "
-                 "once a day!\r\n",
+                 "once a day!\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -233,7 +233,7 @@ int do_stun(Character *ch, char *argument, cmd_t cmd)
   char name[256];
   int retval;
 
-  if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\r\n"))
+  if (!ch->canPerform(SKILL_STUN, "Your lack of knowledge is stunning...\n"))
   {
     return ReturnValue::eFAILURE;
   }

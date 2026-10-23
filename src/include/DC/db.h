@@ -340,8 +340,6 @@ class Object *clone_object(int nr);
 void randomize_object(Object *obj);
 std::ofstream &operator<<(std::ofstream &out, Object *obj);
 std::ifstream &operator>>(std::ifstream &in, Object *obj);
-std::string lf_to_crlf(std::string &s1);
-QString lf_to_crlf(QString s1);
 void copySaveData(Object *new_obj, Object *obj);
 bool verify_item(class Object **obj);
 bool fullItemMatch(Object *obj, Object *obj2);

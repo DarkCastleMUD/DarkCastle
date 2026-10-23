@@ -151,7 +151,7 @@ int mprog_process_cmnd(char *cmnd, Character *mob,
  * Local function code and brief comments.
  */
 
-/* Used to get sequential lines of a multi line std::string (separated by "\r\n")
+/* Used to get sequential lines of a multi line std::string (separated by "\n")
  * Thus its like one_argument(), but a trifle different. It is deive
  * to the multi line std::string argument, and thus clist must not be shared.
  */
@@ -162,7 +162,7 @@ char *mprog_next_command(char *clist)
 
   for (; *pointer != '\0'; pointer++)
   {
-    if (!open && (*pointer == '\n' || *pointer == '\r'))
+    if (!open && (*pointer == '\n'))
       break;
     if (*pointer == '{')
       open = true;
@@ -171,12 +171,12 @@ char *mprog_next_command(char *clist)
   }
   //  while ( *pointer != '\n' && *pointer != '\0' )
   //    pointer++;
-  while (*pointer == '\n' || *pointer == '\r')
+  while (*pointer == '\n')
     *pointer++ = '\0';
 
   /*  if ( *pointer == '\n' )
           *pointer++ = '\0';
-    if ( *pointer == '\r' )
+    if ( *pointer == '' )
           *pointer++ = '\0';*/
 
   mprog_line_num++;
@@ -248,7 +248,7 @@ int mprog_veval( int lhs, char *opr, int rhs )
   if ( !str_cmp( opr, "|" ) )
         return ( lhs | rhs );
 
-  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\r\n", 0 );
+  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n", 0 );
   return 0;
 
 }
@@ -273,7 +273,7 @@ int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
   if (!str_cmp(opr, "|"))
     return (lhs | rhs);
 
-  logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\r\n", 0);
+  logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n", 0);
   return 0;
 }
 /*
@@ -296,7 +296,7 @@ int mprog_veval( quint64 lhs, char *opr, quint64 rhs )
   if ( !str_cmp( opr, "|" ) )
         return ( lhs | rhs );
 
-  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\r\n", 0 );
+  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n", 0 );
   return 0;
 
 }
@@ -1576,7 +1576,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   /* check to see if there is an operator */
 
   // same for both traditional and non-traditional
-  while (*point == ' ' || *point == '\r')
+  while (*point == ' ')
     point++;
   if (*point == '\0')
   {
@@ -1607,7 +1607,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
         valpt = val2;
         point++;
       }
-      else if (*point == '\0' || *point == '\r' || *point == '\n')
+      else if (*point == '\0' || *point == '\n')
         break;
       else
         *valpt++ = *point++;
@@ -4064,7 +4064,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
       {
         list += 2;
         while ((start = strstr(dupl, list)))
-          if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(list)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
+          if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(list)) == ' ' || *end == '\n' || *end == '\0'
                                                          // allow punctuation at the end
                                                          || *end == '.' || *end == '?' || *end == '!'))
           {
@@ -4085,7 +4085,7 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
         for (; word[0] != '\0'; list = one_argument(list, word))
         {
           while ((start = strstr(dupl, word)))
-            if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(word)) == ' ' || *end == '\n' || *end == '\r' || *end == '\0'
+            if ((start == dupl || *(start - 1) == ' ') && (*(end = start + strlen(word)) == ' ' || *end == '\n' || *end == '\0'
                                                            // allow punctuation at the end
                                                            || *end == '.' || *end == '?' || *end == '!'))
             {

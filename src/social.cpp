@@ -333,7 +333,7 @@ int do_social(Character *ch, char *argument, cmd_t cmd)
     sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
     if (!(i % 4))
     {
-      strcat(buf, "\r\n");
+      strcat(buf, "\n");
       ch->send(buf);
       *buf = '\0';
     }
@@ -341,7 +341,7 @@ int do_social(Character *ch, char *argument, cmd_t cmd)
   if (*buf)
     ch->send(buf);
 
-  sprintf(buf, "\r\nCurrent Socials:  %d\r\n", i);
+  sprintf(buf, "\nCurrent Socials:  %d\n", i);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }

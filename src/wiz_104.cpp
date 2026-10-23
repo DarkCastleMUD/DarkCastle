@@ -105,11 +105,11 @@ int do_thunder(Character *ch, char *argument, cmd_t cmd)
 
         if (cmd == cmd_t::DEFAULT)
         {
-          sprintf(buf1, "$B$4%s thunders '%s'$R\r\n", buf3, argument);
+          sprintf(buf1, "$B$4%s thunders '%s'$R\n", buf3, argument);
         }
         else
         {
-          sprintf(buf1, "$7$B%s bellows '%s'$R\r\n", buf3, argument);
+          sprintf(buf1, "$7$B%s bellows '%s'$R\n", buf3, argument);
         }
 
         send_to_char(buf1, i->character);
@@ -131,7 +131,7 @@ int do_incognito(Character *ch, char *argument, cmd_t cmd)
   else
   {
     send_to_char("Incognito on.  Even while invis, anyone in your room can "
-                 "see you.\r\n",
+                 "see you.\n",
                  ch);
     ch->player->incognito = true;
   }
@@ -191,7 +191,7 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
       if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
       {
         cnt++;
-        sprintf(buf, "[%3d] [%5llu] %s\r\n", cnt, x, qPrintable(((class Object *)(DC::getInstance()->obj_index[num].item))->short_description));
+        sprintf(buf, "[%3d] [%5llu] %s\n", cnt, x, qPrintable(((class Object *)(DC::getInstance()->obj_index[num].item))->short_description));
         ch->send(buf);
       }
 
@@ -310,17 +310,17 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
         Object *obj = (Object *)(DC::getInstance()->obj_index[number].item);
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
-          ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\r\n").arg(num));
+          ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\n").arg(num));
           return ReturnValue::eFAILURE;
         }
         else if (isSet(obj->obj_flags.extra_flags, ITEM_QUEST))
         {
-          ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\r\n").arg(num));
+          ch->send(QStringLiteral("You cannnot random load vnum %1 because extra flag ITEM_QUEST is set.\n").arg(num));
           return ReturnValue::eFAILURE;
         }
         else if (isSet(obj->obj_flags.more_flags, ITEM_NO_CUSTOM))
         {
-          ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\r\n").arg(num));
+          ch->send(QStringLiteral("You cannot random load vnum %1 because more flag ITEM_NO_CUSTOM is set.\n").arg(num));
           return ReturnValue::eFAILURE;
         }
       }
@@ -371,7 +371,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
       if (vict->isPlayer() && (ch->getLevel() <= vict->getLevel()))
       {
         sprintf(buf, "%s is surrounded with scorching flames but is"
-                     " unharmed.\r\n",
+                     " unharmed.\n",
                 GET_SHORT(vict));
         ch->send(buf);
         act("$n tried to purge you.", ch, 0, vict, TO_VICT, 0);
@@ -413,7 +413,7 @@ int do_purge(Character *ch, char *argument, cmd_t cmd)
     act("$n gestures... the room is filled with scorching flames!",
         ch, 0, 0, TO_ROOM, 0);
     send_to_char("You gesture...the room is filled with scorching "
-                 "flames!\r\n",
+                 "flames!\n",
                  ch);
 
     for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_v)
@@ -468,12 +468,12 @@ int Zone::show_info(Character *ch)
   if (continent && (unsigned)continent < continent_names.size())
     continent_name = continent_names.at(continent);
 
-  ch->send(QString("$3Name:$R %1\r\n"
-                   "$3Filename:$R %2\r\n"
-                   "$3Starts:$R    %3 $3Ends:$R  %4     $3Continent:$R %5\r\n"
-                   "$3Starts:$R    %6 $3Ends:$R  %7\r\n"
-                   "$3Lifetime:$R  %8 $3Age:$R   %9     $3Left:$R   %10\r\n"
-                   "$3PC'sInZone:$R  %11 $3Mode:$R %12 $3Last full reset:$R %13 %14\r\n"
+  ch->send(QString("$3Name:$R %1\n"
+                   "$3Filename:$R %2\n"
+                   "$3Starts:$R    %3 $3Ends:$R  %4     $3Continent:$R %5\n"
+                   "$3Starts:$R    %6 $3Ends:$R  %7\n"
+                   "$3Lifetime:$R  %8 $3Age:$R   %9     $3Left:$R   %10\n"
+                   "$3PC'sInZone:$R  %11 $3Mode:$R %12 $3Last full reset:$R %13 %14\n"
                    "$3Flags:$R ")
                .arg(Name())
                .arg(filename)
@@ -492,9 +492,9 @@ int Zone::show_info(Character *ch)
 
   sprintbit(zone_flags, Zone::zone_bits, buf);
   ch->send(buf);
-  sprintf(buf, "\r\n"
-               "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\r\n"
-               "$3DiedThisTick$R: %3llu $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\r\n",
+  sprintf(buf, "\n"
+               "$3MobsLastPop$R:  %3d $3DeathCounter$R: %6d     $3ReduceCounter$R: %d\n"
+               "$3DiedThisTick$R: %3llu $3Repops without Deaths$R: %d $3Repops with bonus$R: %d\n",
           num_mob_on_repop,
           death_counter,
           counter_mod,
@@ -519,7 +519,7 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
 
   if (k < start)
   {
-    sprintf(buf, "Last command in this zone is %d.\r\n", k);
+    sprintf(buf, "Last command in this zone is %d.\n", k);
     ch->send(buf);
     return ReturnValue::eFAILURE;
   }
@@ -617,7 +617,7 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
       sprintf(buf, "%s ([%d] [%d] [%s])", buf,
               zone.cmd[j]->lastPop ? 1 : 0, charExists(zone.cmd[j]->lastPop),
               charExists(zone.cmd[j]->lastPop) ? GET_SHORT(zone.cmd[j]->lastPop) : "Unknown");
-      sprintf(buf, "%s\r\n", buf);
+      sprintf(buf, "%s\n", buf);
       break;
     case 'O':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
@@ -626,9 +626,9 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
         strcat(buf, "(  always ) in room ");
       else
         sprintf(buf, "%s(if< [%3d]) in room ", buf, zone.cmd[j]->arg2);
-      //      sprintf(buf, "%s[%5d].$R\r\n", buf,
+      //      sprintf(buf, "%s[%5d].$R\n", buf,
       // DC::getInstance()->world[zone.cmd[j]->arg3].number);
-      sprintf(buf, "%s[%5d].$R\r\n", buf, zone.cmd[j]->arg3);
+      sprintf(buf, "%s[%5d].$R\n", buf, zone.cmd[j]->arg3);
       break;
     case 'P':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
@@ -638,15 +638,15 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
       else
         sprintf(buf, "%s(if< [%3d]) in objt ", buf, zone.cmd[j]->arg2);
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg3].vnum() : ZCMD->arg3;
-      sprintf(buf, "%s[%5d] (in last created).$R\r\n", buf, virt);
+      sprintf(buf, "%s[%5d] (in last created).$R\n", buf, virt);
       break;
     case 'G':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
       sprintf(buf, "%s $6Place obj [%5d] ", buf, virt);
       if (zone.cmd[j]->arg2 == -1)
-        strcat(buf, "(  always ) on last mob loaded.$R\r\n");
+        strcat(buf, "(  always ) on last mob loaded.$R\n");
       else
-        sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\r\n", buf, zone.cmd[j]->arg2);
+        sprintf(buf, "%s(if< [%3d]) on last mob loaded.$R\n", buf, zone.cmd[j]->arg2);
       break;
     case 'E':
       virt = ZCMD->active ? DC::getInstance()->obj_index[ZCMD->arg1].vnum() : ZCMD->arg1;
@@ -657,9 +657,9 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
         sprintf(buf, "%s(if< [%3d]) on last mob on ", buf, zone.cmd[j]->arg2);
       if (zone.cmd[j]->arg3 > MAX_WEAR - 1 ||
           zone.cmd[j]->arg3 < 0)
-        sprintf(buf, "%s[%d](InvalidArg3).$R\r\n", buf, zone.cmd[j]->arg3);
+        sprintf(buf, "%s[%d](InvalidArg3).$R\n", buf, zone.cmd[j]->arg3);
       else
-        sprintf(buf, "%s[%d](%s).$R\r\n", buf, zone.cmd[j]->arg3,
+        sprintf(buf, "%s[%d](%s).$R\n", buf, zone.cmd[j]->arg3,
                 equipment_types[zone.cmd[j]->arg3]);
       break;
     case 'D':
@@ -670,37 +670,37 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
       switch (zone.cmd[j]->arg3)
       {
       case 0:
-        strcat(buf, "Unlock/Open$R\r\n");
+        strcat(buf, "Unlock/Open$R\n");
         break;
       case 1:
-        strcat(buf, "Unlock/Close$R\r\n");
+        strcat(buf, "Unlock/Close$R\n");
         break;
       case 2:
-        strcat(buf, "Lock/Close$R\r\n");
+        strcat(buf, "Lock/Close$R\n");
         break;
       default:
-        strcat(buf, "ERROR: Unknown$R\r\n");
+        strcat(buf, "ERROR: Unknown$R\n");
         break;
       }
       break;
     case '%':
-      sprintf(buf, "%s Consider myself true on %d times out of %d.\r\n", buf,
+      sprintf(buf, "%s Consider myself true on %d times out of %d.\n", buf,
               zone.cmd[j]->arg1,
               zone.cmd[j]->arg2);
 
       break;
     case 'J':
-      sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\r\n", buf,
+      sprintf(buf, "%s Temp Command. [%d] [%d] [%d]\n", buf,
               zone.cmd[j]->arg1,
               zone.cmd[j]->arg2,
               zone.cmd[j]->arg3);
       break;
     case '*':
-      sprintf(buf, "%s %s\r\n", buf,
+      sprintf(buf, "%s %s\n", buf,
               zone.cmd[j]->comment.toStdString().c_str() ? zone.cmd[j]->comment.toStdString().c_str() : "Empty Comment");
       break;
     case 'K':
-      sprintf(buf, "%s Skip next [%d] commands.\r\n", buf,
+      sprintf(buf, "%s Skip next [%d] commands.\n", buf,
               zone.cmd[j]->arg1);
       break;
     case 'X':
@@ -731,12 +731,12 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
         break;
       }
 
-      sprintf(buf, "%s [%d] %s\r\n", buf,
+      sprintf(buf, "%s [%d] %s\n", buf,
               zone.cmd[j]->arg1, xresultstr);
     }
     break;
     default:
-      sprintf(buf, "Illegal Command: %c %d %d %d %d\r\n",
+      sprintf(buf, "Illegal Command: %c %d %d %d %d\n",
               zone.cmd[j]->command,
               zone.cmd[j]->if_flag,
               zone.cmd[j]->arg1,
@@ -747,7 +747,7 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
 
     if (!zone.cmd[j]->comment.isEmpty() && zone.cmd[j]->command != '*')
     {
-      sprintf(buf, "%s       %s\r\n", buf, zone.cmd[j]->comment.toStdString().c_str());
+      sprintf(buf, "%s       %s\n", buf, zone.cmd[j]->comment.toStdString().c_str());
     }
 
     ch->send(buf);
@@ -759,7 +759,7 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
 
   if (num_to_show != 1)
   {
-    ch->sendln("\r\nUse zedit to see the rest of the commands if they were truncated.");
+    ch->sendln("\nUse zedit to see the rest of the commands if they were truncated.");
   }
   return ReturnValue::eSUCCESS;
 }
@@ -779,8 +779,8 @@ void show_legacy_files(Character *ch, const world_file_list_t &list)
 {
   quint64 i = 0;
 
-  ch->send("ID ) Filename                       Begin  End\r\n"
-           "----------------------------------------------------------\r\n");
+  ch->send("ID ) Filename                       Begin  End\n"
+           "----------------------------------------------------------\n");
 
   for (const auto &curr : list)
   {
@@ -805,7 +805,7 @@ void show_legacy_files(Character *ch, const world_file_list_t &list)
       file_modified = "MODIFIED";
     }
 
-    ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\r\n").arg(i++, 3).arg(curr->filename(), -30).arg(curr->firstnum(), -6).arg(curr->lastnum(), -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
+    ch->send(QStringLiteral("%1) %2 %3 %4 %5%6%7 %8\n").arg(i++, 3).arg(curr->filename(), -30).arg(curr->firstnum(), -6).arg(curr->lastnum(), -6).arg(file_in_progress, 1).arg(file_ready, 1).arg(file_approved, 1).arg(file_modified));
   }
 }
 
@@ -830,23 +830,23 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
 
   if (!*type)
   {
-    send_to_char("Format: show <type> <name>.\r\n"
-                 "Types:\r\n"
-                 "  keydoorcombo\r\n"
-                 "  mob\r\n"
-                 "  obj\r\n"
-                 "  room\r\n"
-                 "  zone\r\n"
-                 "  zone all\r\n",
+    send_to_char("Format: show <type> <name>.\n"
+                 "Types:\n"
+                 "  keydoorcombo\n"
+                 "  mob\n"
+                 "  obj\n"
+                 "  room\n"
+                 "  zone\n"
+                 "  zone all\n",
                  ch);
     if (has_range)
-      send_to_char("  rfiles\r\n"
-                   "  mfiles\r\n"
-                   "  ofiles\r\n"
-                   "  search\r\n"
-                   " msearch\r\n"
-                   " rsearch\r\n"
-                   " counts\r\n",
+      send_to_char("  rfiles\n"
+                   "  mfiles\n"
+                   "  ofiles\n"
+                   "  search\n"
+                   " msearch\n"
+                   " rsearch\n"
+                   " counts\n",
                    ch);
     return ReturnValue::eFAILURE;
   }
@@ -856,9 +856,9 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, name);
     if (!*name)
     {
-      send_to_char("Format:  show mob <keyword>\r\n"
-                   "                  <number>\r\n"
-                   "                  <beginrange> <endrange>\r\n",
+      send_to_char("Format:  show mob <keyword>\n"
+                   "                  <number>\n"
+                   "                  <beginrange> <endrange>\n",
                    ch);
       return ReturnValue::eFAILURE;
     }
@@ -893,7 +893,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->mob_index.contains(begin))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\n", begin, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
           ch->send(buf);
         }
       }
@@ -909,7 +909,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, i, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
           ch->send(buf);
 
           if (count > 200)
@@ -934,7 +934,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (isexact(name, vch.mob->getNameC()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vch.vnum(), vch.mob->getLevel(), qPrintable(vch.mob->short_desc));
+          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\n", count, vch.vnum(), vch.mob->getLevel(), qPrintable(vch.mob->short_desc));
           ch->send(buf);
 
           if (count > 200)
@@ -950,7 +950,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   } /* "mobile" */
   else if (is_abbrev(type, "counts") && has_range)
   {
-    csendf(ch, "$3Rooms$R: %d\r\n$3Mobiles$R: %d\r\n$3Objects$R: %d\r\n", DC::getInstance()->total_rooms, DC::getInstance()->mob_index.count(), DC::getInstance()->obj_index.count());
+    csendf(ch, "$3Rooms$R: %d\n$3Mobiles$R: %d\n$3Objects$R: %d\n", DC::getInstance()->total_rooms, DC::getInstance()->mob_index.count(), DC::getInstance()->obj_index.count());
     return ReturnValue::eSUCCESS;
   }
   else if (is_abbrev(type, "object"))
@@ -958,9 +958,9 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, name);
     if (!*name)
     {
-      send_to_char("Format:  show obj <keyword>\r\n"
-                   "                  <number>\r\n"
-                   "                  <beginrange> <endrange>\r\n",
+      send_to_char("Format:  show obj <keyword>\n"
+                   "                  <number>\n"
+                   "                  <beginrange> <endrange>\n",
                    ch);
       return ReturnValue::eFAILURE;
     }
@@ -995,7 +995,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->obj_index.contains(nr))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\r\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
           ch->send(buf);
         }
       }
@@ -1010,7 +1010,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
           ch->send(buf);
 
           if (count > 200)
@@ -1035,7 +1035,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         if (isexact(name, index_entry.item->Name()))
         {
           count++;
-          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\r\n", count, vnum, index_entry.item->obj_flags.eq_level, qPrintable(index_entry.item->short_description));
+          sprintf(buf, "[%3d] [%5llu] [%2llu] %s\n", count, vnum, index_entry.item->obj_flags.eq_level, qPrintable(index_entry.item->short_description));
           ch->send(buf);
         }
 
@@ -1087,7 +1087,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       {
         if (DC::getInstance()->rooms.contains(begin))
         {
-          sprintf(buf, "[  1] [%5d] %s\r\n", begin,
+          sprintf(buf, "[  1] [%5d] %s\n", begin,
                   qPrintable(DC::getInstance()->world[begin].name));
           ch->send(buf);
         }
@@ -1099,7 +1099,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
           if (!DC::getInstance()->rooms.contains(i))
             continue;
           count++;
-          sprintf(buf, "[%3d] [%5d] %s\r\n", count, i, qPrintable(DC::getInstance()->world[i].name));
+          sprintf(buf, "[%3d] [%5d] %s\n", count, i, qPrintable(DC::getInstance()->world[i].name));
           ch->send(buf);
 
           if (count > 200)
@@ -1125,10 +1125,10 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (QString(name) == "all")
     {
       send_to_char(
-          "     Range        Usage\r\n"
-          "Num  Start-End    Start-End    Rooms   Name\r\n"
+          "     Range        Usage\n"
+          "Num  Start-End    Start-End    Rooms   Name\n"
           //	 174  31900-32100  32001-32079   78   the Battle of Troy
-          "---  -----------  -----------  -----  ----------------------\r\n",
+          "---  -----------  -----------  -----  ----------------------\n",
           ch);
       for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
       {
@@ -1136,7 +1136,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         room_t range_end = zone.getTop();
         int num = count_rooms(range_start, range_end);
 
-        ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\r\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
+        ch->send(QStringLiteral("%1  %2-%3  $0$B%4-%5  %6$R  %7$R\n").arg(zone_key, 3).arg(zone.getBottom(), 5).arg(zone.getTop(), -5).arg(zone.getRealBottom(), 5).arg(zone.getRealTop(), -5).arg(num, 5).arg(zone.Name()));
       }
       return ReturnValue::eSUCCESS;
     }
@@ -1197,7 +1197,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
     if (zon > last_room)
     {
 
-      ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\r\n").arg(zon).arg(last_room));
+      ch->send(QStringLiteral("Unknown zone. Zone %1 is greater than last valid zone %2.\n").arg(zon).arg(last_room));
       return ReturnValue::eFAILURE;
     }
     char buf[MAX_INPUT_LENGTH];
@@ -1212,7 +1212,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       if (sector)
         if (DC::getInstance()->world[i].sector_type != sector)
           continue;
-      sprintf(buf, "[%3d] %s\r\n", i, qPrintable(DC::getInstance()->world[i].name));
+      sprintf(buf, "[%3d] %s\n", i, qPrintable(DC::getInstance()->world[i].name));
       ch->send(buf);
     }
   }
@@ -1410,7 +1410,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, c, DC::getInstance()->mob_index[nr].mob->getLevel(), qPrintable(DC::getInstance()->mob_index[nr].mob->short_desc));
       ch->send(buf);
     eheh:
       continue;
@@ -1547,7 +1547,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
         }
       }
-      csendf(ch, "Unknown type: %s.\r\n", arg1);
+      csendf(ch, "Unknown type: %s.\n", arg1);
     endy:
       continue;
     }
@@ -1735,7 +1735,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\r\n", count, c, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, c, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
       ch->send(buf);
     endLoop:
       continue;
@@ -1768,7 +1768,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->send(QStringLiteral("$3Doors in game that use key %1$R:\r\n\r\n").arg(count));
+    ch->send(QStringLiteral("$3Doors in game that use key %1$R:\n\n").arg(count));
     for (i = 0; i < DC::getInstance()->top_of_world; i++)
       for (nr = 0; nr < MAX_DIRS; nr++)
         if (DC::getInstance()->rooms.contains(i) && DC::getInstance()->rooms[i].dir_option[nr])
@@ -1778,7 +1778,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
               DC::getInstance()->rooms[i].dir_option[nr]->key == count)
           {
             csendf(ch,
-                   " $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\r\n",
+                   " $3Room$R: %5d $3Dir$R: %5s $3Key$R: %d\n",
                    DC::getInstance()->rooms[i].number, qPrintable(DC::dirs[nr]),
                    DC::getInstance()->rooms[i].dir_option[nr]->key);
           }
@@ -1806,8 +1806,8 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   std::tie(arg1, arguments) = half_chop(arguments);
   if (arg1.empty())
   {
-    ch->send("Usage: transfer <name>\r\n");
-    ch->send("       transfer all\r\n");
+    ch->send("Usage: transfer <name>\n");
+    ch->send("       transfer all\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -1823,7 +1823,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
       if (victim != ch && i->connected == Connection::states::PLAYING && source_room != 0)
       {
         act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-        ch->send(fmt::format("Moving {} from {} to {}.\r\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
+        ch->send(fmt::format("Moving {} from {} to {}.\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
         move_char(victim, destination_room);
         act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
         act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1838,7 +1838,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   victim = get_char_vis(ch, arg1);
   if (victim == nullptr)
   {
-    ch->send("No-one by that name around.\r\n");
+    ch->send("No-one by that name around.\n");
     return ReturnValue::eFAILURE;
   }
   source_room = victim->in_room;
@@ -1850,7 +1850,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   }
 
   act("$n disappears in a mushroom cloud.", victim, 0, 0, TO_ROOM, 0);
-  ch->send(fmt::format("Moving {} from {} to {}.\r\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
+  ch->send(fmt::format("Moving {} from {} to {}.\n", victim->getNameC(), DC::getInstance()->world[source_room].number, DC::getInstance()->world[destination_room].number));
   move_char(victim, destination_room);
   act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
   act("$n has transferred you!", ch, 0, victim, TO_VICT, 0);
@@ -1944,7 +1944,7 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
   }
 
   act("$n disappears in a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
-  csendf(ch, "Moving %s from %d to %d.\r\n", victim->getNameC(),
+  csendf(ch, "Moving %s from %d to %d.\n", victim->getNameC(),
          DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
   move_char(victim, target);
   act("$n arrives from a puff of smoke.", victim, 0, 0, TO_ROOM, 0);
@@ -1983,7 +1983,7 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
     act("$n disappears in a mushroom cloud.",
         victim, 0, 0, TO_ROOM, 0);
     target = ch->in_room;
-    csendf(ch, "Moving %s from %d to %d.\r\n", victim->getNameC(),
+    csendf(ch, "Moving %s from %d to %d.\n", victim->getNameC(),
            DC::getInstance()->world[victim->in_room].number, DC::getInstance()->world[target].number);
     move_char(victim, target);
     act("$n arrives from a puff of smoke.",
@@ -2000,7 +2000,7 @@ int do_gtrans(Character *ch, char *argument, cmd_t cmd)
           act("$n disappears in a mushroom cloud.",
               victim, 0, 0, TO_ROOM, 0);
           target = ch->in_room;
-          csendf(ch, "Moving %s from %d to %d.\r\n", GET_NAME(k->follower),
+          csendf(ch, "Moving %s from %d to %d.\n", GET_NAME(k->follower),
                  DC::getInstance()->world[k->follower->in_room].number, DC::getInstance()->world[target].number);
           move_char(k->follower, target);
           act("$n arrives from a puff of smoke.",
@@ -2056,7 +2056,7 @@ void opstat(Character *ch, vnum_t vnum)
     return;
   }
   obj = DC::getInstance()->obj_index[num].item;
-  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %llu.\r\n", qPrintable(obj->Name()), vnum);
+  sprintf(buf, "$3Object$R: %s   $3Vnum$R: %llu.\n", qPrintable(obj->Name()), vnum);
   ch->send(buf);
   if (DC::getInstance()->obj_index[num].progtypes == 0)
   {
@@ -2074,7 +2074,7 @@ void opstat(Character *ch, vnum_t vnum)
     ch->send(buf);
     send_to_char(oprog_type_to_name(mprg->type), ch);
     ch->send("$R ");
-    sprintf(buf, "$B$5%s$R\r\n", qPrintable(mprg->arglist));
+    sprintf(buf, "$B$5%s$R\n", qPrintable(mprg->arglist));
     ch->send(buf);
     if (mprg->comlist != nullptr)
     {
@@ -2090,7 +2090,7 @@ int do_opstat(Character *ch, char *argument, cmd_t cmd)
 
   if (!*argument)
   {
-    ch->send("Usage: opstat <vnum>\r\n ");
+    ch->send("Usage: opstat <vnum>\n ");
     return ReturnValue::eFAILURE;
   }
   one_argument(argument, buf);
@@ -2167,15 +2167,15 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     argument = one_argument(argument, arg);
     if (!*arg)
     {
-      send_to_char("$3Syntax$R: opedit [num] add new\r\n"
-                   "This creates a new object proc.\r\n",
+      send_to_char("$3Syntax$R: opedit [num] add new\n"
+                   "This creates a new object proc.\n",
                    ch);
       return ReturnValue::eFAILURE;
     }
     prog = new mob_prog_data;
     prog->type = ALL_GREET_PROG;
     prog->arglist = strdup("80");
-    prog->comlist = strdup("say This is my new obj prog!\r\n");
+    prog->comlist = strdup("say This is my new obj prog!\n");
     prog->next = nullptr;
 
     if ((currprog = DC::getInstance()->obj_index[num].mobprogs))
@@ -2196,8 +2196,8 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     int a = -1;
     if (!*arg || !isdigit(*arg))
     {
-      send_to_char("$3Syntax$R: opedit [obj_num] remove <prog>\r\n"
-                   "This removes an object procedure completly\r\n",
+      send_to_char("$3Syntax$R: opedit [obj_num] remove <prog>\n"
+                   "This removes an object procedure completly\n",
                    ch);
       return ReturnValue::eFAILURE;
     }
@@ -2235,7 +2235,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
       char buf[MAX_STRING_LENGTH];
       for (i = 0; *obj_types[i] != '\n'; i++)
       {
-        sprintf(buf, " %2d - %15s\r\n",
+        sprintf(buf, " %2d - %15s\n",
                 i + 1, obj_types[i]);
         ch->send(buf);
       }
@@ -2354,8 +2354,8 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     {
       ch->desc->connected = Connection::states::EDIT_MPROG;
 
-      send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\r\n"
-                   "|--------------------------------------------------------------------------------|\r\n",
+      send_to_char("        Write your help entry and stay within the line.(/s saves /h for help)\n"
+                   "|--------------------------------------------------------------------------------|\n",
                    ch);
 
       if (!currprog->comlist.isEmpty())
@@ -2372,13 +2372,13 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
     opstat(ch, vnum);
     return ReturnValue::eSUCCESS;
   }
-  send_to_char("$3Syntax$R: opedit [obj_num] [field] [arg]\r\n"
-               "Edit a field with no args for help on that field.\r\n\r\n"
-               "The field must be one of the following:\r\n"
-               "\tadd\tremove\ttype\targlist\r\n\tcommand\tlist\r\n\r\n",
+  send_to_char("$3Syntax$R: opedit [obj_num] [field] [arg]\n"
+               "Edit a field with no args for help on that field.\n\n"
+               "The field must be one of the following:\n"
+               "\tadd\tremove\ttype\targlist\n\tcommand\tlist\n\n",
                ch);
   char buf[MAX_STRING_LENGTH];
-  sprintf(buf, "$3Current object set to: %llu\r\n", ch->player->last_obj_vnum);
+  sprintf(buf, "$3Current object set to: %llu\n", ch->player->last_obj_vnum);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2437,7 +2437,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
     }
   */
 
-  csendf(ch, "Ok.\r\nYou copied item %d (%s) and replaced item %d (%s).\r\n", v1, qPrintable((DC::getInstance()->obj_index[v1].item)->short_description), v2, qPrintable((DC::getInstance()->obj_index[v2].item)->short_description));
+  csendf(ch, "Ok.\nYou copied item %d (%s) and replaced item %d (%s).\n", v1, qPrintable((DC::getInstance()->obj_index[v1].item)->short_description), v2, qPrintable((DC::getInstance()->obj_index[v2].item)->short_description));
 
   DC::getInstance()->object_list = DC::getInstance()->object_list->next;
   otmp = DC::getInstance()->obj_index[r2].item;
@@ -2526,7 +2526,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  csendf(ch, "Ok.\r\nYou copied mob %d (%s) and replaced mob %d (%s).\r\n",
+  csendf(ch, "Ok.\nYou copied mob %d (%s) and replaced mob %d (%s).\n",
          vsrc, qPrintable((DC::getInstance()->mob_index[src].mob)->short_desc),
          vdst, qPrintable((DC::getInstance()->mob_index[dst].mob)->short_desc));
 

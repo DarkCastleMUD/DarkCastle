@@ -232,14 +232,14 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key)
   {
     if (ch)
     {
-      ch->send(QStringLiteral("Zone %1 not found.\r\n").arg(zone_key));
+      ch->send(QStringLiteral("Zone %1 not found.\n").arg(zone_key));
       if (dc->zones.isEmpty())
       {
-        ch->send("There are no zones currently.\r\n");
+        ch->send("There are no zones currently.\n");
       }
       else
       {
-        ch->send(QStringLiteral("Valid values are 1-%1\r\n").arg(dc->zones.last().getID()));
+        ch->send(QStringLiteral("Valid values are 1-%1\n").arg(dc->zones.last().getID()));
       }
     }
     return false;
@@ -263,14 +263,14 @@ bool isValidZoneCommandKey(Character *ch, const Zone &zone, const qsizetype zone
   {
     if (ch)
     {
-      ch->send(QStringLiteral("Zone command %1 not found.\r\n").arg(zone_command_key + 1));
+      ch->send(QStringLiteral("Zone command %1 not found.\n").arg(zone_command_key + 1));
       if (zone.cmd.isEmpty())
       {
-        ch->send("There are no zone commands.\r\n");
+        ch->send("There are no zone commands.\n");
       }
       else
       {
-        ch->send(QStringLiteral("Valid values are 1-%1\r\n").arg(zone.cmd.size()));
+        ch->send(QStringLiteral("Valid values are 1-%1\n").arg(zone.cmd.size()));
       }
     }
     return false;

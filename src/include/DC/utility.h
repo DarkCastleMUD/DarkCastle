@@ -18,9 +18,7 @@
  ***************************************************************************/
 /* $Id: utility.h,v 1.100 2014/07/27 00:20:02 jhhudso Exp $ */
 
-#ifndef UTILITY_H_
-#define UTILITY_H_
-
+#pragma once
 #include <qbytearray.h>
 #include <qchar.h>
 #include <qcontainerfwd.h>
@@ -110,14 +108,9 @@ bool is_hiding(Character *ch, Character *vict);
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-
 #define LOWER(c) (((c) >= 'A' && (c) <= 'Z') ? ((c) + ('a' - 'A')) : (c))
 #define UPPER(c) (((c) >= 'a' && (c) <= 'z') ? ((c) + ('A' - 'a')) : (c))
-
-// #define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r' || (ch) == '|')
-#define ISNEWL(ch) ((ch) == '\n' || (ch) == '\r') // replaced to leave off the pipe and put it eclusively in comm.c
-                                                  // where we could check to see if we were in an editor first.
-
+#define ISNEWL(ch) ((ch) == '\n')
 #define CAP(st) (*(st) = UPPER(*(st)), st)
 
 #ifdef LEAK_CHECK
@@ -151,7 +144,6 @@ bool is_hiding(Character *ch, Character *vict);
       abort();                                                               \
     }                                                                        \
   } while (0)
-
 #define FREE(p)         \
   do                    \
   {                     \
@@ -657,7 +649,7 @@ void send_to_char_nosp(const char *messg, Character *ch);
 void send_to_char_nosp(QString messg, Character *ch);
 void send_to_room(QString messg, room_t room, bool awakeonly = false, Character *nta = nullptr);
 void record_track_data(Character *ch, cmd_t cmd);
-int write_to_descriptor_fd(int desc, char *txt);
+ssize_t write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(QByteArray txt, std::queue<QByteArray> &queue);
 int use_mana(Character *ch, int sn);
 void automail(char *name);
@@ -924,5 +916,3 @@ void special_log(QString message);
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 int len_cmp(const char *s1, const char *s2);
 int len_cmp(QString s1, QString s2);
-
-#endif /* UTILITY_H_ */

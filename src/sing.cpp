@@ -557,8 +557,8 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
       if (!tar_char && !tar_obj)
       {
         logentry(QStringLiteral("Dammit, fix that null tar_char thing in do_song"), IMPLEMENTER, DC::LogChannel::LOG_BUG);
-        send_to_char("If you triggered this message, you almost crashed the\r\n"
-                     "game.  Tell a god what you did immediately.\r\n",
+        send_to_char("If you triggered this message, you almost crashed the\n"
+                     "game.  Tell a god what you did immediately.\n",
                      ch);
         return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
       }
@@ -685,7 +685,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
         }
         else
         {
-          csendf(ch, "You seamlessly orchestrate a %s melody with your current song, playing them in perfect concert!\r\n",
+          csendf(ch, "You seamlessly orchestrate a %s melody with your current song, playing them in perfect concert!\n",
                  numToStringTH(ch->songs.size() + 1));
           act("$n seamlessly orchestrates another melody with $s current song, playing them in perfect concert!", ch, 0, 0, TO_ROOM, 0);
         }
@@ -938,7 +938,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   {
     dc_free((*i).song_data);
     (*i).song_data = 0;
-    ch->sendln("They seem to have left.\r\nIn the middle of your performance too!");
+    ch->sendln("They seem to have left.\nIn the middle of your performance too!");
     return ReturnValue::eFAILURE;
   }
   dc_free((*i).song_data);
@@ -1000,7 +1000,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
 
   int learned = ch->has_skill(song_info[SKILL_SONG_DISARMING_LIMERICK - SKILL_SONG_BASE].skill_num());
 
-  act("$n sings a witty little limerick to you!\r\nYour laughing makes it hard to concentrate on keeping your spells up!", ch, 0, victim, TO_VICT, 0);
+  act("$n sings a witty little limerick to you!\nYour laughing makes it hard to concentrate on keeping your spells up!", ch, 0, victim, TO_VICT, 0);
   act("$n sings a hilarious limerick about a man from Nantucket to $N!", ch, 0, victim, TO_ROOM, NOTVICT);
   ch->sendln("You sing your funniest limerick!");
 
@@ -1151,11 +1151,11 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
     {
       if (tmp_char == ch)
       {
-        ch->send(QStringLiteral("You feel your Healing Melody soothing %1 points of your health.\r\n").arg(heal));
+        ch->send(QStringLiteral("You feel your Healing Melody soothing %1 points of your health.\n").arg(heal));
       }
       else
       {
-        csendf(tmp_char, "You feel %s's Healing Melody soothing %d points of your health.\r\n", GET_NAME(ch), heal);
+        csendf(tmp_char, "You feel %s's Healing Melody soothing %d points of your health.\n", GET_NAME(ch), heal);
       }
     }
     else
@@ -1174,7 +1174,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*i).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1279,7 +1279,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*k).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*k).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*k).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1417,7 +1417,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
 
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names[(*i).song_number].toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names[(*i).song_number].toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names[(*i).song_number].toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1432,13 +1432,13 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
 {
   char buf[200];
 
-  ch->sendln("Available Songs\r\n---------------");
+  ch->sendln("Available Songs\n---------------");
   for (qsizetype i = 0; i < Character::song_names.length(); i++)
   {
     if (!ch->isImmortalPlayer() && !ch->has_skill(song_info[i].skill_num()))
       continue;
 
-    sprintf(buf, " %-50s    %d ki\r\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski());
+    sprintf(buf, " %-50s    %d ki\n", Character::song_names.value(i).toStdString().c_str(), song_info[i].min_useski());
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -1493,9 +1493,9 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
     if (tmp_char->isPlayer() && isSet(tmp_char->player->toggles, Player::PLR_DAMAGE))
     {
       if (tmp_char == ch)
-        sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\r\n", heal);
+        sprintf(buf, "You feel your Soothing Rememberance revitalize %d points of your mana.\n", heal);
       else
-        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\r\n", GET_NAME(ch), heal);
+        sprintf(buf, "You feel %s's Soothing Rememberance revitalize %d points of your mana.\n", GET_NAME(ch), heal);
       tmp_char->send(buf);
     }
     else
@@ -1514,7 +1514,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*i).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -1590,11 +1590,11 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
     {
       if (tmp_char == ch)
       {
-        tmp_char->send(QStringLiteral("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
+        tmp_char->send(QStringLiteral("You feel your Travelling March recover %1 moves for you.\n").arg(heal));
       }
       else
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\n", GET_NAME(ch), heal);
         tmp_char->send(buf);
       }
     }
@@ -1612,7 +1612,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
   }
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*i).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -2016,7 +2016,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
     return ReturnValue::eFAILURE;
   }
 
-  send_to_room("You hear a loud shattering sound of magic discharging and the portal fades away.\r\n", obj->in_room);
+  send_to_room("You hear a loud shattering sound of magic discharging and the portal fades away.\n", obj->in_room);
   // we remove it from the room, in case the other portal is also in the same room
   // we extract both portals at the end
   obj_from_room(obj);
@@ -2029,7 +2029,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   }
 
   // destroy it
-  send_to_room("You hear a loud shattering sound of magic discharging and the portal fades away.\r\n", tobj->in_room);
+  send_to_room("You hear a loud shattering sound of magic discharging and the portal fades away.\n", tobj->in_room);
   extract_obj(obj);
   extract_obj(tobj);
   return ReturnValue::eSUCCESS;
@@ -2221,7 +2221,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
   if (target->affected_by_spell(SPELL_DETECT_MAGIC) && target->affected_by_spell(SPELL_DETECT_MAGIC)->modifier > 80)
     target->sendln("You sense you are the target of scrying.");
 
-  sprintf(buf, "%s%s.\r\n", buf, qPrintable(DC::getInstance()->world[target->in_room].name));
+  sprintf(buf, "%s%s.\n", buf, qPrintable(DC::getInstance()->world[target->in_room].name));
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -2283,7 +2283,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
       if (IS_AFFECTED(fvictim->follower, AFF_CHARM) && fvictim->follower->isNonPlayer() && ch->in_room != fvictim->follower->in_room)
       {
         summoned = true;
-        do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\r\n");
+        do_emote(fvictim->follower, "disappears in a flash of $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R (disco?) light.\n");
         move_char(fvictim->follower, ch->in_room);
         act("With a $B$6m$4u$1l$7t$4i$7-$6c$4o$1l$6o$7r$4e$1d$R flash of (disco?) light $n appears!", fvictim->follower, 0, 0, TO_ROOM, 0);
       }
@@ -2368,7 +2368,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     (*i).song_timer = -1;
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*i).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -2433,7 +2433,7 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
     if (ch == tmp_char)
       tmp_char->sendln("Your song causes your mind to race at a thousand miles an hour!");
     else
-      csendf(tmp_char, "%s's song causes your mind to race at a thousand miles an hour!\r\n", GET_NAME(ch));
+      csendf(tmp_char, "%s's song causes your mind to race at a thousand miles an hour!\n", GET_NAME(ch));
   }
 
   return ReturnValue::eSUCCESS;
@@ -2505,7 +2505,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     (*i).song_timer = -1;
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*i).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);
@@ -2685,7 +2685,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
     // prevent stacking
     if (IS_AFFECTED(victim, AFF_GLITTER_DUST))
     {
-      csendf(ch, "%s is already covered in glitter.\r\n", GET_SHORT(victim));
+      csendf(ch, "%s is already covered in glitter.\n", GET_SHORT(victim));
       continue;
     }
 
@@ -2695,7 +2695,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
     bool post_see = CAN_SEE(ch, victim);
     if (!pre_see && post_see)
     {
-      csendf(ch, "Your glitter reveals %s.\r\n", GET_SHORT(victim));
+      csendf(ch, "Your glitter reveals %s.\n", GET_SHORT(victim));
     }
   }
 
@@ -2801,7 +2801,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
 
   if (target->isPlayer())
   {
-    csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\r\n", GET_NAME(target), HSHR(target));
+    csendf(ch, "%s is too strong willed for you to break any of %s loyalties.\n", GET_NAME(target), HSHR(target));
     return ReturnValue::eFAILURE;
   }
   if (!target->affected_by_spell(SPELL_CHARM_PERSON) && !IS_AFFECTED(target, AFF_FAMILIAR))
@@ -2821,7 +2821,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
   if ((type == 4 && !number(0, 9)) || (type == 2 && !number(0, 4)) || (type == 1 && !number(0, 1)))
   {
     ch->sendln("Ooops, that didn't work out like you hoped.");
-    act("$N charges at $n, for trying to break its bond with its master.\r\n", ch, 0, target, TO_ROOM, NOTVICT);
+    act("$N charges at $n, for trying to break its bond with its master.\n", ch, 0, target, TO_ROOM, NOTVICT);
     act("$N charges at you!", ch, 0, target, TO_CHAR, 0);
     return attack(target, ch, TYPE_UNDEFINED);
   }
@@ -2954,7 +2954,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
 
   act("You enter $S mind...", ch, 0, target, TO_CHAR, INVIS_NULL);
   auto new_hate = target->get_random_hate();
-  sprintf(buf, "%s seems to hate... %s.\r\n", GET_SHORT(target), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
+  sprintf(buf, "%s seems to hate... %s.\n", GET_SHORT(target), new_hate.isEmpty() ? "no one!" : new_hate.toStdString().c_str());
   ch->send(buf);
 
   if (skill > 80)
@@ -2965,7 +2965,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is resistant to: %s\r\n", GET_SHORT(target), buf);
+    csendf(ch, "%s is resistant to: %s\n", GET_SHORT(target), buf);
   }
   if (skill > 85)
   {
@@ -2975,7 +2975,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is immune to: %s\r\n", GET_SHORT(target), buf);
+    csendf(ch, "%s is immune to: %s\n", GET_SHORT(target), buf);
   }
   if (skill > 90)
   {
@@ -2985,7 +2985,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
       strcpy(buf, "nothing");
     }
 
-    csendf(ch, "%s is susceptible to: %s\r\n", GET_SHORT(target), buf);
+    csendf(ch, "%s is susceptible to: %s\n", GET_SHORT(target), buf);
   }
 
   return ReturnValue::eSUCCESS;
@@ -3135,7 +3135,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
   if (ch->songs.size() > 1 && !skill_success(ch, nullptr, SKILL_ORCHESTRATE))
   {
     (*i).song_timer = -1;
-    csendf(ch, "You miss a note, ruining your orchestration of %s!\r\n", Character::song_names.value((*i).song_number).toStdString().c_str());
+    csendf(ch, "You miss a note, ruining your orchestration of %s!\n", Character::song_names.value((*i).song_number).toStdString().c_str());
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "$n misses a note, ruining $s orchestration of %s!", Character::song_names.value((*i).song_number).toStdString().c_str());
     act(buf, ch, 0, 0, TO_ROOM, 0);

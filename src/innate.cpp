@@ -94,7 +94,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
     {
       if (buf[0] == '\0')
       {
-        csendf(ch, "Your race has access to the $B%s$R innate ability.\r\n", innates[i].name);
+        csendf(ch, "Your race has access to the $B%s$R innate ability.\n", innates[i].name);
         found = true;
       }
       else if (!str_cmp(innates[i].name, buf))

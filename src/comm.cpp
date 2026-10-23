@@ -254,7 +254,7 @@ int DC::write_hotboot_file(void)
           }
           d->character->save_char_obj();
         }
-        write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\r\nPlease wait..");
+        write_to_descriptor(d->descriptor, "Attempting to maintain your link during reboot.\nPlease wait..");
       }
     }
 
@@ -346,7 +346,7 @@ int DC::load_hotboot_descs(void)
       d->setPeerAddress(QHostAddress(address));
       d->descriptor = descriptor;
 
-      for (const auto &str : {"Recovering...\r\n", "Link recovery successful.\r\nPlease wait while mud finishes rebooting...\r\n"})
+      for (const auto &str : {"Recovering...\n", "Link recovery successful.\nPlease wait while mud finishes rebooting...\n"})
       {
         if (write_to_descriptor(descriptor, str) == -1)
         {
@@ -398,17 +398,17 @@ void DC::finish_hotboot(void)
 
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
-    write_to_descriptor(d->descriptor, "Reconnecting your link to your character...\r\n");
+    write_to_descriptor(d->descriptor, "Reconnecting your link to your character...\n");
 
     if (!load_char_obj(d, d->output))
     {
       logmisc(QStringLiteral("Could not load char '%1' in hotboot.").arg(d->output));
-      write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\r\n");
+      write_to_descriptor(d->descriptor, "Link Failed!  Tell an Immortal when you can.\n");
       close_socket(d);
       continue;
     }
 
-    write_to_descriptor(d->descriptor, "Success...May your visit continue to suck...\r\n");
+    write_to_descriptor(d->descriptor, "Success...May your visit continue to suck...\n");
 
     d->output.clear();
 
@@ -700,7 +700,7 @@ void DC::game_loop(void)
       case Connection::states::GET_OLD_PASSWORD:
         if (idle_seconds > 30)
         {
-          SEND_TO_Q(QStringLiteral("Disconnected for being idle for over 30 seconds.\r\n"), d);
+          SEND_TO_Q(QStringLiteral("Disconnected for being idle for over 30 seconds.\n"), d);
           close_socket(d);
         }
         break;
@@ -898,19 +898,19 @@ void DC::game_loop_init(void)
   server.route("/myApi/<arg>", QHttpServerRequest::Method::Get,
                [&dc](int id, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QStringLiteral("int:%1\r\n").arg(id));
+                 return QHttpServerResponse(QStringLiteral("int:%1\n").arg(id));
                });
   server.route("/myApi/<arg>/<arg>", QHttpServerRequest::Method::Get,
                [&dc](QString str, QString str2, const QHttpServerRequest &request)
                {
-                 return QHttpServerResponse(QStringLiteral("str:%1 str2:%2\r\n").arg(str).arg(str2));
+                 return QHttpServerResponse(QStringLiteral("str:%1 str2:%2\n").arg(str).arg(str2));
                });
 
   server.route("/test", [&dc](const QHttpServerRequest &request)
                {
     if (!dc->authenticate(request))
     {
-      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\n"));
     }
 
     auto future = QtConcurrent::run([]() {});
@@ -919,43 +919,43 @@ void DC::game_loop_init(void)
     {
       // QJsonArray array = QJsonArray::fromStringList(myData);
 
-      return QHttpServerResponse(QStringLiteral("Success.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Success.\n"));
     }
     else
     {
-      return QHttpServerResponse("Failed.\r\n");
+      return QHttpServerResponse("Failed.\n");
     } });
 
   server.route("/", [&dc](const QHttpServerRequest &request)
                {
     if (!dc->authenticate(request))
     {
-      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Failed to authenticate.\n"));
     }
 
     auto future = QtConcurrent::run([]() {});
 
     if (future.isValid())
     {
-      return QHttpServerResponse(QStringLiteral("Success.\r\n"));
+      return QHttpServerResponse(QStringLiteral("Success.\n"));
     }
     else
     {
-      return QHttpServerResponse("Failed.\r\n");
+      return QHttpServerResponse("Failed.\n");
     } });
 
   server.route("/shutdown", QHttpServerRequest::Method::Get, [this, &dc](const QHttpServerRequest &request)
                {
                  if (!dc->authenticate(request, 110))
                  {
-                   return QHttpServerResponse(QStringLiteral("Failed to authenticate.\r\n"));
+                   return QHttpServerResponse(QStringLiteral("Failed to authenticate.\n"));
                  }
 
                  auto future = QtConcurrent::run([]() {});
 
                  int do_not_save_corpses = 1;
 
-                 QString buf = QStringLiteral("Hot reboot by %1.\r\n").arg("HTTP /shutdown/");
+                 QString buf = QStringLiteral("Hot reboot by %1.\n").arg("HTTP /shutdown/");
                  send_to_all(buf);
                  logentry(buf, ANGEL, DC::LogChannel::LOG_GOD);
                  logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
@@ -971,10 +971,10 @@ void DC::game_loop_init(void)
                  if (!write_hotboot_file())
                  {
                    logentry(QStringLiteral("Hotboot failed.  Closing all sockets."), 0, DC::LogChannel::LOG_MISC);
-                   return QHttpServerResponse("Failed.\r\n");
+                   return QHttpServerResponse("Failed.\n");
                  }
 
-                 return QHttpServerResponse("Rebooting.\r\n"); });
+                 return QHttpServerResponse("Rebooting.\n"); });
 
   QLoggingCategory::setFilterRules("qt.httpserver=true");
 
@@ -1447,7 +1447,7 @@ QString Connection::createPrompt(void)
   }
   if (showstr_count)
   {
-    return QStringLiteral("\r\n[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%1 %2) ]").arg(showstr_page).arg(showstr_count);
+    return QStringLiteral("\n[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%1 %2) ]").arg(showstr_page).arg(showstr_count);
   }
   else if (strnew)
   {
@@ -1475,7 +1475,7 @@ QString Connection::createPrompt(void)
   else
   {
     if (!isSet(GET_TOGGLES(character), Player::PLR_COMPACT))
-      prompt += "\r\n";
+      prompt += "\n";
     if (character->getPrompt().isEmpty())
       prompt += "type 'help prompt'> ";
     else
@@ -1649,9 +1649,9 @@ int new_descriptor(int s)
   /* determine if the site is banned */
   if (isbanned(newd->getPeerOriginalAddress()) == BAN_ALL)
   {
-    write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\r\n"
-                              "Questions, please email us at:\r\n"
-                              "imps@dcastle.org\r\n");
+    write_to_descriptor(desc, "Your site has been banned from Dark Castle. If you have any\n"
+                              "Questions, please email us at:\n"
+                              "imps@dcastle.org\n");
 
     CLOSE_SOCKET(desc);
     logentry(QStringLiteral("Connection attempt denied from [%1]").arg(newd->getPeerOriginalAddress().toString()), OVERSEER, DC::LogChannel::LOG_SOCKET);
@@ -1710,14 +1710,10 @@ int Connection::process_output(void)
     i += go_ahead;
   }
 
-  /*
-   * now, send the output.  If this is an 'interruption', use the prepended
-   * CRLF, otherwise send the straight output sans CRLF.
-   */
   int result{};
   if (!prompt_mode)
   { /* && !t->connected) */
-    result = write_to_descriptor(descriptor, "\r\n" + i);
+    result = write_to_descriptor(descriptor, "\n" + i);
     prompt_mode = 0;
   }
   else
@@ -1738,10 +1734,12 @@ int Connection::process_output(void)
   return result;
 }
 
-int write_to_descriptor(int desc, QByteArray txt)
+ssize_t write_to_descriptor(int desc, QByteArray txt)
 {
   if (txt.isEmpty())
     return 0;
+
+  txt.replace("\n", "\r\n");
 
   auto txtPtr = txt.constData();
 
@@ -1782,11 +1780,11 @@ void process_iac(Connection *t)
 {
   char prev = '\0';
 
-  size_t iac_pos = t->inbuf.find(telnet::iac);
-  if (iac_pos != t->inbuf.npos)
+  auto iac_pos = t->inbuf.indexOf(telnet::iac);
+  if (iac_pos != -1)
   {
     size_t processed = 0;
-    auto iac_str = t->inbuf.substr(iac_pos);
+    auto iac_str = QByteArray(t->inbuf).slice(iac_pos);
     for (const auto &c : iac_str)
     {
       // count every processed character so we know how many to delete from t->inbuf
@@ -1843,7 +1841,7 @@ void process_iac(Connection *t)
         prev = 0;
       }
     }
-    t->inbuf.erase(iac_pos, processed);
+    t->inbuf.remove(iac_pos, processed);
   }
 }
 
@@ -1853,15 +1851,6 @@ std::string removeUnprintable(std::string input)
   do
   {
     found_pos = input.find('\n');
-    if (found_pos != input.npos)
-    {
-      input.erase(found_pos, 1);
-    }
-  } while (found_pos != input.npos);
-
-  do
-  {
-    found_pos = input.find('\r');
     if (found_pos != input.npos)
     {
       input.erase(found_pos, 1);
@@ -1895,16 +1884,6 @@ std::string makePrintable(std::string input)
 
   do
   {
-    found_pos = input.find('\r');
-    if (found_pos != input.npos)
-    {
-      input.erase(found_pos, 1);
-      input.insert(found_pos, "\\r");
-    }
-  } while (found_pos != input.npos);
-
-  do
-  {
     found_pos = input.find('\b');
     if (found_pos != input.npos)
     {
@@ -1922,15 +1901,15 @@ std::string makePrintable(std::string input)
  */
 int process_input(class Connection *t)
 {
-  size_t eoc_pos = t->inbuf.npos;
+  size_t eoc_pos = -1;
   size_t erase = 0;
-  ssize_t bytes_read = 0;
   t->idle_time = 0;
 
   do
   {
     char c_buffer[8193] = {};
-    if ((bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1)) < 0)
+    auto bytes_read = read(t->descriptor, &c_buffer, sizeof(c_buffer) - 1);
+    if (bytes_read < 0)
     {
 #ifdef EWOULDBLOCK
       if (errno == EWOULDBLOCK)
@@ -1948,79 +1927,53 @@ int process_input(class Connection *t)
     }
     else if (bytes_read == 0)
     {
-      if (t->character != nullptr && GET_NAME(t->character) != nullptr)
+      if (t->character && GET_NAME(t->character))
       {
-        logentry(QStringLiteral("Connection broken by peer %1 playing %2.").arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        logsocket(u"Connection broken by peer %1 playing %2."_s.arg(t->getPeerAddress().toString()).arg(GET_NAME(t->character)));
       }
       else
       {
-        logentry(QStringLiteral("Connection broken by peer %1 not playing a character.").arg(t->getPeerAddress().toString()), IMPLEMENTER + 1, DC::LogChannel::LOG_SOCKET);
+        logsocket(u"Connection broken by peer %1 not playing a character."_s.arg(t->getPeerAddress().toString()));
       }
 
       return -1;
     }
-    std::string buffer = c_buffer;
+    QByteArray buffer = c_buffer;
+    // erase everything except:
+    // visible ASCII characters
+    // \b (backspace)
+    // \x7F (delete)
+    // \n (new line)
+    buffer.erase(std::remove_if(buffer.begin(), buffer.end(), [](char c)
+                                { return (c < ' ' || c > '~') &&
+                                         c != '\b' &&   // backspace
+                                         c != '\x7F' && // delete
+                                         c != '\n' &&   // new line
+                                         c != telnet::do_opt &&
+                                         c != telnet::dont_opt &&
+                                         c != telnet::iac &&
+                                         c != telnet::will_opt &&
+                                         c != telnet::wont_opt; }),
+                 buffer.end());
+
     t->inbuf += buffer;
 
-    // Search for telnet control codes
+    // Process any telnet control codes
     process_iac(t);
     if (t->server_size_echo)
     {
-      std::string new_buffer;
-      for (const auto &c : buffer)
-      {
-        if ((c >= ' ' && c <= '~'))
-        {
-          new_buffer += c;
-        }
-        else if (c == '\b' || c == '\x7F') // erase last character for backspace or delete
-        {
-          if (t->inbuf.size() == 1)
-          {
-            // // std::cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
-            t->inbuf.erase(t->inbuf.end() - 1, t->inbuf.end());
-            // // std::cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
-          }
-          if (t->inbuf.size() >= 2)
-          {
-            // // std::cerr << "Before: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
-            t->inbuf.erase(t->inbuf.end() - 2, t->inbuf.end());
-            // // std::cerr << "After: [" << t->inbuf << "]" << t->inbuf.size() << std::endl;
-            new_buffer += "\b \b";
-          }
-        }
-        else if (c == '\r')
-        {
-          new_buffer += "\r\n";
-        }
-        write_to_descriptor(t->descriptor, new_buffer.c_str());
-      }
+      write_to_descriptor(t->descriptor, buffer);
     }
-    // Keep looping until client sends us a \n or \r
+    // Keep looping until client sends us a \n or
     // if read() above has nothing then we return
-  } while (t->inbuf.find('\n') == t->inbuf.npos && t->inbuf.find('\r') == t->inbuf.npos);
+  } while (t->inbuf.indexOf('\n') == -1);
 
   do
   {
-    eoc_pos = t->inbuf.npos;
+    eoc_pos = -1;
     erase = 0;
-    size_t crnl_pos = t->inbuf.find("\r\n");
-    if (crnl_pos != t->inbuf.npos)
-    {
-      eoc_pos = crnl_pos;
-      erase = 2;
-    }
-
-    // search for carriage return, new line or pipe representing end of command
-    size_t cr_pos = t->inbuf.find('\r');
-    if (cr_pos != t->inbuf.npos && cr_pos < eoc_pos)
-    {
-      eoc_pos = cr_pos;
-      erase = 1;
-    }
-
-    size_t nl_pos = t->inbuf.find('\n');
-    if (nl_pos != t->inbuf.npos && nl_pos <= eoc_pos)
+    auto nl_pos = t->inbuf.indexOf('\n');
+    if (nl_pos != -1 && nl_pos <= eoc_pos)
     {
       eoc_pos = nl_pos;
       erase = 1;
@@ -2030,8 +1983,8 @@ int process_input(class Connection *t)
     // std::cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
     << "(" << t->inbuf.length() << ")" << std::endl;
 #endif
-    std::string buffer = t->inbuf.substr(0, eoc_pos);
-    t->inbuf.erase(0, eoc_pos + erase);
+    auto buffer = t->inbuf.slice(0, eoc_pos);
+    t->inbuf.remove(0, eoc_pos + erase);
 #ifdef DEBUG_INPUT
     // std::cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
     << "(" << t->inbuf.length() << ")" << std::endl;
@@ -2050,25 +2003,25 @@ int process_input(class Connection *t)
       size_t pipe_pos = 0;
       do
       {
-        pipe_pos = buffer.find('|');
-        if (pipe_pos != buffer.npos)
+        pipe_pos = buffer.indexOf('|');
+        if (pipe_pos != -1)
         {
-          std::string new_buffer = buffer.substr(0, pipe_pos);
-          write_to_q(new_buffer.c_str(), t->input);
+          auto new_buffer = buffer.slice(0, pipe_pos);
+          write_to_q(new_buffer, t->input);
 
-          buffer.erase(0, pipe_pos + 1);
+          buffer.remove(0, pipe_pos + 1);
         }
         else
         {
-          write_to_q(buffer.c_str(), t->input);
+          write_to_q(buffer, t->input);
         }
-      } while (pipe_pos != buffer.npos);
+      } while (pipe_pos != -1);
     }
     else
     {
-      write_to_q(buffer.c_str(), t->input);
+      write_to_q(buffer, t->input);
     }
-  } while (t->inbuf.find('\n') != t->inbuf.npos || t->inbuf.find('\r') != t->inbuf.npos);
+  } while (t->inbuf.indexOf('\n') != -1);
 
   /*
           else
@@ -2109,7 +2062,7 @@ int process_input(class Connection *t)
       {
         std::string buffer;
 
-        buffer = fmt::format("Line too long.  Truncated to:\r\n{}\r\n", tmp);
+        buffer = fmt::format("Line too long.  Truncated to:\n{}\n", tmp);
         if (write_to_descriptor(t->descriptor, buffer) < 0)
           return -1;
       }
@@ -2117,7 +2070,7 @@ int process_input(class Connection *t)
       {
         SEND_TO_Q("% ", t->snoop_by);
         SEND_TO_Q(tmp, t->snoop_by);
-        SEND_TO_Q("\r\n", t->snoop_by);
+        SEND_TO_Q("\n", t->snoop_by);
       }
       failed_subst = 0;
 
@@ -2181,7 +2134,7 @@ int perform_subst(class Connection *t, char *orig, char *subst)
   /* now find the second '^' */
   if (!(second = strchr(first, '^')))
   {
-    SEND_TO_Q("Invalid substitution.\r\n", t);
+    SEND_TO_Q("Invalid substitution.\n", t);
     return 1;
   }
   /* terminate "first" at the position of the '^' and make 'second' point
@@ -2191,7 +2144,7 @@ int perform_subst(class Connection *t, char *orig, char *subst)
   /* now, see if the contents of the first std::string appear in the original */
   if (!(strpos = strstr(orig, first)))
   {
-    SEND_TO_Q("Invalid substitution.\r\n", t);
+    SEND_TO_Q("Invalid substitution.\n", t);
     return 1;
   }
   /* now, we construct the new std::string for output. */
@@ -2238,19 +2191,19 @@ int close_socket(class Connection *d)
 
   if (d->snoop_by)
   {
-    SEND_TO_Q("Your victim is no longer among us.\r\n", d->snoop_by);
+    SEND_TO_Q("Your victim is no longer among us.\n", d->snoop_by);
     d->snoop_by->snooping = nullptr;
   }
 
   // Force descriptors to send tilde (~) or "/s" to finish in-progress edits
   if (d->hashstr)
   {
-    auto idiotbuf = u"\r\n~\r\n"_s;
+    auto idiotbuf = u"\n~\n"_s;
     string_hash_add(d, idiotbuf);
   }
   if (d->strnew && (d->character->isNonPlayer() || !isSet(d->character->player->toggles, Player::PLR_EDITOR_WEB)))
   {
-    auto idiotbuf = u"/s\r\n"_s;
+    auto idiotbuf = u"/s\n"_s;
     d->editor_parse_line(idiotbuf);
   }
   if (d->character)
@@ -2342,7 +2295,7 @@ void check_idle_passwords(void)
     else if (d->idle_tics > 5)
     {
       telnet_echo_on(d);
-      SEND_TO_Q("\r\nTimed out... goodbye.\r\n", d);
+      SEND_TO_Q("\nTimed out... goodbye.\n", d);
       STATE(d) = Connection::states::CLOSE;
     }
   }
@@ -2365,7 +2318,7 @@ void DC::crash_hotboot(void)
 
   for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
-    write_to_descriptor(d->descriptor, "Mud crash detected.\r\n");
+    write_to_descriptor(d->descriptor, "Mud crash detected.\n");
   }
 
   // attempt to hotboot
@@ -2373,7 +2326,7 @@ void DC::crash_hotboot(void)
   {
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\r\n");
+      write_to_descriptor(d->descriptor, "Attempting to recover with a hotboot.\n");
     }
     logentry(QStringLiteral("Attempting to hotboot from the crash."), ANGEL, DC::LogChannel::LOG_BUG);
     write_hotboot_file();
@@ -2381,13 +2334,13 @@ void DC::crash_hotboot(void)
     logentry(QStringLiteral("Hotboot crash recovery failed.  Exiting."), ANGEL, DC::LogChannel::LOG_BUG);
     for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
     {
-      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\r\n");
+      write_to_descriptor(d->descriptor, "Hotboot failed giving up.\n");
     }
   }
 
   for (d = descriptor_list; d && died_from_sigsegv < 2; d = d->next)
   {
-    write_to_descriptor(d->descriptor, "Giving up, goodbye.\r\n");
+    write_to_descriptor(d->descriptor, "Giving up, goodbye.\n");
   }
 }
 
@@ -2501,8 +2454,8 @@ void signal_handler(int signal, siginfo_t *si, void *)
     char **new_argv = nullptr;
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
-    send_to_all(QStringLiteral("Hot reboot by SIGHUP.\r\n"));
-    logentry(QStringLiteral("Hot reboot by SIGHUP.\r\n"), ANGEL, DC::LogChannel::LOG_GOD);
+    send_to_all(QStringLiteral("Hot reboot by SIGHUP.\n"));
+    logentry(QStringLiteral("Hot reboot by SIGHUP.\n"), ANGEL, DC::LogChannel::LOG_GOD);
     logentry(QStringLiteral("Writing sockets to file for hotboot recovery."), 0, DC::LogChannel::LOG_MISC);
     if (!DC::getInstance()->write_hotboot_file())
     {
@@ -2603,7 +2556,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 
   if (ch->player->away_msgs.isEmpty())
   {
-    SEND_TO_Q("No messages have been recorded.\r\n", ch->desc);
+    SEND_TO_Q("No messages have been recorded.\n", ch->desc);
     return ReturnValue::eSUCCESS;
   }
 
@@ -2616,7 +2569,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
 
     if (++lines == 23)
     {
-      SEND_TO_Q("\r\nMore msgs available. Type awaymsgs to see them\r\n",
+      SEND_TO_Q("\nMore msgs available. Type awaymsgs to see them\n",
                 ch->desc);
       break;
     }
@@ -2890,7 +2843,7 @@ int do_editor(Character *ch, char *argument, cmd_t cmd)
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
 
-  csendf(ch, "Current editor: %s\r\n\r\n", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
+  csendf(ch, "Current editor: %s\n\n", isSet(ch->player->toggles, Player::PLR_EDITOR_WEB) ? "web" : "game");
 
   one_argument(argument, arg1);
 

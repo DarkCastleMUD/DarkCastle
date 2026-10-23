@@ -101,7 +101,7 @@ void string_hash_add(class Connection *d, QString str)
     check_for_awaymsgs(ch);
   }
   else
-    *d->hashstr += u"\r\n"_s;
+    *d->hashstr += u"\n"_s;
 }
 
 // TODO - figure out what this is for...kill it if nothing
@@ -156,8 +156,8 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 
   if (type == TP_ERROR)
   {
-    send_to_char("Syntax:\r\nstring ('obj'|'char') <name> <field>"
-                 " [<string>].\r\n",
+    send_to_char("Syntax:\nstring ('obj'|'char') <name> <field>"
+                 " [<string>].\n",
                  ch);
     return 1;
   }
@@ -179,7 +179,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
 
     if ((mob->getLevel() > ch->getLevel()) && mob->isPlayer())
     {
-      sprintf(message, "%s can string himself, thank you.\r\n", GET_SHORT(mob));
+      sprintf(message, "%s can string himself, thank you.\n", GET_SHORT(mob));
       ch->send(message);
       return 1;
     }
@@ -371,7 +371,7 @@ int do_string(Character *ch, char *arg, cmd_t cmd)
   else
   {
     send_to_char("Enter string. Terminate with '~' at the beginning "
-                 "of a line.\r\n",
+                 "of a line.\n",
                  ch);
     if (type == TP_MOB && mob->isPlayer())
 #ifdef LEAK_CHECK
@@ -565,11 +565,8 @@ const char *next_page(const char *str)
     {
       chars += 1;
 
-      // Carriage return puts us in column one.
-      if (*str == '\r')
-        col = 1;
       // Newline puts us on the next line.
-      else if (*str == '\n')
+      if (*str == '\n')
         line++;
 
       // We need to check here and see if we are over the page width,
@@ -638,8 +635,8 @@ void page_string(class Connection *d, const char *str, int keep_internal)
 
     if (std::string::npos == pagebreak)
       pagebreak = print_me.size(); // if one doesn't exist (string < 3800) just set to max string length
-    else if (print_me.at(pagebreak) == '\r')
-      pagebreak++; // if its a \r, go 1 greater.
+    else if (print_me.at(pagebreak) == '\n')
+      pagebreak++; // if its a , go 1 greater.
 
     tmp = print_me.substr(0, pagebreak);
     print_me = print_me.substr(pagebreak, std::string::npos);

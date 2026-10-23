@@ -331,12 +331,12 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
       if (IS_AFFECTED(this, AFF_HIDE)) {
         if (found->toggle_hide == 0) {
           REMBIT(this->affected_by, AFF_HIDE);
-          sprintf(buf, "You emerge from your hidden position...\r\n");
+          sprintf(buf, "You emerge from your hidden position...\n");
           act(buf, this, 0, 0, TO_CHAR, 0);
           }
         if ((found->toggle_hide > 1) && (number(1, this->has_skill( SKILL_HIDE)) < found->toggle_hide)) {
           REMBIT(this->affected_by, AFF_HIDE);
-          sprintf(buf, "Your movements disrupt your attempt to remain hidden...\r\n");
+          sprintf(buf, "Your movements disrupt your attempt to remain hidden...\n");
           act(buf, this, 0, 0, TO_CHAR, 0);
           }
         }
@@ -676,7 +676,7 @@ int do_boss(Character *ch, char *arg, cmd_t cmd)
   for (x = 0; x <= 60; x++)
   {
     sprintf(buf, "NUMBER-CRUNCHER: %d crunched to %d converted to black"
-                 "/white tree node %d\r\n",
+                 "/white tree node %d\n",
             x, 50 - x, x + x);
     ch->send(buf);
   }

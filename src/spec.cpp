@@ -43,7 +43,7 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
        for (int i = 0; spec_list[i].name != nullptr; i++)
         {
            if (spec_list[i].pcclass != GET_CLASS(ch)) continue;
-           sprintf(buf, "%d. %s : %s\r\n",i+1, spec_list[i].name,
+           sprintf(buf, "%d. %s : %s\n",i+1, spec_list[i].name,
         spec_list[i].description);
         }
     */
@@ -56,7 +56,7 @@ int do_spec(Character *ch, char *argument, cmd_t cmd)
     if (str_cmp(arg, "iamsure"))
     {
       // messagemoose, couple below too
-      ch->sendln("You will have to type \"profession unlearn iamsure\"\r\nThis costs 10,000 platinum coins and is not reversable.");
+      ch->sendln("You will have to type \"profession unlearn iamsure\"\nThis costs 10,000 platinum coins and is not reversable.");
       return ReturnValue::eFAILURE;
     }
     if (ch->spec == 0)

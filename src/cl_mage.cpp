@@ -97,7 +97,7 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
   affected_type af;
   int duration = 40;
 
-  if (!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\r\n"))
+  if (!ch->canPerform(SKILL_FOCUSED_REPELANCE, "You wish really really hard that magic couldn't hurt you....\n"))
   {
     return ReturnValue::eFAILURE;
   }
@@ -121,7 +121,7 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
     act("$n closes $s eyes and chants quietly, $s eyes flick open with a devilish smile.",
         ch, nullptr, nullptr, TO_ROOM, NOTVICT);
     send_to_char("Your mystical vision is clear, your senses of the arcane sharpened.  "
-                 "No mortal can break through _your_ magical barrier.\r\n",
+                 "No mortal can break through _your_ magical barrier.\n",
                  ch);
     SET_BIT(ch->combat, COMBAT_REPELANCE);
     duration = 40 - (ch->has_skill(SKILL_FOCUSED_REPELANCE) / 10);

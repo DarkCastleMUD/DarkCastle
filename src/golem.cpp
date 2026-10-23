@@ -63,8 +63,8 @@ public:
 };
 
 const golem_data golem_list[] = {
-    {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\r\n", "The iron golem is bound by its master's magics.  A mindless automaton,\r\nthe iron golem is one of the most powerful forces available in \r\na wizard's arsenal.  Nearly a full 8 feet tall and weighing several\r\ntons, this behemoth of pure iron is absolutely loyal to its master and\r\nsilently follows commands without fail.\r\n", 1400, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100, "There is a grinding and shrieking of metal as an iron golem is slowly formed.\r\n", "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.", "As the magic binding it is released, the iron golem rusts to pieces."},
-    {"stone", "stone enchanted golem", "an enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\r\n", "The stone golem is bound by its caster's magics.  A mindless automaton,\r\nthe stone golem is one of the sturdiest and most resilliant creatures\r\nknown in the realms.  Nearly a full 8 feet tall and weighing several\r\ntons, this mountain of rock is absolutely loyal to its master and\r\nsilently follows orders without fail.\r\n", 2000, 5, 5, 25, 50, {104, 105, 106, 0, 7003}, -1, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\r\n", "Unable to sustain further damage, the stone golem shatters to pieces.", "As the magic binding it is released, the golem crumbles to dust."}};
+    {"iron", "iron golem enchanted", "an enchanted iron golem", "A powerfully enchanted iron golem stands here, guarding its master.\n", "The iron golem is bound by its master's magics.  A mindless automaton,\nthe iron golem is one of the most powerful forces available in \na wizard's arsenal.  Nearly a full 8 feet tall and weighing several\ntons, this behemoth of pure iron is absolutely loyal to its master and\nsilently follows commands without fail.\n", 1400, 15, 5, 25, 50, {107, 108, 109, 0, 7004}, AFF_LIGHTNINGSHIELD, 0, -100, "There is a grinding and shrieking of metal as an iron golem is slowly formed.\n", "Unable to sustain further damage, the iron golem falls into unrecoverable scrap.", "As the magic binding it is released, the iron golem rusts to pieces."},
+    {"stone", "stone enchanted golem", "an enchanted stone golem", "A powerfully enchanted stone golem stands here, guarding its master.\n", "The stone golem is bound by its caster's magics.  A mindless automaton,\nthe stone golem is one of the sturdiest and most resilliant creatures\nknown in the realms.  Nearly a full 8 feet tall and weighing several\ntons, this mountain of rock is absolutely loyal to its master and\nsilently follows orders without fail.\n", 2000, 5, 5, 25, 50, {104, 105, 106, 0, 7003}, -1, ISR_PIERCE, -100, "There is a deep rumbling as a stone golem slowly rises from the ground.\n", "Unable to sustain further damage, the stone golem shatters to pieces.", "As the magic binding it is released, the golem crumbles to dust."}};
 
 void shatter_message(Character *ch)
 {
@@ -140,7 +140,7 @@ int verify_existing_components(Character *ch, int golemtype)
       {
         if (number(0, 2) || !spellcraft(ch, SPELL_CREATE_GOLEM))
         {
-          sprintf(buf, "%s explodes, releasing a stream of magical energies!\r\n", qPrintable(curr->short_description));
+          sprintf(buf, "%s explodes, releasing a stream of magical energies!\n", qPrintable(curr->short_description));
           ch->send(buf);
           obj_from_char(curr);
           extract_obj(curr);
@@ -148,7 +148,7 @@ int verify_existing_components(Character *ch, int golemtype)
         }
         else
         {
-          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\r\n", qPrintable(curr->short_description));
+          sprintf(buf, "%s glows bright red, but you manage to retain it by only extracting part of its magic.\n", qPrintable(curr->short_description));
           ch->send(buf);
           break;
         }
@@ -452,7 +452,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   if (cmd == cmd_t::GOLEMSCORE && ch->getLevel() + 19 > 60)
   {
     logentry(QStringLiteral("do_golem_score: bug with %1's golem. It has level %2 which + 19 is %3 > 60.").arg(GET_NAME(master)).arg(ch->getLevel()).arg(ch->getLevel() + 19));
-    master->send("There is an error with your golem. Contact an immortal.\r\n");
+    master->send("There is an error with your golem. Contact an immortal.\n");
     produce_coredump(ch);
     return ReturnValue::eSUCCESS;
   }
@@ -463,21 +463,21 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
   sprintf(buf,
           "$7($5:$7)================================================="
-          "========================($5:$7)\r\n"
-          "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\r\n"
+          "========================($5:$7)\n"
+          "|=| %-30s  -- Character Attributes (DarkCastleMUD) |=|\n"
           "($5:$7)=============================($5:$7)================="
-          "========================($5:$7)\r\n",
+          "========================($5:$7)\n",
           GET_SHORT(ch));
 
   master->send(buf);
 
   sprintf(buf,
-          "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\r\n"
-          "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\r\n"
-          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\r\n"
-          "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\r\n"
-          "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\r\n"
-          "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\r\n",
+          "|\\| $4Strength$7:        %4d  (%2d) |/| $1Race$7:  %-10s  $1HitPts$7:%5d$1/$7(%5d) |~|\n"
+          "|~| $4Dexterity$7:       %4d  (%2d) |o| $1Class$7: %-11s $1Mana$7:   %4d$1/$7(%5d) |\\|\n"
+          "|/| $4Constitution$7:    %4d  (%2d) |\\| $1Level$7:  %-6llu     $1Fatigue$7:%4d$1/$7(%5d) |o|\n"
+          "|o| $4Intelligence$7:    %4d  (%2d) |~| $1Height$7: %3d        $1Ki$7:     %4d$1/$7(%5d) |/|\n"
+          "|\\| $4Wisdom$7:          %4d  (%2d) |/| $1Weight$7: %3d                             |~|\n"
+          "|~| $3Rgn$7: $4H$7:%3d $4M$7:%3d $4V$7:%3d $4K$7:%2d |o| $1Age$7:    %3d yrs    $1Align$7: %+5d         |\\|\n",
           GET_STR(ch), GET_RAW_STR(ch), race, ch->getHP(), GET_MAX_HIT(ch),
           GET_DEX(ch), GET_RAW_DEX(ch), pc_clss_types[(int)GET_CLASS(ch)], GET_MANA(ch), GET_MAX_MANA(ch),
           GET_CON(ch), GET_RAW_CON(ch), ch->getLevel(), GET_MOVE(ch), GET_MAX_MOVE(ch),
@@ -489,15 +489,15 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
   master->send(buf);
 
   sprintf(buf,
-          "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\r\n"
-          "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\r\n"
-          "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\r\n"
-          "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\r\n"
-          "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10ld       |\\|\r\n"
-          "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10ld       |o|\r\n"
-          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10llu $3Platinum$7: %-5d |/|\r\n"
-          "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\r\n"
-          "($5:$7)===================================($5:$7)===================================($5:$7)\r\n",
+          "($5:$7)=============================($5:$7)===($5:$7)===================================($5:$7)\n"
+          "|/| $2Combat Statistics:$7                |\\| $2Equipment and Valuables:$7          |o|\n"
+          "|o|  $3Armor$7:   %5d   $3Pkills$7:  %5d  |~|  $3Items Carried$7:  %-3d/(%-3d)        |/|\n"
+          "|\\|  $3BonusHit$7: %+4d   $3PDeaths$7: %5d  |/|  $3Weight Carried$7: %-3d/(%-4d)       |~|\n"
+          "|~|  $3BonusDam$7: %+4d   $3RDeaths$7: %5d  |o|  $3Experience$7:     %-10ld       |\\|\n"
+          "|/|  $B$4FIRE$R[%+3d]  $B$3COLD$R[%+3d]  $B$5NRGY$R[%+3d]  |\\|  $3ExpTillLevel$7:   %-10ld       |o|\n"
+          "|o|  $B$2ACID$R[%+3d]  $B$7MAGK$R[%+3d]  $2POIS$7[%+3d]  |~|  $3Gold$7: %-10llu $3Platinum$7: %-5d |/|\n"
+          "|\\|  $3MELE$R[%+3d]  $3SPEL$R[%+3d]   $3KI$R [%+3d]  |/|  $3Bank$7: %-10d                 |-|\n"
+          "($5:$7)===================================($5:$7)===================================($5:$7)\n",
           GET_ARMOR(ch), 0, IS_CARRYING_N(ch), CAN_CARRY_N(ch),
           to_hit, 0, IS_CARRYING_W(ch), CAN_CARRY_W(ch),
           to_dam, 0, GET_EXP(ch),
@@ -514,7 +514,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n",
                 scratch, "Immunity", isrString.c_str(), scratch);
         master->send(buf);
         isrString = std::string();
@@ -531,7 +531,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n",
                 scratch, "Susceptibility", isrString.c_str(), scratch);
         master->send(buf);
         isrString = std::string();
@@ -548,7 +548,7 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
       if (!isrString.empty())
       {
         scratch = frills[level];
-        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+        sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n",
                 scratch, "Resistibility", isrString.c_str(), scratch);
         master->send(buf);
         isrString = std::string();
@@ -558,17 +558,17 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
     }
   }
 
-  sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+  sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n",
           frills[level], "STABILITY", "NONE", frills[level]);
   master->send(buf);
   ++level == 4 ? level = 0 : level;
-  sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+  sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n",
           frills[level], "INFRARED", "NONE", frills[level]);
   master->send(buf);
   ++level == 4 ? level = 0 : level;
   if (ISSET(ch->affected_by, AFF_LIGHTNINGSHIELD))
   {
-    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\r\n",
+    sprintf(buf, "|%c| Affected by %-25s          Modifier %-13s   |%c|\n",
             frills[level], "LIGHTNING SHIELD", "NONE", frills[level]);
     master->send(buf);
     ++level == 4 ? level = 0 : level;
@@ -616,14 +616,14 @@ int do_golem_score(Character *ch, char *argument, cmd_t cmd)
 
       if (aff->type == Character::PLAYER_CANTQUIT)
       {
-        sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\r\n",
+        sprintf(buf, "|%c| Affected by %-25s (%s) |%s%s|\n",
                 scratch, qPrintable(aff_name),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], aff->caster.c_str());
       }
       else
       {
-        sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\r\n",
+        sprintf(buf, "|%c| Affected by %-25s %s Modifier %-13s   |%c|\n",
                 scratch, aff_name.toStdString().c_str(),
                 ((IS_AFFECTED(ch, AFF_DETECT_MAGIC) && aff->duration < 3) ? "$2(fading)$7" : "        "),
                 apply_types[(int)aff->location], scratch);

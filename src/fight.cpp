@@ -87,20 +87,20 @@ Character *combat_list = nullptr, *combat_next_dude = nullptr;
 
 char *champ_death_messages[] =
     {
-        /*1*/ "\r\n##Somewhere a village has been deprived of their idiot.\r\n",
-        "\r\n##Don't feel bad %s. A lot of people have no talent!\r\n",
-        "\r\n##If at first you don't succeed, failure may be your style.\r\n",
-        "\r\n##%s just found the cure for stupidity. Death.\r\n",
-        /*5*/ "\r\n##%s just succumbed to a fatal case of stupidity.\r\n",
-        "\r\n##%s: About as useful as a windshield wiper on a goat's ass.\r\n",
-        "\r\n##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\r\n",
-        "\r\n##%s: The poster child for birth control.\r\n",
-        "\r\n##Someone... we're not saying who... but someone is an unmitigated moron.\r\n",
-        /*10*/ "\r\n##%s wasn't ready.\r\n",
-        "\r\n##EPIC FAIL\r\n",
-        "\r\n##%s wants a do-over.\r\n",
-        "\r\n##%s prays, 'THIS GAME SUCKS'\r\n",
-        "\r\n##DarkCastle: Helping people like %s to die since 1991.\r\n"};
+        /*1*/ "\n##Somewhere a village has been deprived of their idiot.\n",
+        "\n##Don't feel bad %s. A lot of people have no talent!\n",
+        "\n##If at first you don't succeed, failure may be your style.\n",
+        "\n##%s just found the cure for stupidity. Death.\n",
+        /*5*/ "\n##%s just succumbed to a fatal case of stupidity.\n",
+        "\n##%s: About as useful as a windshield wiper on a goat's ass.\n",
+        "\n##Proof of reincarnation. Nobody could be as stupid as %s in one lifetime.\n",
+        "\n##%s: The poster child for birth control.\n",
+        "\n##Someone... we're not saying who... but someone is an unmitigated moron.\n",
+        /*10*/ "\n##%s wasn't ready.\n",
+        "\n##EPIC FAIL\n",
+        "\n##%s wants a do-over.\n",
+        "\n##%s prays, 'THIS GAME SUCKS'\n",
+        "\n##DarkCastle: Helping people like %s to die since 1991.\n"};
 
 int debug_retval(Character *ch, Character *victim, int retval);
 
@@ -118,9 +118,9 @@ void do_champ_flag_death(Character *victim)
     send_info(buf);
 
     if (obj && !obj->short_description.isEmpty())
-      send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\r\n").arg(victim->getName()).arg(obj->short_description));
+      send_info(QStringLiteral("##%1 has just died with %2, watch for it to reappear!\n").arg(victim->getName()).arg(obj->short_description));
     else
-      send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\r\n").arg(victim->getName()));
+      send_info(QStringLiteral("##%1 has just died with the Champion Flag, watch for it to reappear!\n").arg(victim->getName()));
   }
   else
   {
@@ -871,7 +871,7 @@ void update_flags(Character *vict)
   {
     REMOVE_BIT(vict->combat, COMBAT_THI_EYEGOUGE2);
     REMBIT(vict->affected_by, AFF_BLIND);
-    act("$n clears the blood from $s eyes.\r\n", vict, nullptr, nullptr, TO_ROOM, 0);
+    act("$n clears the blood from $s eyes.\n", vict, nullptr, nullptr, TO_ROOM, 0);
     vict->sendln("You clear the blood out of your eyes.");
   }
 
@@ -1038,7 +1038,7 @@ int do_lightning_shield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
-      ch->sendln("You have been KILLED!!\r\n");
+      ch->sendln("You have been KILLED!!\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
@@ -1155,7 +1155,7 @@ int do_fireshield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
-      ch->sendln("You have been KILLED!!\r\n");
+      ch->sendln("You have been KILLED!!\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
@@ -1241,7 +1241,7 @@ int do_acidshield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
-      ch->sendln("You have been KILLED!!\r\n");
+      ch->sendln("You have been KILLED!!\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
@@ -1301,7 +1301,7 @@ int do_boneshield(Character *ch, Character *vict, int dam)
     act("$n is DEAD!!", ch, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(vict, ch);
     if (ch->isPlayer())
-      ch->sendln("You have been KILLED!!\r\n");
+      ch->sendln("You have been KILLED!!\n");
 
     fight_kill(vict, ch, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eCH_DIED;
@@ -2579,7 +2579,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     {
       dam -= pspell->modifier;
       pspell->duration -= pspell->modifier;
-      csendf(victim, "Your stones absorb %d damage allowing %d through.\r\n", pspell->modifier, dam);
+      csendf(victim, "Your stones absorb %d damage allowing %d through.\n", pspell->modifier, dam);
       string1 << "Your attack hits $N's stones for " << pspell->modifier << " damage allowing " << dam << " through.";
       act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
       string1.clear();
@@ -2590,7 +2590,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
     else
     {
       pspell->duration -= dam;
-      victim->send(QStringLiteral("Your stones absorb %1 damage from the attack and change its direction slightly.\r\n").arg(dam));
+      victim->send(QStringLiteral("Your stones absorb %1 damage from the attack and change its direction slightly.\n").arg(dam));
       string1 << "$N's stones absorb " << dam << " damage of your attack and cause your blow to change direction slightly.";
       act(string1.str().c_str(), ch, 0, victim, TO_CHAR, 0);
       string1.clear();
@@ -2771,7 +2771,7 @@ int damage(Character *ch, Character *victim, int dam, int weapon_type, int attac
   if (ethereal)
   {
     victim->sendln("The ethereal stones protecting you shatter and fade into nothing.");
-    act("The ethereal stones surrounding $n shatter into nothingness.\r\n", victim, 0, 0, TO_ROOM, 0);
+    act("The ethereal stones surrounding $n shatter into nothingness.\n", victim, 0, 0, TO_ROOM, 0);
   }
 
   /*  Now for eq damage...   */
@@ -2915,7 +2915,7 @@ int noncombat_damage(Character *ch, int dam, char *char_death_msg,
     if (char_death_msg)
     {
       ch->send(char_death_msg);
-      ch->sendln("\r\nYou have been KILLED!");
+      ch->sendln("\nYou have been KILLED!");
     }
     if (room_death_msg)
       act(room_death_msg, ch, 0, 0, TO_ROOM, 0);
@@ -4380,7 +4380,7 @@ void stop_fighting(Character *ch, int clearlag)
   auto showdps = ch->getSetting("fighting.showdps", "0");
   if (showdps == "1" || showdps.startsWith('t', Qt::CaseInsensitive))
   {
-    csendf(ch, "You caused %llu damage over %llu seconds with DPS of %llu.\r\n", ch->damage_done, fight_length, ch->damage_per_second);
+    csendf(ch, "You caused %llu damage over %llu seconds with DPS of %llu.\n", ch->damage_done, fight_length, ch->damage_per_second);
   }
   return;
 }
@@ -5135,9 +5135,9 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
       vict->setHP(-1, ch);
       ch->sendln("You impale your weapon through your opponent's chest!");
       act("$n's weapon blows through your chest sending your entrails flying for yards behind you.  Everything goes black...", ch, 0, vict, TO_VICT, 0);
-      act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\r\n", ch, 0, vict, NOTVICT, 0);
+      act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\n", ch, 0, vict, NOTVICT, 0);
       // duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
-      vict->sendln("You have been SKEWERED!!\r\n");
+      vict->sendln("You have been SKEWERED!!\n");
       damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
       //      update_pos(vict);
       return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
@@ -5633,15 +5633,15 @@ void raw_kill(Character *ch, Character *victim)
       if (GET_CON(victim) <= 4)
       {
         victim->sendln("Your Constitution has reached 4...you are permanently dead!");
-        send_to_char("\r\n"
-                     "         (buh bye, - pirahna)\r\n"
-                     "        O  ,-----------,\r\n"
-                     "       o  /             \\  /|\r\n"
-                     "       . /  0            \\/ |\r\n"
-                     "        |                   |\r\n"
-                     "         \\               /\\ |\r\n"
-                     "          \\             /  \\|\r\n"
-                     "           `-----------`\r\n",
+        send_to_char("\n"
+                     "         (buh bye, - pirahna)\n"
+                     "        O  ,-----------,\n"
+                     "       o  /             \\  /|\n"
+                     "       . /  0            \\/ |\n"
+                     "        |                   |\n"
+                     "         \\               /\\ |\n"
+                     "          \\             /  \\|\n"
+                     "           `-----------`\n",
                      victim);
         char name[100];
         strncpy(name, victim->getNameC(), 100);
@@ -5662,32 +5662,32 @@ void raw_kill(Character *ch, Character *victim)
       else if (GET_INT(victim) <= 4)
       {
         victim->sendln("Your Intelligence has reached 4...you are permanently dead!");
-        send_to_char("\r\n"
-                     "                     At least you have something nice to look at before your character is erased! - Wendy\r\n"
-                     "   888   M:::::::::::::M8888888888888M:::::mM888888888888888    8888\r\n"
-                     "    888  M::::::::::::M8888:888888888888::::m::Mm88888 888888   8888\r\n"
-                     "     88  M::::::::::::8888:88888888888888888::::::Mm8   88888   888\r\n"
-                     "     88  M::::::::::8888M::88888::888888888888:::::::Mm88888    88\r\n"
-                     "     8   MM::::::::8888M:::8888:::::888888888888::::::::Mm8     4\r\n"
-                     "         8M:::::::8888M:::::888:::::::88:::8888888::::::::Mm    2\r\n"
-                     "        88MM:::::8888M:::::::88::::::::8:::::888888:::M:::::M\r\n"
-                     "       8888M:::::888MM::::::::8:::::::::::M::::8888::::M::::M\r\n"
-                     "      88888M:::::88:M::::::::::8:::::::::::M:::8888::::::M::M\r\n"
-                     "     88 888MM:::888:M:::::::::::::::::::::::M:8888:::::::::M:\r\n"
-                     "     8 88888M:::88::M:::::::::::::::::::::::MM:88::::::::::::M\r\n"
-                     "       88888M:::88::M::::::::::*88*::::::::::M:88::::::::::::::M\r\n"
-                     "      888888M:::88::M:::::::::88@@88:::::::::M::88::::::::::::::M\r\n"
-                     "      888888MM::88::MM::::::::88@@88:::::::::M:::8::::::::::::::*8\r\n"
-                     "      88888  M:::8::MM:::::::::*88*::::::::::M:::::::::::::::::88@@\r\n"
-                     "      8888   MM::::::MM:::::::::::::::::::::MM:::::::::::::::::88@@\r\n"
-                     "       888    M:::::::MM:::::::::::::::::::MM::M::::::::::::::::*8\r\n"
-                     "       888    MM:::::::MMM::::::::::::::::MM:::MM:::::::::::::::M\r\n"
-                     "        88     M::::::::MMMM:::::::::::MMMM:::::MM::::::::::::MM\r\n"
-                     "         88    MM:::::::::MMMMMMMMMMMMMMM::::::::MMM::::::::MMM\r\n"
-                     "          88    MM::::::::::::MMMMMMM::::::::::::::MMMMMMMMMM\r\n"
-                     "           88   8MM::::::::::::::::::::::::::::::::::MMMMM\r\n"
-                     "           88   8MM::::::::::::::::::::::::::::::::::MMMMMM\r\n"
-                     "           8   88MM::::::::::::::::::::::M:::M::::::::MM\r\n",
+        send_to_char("\n"
+                     "                     At least you have something nice to look at before your character is erased! - Wendy\n"
+                     "   888   M:::::::::::::M8888888888888M:::::mM888888888888888    8888\n"
+                     "    888  M::::::::::::M8888:888888888888::::m::Mm88888 888888   8888\n"
+                     "     88  M::::::::::::8888:88888888888888888::::::Mm8   88888   888\n"
+                     "     88  M::::::::::8888M::88888::888888888888:::::::Mm88888    88\n"
+                     "     8   MM::::::::8888M:::8888:::::888888888888::::::::Mm8     4\n"
+                     "         8M:::::::8888M:::::888:::::::88:::8888888::::::::Mm    2\n"
+                     "        88MM:::::8888M:::::::88::::::::8:::::888888:::M:::::M\n"
+                     "       8888M:::::888MM::::::::8:::::::::::M::::8888::::M::::M\n"
+                     "      88888M:::::88:M::::::::::8:::::::::::M:::8888::::::M::M\n"
+                     "     88 888MM:::888:M:::::::::::::::::::::::M:8888:::::::::M:\n"
+                     "     8 88888M:::88::M:::::::::::::::::::::::MM:88::::::::::::M\n"
+                     "       88888M:::88::M::::::::::*88*::::::::::M:88::::::::::::::M\n"
+                     "      888888M:::88::M:::::::::88@@88:::::::::M::88::::::::::::::M\n"
+                     "      888888MM::88::MM::::::::88@@88:::::::::M:::8::::::::::::::*8\n"
+                     "      88888  M:::8::MM:::::::::*88*::::::::::M:::::::::::::::::88@@\n"
+                     "      8888   MM::::::MM:::::::::::::::::::::MM:::::::::::::::::88@@\n"
+                     "       888    M:::::::MM:::::::::::::::::::MM::M::::::::::::::::*8\n"
+                     "       888    MM:::::::MMM::::::::::::::::MM:::MM:::::::::::::::M\n"
+                     "        88     M::::::::MMMM:::::::::::MMMM:::::MM::::::::::::MM\n"
+                     "         88    MM:::::::::MMMMMMMMMMMMMMM::::::::MMM::::::::MMM\n"
+                     "          88    MM::::::::::::MMMMMMM::::::::::::::MMMMMMMMMM\n"
+                     "           88   8MM::::::::::::::::::::::::::::::::::MMMMM\n"
+                     "           88   8MM::::::::::::::::::::::::::::::::::MMMMMM\n"
+                     "           8   88MM::::::::::::::::::::::M:::M::::::::MM\n",
                      victim);
 
         char name[100];
@@ -5709,12 +5709,12 @@ void raw_kill(Character *ch, Character *victim)
       else if (GET_WIS(victim) <= 4)
       {
         victim->sendln("Your Wisdom has reached 4...you are permanently dead!");
-        send_to_char("\r\n"
-                     "    	The other stat deaths have alot fancier ASCII pics.\r\n"
-                     "          =,    (\\_/)    ,=\r\n"
-                     "           /`-'--(\")--'-'\\\r\n"
-                     "          /     (___)     \\\r\n"
-                     "         /.-.-./ \" \" \\.-.-.\\\r\n",
+        send_to_char("\n"
+                     "    	The other stat deaths have alot fancier ASCII pics.\n"
+                     "          =,    (\\_/)    ,=\n"
+                     "           /`-'--(\")--'-'\\\n"
+                     "          /     (___)     \\\n"
+                     "         /.-.-./ \" \" \\.-.-.\\\n",
                      victim);
 
         char name[100];
@@ -5736,19 +5736,19 @@ void raw_kill(Character *ch, Character *victim)
       else if (GET_STR(victim) <= 4)
       {
         victim->sendln("Your Strength has reached 4...you are permanently dead!");
-        send_to_char("\r\n"
-                     "           To moose heaven with you! - Apoc\r\n"
-                     "    _/\\_       __/\\__\r\n"
-                     "   ) . (_    _) .' (\r\n"
-                     "   `) '.(   ) .'  (`\r\n"
-                     "    `-._\\(_ )/__(~`\r\n"
-                     "        (ovo)-.__.--._\r\n"
-                     "        )             `-.______\r\n"
-                     "       /                       `---._\r\n"
-                     "      ( ,// )                        \\\\r\n"
-                     "       `''\\/-.                        |\r\n"
-                     "              \\                       | \r\n"
-                     "              |                       |\r\n",
+        send_to_char("\n"
+                     "           To moose heaven with you! - Apoc\n"
+                     "    _/\\_       __/\\__\n"
+                     "   ) . (_    _) .' (\n"
+                     "   `) '.(   ) .'  (`\n"
+                     "    `-._\\(_ )/__(~`\n"
+                     "        (ovo)-.__.--._\n"
+                     "        )             `-.______\n"
+                     "       /                       `---._\n"
+                     "      ( ,// )                        \\\\n"
+                     "       `''\\/-.                        |\n"
+                     "              \\                       | \n"
+                     "              |                       |\n",
                      victim);
         char name[100];
         strncpy(name, victim->getNameC(), 100);
@@ -5769,29 +5769,29 @@ void raw_kill(Character *ch, Character *victim)
       else if (GET_DEX(victim) <= 4 && GET_RACE(victim) == RACE_TROLL)
       {
         victim->sendln("Your Dexterity has reached 4...you are permanently dead!");
-        send_to_char("\r\n"
-                     " Dear Mudder, you suck.\r\nSincerely - Urizen\r\n"
-                     "$4              /                   \\\r\n"
-                     "             /|      ,             |\\\r\n"
-                     "           /' |     /(     )\\      | `\\\r\n"
-                     "         /'   \\    | `~~~~~' |    /    `\\\r\n"
-                     "       /'      \\   \\  $1\\$4 , $1/$4  /   /      `\\\r\n"
-                     "     /C         \\   |  ___  |   /        C\\\r\n"
-                     "    OC       |   `\\  \\ ` ' /  /'   |      CO\r\n"
-                     "   OC   \\    |   __\\_/~\\ /~\\_/__   |   \\   CO\r\n"
-                     "  Oo   |      \\/'  `    '    '  `\\/     |   oO\r\n"
-                     " OC    |      |         :         |     |    CO\r\n"
-                     "oOC    /~~~\\_ |    ;,__,',__,;    | _/~~~\\   COo\r\n"
-                     "oOC   |      \\\\   '\\   _|_   /`   //      |  COo\r\n"
-                     "oOC   |       ~\\    |  _|_   |   /~       |  COo\r\n"
-                     "oOC    \\     ,  \\   \\_______/   /  ,     /   COo\r\n"
-                     " OC     `\\    \\  \\   \\_____/   /  /    /'    CO\r\n"
-                     "  O       `\\   \\, \\   \\   /   / ,/   /'      O\r\n"
-                     "   O    /~~\\\\   \\\\_\\  |___|  /_//   /~~\\    O\r\n"
-                     "    \\  |    `\\,  \\ |  |   |  | /  ,/    |  /\r\n"
-                     "     \\ |     /   /  '''    ``` \\   \\    | /\r\n"
-                     "      \\|    /   /               \\   \\   |/\r\n"
-                     "       `\\   VVV~                 ~VVV  /'$R\r\n",
+        send_to_char("\n"
+                     " Dear Mudder, you suck.\nSincerely - Urizen\n"
+                     "$4              /                   \\\n"
+                     "             /|      ,             |\\\n"
+                     "           /' |     /(     )\\      | `\\\n"
+                     "         /'   \\    | `~~~~~' |    /    `\\\n"
+                     "       /'      \\   \\  $1\\$4 , $1/$4  /   /      `\\\n"
+                     "     /C         \\   |  ___  |   /        C\\\n"
+                     "    OC       |   `\\  \\ ` ' /  /'   |      CO\n"
+                     "   OC   \\    |   __\\_/~\\ /~\\_/__   |   \\   CO\n"
+                     "  Oo   |      \\/'  `    '    '  `\\/     |   oO\n"
+                     " OC    |      |         :         |     |    CO\n"
+                     "oOC    /~~~\\_ |    ;,__,',__,;    | _/~~~\\   COo\n"
+                     "oOC   |      \\\\   '\\   _|_   /`   //      |  COo\n"
+                     "oOC   |       ~\\    |  _|_   |   /~       |  COo\n"
+                     "oOC    \\     ,  \\   \\_______/   /  ,     /   COo\n"
+                     " OC     `\\    \\  \\   \\_____/   /  /    /'    CO\n"
+                     "  O       `\\   \\, \\   \\   /   / ,/   /'      O\n"
+                     "   O    /~~\\\\   \\\\_\\  |___|  /_//   /~~\\    O\n"
+                     "    \\  |    `\\,  \\ |  |   |  | /  ,/    |  /\n"
+                     "     \\ |     /   /  '''    ``` \\   \\    | /\n"
+                     "      \\|    /   /               \\   \\   |/\n"
+                     "       `\\   VVV~                 ~VVV  /'$R\n",
                      victim);
 
         char name[100];
@@ -5896,7 +5896,7 @@ void group_gain(Character *ch, Character *victim)
 
     if (IS_AFFECTED(tmp_ch, AFF_CHAMPION))
       share = (int)((double)share * 1.10);
-    sprintf(buf, "You receive %ld exps of %ld total.\r\n", share, base_xp + bonus_xp);
+    sprintf(buf, "You receive %ld exps of %ld total.\n", share, base_xp + bonus_xp);
     tmp_ch->send(buf);
     gain_exp(tmp_ch, share);
     total_share += share;
@@ -6534,93 +6534,93 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   if (ch != nullptr)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s just got POTATOED!!\n", victim->getNameC());
     else if (type == KILL_MORTAR)
-      sprintf(killer_message, "\r\n##%s just got a FIRE IN THE HOLE!!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s just got a FIRE IN THE HOLE!!\n", victim->getNameC());
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\r\n##%s has perished from %s's POISON!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n##%s has perished from %s's POISON!\n", victim->getNameC(), GET_NAME(ch));
     else if (!str_cmp(GET_NAME(ch), victim->getNameC()))
       sprintf(killer_message, "");
-    //    sprintf(killer_message,"\r\n##%s just commited SUICIDE!\r\n", victim->getNameC());
+    //    sprintf(killer_message,"\n##%s just commited SUICIDE!\n", victim->getNameC());
     else if (victim->getLevel() < PKILL_COUNT_LIMIT || ch == victim)
-      // sprintf(killer_message,"\r\n##%s just DIED!\r\n", victim->getNameC());
-      // sprintf(killer_message,"\r\n##%s was just introduced to the warm hospitality of Dark Castle!!\r\n", victim->getNameC());
+      // sprintf(killer_message,"\n##%s just DIED!\n", victim->getNameC());
+      // sprintf(killer_message,"\n##%s was just introduced to the warm hospitality of Dark Castle!!\n", victim->getNameC());
       sprintf(killer_message, "");
     else if (num == 1000)
-      sprintf(killer_message, "\r\n##%s was just ANALLY PROBED by %s!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n##%s was just ANALLY PROBED by %s!\n", victim->getNameC(), GET_NAME(ch));
     else if (IS_AFFECTED(ch, AFF_FAMILIAR) && ch->master)
-      sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's familiar!\r\n",
+      sprintf(killer_message, "\n##%s was just DEFEATED in battle by %s's familiar!\n",
               victim->getNameC(), GET_NAME(ch->master));
     else if (IS_AFFECTED(ch, AFF_CHARM) && ch->master)
-      sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s's charmie!\r\n",
+      sprintf(killer_message, "\n##%s was just DEFEATED in battle by %s's charmie!\n",
               victim->getNameC(), GET_NAME(ch->master));
     else if (ch->in_room == real_room(START_ROOM))
-      sprintf(killer_message, "\r\n##%s was just PINGED by %s!\r\n",
+      sprintf(killer_message, "\n##%s was just PINGED by %s!\n",
               victim->getNameC(), GET_NAME(ch));
     else if (ch->in_room == real_room(SECOND_START_ROOM))
-      sprintf(killer_message, "\r\n##%s was just PONGED by %s!\r\n",
+      sprintf(killer_message, "\n##%s was just PONGED by %s!\n",
               victim->getNameC(), GET_NAME(ch));
     else if (IS_ANONYMOUS(ch))
-      sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
+      sprintf(killer_message, "\n##%s was just DEFEATED in battle by %s!\n",
               victim->getNameC(), GET_NAME(ch));
     else if (ch->getLevel() > MORTAL)
-      sprintf(killer_message, "\r\n##%s was just SMITED...er..SMOTED..err PKILLED by %s!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n##%s was just SMITED...er..SMOTED..err PKILLED by %s!\n", victim->getNameC(), GET_NAME(ch));
     else if (type == KILL_BINGO)
-      sprintf(killer_message, "\r\n##%s was just BINGOED by %s!\r\n",
+      sprintf(killer_message, "\n##%s was just BINGOED by %s!\n",
               victim->getNameC(), GET_NAME(ch));
     else if (type == SPELL_CONSECRATE)
-      sprintf(killer_message, "\r\n##%s was just slain by %s's CONSECRATION!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n##%s was just slain by %s's CONSECRATION!\n", victim->getNameC(), GET_NAME(ch));
     else if (type == SPELL_DESECRATE)
-      sprintf(killer_message, "\r\n##%s was just slain by %s's DESECRATION!\r\n", victim->getNameC(), GET_NAME(ch));
+      sprintf(killer_message, "\n##%s was just slain by %s's DESECRATION!\n", victim->getNameC(), GET_NAME(ch));
     else
       switch (GET_CLASS(ch))
       {
       case CLASS_MAGIC_USER:
-        sprintf(killer_message, "\r\n##%s was just FRIED by %s's magic!\r\n",
+        sprintf(killer_message, "\n##%s was just FRIED by %s's magic!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_CLERIC:
-        sprintf(killer_message, "\r\n##%s was just BANISHED by %s's holiness!\r\n",
+        sprintf(killer_message, "\n##%s was just BANISHED by %s's holiness!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_THIEF:
-        sprintf(killer_message, "\r\n##%s was just ASSASSINATED by %s!\r\n",
+        sprintf(killer_message, "\n##%s was just ASSASSINATED by %s!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_WARRIOR:
-        sprintf(killer_message, "\r\n##%s was just SLAIN by %s's might!\r\n",
+        sprintf(killer_message, "\n##%s was just SLAIN by %s's might!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_ANTI_PAL:
-        sprintf(killer_message, "\r\n##%s was just CONSUMED by %s's darkness!\r\n",
+        sprintf(killer_message, "\n##%s was just CONSUMED by %s's darkness!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_PALADIN:
-        sprintf(killer_message, "\r\n##%s was just VANQUISHED by %s's goodness!\r\n",
+        sprintf(killer_message, "\n##%s was just VANQUISHED by %s's goodness!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_BARBARIAN:
-        sprintf(killer_message, "\r\n##%s was just SHREDDED by %s's crazed fury!\r\n",
+        sprintf(killer_message, "\n##%s was just SHREDDED by %s's crazed fury!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_MONK:
-        sprintf(killer_message, "\r\n##%s was just SHATTERED by %s's karma!\r\n",
+        sprintf(killer_message, "\n##%s was just SHATTERED by %s's karma!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_RANGER:
-        sprintf(killer_message, "\r\n##%s was just PENETRATED by %s's wood!\r\n",
+        sprintf(killer_message, "\n##%s was just PENETRATED by %s's wood!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_BARD:
-        sprintf(killer_message, "\r\n##%s was just MUTED by %s's snazzy rhythm!\r\n",
+        sprintf(killer_message, "\n##%s was just MUTED by %s's snazzy rhythm!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       case CLASS_DRUID:
-        sprintf(killer_message, "\r\n##%s was just VIOLATED by %s's woodland friends!\r\n",
+        sprintf(killer_message, "\n##%s was just VIOLATED by %s's woodland friends!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       default:
-        sprintf(killer_message, "\r\n##%s was just DEFEATED in battle by %s!\r\n",
+        sprintf(killer_message, "\n##%s was just DEFEATED in battle by %s!\n",
                 victim->getNameC(), GET_NAME(ch));
         break;
       }
@@ -6747,17 +6747,17 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
   {
     // ch == nullptr
     if (type == KILL_DROWN)
-      sprintf(killer_message, "\r\n##%s just DROWNED!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s just DROWNED!\n", victim->getNameC());
     else if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n##%s just got POTATOED!!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s just got POTATOED!!\n", victim->getNameC());
     else if (type == KILL_POISON)
-      sprintf(killer_message, "\r\n##%s has perished from POISON!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s has perished from POISON!\n", victim->getNameC());
     else if (type == KILL_FALL)
-      sprintf(killer_message, "\r\n##%s has FALLEN to death!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s has FALLEN to death!\n", victim->getNameC());
     else if (type == KILL_BATTER)
-      sprintf(killer_message, "\r\n##That's using your head! %s just died attempting to batter a door!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##That's using your head! %s just died attempting to batter a door!\n", victim->getNameC());
     else
-      sprintf(killer_message, "\r\n##%s just DIED!\r\n", victim->getNameC());
+      sprintf(killer_message, "\n##%s just DIED!\n", victim->getNameC());
   }
 
   send_info(killer_message);
@@ -6776,20 +6776,20 @@ void do_pkill(Character *ch, Character *victim, int type, bool vict_is_attacker)
       if (ch->master->in_room >= 1900 || ch->master->in_room <= 1999 || isSet(DC::getInstance()->world[ch->master->in_room].room_flags, CLAN_ROOM))
       {
         SETBIT(victim->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\r\n", GET_NAME(ch->master), victim->getNameC());
+        sprintf(killer_message, "##%s didn't deserve to become the new Champion, it remains %s!\n", GET_NAME(ch->master), victim->getNameC());
       }
       else
       {
         move_obj(obj, ch->master);
         SETBIT(ch->master->affected_by, AFF_CHAMPION);
-        sprintf(killer_message, "##%s has become the new Champion!\r\n", GET_NAME(ch->master));
+        sprintf(killer_message, "##%s has become the new Champion!\n", GET_NAME(ch->master));
       }
     }
     else
     {
       move_obj(obj, ch);
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      sprintf(killer_message, "##%s has become the new Champion!\r\n", GET_NAME(ch));
+      sprintf(killer_message, "##%s has become the new Champion!\n", GET_NAME(ch));
     }
     send_info(killer_message);
   }
@@ -6843,13 +6843,13 @@ void arena_kill(Character *ch, Character *victim, int type)
 
     if (type == KILL_BINGO)
     {
-      sprintf(killer_message, "\r\n## %s [%s] just BINGOED %s [%s] in the arena!\r\n",
+      sprintf(killer_message, "\n## %s [%s] just BINGOED %s [%s] in the arena!\n",
               ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), qPrintable(get_clan_name(ch_clan)),
               victim->getNameC(), qPrintable(get_clan_name(victim_clan)));
     }
     else
     {
-      sprintf(killer_message, "\r\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\r\n",
+      sprintf(killer_message, "\n## %s [%s] just SLAUGHTERED %s [%s] in the arena!\n",
               ((ch->isNonPlayer() && ch->master) ? GET_NAME(ch->master) : GET_NAME(ch)), qPrintable(get_clan_name(ch_clan)),
               victim->getNameC(), qPrintable(get_clan_name(victim_clan)));
     }
@@ -6861,19 +6861,19 @@ void arena_kill(Character *ch, Character *victim, int type)
   else if (ch)
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\n## %s just got POTATOED in the arena!\n", GET_SHORT(victim));
     else if (type == KILL_MASHED)
-      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\n## %s just got MASHED in the potato arena!\n", GET_SHORT(victim));
     else
     {
       if (type == KILL_BINGO)
       {
-        sprintf(killer_message, "\r\n## %s just BINGOED %s in the arena!\r\n",
+        sprintf(killer_message, "\n## %s just BINGOED %s in the arena!\n",
                 (ch->isNonPlayer() && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
       }
       else
       {
-        sprintf(killer_message, "\r\n## %s just SLAUGHTERED %s in the arena!\r\n",
+        sprintf(killer_message, "\n## %s just SLAUGHTERED %s in the arena!\n",
                 (ch->isNonPlayer() && (ch->master) ? GET_SHORT(ch->master) : GET_SHORT(ch)), GET_SHORT(victim));
       }
     }
@@ -6881,11 +6881,11 @@ void arena_kill(Character *ch, Character *victim, int type)
   else
   {
     if (type == KILL_POTATO)
-      sprintf(killer_message, "\r\n## %s just got POTATOED in the arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\n## %s just got POTATOED in the arena!\n", GET_SHORT(victim));
     else if (type == KILL_MASHED)
-      sprintf(killer_message, "\r\n## %s just got MASHED in the potato arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\n## %s just got MASHED in the potato arena!\n", GET_SHORT(victim));
     else
-      sprintf(killer_message, "\r\n## %s just DIED in the arena!\r\n", GET_SHORT(victim));
+      sprintf(killer_message, "\n## %s just DIED in the arena!\n", GET_SHORT(victim));
   }
   send_info(killer_message);
 
@@ -6907,7 +6907,7 @@ void arena_kill(Character *ch, Character *victim, int type)
     }
     if (eliminated)
     {
-      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\r\n", qPrintable(get_clan_name(victim_clan)));
+      sprintf(killer_message, "## [%s] was just eliminated from the chaos!\n", qPrintable(get_clan_name(victim_clan)));
       send_info(killer_message);
       logf(IMMORTAL, DC::LogChannel::LOG_ARENA, "## [%s] was just eliminated from the chaos!", qPrintable(get_clan_name(victim_clan)));
     }
@@ -7381,7 +7381,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
     break;
   case position_t::DEAD:
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
-    victim->sendln("You have been KILLED!!\r\n");
+    victim->sendln("You have been KILLED!!\n");
 
     break;
   default:
@@ -7396,7 +7396,7 @@ void inform_victim(Character *ch, Character *victim, int dam)
           isSet(victim->combat, COMBAT_RAGE2))
       {
         send_to_char("You are too OUTRAGED to care about your "
-                     "wounds!\r\n",
+                     "wounds!\n",
                      victim);
         return;
       }

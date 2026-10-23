@@ -108,7 +108,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
       sprintf(buf, "$n reports '%s'", report);
       act(buf, ch, 0, 0, TO_ROOM, 0);
 
-      ch->send(QStringLiteral("You report: %1\r\n").arg(report));
+      ch->send(QStringLiteral("You report: %1\n").arg(report));
       return ReturnValue::eSUCCESS;
     }
   }
@@ -131,7 +131,7 @@ int do_report(Character *ch, char *argument, cmd_t cmd)
   sprintf(buf, "$n reports '%s'", report);
   act(buf, ch, 0, 0, TO_ROOM, 0);
 
-  ch->send(QStringLiteral("You report: %1\r\n").arg(report));
+  ch->send(QStringLiteral("You report: %1\n").arg(report));
 
   return ReturnValue::eSUCCESS;
 }
@@ -220,8 +220,8 @@ int send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
     break;
   }
 
-  buf = QStringLiteral("//(%1) %2\r\n").arg(typestr).arg(message);
-  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\r\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
+  buf = QStringLiteral("//(%1) %2\n").arg(typestr).arg(message);
+  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
@@ -301,7 +301,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
           y = 1;
         else
           y = 0;
-        sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
+        sprintf(buf2, "%-9s%s\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
@@ -314,7 +314,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
           y = 1;
         else
           y = 0;
-        sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
+        sprintf(buf2, "%-9s%s\n", types[x], on_off[y]);
         send_to_char(buf2, ch);
       }
     }
@@ -323,14 +323,14 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
       y = 1;
     else
       y = 0;
-    sprintf(buf2, "%-9s%s\r\n", types[22], on_off[y]);
+    sprintf(buf2, "%-9s%s\n", types[22], on_off[y]);
     send_to_char(buf2, ch);
 
     if (isSet(ch->misc, 1 << 23))
       y = 1;
     else
       y = 0;
-    sprintf(buf2, "%-9s%s\r\n", types[23], on_off[y]);
+    sprintf(buf2, "%-9s%s\n", types[23], on_off[y]);
     send_to_char(buf2, ch);
 
     int o = ch->getLevel() == 110 ? 26 : 0;
@@ -340,7 +340,7 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
         y = 1;
       else
         y = 0;
-      sprintf(buf2, "%-9s%s\r\n", types[x], on_off[y]);
+      sprintf(buf2, "%-9s%s\n", types[x], on_off[y]);
       send_to_char(buf2, ch);
     }
 
@@ -371,13 +371,13 @@ int do_channel(Character *ch, char *arg, cmd_t cmd)
   }
   if (isSet(ch->misc, (1 << x)))
   {
-    sprintf(buf, "%s channel turned $B$4OFF$R.\r\n", types[x]);
+    sprintf(buf, "%s channel turned $B$4OFF$R.\n", types[x]);
     ch->send(buf);
     REMOVE_BIT(ch->misc, (1 << x));
   }
   else
   {
-    sprintf(buf, "%s channel turned $B$2ON$R.\r\n", types[x]);
+    sprintf(buf, "%s channel turned $B$2ON$R.\n", types[x]);
     ch->send(buf);
     SET_BIT(ch->misc, (1 << x));
   }
@@ -425,7 +425,7 @@ command_return_t Character::do_ignore(QStringList arguments, cmd_t cmd)
   std::tie(arg1, remainder_args) = half_chop(arguments);
   if (arg1.isEmpty())
   {
-    send("Ignore who?\r\n");
+    send("Ignore who?\n");
     return ReturnValue::eFAILURE;
   }
   arg1[0] = arg1[0].toUpper();
@@ -506,13 +506,13 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
-      sprintf(buf, "You have no %s.\r\n", papername);
+      sprintf(buf, "You have no %s.\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
     if (!(pen = get_obj_in_list_vis(ch, penname, ch->carrying)))
     {
-      sprintf(buf, "You have no %s.\r\n", papername);
+      sprintf(buf, "You have no %s.\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -521,7 +521,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
   {
     if (!(paper = get_obj_in_list_vis(ch, papername, ch->carrying)))
     {
-      sprintf(buf, "There is no %s in your inventory.\r\n", papername);
+      sprintf(buf, "There is no %s in your inventory.\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -539,7 +539,7 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
     /* one object was found. Now for the other one. */
     if (!ch->equipment[WEAR_HOLD])
     {
-      sprintf(buf, "You can't write with a %s alone.\r\n", papername);
+      sprintf(buf, "You can't write with a %s alone.\n", papername);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -599,7 +599,7 @@ int do_insult(Character *ch, char *argument, cmd_t cmd)
     {
       if (victim != ch)
       {
-        sprintf(buf, "You insult %s.\r\n", GET_SHORT(victim));
+        sprintf(buf, "You insult %s.\n", GET_SHORT(victim));
         ch->send(buf);
 
         switch (number(0, 3))
@@ -659,7 +659,7 @@ int do_emote(Character *ch, char *argument, cmd_t cmd)
     // don't want players triggering mobs with emotes
     MOBtrigger = false;
     act(buf, ch, 0, 0, TO_ROOM, 0);
-    csendf(ch, "%s %s\r\n", GET_SHORT(ch), argument + i);
+    csendf(ch, "%s %s\n", GET_SHORT(ch), argument + i);
     MOBtrigger = true;
   }
   return ReturnValue::eSUCCESS;
@@ -734,8 +734,7 @@ void DC::save_hints(void)
   for (hints_t::iterator i = hints_.begin(); i != hints_.end(); ++i)
   {
     out << "#" << ++hint_key << "\n";
-    out << (*i).remove('\r') << "~"
-        << "\n";
+    out << *i << "~"        << "\n";
   }
   out << "$\n";
 }
@@ -755,7 +754,7 @@ void DC::send_hint(void)
     num = number(0LL, hints_.size() - 1);
   }
 
-  QString hint = QStringLiteral("$B$5HINT:$7 %1$R\r\n").arg(hints_.value(num));
+  QString hint = QStringLiteral("$B$5HINT:$7 %1$R\n").arg(hints_.value(num));
 
   for (Connection *i = DC::getInstance()->descriptor_list; i; i = i->next)
   {

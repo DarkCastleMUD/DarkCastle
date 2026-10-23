@@ -79,11 +79,11 @@ char *Path::determineRoute(Character *ch, room_t from, room_t to)
   static char buf[MAX_STRING_LENGTH];
   buf[0] = 0;
   if (ch && ch->getLevel() >= 105)
-    ch->send(QStringLiteral("# of steps: %1\r\n").arg(i));
+    ch->send(QStringLiteral("# of steps: %1\n").arg(i));
   resetPath();
   findRoom(from, to, 1, i, &buf[0]);
   if (ch && ch->getLevel() >= 105)
-    ch->send(QStringLiteral("Best route: %1\r\n").arg(buf));
+    ch->send(QStringLiteral("Best route: %1\n").arg(buf));
 
   return &buf[0];
 }
@@ -241,7 +241,7 @@ int do_newPath(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    ch->sendln("Syntax: newPath <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
+    ch->sendln("Syntax: newPath <name of path>\nNote that the room you are currently in will automatically be added to the path.");
     return ReturnValue::eFAILURE;
   }
   class Path *p;
@@ -279,10 +279,10 @@ int do_listPathsByZone(Character *ch, char *argument, cmd_t cmd)
     for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
       if ((*iter).first >= low && (*iter).first <= high)
       {
-        ch->send(QStringLiteral("Path '%1' connects to this zone.\r\n").arg(p->name));
+        ch->send(QStringLiteral("Path '%1' connects to this zone.\n").arg(p->name));
         path_data *pa;
         for (pa = p->p; pa; pa = pa->next)
-          csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
+          csendf(ch, " --- Path '%s' connects to that path in %d places.\n",
                  pa->p->name, pa->num);
         found = true;
         break;
@@ -299,10 +299,10 @@ int do_listAllPaths(Character *ch, char *argument, cmd_t cmd)
   bool found = false;
   for (p = mPathList; p; p = p->next)
   {
-    ch->send(QStringLiteral("Path '%1'.\r\n").arg(p->name));
+    ch->send(QStringLiteral("Path '%1'.\n").arg(p->name));
     path_data *pa;
     for (pa = p->p; pa; pa = pa->next)
-      csendf(ch, " --- Path '%s' connects to that path in %d places.\r\n",
+      csendf(ch, " --- Path '%s' connects to that path in %d places.\n",
              pa->p->name, pa->num);
     found = true;
   }
@@ -318,7 +318,7 @@ int do_addRoom(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    ch->sendln("Syntax: addRoom <name of path>\r\nNote that the room you are currently in will automatically be added to the path.");
+    ch->sendln("Syntax: addRoom <name of path>\nNote that the room you are currently in will automatically be added to the path.");
     return ReturnValue::eFAILURE;
   }
   class Path *p;
@@ -340,7 +340,7 @@ int do_findPath(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, arg1);
   if (!arg1[0])
   {
-    ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\r\nNote that the room you are currently in will automatically be added to the path.");
+    ch->sendln("Syntax: findPath <name of path> <start vnum> <end vnum>\nNote that the room you are currently in will automatically be added to the path.");
     return ReturnValue::eFAILURE;
   }
   class Path *p;
@@ -451,7 +451,7 @@ int do_pathpath(Character *ch, char *argument, cmd_t cmd)
   int i = 1000;
   leastPathSteps(pt, pt2, 1, &i);
 
-  ch->send(QStringLiteral("Least # of steps: %1\r\n").arg(i));
+  ch->send(QStringLiteral("Least # of steps: %1\n").arg(i));
 
   if (i >= 50)
   {
@@ -525,27 +525,27 @@ char *findPath(int from, int to, Character *ch = nullptr)
   class Path *start, *stop;
   if (DC::getInstance()->world[from].paths)
   {
-    csendf(ch, "Starting from path %s.\r\n", DC::getInstance()->world[from].paths->p->name);
+    csendf(ch, "Starting from path %s.\n", DC::getInstance()->world[from].paths->p->name);
   }
   else
   {
     std::map<int, int> z;
     from = find_closest_path(from, 1, &buf[0], z);
     if (from && DC::getInstance()->world[from].paths)
-      csendf(ch, "Starting from path %s.\r\n", DC::getInstance()->world[from].paths->p->name);
+      csendf(ch, "Starting from path %s.\n", DC::getInstance()->world[from].paths->p->name);
   }
   strcat(endbuf, buf);
   start = DC::getInstance()->world[from].paths->p;
   if (DC::getInstance()->world[to].paths)
   {
-    csendf(ch, "Ending in path %s.\r\n", DC::getInstance()->world[to].paths->p->name);
+    csendf(ch, "Ending in path %s.\n", DC::getInstance()->world[to].paths->p->name);
   }
   else
   {
     std::map<int, int> z;
     to = find_closest_path(to, 1, &buf[0], z);
     if (to && DC::getInstance()->world[to].paths)
-      csendf(ch, "Ending in path %s.\r\n", DC::getInstance()->world[to].paths->p->name);
+      csendf(ch, "Ending in path %s.\n", DC::getInstance()->world[to].paths->p->name);
   }
   stop = DC::getInstance()->world[to].paths->p;
   if (!start || !stop)
@@ -559,7 +559,7 @@ char *findPath(int from, int to, Character *ch = nullptr)
   int i = 1000;
   leastPathSteps(start, stop, 1, &i);
 
-  ch->send(QStringLiteral("Least # of steps: %1\r\n").arg(i));
+  ch->send(QStringLiteral("Least # of steps: %1\n").arg(i));
 
   if (i >= 50)
   {
@@ -596,14 +596,14 @@ int do_findpath(Character *ch, char *argument, cmd_t cmd)
   Path *p;
   for (p = mPathList; p; p = p->next)
     for (std::map<int, int>::iterator iter = p->begin(); iter != p->end(); iter++)
-      csendf(ch, "Hmm: %d\r\n", (*iter).first);
+      csendf(ch, "Hmm: %d\n", (*iter).first);
   return ReturnValue::eSUCCESS;
   /*  argument = one_argument(argument, arg1);
     argument = one_argument(argument, arg2);
     int i = atoi(arg1), z = atoi(arg2);
     if (!i || !z) { ch->sendln("BLeh!"); return ReturnValue::eFAILURE; }
     char *t =  findPath(i, z, ch);
-    ch->send(QStringLiteral("Final Path: %1\r\n").arg(t));
+    ch->send(QStringLiteral("Final Path: %1\n").arg(t));
     return ReturnValue::eSUCCESS;
   */
 }

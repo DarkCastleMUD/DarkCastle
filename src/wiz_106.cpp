@@ -63,7 +63,7 @@ int do_plats(Character *ch, char *argument, cmd_t cmd)
     if (GET_PLATINUM(i) < (uint32_t)minamt)
       continue;
 
-    sprintf(buf, "%15d - %s - %llu - %d\r\n", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
+    sprintf(buf, "%15d - %s - %llu - %d\n", GET_PLATINUM(i), GET_NAME(i), i->getGold(), GET_BANK(i));
     ch->send(buf);
   }
   return ReturnValue::eSUCCESS;
@@ -83,7 +83,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
 
   if (!ch->has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
-    ch->send("Huh?\r\n");
+    ch->send("Huh?\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -91,7 +91,7 @@ int do_force(Character *ch, std::string argument, cmd_t cmd)
 
   if (name.empty() || to_force.empty())
   {
-    ch->send("Who do you wish to force to do what?\r\n");
+    ch->send("Who do you wish to force to do what?\n");
     return ReturnValue::eFAILURE;
   }
   else if (name != "all")
@@ -194,7 +194,7 @@ command_return_t run_all_events(Character *ch = nullptr)
   {
     if (ch)
     {
-      ch->send("Running check_timer()\r\n");
+      ch->send("Running check_timer()\n");
       ch->desc->process_output();
     }
     check_timer();
@@ -259,7 +259,7 @@ void run_check(Character *ch, command_return_t *rc, auto *function, char *argume
     {
       new_rc = function(ch, arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -281,7 +281,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std
     {
       new_rc = function(ch, arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -303,7 +303,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QSt
     {
       new_rc = (*ch.*(function))(arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -325,7 +325,7 @@ void run_check(Character *ch, command_return_t *rc, command_special_t function, 
     {
       new_rc = (*ch.*(function))(arguments, cmd);
     }
-    ch->send(QStringLiteral("Return code is %1 (%2)\r\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
+    ch->send(QStringLiteral("Return code is %1 (%2)\n").arg(new_rc).arg(rc_to_qstring(new_rc)));
     if (ch->desc)
     {
       ch->desc->process_output();
@@ -428,7 +428,7 @@ command_return_t test_casino(Character *ch)
 
   if (ch->getGold() > 2000000)
   {
-    ch->send(QStringLiteral("Possible problem. After test, player gold amount is %1 from 1,000,000.\r\n").arg(ch->getGold()));
+    ch->send(QStringLiteral("Possible problem. After test, player gold amount is %1 from 1,000,000.\n").arg(ch->getGold()));
     max_rc = max_rc | ReturnValue::eFAILURE;
   }
 
@@ -446,11 +446,11 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
 
   if (arg1.isEmpty() || arg1 == "help")
   {
-    send("Usage: test [help] [test name]\r\n");
-    send("Test names:\r\n");
+    send("Usage: test [help] [test name]\n");
+    send("Test names:\n");
     for (auto const &test : tests)
     {
-      send(test.getName() + "\r\n");
+      send(test.getName() + "\n");
     }
     return ReturnValue::eSUCCESS;
   }
@@ -469,7 +469,7 @@ command_return_t Character::do_test(QStringList arguments, cmd_t cmd)
   else if (tests.contains(arg1))
   {
     auto rc = tests[arg1].run(this);
-    send(QStringLiteral("Return code is %1 (%2)\r\n").arg(rc).arg(rc_to_qstring(rc)));
+    send(QStringLiteral("Return code is %1 (%2)\n").arg(rc).arg(rc_to_qstring(rc)));
     return rc;
   }
 

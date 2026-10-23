@@ -2432,7 +2432,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
         if (!ch->isImmortalPlayer() && number(1, 100) > chance && !IS_AFFECTED(ch, AFF_FOCUS) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
         {
           set_conc_loss(ch, spl);
-          csendf(ch, "You lost your concentration and are unable to cast %s!\r\n", spells[spl - 1]);
+          csendf(ch, "You lost your concentration and are unable to cast %s!\n", spells[spl - 1]);
           if (rel > 1)
           {
             ch->sendln("The failed elemental filter drains you of additional mana.");
@@ -2623,32 +2623,32 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
           switch (fil)
           {
           case FILTER_FIRE:
-            csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\r\n", spells[spl - 1]);
+            csendf(ch, "Upon casting, your %s filters through a $B$4blast of flame$R!\n", spells[spl - 1]);
             act("Upon casting, $n filters $s magic through a $B$4blast of flame$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_FIRE - TYPE_HIT;
             break;
           case FILTER_ACID:
-            csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\r\n", spells[spl - 1]);
+            csendf(ch, "Upon casting, your %s filters through $B$2sizzling acid$R!\n", spells[spl - 1]);
             act("Upon casting, $n filters $s magic through $B$2sizzling acid$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_ACID - TYPE_HIT;
             break;
           case FILTER_COLD:
-            csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\r\n", spells[spl - 1]);
+            csendf(ch, "Upon casting, your %s filters through $B$3shards of ice$R!\n", spells[spl - 1]);
             act("Upon casting, $n filters $s magic through $B$3shards of ice$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_COLD - TYPE_HIT;
             break;
           case FILTER_ENERGY:
-            csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\r\n", spells[spl - 1]);
+            csendf(ch, "Upon casting, your %s filters through $B$5crackling energy$R!\n", spells[spl - 1]);
             act("Upon casting, $n filters $s magic through $B$4crackling energy$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_ENERGY - TYPE_HIT;
             break;
           case FILTER_MAGIC:
-            csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\r\n", spells[spl - 1]);
+            csendf(ch, "Upon casting, your %s filters through a $B$7burst of magic$R!\n", spells[spl - 1]);
             act("Upon casting, $n filters $s magic through a $B$4burst of magic$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_MAGIC - TYPE_HIT;
             break;
           case FILTER_POISON:
-            csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\r\n", spells[spl - 1]);
+            csendf(ch, "Upon casting, your %s filters through $2poisonous fumes$R!\n", spells[spl - 1]);
             act("Upon casting, $n filters $s magic through $2poisonous fumes$R!", ch, 0, 0, TO_ROOM, 0);
             level = 200 + TYPE_POISON - TYPE_HIT;
             break;
@@ -2926,10 +2926,10 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
       continue;
 
     strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    strcat(buf, "\n");
   }
 
-  strcat(buf, "\r\n");
+  strcat(buf, "\n");
   page_string(ch->desc, buf, 1);
 
   return ReturnValue::eSUCCESS;
@@ -2952,11 +2952,11 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
               UPPER(*d_skills[i].skillname), d_skills[i].skillname + 1,
               song_info[d_skills[i].skillnum - SKILL_SONG_BASE].min_useski(),
               "Brd", d_skills[i].levelavailable);
-      strcat(buf, "\r\n");
+      strcat(buf, "\n");
     }
   }
 
-  strcat(buf, "\r\n");
+  strcat(buf, "\n");
   page_string(ch->desc, buf, 1);
 
   return ReturnValue::eSUCCESS;
@@ -3085,10 +3085,10 @@ int do_spells(Character *ch, char *arg, cmd_t cmd)
       continue;
 
     strcat(buf, buf2);
-    strcat(buf, "\r\n");
+    strcat(buf, "\n");
   }
 
-  strcat(buf, "\r\n");
+  strcat(buf, "\n");
   page_string(ch->desc, buf, 1);
 
   return ReturnValue::eSUCCESS;

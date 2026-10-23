@@ -70,7 +70,7 @@ void write_to_output(const char *txt, class Connection *t);
 void write_to_output(QByteArray txt, class Connection *d);
 void write_to_output(std::string txt, class Connection *d);
 void write_to_output(QString txt, class Connection *t);
-int write_to_descriptor(int desc, QByteArray txt);
+ssize_t write_to_descriptor(int desc, QByteArray txt);
 
 void scramble_text(char *txt);
 QString scramble_text(QString txt);

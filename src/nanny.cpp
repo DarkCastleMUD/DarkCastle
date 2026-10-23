@@ -77,12 +77,12 @@
 bool is_bracing(Character *bracee, room_direction_data *exit);
 void show_question_race(Connection *d);
 
-const char menu[] = "\r\nWelcome to Dark Castle Mud\r\n\r\n"
-                    "0) Exit Dark Castle.\r\n"
-                    "1) Enter the game.\r\n"
-                    "2) Enter your character's description.\r\n"
-                    "3) Change your password.\r\n"
-                    "4) Delete this character.\r\n\r\n"
+const char menu[] = "\nWelcome to Dark Castle Mud\n\n"
+                    "0) Exit Dark Castle.\n"
+                    "1) Enter the game.\n"
+                    "2) Enter your character's description.\n"
+                    "3) Change your password.\n"
+                    "4) Delete this character.\n\n"
                     "   Make your choice: ";
 
 bool wizlock = false;
@@ -622,7 +622,7 @@ void Character::do_on_login_stuff(void)
       if (curr.first < 600 && search_skills2(curr.first, c_skills) == -1 && search_skills2(curr.first, g_skills) == -1 && curr.first != META_REIMB && curr.first != NEW_SAVE)
       {
         logentry(QStringLiteral("Removing skill %1 from %2").arg(curr.first).arg(GET_NAME(this)), IMMORTAL, DC::LogChannel::LOG_PLAYER);
-        // this->send(fmt::format("Removing skill {}\r\n", curr.first));
+        // this->send(fmt::format("Removing skill {}\n", curr.first));
         skills_to_delete.push(curr.first);
       }
     }
@@ -719,26 +719,26 @@ void Character::roll_and_display_stats(void)
   this->desc->stats->wis[0] = 14;
   */
 
-  SEND_TO_Q("\r\n  Choose from any of the following groups of abilities...     \r\n", this->desc);
+  SEND_TO_Q("\n  Choose from any of the following groups of abilities...     \n", this->desc);
 
-  SEND_TO_Q("Group: 1     2     3     4     5\r\n", this->desc);
-  sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
+  SEND_TO_Q("Group: 1     2     3     4     5\n", this->desc);
+  sprintf(buf, "Str:   %-2d    %-2d    %-2d    %-2d    %-2d\n",
           this->desc->stats->str[0], this->desc->stats->str[1], this->desc->stats->str[2],
           this->desc->stats->str[3], this->desc->stats->str[4]);
   SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
+  sprintf(buf, "Dex:   %-2d    %-2d    %-2d    %-2d    %-2d\n",
           this->desc->stats->dex[0], this->desc->stats->dex[1], this->desc->stats->dex[2],
           this->desc->stats->dex[3], this->desc->stats->dex[4]);
   SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
+  sprintf(buf, "Con:   %-2d    %-2d    %-2d    %-2d    %-2d\n",
           this->desc->stats->con[0], this->desc->stats->con[1], this->desc->stats->con[2],
           this->desc->stats->con[3], this->desc->stats->con[4]);
   SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
+  sprintf(buf, "Int:   %-2d    %-2d    %-2d    %-2d    %-2d\n",
           this->desc->stats->tel[0], this->desc->stats->tel[1], this->desc->stats->tel[2],
           this->desc->stats->tel[3], this->desc->stats->tel[4]);
   SEND_TO_Q(buf, this->desc);
-  sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\r\n",
+  sprintf(buf, "Wis:   %-2d    %-2d    %-2d    %-2d    %-2d\n",
           this->desc->stats->wis[0], this->desc->stats->wis[1], this->desc->stats->wis[2],
           this->desc->stats->wis[3], this->desc->stats->wis[4]);
   SEND_TO_Q(buf, this->desc);
@@ -768,10 +768,10 @@ int DC::exceeded_connection_limit(class Connection *new_conn)
 
   if (count > getConnectionLimit())
   {
-    SEND_TO_Q(QStringLiteral("Sorry, there are more than %1 connections from IP %2\r\n"
-                             "already logged into Dark Castle.  If you have a valid reason\r\n"
-                             "for having this many connections from one IP please let an imm\r\n"
-                             "know and they will speak with you. Assuming this is an error and closing all connections.\r\n")
+    SEND_TO_Q(QStringLiteral("Sorry, there are more than %1 connections from IP %2\n"
+                             "already logged into Dark Castle.  If you have a valid reason\n"
+                             "for having this many connections from one IP please let an imm\n"
+                             "know and they will speak with you. Assuming this is an error and closing all connections.\n")
                   .arg(getConnectionLimit())
                   .arg(new_conn->getPeerOriginalAddress().toString()),
               new_conn);
@@ -828,7 +828,7 @@ void DC::nanny(class Connection *d, QString arg)
   bool ok = false;
   unsigned selection{};
   int y{};
-  char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\r\nSelect a class-> ";
+  char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\nSelect a class-> ";
   Character *ch{};
   QString buf;
   QString str_tmp;
@@ -904,7 +904,7 @@ void DC::nanny(class Connection *d, QString arg)
 
     if (wizlock)
     {
-      SEND_TO_Q("The game is currently WIZLOCKED. Only immortals can connect at this time.\r\n", d);
+      SEND_TO_Q("The game is currently WIZLOCKED. Only immortals can connect at this time.\n", d);
     }
     SEND_TO_Q("What name for the roster? ", d);
     telnet_ga(d);
@@ -942,7 +942,7 @@ void DC::nanny(class Connection *d, QString arg)
 
     if (!is_valid_name(arg))
     {
-      SEND_TO_Q("Illegal name, try another.\r\nName: ", d);
+      SEND_TO_Q("Illegal name, try another.\nName: ", d);
       telnet_ga(d);
       return;
     }
@@ -961,8 +961,8 @@ void DC::nanny(class Connection *d, QString arg)
       str_tmp = u"../archive/%1.gz"_s.arg(arg);
       if (file_exists(str_tmp))
       {
-        SEND_TO_Q("That character is archived.\r\nPlease mail "
-                  "imps@dcastle.org to request it be restored.\r\n",
+        SEND_TO_Q("That character is archived.\nPlease mail "
+                  "imps@dcastle.org to request it be restored.\n",
                   d);
         close_socket(d);
         return;
@@ -976,11 +976,11 @@ void DC::nanny(class Connection *d, QString arg)
     ch->setName(arg);
 
     // if (isAllowedHost(d->getPeerOriginalAddress().toString().toStdString().c_str()))
-    // SEND_TO_Q("You are logging in from an ALLOWED host.\r\n", d);
+    // SEND_TO_Q("You are logging in from an ALLOWED host.\n", d);
 
     if (!check_reconnect(d, arg, false) && wizlock && !DC::getInstance()->isAllowedHost(d->getPeerOriginalAddress()))
     {
-      SEND_TO_Q("The game is wizlocked.\r\n", d);
+      SEND_TO_Q("The game is wizlocked.\n", d);
       close_socket(d);
       return;
     }
@@ -997,7 +997,7 @@ void DC::nanny(class Connection *d, QString arg)
     {
       if (DC::getInstance()->cf.bport)
       {
-        SEND_TO_Q("New chars not allowed on this port.\r\nEnter a new name: ", d);
+        SEND_TO_Q("New chars not allowed on this port.\nEnter a new name: ", d);
         return;
       }
       /* New player */
@@ -1015,7 +1015,7 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::GET_OLD_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
 
     // Default is to authenticate against character password
     password = ch->player->pwd;
@@ -1039,14 +1039,14 @@ void DC::nanny(class Connection *d, QString arg)
 
     if (QString(crypt(qPrintable(arg), qPrintable(password))) != password)
     {
-      SEND_TO_Q("Wrong password.\r\n", d);
+      SEND_TO_Q("Wrong password.\n", d);
       log_buf = u"%1 wrong password: %2"_s.arg(ch->getName()).arg(d->getPeerOriginalAddress().toString());
       logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
       if ((ch = get_pc(GET_NAME(d->character))))
       {
-        log_buf = u"$4$BWARNING: Someone just tried to log in as you with the wrong password.\r\n"
-                  //           "Attempt was from %s.$R\r\n"
-                  "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let an immortal know.)\r\n"_s;
+        log_buf = u"$4$BWARNING: Someone just tried to log in as you with the wrong password.\n"
+                  //           "Attempt was from %s.$R\n"
+                  "(If it's only once or twice, you can ignore it.  If it's several dozen tries, let an immortal know.)\n"_s;
         ch->send(log_buf);
       }
       else
@@ -1092,12 +1092,12 @@ void DC::nanny(class Connection *d, QString arg)
       ch->sendln("$B----------------------------------------------------------------------$R");
     }
 
-    SEND_TO_Q(QStringLiteral("\r\nIf you have read this motd, press Return.\r\nLast connected from:\r\n%1\r\n").arg(ch->player->last_site), d);
+    SEND_TO_Q(QStringLiteral("\nIf you have read this motd, press Return.\nLast connected from:\n%1\n").arg(ch->player->last_site), d);
     telnet_ga(d);
 
     if (d->character->player->bad_pw_tries)
     {
-      buf = u"\r\n\r\n$4$BYou have had %1 wrong passwords entered since your last complete login.$R\r\n\r\n"_s.arg(d->character->player->bad_pw_tries);
+      buf = u"\n\n$4$BYou have had %1 wrong passwords entered since your last complete login.$R\n\n"_s.arg(d->character->player->bad_pw_tries);
       SEND_TO_Q(buf, d);
     }
     DC::getInstance()->TheAuctionHouse.CheckForSoldItems(d->character);
@@ -1121,13 +1121,13 @@ void DC::nanny(class Connection *d, QString arg)
       {
         buf = u"Request for new character %1 denied from [%2] (siteban)"_s.arg(d->character->getName()).arg(d->getPeerOriginalAddress().toString());
         logentry(buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
-        SEND_TO_Q("Sorry, new chars are not allowed from your site.\r\n"
-                  "Questions may be directed to imps@dcastle.org\r\n",
+        SEND_TO_Q("Sorry, new chars are not allowed from your site.\n"
+                  "Questions may be directed to imps@dcastle.org\n",
                   d);
         STATE(d) = Connection::states::CLOSE;
         return;
       }
-      buf = u"New character.\r\nGive me a password for %1: "_s.arg(ch->getName());
+      buf = u"New character.\nGive me a password for %1: "_s.arg(ch->getName());
       SEND_TO_Q(buf, d);
       telnet_ga(d);
       STATE(d) = Connection::states::GET_NEW_PASSWORD;
@@ -1157,11 +1157,11 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::GET_NEW_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
 
     if (arg.length() < 6)
     {
-      SEND_TO_Q("Password must be at least six characters long.\r\nPassword: ", d);
+      SEND_TO_Q("Password must be at least six characters long.\nPassword: ", d);
       telnet_ga(d);
       return;
     }
@@ -1173,11 +1173,11 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::CONFIRM_NEW_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
 
     if (QString(crypt(qPrintable(arg), qPrintable(ch->player->pwd))) != ch->player->pwd)
     {
-      SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
+      SEND_TO_Q("Passwords don't match.\nRetype password: ", d);
       telnet_ga(d);
       STATE(d) = Connection::states::GET_NEW_PASSWORD;
       return;
@@ -1223,7 +1223,7 @@ void DC::nanny(class Connection *d, QString arg)
   case Connection::states::GET_NEW_SEX:
     if (arg.isEmpty())
     {
-      SEND_TO_Q("That's not a sex.\r\n", d);
+      SEND_TO_Q("That's not a sex.\n", d);
       STATE(d) = Connection::states::QUESTION_SEX;
       break;
     }
@@ -1239,7 +1239,7 @@ void DC::nanny(class Connection *d, QString arg)
       ch->sex = SEX_FEMALE;
       break;
     default:
-      SEND_TO_Q("That's not a sex.\r\n", d);
+      SEND_TO_Q("That's not a sex.\n", d);
       STATE(d) = Connection::states::QUESTION_SEX;
       return;
     }
@@ -1252,31 +1252,31 @@ void DC::nanny(class Connection *d, QString arg)
           }
     */
 
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\r\n", d);
-    SEND_TO_Q("exists a helpfile for that word which you can lookup with the command\r\n", d);
-    SEND_TO_Q("help keyword.\r\n", d);
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q("Dark Castle supports two ways of picking your race, class and initial\r\n", d);
-    SEND_TO_Q("$BATTRIBUTES$R such as $BSTRENGTH$R, $BDEXTERITY$R, $BCONSTITUION$R, $BINTELLIGENCE$R\r\n", d);
-    SEND_TO_Q("or $BWISDOM$R.\r\n\r\n", d);
-    SEND_TO_Q("The newest method is you first pick a race, a class then you get 12 points\r\n", d);
-    SEND_TO_Q("in each attribute and 23 points you can divide among those five\r\n", d);
-    SEND_TO_Q("attributes.\r\n\r\n", d);
-    SEND_TO_Q("The old method is you roll virtual dice. The virtual dice consist of either\r\n", d);
-    SEND_TO_Q("three 6-sided dice or six 3-sided dice. The game picks the larger group of\r\n", d);
-    SEND_TO_Q("those two separate sets of dice rolls and throws out any sets with a sum less\r\n", d);
-    SEND_TO_Q("than 12. You can roll virtual dice as many times as you like. After you finish\r\n", d);
-    SEND_TO_Q("rolling dice then the game shows you what races you can pick based on the dice\r\n", d);
-    SEND_TO_Q("rolls. After picking from the races your dice rolls allow then you have to\r\n", d);
-    SEND_TO_Q("pick a class that fits your choosen stats.\r\n", d);
+    SEND_TO_Q("\n", d);
+    SEND_TO_Q("$R$7Note: If you see a word that is entirely CAPITALIZED and $Bbold$R then there\n", d);
+    SEND_TO_Q("exists a helpfile for that word which you can lookup with the command\n", d);
+    SEND_TO_Q("help keyword.\n", d);
+    SEND_TO_Q("\n", d);
+    SEND_TO_Q("Dark Castle supports two ways of picking your race, class and initial\n", d);
+    SEND_TO_Q("$BATTRIBUTES$R such as $BSTRENGTH$R, $BDEXTERITY$R, $BCONSTITUION$R, $BINTELLIGENCE$R\n", d);
+    SEND_TO_Q("or $BWISDOM$R.\n\n", d);
+    SEND_TO_Q("The newest method is you first pick a race, a class then you get 12 points\n", d);
+    SEND_TO_Q("in each attribute and 23 points you can divide among those five\n", d);
+    SEND_TO_Q("attributes.\n\n", d);
+    SEND_TO_Q("The old method is you roll virtual dice. The virtual dice consist of either\n", d);
+    SEND_TO_Q("three 6-sided dice or six 3-sided dice. The game picks the larger group of\n", d);
+    SEND_TO_Q("those two separate sets of dice rolls and throws out any sets with a sum less\n", d);
+    SEND_TO_Q("than 12. You can roll virtual dice as many times as you like. After you finish\n", d);
+    SEND_TO_Q("rolling dice then the game shows you what races you can pick based on the dice\n", d);
+    SEND_TO_Q("rolls. After picking from the races your dice rolls allow then you have to\n", d);
+    SEND_TO_Q("pick a class that fits your choosen stats.\n", d);
     STATE(d) = Connection::states::QUESTION_STAT_METHOD;
     return;
 
   case Connection::states::QUESTION_STAT_METHOD:
-    SEND_TO_Q("\r\n", d);
-    SEND_TO_Q("1. Pick race, class then assign points to attributes. (new method)\r\n", d);
-    SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\r\n", d);
+    SEND_TO_Q("\n", d);
+    SEND_TO_Q("1. Pick race, class then assign points to attributes. (new method)\n", d);
+    SEND_TO_Q("2. Roll virtual dice for attributes then pick race and class. (old method)\n", d);
     SEND_TO_Q("What is your choice (1,2)? ", d);
     telnet_ga(d);
     STATE(d) = Connection::states::GET_STAT_METHOD;
@@ -1395,11 +1395,11 @@ void DC::nanny(class Connection *d, QString arg)
       GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
       delete ch->desc->stats;
       ch->desc->stats = nullptr;
-      SEND_TO_Q("\r\nChoose a race(races you can select are marked with a *).\r\n", d);
-      buf = u"  %11: Human\r\n  %22: Elf\r\n  %33: Dwarf\r\n"
-            "  %44: Hobbit\r\n  %55: Pixie\r\n  %66: Ogre\r\n"
-            "  %77: Gnome\r\n  %88: Orc\r\n  %99: Troll\r\n"
-            "\r\nSelect a race(Type help <race> for more information)-> "_s
+      SEND_TO_Q("\nChoose a race(races you can select are marked with a *).\n", d);
+      buf = u"  %11: Human\n  %22: Elf\n  %33: Dwarf\n"
+            "  %44: Hobbit\n  %55: Pixie\n  %66: Ogre\n"
+            "  %77: Gnome\n  %88: Orc\n  %99: Troll\n"
+            "\nSelect a race(Type help <race> for more information)-> "_s
                 .arg(is_race_eligible(ch, 1) ? '*' : ' ')
                 .arg(is_race_eligible(ch, 2) ? '*' : ' ')
                 .arg(is_race_eligible(ch, 3) ? '*' : ' ')
@@ -1427,7 +1427,7 @@ void DC::nanny(class Connection *d, QString arg)
     switch (selection)
     {
     default:
-      SEND_TO_Q("That's not a race.\r\nWhat IS your race? ", d);
+      SEND_TO_Q("That's not a race.\nWhat IS your race? ", d);
       telnet_ga(d);
       return;
 
@@ -1557,19 +1557,19 @@ void DC::nanny(class Connection *d, QString arg)
     }
 
     ch->set_hw();
-    SEND_TO_Q("\r\nA '*' denotes a class that fits your chosen stats.\r\n", d);
-    buf = u" %1 1: Warrior\r\n"
-          " %2 2: Cleric\r\n"
-          " %3 3: Mage\r\n"
-          " %4 4: Thief\r\n"
-          " %5 5: Anti-Paladin\r\n"
-          " %6 6: Paladin\r\n"
-          " %7 7: Barbarian \r\n"
-          " %8 8: Monk\r\n"
-          " %9 9: Ranger\r\n"
-          " %10 10: Bard\r\n"
-          " %11 11: Druid\r\n"
-          "\r\nSelect a class(Type help <class> for more information) > "_s
+    SEND_TO_Q("\nA '*' denotes a class that fits your chosen stats.\n", d);
+    buf = u" %1 1: Warrior\n"
+          " %2 2: Cleric\n"
+          " %3 3: Mage\n"
+          " %4 4: Thief\n"
+          " %5 5: Anti-Paladin\n"
+          " %6 6: Paladin\n"
+          " %7 7: Barbarian \n"
+          " %8 8: Monk\n"
+          " %9 9: Ranger\n"
+          " %10 10: Bard\n"
+          " %11 11: Druid\n"
+          "\nSelect a class(Type help <class> for more information) > "_s
               .arg('*')
               .arg(is_clss_eligible(ch, CLASS_CLERIC) ? '*' : ' ')
               .arg(is_clss_eligible(ch, CLASS_MAGIC_USER) ? '*' : ' ')
@@ -1595,7 +1595,7 @@ void DC::nanny(class Connection *d, QString arg)
     switch (selection)
     {
     default:
-      SEND_TO_Q("That's not a class.\r\nWhat IS your class? ", d);
+      SEND_TO_Q("That's not a class.\nWhat IS your class? ", d);
       telnet_ga(d);
       return;
 
@@ -1626,7 +1626,7 @@ void DC::nanny(class Connection *d, QString arg)
         SEND_TO_Q(badclssmsg, d);
         return;
       }
-      SEND_TO_Q("Pstealing is legal on this mud :)\r\n"
+      SEND_TO_Q("Pstealing is legal on this mud :)\n"
                 "Check 'help psteal' before you try though.",
                 d);
       GET_CLASS(ch) = CLASS_THIEF;
@@ -1699,9 +1699,9 @@ void DC::nanny(class Connection *d, QString arg)
 
     log_buf = u"%1@%2 new player."_s.arg(GET_NAME(ch)).arg(d->getPeerOriginalAddress().toString());
     logentry(log_buf, OVERSEER, DC::LogChannel::LOG_SOCKET);
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
     SEND_TO_Q(motd, d);
-    SEND_TO_Q("\r\nIf you have read this motd, press Return.", d);
+    SEND_TO_Q("\nIf you have read this motd, press Return.", d);
     telnet_ga(d);
 
     STATE(d) = Connection::states::READ_MOTD;
@@ -1764,13 +1764,13 @@ void DC::nanny(class Connection *d, QString arg)
         log_buf = u"%1 has more than a billion gold in the bank. Rich fucker or bugged."_s.arg(GET_NAME(ch));
         logentry(log_buf, 100, DC::LogChannel::LOG_WARNING);
       }
-      ch->sendln("\r\nWelcome to Dark Castle.");
+      ch->sendln("\nWelcome to Dark Castle.");
       character_list.insert(ch);
 
       if (IS_AFFECTED(ch, AFF_ITEM_REMOVE))
       {
         REMBIT(ch->affected_by, AFF_ITEM_REMOVE);
-        ch->sendln("\r\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R");
+        ch->sendln("\n$I$B$4***WARNING*** Items you were previously wearing have been moved to your inventory, please check before moving out of a safe room.$R");
       }
 
       ch->do_on_login_stuff();
@@ -1796,8 +1796,8 @@ void DC::nanny(class Connection *d, QString arg)
       {
         if (ch->getLevel() >= 40 && DCVote.IsActive() && !DCVote.HasVoted(ch))
         {
-          send_to_char("\r\nThere is an active vote in which you have not yet voted.\r\n"
-                       "Enter \"vote\" to see details\r\n\r\n",
+          send_to_char("\nThere is an active vote in which you have not yet voted.\n"
+                       "Enter \"vote\" to see details\n\n",
                        ch);
         }
       }
@@ -1806,12 +1806,12 @@ void DC::nanny(class Connection *d, QString arg)
       break;
 
     case '2':
-      SEND_TO_Q("Enter a text you'd like others to see when they look at you.\r\n"
-                "Terminate with '/s' on a new line.\r\n",
+      SEND_TO_Q("Enter a text you'd like others to see when they look at you.\n"
+                "Terminate with '/s' on a new line.\n",
                 d);
       if (!ch->description.isEmpty())
       {
-        SEND_TO_Q("Old description:\r\n", d);
+        SEND_TO_Q("Old description:\n", d);
         SEND_TO_Q(ch->description, d);
       }
 
@@ -1830,14 +1830,14 @@ void DC::nanny(class Connection *d, QString arg)
       // delete this character
       if (d->character->getLevel() >= 20)
       {
-        SEND_TO_Q("\r\nOnly characters under level 20 can be self-deleted.\r\n", d);
+        SEND_TO_Q("\nOnly characters under level 20 can be self-deleted.\n", d);
         STATE(d) = Connection::states::SELECT_MENU;
         SEND_TO_Q(menu, d);
         telnet_ga(d);
       }
       else
       {
-        SEND_TO_Q("This will _permanently_ erase you.\r\nType ERASE ME if this is really what you want: ", d);
+        SEND_TO_Q("This will _permanently_ erase you.\nType ERASE ME if this is really what you want: ", d);
         telnet_ga(d);
         STATE(d) = Connection::states::DELETE_CHAR;
       }
@@ -1854,7 +1854,7 @@ void DC::nanny(class Connection *d, QString arg)
     if (arg == "ARCHIVE ME")
     {
       str_tmp = GET_NAME(d->character);
-      SEND_TO_Q("\r\nCharacter Archived.\r\n", d);
+      SEND_TO_Q("\nCharacter Archived.\n", d);
       DC::getInstance()->update_wizlist(d->character);
       close_socket(d);
       util_archive(qPrintable(str_tmp), 0);
@@ -1896,7 +1896,7 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::CONFIRM_PASSWORD_CHANGE:
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
     if (ch->player->pwd == crypt(qPrintable(arg), qPrintable(ch->player->pwd)))
     {
       SEND_TO_Q("Enter a new password: ", d);
@@ -1913,11 +1913,11 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::RESET_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
 
     if (arg.length() < 6)
     {
-      SEND_TO_Q("Password must be at least six characters long.\r\nPassword: ", d);
+      SEND_TO_Q("Password must be at least six characters long.\nPassword: ", d);
       telnet_ga(d);
       return;
     }
@@ -1928,17 +1928,17 @@ void DC::nanny(class Connection *d, QString arg)
     break;
 
   case Connection::states::CONFIRM_RESET_PASSWORD:
-    SEND_TO_Q("\r\n", d);
+    SEND_TO_Q("\n", d);
 
     if (ch->player->pwd != crypt(qPrintable(arg), qPrintable(ch->player->pwd)))
     {
-      SEND_TO_Q("Passwords don't match.\r\nRetype password: ", d);
+      SEND_TO_Q("Passwords don't match.\nRetype password: ", d);
       telnet_ga(d);
       STATE(d) = Connection::states::RESET_PASSWORD;
       return;
     }
 
-    SEND_TO_Q("\r\nDone.\r\n", d);
+    SEND_TO_Q("\nDone.\n", d);
     SEND_TO_Q(menu, d);
     STATE(d) = Connection::states::SELECT_MENU;
     if (ch->getLevel() > 1)
@@ -2173,7 +2173,7 @@ void update_characters()
       }
       else
       {
-        csendf(i, "You strain your muscles keeping the %s closed.\r\n", fname(i->brace_at->keyword).toStdString().c_str());
+        csendf(i, "You strain your muscles keeping the %s closed.\n", fname(i->brace_at->keyword).toStdString().c_str());
         act("$n strains $s muscles keeping the $F blocked.", i, 0, i->brace_at->keyword, TO_ROOM, 0);
       }
     }
@@ -2300,16 +2300,16 @@ void checkConsecrate(int pulseType)
               if (spl == SPELL_CONSECRATE)
               {
                 if (ch->in_room != obj->in_room)
-                  csendf(ch, "You sense your consecration of %s has ended.\r\n", qPrintable(DC::getInstance()->world[obj->in_room].name));
+                  csendf(ch, "You sense your consecration of %s has ended.\n", qPrintable(DC::getInstance()->world[obj->in_room].name));
                 else
-                  ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nYour holy consecration has ended.");
+                  ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\nYour holy consecration has ended.");
               }
               else
               {
                 if (ch->in_room != obj->in_room)
-                  csendf(ch, "You sense your desecration of %s has ended.\r\n", qPrintable(DC::getInstance()->world[obj->in_room].name));
+                  csendf(ch, "You sense your desecration of %s has ended.\n", qPrintable(DC::getInstance()->world[obj->in_room].name));
                 else
-                  ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nYour unholy desecration has ended.");
+                  ch->sendln("The runes upon the ground shatter with a burst of magic!\nYour unholy desecration has ended.");
               }
             }
           }
@@ -2329,7 +2329,7 @@ void checkConsecrate(int pulseType)
             if (spl == SPELL_CONSECRATE)
             {
               if (tmp_ch->affected_by_spell(SPELL_DETECT_GOOD) && tmp_ch->affected_by_spell(SPELL_DETECT_GOOD)->modifier >= 80)
-                tmp_ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\r\nThe holy consecration here has ended.");
+                tmp_ch->sendln("Runes upon the ground glow brightly, then fade to nothing.\nThe holy consecration here has ended.");
             }
             else
             {
@@ -2338,7 +2338,7 @@ void checkConsecrate(int pulseType)
                 {
                   send_damage("Runes upon the ground glow softly as your holy consecration heals $N of | damage.", ch, 0, tmp_ch, buf, "Runes upon the ground glow softly as your holy consecration heals $N.", TO_CHAR);
                 }
-              tmp_ch->sendln("The runes upon the ground shatter with a burst of magic!\r\nThe unholy desecration has ended.");
+              tmp_ch->sendln("The runes upon the ground shatter with a burst of magic!\nThe unholy desecration has ended.");
             }
           }
           extract_obj(obj);
@@ -2401,7 +2401,7 @@ void checkConsecrate(int pulseType)
                 if (tmp_ch->isPlayer())
                 {
                   act("The strength of $N's desecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
-                  tmp_ch->sendln("You have been KILLED!!\r\n");
+                  tmp_ch->sendln("You have been KILLED!!\n");
                 }
                 group_gain(ch, tmp_ch);
                 fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_DESECRATE);
@@ -2457,7 +2457,7 @@ void checkConsecrate(int pulseType)
                 if (tmp_ch->isPlayer())
                 {
                   act("The strength of $N's consecration proves fatal and the world fades to black...", tmp_ch, 0, ch, TO_CHAR, 0);
-                  tmp_ch->sendln("You have been KILLED!!\r\n");
+                  tmp_ch->sendln("You have been KILLED!!\n");
                 }
                 group_gain(ch, tmp_ch);
                 fight_kill(ch, tmp_ch, TYPE_CHOOSE, SPELL_CONSECRATE);
@@ -2523,13 +2523,13 @@ void show_question_race(Connection *d)
 
   Character *ch = d->character;
   QString buffer, races_buffer;
-  buffer += "\r\nRacial Bonuses and Pentalties:\r\n";
-  buffer += "$B$7   Race   STR DEX CON INT WIS$R\r\n";
+  buffer += "\nRacial Bonuses and Pentalties:\n";
+  buffer += "$B$7   Race   STR DEX CON INT WIS$R\n";
   for (int race = 1; race <= 9; race++)
   {
     if (races[race].singular_name != nullptr)
     {
-      buffer += u"%1. %2 %3 %4 %5 %6 %7\r\n"_s
+      buffer += u"%1. %2 %3 %4 %5 %6 %7\n"_s
                     .arg(race)
                     .arg(races[race].singular_name, 6)
                     .arg(races[race].mod_str, 3)
@@ -2592,7 +2592,7 @@ void show_question_class(Connection *d)
 
   Character *ch = d->character;
   std::string buffer, classes_buffer;
-  buffer += "\r\n   Class$R\r\n";
+  buffer += "\n   Class$R\n";
   int clss;
   for (clss = 1; clss <= CLASS_MAX_PROD; clss++)
   {
@@ -2600,11 +2600,11 @@ void show_question_class(Connection *d)
     {
       if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
       {
-        buffer += fmt::format("{:2}. {:11} (Unavailble for your race)\r\n", clss, pc_clss_types[clss]);
+        buffer += fmt::format("{:2}. {:11} (Unavailble for your race)\n", clss, pc_clss_types[clss]);
       }
       else
       {
-        buffer += fmt::format("{:2}. {:11}\r\n", clss, pc_clss_types[clss]);
+        buffer += fmt::format("{:2}. {:11}\n", clss, pc_clss_types[clss]);
         classes_buffer += std::string(pc_clss_types3[clss]);
         if (clss < CLASS_MAX_PROD)
         {
@@ -2614,7 +2614,7 @@ void show_question_class(Connection *d)
     }
   }
 
-  buffer += "Type 'back' to go back and pick a different race.\r\n";
+  buffer += "Type 'back' to go back and pick a different race.\n";
   buffer += "Type '1-" + std::to_string(CLASS_MAX_PROD) + "," + classes_buffer + "' or 'help keyword': ";
   SEND_TO_Q(buffer.c_str(), d);
   telnet_ga(d);
@@ -2725,62 +2725,62 @@ void show_question_stats(Connection *d)
   Character *ch = d->character;
   unsigned race = GET_RACE(ch);
   unsigned clss = GET_CLASS(ch);
-  std::string buffer = fmt::format("\r\nRace: {}\r\n", races[race].singular_name);
-  buffer += fmt::format("Class: {}\r\n", classes[clss].name);
-  buffer += fmt::format("Points left to assign: {}\r\n", d->stats->points);
-  buffer += fmt::format("## Attribute      Current  Racial Offsets  Total\r\n");
+  std::string buffer = fmt::format("\nRace: {}\n", races[race].singular_name);
+  buffer += fmt::format("Class: {}\n", classes[clss].name);
+  buffer += fmt::format("Points left to assign: {}\n", d->stats->points);
+  buffer += fmt::format("## Attribute      Current  Racial Offsets  Total\n");
   if (d->stats->selection == attribute_t::STRENGTH)
   {
-    buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("1. $B*Strength*$R     {:2}      {:2}               {:2}\n",
                           d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
   }
   else
   {
-    buffer += fmt::format("1. Strength       {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("1. Strength       {:2}      {:2}               {:2}\n",
                           d->stats->str[0], races[race].mod_str, d->stats->str[0] + races[race].mod_str);
   }
 
   if (d->stats->selection == attribute_t::DEXTERITY)
   {
-    buffer += fmt::format("2. $B*Dexterity*$R    {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("2. $B*Dexterity*$R    {:2}      {:2}               {:2}\n",
                           d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
   }
   else
   {
-    buffer += fmt::format("2. Dexterity      {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("2. Dexterity      {:2}      {:2}               {:2}\n",
                           d->stats->dex[0], races[race].mod_dex, d->stats->dex[0] + races[race].mod_dex);
   }
 
   if (d->stats->selection == attribute_t::INTELLIGENCE)
   {
-    buffer += fmt::format("3. $B*Intelligence*$R {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("3. $B*Intelligence*$R {:2}      {:2}               {:2}\n",
                           d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
   }
   else
   {
-    buffer += fmt::format("3. Intelligence   {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("3. Intelligence   {:2}      {:2}               {:2}\n",
                           d->stats->tel[0], races[race].mod_int, d->stats->tel[0] + races[race].mod_int);
   }
 
   if (d->stats->selection == attribute_t::WISDOM)
   {
-    buffer += fmt::format("4. $B*Wisdom*$R       {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("4. $B*Wisdom*$R       {:2}      {:2}               {:2}\n",
                           d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
   }
   else
   {
-    buffer += fmt::format("4. Wisdom         {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("4. Wisdom         {:2}      {:2}               {:2}\n",
                           d->stats->wis[0], races[race].mod_wis, d->stats->wis[0] + races[race].mod_wis);
   }
 
   if (d->stats->selection == attribute_t::CONSTITUTION)
   {
-    buffer += fmt::format("5. $B*Constitution*$R {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("5. $B*Constitution*$R {:2}      {:2}               {:2}\n",
                           d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
   }
   else
   {
-    buffer += fmt::format("5. Constitution   {:2}      {:2}               {:2}\r\n",
+    buffer += fmt::format("5. Constitution   {:2}      {:2}               {:2}\n",
                           d->stats->con[0], races[race].mod_con, d->stats->con[0] + races[race].mod_con);
   }
 
@@ -2821,7 +2821,7 @@ bool handle_get_stats(Connection *d, std::string arg)
     else
     {
       d->stats->selection = attribute_t::UNDEFINED;
-      SEND_TO_Q("Invalid number specified.\r\n", d);
+      SEND_TO_Q("Invalid number specified.\n", d);
     }
 
     return false;
@@ -2852,7 +2852,7 @@ bool handle_get_stats(Connection *d, std::string arg)
     {
       if (d->stats->points > 0)
       {
-        SEND_TO_Q("You must assign all your points first.\r\n", d);
+        SEND_TO_Q("You must assign all your points first.\n", d);
         return false;
       }
 

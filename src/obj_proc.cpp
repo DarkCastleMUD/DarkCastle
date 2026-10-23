@@ -372,7 +372,7 @@ int pushwand(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       break;
     }
     obj->obj_flags.value[3] = newspell;
-    ch->sendln("You push the ivory so that the ivory and ebony separate.\r\nReassembling them, you hear a \"click\" as they snap back into place.");
+    ch->sendln("You push the ivory so that the ivory and ebony separate.\nReassembling them, you hear a \"click\" as they snap back into place.");
     return ReturnValue::eSUCCESS;
   }
   else if (cmd == cmd_t::SAY)
@@ -478,11 +478,11 @@ int songstaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     {
       if (tmp_char == ch)
       {
-        tmp_char->send(QStringLiteral("You feel your Travelling March recover %1 moves for you.\r\n").arg(heal));
+        tmp_char->send(QStringLiteral("You feel your Travelling March recover %1 moves for you.\n").arg(heal));
       }
       else
       {
-        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\r\n", GET_NAME(ch), heal);
+        sprintf(buf, "You feel %s's Travelling March recovering %d moves for you.\n", GET_NAME(ch), heal);
         tmp_char->send(buf);
       }
     }
@@ -587,7 +587,7 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
     {
       return ReturnValue::eFAILURE;
     }
-    ch->send("You push an almost invisible button on the wand with an audible *click*.\r\n");
+    ch->send("You push an almost invisible button on the wand with an audible *click*.\n");
     break;
   default:
     return ReturnValue::eFAILURE;
@@ -596,7 +596,7 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
 
   if (obj->obj_flags.value[2] >= 5)
   {
-    ch->send("The wand cannot be recharged yet.\r\n");
+    ch->send("The wand cannot be recharged yet.\n");
     return ReturnValue::eSUCCESS;
   }
 
@@ -621,22 +621,22 @@ int orrowand(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Chara
     if (!firstP && DC::getInstance()->obj_index.contains(27903))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[27903].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!secondP && DC::getInstance()->obj_index.contains(27903))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[27903].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!vial && DC::getInstance()->obj_index.contains(27904))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[27904].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\n").arg(GET_OBJ_SHORT(obj)));
     }
     if (!diamond && DC::getInstance()->obj_index.contains(17399))
     {
       auto obj = static_cast<Object *>(DC::getInstance()->obj_index[17399].item);
-      ch->send(QStringLiteral("%1\r\n").arg(GET_OBJ_SHORT(obj)));
+      ch->send(QStringLiteral("%1\n").arg(GET_OBJ_SHORT(obj)));
     }
     return ReturnValue::eSUCCESS;
   }
@@ -814,7 +814,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   /* balance */
   if (cmd == cmd_t::BALANCE)
   {
-    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
+    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\n", GET_BANK(ch)));
     return ReturnValue::eSUCCESS;
   }
 
@@ -845,7 +845,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     }
     ch->removeGold(x);
     GET_BANK(ch) += x;
-    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\r\n", x));
+    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You deposit {:L} $B$5gold$R coins.\n", x));
     ch->save();
     return ReturnValue::eSUCCESS;
   }
@@ -864,7 +864,7 @@ int bank(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
-  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
+  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\n", x));
   ch->save();
   return ReturnValue::eSUCCESS;
 }
@@ -881,7 +881,7 @@ int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   /* balance */
   if (cmd == cmd_t::BALANCE)
   {
-    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\r\n", GET_BANK(ch)));
+    ch->send(fmt::format(std::locale("en_US.UTF-8"), "You have {:L} $B$5gold$R coins in the bank.\n", GET_BANK(ch)));
     return ReturnValue::eSUCCESS;
   }
 
@@ -906,7 +906,7 @@ int casino_atm(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   }
   ch->addGold(x);
   GET_BANK(ch) -= x;
-  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\r\n", x));
+  ch->send(fmt::format(std::locale("en_US.UTF-8"), "You withdraw {:L} $B$5gold$R coins.\n", x));
   ch->save();
   return ReturnValue::eSUCCESS;
 }
@@ -963,62 +963,62 @@ public:
 
 assemble_item assemble_items[] = {
     // Item 0, the crystalline tir stuff
-    {"A brilliant flash of light erupts from your hands as the gems mold themselves together and form a cohesive and flawless gem.\r\n",
+    {"A brilliant flash of light erupts from your hands as the gems mold themselves together and form a cohesive and flawless gem.\n",
      "A brilliant flash of light erupts from $n's hands as the gems $e holds form a new cohesive and flawless gem.",
-     "One of the gems seems to be missing.\r\n",
+     "One of the gems seems to be missing.\n",
      {2714, 2602, 12607, -1, -1, -1, -1, -1, -1, -1},
      1506},
 
     // Item 1, Etala the Shadowblade
-    {"Connecting the hilt and gem to the blade, you form a whole sword.\r\n",
+    {"Connecting the hilt and gem to the blade, you form a whole sword.\n",
      "$n fiddles around with some stuff in $s inventory.",
-     "You seem to be missing a piece.\r\n",
+     "You seem to be missing a piece.\n",
      {181, 182, 183, -1, -1, -1, -1, -1, -1, -1},
      184},
 
     // Item 2, Broadhead arrow from forage items
-    {"You carefully sand down the pointy stick, adding to its excellent form.\r\n"
-     "Splitting the feathers down, you carefully attach them to the pointy stick.\r\n"
-     "Finally, you shape the scorpion stinger into a deadly arrowhead and secure it to the front.\r\n",
+    {"You carefully sand down the pointy stick, adding to its excellent form.\n"
+     "Splitting the feathers down, you carefully attach them to the pointy stick.\n"
+     "Finally, you shape the scorpion stinger into a deadly arrowhead and secure it to the front.\n",
      "$n sits down with some junk and tries $s hand at fletching.",
-     "You don't have all the items required to fletch an arrow.\r\n",
+     "You don't have all the items required to fletch an arrow.\n",
      {3185, 3186, 3187, -1, -1, -1, -1, -1, -1, -1},
      3188},
 
     // Item 3, Wolf tooh arrow from forage items
-    {"You carefully sand down the pointy stick, adding to its excellent form.\r\n"
-     "Splitting the feathers down, you carefully attach them to the pointy stick.\r\n"
-     "Finally, you hone the wolf's tooth stinger into a sharp arrowhead and secure it to the front.\r\n",
+    {"You carefully sand down the pointy stick, adding to its excellent form.\n"
+     "Splitting the feathers down, you carefully attach them to the pointy stick.\n"
+     "Finally, you hone the wolf's tooth stinger into a sharp arrowhead and secure it to the front.\n",
      "$n sits down with some junk and tries $s hand at fletching.",
-     "You don't have all the items required to fletch an arrow.\r\n",
+     "You don't have all the items required to fletch an arrow.\n",
      {3185, 28301, 3187, -1, -1, -1, -1, -1, -1, -1},
      3190},
 
     // Item 4, Gaiot key in DK
-    {"The stone pieces join together to form a small statue of a dragon.\r\n",
-     "$n assembles some stones together to form a black statue.\r\n",
-     "The pieces click together but fall apart as if something is missing.\r\n",
+    {"The stone pieces join together to form a small statue of a dragon.\n",
+     "$n assembles some stones together to form a black statue.\n",
+     "The pieces click together but fall apart as if something is missing.\n",
      {9502, 9503, 9504, 9505, 9506, -1, -1, -1, -1, -1},
      9501},
 
     // Item 5, ventriloquate dummy - rahz
-    {"You are able to put the parts together, and create a ventriloquist's dummy.\r\n",
-     "$n manages to the parts together, creating a ventriloquist's dummy.\r\n",
-     "The pieces don't seem to fit together quite right.\r\n",
+    {"You are able to put the parts together, and create a ventriloquist's dummy.\n",
+     "$n manages to the parts together, creating a ventriloquist's dummy.\n",
+     "The pieces don't seem to fit together quite right.\n",
      {17349, 17350, 17351, 17352, 17353, 17354, -1, -1, -1, -1},
      17348},
 
     // Item 6, the Shield of the Beholder
-    {"You place the two gems into the holes on the shield and it seems to hum with power.\r\n",
-     "$n places two precious gemstones into a beholder's carapace to create a shield.\r\n",
-     "You seem to be missing a piece.\r\n",
+    {"You place the two gems into the holes on the shield and it seems to hum with power.\n",
+     "$n places two precious gemstones into a beholder's carapace to create a shield.\n",
+     "You seem to be missing a piece.\n",
      {5260, 5261, 5262, -1, -1, -1, -1, -1, -1, -1},
      5263},
 
     // Item 7, a curiously notched medallion
-    {"With a blinding flash, the gem makes the medallion whole.\r\n",
-     "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\r\n",
-     "You attempt to assemble the family medallion but something is missing.\r\n",
+    {"With a blinding flash, the gem makes the medallion whole.\n",
+     "As $n fiddles with the medallion pieces, you are dazed by a bright flash!\n",
+     "You attempt to assemble the family medallion but something is missing.\n",
      {30084, 30085, 30086, 30087, 30088, -1, -1, -1, -1, -1},
      30083},
 
@@ -1049,10 +1049,10 @@ int hellmouth_thing(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   if (invoker->fighting)
     return ReturnValue::eFAILURE;
 
-  // send_to_char("The hellmouth reaches out and embraces you. As you become completely\r\n"
-  // "immersed in its energy your skin burns, your sight fades into darkness,\r\n"
-  // "your nose recoils at the stench of sulphur, and all you can taste is\r\n"
-  // "blood.\r\n",invoker);
+  // send_to_char("The hellmouth reaches out and embraces you. As you become completely\n"
+  // "immersed in its energy your skin burns, your sight fades into darkness,\n"
+  // "your nose recoils at the stench of sulphur, and all you can taste is\n"
+  // "blood.\n",invoker);
   //  char_from_room(invoker);
   //  char_to_room(invoker, real_room(4801));
   GET_KI(invoker) -= 50;
@@ -1062,10 +1062,10 @@ int hellmouth_thing(Character *ch, class Object *obj, cmd_t cmd, const char *arg
   GET_MANA(invoker) /= 2;
   invoker->setMove(invoker->getMove() / 2.0);
   //  do_look(invoker, "");
-  //   send_to_char("In an instant your senses are restored and you are left only temporarily\r\n"
-  //                "dazed. Although you appear to be somewhere other than where you were prior\r\n"
-  //                "to this experience, your life feels as though it has ebbed to the brink of\r\n"
-  // 	        "death and has been only partially restored.\r\n",invoker);
+  //   send_to_char("In an instant your senses are restored and you are left only temporarily\n"
+  //                "dazed. Although you appear to be somewhere other than where you were prior\n"
+  //                "to this experience, your life feels as though it has ebbed to the brink of\n"
+  // 	        "death and has been only partially restored.\n",invoker);
 
   return ReturnValue::eFAILURE; // So normal say function will execute after this
 }
@@ -1075,7 +1075,7 @@ int search_assemble_items(int vnum)
   // This should never happen
   if (vnum < 1)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\r\n", vnum);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "search_assemble_items passed vnumx=%d\n", vnum);
     produce_coredump();
     return -1;
   }
@@ -1101,7 +1101,7 @@ bool assemble_item_index(Character *ch, int item_index)
   // This should never happen
   if (item_index < 0)
   {
-    logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\r\n", item_index);
+    logf(ANGEL, DC::LogChannel::LOG_BUG, "assemble_item_index passed item_index=%d\n", item_index);
     produce_coredump();
     return false;
   }
@@ -1530,7 +1530,7 @@ void remove_eliara(Character *ch)
     return;
 
   act("Eliara's glow fades, as she falls dormant once again.", ch, 0, 0, TO_ROOM, 0);
-  ch->sendln("Eliara's glow fades, as she falls dormant once again.\r\n");
+  ch->sendln("Eliara's glow fades, as she falls dormant once again.\n");
   REMBIT(ch->affected_by, AFF_SANCTUARY);
 }
 
@@ -1743,7 +1743,7 @@ int arenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     stop_fighting(ch);
   }
 
-  ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");
+  ch->sendln("A dimensional hole swallows you.\nYou reappear elsewhere.");
   act("$n fades out of existence.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   do_look(ch, "\0");
@@ -1779,7 +1779,7 @@ int movingarenaporter(Character *ch, class Object *obj, cmd_t cmd, char *arg,
   if (!move_char(ch, real_room(number(17800, 17949))))
     return ReturnValue::eFAILURE;
 
-  ch->sendln("A dimensional hole swallows you.\r\nYou reappear elsewhere.");
+  ch->sendln("A dimensional hole swallows you.\nYou reappear elsewhere.");
   act("$n fades out of existence.", ch, 0, 0, TO_ROOM, INVIS_NULL);
 
   if (ch->fighting)
@@ -1810,11 +1810,11 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
 
   if (!*arg || !*name || !*buf)
   {
-    send_to_char("'Restring Machine v2.1' *beep*'\r\n"
-                 "'restring <Item> <Description>' *beep*'\r\n"
-                 "'This requires up to 50 platinum.  *beep*'\r\n"
-                 "'This will only work on Godload. *beep*'\r\n"
-                 "'Be careful and type correctly.  No refunds.'\r\n",
+    send_to_char("'Restring Machine v2.1' *beep*'\n"
+                 "'restring <Item> <Description>' *beep*'\n"
+                 "'This requires up to 50 platinum.  *beep*'\n"
+                 "'This will only work on Godload. *beep*'\n"
+                 "'Be careful and type correctly.  No refunds.'\n",
                  ch);
     return ReturnValue::eSUCCESS;
   }
@@ -1852,10 +1852,10 @@ int restring_machine(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   sprintf(zarg, "$B$7%s$R", buf);
   target_obj->short_description = str_hsh(zarg);
 
-  send_to_char("\r\n'Beginning magical transformation process. *beep*'\r\n"
-               "You put your item into the machine and close the lid.\r\n"
-               "Smoke pours out of the machine and sparks fly out blackening the floor.\r\n"
-               "Your item looks new!\r\n\r\n",
+  send_to_char("\n'Beginning magical transformation process. *beep*'\n"
+               "You put your item into the machine and close the lid.\n"
+               "Smoke pours out of the machine and sparks fly out blackening the floor.\n"
+               "Your item looks new!\n\n",
                ch);
 
   ch->save();
@@ -1871,11 +1871,11 @@ int weenie_weedy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   if (number(1, 1000) > 990)
   {
     if (obj->carried_by)
-      send_to_room("Someone's weenie weedy doll says, 'BLARG!'\r\n", obj->carried_by->in_room);
+      send_to_room("Someone's weenie weedy doll says, 'BLARG!'\n", obj->carried_by->in_room);
     else if (obj->in_room != DC::NOWHERE)
-      send_to_room("a weenie weedy doll says, 'BLARG!'\r\n", obj->in_room);
+      send_to_room("a weenie weedy doll says, 'BLARG!'\n", obj->in_room);
     else if (obj->in_obj && obj->in_obj->carried_by)
-      send_to_room("a muffled 'BLARG!' comes from a weenie weedy doll somewhere nearby.\r\n", obj->in_obj->carried_by->in_room);
+      send_to_room("a muffled 'BLARG!' comes from a weenie weedy doll somewhere nearby.\n", obj->in_obj->carried_by->in_room);
   }
 
   return ReturnValue::eSUCCESS;
@@ -1897,9 +1897,9 @@ int stupid_message(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
 
   if (number(1, 10) == 1)
-    send_to_room("The shadows swirl to reveal a face before you.\r\n"
+    send_to_room("The shadows swirl to reveal a face before you.\n"
                  "It speaks suddenly, 'Only with the key can you unlock the masters name' "
-                 "and then fades away.\r\n",
+                 "and then fades away.\n",
                  obj->in_room, true);
 
   return ReturnValue::eSUCCESS;
@@ -1938,8 +1938,8 @@ int pagoda_balance(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
 
   for (int j = 8695; j < 8699; j++)
-    send_to_room("The weight of your body helps shift the balances.\r\n"
-                 "You hear the poping of a magical barrier dissapating.\r\n\r\n",
+    send_to_room("The weight of your body helps shift the balances.\n"
+                 "You hear the poping of a magical barrier dissapating.\n\n",
                  real_room(j));
 
   REMOVE_BIT(DC::getInstance()->world[real_room(8699)].room_flags, IMP_ONLY);
@@ -1955,7 +1955,7 @@ int pagoda_shield_restorer(Character *ch, class Object *obj, cmd_t cmd, const ch
 
   if (!isSet(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY))
   {
-    send_to_room("You hear the 'pop' of a magical barrier springing up.\r\n\r\n", obj->in_room);
+    send_to_room("You hear the 'pop' of a magical barrier springing up.\n\n", obj->in_room);
     SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, IMP_ONLY);
   }
 
@@ -1978,7 +1978,7 @@ int phish_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
 
   if (!(victim = get_char("Pirahna")))
   {
-    ch->sendln("The locator beeps angrily and smoke starts to come out.\r\nPirahna is unlocatable.");
+    ch->sendln("The locator beeps angrily and smoke starts to come out.\nPirahna is unlocatable.");
     return ReturnValue::eSUCCESS;
   }
 
@@ -2002,7 +2002,7 @@ int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *a
   switch (obj_vnum)
   {
   case 26723: // transporter in star-trek
-    send_to_room("You hear a chiming electrical noise as the transporter hums to life.\r\n", obj->in_room);
+    send_to_room("You hear a chiming electrical noise as the transporter hums to life.\n", obj->in_room);
     for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
@@ -2016,7 +2016,7 @@ int generic_push_proc(Character *ch, class Object *obj, cmd_t cmd, const char *a
 
   default:
     ch->sendln("Whatever you pushed doesn't have an entry in the button push table.  Tell a god.");
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\r\n", obj_vnum);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Push' proc on obj %d without entry in proc table. (push_proc)\n", obj_vnum);
     break;
   }
 
@@ -2427,22 +2427,22 @@ int pull_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
     // unlock the gate
     REMOVE_BIT(DC::getInstance()->world[9531].dir_option[1]->exit_info, EX_LOCKED);
     REMOVE_BIT(DC::getInstance()->world[9532].dir_option[3]->exit_info, EX_LOCKED);
-    send_to_room("You hear a large clicking noise.\r\n", 9531, true);
-    send_to_room("You hear a large clicking noise.\r\n", 9532, true);
-    send_to_room("You hear a large clicking noise.\r\n", ch->in_room, true);
+    send_to_room("You hear a large clicking noise.\n", 9531, true);
+    send_to_room("You hear a large clicking noise.\n", 9532, true);
+    send_to_room("You hear a large clicking noise.\n", ch->in_room, true);
     break;
   case 29203:
     if (DC::getInstance()->obj_index[29202].qty > 0)
     {
-      send_to_room("A compartment in the ceiling opens, but is it empty.\r\n", 29258, true);
+      send_to_room("A compartment in the ceiling opens, but is it empty.\n", 29258, true);
       break;
     }
-    send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\r\n", 29258, true);
+    send_to_room("A compartment in the ceiling opens, and a key drops to the ground.\n", 29258, true);
     obj_to_room(clone_object(29202), 29258);
     break;
   default:
     ch->sendln("Whatever you pulled doesn't have an entry in the lever pull table.  Tell a god.");
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\r\n", obj_vnum);
+    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "'Pull' proc on obj %d without entry in proc table. (pull_proc)\n", obj_vnum);
     break;
   }
 
@@ -2460,7 +2460,7 @@ int szrildor_pass(Character *ch, class Object *obj, cmd_t cmd, const char *arg, 
     if (!str_cmp(target, "daypass") || !str_cmp(target, "pass"))
     {
       char buf[2000];
-      sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\r\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
+      sprintf(buf, "There appears to be approximately %d minutes left of time before the pass expires.\n", ((1800 - obj->obj_flags.timer) * 4) / 60);
       ch->send(buf);
       return ReturnValue::eSUCCESS;
     }
@@ -2609,8 +2609,8 @@ int szrildor_pass_checks(Character *ch, class Object *obj, cmd_t cmd, const char
 
     if (!search_char_for_item(i, 30097, false) || (++count) > 4)
     {
-      act("Jeff arrives and frowns.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
-      act("Jeff arrives and frowns at $n.\r\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
+      act("Jeff arrives and frowns.\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_CHAR, 0);
+      act("Jeff arrives and frowns at $n.\n$B$7Jeff says, 'Hey! You don't have a pass. Get the heck outta here!'$R", i, 0, 0, TO_ROOM, 0);
 
       if (i->getLevel() >= IMMORTAL)
       {
@@ -2731,13 +2731,13 @@ int no_magic_while_alive(Character *ch, class Object *obj, cmd_t cmd, const char
   if (vict)
   {
     if (!isSet(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
-      send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\r\n", obj->in_room);
+      send_to_room("With an audible whoosh, the flow of magic is sucked from the room.\n", obj->in_room);
     SET_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
   else
   {
     if (isSet(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC))
-      send_to_room("With a large popping noise, the flow of magic returns to the room.\r\n", obj->in_room);
+      send_to_room("With a large popping noise, the flow of magic returns to the room.\n", obj->in_room);
     REMOVE_BIT(DC::getInstance()->world[obj->in_room].room_flags, NO_MAGIC);
   }
   return ReturnValue::eSUCCESS;
@@ -2819,7 +2819,7 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       if (obj->obj_flags.value[0] == -1) // at beginning
       {
         obj->obj_flags.value[0] = 1;
-        send_to_boat(obj->vnum_, "The ship docks at its destination.\r\n");
+        send_to_boat(obj->vnum_, "The ship docks at its destination.\n");
       }
     }
     else
@@ -2829,14 +2829,14 @@ int boat_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Char
       if (obj->obj_flags.value[0] == boat_list[0]) // at beginning
       {
         obj->obj_flags.value[0] *= -1;
-        send_to_boat(obj->vnum_, "The ship docks at its destination.\r\n");
+        send_to_boat(obj->vnum_, "The ship docks at its destination.\n");
       }
     }
-    send_to_room("The ship sails away.\r\n", obj->in_room, true);
-    send_to_boat(obj->vnum_, "The ship sails onwards.\r\n");
+    send_to_room("The ship sails away.\n", obj->in_room, true);
+    send_to_boat(obj->vnum_, "The ship sails onwards.\n");
     obj_from_room(obj);
     obj_to_room(obj, move_to);
-    send_to_room("A ship sails in.\r\n", obj->in_room, true);
+    send_to_room("A ship sails in.\n", obj->in_room, true);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2942,13 +2942,13 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     switch (obj->obj_flags.value[0])
     {
     case 0:
-      send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\r\n", BONEWRACK_ROOM, true);
+      send_to_room("The shadows in the room begin to shift and slide in tricks of the light.\n", BONEWRACK_ROOM, true);
       break;
     case 1:
-      send_to_zone("A loud roar echos audibly through the entire kingdom.\r\n", DC::getInstance()->world[obj->in_room].zone);
+      send_to_zone("A loud roar echos audibly through the entire kingdom.\n", DC::getInstance()->world[obj->in_room].zone);
       break;
     case 2:
-      send_to_room("The dragon $B$2Bonewrack$R flies in from above!\r\n", BONEWRACK_ROOM, true);
+      send_to_room("The dragon $B$2Bonewrack$R flies in from above!\n", BONEWRACK_ROOM, true);
       move_char(vict, BONEWRACK_ROOM);
       obj->obj_flags.value[0] = 0;
       break;
@@ -2966,13 +2966,13 @@ int mob_summoner(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     switch (obj->obj_flags.value[0])
     {
     case 0:
-      send_to_room("In the distance a winged creature can be seen flying towards you.\r\n", GAIOT_AVATAR, true);
+      send_to_room("In the distance a winged creature can be seen flying towards you.\n", GAIOT_AVATAR, true);
       break;
     case 1:
-      send_to_room("The winged creature flies closer and closer.\r\n", GAIOT_AVATAR, true);
+      send_to_room("The winged creature flies closer and closer.\n", GAIOT_AVATAR, true);
       break;
     case 2:
-      send_to_room("The creature shatters in illusion!\r\n", GAIOT_AVATAR, true);
+      send_to_room("The creature shatters in illusion!\n", GAIOT_AVATAR, true);
       move_char(vict, GAIOT_AVATAR);
       obj->obj_flags.value[0] = 0;
       break;
@@ -3005,7 +3005,7 @@ int globe_of_darkness_proc(Character *ch, class Object *obj, cmd_t cmd, const ch
   {
     // time to kill myself
     DC::getInstance()->world[obj->in_room].light += obj->obj_flags.value[1]; // light back up
-    send_to_room("The globe of darkness fades brightening the room some.\r\n", obj->in_room, true);
+    send_to_room("The globe of darkness fades brightening the room some.\n", obj->in_room, true);
     extract_obj(obj);
   }
   else
@@ -3202,7 +3202,7 @@ int TOHS_locator(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     return ReturnValue::eFAILURE;
 
   act("$n pushes a small button then holds a looking glass to $s face.", ch, 0, 0, TO_ROOM, INVIS_NULL);
-  ch->sendln("You push the small button and then hold the looking glass to your face peering through it.\r\n");
+  ch->sendln("You push the small button and then hold the looking glass to your face peering through it.\n");
 
   // 1406 is the portal 'rock' you enter to get to Tohs
   int searchnum = 1406;
@@ -3289,20 +3289,20 @@ int noremove_eq(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (!obj->obj_flags.value[3])
-      obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\r\n").arg(obj->short_description));
+      obj->equipped_by->send(QStringLiteral("The %1 loses it's grip on your body.\n").arg(obj->short_description));
     return ReturnValue::eSUCCESS;
   }
   if (cmd == cmd_t::UNDEFINED && obj->obj_flags.value[3] <= 0)
   {
     if (number(0, 4))
       return ReturnValue::eSUCCESS;
-    csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\r\n", qPrintable(obj->short_description));
+    csendf(obj->equipped_by, "The %s clamps down onto your body locking your equipment in place!\n", qPrintable(obj->short_description));
     obj->obj_flags.value[3] = 5;
     return ReturnValue::eSUCCESS;
   }
   if (obj->obj_flags.value[3] > 0)
   {
-    obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\r\n").arg(obj->short_description));
+    obj->equipped_by->send(QStringLiteral("The %1 refuses to let you remove anything!\n").arg(obj->short_description));
     return ReturnValue::eSUCCESS;
   }
   return ReturnValue::eFAILURE;
@@ -3563,7 +3563,7 @@ int eternitystaff(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     if (dam > 0)
     {
       GET_MANA(obj->equipped_by) -= dam;
-      obj->equipped_by->send(QStringLiteral("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\r\n").arg(dam));
+      obj->equipped_by->send(QStringLiteral("Your body hemorrhages %1 mana as you struggle to control The Eternity Staff.\n").arg(dam));
 
       act("$n is wracked by magical energies!", obj->equipped_by, 0, 0, TO_ROOM, 0);
     }
@@ -3586,13 +3586,13 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       if (isSet(obj->obj_flags.more_flags, ITEM_TOGGLE))
       {
         REMOVE_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
-        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\r\n");
+        strcat(buf2, "And I'm back! Couldn\'t live without me eh?'$R\n");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       else
       {
         SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
-        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\r\n");
+        strcat(buf2, "Fine, I will keep quiet for a while, but you will miss me!'$R\n");
         send_to_room(buf2, obj->equipped_by->in_room, true);
       }
       return ReturnValue::eSUCCESS;
@@ -3749,7 +3749,7 @@ int talkingsword(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       int rnd = number((quint64)0, (quint64)tmp.size() - 1);
       char buf2[MAX_STRING_LENGTH] = "$B$7Ghaerad, Sword of Legends says, '";
       strcat(buf2, tmp[rnd].c_str());
-      strcat(buf2, "'$R\r\n");
+      strcat(buf2, "'$R\n");
       send_to_room(buf2, vict->in_room, true);
 
       if (rnd == unequip)
@@ -3899,7 +3899,7 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
   {
     obj->obj_flags.value[3]--;
     if (obj->obj_flags.value[3] % 3 == 0)
-      send_to_room("You smell a delicious baked potato and hear a faint *beep*.\r\n", vict->in_room, true);
+      send_to_room("You smell a delicious baked potato and hear a faint *beep*.\n", vict->in_room, true);
   }
   else
   {
@@ -3914,15 +3914,15 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
         if (i->character && i->character->in_room != vict->in_room && !i->connected)
           i->character->sendln("You hear a large BOOM from somewhere in the distance.");
 
-    act("The hot potato $n is carrying beeps one final time.\r\n"
-        "\r\n$B"
-        "BBBB     OOO     OOO    M   M   !!   !!\r\n"
-        "B   B   O   O   O   O   MM MM   !!   !!\r\n"
-        "BBBB    O   O   O   O   M M M   !!   !!\r\n"
-        "B   B   O   O   O   O   M   M \r\n"
-        "BBBB     OOO     OOO    M   M   !!   !!\r\n"
-        "\r\n$R"
-        "Small pieces of $n and mashed potato splatter everywhere!!!\r\n"
+    act("The hot potato $n is carrying beeps one final time.\n"
+        "\n$B"
+        "BBBB     OOO     OOO    M   M   !!   !!\n"
+        "B   B   O   O   O   O   MM MM   !!   !!\n"
+        "BBBB    O   O   O   O   M M M   !!   !!\n"
+        "B   B   O   O   O   O   M   M \n"
+        "BBBB     OOO     OOO    M   M   !!   !!\n"
+        "\n$R"
+        "Small pieces of $n and mashed potato splatter everywhere!!!\n"
         "$n has been KILLED!!",
         vict, 0, 0, TO_ROOM, 0);
 
@@ -3937,15 +3937,15 @@ int hot_potato(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     vict->setHP(-1);
     update_pos(vict);
     send_to_char("$B"
-                 "BBBB     OOO     OOO    M   M !!   !!\r\n"
-                 "B   B   O   O   O   O   MM MM !!   !!\r\n"
-                 "BBBB    O   O   O   O   M M M !!   !!\r\n"
-                 "B   B   O   O   O   O   M   M \r\n"
-                 "BBBB     OOO     OOO    M   M !!   !!\r\n\r\n"
+                 "BBBB     OOO     OOO    M   M !!   !!\n"
+                 "B   B   O   O   O   O   MM MM !!   !!\n"
+                 "BBBB    O   O   O   O   M M M !!   !!\n"
+                 "B   B   O   O   O   O   M   M \n"
+                 "BBBB     OOO     OOO    M   M !!   !!\n\n"
                  "$R",
                  vict);
-    send_to_char("The baked potato you are carrying EXPLODES!!!\r\n"
-                 "You have been KILLED!\r\n",
+    send_to_char("The baked potato you are carrying EXPLODES!!!\n"
+                 "You have been KILLED!\n",
                  vict);
     extract_obj(obj);
     if (!vict->room().isArena())
@@ -3981,11 +3981,11 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
     return ReturnValue::eFAILURE;
   }
 
-  send_to_room("The mortar shell explodes ripping the area to shreds!\r\n", obj->in_room);
+  send_to_room("The mortar shell explodes ripping the area to shreds!\n", obj->in_room);
 
   for (int i = 0; i < 6; i++)
     if (DC::getInstance()->world[obj->in_room].dir_option[i] && DC::getInstance()->world[obj->in_room].dir_option[i]->to_room)
-      send_to_room("You hear a loud boom.\r\n", DC::getInstance()->world[obj->in_room].dir_option[i]->to_room);
+      send_to_room("You hear a loud boom.\n", DC::getInstance()->world[obj->in_room].dir_option[i]->to_room);
 
   for (victim = DC::getInstance()->world[obj->in_room].people; victim; victim = next_v)
   {
@@ -3995,7 +3995,7 @@ int exploding_mortar_shells(Character *ch, class Object *obj, cmd_t cmd, const c
 
     dam = dice(obj->obj_flags.value[1], obj->obj_flags.value[2]);
     victim->removeHP(dam);
-    sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\r\n", dam);
+    sprintf(buf, "Pieces of shrapnel rip through your skin inflicting %d damage!\n", dam);
     victim->send(buf);
     if (victim->getHP() < 1)
     {
@@ -4479,18 +4479,18 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     if (!str_cmp(target, "sun"))
     {
-      send_to_room("The sun glows brightly as it releases the energy inside the glyph.\r\n", ch->in_room);
+      send_to_room("The sun glows brightly as it releases the energy inside the glyph.\n", ch->in_room);
       obj_from_char(sunglyph);
       SET_BIT(ch->spellcraftglyph, 1);
     }
     else if (!str_cmp(target, "book"))
     {
-      send_to_room("The sun glows a bright red and shatters the glyphs!\r\n", ch->in_room);
+      send_to_room("The sun glows a bright red and shatters the glyphs!\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "heart"))
     {
-      send_to_room("The sun glows a bright red and shatters the glyphs!\r\n", ch->in_room);
+      send_to_room("The sun glows a bright red and shatters the glyphs!\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else
@@ -4513,18 +4513,18 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     if (!str_cmp(target, "sun"))
     {
-      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\r\n", ch->in_room);
+      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "book"))
     {
-      send_to_room("The book closes over the glyph, becoming slightly warm.\r\n", ch->in_room);
+      send_to_room("The book closes over the glyph, becoming slightly warm.\n", ch->in_room);
       obj_from_char(bookglyph);
       SET_BIT(ch->spellcraftglyph, 2);
     }
     else if (!str_cmp(target, "heart"))
     {
-      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\r\n", ch->in_room);
+      send_to_room("The book slams shut creating a sonic wave that shatters the glyphs!\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else
@@ -4548,17 +4548,17 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
     }
     if (!str_cmp(target, "sun"))
     {
-      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\r\n", ch->in_room);
+      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "book"))
     {
-      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\r\n", ch->in_room);
+      send_to_room("The heart beats seemingly uncontrollibly and shatters the glyphs!\n", ch->in_room);
       destroy_spellcraft_glyphs(ch);
     }
     else if (!str_cmp(target, "heart"))
     {
-      send_to_room("You place the glyph next to the heart, and it slowly begins to pulse.\r\n", ch->in_room);
+      send_to_room("You place the glyph next to the heart, and it slowly begins to pulse.\n", ch->in_room);
       obj_from_char(heartglyph);
       SET_BIT(ch->spellcraftglyph, 4);
     }
@@ -4575,8 +4575,8 @@ int spellcraft_glyphs(Character *ch, class Object *obj, cmd_t cmd, const char *a
   {
     if (GET_CLASS(ch) == CLASS_MAGIC_USER && ch->getLevel() >= 50 && !ch->has_skill(SKILL_SPELLCRAFT))
     {
-      send_to_room("The glyph receptacles glow an eerie pale white.\r\nThe book shoots out a beams of light from the pages.\r\n", ch->in_room);
-      ch->sendln("A beam of light hits you in the head!\r\nYou have learned spellcraft!");
+      send_to_room("The glyph receptacles glow an eerie pale white.\nThe book shoots out a beams of light from the pages.\n", ch->in_room);
+      ch->sendln("A beam of light hits you in the head!\nYou have learned spellcraft!");
       ch->learn_skill(SKILL_SPELLCRAFT, 1, 1);
     }
   }
@@ -4701,7 +4701,7 @@ int godload_jaelgreth(Character *ch, class Object *obj, cmd_t cmd, const char *a
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
     if (victim->isPlayer())
-      victim->sendln("You have been KILLED!!\r\n");
+      victim->sendln("You have been KILLED!!\n");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }
@@ -4754,7 +4754,7 @@ int godload_foecrusher(Character *ch, class Object *obj, cmd_t cmd, const char *
     act("$n is DEAD!!", victim, 0, 0, TO_ROOM, INVIS_NULL);
     group_gain(ch, victim);
     if (victim->isPlayer())
-      victim->sendln("You have been KILLED!!\r\n");
+      victim->sendln("You have been KILLED!!\n");
     fight_kill(ch, victim, TYPE_CHOOSE, 0);
     return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
   }

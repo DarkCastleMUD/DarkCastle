@@ -53,7 +53,7 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
   if (!*buf)
     victim = ch;
   else if (!generic_find(argument, FIND_CHAR_ROOM | FIND_CHAR_WORLD, ch, &victim, &dummy, true))
-    ch->send(QStringLiteral("Couldn't find '%1' anywhere.\r\n").arg(argument));
+    ch->send(QStringLiteral("Couldn't find '%1' anywhere.\n").arg(argument));
   if (victim)
   {
     for (af = victim->affected; af; af = afpk)
@@ -63,7 +63,7 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
       QString aff_name = get_skill_name(af->type);
       if (!aff_name.isEmpty())
       {
-        ch->send(QStringLiteral("Removing %1 affect.\r\n").arg(aff_name));
+        ch->send(QStringLiteral("Removing %1 affect.\n").arg(aff_name));
       }
       else
       {
@@ -169,7 +169,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  csendf(ch, "Player: %s\r\n", victim->getNameC());
+  csendf(ch, "Player: %s\n", victim->getNameC());
 
   if (isSet(victim->combat, COMBAT_SHOCKED))
     ch->sendln("COMBAT_SHOCKED");
@@ -246,7 +246,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
   if (isSet(victim->combat, COMBAT_ATTACKER))
     ch->sendln("COMBAT_ATTACKER");
 
-  ch->sendln("--------------------\r\n");
+  ch->sendln("--------------------\n");
 
   return ReturnValue::eSUCCESS;
 }
@@ -264,7 +264,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
     {
       for (const auto &pt : PerfTimers)
       {
-        csendf(ch, "%s\r\n", pt.first.c_str());
+        csendf(ch, "%s\n", pt.first.c_str());
       }
     }
     else if (arg2 == "show")
@@ -280,7 +280,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
                      "cur:%llus %lluμs"
                      "\tmin:%llus %lluμs"
                      "\tmax:%llus %lluμs"
-                     "\tavg:%llus %lluμs\r\n",
+                     "\tavg:%llus %lluμs\n",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
@@ -299,7 +299,7 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
                      "cur:%llus %lluμs"
                      "\tmin:%llus %lluμs"
                      "\tmax:%llus %lluμs"
-                     "\tavg:%llus %lluμs\r\n",
+                     "\tavg:%llus %lluμs\n",
                  key.c_str(),
                  t.getDiff().tv_sec, t.getDiff().tv_usec,
                  t.getDiffMin().tv_sec, t.getDiffMin().tv_usec,
@@ -553,8 +553,8 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   //   argument = one_argument(argument, skill+strlen(skill));
   /*  if (!argument || !*argument)
     {
-       send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\r\n"
-                    "$3Syntax:$R sqedit message/new/delete <skillname>\r\n",ch);
+       send_to_char("$3Syntax:$R sqedit <level/class> <skill> <value> OR\n"
+                    "$3Syntax:$R sqedit message/new/delete <skillname>\n",ch);
        ch->sendln("$3Syntax:$R sqedit list.");
        return ReturnValue::eFAILURE;
     }*/
@@ -569,8 +569,8 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
   if (!str_cmp((char *)fields[i], "\n"))
   {
 
-    send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\r\n"
-                 "$3Syntax:$R sqedit <show/new/delete> <skillname> OR\r\n",
+    send_to_char("$3Syntax:$R sqedit <message/level/class> <skill> <value> OR\n"
+                 "$3Syntax:$R sqedit <show/new/delete> <skillname> OR\n",
                  ch);
     ch->sendln("$3Syntax:$R sqedit list <class>.");
     ch->sendln("$3Syntax:$R sqedit save.");
@@ -700,7 +700,7 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Class modified.");
     break;
   case 5: // show
-    ch->sendln(u"$3Skill$R: %1\r\n$3Message$R: %2\r\n$3Class$R: %3\r\n$3Level$R: %4"_s
+    ch->sendln(u"$3Skill$R: %1\n$3Message$R: %2\n$3Class$R: %3\n$3Level$R: %4"_s
                    .arg(get_skill_name(skill->num))
                    .arg(skill->message)
                    .arg(print_classes(skill->clas))
@@ -719,12 +719,12 @@ int do_sqedit(Character *ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     ch->sendln("These are the current sqs:");
-    csendf(ch, "$3%s skillquests.$R\r\n", pc_clss_types2[l]);
+    csendf(ch, "$3%s skillquests.$R\n", pc_clss_types2[l]);
     for (curren = skill_list; curren; curren = curren->next)
     {
       if (!isSet(curren->clas, 1 << (l - 1)))
         continue;
-      csendf(ch, "$3%d$R. %s\r\n", curren->num, get_skill_name(curren->num).toStdString().c_str());
+      csendf(ch, "$3%d$R. %s\n", curren->num, get_skill_name(curren->num).toStdString().c_str());
       done = true;
     }
     if (!done)
@@ -869,19 +869,19 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
     if (last_vnum[a][0] != -1)
       tot += last_max[a];
     if (last_vnum[a][i] == -1)
-      sprintf(buf1, "%s Nothing\r\n", buf1);
+      sprintf(buf1, "%s Nothing\n", buf1);
     else
       for (a = 0; a < 5; a++)
       {
         if (last_vnum[a][i] == -1)
           continue;
         sprintf(buf1, "%s %s(%llu)   ", buf1, qPrintable(DC::getInstance()->obj_index[last_vnum[a][i]].item->short_description), last_vnum[a][i]);
-        //    else sprintf(buf1,"%s%d. %d\r\n",buf1,i,last_vnum[i]);
+        //    else sprintf(buf1,"%s%d. %d\n",buf1,i,last_vnum[i]);
       }
     sprintf(buf1, "%s\n", buf1);
     send_to_char(buf1, ch);
   }
-  sprintf(buf1, "Total %s: %d\r\n", arg, tot);
+  sprintf(buf1, "Total %s: %d\n", arg, tot);
   send_to_char(buf1, ch);
   return ReturnValue::eSUCCESS;
 }

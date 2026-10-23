@@ -146,7 +146,7 @@ public:
   std::string buf = {};        /* buffer for raw input	*/
   std::string last_input = {}; /* the last input	*/
   QByteArray output = {};      /* output buffer for writing to connection	*/
-  std::string inbuf = {};
+  QByteArray inbuf = {};
   std::queue<QByteArray> input = {}; /* queue of unprocessed input	*/
   Character *character = {};         /* linked to char		*/
   Character *original = {};          /* for switch / return		*/

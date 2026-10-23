@@ -686,7 +686,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
   if (!(*argument))
   {
     if (ch->master)
-      csendf(ch, "You are currently stalking %s.\r\n", GET_SHORT(ch->master));
+      csendf(ch, "You are currently stalking %s.\n", GET_SHORT(ch->master));
     else
       ch->sendln("Pick a name, any name.");
     return ReturnValue::eFAILURE;
@@ -849,7 +849,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
+    ch->sendln("Got it!\nYou receive 30000000000 experience.");
     return ReturnValue::eFAILURE;
   }
 
@@ -979,7 +979,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           if (_exp)
           {
             GET_EXP(ch) += _exp; /* exp for stealing :) */
-            sprintf(buf, "You receive %d experience.\r\n", _exp);
+            sprintf(buf, "You receive %d experience.\n", _exp);
             ch->send(buf);
           }
 
@@ -1034,7 +1034,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
           if (isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
               (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
           {
-            ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\r\n").arg(obj->short_description));
+            ch->send(QStringLiteral("Whoa!  The %1 poofed into thin air!\n").arg(obj->short_description));
             extract_obj(obj);
           }
           // check for no_trade inside containers
@@ -1048,7 +1048,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
               if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                   (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
               {
-                csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\r\n", qPrintable(loop_obj->short_description), qPrintable(obj->short_description));
+                csendf(ch, "Whoa!  The %s inside the %s poofed into thin air!\n", qPrintable(loop_obj->short_description), qPrintable(obj->short_description));
                 extract_obj(loop_obj);
               }
             }
@@ -1183,7 +1183,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
         if (GET_POS(victim) <= position_t::SLEEPING)
           _exp = 1;
         GET_EXP(ch) += _exp; /* exp for stealing :) */
-        sprintf(buf, "You receive %d exps.\r\n", _exp);
+        sprintf(buf, "You receive %d exps.\n", _exp);
         ch->send(buf);
         sprintf(buf, "%s stole %s from %s while victim was asleep",
                 GET_NAME(ch), qPrintable(obj->short_description), victim->getNameC());
@@ -1241,7 +1241,7 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
             if (isSet(loop_obj->obj_flags.more_flags, ITEM_NO_TRADE) ||
                 (isSet(obj->obj_flags.more_flags, ITEM_UNIQUE) && has_item))
             {
-              csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\r\n", qPrintable(loop_obj->short_description), qPrintable(obj->short_description));
+              csendf(ch, "Whoa! The %s inside the %s poofed into thin air!\n", qPrintable(loop_obj->short_description), qPrintable(obj->short_description));
               extract_obj(loop_obj);
             }
           }
@@ -1298,7 +1298,7 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   }
   else if (victim == ch)
   {
-    ch->sendln("Got it!\r\nYou receive 30000000000 experience.");
+    ch->sendln("Got it!\nYou receive 30000000000 experience.");
     return ReturnValue::eFAILURE;
   }
 
@@ -1405,12 +1405,12 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
       if (GET_POS(victim) <= position_t::SLEEPING || IS_AFFECTED(victim, AFF_PARALYSIS))
         _exp = 0;
 
-      sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\r\n", gold);
+      sprintf(buf, "Nice work! You pilfered %d $B$5gold$R coins.\n", gold);
       ch->send(buf);
       if (_exp && _exp > 1)
       {
         GET_EXP(ch) += _exp; /* exp for stealing :) */
-        sprintf(buf, "You receive %d experience.\r\n", _exp);
+        sprintf(buf, "You receive %d experience.\n", _exp);
         ch->send(buf);
       }
 
@@ -1689,10 +1689,10 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
       }
 
       act("$n tries to slip you some coins, but $e accidentally drops "
-          "them.\r\n",
+          "them.\n",
           ch, 0, vict, TO_VICT, 0);
       act("$n tries to slip $N some coins, but $e accidentally drops "
-          "them.\r\n",
+          "them.\n",
           ch, 0, vict, TO_ROOM, NOTVICT);
 
       if (ch->isNonPlayer() || (ch->getLevel() < DEITY))
@@ -1706,14 +1706,14 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     // Success
     else
     {
-      csendf(ch, "You slip %d coins to %s.\r\n", amount, GET_NAME(vict));
+      csendf(ch, "You slip %d coins to %s.\n", amount, GET_NAME(vict));
 
       if (ch->isImmortalPlayer())
       {
         special_log(QString(QStringLiteral("%1 slips %2 coins to %3 in room %4!")).arg(ch->getName()).arg(amount).arg(vict->getName()).arg(ch->in_room));
       }
 
-      sprintf(buf, "%s slips you %d $B$5gold$R coins.\r\n", PERS(ch, vict),
+      sprintf(buf, "%s slips you %d $B$5gold$R coins.\n", PERS(ch, vict),
               amount);
       act(buf, ch, 0, vict, TO_VICT, GODS);
       act("$n slips some $B$5gold$R to $N.", ch, 0, vict, TO_ROOM, GODS | NOTVICT);
@@ -1843,7 +1843,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   if (ch->isPlayerObjectThief() && !vict->desc)
   {
     send_to_char("Now WHY would a thief slip something to a "
-                 "linkdead character?\r\n",
+                 "linkdead character?\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -1887,10 +1887,10 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
     move_obj(obj, ch->in_room);
 
     act("$n tries to slip you something, but $e accidentally drops "
-        "it.\r\n",
+        "it.\n",
         ch, 0, vict, TO_VICT, 0);
     act("$n tries to slip $N something, but $e accidentally drops "
-        "it.\r\n",
+        "it.\n",
         ch, 0, vict, TO_ROOM, NOTVICT);
     ch->sendln("Whoops!  You dropped it.");
     ch->save();
@@ -1950,8 +1950,8 @@ int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
   else
   {
     act("$n begins jabbing $s weapons with lethal accuracy and strength.", ch, 0, 0, TO_ROOM, NOTVICT);
-    send_to_char("Your body begins to coil, the strength building inside of you, your mind\r\n"
-                 "pinpointing vital and vulnerable areas....\r\n",
+    send_to_char("Your body begins to coil, the strength building inside of you, your mind\n"
+                 "pinpointing vital and vulnerable areas....\n",
                  ch);
     SET_BIT(ch->combat, COMBAT_VITAL_STRIKE);
   }

@@ -446,18 +446,18 @@ const set_data set_list[] = {
     {"Ascetic's Focus",
      19,
      {2700, 6904, 8301, 8301, 9567, 9567, 12108, 14805, 15621, 21718, 22302, 22314, 22600, 22601, 22602, 24815, 24815, 24816, 26237},
-     "You attach your penis mightier.\r\n",
-     "You remove your penis mightier.\r\n"},
+     "You attach your penis mightier.\n",
+     "You remove your penis mightier.\n"},
     {"Warlock's Vestments",
      7,
      {17334, 17335, 17336, 17337, 17338, 17339, 17340, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "You feel an increase in energy coursing through your body.\r\n",
-     "Your magical energy returns to its normal state.\r\n"},
+     "You feel an increase in energy coursing through your body.\n",
+     "Your magical energy returns to its normal state.\n"},
     {"Hunter's Arsenal",
      7,
      {17327, 17328, 17329, 17330, 17331, 17332, 17333, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "You sense your accuracy and endurance have undergone a magical improvement.\r\n",
-     "Your accuracy and endurance return to their normal levels.\r\n"},
+     "You sense your accuracy and endurance have undergone a magical improvement.\n",
+     "Your accuracy and endurance return to their normal levels.\n"},
     {"Captain's Regalia",
      7,
      {17341, 17342, 17343, 17344, 17345, 17346, 17347, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -466,68 +466,68 @@ const set_data set_list[] = {
     {"Celebrant's Defenses",
      7,
      {17319, 17320, 17321, 17322, 17323, 17324, 17325, 17326, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "Your inner focus feels as though it is more powerful.\r\n",
-     "Your inner focus has reverted to its original form.\r\n"},
+     "Your inner focus feels as though it is more powerful.\n",
+     "Your inner focus has reverted to its original form.\n"},
     {"Battlerager's Fury",
      18,
      {352, 353, 354, 355, 356, 357, 358, 359, 359, 360, 361, 362, 362, 9702, 9808, 9808, 27114, 27114, -1},
-     "You feel your stance harden and blood boil as you strap on your battlerager's gear.\r\n",
-     "Your blood returns to its normal temperature as you remove your battlerager's gear.\r\n"},
+     "You feel your stance harden and blood boil as you strap on your battlerager's gear.\n",
+     "Your blood returns to its normal temperature as you remove your battlerager's gear.\n"},
     {"Veteran's Field Plate Set",
      9,
      {21719, 21720, 21721, 21722, 21723, 21724, 21725, 21726, 21727, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "There is an audible *click* as the field plate locks into its optimal assembly.\r\n",
-     "There is a soft *click* as you remove the field plate from its optimal positioning.\r\n"},
+     "There is an audible *click* as the field plate locks into its optimal assembly.\n",
+     "There is a soft *click* as you remove the field plate from its optimal positioning.\n"},
     {"Mother of All Dragons",
      7,
      {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "You feel the might of the ancient dragonkind surge through your body.\r\n",
-     "The might of the ancient dragonkind has left you.\r\n"},
+     "You feel the might of the ancient dragonkind surge through your body.\n",
+     "The might of the ancient dragonkind has left you.\n"},
     {"Feral Fangs",
      2,
      {4818, 4819, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "As the fangs' cries harmonize they unleash something feral inside you.\r\n",
-     "As you remove the fangs your muscles relax and focus is restored.\r\n"},
+     "As the fangs' cries harmonize they unleash something feral inside you.\n",
+     "As you remove the fangs your muscles relax and focus is restored.\n"},
     {"White Crystal Armours",
      10,
      {22003, 22006, 22010, 22014, 22015, 22020, 22021, 22022, 22023, 22024, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "Your crystal armours begin to $B$7glow$R with an ethereal light.\r\n",
-     "The $B$7glow$R fades from your crystal armours.\r\n"},
+     "Your crystal armours begin to $B$7glow$R with an ethereal light.\n",
+     "The $B$7glow$R fades from your crystal armours.\n"},
     {"Black Crystal Armours",
      7,
      {22011, 22017, 22025, 22026, 22027, 22028, 22029, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "Your crystal armours $B$0darken$R and begin to hum with magic.\r\n",
-     "The $B$0darkness$R disperses as the crystal armours are removed.\r\n"},
+     "Your crystal armours $B$0darken$R and begin to hum with magic.\n",
+     "The $B$0darkness$R disperses as the crystal armours are removed.\n"},
     {"Aqua Pendants",
      2,
      {5611, 5643, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "The pendants click softly and you feel a surge of energy as gills spring from your neck!\r\n",
-     "Your gills retract and fade as the two pendants separate quietly.\r\n"},
+     "The pendants click softly and you feel a surge of energy as gills spring from your neck!\n",
+     "Your gills retract and fade as the two pendants separate quietly.\n"},
     {"Arcane Apparatus",
      19,
      {367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 379, 380, 381, 382, 383, 383},
-     "The power of ancient magicks surges through your body as you slowly fade out of existence.\r\n",
-     "You feel a slight tingle of fading magicks as you shimmer into existence.\r\n"},
+     "The power of ancient magicks surges through your body as you slowly fade out of existence.\n",
+     "You feel a slight tingle of fading magicks as you shimmer into existence.\n"},
     {"Titanic Gear",
      11,
      {19402, 19404, 19406, 19407, 19408, 19409, 19410, 19411, 19413, 19417, 19419, -1, -1, -1, -1, -1, -1, -1, -1},
-     "You feel a mighty surge as your body rapidly expands.\r\n",
-     "You feel your size reduce to normal proportions.\r\n"},
+     "You feel a mighty surge as your body rapidly expands.\n",
+     "You feel your size reduce to normal proportions.\n"},
     {"Moss Equipment",
      11,
      {18001, 18002, 18003, 18004, 18006, 18008, 18009, 18010, 18011, 18016, 18017, -1, -1, -1, -1, -1, -1, -1, -1},
-     "A strange energy surges through you and you feel your senses sharpen.\r\n",
-     "Your senses return to normal as you remove your mossy garb.\r\n"},
+     "A strange energy surges through you and you feel your senses sharpen.\n",
+     "Your senses return to normal as you remove your mossy garb.\n"},
     {"Blacksteel Battlegear",
      19,
      {283, 283, 284, 284, 285, 286, 287, 288, 289, 290, 292, 293, 294, 294, 295, 296, 296, 297, 291},
-     "The might of the warrior's spirit, past, present, and future, hums through your body.\r\n",
-     "The harmony of the warrior's spirit has left you.\r\n"},
+     "The might of the warrior's spirit, past, present, and future, hums through your body.\n",
+     "The harmony of the warrior's spirit has left you.\n"},
     {"Mother of All Dragons",
      7,
      {22323, 22330, 22331, 22332, 22334, 22335, 22336, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-     "You feel the might of the ancient dragonkind surge through your body.\r\n",
-     "The might of the ancient dragonkind has left you.\r\n"},
+     "You feel the might of the ancient dragonkind surge through your body.\n",
+     "The might of the ancient dragonkind has left you.\n"},
     {"Berkthgar's Rage",
      1,
      {27977, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -536,13 +536,13 @@ const set_data set_list[] = {
     {"The Naturalists Trappings",
      17,
      {331, 332, 333, 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 343, 344, 345, 346, 347, 347},
-     "You feel the spirit of the wolf upon you.\r\n",
-     "The spirit of the wolf leaves you.\r\n"},
+     "You feel the spirit of the wolf upon you.\n",
+     "The spirit of the wolf leaves you.\n"},
     {"Troubadour's Finery",
      16,
      {314, 314, 316, 317, 318, 319, 320, 321, 322, 328, 328, 324, 325, 325, 326, 327, -1, -1, -1},
-     "You feel the need to sing, you are a STAR!\r\n",
-     "Your desire to sing like a star has faded.\r\n"},
+     "You feel the need to sing, you are a STAR!\n",
+     "Your desire to sing like a star has faded.\n"},
     {"\n",
      0,
      {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -927,7 +927,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
         if (!flag)
         {
           send_to_char("The magic of this item clashes with your fire "
-                       "shield.\r\n",
+                       "shield.\n",
                        ch);
           act("Your $B$4flames$R have been extinguished!", ch, 0, ch, TO_VICT, 0);
           act("The $B$4flames$R encompassing $n's body are extinguished!", ch, 0, 0, TO_ROOM, 0);
@@ -941,7 +941,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
         if (!flag)
         {
           send_to_char("The magic of this item clashes with your acid "
-                       "shield.\r\n",
+                       "shield.\n",
                        ch);
           act("Your shield of $B$2acid$R dissolves to nothing!", ch, 0, ch, TO_VICT, 0);
           act("The $B$2acid$R swirling about $n's body dissolves to nothing!", ch, 0, 0, TO_ROOM, 0);
@@ -1944,7 +1944,7 @@ void affect_remove(Character *ch, affected_type *af, int flags)
       ch->sendln("Your musical ability to breathe water ends.");
       if (DC::getInstance()->world[ch->in_room].sector_type == SECT_UNDERWATER) // uh oh
       {
-        act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
+        act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n", ch, 0, 0, TO_ROOM, 0);
         ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
       }
     }
@@ -1954,14 +1954,14 @@ void affect_remove(Character *ch, affected_type *af, int flags)
     {
 #if 0
 			// you just drowned!
-			act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\r\n"
+			act("$n begins to choke on the water, a look of panic filling $s eyes as it fill $s lungs.\n"
 					"$n is DEAD!!", ch, 0, 0, TO_ROOM, 0);
-			send_to_char("The water rushes into your lungs and the light fades with your oxygen.\r\n"
-					"You have been KILLED!!!\r\n", ch);
+			send_to_char("The water rushes into your lungs and the light fades with your oxygen.\n"
+					"You have been KILLED!!!\n", ch);
 			fight_kill(nullptr, ch, TYPE_RAW_KILL, 0);
 			char_died = true;
 #else
-      act("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\r\n", ch, 0, 0, TO_ROOM, 0);
+      act("$n begins to choke on the water, a look of panic filling $s eyes as it fills $s lungs.\n", ch, 0, 0, TO_ROOM, 0);
       ch->sendln("The water rushes into your lungs and the light fades with your oxygen.");
 #endif
     }
@@ -3246,7 +3246,7 @@ int move_obj(Object *obj, Character *ch)
    // This should make sure we don't have any money items on players
    if(obj->obj_flags.type_flag == ITEM_MONEY &&
    obj->obj_flags.value[0] >= 1 ) {
-   sprintf(buffer,"There was %d coins.\r\n", obj->obj_flags.value[0]);
+   sprintf(buffer,"There was %d coins.\n", obj->obj_flags.value[0]);
    send(buffer);
    GET_GOLD(ch) += obj->obj_flags.value[0];
    extract_obj(obj);
@@ -3726,7 +3726,7 @@ void update_char_objects(Character *ch)
 
         if (ch->equipment[i]->obj_flags.timer < 1)
         {
-          send_to_room("The spirit shield shimmers brightly and then fades away.\r\n", ch->in_room);
+          send_to_room("The spirit shield shimmers brightly and then fades away.\n", ch->in_room);
           extract_obj(ch->equipment[i]);
         }
       }
@@ -4809,7 +4809,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
       {
         if (!(*tar_ch)->short_desc.isEmpty())
         {
-          csendf(ch, "You find %s in this room.\r\n", qPrintable((*tar_ch)->short_desc));
+          csendf(ch, "You find %s in this room.\n", qPrintable((*tar_ch)->short_desc));
         }
         else if (!(*tar_ch)->getName().isEmpty())
         {
@@ -4833,7 +4833,7 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
       {
         if (!(*tar_ch)->short_desc.isEmpty())
         {
-          csendf(ch, "You find %s somewhere in the world.\r\n", qPrintable((*tar_ch)->short_desc));
+          csendf(ch, "You find %s somewhere in the world.\n", qPrintable((*tar_ch)->short_desc));
         }
         else if (!(*tar_ch)->getName().isEmpty())
         {
@@ -4888,11 +4888,11 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
       {
         if (!(*tar_obj)->short_description.isEmpty())
         {
-          csendf(ch, "You find %s among your equipment.\r\n", qPrintable((*tar_obj)->short_description));
+          csendf(ch, "You find %s among your equipment.\n", qPrintable((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
-          csendf(ch, "You find %s among your equipment.\r\n", qPrintable((*tar_obj)->Name()));
+          csendf(ch, "You find %s among your equipment.\n", qPrintable((*tar_obj)->Name()));
         }
         else
         {
@@ -4912,11 +4912,11 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
       {
         if (!(*tar_obj)->short_description.isEmpty())
         {
-          csendf(ch, "You find %s in this room.\r\n", qPrintable((*tar_obj)->short_description));
+          csendf(ch, "You find %s in this room.\n", qPrintable((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
-          csendf(ch, "You find %s in this room.\r\n", qPrintable((*tar_obj)->Name()));
+          csendf(ch, "You find %s in this room.\n", qPrintable((*tar_obj)->Name()));
         }
         else
         {
@@ -4936,11 +4936,11 @@ int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_
       {
         if (!(*tar_obj)->short_description.isEmpty())
         {
-          csendf(ch, "You find %s somewhere in the world.\r\n", qPrintable((*tar_obj)->short_description));
+          csendf(ch, "You find %s somewhere in the world.\n", qPrintable((*tar_obj)->short_description));
         }
         else if (!(*tar_obj)->Name().isEmpty())
         {
-          csendf(ch, "You find %s somewhere in the world\r\n", qPrintable((*tar_obj)->Name()));
+          csendf(ch, "You find %s somewhere in the world\n", qPrintable((*tar_obj)->Name()));
         }
         else
         {

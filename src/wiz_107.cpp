@@ -46,9 +46,9 @@ int do_archive(Character *ch, char *argument, cmd_t cmd)
   }
 
   send_to_char("Suddenly someone reaches down and packs you into a "
-               "little ball.\r\n",
+               "little ball.\n",
                victim);
-  csendf(victim, "You have been archived by %s.  Goodbye.\r\n", GET_NAME(ch));
+  csendf(victim, "You have been archived by %s.  Goodbye.\n", GET_NAME(ch));
   act("$N is grabbed up and packed into a small ball by $n.", ch, 0,
       victim, TO_ROOM, 0);
   do_quit(victim, "", cmd_t::SAVE_SILENTLY);
@@ -117,7 +117,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   if (!(victim = get_active_pc_vis(arg1)))
   {
     send_to_char("Your victim is either not available or "
-                 "linkdead.\r\n",
+                 "linkdead.\n",
                  this);
     this->sendln("(You can only snoop a link-active pc.)");
     return ReturnValue::eFAILURE;
@@ -125,7 +125,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   if ((victim->getLevel() > this->getLevel()) && (GET_NAME(this) != victim->getNameC()))
   {
     this->sendln("Can't do that. That mob is higher than you!");
-    logentry(QStringLiteral("%1 tried to snoop a higher mob\r\n").arg(GET_NAME(this)), OVERSEER, DC::LogChannel::LOG_GOD);
+    logentry(QStringLiteral("%1 tried to snoop a higher mob\n").arg(GET_NAME(this)), OVERSEER, DC::LogChannel::LOG_GOD);
     return ReturnValue::eFAILURE;
   }
 
@@ -226,9 +226,9 @@ int do_send(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You send '%s' to %s.\r\n", message, GET_NAME(vict));
+  sprintf(buf, "You send '%s' to %s.\n", message, GET_NAME(vict));
   ch->send(buf);
-  sprintf(buf, "%s\r\n", message);
+  sprintf(buf, "%s\n", message);
   vict->send(buf);
   return ReturnValue::eSUCCESS;
 }

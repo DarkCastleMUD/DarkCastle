@@ -498,7 +498,7 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
             }
   } /* for loop */
 
-  interp += "\r\n";
+  interp += "\n";
 
   return interp;
 }

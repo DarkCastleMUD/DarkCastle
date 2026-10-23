@@ -233,20 +233,20 @@ command_return_t Character::do_new_help(QStringList arguments, cmd_t cmd)
                  .arg(this_help->keyword3 && key4 != u"'NONE'"_s ? key4 : u" "_s)
                  .arg(this_help->keyword3 && key5 != u"'NONE'"_s ? key5 : u" "_s);
 
-  rec_level = u"\r\nLevel Required: %1"_s.arg(this_help->min_level);
-  entry = u"$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$1$B| | $B$5Help For: $B$7%1 $1$B| |\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
+  rec_level = u"\nLevel Required: %1"_s.arg(this_help->min_level);
+  entry = u"$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\n"
+          "$1$B| | $B$5Help For: $B$7%1 $1$B| |\n"
+          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\n"
           "$B$7%2%3$R"
-          "\r\n"
+          "\n"
           "$R%4"
-          "\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n"
-          "$1$B| | $B$5Related Help: $B$7%5 $1$B| |\r\n"
-          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\r\n$R"_s
+          "\n"
+          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\n"
+          "$1$B| | $B$5Related Help: $B$7%5 $1$B| |\n"
+          "$1$B+=+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=+=+\n$R"_s
               .arg(buf, 61)
               .arg(isImmortalPlayer() ? rec_level : u" "_s)
-              .arg(this_help->min_level < IMMORTAL ? u" "_s : u"\r\nImmortal-only command.\r\n"_s)
+              .arg(this_help->min_level < IMMORTAL ? u" "_s : u"\nImmortal-only command.\n"_s)
               .arg(this_help->entry)
               .arg(this_help->related, 57);
 
@@ -288,12 +288,12 @@ int load_new_help(FILEPtr fl, int reload, Character *ch)
   {
     if (reload == 1)
     {
-      logentry(QStringLiteral("Error in verion number in help file.\r\n"), OVERSEER, DC::LogChannel::LOG_HELP);
+      logentry(QStringLiteral("Error in verion number in help file.\n"), OVERSEER, DC::LogChannel::LOG_HELP);
       return ReturnValue::eFAILURE;
     }
     else
     {
-      perror("Error in verion number in help file.\r\n");
+      perror("Error in verion number in help file.\n");
       abort();
     }
   }
@@ -337,12 +337,12 @@ int load_new_help(FILEPtr fl, int reload, Character *ch)
     {
       if (*line == '\0')
       {
-        snprintf(tmpbuffer, ENTRY_MAX, "%s\r\n", tmpentry);
+        snprintf(tmpbuffer, ENTRY_MAX, "%s\n", tmpentry);
         strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
       else
       {
-        snprintf(tmpbuffer, ENTRY_MAX, "%s%s\r\n", tmpentry, line);
+        snprintf(tmpbuffer, ENTRY_MAX, "%s%s\n", tmpentry, line);
         strncpy(tmpentry, tmpbuffer, ENTRY_MAX);
       }
       linenum += get_line_with_space(fl, line);
@@ -393,15 +393,15 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
   half_chop(argument, argument, arg);
   if (!*argument)
   {
-    csendf(ch, "Usage: hindex <ID#>\r\n"
-               "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
-               "       hindex <start of a word(s)>\r\n"
-               "       hindex -<l|i|u|d>\r\n"
-               "              l = level, l <start> <end>\r\n"
-               "              i = immortal\r\n"
-               "              d = defunct, < level 0 OR > level %d\r\n"
-               "              u = unfinished, level 75\r\n"
-               "\r\n",
+    csendf(ch, "Usage: hindex <ID#>\n"
+               "       hindex <low ID#> <high ID#>  (you can display up to 30 at a time)\n"
+               "       hindex <start of a word(s)>\n"
+               "       hindex -<l|i|u|d>\n"
+               "              l = level, l <start> <end>\n"
+               "              i = immortal\n"
+               "              d = defunct, < level 0 OR > level %d\n"
+               "              u = unfinished, level 75\n"
+               "\n",
            IMPLEMENTER);
     return ReturnValue::eFAILURE;
   }
@@ -524,8 +524,8 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
     show_help_bar(ch);
   }
   ch->send(help_buf);
-  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
+  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\n").arg(count));
+  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\n").arg(DC::getInstance()->new_top_of_helpt));
 
   return ReturnValue::eSUCCESS;
 }
@@ -538,10 +538,10 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
   half_chop(argument, argument, arg);
   if (!*argument)
   {
-    csendf(ch, "Usage: index <ID#>\r\n"
-               "       index <low ID#> <high ID#>  (you can display up to 30 at a time)\r\n"
-               "       index <start of a word(s)>\r\n"
-               "\r\n");
+    csendf(ch, "Usage: index <ID#>\n"
+               "       index <low ID#> <high ID#>  (you can display up to 30 at a time)\n"
+               "       index <start of a word(s)>\n"
+               "\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -607,8 +607,8 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
     show_help_bar(ch);
   }
   ch->send(help_buf);
-  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\r\n").arg(count));
-  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\r\n").arg(DC::getInstance()->new_top_of_helpt));
+  ch->send(QStringLiteral("$B$7Total Shown: $B$5%1$R\n").arg(count));
+  ch->send(QStringLiteral("$B$7Total Help Entries: $B$5%1$R\n").arg(DC::getInstance()->new_top_of_helpt));
 
   return ReturnValue::eSUCCESS;
 }
@@ -617,7 +617,7 @@ int show_one_help_entry(int entry, Character *ch, int count)
 {
 
   csendf(ch, "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] "
-             "[$3%-20.20s$B$7] [$3%-20.20s$B$7]\r\n",
+             "[$3%-20.20s$B$7] [$3%-20.20s$B$7]\n",
          entry,
          (new_help_table[entry].min_level >= 0 ? new_help_table[entry].min_level : 999),
          (*new_help_table[entry].keyword1 ? new_help_table[entry].keyword1 : "None"),
@@ -631,7 +631,7 @@ int show_one_help_entry(int entry, Character *ch, int count)
 void show_help_header(Character *ch)
 {
   send_to_char("$B$6ID# $B$7- $RLVL $3 Keyword 1              Keyword 2              Keyword 3"
-               "              Keyword 4              Keyword 5\r\n",
+               "              Keyword 4              Keyword 5\n",
                ch);
   show_help_bar(ch);
 }
@@ -639,7 +639,7 @@ void show_help_header(Character *ch)
 void show_help_bar(Character *ch)
 {
   send_to_char("$B$7--------------------------------------------------------------------------"
-               "--------------------------------------------------\r\n$R",
+               "--------------------------------------------------\n$R",
                ch);
 }
 
@@ -749,11 +749,11 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     new_help.keyword5 = str_hsh("NONE");
     new_help.related = str_hsh("NONE");
     new_help.min_level = 75;
-    new_help.entry = str_hsh("Blank help file!\r\n");
+    new_help.entry = str_hsh("Blank help file!\n");
 
     RECREATE(new_help_table, help_index_element_new, DC::getInstance()->new_top_of_helpt + 1);
     new_help_table[DC::getInstance()->new_top_of_helpt] = new_help;
-    sprintf(buf, "Help entry #%d added with keyword '%s'.\r\n", DC::getInstance()->new_top_of_helpt, buf2);
+    sprintf(buf, "Help entry #%d added with keyword '%s'.\n", DC::getInstance()->new_top_of_helpt, buf2);
     ch->send(buf);
     DC::getInstance()->new_top_of_helpt++;
     sprintf(buf, "%s just created a help file for '%s'.", GET_NAME(ch), buf2);
@@ -807,7 +807,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
           return ReturnValue::eFAILURE;
           break;
         }
-        sprintf(buf, "Keyword %d changed to '%s' for ID# %d.\r\n", key_id, value, help_id);
+        sprintf(buf, "Keyword %d changed to '%s' for ID# %d.\n", key_id, value, help_id);
         ch->send(buf);
       }
       else
@@ -823,7 +823,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
         if (*buf2 == '0')
           level = 0;
         new_help_table[help_id].min_level = level;
-        sprintf(buf, "Level changed to '%d' for ID# %d.\r\n", level, help_id);
+        sprintf(buf, "Level changed to '%d' for ID# %d.\n", level, help_id);
         ch->send(buf);
       }
       else
@@ -842,7 +842,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
         for (i = 0; i < (int)strlen(buf2); i++)
           buf2[i] = UPPER(buf2[i]);
         new_help_table[help_id].related = str_hsh(buf2);
-        sprintf(buf, "Related changed to '%s' for ID# %d.\r\n", buf2, help_id);
+        sprintf(buf, "Related changed to '%s' for ID# %d.\n", buf2, help_id);
         ch->send(buf);
       }
       else
@@ -854,8 +854,8 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
     else if (is_abbrev(field, "entry"))
     { // changing the actual help entry
       ch->desc->backstr = nullptr;
-      send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\r\n"
-                   "   |--------------------------------------------------------------------------------|\r\n",
+      send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\n"
+                   "   |--------------------------------------------------------------------------------|\n",
                    ch);
       if (!new_help_table[help_id].entry.isEmpty())
       {
@@ -885,12 +885,12 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
 void show_hedit_usage(Character *ch)
 {
 
-  send_to_char("$3Syntax$R: hedit <id#> <field> [arg] [value]\r\n"
-               "        hedit new <first keyword>\r\n"
-               "        hedit save\r\n\r\n"
-               "  Fields: key, level, entry, related\r\n"
-               "  Args: Only apply to key in which it is 1-5\r\n"
-               "  Values: The value of the specified field.  Does not affect entry\r\n",
+  send_to_char("$3Syntax$R: hedit <id#> <field> [arg] [value]\n"
+               "        hedit new <first keyword>\n"
+               "        hedit save\n\n"
+               "  Fields: key, level, entry, related\n"
+               "  Args: Only apply to key in which it is 1-5\n"
+               "  Values: The value of the specified field.  Does not affect entry\n",
                ch);
 }
 
@@ -961,7 +961,7 @@ void save_help(Character *ch)
   else
   {
     ch->sendln("Couldn't open web help file for saving.");
-    perror("Couldn't open web help file for saving.\r\n");
+    perror("Couldn't open web help file for saving.\n");
     return;
   }
 }
@@ -970,17 +970,6 @@ void help_string_to_file(FILEPtr f, char *str)
 {
   char *newbuf = new char[strlen(str) + 1];
   strcpy(newbuf, str);
-
-  // remove all \r's
-  for (char *curr = newbuf; *curr != '\0'; curr++)
-  {
-    if (*curr == '\r')
-    {
-      for (char *blah = curr; *blah != '\0'; blah++) // shift the rest of the std::string 1 left
-        *blah = *(blah + 1);
-      curr--; // (to check for \r\r cases)
-    }
-  }
 
   if (newbuf[strlen(newbuf) - 1] == '\n')
     newbuf[strlen(newbuf) - 1] = '\0';

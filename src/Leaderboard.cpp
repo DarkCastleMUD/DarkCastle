@@ -1712,30 +1712,30 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     }
   }
   sprintf(buf,
-          "(*)**************************************************************************(*)\r\n");
+          "(*)**************************************************************************(*)\n");
   strcat(buf,
-         "(*)                          $BDark Castle Leaderboard$R                         (*)\r\n");
+         "(*)                          $BDark Castle Leaderboard$R                         (*)\n");
   if (validclass)
   {
     k != 2 ? sprintf(buf2,
-                     "(*)                             $Bfor %11ss$R                             (*)\r\n",
+                     "(*)                             $Bfor %11ss$R                             (*)\n",
                      clss_types[k])
            : sprintf(buf2,
-                     "(*)                             $Bfor      thieves$R                             (*)\r\n");
+                     "(*)                             $Bfor      thieves$R                             (*)\n");
     strcat(buf, buf2);
   }
   strcat(buf,
-         "(*)--------------------------------------------------------------------------(*)\r\n");
+         "(*)--------------------------------------------------------------------------(*)\n");
   strcat(buf,
-         "(*)                                                                          (*)\r\n");
+         "(*)                                                                          (*)\n");
   strcat(buf,
-         "(*)    Online         All Time                Online        All Time         (*)\r\n");
+         "(*)    Online         All Time                Online        All Time         (*)\n");
   strcat(buf,
-         "(*)                                                                          (*)\r\n");
+         "(*)                                                                          (*)\n");
   strcat(buf,
-         "(*)            $2$BHit Points                               Mana$R                 (*)\r\n");
+         "(*)            $2$BHit Points                               Mana$R                 (*)\n");
   sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
+          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\n",
           hponlinename[0], hpactivename[0], mnonlinename[0], mnactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
@@ -1769,7 +1769,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     else
       skippedd++;
     sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
+            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\n",
             placea, hponlinename[i], placeb, hpactivename[i],
             hpactive[0] - hpactive[i], placec, mnonlinename[i], placed,
             mnactivename[i], mnactive[0] - mnactive[i]);
@@ -1784,11 +1784,11 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   skippedc = 0;
   skippedd = 0;
   strcat(buf,
-         "(*)                                                                          (*)\r\n");
+         "(*)                                                                          (*)\n");
   strcat(buf,
-         "(*)                $2$BKi                                Movement        $R        (*)\r\n");
+         "(*)                $2$BKi                                Movement        $R        (*)\n");
   sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
+          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\n",
           kionlinename[0], kiactivename[0], mvonlinename[0], mvactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
@@ -1822,7 +1822,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     else
       skippedd++;
     sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
+            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\n",
             placea, kionlinename[i], placeb, kiactivename[i],
             kiactive[0] - kiactive[i], placec, mvonlinename[i], placed,
             mvactivename[i], mvactive[0] - mvactive[i]);
@@ -1837,11 +1837,11 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   skippedc = 0;
   skippedd = 0;
   strcat(buf,
-         "(*)                                                                          (*)\r\n");
+         "(*)                                                                          (*)\n");
   strcat(buf,
-         "(*)         $2$BPlayer Kill Score                   Player Death Score       $R    (*)\r\n");
+         "(*)         $2$BPlayer Kill Score                   Player Death Score       $R    (*)\n");
   sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\r\n",
+          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R        1) $5$B%-12s$R1) $5$B%-12s$R     (*)\n",
           pkonlinename[0], pkactivename[0], pdonlinename[0], pdactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
@@ -1875,7 +1875,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     else
       skippedd++;
     sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\r\n",
+            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d   %d) $B%-12s$R%d) $B%-12s$R-%-4d(*)\n",
             placea, pkonlinename[i], placeb, pkactivename[i],
             pkactive[0] - pkactive[i], placec, pdonlinename[i], placed,
             pdactivename[i], pdactive[0] - pdactive[i]);
@@ -1891,11 +1891,11 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
   skippedc = 0;
   skippedd = 0;
   strcat(buf,
-         "(*)                                                                          (*)\r\n");
+         "(*)                                                                          (*)\n");
   strcat(buf,
-         "(*)        $2$BReal Deaths (Level 60)                                      $R      (*)\r\n");
+         "(*)        $2$BReal Deaths (Level 60)                                      $R      (*)\n");
   sprintf(buf2,
-          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                           (*)\r\n",
+          "(*) 1) $5$B%-12s$R1) $5$B%-12s$R                                           (*)\n",
           rdonlinename[0], rdactivename[0]);
   strcat(buf, buf2);
   for (i = 1; i < 5; i++)
@@ -1925,7 +1925,7 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
     //     }
     //      else skippedd++;
     sprintf(buf2,
-            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                      (*)\r\n",
+            "(*) %d) $B%-12s$R%d) $B%-12s$R-%-4d                                      (*)\n",
             placea, rdonlinename[i], placeb, rdactivename[i],
             rdactive[0] - rdactive[i]);
     strcat(buf, buf2);
@@ -1933,11 +1933,11 @@ int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
 
   // TO HERE
   strcat(buf,
-         "(*)                                                                          (*)\r\n");
+         "(*)                                                                          (*)\n");
   strcat(buf,
-         "(*)--------------------------------------------------------------------------(*)\r\n");
+         "(*)--------------------------------------------------------------------------(*)\n");
   strcat(buf,
-         "(*)**************************************************************************(*)\r\n");
+         "(*)**************************************************************************(*)\n");
   page_string(ch->desc, buf, 1);
   for (i = 0; i < 5; i++)
   {

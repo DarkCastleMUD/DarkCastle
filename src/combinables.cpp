@@ -192,7 +192,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
 
   Object *reward = clone_object(rewardnum);
   obj_to_char(reward, ch);
-  ch->send(QStringLiteral("You succesfully make a %1!\r\n").arg(reward->short_description));
+  ch->send(QStringLiteral("You succesfully make a %1!\n").arg(reward->short_description));
   act("$n successfully makes a $p.", ch, reward, 0, TO_ROOM, 0);
 
   return ReturnValue::eSUCCESS;
@@ -234,7 +234,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
   Object *vial = get_obj_in_list_vis(ch, vialarg, ch->carrying);
   if (!vial)
   {
-    ch->send(QStringLiteral("You don't seem to have any %1.\r\n").arg(vialarg));
+    ch->send(QStringLiteral("You don't seem to have any %1.\n").arg(vialarg));
     return ReturnValue::eFAILURE;
   }
 
@@ -248,7 +248,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
 
   if (found < 0)
   {
-    ch->send(QStringLiteral("The %1 is not a valid weapon poison.\r\n").arg(vial->short_description));
+    ch->send(QStringLiteral("The %1 is not a valid weapon poison.\n").arg(vial->short_description));
     return ReturnValue::eFAILURE;
   }
 
@@ -279,7 +279,7 @@ int valid_trade_skill_combine(Object *container, trade_data_type *data, Characte
 {
   if (!(container->contains))
   {
-    ch->send(QStringLiteral("Your %1 appears to be empty.\r\n").arg(container->short_description));
+    ch->send(QStringLiteral("Your %1 appears to be empty.\n").arg(container->short_description));
     return -2;
   }
 
@@ -392,7 +392,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
            break;
 
         default:
-           ch->send(QStringLiteral("Unknown poison type %1.  Let a god know.\r\n").arg(type));
+           ch->send(QStringLiteral("Unknown poison type %1.  Let a god know.\n").arg(type));
            break;
      }
 
@@ -419,16 +419,16 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
 
   if (!*argument)
   {
-    send_to_char("Brew what?\r\n"
-                 "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
+    send_to_char("Brew what?\n"
+                 "$3Syntax:$R brew <herb> <liquid> <container>\n",
                  ch);
     if (ch->getLevel() >= 106)
     {
-      send_to_char("        brew load\r\n"
-                   "        brew save\r\n"
-                   "        brew list\r\n"
-                   "        brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\r\n"
-                   "        brew remove [recipe_num]\r\n\r\n",
+      send_to_char("        brew load\n"
+                   "        brew save\n"
+                   "        brew list\n"
+                   "        brew add [herb_vnum] [liquid_type] [container_vnum] [spell_num]\n"
+                   "        brew remove [recipe_num]\n\n",
                    ch);
     }
     return ReturnValue::eFAILURE;
@@ -476,16 +476,16 @@ int do_brew(Character *ch, char *argument, cmd_t cmd)
 
   if (!*liquid)
   {
-    send_to_char("You'll need to choose a liquid type and container.\r\n"
-                 "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
+    send_to_char("You'll need to choose a liquid type and container.\n"
+                 "$3Syntax:$R brew <herb> <liquid> <container>\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
 
   if (!*container)
   {
-    send_to_char("You'll need to select a container.\r\n"
-                 "$3Syntax:$R brew <herb> <liquid> <container>\r\n",
+    send_to_char("You'll need to select a container.\n"
+                 "$3Syntax:$R brew <herb> <liquid> <container>\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -782,14 +782,14 @@ void Brew::list(Character *ch)
     return;
   }
 
-  ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\r\n");
+  ch->sendln("[# ] [herb #] [liquid] [container] Spell Name\n");
   for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
     int spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\r\n", ++i, r.herb, r.liquid, r.container, buffer, spell);
+    csendf(ch, "[%2d] [%6llu] [%6llu] [%9llu] %s (%d)\n", ++i, r.herb, r.liquid, r.container, buffer, spell);
   }
 }
 
@@ -832,7 +832,7 @@ int Brew::add(Character *ch, char *argument)
   case LIQ_SALTWATER:
     break;
   default:
-    csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\r\n",
+    csendf(ch, "Invalid liquid type. Only Milk (%d), Wine (%d), Salt Water (%d) allowed.\n",
            LIQ_MILK, LIQ_WINE, LIQ_SALTWATER);
     return ReturnValue::eFAILURE;
     break;
@@ -846,7 +846,7 @@ int Brew::add(Character *ch, char *argument)
 
   if ((spell = find_skill_num(arg4)) < 0)
   {
-    csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
+    csendf(ch, "Cannot find spell '%s' in master spell list.\n", arg4);
     return ReturnValue::eFAILURE;
   }
 
@@ -879,13 +879,13 @@ int Brew::remove(Character *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
+      ch->send(QStringLiteral("Recipe # %1 has been removed.\n").arg(target));
 
       return ReturnValue::eSUCCESS;
     }
   }
 
-  ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
+  ch->send(QStringLiteral("Recipe # %1 not found.\n").arg(target));
   return ReturnValue::eFAILURE;
 }
 
@@ -924,16 +924,16 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
   if (!*argument)
   {
-    send_to_char("Scribe what?\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
+    send_to_char("Scribe what?\n"
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n",
                  ch);
     if (ch->getLevel() >= 106)
     {
-      send_to_char("        scribe load\r\n"
-                   "        scribe save\r\n"
-                   "        scribe list\r\n"
-                   "        scribe add <ink_vnum> <dust_vnum> <pen_vnum> <paper_vnum> <spell_num>\r\n"
-                   "        scribe remove [recipe_num]\r\n\r\n",
+      send_to_char("        scribe load\n"
+                   "        scribe save\n"
+                   "        scribe list\n"
+                   "        scribe add <ink_vnum> <dust_vnum> <pen_vnum> <paper_vnum> <spell_num>\n"
+                   "        scribe remove [recipe_num]\n\n",
                    ch);
     }
     return ReturnValue::eFAILURE;
@@ -982,24 +982,24 @@ int do_scribe(Character *ch, char *argument, cmd_t cmd)
 
   if (!*dust)
   {
-    send_to_char("You'll need to choose a dust, pen and paper.\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
+    send_to_char("You'll need to choose a dust, pen and paper.\n"
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
 
   if (!*pen)
   {
-    send_to_char("You'll need to choose a pen and paper.\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
+    send_to_char("You'll need to choose a pen and paper.\n"
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
 
   if (!*paper)
   {
-    send_to_char("You'll need to select a paper.\r\n"
-                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\r\n",
+    send_to_char("You'll need to select a paper.\n"
+                 "$3Syntax:$R scribe <ink> <dust> <pen> <paper>\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -1234,14 +1234,14 @@ void Scribe::list(Character *ch)
     return;
   }
 
-  ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\r\n");
+  ch->sendln("[# ] [ink #] [dust #] [pen #] [paper #] Spell Name\n");
   for (std::map<recipe, int>::reverse_iterator iter = recipes.rbegin(); iter != recipes.rend(); ++iter)
   {
     recipe r = iter->first;
     int spell = iter->second;
 
     sprinttype(spell - 1, spells, buffer);
-    csendf(ch, "[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\r\n", ++i, r.ink, r.dust, r.pen, r.paper, buffer, spell);
+    csendf(ch, "[%2d] [%5d] [%6d] [%5d] [%7d] %s (%d)\n", ++i, r.ink, r.dust, r.pen, r.paper, buffer, spell);
   }
 }
 
@@ -1299,7 +1299,7 @@ int Scribe::add(Character *ch, char *argument)
 
   if ((spell = find_skill_num(arg5)) < 0)
   {
-    csendf(ch, "Cannot find spell '%s' in master spell list.\r\n", arg4);
+    csendf(ch, "Cannot find spell '%s' in master spell list.\n", arg4);
     return ReturnValue::eFAILURE;
   }
 
@@ -1332,13 +1332,13 @@ int Scribe::remove(Character *ch, char *argument)
     if (++i == target)
     {
       recipes.erase((*iter).first);
-      ch->send(QStringLiteral("Recipe # %1 has been removed.\r\n").arg(target));
+      ch->send(QStringLiteral("Recipe # %1 has been removed.\n").arg(target));
 
       return ReturnValue::eSUCCESS;
     }
   }
 
-  ch->send(QStringLiteral("Recipe # %1 not found.\r\n").arg(target));
+  ch->send(QStringLiteral("Recipe # %1 not found.\n").arg(target));
   return ReturnValue::eFAILURE;
 }
 

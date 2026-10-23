@@ -152,7 +152,7 @@ int damage_eq_once(Object *obj)
 {
   if (obj->vnum_ == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
-    send_to_room("The spirit shield shimmers brightly then fades away.\r\n", obj->carried_by->in_room);
+    send_to_room("The spirit shield shimmers brightly then fades away.\n", obj->carried_by->in_room);
     extract_obj(obj);
     return 0;
   }
@@ -221,7 +221,7 @@ int do_switch(Character *ch, char *arg, cmd_t cmd)
   if (!ch->equipment[WEAR_WIELD] || !ch->equipment[WEAR_SECOND_WIELD])
   {
     send_to_char("You must be wielding two weapons to switch their "
-                 "positions.\r\n",
+                 "positions.\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -494,7 +494,7 @@ void set_movement_trap(Character *ch, class Object *obj)
   char buf[200];
   class Object *trap_obj = nullptr;
 
-  sprintf(buf, "You set up the %s to catch people moving around in the area.\r\n", qPrintable(obj->short_description));
+  sprintf(buf, "You set up the %s to catch people moving around in the area.\n", qPrintable(obj->short_description));
   ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -515,7 +515,7 @@ void set_exit_trap(Character *ch, class Object *obj, char *arg)
   char buf[200];
   class Object *trap_obj = nullptr;
 
-  sprintf(buf, "You set up the %s to catch people trying to leave the area.\r\n", qPrintable(obj->short_description));
+  sprintf(buf, "You set up the %s to catch people trying to leave the area.\n", qPrintable(obj->short_description));
   ch->send(buf);
   act("$n sets something on the ground all around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -591,15 +591,15 @@ bool set_utility_mortar(Character *ch, class Object *obj, char *arg)
 
   if (!CAN_GO(ch, dir))
   {
-    send_to_room("It smacks against the wall, zings aorund, and lands in the middle of the room.\r\n", ch->in_room);
+    send_to_room("It smacks against the wall, zings aorund, and lands in the middle of the room.\n", ch->in_room);
     // set it up in the room
     obj_to_room(trap_obj, ch->in_room);
   }
   else
   {
-    sprintf(buf, "It flies with great speed %sward.\r\n", qPrintable(DC::dirs[dir]));
+    sprintf(buf, "It flies with great speed %sward.\n", qPrintable(DC::dirs[dir]));
     send_to_room(buf, ch->in_room);
-    sprintf(buf, "Something flies into the area with great speed landing at your feet.\r\n");
+    sprintf(buf, "Something flies into the area with great speed landing at your feet.\n");
     send_to_room(buf, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
     // set it up in the target room
     obj_to_room(trap_obj, DC::getInstance()->world[ch->in_room].dir_option[dir]->to_room);
@@ -614,7 +614,7 @@ void set_catstink(Character *ch, class Object *obj)
   char buf[200];
   extern const char *sector_types[];
 
-  sprintf(buf, "You sprinkle the %s all around you.\r\n", qPrintable(obj->short_description));
+  sprintf(buf, "You sprinkle the %s all around you.\n", qPrintable(obj->short_description));
   ch->send(buf);
   act("$n sprinkles something on the ground around $m.", ch, 0, 0, TO_ROOM, 0);
 
@@ -692,7 +692,7 @@ int do_mortal_set(Character *ch, char *argument, cmd_t cmd)
 
   if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
   {
-    sprintf(buf, "You do not seem to have a '%s'.\r\n", arg);
+    sprintf(buf, "You do not seem to have a '%s'.\n", arg);
     ch->send(buf);
     return ReturnValue::eFAILURE;
   }
@@ -1210,7 +1210,7 @@ int do_pour(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  sprintf(buf, "You pour the %s into the %s.\r\n",
+  sprintf(buf, "You pour the %s into the %s.\n",
           drinks[from_obj->obj_flags.value[2]], arg2);
   ch->send(buf);
 
@@ -1279,7 +1279,7 @@ int do_sip(Character *ch, char *argument, cmd_t cmd)
   }
 
   act("$n sips from the $o", ch, temp, 0, TO_ROOM, INVIS_NULL);
-  sprintf(buf, "It tastes like %s.\r\n", drinks[temp->obj_flags.value[2]]);
+  sprintf(buf, "It tastes like %s.\n", drinks[temp->obj_flags.value[2]]);
   ch->send(buf);
 
   gain_condition(ch, DRUNK,
@@ -1612,9 +1612,9 @@ int will_screwup_worn_sizes(Character *ch, Object *obj, int add)
   if (problem)
   {
     if (add)
-      csendf(ch, "Wearing that would cause your %s to no longer fit!\r\n", qPrintable(ch->equipment[j]->short_description));
+      csendf(ch, "Wearing that would cause your %s to no longer fit!\n", qPrintable(ch->equipment[j]->short_description));
     else
-      csendf(ch, "Removing that would cause your %s to no longer fit!\r\n", qPrintable(ch->equipment[j]->short_description));
+      csendf(ch, "Removing that would cause your %s to no longer fit!\n", qPrintable(ch->equipment[j]->short_description));
 
     return true;
   }
@@ -1703,14 +1703,14 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_FINGER_L])
         {
-          sprintf(buffer, "You put the %s on your right ring-finger.\r\n", qPrintable(fname(obj_object->Name())));
+          sprintf(buffer, "You put the %s on your right ring-finger.\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_FINGER_R);
         }
         else
         {
-          sprintf(buffer, "You put the %s on your left ring-finger.\r\n", qPrintable(fname(obj_object->Name())));
+          sprintf(buffer, "You put the %s on your left ring-finger.\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           obj_from_char(obj_object);
           ch->equip_char(obj_object, WEAR_FINGER_L);
@@ -1936,13 +1936,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
         perform_wear(ch, obj_object, keyword);
         if (ch->equipment[WEAR_WRIST_L])
         {
-          sprintf(buffer, "You wear the %s around your right wrist.\r\n", qPrintable(fname(obj_object->Name())));
+          sprintf(buffer, "You wear the %s around your right wrist.\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           ch->equip_char(obj_object, WEAR_WRIST_R);
         }
         else
         {
-          sprintf(buffer, "You wear the %s around your left wrist.\r\n", qPrintable(fname(obj_object->Name())));
+          sprintf(buffer, "You wear the %s around your left wrist.\n", qPrintable(fname(obj_object->Name())));
           ch->send(buffer);
           ch->equip_char(obj_object, WEAR_WRIST_L);
         }
@@ -2174,13 +2174,13 @@ void wear(Character *ch, class Object *obj_object, int keyword)
 
   case -1:
   {
-    sprintf(buffer, "Wear %s where?.\r\n", qPrintable(fname(obj_object->Name())));
+    sprintf(buffer, "Wear %s where?.\n", qPrintable(fname(obj_object->Name())));
     ch->send(buffer);
   }
   break;
   case -2:
   {
-    sprintf(buffer, "You can't wear the %s.\r\n", qPrintable(fname(obj_object->Name())));
+    sprintf(buffer, "You can't wear the %s.\n", qPrintable(fname(obj_object->Name())));
     ch->send(buffer);
   }
   break;
@@ -2323,7 +2323,7 @@ int do_wear(Character *ch, char *argument, cmd_t cmd)
       if (keyword == -1)
       {
         sprintf(buf,
-                "%s is an unknown body location.\r\n", arg2);
+                "%s is an unknown body location.\n", arg2);
         ch->send(buf);
       }
       else
@@ -2340,7 +2340,7 @@ int do_wear(Character *ch, char *argument, cmd_t cmd)
   }
   else
   {
-    sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
+    sprintf(buffer, "You do not seem to have the '%s'.\n", arg1);
     ch->send(buffer);
   }
   return ReturnValue::eSUCCESS;
@@ -2385,7 +2385,7 @@ int do_wield(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
+      sprintf(buffer, "You do not seem to have the '%s'.\n", arg1);
       ch->send(buffer);
     }
   }
@@ -2431,7 +2431,7 @@ int do_grab(Character *ch, char *argument, cmd_t cmd)
     }
     else
     {
-      sprintf(buffer, "You do not seem to have the '%s'.\r\n", arg1);
+      sprintf(buffer, "You do not seem to have the '%s'.\n", arg1);
       ch->send(buffer);
     }
   }
@@ -2518,7 +2518,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
             obj_object = ch->equipment[j];
             if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
             {
-              sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description));
+              sprintf(arg1, "You can't remove %s, it must be CURSED!\n", qPrintable(obj_object->short_description));
               send_to_char(arg1, ch);
               continue;
             }
@@ -2530,7 +2530,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
 
             if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
             {
-              send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
+              send_to_room("The spirit shield shimmers brightly then fades away.\n", ch->in_room);
               extract_obj(obj_object);
               continue;
             }
@@ -2561,7 +2561,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
         {
           if (isSet(obj_object->obj_flags.extra_flags, ITEM_NODROP) && ch->getLevel() <= MORTAL)
           {
-            sprintf(arg1, "You can't remove %s, it must be CURSED!\r\n", qPrintable(obj_object->short_description));
+            sprintf(arg1, "You can't remove %s, it must be CURSED!\n", qPrintable(obj_object->short_description));
             send_to_char(arg1, ch);
             return ReturnValue::eFAILURE;
           }
@@ -2584,7 +2584,7 @@ int do_remove(Character *ch, char *argument, cmd_t cmd)
           }
           else if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == SPIRIT_SHIELD_OBJ_NUMBER)
           {
-            send_to_room("The spirit shield shimmers brightly then fades away.\r\n", ch->in_room);
+            send_to_room("The spirit shield shimmers brightly then fades away.\n", ch->in_room);
             extract_obj(obj_object);
             return ReturnValue::eSUCCESS;
           }

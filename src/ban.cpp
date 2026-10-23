@@ -139,7 +139,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
       ch->sendln("No sites are banned.");
       return ReturnValue::eSUCCESS;
     }
-    strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\r\n");
+    strcpy(format, "%-15.15s  %-8.8s  %-19s  %-16.16s\n");
     sprintf(buf, format,
             "Banned Site Name",
             "Ban Type",

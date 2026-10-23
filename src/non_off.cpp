@@ -242,7 +242,7 @@ int do_donate(Character *ch, char *argument, cmd_t cmd)
       {
         REMBIT(ch->affected_by, AFF_CHAMPION);
 
-        sprintf(buf, "\r\n##%s has just yielded %s!\r\n", GET_NAME(ch), qPrintable(obj->short_description));
+        sprintf(buf, "\n##%s has just yielded %s!\n", GET_NAME(ch), qPrintable(obj->short_description));
         send_info(buf);
 
         affected_type af;
@@ -399,7 +399,7 @@ int do_title(Character *ch, char *argument, cmd_t cmd)
   }
 
   ch->title = argument;
-  sprintf(buf, "Your title is now: %s\r\n", argument);
+  sprintf(buf, "Your title is now: %s\n", argument);
   ch->send(buf);
   return ReturnValue::eSUCCESS;
 }
@@ -408,7 +408,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
 {
   if (this->isNonPlayer())
   {
-    send("You can't toggle anything, you're a mob!\r\n");
+    send("You can't toggle anything, you're a mob!\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -428,7 +428,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
       if (t.value_ != Player::PLR_GUIDE_TOG || (isSet(player->toggles, Player::PLR_GUIDE)))
       {
         send(QStringLiteral("%1 ").arg(t.name_, -11));
-        send(QStringLiteral("%1\r\n").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
+        send(QStringLiteral("%1\n").arg(isSet(player->toggles, t.value_) ? t.on_message_ : t.off_message_));
       }
     }
     return ReturnValue::eSUCCESS;
@@ -453,7 +453,7 @@ command_return_t Character::do_toggle(QStringList arguments, cmd_t cmd)
   if (!txt_found || !found_toggle.isValid())
   {
     send("Bad option.  Type toggle with no arguments for a list of "
-         "good ones.\r\n");
+         "good ones.\n");
     return ReturnValue::eFAILURE;
   }
 
@@ -476,7 +476,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
   {
     for (auto setting = player->config->constBegin(); setting != player->config->constEnd(); ++setting)
     {
-      send(QStringLiteral("%1=%2\r\n").arg(setting.key()).arg(setting.value()));
+      send(QStringLiteral("%1=%2\n").arg(setting.key()).arg(setting.value()));
     }
     return ReturnValue::eSUCCESS;
   }
@@ -501,13 +501,13 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
 
   if (arguments.size() > 0 && arguments.at(0) == "help")
   {
-    send("Usage:\r\n");
-    send("config                       - Show all currently set configuration options.\r\n");
-    send("config color.good=color name - Set color to use for \"good\" values in game.\r\n");
-    send("config color.bad=color name  - Set color to use for \"bad\" values in game.\r\n");
-    send("                               Use ? as color name to see valid colors.\r\n");
-    send("config color.good=           - Unset color.good. Will use default \"good\" color.\r\n");
-    send("config color.bad=            - Unset color.bad. Will use default \"bad\" color.\r\n\r\n");
+    send("Usage:\n");
+    send("config                       - Show all currently set configuration options.\n");
+    send("config color.good=color name - Set color to use for \"good\" values in game.\n");
+    send("config color.bad=color name  - Set color to use for \"bad\" values in game.\n");
+    send("                               Use ? as color name to see valid colors.\n");
+    send("config color.good=           - Unset color.good. Will use default \"good\" color.\n");
+    send("config color.bad=            - Unset color.bad. Will use default \"bad\" color.\n\n");
     return ReturnValue::eSUCCESS;
   }
 
@@ -533,7 +533,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
       if (key == i.key() || key.isEmpty() || i.key().startsWith(key))
       {
         found = true;
-        send(QStringLiteral("%1=%2\r\n").arg(i.key()).arg(i.value()));
+        send(QStringLiteral("%1=%2\n").arg(i.key()).arg(i.value()));
       }
     }
 
@@ -541,11 +541,11 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
     {
       if (key.isEmpty() == false)
       {
-        send(QStringLiteral("%1 not found.\r\n").arg(key));
+        send(QStringLiteral("%1 not found.\n").arg(key));
       }
       else
       {
-        send("No config options set.\r\n");
+        send("No config options set.\n");
       }
       return ReturnValue::eFAILURE;
     }
@@ -563,7 +563,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
       save(cmd_t::SAVE_SILENTLY);
       return ReturnValue::eSUCCESS;
     }
-    send(QStringLiteral("%1 not found.\r\n").arg(key));
+    send(QStringLiteral("%1 not found.\n").arg(key));
     return ReturnValue::eFAILURE;
   }
 
@@ -576,22 +576,22 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
       {
         if (value == "?")
         {
-          send("Valid colors:\r\n");
+          send("Valid colors:\n");
         }
         else
         {
-          send("Invalid color specified. Valid colors:\r\n");
+          send("Invalid color specified. Valid colors:\n");
         }
 
         for (auto color = colors.constBegin(); color != colors.constEnd(); ++color)
         {
           if (color.key() == "black")
           {
-            send(QStringLiteral("%1\r\n").arg(color.key()));
+            send(QStringLiteral("%1\n").arg(color.key()));
           }
           else
           {
-            send(QStringLiteral("%1 - %2Example$R\r\n").arg(color.key(), -15).arg(color.value()));
+            send(QStringLiteral("%1 - %2Example$R\n").arg(color.key(), -15).arg(color.value()));
           }
         }
 
@@ -607,7 +607,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
       }
       else if (value.startsWith("line") == false)
       {
-        send("Valid telnet modes are line for linemode or char for character mode.\r\n");
+        send("Valid telnet modes are line for linemode or char for character mode.\n");
         return ReturnValue::eFAILURE;
       }
     }
@@ -680,7 +680,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
     }
     else if (!QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
     {
-      send("Invalid config option.\r\n");
+      send("Invalid config option.\n");
       return ReturnValue::eFAILURE;
     }
 
@@ -692,7 +692,7 @@ int Character::do_config(QStringList arguments, cmd_t cmd)
 
     player->config->insert(key, value);
 
-    send(QStringLiteral("Setting %1=%2\r\n").arg(key).arg(value));
+    send(QStringLiteral("Setting %1=%2\n").arg(key).arg(value));
     save(cmd_t::SAVE_SILENTLY);
     return ReturnValue::eSUCCESS;
   }
@@ -707,12 +707,12 @@ command_return_t Character::do_brief(QStringList arguments, cmd_t cmd)
 
   if (isSet(player->toggles, Player::PLR_BRIEF))
   {
-    send("Brief mode $B$4off$R.\r\n");
+    send("Brief mode $B$4off$R.\n");
     REMOVE_BIT(player->toggles, Player::PLR_BRIEF);
   }
   else
   {
-    send("Brief mode $B$2on$R.\r\n");
+    send("Brief mode $B$2on$R.\n");
     SET_BIT(player->toggles, Player::PLR_BRIEF);
   }
   return ReturnValue::eSUCCESS;
@@ -784,8 +784,8 @@ command_return_t Character::do_summon_toggle(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    send_to_char("You may now be summoned by other players.\r\n"
-                 "Make _sure_ you want this...they could summon you to your death!\r\n",
+    send_to_char("You may now be summoned by other players.\n"
+                 "Make _sure_ you want this...they could summon you to your death!\n",
                  this);
     SET_BIT(player->toggles, Player::PLR_SUMMONABLE);
   }
@@ -1033,12 +1033,12 @@ command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
   if (isSet(player->toggles, Player::PLR_BEEP))
   {
     REMOVE_BIT(player->toggles, Player::PLR_BEEP);
-    this->sendln("\r\nTell is now silent.");
+    this->sendln("\nTell is now silent.");
     return ReturnValue::eFAILURE;
   }
 
   SET_BIT(player->toggles, Player::PLR_BEEP);
-  this->sendln("\r\nTell now beeps.\a");
+  this->sendln("\nTell now beeps.\a");
   return ReturnValue::eSUCCESS;
 }
 
@@ -1404,17 +1404,17 @@ void CVoteData::DisplayVote(Character *ch)
   int i = 1;
   if (vote_question.empty())
   {
-    ch->send("\r\nSorry! There are no active votes right now!\r\n\r\n");
+    ch->send("\nSorry! There are no active votes right now!\n\n");
     return;
   }
-  ch->send("\r\n--Current Vote Infortmation--\r\nTo vote, type \"vote #\".\r\n"
-           "Enter \"vote results\" to see the current voting demographics.\r\n\r\n");
+  ch->send("\n--Current Vote Infortmation--\nTo vote, type \"vote #\".\n"
+           "Enter \"vote results\" to see the current voting demographics.\n\n");
   strncpy(buf, vote_question.c_str(), MAX_STRING_LENGTH);
   ch->send(buf);
-  ch->send("\r\n");
+  ch->send("\n");
   for (answer_it = answers.begin(); answer_it != answers.end(); answer_it++)
-    ch->send(QStringLiteral("%1: %2\r\n").arg(i++, 2).arg(answer_it->answer.c_str()));
-  ch->send("\r\n");
+    ch->send(QStringLiteral("%1: %2\n").arg(i++, 2).arg(answer_it->answer.c_str()));
+  ch->send("\n");
 }
 
 void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
@@ -1458,7 +1458,7 @@ void CVoteData::StartVote(Character *ch)
   }
 
   ch->sendln("$4**MAKE SURE YOU VOTESET CLEAR IF THIS IS A NEW VOTE!**$R");
-  send_info("\r\n##Attention! There is now a vote in progress!\r\n##Type Vote for more information!\r\n");
+  send_info("\n##Attention! There is now a vote in progress!\n##Type Vote for more information!\n");
 
   active = true;
   this->OutToFile();
@@ -1475,7 +1475,7 @@ void CVoteData::EndVote(Character *ch)
 
   active = false;
   this->OutToFile();
-  send_info("\r\n##The vote has ended! Type \"Vote Results\" to see the results!\r\n");
+  send_info("\n##The vote has ended! Type \"Vote Results\" to see the results!\n");
 }
 
 void CVoteData::AddAnswer(Character *ch, std::string answer)
@@ -1551,10 +1551,10 @@ void CVoteData::DisplayResults(Character *ch)
     if (ch->isMortalPlayer())
     {
       percent = (answer_it->votes * 100) / total_votes;
-      csendf(ch, "%3d\%: %s\r\n", percent, answer_it->answer.c_str());
+      csendf(ch, "%3d\%: %s\n", percent, answer_it->answer.c_str());
     }
     else
-      csendf(ch, "%3d: %s\r\n", answer_it->votes, answer_it->answer.c_str());
+      csendf(ch, "%3d: %s\n", answer_it->votes, answer_it->answer.c_str());
   }
   ch->sendln("");
 }
@@ -1764,7 +1764,7 @@ int do_vote(Character *ch, char *arg, cmd_t cmd)
 
   vote = atoi(buf);
   if (true == DC::getInstance()->DCVote.Vote(ch, vote))
-    logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\r\n", GET_NAME(ch), vote);
+    logf(IMMORTAL, DC::LogChannel::LOG_PLAYER, "%s just voted %d\n", GET_NAME(ch), vote);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1781,8 +1781,8 @@ int do_random(Character *ch, char *argument, cmd_t cmd)
   }
 
   i = number(1, 100);
-  ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\r\n").arg(i));
-  sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\r\n", i);
+  ch->send(QStringLiteral("You roll a random number between 1 and 100 resulting in: $B%1$R.\n").arg(i));
+  sprintf(buf, "$n rolls a number between 1 and 100 resulting in: $B%u$R.\n", i);
   act(buf, ch, 0, 0, TO_ROOM, 0);
   return ReturnValue::eSUCCESS;
 }

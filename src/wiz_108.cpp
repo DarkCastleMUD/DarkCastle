@@ -54,7 +54,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  ch->send(QStringLiteral("Searching Zone: %1 - %2\r\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
+  ch->send(QStringLiteral("Searching Zone: %1 - %2\n").arg(curZone).arg(DC::getInstance()->zones.value(DC::getInstance()->world[curRoom].zone).Name()));
   for (low = curRoom; low > 0; low--)
   {
     if (!DC::getInstance()->rooms.contains(low - 1))
@@ -85,7 +85,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (curExits->to_room > 0 && DC::getInstance()->world[curExits->to_room].zone != curZone)
         {
-          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3llu (%s)\r\n", i, qPrintable(DC::dirs[dir]), curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
+          sprintf(buf, "Room %5d - %5s to Room %5d, zone %3llu (%s)\n", i, qPrintable(DC::dirs[dir]), curExits->to_room, DC::getInstance()->world[curExits->to_room].zone, DC::getInstance()->zones.value(DC::getInstance()->world[curExits->to_room].zone).NameC());
 
           output += buf;
         }
@@ -97,19 +97,19 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (portal->obj_flags.value[0] < 0)
         {
-          sprintf(buf, "Room %5d - climb to Room %5llu (ERROR)\r\n", i, real_room(portal->obj_flags.value[0]));
+          sprintf(buf, "Room %5d - climb to Room %5llu (ERROR)\n", i, real_room(portal->obj_flags.value[0]));
 
           output += buf;
         }
         else if (!DC::getInstance()->rooms.contains(portal->obj_flags.value[0]))
         {
-          sprintf(buf, "Room %5d - climb to Room %5llu (DOES NOT EXIST)\r\n", i, real_room(portal->obj_flags.value[0]));
+          sprintf(buf, "Room %5d - climb to Room %5llu (DOES NOT EXIST)\n", i, real_room(portal->obj_flags.value[0]));
 
           output += buf;
         }
         else if (DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone != curZone)
         {
-          sprintf(buf, "Room %5d - climb to Room %5llu, zone %3llu (%s)\r\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
+          sprintf(buf, "Room %5d - climb to Room %5llu, zone %3llu (%s)\n", i, real_room(portal->obj_flags.value[0]), DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->obj_flags.value[0])].zone).NameC());
 
           output += buf;
         }
@@ -119,13 +119,13 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
       {
         if (real_room(portal->getPortalDestinationRoom()) == DC::NOWHERE)
         {
-          sprintf(buf, "Room %5d - enter to Room %5llu (ERROR)\r\n", i, real_room(portal->getPortalDestinationRoom()));
+          sprintf(buf, "Room %5d - enter to Room %5llu (ERROR)\n", i, real_room(portal->getPortalDestinationRoom()));
 
           output += buf;
         }
         else if (DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone != curZone)
         {
-          sprintf(buf, "Room %5d - enter to Room %5llu, zone %3llu (%s)\r\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
+          sprintf(buf, "Room %5d - enter to Room %5llu, zone %3llu (%s)\n", i, real_room(portal->getPortalDestinationRoom()), DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->getPortalDestinationRoom())].zone).NameC());
 
           output += buf;
         }
@@ -140,7 +140,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
         {
           if (DC::getInstance()->world[real_room(portal->in_room)].zone != curZone)
           {
-            sprintf(buf, "Room %5d - leave to Room %5llu, zone %3llu (%s)\r\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
+            sprintf(buf, "Room %5d - leave to Room %5llu, zone %3llu (%s)\n", i, real_room(portal->in_room), DC::getInstance()->world[real_room(portal->in_room)].zone, DC::getInstance()->zones.value(DC::getInstance()->world[real_room(portal->in_room)].zone).NameC());
 
             output += buf;
           }
@@ -153,7 +153,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   // }
   // catch(char *errmsg)
   // {
-  //   ch->send(QStringLiteral("Error encountered while finding zone exits:\r\n%1\r\n").arg(errmsg));
+  //   ch->send(QStringLiteral("Error encountered while finding zone exits:\n%1\n").arg(errmsg));
   //   ch->sendln("Ask Rubicon if it needs fixed...");
   //   return ReturnValue::eFAILURE;
   //}
@@ -178,9 +178,9 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
   // if the std::string is nullptr, return.  Else assign pBuf to point to it.
   if (*(pBuf = bufName) == '\0')
   {
-    send_to_char("Retrieves any item in the game and puts it in your inventory.\r\n"
-                 "Works well in combination with the 'find obj' command.\r\n"
-                 "Usage: purloin [number.]name\r\n",
+    send_to_char("Retrieves any item in the game and puts it in your inventory.\n"
+                 "Works well in combination with the 'find obj' command.\n"
+                 "Usage: purloin [number.]name\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -254,12 +254,12 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
       }
       if (vict != nullptr)
       {
-        csendf(ch, "You purloin %s from %s.\r\n", qPrintable(k->short_description), GET_NAME(vict));
+        csendf(ch, "You purloin %s from %s.\n", qPrintable(k->short_description), GET_NAME(vict));
         logf(ch->getLevel(), DC::LogChannel::LOG_GOD, "%s purloins %s from %s", GET_NAME(ch), qPrintable(k->short_description), GET_NAME(vict));
       }
       else
       {
-        ch->send(QStringLiteral("You purloin %1.\r\n").arg(k->short_description));
+        ch->send(QStringLiteral("You purloin %1.\n").arg(k->short_description));
       }
       move_obj(k, ch);
       return ReturnValue::eSUCCESS;
@@ -305,16 +305,16 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, name);
   if (!*name) // no arguments. print an informative text
   {
-    ch->sendln("Usage:\r\nset <name> <field> <value>");
+    ch->sendln("Usage:\nset <name> <field> <value>");
 
-    strcpy(help, "\r\nField being one of the following:\r\n");
+    strcpy(help, "\nField being one of the following:\n");
     ch->display_string_list(values);
     /*        for (i = 1; *values[i] != '\n'; i++)
             {
                 sprintf(help + strlen(help), "%18s", values[i]);
                 if (!(i % 4))
                 {
-                    strcat(help, "\r\n");
+                    strcat(help, "\n");
                     ch->send(help);
                     *help = '\0';
                 }
@@ -335,7 +335,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Get real! You ain't that big.");
     if (vict->isPlayer())
     {
-      sprintf(buf2, "%s just tried to set: %s\r\n", GET_NAME(ch), buf);
+      sprintf(buf2, "%s just tried to set: %s\n", GET_NAME(ch), buf);
       send_to_char(buf2, vict);
     }
     return ReturnValue::eFAILURE;
@@ -415,7 +415,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
 
     {
       send_to_char("Class must be 'm','c','w','t','a','p','b',"
-                   "'r', 'k'(monk), 'd'(bard), or 'u'(druid). \r\n",
+                   "'r', 'k'(monk), 'd'(bard), or 'u'(druid). \n",
                    ch);
       return ReturnValue::eFAILURE;
     }
@@ -799,7 +799,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
   {
     if (!*buf)
     {
-      ch->send(QStringLiteral("Syntax: set <vict> profession <0-%1>\r\n").arg(MAX_PROFESSIONS));
+      ch->send(QStringLiteral("Syntax: set <vict> profession <0-%1>\n").arg(MAX_PROFESSIONS));
       return ReturnValue::eFAILURE;
     }
 
@@ -811,7 +811,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
 
     if (!check_range_valid_and_convert(value, buf, 0, MAX_PROFESSIONS))
     {
-      ch->send(QStringLiteral("Save type be from 0 to %1.\r\n").arg(MAX_PROFESSIONS));
+      ch->send(QStringLiteral("Save type be from 0 to %1.\n").arg(MAX_PROFESSIONS));
       return ReturnValue::eFAILURE;
     }
 

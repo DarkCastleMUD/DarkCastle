@@ -168,9 +168,9 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
     old = buf;
     QString newsstring = tnews->news;
     if (up)
-      buf = u"%1$B$4[ $3%2 $4] \r\n$R%3\r\n"_s.arg(old).arg(timez).arg(newsstring);
+      buf = u"%1$B$4[ $3%2 $4] \n$R%3\n"_s.arg(old).arg(timez).arg(newsstring);
     else
-      buf = u"$B$4[ $3%1$4 ] \r\n$R%2\r\n%3"_s.arg(timez).arg(newsstring).arg(old);
+      buf = u"$B$4[ $3%1$4 ] \n$R%2\n%3"_s.arg(timez).arg(newsstring).arg(old);
     if (buf.size() > MAX_STRING_LENGTH - 1000)
       break;
   }
@@ -198,9 +198,9 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
 
   if (!argument || !*argument || !ch->desc)
   {
-    send_to_char("Syntax: addnews <date>\r\n"
-                 "Date is either TODAY or in the following format: day/month/year\r\n"
-                 "such as 23/02/06 for 23rd february 2006\r\n",
+    send_to_char("Syntax: addnews <date>\n"
+                 "Date is either TODAY or in the following format: day/month/year\n"
+                 "such as 23/02/06 for 23rd february 2006\n",
                  ch);
     return ReturnValue::eFAILURE;
   }
@@ -262,7 +262,7 @@ int do_addnews(Character *ch, char *argument, cmd_t cmd)
   ch->sendln("        Enter news item.  (/s saves /h for help)");
   if (!nnews->news.isEmpty())
     ch->send(nnews->news);
-  //  nnews->news = str_dup("Temporary data.\r\n");
+  //  nnews->news = str_dup("Temporary data.\n");
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(nnews->news);
   ch->desc->max_str = 2096;

@@ -581,10 +581,10 @@ void Character::display_string_list(QStringList list)
     send(QStringLiteral("%1").arg(item, 18));
     if (++count % 4 == 0)
     {
-      send("\r\n");
+      send("\n");
     }
   }
-  send("\r\n");
+  send("\n");
 }
 
 void Character::display_string_list(const char *list[])
@@ -597,7 +597,7 @@ void Character::display_string_list(const char *list[])
     sprintf(buf + strlen(buf), "%18s", list[i - 1]);
     if (!(i % 4))
     {
-      strlcat(buf, "\r\n", MAX_STRING_LENGTH);
+      strlcat(buf, "\n", MAX_STRING_LENGTH);
       this->send(buf);
       *buf = '\0';
     }
@@ -1072,7 +1072,7 @@ QString Character::parse_prompt_variable(QString variable, PromptVariableType ty
     value = time_look[weather_info.sunlight];
   }
   else if (variable == "cr")
-    value = QStringLiteral("\r\n");
+    value = QStringLiteral("\n");
 
   if (value.isEmpty())
     return {};
@@ -1113,7 +1113,7 @@ QString Character::createPrompt(void)
     match = re.match(source);
   }
 
-  if (!source.endsWith(' ') && !source.endsWith('\n') && !source.endsWith('\r'))
+  if (!source.endsWith(' ') && !source.endsWith('\n'))
     source.append(" ");
 
   return source;
