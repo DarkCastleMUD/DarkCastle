@@ -4876,7 +4876,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  LegacyFile lf("mobs", curr->filename(), "Couldn't open legacy mob save file %1.");
+  LegacyFile lf("", curr->filename(), "Couldn't open legacy mob save file %1.");
   if (lf.isOpen())
   {
     for (const auto &[vnum, enabled] : curr->vnums().asKeyValueRange())
@@ -4885,10 +4885,14 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
         write_mobile(lf, DC::getInstance()->mob_index[vnum].mob);
     }
     dc_fprintf(lf.file_handle_, "$~\n");
+    DC::getInstance()->set_zone_saved_mob(curr->firstnum());
+    ch->sendln("Saved.");
+  }
+  else
+  {
+    ch->sendln(u"Failed to save to '%1'."_s.arg(curr->filename()));
   }
 
-  ch->sendln("Saved.");
-  DC::getInstance()->set_zone_saved_mob(curr->firstnum());
   return ReturnValue::eSUCCESS;
 }
 
