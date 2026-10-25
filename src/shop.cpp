@@ -702,6 +702,18 @@ void shopping_list(const char *arg, Character *ch,
 // TODO - Remove goto's from this....I hate goto's.  This is C, not BASIC....
 int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
 {
+  switch (cmd)
+  {
+  case cmd_t::BUY:
+  case cmd_t::SELL:
+  case cmd_t::VALUE:
+  case cmd_t::LIST:
+    break;
+  default:
+    return ReturnValue::eFAILURE;
+    break;
+  }
+
   Character *keeper;
   int shop_nr;
 
