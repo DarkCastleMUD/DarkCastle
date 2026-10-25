@@ -375,3 +375,30 @@ extern int exp_table[61 + 1];
 
 int fwrite_string(char *buf, FILEPtr fl);
 int fwrite_string(QString buf, FILEPtr fl);
+
+template <typename T>
+typename T::const_iterator const find_file_list(T &file_list, vnum_t vnum)
+{
+  return std::find_if(file_list.cbegin(), file_list.cend(), [&vnum](const auto &entry)
+                      { 
+                      if (entry->vnums().contains(vnum))
+                      {
+                      assert (entry->vnums()[vnum]);
+                      return true;
+                      }
+                      else
+                      {
+                      return false;
+                      } });
+}
+
+template <typename T>
+typename T::const_iterator const do_find_file_list(Character *ch, T &file_list, vnum_t vnum)
+{
+  const auto &it = find_file_list(file_list, vnum);
+  if (it == file_list.cend())
+  {
+    ch->sendln("That range doesn't seem to exist...tell an imp.");
+  }
+  return it;
+}

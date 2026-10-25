@@ -4811,13 +4811,7 @@ int do_rsave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  const auto it = std::find_if(DC::getInstance()->world_file_list.cbegin(), DC::getInstance()->world_file_list.cend(), [&ch](const auto &entry)
-                               { return entry->vnums().contains(ch->in_room) && entry->vnums()[ch->in_room]; });
-  if (it == DC::getInstance()->world_file_list.cend())
-  {
-    ch->sendln("That range doesn't seem to exist...tell an imp.");
-    return ReturnValue::eFAILURE;
-  }
+  const auto &it = do_find_file_list(ch, DC::getInstance()->world_file_list, ch->in_room);
   const auto &curr = *it;
   if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
   {
@@ -4860,14 +4854,7 @@ int do_msave(Character *ch, char *arg, cmd_t cmd)
 
   int r = v;
 
-  const auto &it = std::find_if(DC::getInstance()->mob_file_list.cbegin(), DC::getInstance()->mob_file_list.cend(), [&r](const auto &entry)
-                                { return entry->vnums().contains(r) && entry->vnums()[r]; });
-
-  if (it == DC::getInstance()->mob_file_list.cend())
-  {
-    ch->sendln("That range doesn't seem to exist...tell an imp.");
-    return ReturnValue::eFAILURE;
-  }
+  const auto &it = do_find_file_list(ch, DC::getInstance()->mob_file_list, v);
   const auto &curr = *it;
 
   if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
@@ -4913,14 +4900,7 @@ int do_osave(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
   int r = v;
-
-  const auto it = std::find_if(DC::getInstance()->obj_file_list.cbegin(), DC::getInstance()->obj_file_list.cend(), [&r](const auto &entry)
-                               { return entry->vnums().contains(r) && entry->vnums()[r]; });
-  if (it == DC::getInstance()->obj_file_list.cend())
-  {
-    ch->sendln("That range doesn't seem to exist...tell an imp.");
-    return ReturnValue::eFAILURE;
-  }
+  const auto &it = do_find_file_list(ch, DC::getInstance()->obj_file_list, v);
   const auto &curr = *it;
 
   if (!isSet(curr->flags, WORLD_FILE_MODIFIED))
