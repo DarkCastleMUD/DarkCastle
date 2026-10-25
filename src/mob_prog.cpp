@@ -132,20 +132,33 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-int mprog_veval(int64_t lhs, char *opr, int64_t rhs);
-int mprog_do_ifchck(char *ifchck, Character *mob,
-                    Character *actor, Object *obj,
-                    void *vo, Character *rndm);
-char *mprog_process_if(char *ifchck, char *com_list,
-                       Character *mob, Character *actor,
-                       Object *obj, void *vo,
-                       Character *rndm, mprog_throw_type *thrw = nullptr);
-void mprog_translate(char ch, char *t, Character *mob,
-                     Character *actor, Object *obj,
-                     void *vo, Character *rndm);
-int mprog_process_cmnd(char *cmnd, Character *mob,
-                       Character *actor, Object *obj,
-                       void *vo, Character *rndm);
+bool mprog_veval(auto lhs, QString opr, auto rhs)
+{
+  if (opr == "==")
+    return lhs == rhs;
+  if (opr == "!=")
+    return lhs != rhs;
+  if (opr == ">")
+    return lhs > rhs;
+  if (opr == "<")
+    return lhs < rhs;
+  if (opr == "<=")
+    return lhs <= rhs;
+  if (opr == ">=")
+    return lhs >= rhs;
+  if (opr == "&")
+    return lhs & rhs;
+  if (opr == "|")
+    return lhs | rhs;
+
+  logworld(u"Improper MOBprog operator"_s);
+  return false;
+}
+
+int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
+char *mprog_process_if(char *ifchck, char *com_list, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, mprog_throw_type *thrw = nullptr);
+void mprog_translate(char ch, char *t, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
+int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
 
 /***************************************************************************
  * Local function code and brief comments.
@@ -226,81 +239,6 @@ bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
   logworld(QStringLiteral("Improper MOBprog operator"));
   return false;
 }
-
-/*
-int mprog_veval( int lhs, char *opr, int rhs )
-{
-
-  if ( !str_cmp( opr, "==" ) )
-        return ( lhs == rhs );
-  if ( !str_cmp( opr, "!=" ) )
-        return ( lhs != rhs );
-  if ( !str_cmp( opr, ">" ) )
-        return ( lhs > rhs );
-  if ( !str_cmp( opr, "<" ) )
-        return ( lhs < rhs );
-  if ( !str_cmp( opr, "<=" ) )
-        return ( lhs <= rhs );
-  if ( !str_cmp( opr, ">=" ) )
-        return ( lhs >= rhs );
-  if ( !str_cmp( opr, "&" ) )
-        return ( lhs & rhs );
-  if ( !str_cmp( opr, "|" ) )
-        return ( lhs | rhs );
-
-  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n", 0 );
-  return 0;
-
-}
-*/
-int mprog_veval(int64_t lhs, char *opr, int64_t rhs)
-{
-
-  if (!str_cmp(opr, "=="))
-    return (lhs == rhs);
-  if (!str_cmp(opr, "!="))
-    return (lhs != rhs);
-  if (!str_cmp(opr, ">"))
-    return (lhs > rhs);
-  if (!str_cmp(opr, "<"))
-    return (lhs < rhs);
-  if (!str_cmp(opr, "<="))
-    return (lhs <= rhs);
-  if (!str_cmp(opr, ">="))
-    return (lhs >= rhs);
-  if (!str_cmp(opr, "&"))
-    return (lhs & rhs);
-  if (!str_cmp(opr, "|"))
-    return (lhs | rhs);
-
-  logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Improper MOBprog operator\n", 0);
-  return 0;
-}
-/*
-int mprog_veval( quint64 lhs, char *opr, quint64 rhs )
-{
-  if ( !str_cmp( opr, "==" ) )
-        return ( lhs == rhs );
-  if ( !str_cmp( opr, "!=" ) )
-        return ( lhs != rhs );
-  if ( !str_cmp( opr, ">" ) )
-        return ( lhs > rhs );
-  if ( !str_cmp( opr, "<" ) )
-        return ( lhs < rhs );
-  if ( !str_cmp( opr, "<=" ) )
-        return ( lhs <= rhs );
-  if ( !str_cmp( opr, ">=" ) )
-        return ( lhs >= rhs );
-  if ( !str_cmp( opr, "&" ) )
-        return ( lhs & rhs );
-  if ( !str_cmp( opr, "|" ) )
-        return ( lhs | rhs );
-
-  logf( IMMORTAL, DC::LogChannel::LOG_WORLD,  "Improper MOBprog operator\n", 0 );
-  return 0;
-
-}
-*/
 
 bool Character::isTank(void)
 {
