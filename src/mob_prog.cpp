@@ -1431,8 +1431,7 @@ std::map<std::string, mprog_ifs> load_ifchecks()
 
 std::map<std::string, mprog_ifs> ifcheck = load_ifchecks();
 
-int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
-                    Object *obj, void *vo, Character *rndm)
+int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -1446,109 +1445,109 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
   char *argpt = arg;
   char *oprpt = opr;
   char *valpt = val;
-  char *point = ifchck;
+  char *ifchckpt = ifchck;
   val2[0] = '\0';
 
-  if (*point == '\0')
+  if (*ifchckpt == '\0')
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: null ifchck: '%s'", mob->mobdata->vnum_, ifchck);
     return -1;
   }
   /* skip leading spaces */
-  while (*point == ' ')
-    point++;
+  while (*ifchckpt == ' ')
+    ifchckpt++;
   bool traditional = false;
 
   /* get whatever comes before the left paren.. ignore spaces */
-  while (*point)
-    if (*point == '(')
+  while (*ifchckpt)
+    if (*ifchckpt == '(')
     {
       traditional = true;
       break;
     }
-    else if (*point == ' ')
+    else if (*ifchckpt == ' ')
     {
       mob->prog_error(QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
       return -1;
     }
-    else if (*point == '.')
+    else if (*ifchckpt == '.')
     {
       break;
     }
-    else if (*point == '\0')
+    else if (*ifchckpt == '\0')
     {
       mob->prog_error(QStringLiteral("ifchck syntax error"));
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
       return -1;
     }
-    else if (*point == ' ')
-      point++;
+    else if (*ifchckpt == ' ')
+      ifchckpt++;
     else
-      *bufpt++ = *point++;
+      *bufpt++ = *ifchckpt++;
 
   *bufpt = '\0';
-  point++;
+  ifchckpt++;
 
   /* get whatever is in between the parens.. ignore spaces */
-  while (*point)
-    if (traditional && *point == ')')
+  while (*ifchckpt)
+    if (traditional && *ifchckpt == ')')
       break;
-    else if (!traditional && !isalpha(*point))
+    else if (!traditional && !isalpha(*ifchckpt))
     {
-      point--;
+      ifchckpt--;
       break;
     }
-    else if (*point == '\0')
+    else if (*ifchckpt == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
       return -1;
     }
-    else if (*point == ' ')
-      point++;
+    else if (*ifchckpt == ' ')
+      ifchckpt++;
     else
-      *argpt++ = *point++;
+      *argpt++ = *ifchckpt++;
 
   *argpt = '\0';
-  point++;
+  ifchckpt++;
 
   /* check to see if there is an operator */
 
   // same for both traditional and non-traditional
-  while (*point == ' ')
-    point++;
-  if (*point == '\0')
+  while (*ifchckpt == ' ')
+    ifchckpt++;
+  if (*ifchckpt == '\0')
   {
     *opr = '\0';
     *val = '\0';
   }
   else /* there should be an operator and value, so get them */
   {
-    while ((*point != ' ') && (!isalnum(*point)))
-      if (*point == '\0')
+    while ((*ifchckpt != ' ') && (!isalnum(*ifchckpt)))
+      if (*ifchckpt == '\0')
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck operator without value: '%s'", mob->mobdata->vnum_, ifchck);
         return -1;
       }
       else
-        *oprpt++ = *point++;
+        *oprpt++ = *ifchckpt++;
 
     *oprpt = '\0';
 
     /* finished with operator, skip spaces and then get the value */
-    while (*point == ' ')
-      point++;
+    while (*ifchckpt == ' ')
+      ifchckpt++;
     for (;;)
     {
-      if (*point == '.')
+      if (*ifchckpt == '.')
       {
         *valpt = '\0';
         valpt = val2;
-        point++;
+        ifchckpt++;
       }
-      else if (*point == '\0' || *point == '\n')
+      else if (*ifchckpt == '\0' || *ifchckpt == '\n')
         break;
       else
-        *valpt++ = *point++;
+        *valpt++ = *ifchckpt++;
     }
 
     *valpt = '\0';
@@ -1626,20 +1625,20 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor,
 
   if (!traditional)
   {
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
       qDebug("%s vs %s", buf, arg);
     translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
       qDebug("%s vs %s", buf, arg);
   }
   else
   {
     // switch order of traditional so it'd be $n(ispc), to conform with
     // new ifchecks
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
       qDebug("%s vs %s", arg, buf);
     translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
+    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
       qDebug("%s vs %s", arg, buf);
   }
 
