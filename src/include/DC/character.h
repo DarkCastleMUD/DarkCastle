@@ -48,6 +48,13 @@
 #include "DC/dcstdio.h"
 #include "DC/obj.h"
 
+enum IfReturnType
+{
+  TRUE = 1,
+  FALSE = 0,
+  ILLEGAL = -1
+};
+
 class Character;
 struct timeval;
 
@@ -1219,7 +1226,7 @@ public:
   void list_obj_to_char(Object *list, int mode, bool show);
   void list_char_to_char(Character *list, int mode);
 
-  bool mprog_seval(QString lhs, QString opr, QString rhs);
+  IfReturnType mprog_seval(QString lhs, QString opr, QString rhs);
   QString getTemp(QString name);
 
   QString get_random_hate(void);
@@ -1409,7 +1416,7 @@ public:
   int oprog_load_trigger(void);
   int oprog_weapon_trigger(Object *item);
   int oprog_armour_trigger(Object *item);
-  bool mprog_seval(const char *lhs, const char *opr, const char *rhs);
+  IfReturnType mprog_seval(const char *lhs, const char *opr, const char *rhs);
   bool isTank(void);
   void save_char_obj(void);
   void char_to_store(class char_file_u4 *st, time_data &tmpage);

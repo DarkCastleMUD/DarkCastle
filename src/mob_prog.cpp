@@ -132,30 +132,30 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-bool mprog_veval(auto lhs, QString opr, auto rhs)
+IfReturnType mprog_veval(auto lhs, QString opr, auto rhs)
 {
   if (opr == "==")
-    return lhs == rhs;
+    return IfReturnType(lhs == rhs);
   if (opr == "!=")
-    return lhs != rhs;
+    return IfReturnType(lhs != rhs);
   if (opr == ">")
-    return lhs > rhs;
+    return IfReturnType(lhs > rhs);
   if (opr == "<")
-    return lhs < rhs;
+    return IfReturnType(lhs < rhs);
   if (opr == "<=")
-    return lhs <= rhs;
+    return IfReturnType(lhs <= rhs);
   if (opr == ">=")
-    return lhs >= rhs;
+    return IfReturnType(lhs >= rhs);
   if (opr == "&")
-    return lhs & rhs;
+    return IfReturnType(lhs & rhs);
   if (opr == "|")
-    return lhs | rhs;
+    return IfReturnType(lhs | rhs);
 
   logworld(u"Improper MOBprog operator"_s);
-  return false;
+  return IfReturnType::ILLEGAL;
 }
 
-int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
+IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
 char *mprog_process_if(char *ifchck, char *com_list, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, mprog_throw_type *thrw = nullptr);
 void mprog_translate(char ch, char *t, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
 int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
@@ -203,41 +203,41 @@ char *mprog_next_command(char *clist)
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-bool Character::mprog_seval(const char *lhs, const char *opr, const char *rhs)
+IfReturnType Character::mprog_seval(const char *lhs, const char *opr, const char *rhs)
 {
   if (!lhs || !rhs)
-    return false;
+    return IfReturnType::FALSE;
   if (!str_cmp(opr, "=="))
-    return (!str_cmp(lhs, rhs));
+    return IfReturnType(!str_cmp(lhs, rhs));
   if (!str_cmp(opr, "!="))
-    return (str_cmp(lhs, rhs));
+    return IfReturnType(str_cmp(lhs, rhs));
   if (!str_cmp(opr, "/"))
-    return (!str_infix(rhs, lhs));
+    return IfReturnType(!str_infix(rhs, lhs));
   if (!str_cmp(opr, "!/"))
-    return (str_infix(rhs, lhs));
+    return IfReturnType(str_infix(rhs, lhs));
 
   prog_error(QStringLiteral("Improper MOBprog operator"));
   logworld(QStringLiteral("Improper MOBprog operator"));
-  return false;
+  return IfReturnType::FALSE;
 }
 
-bool Character::mprog_seval(QString lhs, QString opr, QString rhs)
+IfReturnType Character::mprog_seval(QString lhs, QString opr, QString rhs)
 {
   if (lhs.isEmpty() || rhs.isEmpty())
-    return false;
+    return IfReturnType::FALSE;
 
   if (opr == "==")
-    return lhs == rhs;
+    return IfReturnType(lhs == rhs);
   if (opr == "!=")
-    return lhs != rhs;
+    return IfReturnType(lhs != rhs);
   if (opr == "/")
-    return !str_infix(rhs, lhs);
+    return IfReturnType(!str_infix(rhs, lhs));
   if (opr == "!/")
-    return str_infix(rhs, lhs);
+    return IfReturnType(str_infix(rhs, lhs));
 
   prog_error(QStringLiteral("Improper MOBprog operator"));
   logworld(QStringLiteral("Improper MOBprog operator"));
-  return false;
+  return IfReturnType::ILLEGAL;
 }
 
 bool Character::isTank(void)
@@ -1431,7 +1431,7 @@ std::map<std::string, mprog_ifs> load_ifchecks()
 
 std::map<std::string, mprog_ifs> ifcheck = load_ifchecks();
 
-int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
+IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -1451,7 +1451,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
   if (*ifchckpt == '\0')
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: null ifchck: '%s'", mob->mobdata->vnum_, ifchck);
-    return -1;
+    return IfReturnType::ILLEGAL;
   }
   /* skip leading spaces */
   while (*ifchckpt == ' ')
@@ -1468,7 +1468,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     else if (*ifchckpt == ' ')
     {
       mob->prog_error(QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == '.')
     {
@@ -1478,7 +1478,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     {
       mob->prog_error(QStringLiteral("ifchck syntax error"));
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == ' ')
       ifchckpt++;
@@ -1500,7 +1500,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     else if (*ifchckpt == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == ' ')
       ifchckpt++;
@@ -1526,7 +1526,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
       if (*ifchckpt == '\0')
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck operator without value: '%s'", mob->mobdata->vnum_, ifchck);
-        return -1;
+        return IfReturnType::ILLEGAL;
       }
       else
         *oprpt++ = *ifchckpt++;
@@ -1703,11 +1703,11 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
   switch (ifcheck[buf])
   {
   case eRAND:
-    return (number(1, 100) <= atoi(arg));
+    return IfReturnType(number(1, 100) <= atoi(arg));
     break;
 
   case eRAND1K:
-    return (number(1, 1000) <= atoi(arg));
+    return IfReturnType(number(1, 1000) <= atoi(arg));
     break;
 
   case eAMTITEMS:
@@ -1780,92 +1780,92 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
 
   case eISPC:
     if (fvict)
-      return fvict->isPlayer();
+      return IfReturnType(fvict->isPlayer());
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return 0;
+      return IfReturnType::FALSE;
     case 'z':
       if (mob->beacon)
-        return reinterpret_cast<Character *>(mob->beacon)->isNonPlayer();
+        return IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isNonPlayer());
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return (actor->isPlayer());
+        return IfReturnType(actor->isPlayer());
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 't':
       if (vict)
-        return (vict->isPlayer());
+        return IfReturnType(vict->isPlayer());
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'r':
       if (rndm)
-        return (rndm->isPlayer());
+        return IfReturnType(rndm->isPlayer());
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'f':
       if (actor && actor->fighting)
-        return (actor->fighting->isPlayer());
+        return IfReturnType(actor->fighting->isPlayer());
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'g':
       if (mob && mob->fighting)
-        return (mob->fighting->isPlayer());
+        return IfReturnType(mob->fighting->isPlayer());
       else
-        return 0;
+        return IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'ispc'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISWIELDING:
     if (fvict)
-      return fvict->equipment[WEAR_WIELD] ? 1 : 0;
+      return fvict->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return (mob->equipment[WEAR_WIELD]) ? 1 : 0;
+      return (mob->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->equipment[WEAR_WIELD] ? 1 : 0;
+        return ((Character *)mob->beacon)->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return (actor->equipment[WEAR_WIELD]) ? 1 : 0;
+        return (actor->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 't':
       if (vict)
-        return (vict->equipment[WEAR_WIELD]) ? 1 : 0;
+        return (vict->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'r':
       if (rndm)
-        return (rndm->equipment[WEAR_WIELD]) ? 1 : 0;
+        return (rndm->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'f':
       if (actor && actor->fighting)
-        return (actor->fighting->equipment[WEAR_WIELD]) ? 1 : 0;
+        return (actor->fighting->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'g':
       if (mob && mob->fighting)
-        return (mob->fighting->equipment[WEAR_WIELD]) ? 1 : 0;
+        return (mob->fighting->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return 0;
+        return IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'iswielding'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
@@ -1873,37 +1873,37 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (fvict && fvict->equipment[WEAR_WIELD])
       return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
       if (mob->equipment[WEAR_WIELD])
         return mprog_veval(mob->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'z':
       if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_WIELD])
         return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor && actor->equipment[WEAR_WIELD])
         return mprog_veval(actor->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 't':
       if (vict && vict->equipment[WEAR_WIELD])
         return mprog_veval(vict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'r':
       if (rndm && rndm->equipment[WEAR_WIELD])
         return mprog_veval(rndm->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isweappri'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
@@ -1911,181 +1911,181 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (fvict && fvict->equipment[WEAR_SECOND_WIELD])
       return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
       if (mob->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'z':
       if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor && actor->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 't':
       if (vict && vict->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'r':
       if (rndm && rndm->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return 0;
+        return IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isweapsec'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISNPC:
     if (fvict)
-      return fvict->isNonPlayer();
+      return IfReturnType(fvict->isNonPlayer());
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return true;
+      return IfReturnType::TRUE;
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->isNonPlayer();
+        return IfReturnType(((Character *)mob->beacon)->isNonPlayer());
       else
-        return false;
+        return IfReturnType::FALSE;
 
     case 'n':
       if (actor)
-        return actor->isNonPlayer();
+        return IfReturnType(actor->isNonPlayer());
       else
-        return false;
+        return IfReturnType::FALSE;
     case 't':
       if (vict)
-        return vict->isNonPlayer();
+        return IfReturnType(vict->isNonPlayer());
       else
-        return false;
+        return IfReturnType::FALSE;
     case 'r':
       if (rndm)
-        return rndm->isNonPlayer();
+        return IfReturnType(rndm->isNonPlayer());
       else
-        return false;
+        return IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isnpc(): '%s'", mob->mobdata->vnum_, ifchck);
-      return false;
+      return IfReturnType::FALSE;
     }
     break;
 
   case eISGOOD:
     if (fvict)
-      return IS_GOOD(fvict);
+      return IfReturnType(IS_GOOD(fvict));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return IS_GOOD(mob);
+      return IfReturnType(IS_GOOD(mob));
     case 'z':
       if (mob->beacon)
-        return IS_GOOD(((Character *)mob->beacon));
+        return IfReturnType(IS_GOOD(((Character *)mob->beacon)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IS_GOOD(actor);
+        return IfReturnType(IS_GOOD(actor));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IS_GOOD(vict);
+        return IfReturnType(IS_GOOD(vict));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IS_GOOD(rndm);
+        return IfReturnType(IS_GOOD(rndm));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISNEUTRAL:
     if (fvict)
-      return IS_NEUTRAL(fvict);
+      return IfReturnType(IS_NEUTRAL(fvict));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return IS_NEUTRAL(mob);
+      return IfReturnType(IS_NEUTRAL(mob));
     case 'z':
       if (mob->beacon)
-        return IS_NEUTRAL(((Character *)mob->beacon));
+        return IfReturnType(IS_NEUTRAL(((Character *)mob->beacon)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IS_NEUTRAL(actor);
+        return IfReturnType(IS_NEUTRAL(actor));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IS_NEUTRAL(vict);
+        return IfReturnType(IS_NEUTRAL(vict));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IS_NEUTRAL(rndm);
+        return IfReturnType(IS_NEUTRAL(rndm));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISEVIL:
     if (fvict)
-      return IS_EVIL(fvict);
+      return IfReturnType(IS_EVIL(fvict));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return IS_EVIL(mob);
+      return IfReturnType(IS_EVIL(mob));
     case 'z':
       if (mob->beacon)
-        return IS_EVIL(((Character *)mob->beacon));
+        return IfReturnType(IS_EVIL(((Character *)mob->beacon)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IS_EVIL(actor);
+        return IfReturnType(IS_EVIL(actor));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IS_EVIL(vict);
+        return IfReturnType(IS_EVIL(vict));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IS_EVIL(rndm);
+        return IfReturnType(IS_EVIL(rndm));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
@@ -2097,218 +2097,218 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
       o = mob->mobdata->getObject();
     }
     if (fvict)
-      return is_wearing(fvict, o);
+      return IfReturnType(is_wearing(fvict, o));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'z':
       if (mob->beacon)
-        return is_wearing(((Character *)mob->beacon), o);
+        return IfReturnType(is_wearing(((Character *)mob->beacon), o));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'i':
-      return -1;
+      return IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return is_wearing(actor, o);
+        return IfReturnType(is_wearing(actor, o));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return is_wearing(actor, o);
+        return IfReturnType(is_wearing(actor, o));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return is_wearing(rndm, o);
+        return IfReturnType(is_wearing(rndm, o));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isword(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
   }
   break;
 
   case eISFIGHT:
     if (fvict)
-      return fvict->fighting ? 1 : 0;
+      return fvict->fighting ? IfReturnType::TRUE : IfReturnType::FALSE;
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->fighting ? 1 : 0;
+        return IfReturnType(((Character *)mob->beacon)->fighting ? 1 : 0);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'i':
-      return (mob->fighting) ? 1 : 0;
+      return IfReturnType((mob->fighting) ? 1 : 0);
     case 'n':
       if (actor)
-        return (actor->fighting) ? 1 : 0;
+        return IfReturnType((actor->fighting) ? 1 : 0);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return (vict->fighting) ? 1 : 0;
+        return IfReturnType((vict->fighting) ? 1 : 0);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return (rndm->fighting) ? 1 : 0;
+        return IfReturnType((rndm->fighting) ? 1 : 0);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isfight(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISTANK:
     if (fvict)
-      return fvict->isTank();
+      return IfReturnType(fvict->isTank());
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'z':
       if (mob->beacon)
-        return reinterpret_cast<Character *>(mob->beacon)->isTank();
+        return IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isTank());
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'i':
-      return mob->isTank();
+      return IfReturnType(mob->isTank());
     case 'n':
       if (actor)
-        return actor->isTank();
+        return IfReturnType(actor->isTank());
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return vict->isTank() ? 1 : 0;
+        return IfReturnType(vict->isTank());
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return rndm->isTank() ? 1 : 0;
+        return IfReturnType(rndm->isTank());
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to istank(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISIMMORT:
     if (fvict)
-      return fvict->getLevel() > IMMORTAL;
+      return IfReturnType(fvict->getLevel() > IMMORTAL);
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return (mob->getLevel() > IMMORTAL);
+      return IfReturnType(mob->getLevel() > IMMORTAL);
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->getLevel() > IMMORTAL;
+        return IfReturnType(((Character *)mob->beacon)->getLevel() > IMMORTAL);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return (actor->getLevel() > IMMORTAL);
+        return IfReturnType(actor->getLevel() > IMMORTAL);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return (vict->getLevel() > IMMORTAL);
+        return IfReturnType(vict->getLevel() > IMMORTAL);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return (rndm->getLevel() > IMMORTAL);
+        return IfReturnType(rndm->getLevel() > IMMORTAL);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isimmort(): '%s'", mob->mobdata->vnum_, ifchck);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISCHARMED:
     if (fvict)
-      return IS_AFFECTED(fvict, AFF_CHARM);
+      return IfReturnType(IS_AFFECTED(fvict, AFF_CHARM));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return IS_AFFECTED(mob, AFF_CHARM);
+      return IfReturnType(IS_AFFECTED(mob, AFF_CHARM));
     case 'z':
       if (mob->beacon)
-        return IS_AFFECTED(((Character *)mob->beacon), AFF_CHARM);
+        return IfReturnType(IS_AFFECTED(((Character *)mob->beacon), AFF_CHARM));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return IS_AFFECTED(actor, AFF_CHARM);
+        return IfReturnType(IS_AFFECTED(actor, AFF_CHARM));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IS_AFFECTED(vict, AFF_CHARM);
+        return IfReturnType(IS_AFFECTED(vict, AFF_CHARM));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IS_AFFECTED(rndm, AFF_CHARM);
+        return IfReturnType(IS_AFFECTED(rndm, AFF_CHARM));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'ischarmed'", mob->mobdata->vnum_);
 
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISFOLLOW:
     if (fvict)
-      return (fvict->master != nullptr && fvict->master->in_room == fvict->in_room);
+      return IfReturnType(fvict->master != nullptr && fvict->master->in_room == fvict->in_room);
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return (mob->master != nullptr && mob->master->in_room == mob->in_room);
+      return IfReturnType(mob->master != nullptr && mob->master->in_room == mob->in_room);
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->master && ((Character *)mob->beacon)->master->in_room == ((Character *)mob->beacon)->in_room;
+        return IfReturnType(((Character *)mob->beacon)->master && ((Character *)mob->beacon)->master->in_room == ((Character *)mob->beacon)->in_room);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return (actor->master != nullptr && actor->master->in_room == actor->in_room);
+        return IfReturnType(actor->master != nullptr && actor->master->in_room == actor->in_room);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return (vict->master != nullptr && vict->master->in_room == vict->in_room);
+        return IfReturnType(vict->master != nullptr && vict->master->in_room == vict->in_room);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return (rndm->master != nullptr && rndm->master->in_room == rndm->in_room);
+        return IfReturnType(rndm->master != nullptr && rndm->master->in_room == rndm->in_room);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isfollow'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
@@ -2319,130 +2319,130 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (!str_cmp(val, "fly")) // needs special check.. sigh..
     {
       if (fvict && IS_AFFECTED(fvict, AFF_FLYING))
-        return true;
+        return IfReturnType::TRUE;
       if (ye)
-        return false;
+        return IfReturnType::FALSE;
       switch (arg[1])
       {
       case 'i': // mob
         if (IS_AFFECTED(mob, AFF_FLYING))
-          return true;
+          return IfReturnType::TRUE;
         break;
       case 'z':
         if (mob->beacon)
           if (IS_AFFECTED(((Character *)mob->beacon), AFF_FLYING))
-            return true;
+            return IfReturnType::TRUE;
         break;
       case 'n': // actor
         if (actor)
           if (IS_AFFECTED(actor, AFF_FLYING))
-            return true;
+            return IfReturnType::TRUE;
         break;
       case 't': // vict
         if (vict)
           if (IS_AFFECTED(vict, AFF_FLYING))
-            return true;
+            return IfReturnType::TRUE;
         break;
       case 'r': // rand
         if (rndm)
           if (IS_AFFECTED(rndm, AFF_FLYING))
-            return true;
+            return IfReturnType::TRUE;
         break;
       case 'f':
         if (actor && actor->fighting)
           if (IS_AFFECTED(actor->fighting, AFF_FLYING))
-            return true;
+            return IfReturnType::TRUE;
         break;
       case 'g':
         if (mob && mob->fighting)
           if (IS_AFFECTED(mob->fighting, AFF_FLYING))
-            return true;
+            return IfReturnType::TRUE;
         break;
       default:
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isspelled'", mob->mobdata->vnum_);
-        return -1;
+        return IfReturnType::ILLEGAL;
       }
     }
 
     if (fvict)
-      return (int64_t)(fvict->affected_by_spell(find_skill_num(val)));
+      return IfReturnType((int64_t)(fvict->affected_by_spell(find_skill_num(val))));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1])
     {
     case 'i': // mob
-      return (int64_t)(mob->affected_by_spell(find_skill_num(val)));
+      return IfReturnType((int64_t)(mob->affected_by_spell(find_skill_num(val))));
     case 'z':
       if (mob->beacon)
-        return (int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val)));
+        return IfReturnType((int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val))));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'n': // actor
       if (actor)
-        return (int64_t)(actor->affected_by_spell(find_skill_num(val)));
+        return IfReturnType((int64_t)(actor->affected_by_spell(find_skill_num(val))));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't': // vict
       if (vict)
-        return (int64_t)(vict->affected_by_spell(find_skill_num(val)));
+        return IfReturnType((int64_t)(vict->affected_by_spell(find_skill_num(val))));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r': // rand
       if (rndm)
-        return (int64_t)(rndm->affected_by_spell(find_skill_num(val)));
-      return -1;
+        return IfReturnType((int64_t)(rndm->affected_by_spell(find_skill_num(val))));
+      return IfReturnType::ILLEGAL;
     case 'f':
       if (actor && actor->fighting)
-        return (int64_t)(actor->fighting->affected_by_spell(find_skill_num(val)));
+        return IfReturnType((int64_t)(actor->fighting->affected_by_spell(find_skill_num(val))));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'g':
       if (mob && mob->fighting)
-        return (int64_t)(mob->fighting->affected_by_spell(find_skill_num(val)));
+        return IfReturnType((int64_t)(mob->fighting->affected_by_spell(find_skill_num(val))));
       else
-        return 0;
+        return IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isspelled'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
   }
   break;
 
   case eISAFFECTED:
     if (fvict)
-      return (ISSET(fvict->affected_by, atoi(val)));
+      return IfReturnType(ISSET(fvict->affected_by, atoi(val)));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
-      return (ISSET(mob->affected_by, atoi(val)));
+      return IfReturnType(ISSET(mob->affected_by, atoi(val)));
     case 'z':
       if (mob->beacon)
-        return (ISSET(((Character *)mob->beacon)->affected_by, atoi(val)));
+        return IfReturnType(ISSET(((Character *)mob->beacon)->affected_by, atoi(val)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return (ISSET(actor->affected_by, atoi(val)));
+        return IfReturnType(ISSET(actor->affected_by, atoi(val)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return (ISSET(vict->affected_by, atoi(val)));
+        return IfReturnType(ISSET(vict->affected_by, atoi(val)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return (ISSET(rndm->affected_by, atoi(val)));
+        return IfReturnType(ISSET(rndm->affected_by, atoi(val)));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isaffected'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
@@ -2456,7 +2456,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
       return mprog_veval(lhsvl, opr, rhsvl);
     }
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'i':
@@ -2471,7 +2471,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
@@ -2481,7 +2481,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
       {
@@ -2490,7 +2490,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
       {
@@ -2499,10 +2499,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'hitprcnt'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2522,12 +2522,12 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     else
     {
       if (ye)
-        return false;
+        return IfReturnType::FALSE;
       switch (arg[1])
       {
       case 'z':
         if (!mob->beacon)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), true);
         take = ((Character *)mob->beacon);
       case 'i': // mob
@@ -2536,31 +2536,31 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         break;
       case 'n': // actor
         if (!actor)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(actor, atoi(valu), true);
         take = actor;
         break;
       case 't': // vict
         if (!vict)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(vict, atoi(valu), true);
         take = vict;
         break;
       case 'r': // rndm
         if (!rndm)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(rndm, atoi(valu), true);
         take = rndm;
         break;
       default:
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'carries'", mob->mobdata->vnum_);
-        return -1;
+        return IfReturnType::ILLEGAL;
       }
     }
     if (!obj)
-      return 0;
+      return IfReturnType::FALSE;
     if (!str_cmp(bufeh, "keep"))
-      return 1;
+      return IfReturnType::TRUE;
     else if (!str_cmp(bufeh, "take"))
     {
       int i;
@@ -2572,9 +2572,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
           obj_from_char(take->unequip_char(i));
         }
       extract_obj(obj);
-      return 1;
+      return IfReturnType::TRUE;
     }
-    return -1;
+    return IfReturnType::ILLEGAL;
   }
   break;
 
@@ -2592,12 +2592,12 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     else
     {
       if (ye)
-        return false;
+        return IfReturnType::FALSE;
       switch (arg[1])
       {
       case 'z':
         if (!mob->beacon)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), false);
         take = ((Character *)mob->beacon);
       case 'i': // mob
@@ -2606,31 +2606,31 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         break;
       case 'n': // actor
         if (!actor)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(actor, atoi(valu), false);
         take = actor;
         break;
       case 't': // vict
         if (!vict)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(vict, atoi(valu), false);
         take = vict;
         break;
       case 'r': // rndm
         if (!rndm)
-          return -1;
+          return IfReturnType::ILLEGAL;
         obj = search_char_for_item(rndm, atoi(valu), false);
         take = rndm;
         break;
       default:
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'carries'", mob->mobdata->vnum_);
-        return -1;
+        return IfReturnType::ILLEGAL;
       }
     }
     if (!obj)
-      return 0;
+      return IfReturnType::FALSE;
     if (!str_cmp(bufeh, "keep"))
-      return 1;
+      return IfReturnType::TRUE;
     else if (!str_cmp(bufeh, "take"))
     {
       int i;
@@ -2642,9 +2642,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
           obj_from_char(take->unequip_char(i));
         }
       extract_obj(obj);
-      return 1;
+      return IfReturnType::TRUE;
     }
-    return -1;
+    return IfReturnType::ILLEGAL;
   }
   break;
 
@@ -2654,13 +2654,13 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (fvict)
     {
       if (fvict->isPlayer())
-        return 0;
+        return IfReturnType::FALSE;
       lhsvl = fvict->mobdata->vnum_;
       rhsvl = atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     }
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
 
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
@@ -2678,10 +2678,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
           return mprog_veval(lhsvl, opr, rhsvl);
         }
         else
-          return 0;
+          return IfReturnType::FALSE;
       }
       else
-        return 0;
+        return IfReturnType::FALSE;
 
     case 'n':
       if (actor)
@@ -2694,7 +2694,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         }
       }
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 't':
       if (vict)
       {
@@ -2706,7 +2706,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         }
       }
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'r':
       if (rndm)
       {
@@ -2718,7 +2718,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         }
       }
       else
-        return 0;
+        return IfReturnType::FALSE;
     case 'o':
       if (obj)
       {
@@ -2727,7 +2727,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'p':
       if (v_obj)
       {
@@ -2736,10 +2736,10 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'number'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2750,7 +2750,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (arg[2] != '[')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad target  to 'tempvar'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     buf4pt = &arg[3];
     strcpy(buf4, buf4pt);
@@ -2760,7 +2760,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (*buf4pt == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad target to 'tempvar'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     *buf4pt = '\0';
     if (val[0] == '$' && val[1])
@@ -2769,7 +2769,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
     if (fvict)
       return mob->mprog_seval(fvict->getTemp(buf4), opr, val);
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'z':
@@ -2778,31 +2778,31 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
         return mob->mprog_seval(((Character *)mob->beacon)->getTemp(buf4), opr, val);
       }
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'i':
       return mob->mprog_seval(mob->getTemp(buf4), opr, val);
     case 'n':
       if (actor)
         return mob->mprog_seval(actor->getTemp(buf4), opr, val);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
         return mob->mprog_seval(vict->getTemp(buf4), opr, val);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
         return mob->mprog_seval(rndm->getTemp(buf4), opr, val);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'o':
-      return -1;
+      return IfReturnType::ILLEGAL;
     case 'p':
-      return -1;
+      return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'tempvar'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2819,9 +2819,9 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
       if (vch->isNonPlayer() &&
           vch != mob &&
           vch->mobdata->vnum_ == target)
-        return 1;
+        return IfReturnType::TRUE;
     }
-    return 0;
+    return IfReturnType::FALSE;
   }
   break;
 
@@ -2835,105 +2835,105 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
          obj = obj->next_content)
     {
       if (obj->vnum_ == target)
-        return 1;
+        return IfReturnType::TRUE;
     }
-    return 0;
+    return IfReturnType::FALSE;
   }
   break;
 
   case eCANSEE:
     if (fvict)
-      return CAN_SEE(mob, fvict, true);
+      return IfReturnType(CAN_SEE(mob, fvict, true));
     if (ye)
-      return false;
+      return IfReturnType::FALSE;
     switch (arg[1]) /* arg should be "$*" so just get the letter */
     {
     case 'z':
-      return 1; // can always see holder
+      return IfReturnType::TRUE; // can always see holder
     case 'i':
-      return 1;
+      return IfReturnType::TRUE;
     case 'n':
       if (actor)
-        return CAN_SEE(mob, actor, true);
+        return IfReturnType(CAN_SEE(mob, actor, true));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return CAN_SEE(mob, vict, true);
+        return IfReturnType(CAN_SEE(mob, vict, true));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return CAN_SEE(mob, rndm, true);
+        return IfReturnType(CAN_SEE(mob, rndm, true));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isnpc'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eINSAMEZONE:
     if (fvict)
-      return (GET_ZONE(fvict) == GET_ZONE(mob));
+      return IfReturnType(GET_ZONE(fvict) == GET_ZONE(mob));
     else if ((fvict = get_pc(arg)) != nullptr)
-      return (GET_ZONE(fvict) == GET_ZONE(mob));
+      return IfReturnType(GET_ZONE(fvict) == GET_ZONE(mob));
 
     switch (arg[1])
     {
     case 'i':
-      return 1; // always in the same zone as itself
+      return IfReturnType::TRUE; // always in the same zone as itself
     case 'n':
       if (actor)
-        return (GET_ZONE(actor) == GET_ZONE(mob));
+        return IfReturnType(GET_ZONE(actor) == GET_ZONE(mob));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
     case 't':
       if (vict)
-        return (GET_ZONE(vict) == GET_ZONE(mob));
+        return IfReturnType(GET_ZONE(vict) == GET_ZONE(mob));
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'insamezone'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eCLAN:
     if (fvict)
-      return fvict->clan;
+      return IfReturnType(fvict->clan);
     switch (arg[1])
     {
     case 'i':
-      return mob->clan; // always in the same zone as itself
+      return IfReturnType(mob->clan); // always in the same zone as itself
     case 'n':
       if (actor)
-        return actor->clan;
+        return IfReturnType(actor->clan);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     case 'r':
     case 't':
       if (vict)
-        return vict->clan;
+        return IfReturnType(vict->clan);
       else
-        return -1;
+        return IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'clan'", mob->mobdata->vnum_);
-      return -1;
+      return IfReturnType::ILLEGAL;
     }
     break;
 
   case eISDAYTIME:
     if (weather_info.sunlight == SUN_DARK)
-      return false;
-    return true;
+      return IfReturnType::FALSE;
+    return IfReturnType::TRUE;
     break;
 
   case eISRAINING:
     if (weather_info.sky == SKY_LIGHTNING || weather_info.sky == SKY_RAINING || weather_info.sky == SKY_HEAVY_RAIN)
-      return true;
-    return false;
+      return IfReturnType::TRUE;
+    return IfReturnType::FALSE;
     break;
 
   default:
@@ -2942,7 +2942,7 @@ int mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj,
      */
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu unknown ifchck  \"%s\" value %d",
          mob->mobdata->vnum_, buf, ifcheck[buf]);
-    return -1;
+    return IfReturnType::ILLEGAL;
   }
 }
 /* Quite a long and arduous function, this guy handles the control
