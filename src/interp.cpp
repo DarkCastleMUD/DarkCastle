@@ -1151,6 +1151,16 @@ std::tuple<std::string, std::string> last_argument(std::string arguments)
   return std::tuple<std::string, std::string>(std::string(), std::string());
 }
 
+std::tuple<QString, QString> last_argument(QString argumentStr)
+{
+  auto arguments = argumentStr.trimmed().split(' ');
+  auto arg1 = arguments.value(0);
+  if (!arguments.isEmpty())
+    arguments.removeFirst();
+  auto remaining = arguments.join(' ');
+  return {arg1, remaining};
+}
+
 /* return first 'word' plus trailing substring of input std::string */
 void half_chop(const char *str, char *arg1, char *arg2)
 {
