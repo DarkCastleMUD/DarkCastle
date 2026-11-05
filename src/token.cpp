@@ -136,7 +136,7 @@ void TokenList::Next()
 QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags)
 {
 
-  // Reset the std::string
+  // Reset the string
   interp.clear();
 
   //--
