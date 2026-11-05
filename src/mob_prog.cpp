@@ -1625,24 +1625,24 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
 
   if (!traditional)
   {
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-      qDebug("%s vs %s", buf, arg);
+    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
+    //  qDebug("%s vs %s", buf, arg);
     translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-      qDebug("%s vs %s", buf, arg);
+    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
+    //  qDebug("%s vs %s", buf, arg);
   }
   else
   {
     // switch order of traditional so it'd be $n(ispc), to conform with
     // new ifchecks
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-      qDebug("%s vs %s", arg, buf);
+    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
+    //  qDebug("%s vs %s", arg, buf);
     translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-    if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-      qDebug("%s vs %s", arg, buf);
+    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
+    //  qDebug("%s vs %s", arg, buf);
   }
 
-  if (val2[0] == '\0')
+  if (val[0] != '\0' && val2[0] == '\0')
   {
     if (lvali)
       return mprog_veval(*lvali, opr, atoi(val));
@@ -1659,7 +1659,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (!lvalqstr.isEmpty())
       return mob->mprog_seval(lvalqstr, opr, val);
   }
-  else
+  else if (val2[0] != '\0')
   {
     int16_t *rvali = nullptr;
     uint32_t *rvalui = nullptr;
@@ -3199,11 +3199,11 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
     {
       if (!str_cmp(buf, "if"))
       {
-        if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
-          qDebug("mprog_process_if(morebuf=%s,com_list=%s", morebuf, com_list);
+        // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
+        //  qDebug("mprog_process_if(morebuf=%s,com_list=%s", morebuf, com_list);
         com_list = mprog_process_if(morebuf, com_list, mob, actor, obj, vo, rndm, thrw);
-        if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
-          qDebug("mprog_process_if(morebuf=%s,com_list=%s", morebuf, com_list);
+        // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23)
+        //  qDebug("mprog_process_if(morebuf=%s,com_list=%s", morebuf, com_list);
 
         if (isSet(mprog_cur_result, ReturnValue::eCH_DIED))
           return null;
