@@ -2800,14 +2800,14 @@ void show_question_stats(Connection *d)
   telnet_ga(d);
 }
 
-bool handle_get_stats(Connection *d, std::string arg)
+bool handle_get_stats(Connection *d, QString arg)
 {
   if (arg != "+" && arg != "-" && arg != "confirm" && arg != "max")
   {
     unsigned long input{};
     try
     {
-      input = stoul(arg);
+      input = std::stoul(qPrintable(arg));
     }
     catch (...)
     {
@@ -2842,10 +2842,10 @@ bool handle_get_stats(Connection *d, std::string arg)
       d->stats->decrease(1);
       d->stats->setMin();
     }
-    else if (arg.find("help") == 0)
+    else if (arg.indexOf("help") == 0)
     {
-      arg.erase(0, 5);
-      do_help(d->character, arg.data());
+      arg.remove(0, 5);
+      do_help(d->character, qPrintable(arg));
       return false;
     }
     else if (arg == "confirm")

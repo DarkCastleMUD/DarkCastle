@@ -966,16 +966,13 @@ void save_help(Character *ch)
   }
 }
 
-void help_string_to_file(FILEPtr f, char *str)
+void help_string_to_file(FILEPtr f, QString str)
 {
-  char *newbuf = new char[strlen(str) + 1];
-  strcpy(newbuf, str);
+  auto newbuf = str;
+  if (newbuf[newbuf.size() - 1] == '\n')
+    newbuf[newbuf.size() - 1] = '\0';
 
-  if (newbuf[strlen(newbuf) - 1] == '\n')
-    newbuf[strlen(newbuf) - 1] = '\0';
-
-  dc_fprintf(f, "%s\n", newbuf);
-  delete[] newbuf;
+  dc_fprintf(f, "%s\n", qPrintable(newbuf));
 }
 
 int get_line_with_space(FILEPtr fl, char *buf)

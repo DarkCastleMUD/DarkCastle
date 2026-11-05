@@ -2423,7 +2423,7 @@ int do_weather(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_help(Character *ch, char *argument, cmd_t cmd)
+int do_help(Character *ch, const char *argument, cmd_t cmd)
 {
   extern help_index_element *help_index;
   extern FILEPtr help_fl;
