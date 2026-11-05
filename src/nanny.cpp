@@ -2620,7 +2620,7 @@ void show_question_class(Connection *d)
   telnet_ga(d);
 }
 
-bool handle_get_class(Connection *d, std::string arg)
+bool handle_get_class(Connection *d, QString arg)
 {
   if (d == nullptr || d->character == nullptr || arg == "")
   {
@@ -2637,7 +2637,7 @@ bool handle_get_class(Connection *d, std::string arg)
 
   for (unsigned clss = 1; clss <= CLASS_MAX_PROD; clss++)
   {
-    if (std::string(pc_clss_types[clss]) == std::string(arg) || std::string(pc_clss_types3[clss]) == std::string(arg))
+    if (pc_clss_types[clss] == arg || pc_clss_types3[clss] == arg)
     {
       if (!is_clss_race_compat(ch, clss, GET_RACE(ch)))
       {
@@ -2652,14 +2652,10 @@ bool handle_get_class(Connection *d, std::string arg)
   }
 
   uint32_t clss = 0;
-  try
-  {
-    clss = stoul(arg);
-  }
-  catch (...)
-  {
+  bool ok = false;
+  clss = arg.toUInt(&ok);
+  if (!ok)
     return false;
-  }
 
   if (clss < 1 || clss > CLASS_MAX_PROD || !is_clss_race_compat(ch, clss, GET_RACE(ch)))
   {
