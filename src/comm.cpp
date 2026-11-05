@@ -1092,7 +1092,7 @@ void DC::heartbeat(void)
     PerfTimers["mobile"].start();
     mobile_activity();
     PerfTimers["mobile"].stop();
-    qDebug("%lus %6luμs", PerfTimers["mobile"].getDiff().tv_sec, PerfTimers["mobile"].getDiff().tv_usec);
+    // qDebug("%lus %6luμs", PerfTimers["mobile"].getDiff().tv_sec, PerfTimers["mobile"].getDiff().tv_usec);
 
     PerfTimers["object"].start();
     object_activity(DC::PULSE_MOBILE);
