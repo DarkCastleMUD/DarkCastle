@@ -29,23 +29,33 @@ extern bool MOBtrigger;
 
 act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
-  return act(qPrintable(str), ch, obj, vict_obj, destination, flags);
+  return act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
 act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
-  return act(str.c_str(), ch, obj, vict_obj, destination, flags);
+  return act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(
-    const char *str,     // Buffer
-    Character *ch,       // Character from
-    Object *obj,         // Object
-    void *vict_obj,      // Victim object
-    int16_t destination, // Destination flags
-    int16_t flags        // Optional flags
-)
+act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
+  return act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+}
+
+act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
+{
+  return act({.str = str, .ch = ch, .obj = obj, .vict_obj = {}, .destination = destination, .flags = flags, .keyword = keyword});
+}
+
+act_return act(act_input input)
+{
+  auto str = input.str;
+  auto ch = input.ch;
+  auto obj = input.obj;
+  auto vict_obj = input.vict_obj;
+  auto destination = input.destination;
+  auto flags = input.flags;
+  auto keyword = input.keyword;
   class Connection *i;
   int retval = 0;
   TokenList *tokens;
@@ -78,7 +88,7 @@ act_return act(
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (Character *)vict_obj);
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (Character *)vict_obj, keyword);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -87,7 +97,7 @@ act_return act(
   {
     if (!isSet(flags, BARDSONG) || ch->player == nullptr || !isSet(ch->player->toggles, Player::PLR_BARD_SONG))
     {
-      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch);
+      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, ch, keyword);
       retval |= st_return.retval;
       ar.str = st_return.str;
       ar.retval = retval;
@@ -114,7 +124,7 @@ act_return act(
         {
           if (!isSet(flags, BARDSONG) || tmp_char->player == nullptr || !isSet(tmp_char->player->toggles, Player::PLR_BARD_SONG))
           {
-            st_return = send_tokens(tokens, ch, obj, vict_obj, flags, tmp_char);
+            st_return = send_tokens(tokens, ch, obj, vict_obj, flags, tmp_char, keyword);
             retval |= st_return.retval;
             ar.str = st_return.str;
             ar.retval = retval;
@@ -142,7 +152,7 @@ act_return act(
         continue;
       if ((destination == TO_ZONE) && DC::getInstance()->world[i->character->in_room].zone != DC::getInstance()->world[ch->in_room].zone)
         continue;
-      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, i->character);
+      st_return = send_tokens(tokens, ch, obj, vict_obj, flags, i->character, keyword);
       retval |= st_return.retval;
       ar.str = st_return.str;
       ar.retval = retval;
@@ -205,10 +215,10 @@ void send_message(std::string str, Character *to)
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to)
+send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to, QString keyword)
 {
   int retval = 0;
-  QByteArray buf = tokens->Interpret(ch, obj, vict_obj, to, flags);
+  QByteArray buf = tokens->Interpret(ch, obj, vict_obj, to, flags, keyword);
 
   // Uppercase first letter of sentence.
   if (!buf.isEmpty())

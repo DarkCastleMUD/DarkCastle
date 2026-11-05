@@ -28,10 +28,23 @@ public:
   int retval;
 };
 
+class act_input
+{
+public:
+  const char *str{};
+  Character *ch{};
+  Object *obj{};
+  void *vict_obj{};
+  int16_t destination{};
+  int16_t flags{};
+  QString keyword{};
+};
+
 act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
 act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags);
 act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
 act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+act_return act(act_input input);
 
 class send_tokens_return
 {
@@ -40,7 +53,7 @@ public:
   int retval;
 };
 
-send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vch, int flags, Character *to);
+send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vch, int flags, Character *to, QString keyword);
 
 void send_message(const char *str, Character *to);
 void send_message(QString str, Character *to);

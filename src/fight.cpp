@@ -3015,24 +3015,24 @@ void send_damage(char const *buf, Character *ch, Object *obj, Character *victim,
       if (tmpch == ch || tmpch == victim)
         continue;
       if (tmpch->isPlayer() && isSet(tmpch->player->toggles, Player::PLR_DAMAGE))
-        send_tokens(tokens, ch, obj, victim, 0, tmpch);
+        send_tokens(tokens, ch, obj, victim, 0, tmpch, {});
       else
-        send_tokens(tokens2, ch, obj, victim, 0, tmpch);
+        send_tokens(tokens2, ch, obj, victim, 0, tmpch, {});
     }
   }
   else if (to == TO_CHAR)
   {
     if (ch->isPlayer() && isSet(ch->player->toggles, Player::PLR_DAMAGE))
-      send_tokens(tokens, ch, obj, victim, 0, ch);
+      send_tokens(tokens, ch, obj, victim, 0, ch, {});
     else
-      send_tokens(tokens2, ch, obj, victim, 0, ch);
+      send_tokens(tokens2, ch, obj, victim, 0, ch, {});
   }
   else if (to == TO_VICT)
   {
     if (victim->isPlayer() && isSet(victim->player->toggles, Player::PLR_DAMAGE))
-      send_tokens(tokens, ch, obj, victim, 0, victim);
+      send_tokens(tokens, ch, obj, victim, 0, victim, {});
     else
-      send_tokens(tokens2, ch, obj, victim, 0, victim);
+      send_tokens(tokens2, ch, obj, victim, 0, victim, {});
   }
   delete tokens;
   delete tokens2;

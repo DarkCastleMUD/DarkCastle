@@ -49,7 +49,7 @@ public:
 
   TokenList(const char *);
   ~TokenList();
-  QByteArray Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags);
+  QByteArray Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags, QString keyword);
 
 private:
   //--

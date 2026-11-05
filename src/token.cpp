@@ -133,7 +133,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the std::string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags)
+QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags, QString keyword)
 {
 
   // Reset the string
@@ -474,17 +474,26 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
                 }
                 break;
               case 'T':
-                if (vict_obj != nullptr)
+                if (!keyword.isEmpty())
+                {
+                  interp += qPrintable(keyword);
+                }
+                else if (vict_obj != nullptr)
                 {
                   interp += (char *)vict_obj;
                 }
                 break;
 
               case 'F':
-                if (vict_obj != nullptr)
+                if (!keyword.isEmpty())
+                {
+                  interp += fname(keyword).toStdString();
+                }
+                else if (vict_obj != nullptr)
                 {
                   interp += fname(QString((char *)vict_obj)).toStdString();
                 }
+
                 break;
 
               default: // Illegal code - just output it
