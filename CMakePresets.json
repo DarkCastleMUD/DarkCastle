@@ -62,6 +62,15 @@
             "cacheVariables": {
                 "CMAKE_CXX_INCLUDE_WHAT_YOU_USE": "include-what-you-use"
             }
+        },
+        {
+            "name": "afl",
+            "displayName": "American Fuzzy lop (afl)",
+            "description": "compiles code with afl for later fuzzing with afl",
+            "inherits": "debug",
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "afl-clang-fast++"
+            }
         }
     ],
     "buildPresets": [
@@ -88,6 +97,11 @@
         {
             "name": "iwyu",
             "configurePreset": "iwyu",
+            "verbose": true
+        },
+        {
+            "name": "afl",
+            "configurePreset": "afl",
             "verbose": true
         }
     ],
@@ -128,6 +142,17 @@
         {
             "name": "release",
             "configurePreset": "release",
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
+        },
+        {
+            "name": "afl",
+            "configurePreset": "afl",
             "output": {
                 "outputOnFailure": true
             },
@@ -217,6 +242,23 @@
                 {
                     "type": "build",
                     "name": "iwyu"
+                }
+            ]
+        },
+        {
+            "name": "afl",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "afl"
+                },
+                {
+                    "type": "build",
+                    "name": "afl"
+                },
+                {
+                    "type": "test",
+                    "name": "afl"
                 }
             ]
         }
