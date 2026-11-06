@@ -682,6 +682,10 @@ public:
   {
     name_ = new_name;
   }
+  inline QStringList getNames(void) const
+  {
+    return name_.split(' ');
+  }
 
   QString short_desc;  // Action 'X hits you.'
   QString long_desc;   // For 'look room'
