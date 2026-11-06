@@ -1050,6 +1050,7 @@ public:
   command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_experience(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_split(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_force(QStringList arguments = {}, cmd_t cmd = cmd_t::FORCE);
 
   command_return_t do_edit_generic_show(QString value, QString fieldname, QString desc, QStringList arguments, cmd_t cmd = cmd_t::DEFAULT)
   {

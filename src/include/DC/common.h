@@ -293,7 +293,6 @@ command_return_t do_flee(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAU
 command_return_t do_focused_repelance(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_follow(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_forage(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-command_return_t do_force(Character *ch, std::string argument, cmd_t cmd = cmd_t::FORCE);
 command_return_t do_found(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_free_animal(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_freeze(Character *ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);

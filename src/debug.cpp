@@ -533,7 +533,7 @@ int main(int argc, char **argv)
     }
     do_look(ch, "");
     d->process_output();
-    do_force(ch, "all save");
+    ch->do_force({"all", "save"});
     d->process_output();
   }
   else

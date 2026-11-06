@@ -69,94 +69,94 @@ int do_plats(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_force(Character *ch, std::string argument, cmd_t cmd)
+command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
 {
   class Connection *i = {};
   class Connection *next_i = {};
   Character *vict = {};
-  std::string name = {}, to_force = {}, buf = {};
+  QString buf = {};
 
-  if (ch->isNonPlayer())
+  if (isNonPlayer())
   {
     return ReturnValue::eFAILURE;
   }
 
-  if (!ch->has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
+  if (!has_skill(COMMAND_FORCE) && cmd != cmd_t::FORCE)
   {
-    ch->send("Huh?\n");
+    send("Huh?\n");
     return ReturnValue::eFAILURE;
   }
 
-  std::tie(name, to_force) = half_chop(argument);
-
-  if (name.empty() || to_force.empty())
+  auto name = arguments.value(0);
+  if (!arguments.isEmpty())
+    arguments.removeFirst();
+  auto to_force = arguments.join(' ');
+  if (name.isEmpty() || to_force.isEmpty())
   {
-    ch->send("Who do you wish to force to do what?\n");
+    send("Who do you wish to force to do what?\n");
     return ReturnValue::eFAILURE;
   }
   else if (name != "all")
   {
-    if (!(vict = get_char_vis(ch, name)))
-      ch->sendln("No one by that name here..");
+    if (!(vict = get_char_vis(this, name)))
+      sendln("No one by that name here..");
     else
     {
-      if (ch->getLevel() < vict->getLevel() && vict->isNonPlayer())
+      if (getLevel() < vict->getLevel() && vict->isNonPlayer())
       {
-        ch->sendln("Now doing that would just tick off the IMPS!");
-        logentry(QStringLiteral("%1 just tried to force %2 to %3").arg(GET_NAME(ch)).arg(GET_NAME(vict)).arg(to_force.c_str()), OVERSEER, DC::LogChannel::LOG_GOD);
+        sendln("Now doing that would just tick off the IMPS!");
+        loggod(u"%1 just tried to force %2 to %3"_s.arg(getName()).arg(GET_NAME(vict)).arg(to_force));
         return ReturnValue::eSUCCESS;
       }
-      if ((ch->getLevel() <= vict->getLevel()) && vict->isPlayer())
+      if ((getLevel() <= vict->getLevel()) && vict->isPlayer())
       {
-        ch->sendln("Why be forceful?");
-        buf = fmt::format("$n has failed to force you to '{}'.", to_force);
-        act(buf, ch, 0, vict, TO_VICT, 0);
+        sendln("Why be forceful?");
+        buf = u"$n has failed to force you to '%1'."_s.arg(to_force);
+        act(buf, this, 0, vict, TO_VICT, 0);
       }
       else
       {
-        if (ch->player->stealth == false)
+        if (player->stealth == false)
         {
-          buf = fmt::format("$n has forced you to '{}'.", to_force);
-          act(buf, ch, 0, vict, TO_VICT, 0);
-          ch->sendln("Ok.");
+          buf = u"$n has forced you to '%1'."_s.arg(to_force);
+          act(buf, this, 0, vict, TO_VICT, 0);
+          sendln("Ok.");
         }
-        buf = fmt::format("{} just forced %s to %s.", GET_NAME(ch),
-                          GET_NAME(vict), to_force);
-        vict->command_interpreter(to_force.c_str());
-        logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+        buf = u"%1 just forced %2 to '%3'."_s.arg(getName()).arg(vict->getName()).arg(to_force);
+        loggod(buf);
+        vict->command_interpreter(to_force);
       }
     }
   }
-
   else
   { /* force all */
-    if (ch->getLevel() < OVERSEER)
+    if (getLevel() < OVERSEER)
     {
-      ch->sendln("Not gonna happen.");
+      sendln("Not gonna happen.");
       return ReturnValue::eFAILURE;
     }
     for (i = DC::getInstance()->descriptor_list; i; i = next_i)
     {
       next_i = i->next;
-      if (i->character != ch && !i->connected)
+      if (i->character != this && !i->connected)
       {
         vict = i->character;
-        if (ch->getLevel() <= vict->getLevel())
+        if (getLevel() <= vict->getLevel())
           continue;
         else
         {
-          if (ch->player->stealth == false || ch->getLevel() < 109)
+          if (player->stealth == false || getLevel() < 109)
           {
-            buf = fmt::format("$n has forced you to '{}'.", to_force);
-            act(buf, ch, 0, vict, TO_VICT, 0);
+            buf = u"$n has forced you to '%1'."_s.arg(to_force);
+            act(buf, this, 0, vict, TO_VICT, 0);
           }
-          vict->command_interpreter(to_force.c_str());
+          vict->command_interpreter(to_force);
         }
       }
     }
-    ch->sendln("Ok.");
-    buf = fmt::format("{} just forced all to {}.", GET_NAME(ch), to_force);
-    logentry(buf.c_str(), ch->getLevel(), DC::LogChannel::LOG_GOD);
+    sendln("Ok.");
+    buf = u"%1 just forced all to '%2'."_s.arg(getName()).arg(to_force);
+    loggod(buf);
   }
   return ReturnValue::eSUCCESS;
 }

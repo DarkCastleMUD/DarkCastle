@@ -360,7 +360,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("unarchive"), do_unarchive, position_t::DEAD, 108, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("stealth"), do_stealth, position_t::DEAD, OVERSEER, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("disconnect"), do_disconnect, position_t::DEAD, 106, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
-        Command(QStringLiteral("force"), do_force, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
+        Command(QStringLiteral("force"), &Character::do_force, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("pardon"), do_pardon, position_t::DEAD, OVERSEER, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("goto"), &Character::do_goto, position_t::DEAD, 102, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
         Command(QStringLiteral("restore"), do_restore, position_t::DEAD, GIFTED_COMMAND, cmd_t::DEFAULT, 0, 1, CommandType::immortals_only),
