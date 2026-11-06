@@ -2370,8 +2370,8 @@ bool is_hiding(Character *ch, Character *vict)
 int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 {
   Character *temp;
-  if (room == DC::NOWHERE)
-    return (0);
+  if (room == DC::NOWHERE || !ch)
+    return 0;
 
   if (DC::getInstance()->world[room].people == ch)
   {
