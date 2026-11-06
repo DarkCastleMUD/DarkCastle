@@ -606,7 +606,7 @@ bool Player::read(FILEPtr fpsave, Character *ch, QString filename)
     {
       ignore_entry ie = {true, 0};
       dc_fread(&ie.ignored_count, sizeof(ie.ignored_count), 1, fpsave);
-      ignoring[name_to_ignore] = ie;
+      ignoring[name_to_ignore.toLower()] = ie;
     }
 
     dc_fread(&typeflag, sizeof(char), 3, fpsave);

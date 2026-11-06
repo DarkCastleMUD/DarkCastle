@@ -394,7 +394,7 @@ command_return_t Character::do_ignore(QStringList arguments, cmd_t cmd)
 
   if (arguments.isEmpty())
   {
-    if (player->ignoring.empty())
+    if (player->ignoring.isEmpty())
     {
       sendln("Ignore who?");
       return ReturnValue::eSUCCESS;
@@ -428,51 +428,35 @@ command_return_t Character::do_ignore(QStringList arguments, cmd_t cmd)
     send("Ignore who?\n");
     return ReturnValue::eFAILURE;
   }
-  arg1[0] = arg1[0].toUpper();
+  arg1 = arg1.toLower();
 
   if (player->ignoring.contains(arg1) == false)
   {
     player->ignoring[arg1] = {true, 0};
-    sendln(u"You now ignore anyone named %1."_s.arg(arg1));
+    sendln(u"You now ignore anyone named '%1'."_s.arg(arg1));
   }
   else
   {
     player->ignoring.remove(arg1);
-    sendln(u"You stop ignoring %1."_s.arg(arg1));
+    sendln(u"You stop ignoring '%1'."_s.arg(arg1));
   }
   return ReturnValue::eSUCCESS;
 }
 
 int is_ignoring(const Character *const ch, const Character *const i)
 {
-  if (ch->isNonPlayer() || (i->getLevel() >= IMMORTAL && i->isPlayer()) || ch->player->ignoring.empty())
+  if (ch->isNonPlayer() || i->isImmortalPlayer() || ch->player->ignoring.isEmpty())
   {
     return false;
   }
 
-  if (GET_NAME(i) == nullptr)
+  auto names = i->getNames();
+  for (auto name : names)
   {
-    return false;
-  }
-
-  if (ch->player->ignoring.contains(GET_NAME(i)))
-  {
-    return true;
-  }
-
-  // Since it didn't match the whole name, see if it matches one of
-  // the name keywords used for a mob name
-  auto names = i->getName();
-  QString name1 = {}, remainder_names = {};
-  std::tie(name1, remainder_names) = half_chop(names);
-  while (!name1.isEmpty())
-  {
-    if (ch->player->ignoring.contains(name1))
+    if (ch->player->ignoring.contains(name))
     {
       return true;
     }
-
-    std::tie(name1, remainder_names) = half_chop(remainder_names);
   }
 
   return false;
@@ -734,7 +718,7 @@ void DC::save_hints(void)
   for (hints_t::iterator i = hints_.begin(); i != hints_.end(); ++i)
   {
     out << "#" << ++hint_key << "\n";
-    out << *i << "~"        << "\n";
+    out << *i << "~" << "\n";
   }
   out << "$\n";
 }
