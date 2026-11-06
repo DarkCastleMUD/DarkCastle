@@ -127,6 +127,11 @@ void do_mload(Character *ch, int rnum, int cnt)
   for (i = 1; i <= cnt; i++)
   {
     mob = ch->getDC()->clone_mobile(rnum);
+    if (!mob)
+    {
+      ch->sendln(u"Unable to create a new mobile from vnum %1"_s.arg(rnum));
+      return;
+    }
     char_to_room(mob, ch->in_room);
     selfpurge = false;
     mprog_load_trigger(mob);
