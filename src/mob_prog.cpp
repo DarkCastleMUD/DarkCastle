@@ -1380,9 +1380,9 @@ enum mprog_ifs
   eNUMOFOBJSINWORLD
 };
 
-std::map<std::string, mprog_ifs> load_ifchecks()
+QMap<QString, mprog_ifs> load_ifchecks(void)
 {
-  std::map<std::string, mprog_ifs> ifcheck_tmp;
+  QMap<QString, mprog_ifs> ifcheck_tmp;
 
   ifcheck_tmp["rand"] = eRAND;
   ifcheck_tmp["rand1k"] = eRAND1K;
@@ -1429,7 +1429,7 @@ std::map<std::string, mprog_ifs> load_ifchecks()
   return ifcheck_tmp;
 }
 
-std::map<std::string, mprog_ifs> ifcheck = load_ifchecks();
+QMap<QString, mprog_ifs> ifcheck = load_ifchecks();
 
 IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
 {
@@ -1625,21 +1625,21 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
 
   if (!traditional)
   {
-    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-    //  qDebug("%s vs %s", buf, arg);
+    if (mob->mobdata->vnum_ == 23)
+      qDebug("%s vs %s", buf, arg);
     translate_value(buf, arg, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-    //  qDebug("%s vs %s", buf, arg);
+    if (mob->mobdata->vnum_ == 23)
+      qDebug("%s vs %s", buf, arg);
   }
   else
   {
     // switch order of traditional so it'd be $n(ispc), to conform with
     // new ifchecks
-    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-    //  qDebug("%s vs %s", arg, buf);
+    if (mob->mobdata->vnum_ == 23)
+      qDebug("%s vs %s", arg, buf);
     translate_value(arg, buf, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, mob, actor, obj, vo, rndm, lvalqstr);
-    // if (mob->mobdata->vnum_ == 6908 || mob->mobdata->vnum_ == 6925 || mob->mobdata->vnum_ == 23 || mob->mobdata->vnum_ == 1)
-    //  qDebug("%s vs %s", arg, buf);
+    if (mob->mobdata->vnum_ == 23)
+      qDebug("%s vs %s", arg, buf);
   }
 
   if (val[0] != '\0' && val2[0] == '\0')
@@ -1783,7 +1783,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(fvict->isPlayer());
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType::FALSE;
@@ -1828,7 +1828,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return fvict->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return (mob->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
@@ -1874,7 +1874,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       if (mob->equipment[WEAR_WIELD])
@@ -1912,7 +1912,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       if (mob->equipment[WEAR_SECOND_WIELD])
@@ -1950,7 +1950,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(fvict->isNonPlayer());
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType::TRUE;
@@ -1987,7 +1987,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (ye)
       return IfReturnType::FALSE;
 
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(IS_GOOD(mob));
@@ -2023,7 +2023,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (ye)
       return IfReturnType::FALSE;
 
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(IS_NEUTRAL(mob));
@@ -2059,7 +2059,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (ye)
       return IfReturnType::FALSE;
 
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(IS_EVIL(mob));
@@ -2100,7 +2100,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(is_wearing(fvict, o));
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
@@ -2136,7 +2136,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return fvict->fighting ? IfReturnType::TRUE : IfReturnType::FALSE;
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
@@ -2172,7 +2172,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(fvict->isTank());
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
@@ -2208,7 +2208,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(fvict->getLevel() > IMMORTAL);
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(mob->getLevel() > IMMORTAL);
@@ -2245,7 +2245,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (ye)
       return IfReturnType::FALSE;
 
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(IS_AFFECTED(mob, AFF_CHARM));
@@ -2282,7 +2282,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(fvict->master != nullptr && fvict->master->in_room == fvict->in_room);
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(mob->master != nullptr && mob->master->in_room == mob->in_room);
@@ -2415,7 +2415,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (ye)
       return IfReturnType::FALSE;
 
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       return IfReturnType(ISSET(mob->affected_by, atoi(val)));
@@ -2457,7 +2457,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     }
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       lhsvl = (mob->hit * 100) / mob->max_hit;
@@ -2662,7 +2662,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (ye)
       return IfReturnType::FALSE;
 
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       lhsvl = mob->mobdata->vnum_;
@@ -2770,7 +2770,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return mob->mprog_seval(fvict->getTemp(buf4), opr, val);
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
@@ -2846,7 +2846,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return IfReturnType(CAN_SEE(mob, fvict, true));
     if (ye)
       return IfReturnType::FALSE;
-    switch (arg[1]) /* arg should be "$*" so just get the letter */
+    switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       return IfReturnType::TRUE; // can always see holder
@@ -2937,9 +2937,9 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     break;
 
   default:
-    /* Ok... all the ifchcks are done, so if we didnt find ours then something
-     * odd happened.  So report the bug and abort the MOBprogram (return error)
-     */
+    // Ok... all the ifchcks are done, so if we didnt find ours then something
+    // odd happened.  So report the bug and abort the MOBprogram (return error)
+    //
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu unknown ifchck  \"%s\" value %d",
          mob->mobdata->vnum_, buf, ifcheck[buf]);
     return IfReturnType::ILLEGAL;
