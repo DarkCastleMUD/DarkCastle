@@ -1063,7 +1063,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
     act("Your piercing note causes $N's brain to leak out $S ears in a "
         "painful death.",
         ch, 0, victim, TO_CHAR, 0);
-    return damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_SONG_WHISTLE_SHARP);
+    return ch->getDC()->damage(ch, victim, 9999999, TYPE_UNDEFINED, SKILL_SONG_WHISTLE_SHARP);
   }
 
   int combat, non_combat;
@@ -1083,7 +1083,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
   char buf[MAX_STRING_LENGTH];
   strcpy(buf, qPrintable(victim->short_desc));
 
-  retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_WHISTLE_SHARP);
   if (isSet(retval, ReturnValue::eCH_DIED))
     return retval;
 
@@ -1398,7 +1398,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
   }
   char buf[MAX_STRING_LENGTH];
   strcpy(buf, qPrintable(victim->short_desc));
-  retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_TERRIBLE_CLEF);
   if (isSet(retval, ReturnValue::eCH_DIED))
     return retval;
   if (isSet(retval, ReturnValue::eVICT_DIED))
@@ -3327,32 +3327,32 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
     switch ((int64_t)(*i).song_data)
     {
     case 1:
-      send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!",
-                  TO_CHAR);
-      send_damage("The strength of $n's music injures $N for |!", ch, 0, victim, dmgmsg, "The strength of $n's music injures $N!", TO_ROOM);
-      send_damage("The strength of $n's crushing crescendo injures you for |!", ch, 0, victim, dmgmsg,
-                  "The strength of $n's crushing crescendo injures you!", TO_VICT);
+      ch->getDC()->send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!",
+                               TO_CHAR);
+      ch->getDC()->send_damage("The strength of $n's music injures $N for |!", ch, 0, victim, dmgmsg, "The strength of $n's music injures $N!", TO_ROOM);
+      ch->getDC()->send_damage("The strength of $n's crushing crescendo injures you for |!", ch, 0, victim, dmgmsg,
+                               "The strength of $n's crushing crescendo injures you!", TO_VICT);
       break;
     case 2:
-      send_damage("$N is injured further by the intensity of your music for | damage!", ch, 0, victim, dmgmsg,
-                  "$N is injured further by the intensity of your music!", TO_CHAR);
-      send_damage("The strength of $n's music increases, and causes further injury to $N for | damage!", ch, 0, victim, dmgmsg,
-                  "The strength of $n's music increases, and causes further injury to $N!", TO_ROOM);
-      send_damage("The strength of $n's crushing crescendo increases, and hurts for | damage!", ch, 0, victim, dmgmsg,
-                  "The strength of $n's crushing crescendo increases, and hurts even more!", TO_VICT);
+      ch->getDC()->send_damage("$N is injured further by the intensity of your music for | damage!", ch, 0, victim, dmgmsg,
+                               "$N is injured further by the intensity of your music!", TO_CHAR);
+      ch->getDC()->send_damage("The strength of $n's music increases, and causes further injury to $N for | damage!", ch, 0, victim, dmgmsg,
+                               "The strength of $n's music increases, and causes further injury to $N!", TO_ROOM);
+      ch->getDC()->send_damage("The strength of $n's crushing crescendo increases, and hurts for | damage!", ch, 0, victim, dmgmsg,
+                               "The strength of $n's crushing crescendo increases, and hurts even more!", TO_VICT);
       break;
     case 3:
-      send_damage("The force of your song powerfully crushes $N for | damage!", ch, 0, victim, dmgmsg,
-                  "The force of your song powerfully crushes the life out of $N!", TO_CHAR);
-      send_damage("The force of $n's crushes $N for | damage!", ch, 0, victim, dmgmsg, "The force of $n's crushes the life out of $N!", TO_ROOM);
-      send_damage("The force of $n's crushes you for | damage!", ch, 0, victim, dmgmsg, "The force of $n's crushes the life out of you!", TO_VICT);
+      ch->getDC()->send_damage("The force of your song powerfully crushes $N for | damage!", ch, 0, victim, dmgmsg,
+                               "The force of your song powerfully crushes the life out of $N!", TO_CHAR);
+      ch->getDC()->send_damage("The force of $n's crushes $N for | damage!", ch, 0, victim, dmgmsg, "The force of $n's crushes the life out of $N!", TO_ROOM);
+      ch->getDC()->send_damage("The force of $n's crushes you for | damage!", ch, 0, victim, dmgmsg, "The force of $n's crushes the life out of you!", TO_VICT);
       break;
     default:
-      send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!",
-                  TO_CHAR);
-      send_damage("The strength of $n's music injures $N for | damage!", ch, 0, victim, dmgmsg, "The strength of $n's music injures $N!", TO_ROOM);
-      send_damage("The strength of $n's crushing crescendo injures you for | damage!", ch, 0, victim, dmgmsg,
-                  "The strength of $n's crushing crescendo injures you!", TO_VICT);
+      ch->getDC()->send_damage("$N is injured for | damage by the strength of your music!", ch, 0, victim, dmgmsg, "$N is injured by the strength of your music!",
+                               TO_CHAR);
+      ch->getDC()->send_damage("The strength of $n's music injures $N for | damage!", ch, 0, victim, dmgmsg, "The strength of $n's music injures $N!", TO_ROOM);
+      ch->getDC()->send_damage("The strength of $n's crushing crescendo injures you for | damage!", ch, 0, victim, dmgmsg,
+                               "The strength of $n's crushing crescendo injures you!", TO_VICT);
       break;
     }
   }
@@ -3361,7 +3361,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
   char buf[MAX_STRING_LENGTH];
   strcpy(buf, qPrintable(victim->short_desc));
 
-  retval = damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_SONG, SKILL_SONG_CRUSHING_CRESCENDO);
   if (isSet(retval, ReturnValue::eCH_DIED))
     return retval;
 

@@ -20,11 +20,7 @@ class follow_type;
 void debug_point();
 
 /* Here are our function prototypes */
-int damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon = {}, bool is_death_prog = false, Object *obj = {});
 int noncombat_damage(Character *ch, int dam, char *char_death_msg, char *room_death_msg, char *death_log_msg, int type);
-void send_damage(char const *, Character *, Object *, Character *, char const *, char const *, int);
-void send_damage(QString buf, Character *, Object *, Character *, QString dmg, QString buf2, int);
-
 int getRealSpellDamage(Character *ch);
 
 #define FIRST WEAR_WIELD
@@ -48,8 +44,6 @@ void make_blood(Character *ch);
 void make_scraps(Character *ch, class Object *obj);
 void room_mobs_only_hate(Character *ch);
 int attack(Character *ch, Character *vict, int type, int attack = FIRST);
-void perform_violence(void);
-void dam_message(int dam, Character *ch, Character *vict, int w_type, int32_t modifier);
 void group_gain(Character *ch, Character *vict);
 int check_magic_block(Character *ch, Character *victim, int attacktype);
 int check_riposte(Character *ch, Character *vict, int attacktype);

@@ -113,6 +113,7 @@
 #include <vector>
 
 #include "DC/DC_global.h"
+#include "DC/token.h"
 #include "DC/class.h"
 #include "DC/common.h"
 #include "DC/dcstdio.h"
@@ -363,6 +364,37 @@ enum class create_error
   index_full,
   entry_exists
 };
+
+class send_tokens_return
+{
+public:
+  QString str;
+  int retval;
+};
+
+class act_return
+{
+public:
+  QString str;
+  int retval;
+};
+act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags);
+act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+
+class act_input
+{
+public:
+  const char *str{};
+  Character *ch{};
+  Object *obj{};
+  void *vict_obj{};
+  int16_t destination{};
+  int16_t flags{};
+  QString keyword{};
+};
+
 class DC_EXPORT DC : public QCoreApplication
 {
   Q_OBJECT
@@ -427,6 +459,55 @@ public:
   };
   Q_ENUM(LogChannel);
 
+  enum mprog_ifs
+  {
+    eRAND = 1, // start this at 1, std::map returns 0 if not found
+    eRAND1K,
+    eAMTITEMS,
+    eNUMPCS,
+    eNUMOFMOBSINWORLD,
+    eNUMOFMOBSINROOM,
+    eISPC,
+    eISWIELDING,
+    eISWEAPPRI,
+    eISWEAPSEC,
+    eISNPC,
+    eISGOOD,
+    eISNEUTRAL,
+    eISEVIL,
+    eISWORN,
+    eISFIGHT,
+    eISTANK,
+    eISIMMORT,
+    eISCHARMED,
+    eISFOLLOW,
+    eISSPELLED,
+    eISAFFECTED,
+    eHITPRCNT,
+    eWEARS,
+    eCARRIES,
+    eNUMBER,
+    eTEMPVAR,
+    eISMOBVNUMINROOM,
+    eISOBJVNUMINROOM,
+    eCANSEE,
+    eHASDONEQUEST1,
+    eINSAMEZONE,
+    eCLAN,
+    eISDAYTIME,
+    eISRAINING,
+    eNUMOFOBJSINWORLD
+  };
+  Q_ENUM(mprog_ifs)
+
+  enum IfReturnType
+  {
+    TRUE = 1,
+    FALSE = 0,
+    ILLEGAL = -1
+  };
+  Q_ENUM(IfReturnType)
+
   static constexpr room_t SORPIGAL_BANK_ROOM = 3005;
   static constexpr room_t NOWHERE = 0UL;
   static constexpr vnum_t INVALID_VNUM = 0UL;
@@ -450,6 +531,7 @@ public:
   static const QStringList connected_states;
   static const QStringList dirs;
   static QList<bestowable_god_commands_type> bestowable_god_commands;
+  static QMap<QString, mprog_ifs> ifcheck;
 
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
@@ -540,6 +622,9 @@ public:
   void crash_hotboot(void);
   void sendAll(QString message);
   bool isAllowedHost(QHostAddress host);
+  act_return act(act_input input);
+  void perform_violence(void);
+
   Database getDatabase(void) { return database_; }
   Database db(void) { return database_; }
   command_lag *getCommandLag(void) const { return command_lag_list_; }
@@ -711,6 +796,54 @@ public:
   int oprog_rand_trigger(Object *item);
   int oprog_arand_trigger(Object *item);
   void mobile_activity(void);
+  QMap<QString, mprog_ifs> load_ifchecks(void);
+  IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
+  char *mprog_process_if(char *ifchck, char *com_list, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, class mprog_throw_type *thrw = nullptr);
+  void mprog_translate(char ch, char *t, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
+  int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
+  void mprog_driver(char *com_list, Character *mob, Character *actor, class Object *obj, void *vo, class mprog_throw_type *thrw, Character *rndm);
+  void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui, QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, QString &valqstr);
+  // MOBProgs prototypes
+  int mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *object, void *vo, int type, bool reverse = false);
+  void mprog_percent_check(Character *mob, Character *actor, Object *object, void *vo, int type);
+  int mprog_act_trigger(std::string buf, Character *mob, Character *ch, Object *obj, void *vo);
+  int mprog_bribe_trigger(Character *mob, Character *ch, int amount);
+  int mprog_entry_trigger(Character *mob);
+  int mprog_give_trigger(Character *mob, Character *ch, Object *obj);
+  int mprog_fight_trigger(Character *mob, Character *ch);
+  int mprog_hitprcnt_trigger(Character *mob, Character *ch);
+  int mprog_death_trigger(Character *mob, Character *killer);
+  int mprog_random_trigger(Character *mob);
+  int mprog_arandom_trigger(Character *mob);
+  int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm);
+  int mprog_attack_trigger(Character *mob, Character *ch);
+  int mprog_load_trigger(Character *mob);
+  int mprog_damage_trigger(Character *mob, Character *ch, int amount);
+  bool is_in_game(Character *ch);
+  send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vch, int flags, Character *to, QString keyword);
+  void send_damage(char const *, Character *, Object *, Character *, char const *, char const *, int);
+  void send_damage(QString buf, Character *, Object *, Character *, QString dmg, QString buf2, int);
+  void dam_message(int dam, Character *ch, Character *vict, int w_type, int32_t modifier);
+  int damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon = {}, bool is_death_prog = false, Object *obj = {});
+  void update_characters(void);
+  void checkConsecrate(int);
+
+  act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+  {
+    return ::act(str, ch, obj, vict_obj, destination, flags);
+  }
+  act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
+  {
+    return ::act(str, ch, obj, keyword, destination, flags);
+  }
+  act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+  {
+    return ::act(str, ch, obj, vict_obj, destination, flags);
+  }
+  act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+  {
+    return ::act(str, ch, obj, vict_obj, destination, flags);
+  }
 
   ~DC(void)
   {

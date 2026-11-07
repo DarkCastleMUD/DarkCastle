@@ -1,5 +1,4 @@
-#ifndef MOBILE_H_
-#define MOBILE_H_
+#pragma once
 /************************************************************************
 | $Id: mobile.h,v 1.32 2010/01/01 03:03:14 jhhudso Exp $
 | mobile.h
@@ -14,11 +13,11 @@
 #include <stdint.h>
 #include <string>
 #include <QString>
+#include <QMetaEnum>
 
 class Character;
 class QString;
 
-void mprog_driver(char *com_list, Character *mob, Character *actor, class Object *obj, void *vo, class mprog_throw_type *thrw, Character *rndm);
 char *mprog_next_command(char *clist);
 
 bool charExists(Character *ch);
@@ -165,11 +164,5 @@ public:
   int gold;
 };
 
-void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
-                     QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb, Character *mob, Character *actor,
-                     Object *obj, void *vo, Character *rndm, QString &valqstr);
-
 void save_golem_data(Character *ch);
 void save_charmie_data(Character *ch);
-
-#endif

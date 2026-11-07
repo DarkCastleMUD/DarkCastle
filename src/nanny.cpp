@@ -2155,7 +2155,7 @@ void remove_command_lag(Character *ch)
   ch->timer = 0;
 }
 
-void update_characters()
+void DC::update_characters(void)
 {
   int tmp, retval;
   char log_msg[MAX_STRING_LENGTH], dammsg[MAX_STRING_LENGTH];
@@ -2274,7 +2274,7 @@ void check_silence_beacons(void)
   return;
 }
 
-void checkConsecrate(int pulseType)
+void DC::checkConsecrate(int pulseType)
 {
   Object *obj, *tmp_obj;
   Character *ch = nullptr, *tmp_ch, *next_ch;

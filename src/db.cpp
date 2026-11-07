@@ -4087,7 +4087,7 @@ void Zone::reset(ResetType reset_type)
           last_cmd = 1;
           last_mob = 1;
           selfpurge = false;
-          mprog_load_trigger(mob);
+          dc_->mprog_load_trigger(mob);
           if (selfpurge)
           {
             mob = nullptr;

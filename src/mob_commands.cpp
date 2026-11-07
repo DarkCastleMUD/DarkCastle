@@ -559,7 +559,8 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
   }
   victim->hometown = ch->getDC()->world[ch->in_room].number;
   char_to_room(victim, ch->in_room);
-  mprog_load_trigger(victim); // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
+  // victim not used after, no selfpurge checks, leave the selfpurge of the mobprog that is causing this load intact as whatever it is
+  ch->getDC()->mprog_load_trigger(victim);
 
   return ReturnValue::eSUCCESS;
 }
@@ -1508,7 +1509,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       add_dmg(victim, dam);
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
-        retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
+        retval = ch->getDC()->damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
         if (SOMEONE_DIED(retval))
           return retval;
       }
@@ -1566,7 +1567,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       add_dmg(victim, dam);
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
-        retval = damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
+        retval = ch->getDC()->damage(ch, victim, dam, damtype, TYPE_UNDEFINED, 0, true);
         if (isSet(retval, ReturnValue::eCH_DIED))
         {
           return retval;
@@ -2121,7 +2122,7 @@ char *expand_data(Character *ch, char *orig)
     int64_t *lvali64 = nullptr;
     quint64 *lvalui64 = nullptr;
     int8_t *lvalb = nullptr;
-    translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
+    ch->getDC()->translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
     if (!lvali && !lvalui && !lvalb)
     {
@@ -2201,7 +2202,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
   int64_t *lvali64 = nullptr;
   quint64 *lvalui64 = nullptr;
   int8_t *lvalb = nullptr;
-  translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
+  ch->getDC()->translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
   vict = activeTarget;
   if (!vict)

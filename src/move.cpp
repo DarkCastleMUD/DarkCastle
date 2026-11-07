@@ -871,7 +871,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
     }
 
   // let our mobs know they're here
-  retval = mprog_entry_trigger(ch);
+  retval = ch->getDC()->mprog_entry_trigger(ch);
   if (SOMEONE_DIED(retval))
     return retval | ReturnValue::eSUCCESS;
   retval = ch->mprog_greet_trigger();
@@ -1380,7 +1380,7 @@ int ambush(Character *ch)
         //         act("$n ambushes $N in a brilliant surprise attack!", i, 0, ch, TO_ROOM, NOTVICT);
         //         act("$n ambushes you as you enter the room!", i, 0, ch, TO_VICT, 0);
         //         act("You ambush $N with a brilliant surprise attack!", i, 0, ch, TO_CHAR, 0);
-        retval = damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH);
+        retval = ch->getDC()->damage(i, ch, i->getLevel() * 10, TYPE_HIT, SKILL_AMBUSH);
         if (isSet(retval, ReturnValue::eVICT_DIED))
           return (ReturnValue::eSUCCESS | ReturnValue::eCH_DIED); // ch = damage vict
         if (isSet(retval, ReturnValue::eCH_DIED))

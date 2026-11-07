@@ -134,7 +134,7 @@ void do_mload(Character *ch, int rnum, int cnt)
     }
     char_to_room(mob, ch->in_room);
     selfpurge = false;
-    mprog_load_trigger(mob);
+    ch->getDC()->mprog_load_trigger(mob);
     if (selfpurge)
     {
       mob = nullptr;

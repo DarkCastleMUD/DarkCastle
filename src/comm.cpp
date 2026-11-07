@@ -168,7 +168,6 @@ Database db;
 #endif
 
 /* functions in this file */
-void update_characters(void);
 void short_activity();
 void skip_spaces(char **string);
 char *any_one_arg(char *argument, char *first_arg);
@@ -193,12 +192,10 @@ void food_update(void);  /* In limits.c */
 void object_activity(quint64 pulse_type);
 void update_corpses_and_portals(void);
 void string_hash_add(class Connection *d, QString str);
-void perform_violence(void);
 void time_update();
 void weather_update();
 void send_hint();
 extern void pulse_command_lag();
-void checkConsecrate(int);
 
 // extern char greetings1[MAX_STRING_LENGTH];
 // extern char greetings2[MAX_STRING_LENGTH];
@@ -2598,7 +2595,7 @@ void check_for_awaymsgs(Character *ch)
 void send_to_char(QString messg, Character *ch)
 {
   if (ch->isNonPlayer() && !ch->desc && MOBtrigger && !messg.isEmpty())
-    mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
+    ch->getDC()->mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
   if (ch->isNonPlayer() && !ch->desc && !selfpurge && MOBtrigger && !messg.isEmpty())
     ch->oprog_act_trigger(messg);
 

@@ -419,7 +419,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
             retval = ReturnValue::eSUCCESS;
             if (tmp_ch)
             {
-              retval = mprog_attack_trigger(this, tmp_ch);
+              retval = dc_->mprog_attack_trigger(this, tmp_ch);
             }
             if (SOMEONE_DIED(retval) || fighting || hunting.isEmpty())
               return retval;
@@ -1489,7 +1489,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
           "An arrow flies into the room with incredible speed!\n",
           victroom);
 
-    retval = damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_PIERCE, SKILL_ARCHERY);
 
     if (isSet(retval, ReturnValue::eVICT_DIED))
     {
@@ -1638,29 +1638,29 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       case 1:
         dam = 90;
         snprintf(buffer, 100, "%d", dam);
-        send_damage(
+        ch->getDC()->send_damage(
             "The flames surrounding the arrow burns your wound for | damage!",
             ch, 0, victim, buffer,
             "The flames surrounding the arrow burns your wound!",
             TO_VICT);
-        send_damage(
+        ch->getDC()->send_damage(
             "The flames surrounding the arrow burns $n's wound for | damage!",
             victim, 0, 0, buffer,
             "The flames surrounding the arrow burns $n's wound!",
             TO_ROOM);
-        retval = damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW);
+        retval = ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SKILL_FIRE_ARROW);
         ch->skill_increase_check(SKILL_FIRE_ARROW, ch->has_skill(SKILL_FIRE_ARROW), get_difficulty(SKILL_FIRE_ARROW));
         enchantmentused = true;
         break;
       case 2:
         dam = 50;
         snprintf(buffer, 100, "%d", dam);
-        send_damage("The stray ice shards impale you for | damage!", ch,
-                    0, victim, buffer, "The stray ice shards impale you!",
-                    TO_VICT);
-        send_damage("The stray ice shards impale $n for | damage!",
-                    victim, 0, 0, buffer, "The stray ice shards impale $n!",
-                    TO_ROOM);
+        ch->getDC()->send_damage("The stray ice shards impale you for | damage!", ch,
+                                 0, victim, buffer, "The stray ice shards impale you!",
+                                 TO_VICT);
+        ch->getDC()->send_damage("The stray ice shards impale $n for | damage!",
+                                 victim, 0, 0, buffer, "The stray ice shards impale $n!",
+                                 TO_ROOM);
         if (number(1, 100) < ch->has_skill(SKILL_ICE_ARROW) / 4)
         {
           act("Your body slows down for a second!", ch, 0, victim,
@@ -1669,7 +1669,7 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
               0);
           WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
-        retval = damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW);
+        retval = ch->getDC()->damage(ch, victim, dam, TYPE_COLD, SKILL_ICE_ARROW);
         ch->skill_increase_check(SKILL_ICE_ARROW,
                                  ch->has_skill(SKILL_ICE_ARROW),
                                  get_difficulty(SKILL_ICE_ARROW));
@@ -1678,18 +1678,18 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       case 3:
         dam = 30;
         snprintf(buffer, 100, "%d", dam);
-        send_damage(
+        ch->getDC()->send_damage(
             "The storm cloud enveloping the arrow shocks you for | damage!",
             ch, 0, victim, buffer,
             "The storm cloud enveloping the arrow shocks you!",
             TO_VICT);
-        send_damage(
+        ch->getDC()->send_damage(
             "The storm cloud enveloping the arrow shocks $n for | damage!",
             victim, 0, ch, buffer,
             "The storm cloud enveloping the arrow shocks $n!",
             TO_ROOM);
-        retval = damage(ch, victim, dam, TYPE_ENERGY,
-                        SKILL_TEMPEST_ARROW, 0);
+        retval = ch->getDC()->damage(ch, victim, dam, TYPE_ENERGY,
+                                     SKILL_TEMPEST_ARROW, 0);
         ch->skill_increase_check(SKILL_TEMPEST_ARROW,
                                  ch->has_skill(SKILL_TEMPEST_ARROW),
                                  get_difficulty(SKILL_TEMPEST_ARROW));
@@ -1698,12 +1698,12 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
       case 4:
         dam = 70;
         snprintf(buffer, 100, "%d", dam);
-        send_damage(
+        ch->getDC()->send_damage(
             "The magical stones surrounding the arrow smack into you, hard for | damage.",
             ch, 0, victim, buffer,
             "The magical stones surrounding the arrow smack into you, hard.",
             TO_VICT);
-        send_damage(
+        ch->getDC()->send_damage(
             "The magical stones surrounding the arrow smack hard into $n for | damage.",
             victim, 0, 0, buffer,
             "The magical stones surrounding the arrow smack hard into $n.",
@@ -1717,8 +1717,8 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
           victim->setSitting();
           WAIT_STATE(victim, DC::PULSE_VIOLENCE);
         }
-        retval = damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
-                        0);
+        retval = ch->getDC()->damage(ch, victim, dam, TYPE_HIT, SKILL_GRANITE_ARROW,
+                                     0);
         ch->skill_increase_check(SKILL_GRANITE_ARROW,
                                  ch->has_skill(SKILL_GRANITE_ARROW),
                                  get_difficulty(SKILL_GRANITE_ARROW));

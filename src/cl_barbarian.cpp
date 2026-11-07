@@ -116,9 +116,9 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
       sprintf(dammsg, "$B%d$R", dam);
       sprintf(buf2, "With a resounding crash, you bounce off the %s and fall to the ground, receiving | damage!", fname(exit->keyword).toStdString().c_str());
       sprintf(buf, "With a resounding crash, you bounce off the %s and fall to the ground!", fname(exit->keyword).toStdString().c_str());
-      send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
+      ch->getDC()->send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
       sprintf(buf, "With a resounding crash, $e bounces off the %s and falls to the ground!", fname(exit->keyword).toStdString().c_str());
-      send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
+      ch->getDC()->send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
 
       sprintf(buf, "The %s survived, but you didn't...\n", fname(exit->keyword).toStdString().c_str());
       sprintf(buf2, "The %s survived, but $n didn't...", fname(exit->keyword).toStdString().c_str());
@@ -183,9 +183,9 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
         sprintf(dammsg, "$B%d$R", dam);
         sprintf(buf2, "With a resounding crash, the %s gives way and bursts open, receiving | damage!.", fname(exit->keyword).toStdString().c_str());
         sprintf(buf, "With a resounding crash, the %s gives way and bursts open!\n", fname(exit->keyword).toStdString().c_str());
-        send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
+        ch->getDC()->send_damage(buf2, ch, 0, 0, dammsg, buf, TO_CHAR);
         sprintf(buf, "With a resounding crash, the %s gives way and bursts open!", fname(exit->keyword).toStdString().c_str());
-        send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
+        ch->getDC()->send_damage(buf, ch, 0, 0, dammsg, buf, TO_ROOM);
       }
 
       sprintf(buf, "Your heroic efforts managed to slay both the %s... and yourself. Nice going.\n", fname(exit->keyword).toStdString().c_str());
@@ -732,8 +732,8 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   if (!skill_success(ch, victim, SKILL_HEADBUTT, mod) || isSet(victim->immune, weapon_bit) || do_frostshield(ch, victim))
   {
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
-    // the damage call here takes care of starting combat and such
+    retval = ch->getDC()->damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
+    // the ch->getDC()->damage call here takes care of starting combat and such
     retval = ReturnValue::eSUCCESS;
   }
   else
@@ -751,8 +751,8 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
       }
 
       WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-      retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
-      // the damage call here takes care of starting combat and such
+      retval = ch->getDC()->damage(ch, victim, 0, TYPE_CRUSH, SKILL_HEADBUTT);
+      // the ch->getDC()->damage call here takes care of starting combat and such
       retval = ReturnValue::eSUCCESS;
     }
     else
@@ -765,14 +765,14 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
 
       WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
       SET_BIT(victim->combat, COMBAT_SHOCKED2);
-      retval = damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
+      retval = ch->getDC()->damage(ch, victim, 50, TYPE_CRUSH, SKILL_HEADBUTT);
       if (!SOMEONE_DIED(retval) && !number(0, 9) &&
           ch->equipment[WEAR_HEAD] && DC::getInstance()->obj_index[ch->equipment[WEAR_HEAD]->vnum_].vnum() == 508)
       {
         act("$n's spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_ROOM, NOTVICT);
         act("$n's spiked helmet crackles as it strikes your face!", ch, nullptr, victim, TO_VICT, 0);
         act("Your spiked helmet crackles as it strikes $N's face!", ch, nullptr, victim, TO_CHAR, 0);
-        //	retval = damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED);
+        //	retval = ch->getDC()->damage(ch, victim, 50, TYPE_PIERCE, TYPE_UNDEFINED);
         retval = spell_shocking_grasp(50, ch, victim, 0, 60);
         // TWEAKME
       }
@@ -1224,7 +1224,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
 
     ch->setSitting();
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
-    retval = damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK);
+    retval = ch->getDC()->damage(ch, victim, 0, TYPE_CRUSH, SKILL_KNOCKBACK);
     return ReturnValue::eFAILURE;
   }
   else if (!victim_paralyzed && victim->affected_by_spell(SKILL_BATTLESENSE) &&
@@ -1254,7 +1254,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     // the room?
     char temp[256]; // what did my innocent bugfix ever do to you?
     sprintf(temp, "%s", GET_SHORT(victim));
-    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
       sprintf(buf, "You smash %s apart!", temp);
@@ -1269,16 +1269,16 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
       sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
       sprintf(buf2, "Your smash for | damage sends %s reeling %s.", GET_SHORT(victim), qPrintable(DC::dirs[dir]));
       sprintf(buf, "Your smash sends %s reeling %s.", GET_SHORT(victim), qPrintable(DC::dirs[dir]));
-      send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
+      ch->getDC()->send_damage(buf2, ch, 0, victim, dammsg, buf, TO_CHAR);
       sprintf(buf2, "%s smashes into you for | damage, sending you reeling %s.", GET_NAME(ch), qPrintable(DC::dirs[dir]));
       sprintf(buf, "%s smashes into you, sending you reeling %s.", GET_NAME(ch), qPrintable(DC::dirs[dir]));
-      send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
+      ch->getDC()->send_damage(buf2, ch, 0, victim, dammsg, buf, TO_VICT);
 
       if (selfpurge)
         return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
       sprintf(buf2, "%s smashes into %s for | damage and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), qPrintable(DC::dirs[dir]));
       sprintf(buf, "%s smashes into %s and sends $S ass reeling to the %s.", GET_NAME(ch), GET_SHORT(victim), qPrintable(DC::dirs[dir]));
-      send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
+      ch->getDC()->send_damage(buf2, ch, 0, victim, dammsg, buf, TO_ROOM);
 
       if (victim->fighting)
       {
@@ -1303,7 +1303,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   {
     char temp[256];
     sprintf(temp, "%s", GET_SHORT(victim));
-    retval = damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_CRUSH, SKILL_KNOCKBACK);
     if (SOMEONE_DIED(retval))
     {
       sprintf(buf, "You smash %s apart!", temp);
@@ -1315,12 +1315,12 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
     else
     {
       sprintf(dammsg, "$B%d$R", prevhps - victim->getHP());
-      send_damage("$N backpeddles across the room due to $n's smash for | damage.", ch, 0, victim, dammsg,
-                  "$N backpessles across the room due to $n's smash.", TO_ROOM);
-      send_damage("$N barely keeps $S footing, stumbling backwards after your smash and taking | damage.", ch, 0, victim, dammsg,
-                  "$N barely keeps $S footing, stumbling backwards after your smash.", TO_CHAR);
-      send_damage("$n knocks you back across the room for | damage.", ch, 0, victim, dammsg,
-                  "$n knocks you back across the room.", TO_VICT);
+      ch->getDC()->send_damage("$N backpeddles across the room due to $n's smash for | damage.", ch, 0, victim, dammsg,
+                               "$N backpessles across the room due to $n's smash.", TO_ROOM);
+      ch->getDC()->send_damage("$N barely keeps $S footing, stumbling backwards after your smash and taking | damage.", ch, 0, victim, dammsg,
+                               "$N barely keeps $S footing, stumbling backwards after your smash.", TO_CHAR);
+      ch->getDC()->send_damage("$n knocks you back across the room for | damage.", ch, 0, victim, dammsg,
+                               "$n knocks you back across the room.", TO_VICT);
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
       return attack(victim, ch, TYPE_UNDEFINED);
     }

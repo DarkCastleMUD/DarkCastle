@@ -63,7 +63,6 @@
 #include "DC/returnvals.h"
 #include "DC/sing.h" // stop_grouped_bards
 #include "DC/innate.h"
-#include "DC/token.h"
 #include "DC/vault.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
@@ -232,7 +231,7 @@ int check_charmiejoin(Character *ch)
   }
 }
 
-void perform_violence(void)
+void DC::perform_violence(void)
 {
   // char debug[256];
   Character *ch;
@@ -1632,7 +1631,7 @@ int one_hit(Character *ch, Character *vict, int type, int weapon)
     }
   }
 
-  retval = damage(ch, vict, dam, weapon_type, w_type, weapon);
+  retval = ch->getDC()->damage(ch, vict, dam, weapon_type, w_type, weapon);
   if (SOMEONE_DIED(retval) || !ch->fighting)
   {
     return debug_retval(ch, vict, retval) | ReturnValue::eSUCCESS;
@@ -2065,7 +2064,7 @@ void Character::addHP(int newhp, Character *causer)
 }
 
 // returns standard returnvals.h return codes
-int damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog, Object *obj)
+int DC::damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog, Object *obj)
 {
   int can_miss = 1;
   int32_t weapon_bit;
@@ -2970,12 +2969,12 @@ int is_pkill(Character *ch, Character *vict)
   return false;
 }
 
-void send_damage(QString buf, Character *ch, Object *obj, Character *victim, QString dmg, QString buf2, int to)
+void DC::send_damage(QString buf, Character *ch, Object *obj, Character *victim, QString dmg, QString buf2, int to)
 {
   send_damage(qPrintable(buf), ch, obj, victim, qPrintable(dmg), qPrintable(buf2), to);
 }
 
-void send_damage(char const *buf, Character *ch, Object *obj, Character *victim, char const *dmg, char const *buf2, int to)
+void DC::send_damage(char const *buf, Character *ch, Object *obj, Character *victim, char const *dmg, char const *buf2, int to)
 {
   Character *tmpch;
   char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
@@ -3130,9 +3129,9 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
       QString room_msg1 = replaceString(messages->die_msg.room_msg, find, replace);
       QString room_msg2 = replaceString(messages2->die_msg.room_msg, find, replace);
 
-      send_damage(victim_msg2, ch, ch->equipment[weapon], victim, dmgmsg, victim_msg1, TO_VICT);
-      send_damage(attacker_msg2, ch, ch->equipment[weapon], victim, dmgmsg, attacker_msg1, TO_CHAR);
-      send_damage(room_msg2, ch, ch->equipment[weapon], victim, dmgmsg, room_msg1, TO_ROOM);
+      ch->getDC()->send_damage(victim_msg2, ch, ch->equipment[weapon], victim, dmgmsg, victim_msg1, TO_VICT);
+      ch->getDC()->send_damage(attacker_msg2, ch, ch->equipment[weapon], victim, dmgmsg, attacker_msg1, TO_CHAR);
+      ch->getDC()->send_damage(room_msg2, ch, ch->equipment[weapon], victim, dmgmsg, room_msg1, TO_ROOM);
     }
     else
     {
@@ -3143,9 +3142,9 @@ void do_dam_msgs(Character *ch, Character *victim, int dam, int attacktype, int 
       QString room_msg1 = replaceString(messages->hit_msg.room_msg, find, replace);
       QString room_msg2 = replaceString(messages2->hit_msg.room_msg, find, replace);
 
-      send_damage(victim_msg2, ch, ch->equipment[weapon], victim, dmgmsg, victim_msg1, TO_VICT);
-      send_damage(attacker_msg2, ch, ch->equipment[weapon], victim, dmgmsg, attacker_msg1, TO_CHAR);
-      send_damage(room_msg2, ch, ch->equipment[weapon], victim, dmgmsg, room_msg1, TO_ROOM);
+      ch->getDC()->send_damage(victim_msg2, ch, ch->equipment[weapon], victim, dmgmsg, victim_msg1, TO_VICT);
+      ch->getDC()->send_damage(attacker_msg2, ch, ch->equipment[weapon], victim, dmgmsg, attacker_msg1, TO_CHAR);
+      ch->getDC()->send_damage(room_msg2, ch, ch->equipment[weapon], victim, dmgmsg, room_msg1, TO_ROOM);
     }
   }
 }
@@ -5123,7 +5122,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
     //  act("You jam your weapon in $N's heart!", ch, 0, vict, TO_CHAR, 0);
     //  act("$n's weapon is speared into you! Ouch!", ch, 0, vict, TO_VICT, 0);
     damadd = (int)(dam * 1.5);
-    int retval = damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
+    int retval = ch->getDC()->damage(ch, vict, damadd, wt, SKILL_SKEWER, weapon);
     if (SOMEONE_DIED(retval))
       return debug_retval(ch, vict, retval);
     // vict->removeHP(damadd);
@@ -5138,7 +5137,7 @@ int do_skewer(Character *ch, Character *vict, int dam, int wt, int wt2, int weap
       act("$n's weapon rips through $N's chest sending gore and entrails flying for yards!\n", ch, 0, vict, NOTVICT, 0);
       // duplicate message   act("$n is DEAD!!", vict, 0, 0, TO_ROOM, INVIS_NULL);
       vict->sendln("You have been SKEWERED!!\n");
-      damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
+      ch->getDC()->damage(ch, vict, 9999999, TYPE_UNDEFINED, SKILL_SKEWER, weapon);
       //      update_pos(vict);
       return ReturnValue::eSUCCESS | ReturnValue::eVICT_DIED;
     }
@@ -5416,7 +5415,7 @@ void raw_kill(Character *ch, Character *victim)
   DC::getInstance()->incrementZoneDiedTick(DC::getInstance()->world[victim->in_room].zone);
 
   victim->setStanding();
-  int retval = mprog_death_trigger(victim, ch);
+  int retval = ch->getDC()->mprog_death_trigger(victim, ch);
   if (SOMEONE_DIED(retval))
     return;
   victim->setDead();
@@ -6003,8 +6002,7 @@ char *elem_type[] =
         "$B$5bolt of energy$R",
         "$B$0stone fist$R"};
 
-void dam_message(int dam, Character *ch, Character *victim,
-                 int w_type, int32_t modifier)
+void DC::dam_message(int dam, Character *ch, Character *victim, int w_type, int32_t modifier)
 {
   static const char *attack_table[] =
       {
@@ -6419,7 +6417,7 @@ void trip(Character *ch, Character *victim)
       ch, nullptr, victim, TO_ROOM, NOTVICT);
 
   WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
-  if (damage(ch, victim, 1, TYPE_HIT, SKILL_TRIP, 0) == (-1))
+  if (ch->getDC()->damage(ch, victim, 1, TYPE_HIT, SKILL_TRIP, 0) == (-1))
     return;
 
   WAIT_STATE(victim, DC::PULSE_VIOLENCE * 2);
@@ -6816,7 +6814,7 @@ void arena_kill(Character *ch, Character *victim, int type)
   // Kill mobs outright
   if (victim->isNonPlayer())
   {
-    mprog_death_trigger(victim, ch);
+    ch->getDC()->mprog_death_trigger(victim, ch);
     remove_nosave(victim);
     extract_char(victim, true);
     return;

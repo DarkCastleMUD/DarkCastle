@@ -97,7 +97,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
   else
   {
     dam = 750;
-    retval = damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_ACID, SKILL_HARM_TOUCH);
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
     if (isSet(retval, ReturnValue::eVICT_DIED) && !isSet(retval, ReturnValue::eCH_DIED))
     {
@@ -108,7 +108,7 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
         if (amount + ch->getHP() > GET_MAX_HIT(ch))
           amount = GET_MAX_HIT(ch) - ch->getHP();
         sprintf(dammsg, "$B%d$R", amount);
-        send_damage("Your god basks in your worship of pain and infuses you with | life.", ch, 0, victim, dammsg, "You god basks in your worship of pain and infuses you with life.", TO_CHAR);
+        ch->getDC()->send_damage("Your god basks in your worship of pain and infuses you with | life.", ch, 0, victim, dammsg, "You god basks in your worship of pain and infuses you with life.", TO_CHAR);
         ch->addHP(amount);
       }
     }
@@ -189,12 +189,12 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
       amount = GET_MAX_HIT(victim) - victim->getHP();
     victim->addHP(amount);
     sprintf(dammsg, "$B%d$R", amount);
-    send_damage("Praying fervently, you lay hands as life force granted by your god streams from your body healing $N for | health.",
-                ch, 0, victim, dammsg, "Praying fervently, you lay hands as life force granted by your god streams from your body into $N.", TO_CHAR);
-    send_damage("Your body surges with holy energies as | points of life force granted by $n's god pours into you!",
-                ch, 0, victim, dammsg, "Your body surges with holy energies as life force granted by $n's god pours into you!", TO_VICT);
-    send_damage("A blinding flash fills the area as | points of life force granted from $n's god pours into $N!", ch, 0,
-                victim, dammsg, "A blinding flash fills the area as life force granted from $n's god pours into $N!", TO_ROOM);
+    ch->getDC()->send_damage("Praying fervently, you lay hands as life force granted by your god streams from your body healing $N for | health.",
+                             ch, 0, victim, dammsg, "Praying fervently, you lay hands as life force granted by your god streams from your body into $N.", TO_CHAR);
+    ch->getDC()->send_damage("Your body surges with holy energies as | points of life force granted by $n's god pours into you!",
+                             ch, 0, victim, dammsg, "Your body surges with holy energies as life force granted by $n's god pours into you!", TO_VICT);
+    ch->getDC()->send_damage("A blinding flash fills the area as | points of life force granted from $n's god pours into $N!", ch, 0,
+                             victim, dammsg, "A blinding flash fills the area as life force granted from $n's god pours into $N!", TO_ROOM);
   }
 
   af.type = SKILL_LAY_HANDS;
@@ -299,7 +299,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
       act("You attempt to behead $N, but your sword bounces of $S neckwear.", ch, 0, vict, TO_CHAR, 0);
       act("$n attempts to behead $N, but fails.", ch, 0, vict, TO_ROOM, NOTVICT);
       act("$n attempts to behead you, but cannot cut through your neckwear.", ch, 0, vict, TO_VICT, 0);
-      retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
+      retval = ch->getDC()->damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
       return ReturnValue::eSUCCESS | retval;
     }
 
@@ -308,7 +308,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
       act("$N deftly dodges your beheading attempt!", ch, 0, vict, TO_CHAR, 0);
       act("$N deftly dodges $n's attempt to behead $M!", ch, 0, vict, TO_ROOM, NOTVICT);
       act("You deftly avoid $n's attempt to lop your head off!", ch, 0, vict, TO_VICT, 0);
-      retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
+      retval = ch->getDC()->damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
       return ReturnValue::eSUCCESS | retval;
     }
 
@@ -328,7 +328,7 @@ int do_behead(Character *ch, char *argument, cmd_t cmd)
     act("You hear the SWOOSH sound of wind as $n's sword attempts to slice off your head!", ch, 0, vict, TO_VICT, 0);
     act("You miss your attempt to behead $N.", ch, 0, vict, TO_CHAR, 0);
     act("$N jumps back as $n makes an attempt to BEHEAD $M!", ch, 0, vict, TO_ROOM, NOTVICT);
-    retval = damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
+    retval = ch->getDC()->damage(ch, vict, 0, TYPE_SLASH, SKILL_BEHEAD);
   }
 
   return retval;

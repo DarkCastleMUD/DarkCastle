@@ -236,9 +236,9 @@ int spell_magic_missile(uint8_t level, Character *ch, Character *victim, class O
   while (!SOMEONE_DIED(retval) && count--)
   {
     if (level > 200)
-      retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_MAGIC_MISSILE, weap_spell);
+      retval = ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_MAGIC_MISSILE, weap_spell);
     else
-      retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, weap_spell);
+      retval = ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_MAGIC_MISSILE, weap_spell);
     if (dam > 50)
       dam = 50; // spelldamage only applies to 1st missile
   }
@@ -256,9 +256,9 @@ int spell_chill_touch(uint8_t level, Character *ch, Character *victim, class Obj
   int retval;
 
   if (level > 200)
-    retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_CHILL_TOUCH, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_CHILL_TOUCH, weap_spell);
   else
-    retval = damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_COLD, SPELL_CHILL_TOUCH, weap_spell);
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -301,9 +301,9 @@ int spell_burning_hands(uint8_t level, Character *ch, Character *victim, class O
   set_cantquit(ch, victim);
   dam = 165;
   if (level > 200)
-    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_BURNING_HANDS);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_BURNING_HANDS);
   else
-    return damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SPELL_BURNING_HANDS);
 }
 
 /* SHOCKING GRASP */
@@ -312,7 +312,7 @@ int spell_shocking_grasp(uint8_t level, Character *ch, Character *victim, class 
 {
   int dam;
   dam = 130;
-  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SHOCKING_GRASP);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_ENERGY, SPELL_SHOCKING_GRASP);
 }
 
 /* LIGHTNING BOLT */
@@ -324,9 +324,9 @@ int spell_lightning_bolt(uint8_t level, Character *ch, Character *victim, class 
   set_cantquit(ch, victim);
   dam = 240;
   if (level > 200)
-    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_LIGHTNING_BOLT, weap_spell);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_LIGHTNING_BOLT, weap_spell);
   else
-    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, weap_spell);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BOLT, weap_spell);
 }
 
 /* COLOUR SPRAY */
@@ -346,8 +346,8 @@ int spell_colour_spray(uint8_t level, Character *ch, Character *victim,
     victim_dazzled = true;
   }
 
-  int retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY,
-                      weap_spell);
+  int retval = ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_COLOUR_SPRAY,
+                                   weap_spell);
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -399,10 +399,10 @@ int spell_drown(uint8_t level, Character *ch, Character *victim, class Object *o
     victim->sendln(QStringLiteral("You are torn apart by the force of %1's watery blast and are killed instantly!").arg(ch->getName()));
     act("$N is torn apart by the force of $n's watery blast and killed instantly!", ch, 0, victim, TO_ROOM, NOTVICT);
     act("$N is torn apart by the force of your watery blast and killed instantly!", ch, 0, victim, TO_CHAR, 0);
-    return damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_WATER, SPELL_DROWN);
   }
 
-  return damage(ch, victim, 265, TYPE_WATER, SPELL_DROWN, weap_spell);
+  return ch->getDC()->damage(ch, victim, 265, TYPE_WATER, SPELL_DROWN, weap_spell);
 }
 
 /* ENERGY DRAIN */
@@ -468,9 +468,9 @@ int spell_souldrain(uint8_t level, Character *ch, Character *victim, class Objec
   GET_MANA(ch) += mana;
   char buf[MAX_STRING_LENGTH];
   sprintf(buf, "$B%d$R", mana);
-  send_damage("You drain $N's very soul for | mana!", ch, 0, victim, buf, "You drain $N's very soul!", TO_CHAR);
-  send_damage("You feel your very soul being drained by $n for | mana!", ch, 0, victim, buf, "You feel your very soul being drained by $n!", TO_VICT);
-  send_damage("$N's soul is drained away by $n for | mana!", ch, 0, victim, buf, "$N's soul is drained away by $n!", TO_ROOM);
+  ch->getDC()->send_damage("You drain $N's very soul for | mana!", ch, 0, victim, buf, "You drain $N's very soul!", TO_CHAR);
+  ch->getDC()->send_damage("You feel your very soul being drained by $n for | mana!", ch, 0, victim, buf, "You feel your very soul being drained by $n!", TO_VICT);
+  ch->getDC()->send_damage("$N's soul is drained away by $n for | mana!", ch, 0, victim, buf, "$N's soul is drained away by $n!", TO_ROOM);
 
   if (GET_MANA(ch) > GET_MAX_MANA(ch))
     GET_MANA(ch) = GET_MAX_MANA(ch);
@@ -494,10 +494,10 @@ int spell_vampiric_touch(uint8_t level, Character *ch, Character *victim, class 
   int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 225;
-  int adam = dam_percent(skill, 225); // Actual damage, for drainy purposes.
+  int adam = dam_percent(skill, 225); // Actual ch->getDC()->damage, for drainy purposes.
 
   int i = victim->getHP();
-  int retval = damage(ch, victim, dam, TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
+  int retval = ch->getDC()->damage(ch, victim, dam, TYPE_COLD, SPELL_VAMPIRIC_TOUCH, weap_spell);
   if (!SOMEONE_DIED(retval) && victim->getHP() >= i)
     return retval;
 
@@ -524,9 +524,9 @@ int spell_meteor_swarm(uint8_t level, Character *ch, Character *victim, class Ob
   int retval;
 
   if (level > 200)
-    retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_METEOR_SWARM, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_METEOR_SWARM, weap_spell);
   else
-    retval = damage(ch, victim, dam, TYPE_MAGIC, SPELL_METEOR_SWARM, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_METEOR_SWARM, weap_spell);
 
   /* Spellcraft Effect */
   if (!SOMEONE_DIED(retval) && spellcraft(ch, SPELL_METEOR_SWARM) && !number(0, 9))
@@ -553,9 +553,9 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
   int retval;
 
   if (level > 200)
-    retval = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIREBALL, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIREBALL, weap_spell);
   else
-    retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SPELL_FIREBALL, weap_spell);
 
   if (SOMEONE_DIED(retval) || ch->in_room != victim->in_room)
     return retval;
@@ -571,7 +571,7 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
     if (number(0, 100) < (skill / 5))
     {
       // Follow the elemental filter (encoded in level > 200) for both the
-      // damage type and the flavor text, instead of always saying "flames".
+      // ch->getDC()->damage type and the flavor text, instead of always saying "flames".
       int dtype = (level > 200) ? (TYPE_HIT + level - 200) : TYPE_FIRE;
       QString element;
       switch (dtype)
@@ -593,7 +593,7 @@ int spell_fireball(uint8_t level, Character *ch, Character *victim, class Object
       QString recombine = QStringLiteral("The expanding %1 suddenly recombine and fly at $N again!").arg(element);
       act(recombine, ch, 0, victim, TO_ROOM, 0);
       act(recombine, ch, 0, victim, TO_CHAR, 0);
-      retval = damage(ch, victim, dam, dtype, SPELL_FIREBALL);
+      retval = ch->getDC()->damage(ch, victim, dam, dtype, SPELL_FIREBALL);
     }
   return retval;
 }
@@ -606,7 +606,7 @@ int spell_sparks(uint8_t level, Character *ch, Character *victim, class Object *
   int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = dice(level, 6);
-  return damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, weap_spell);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SPELL_SPARKS, weap_spell);
 }
 
 /* HOWL */
@@ -620,9 +620,9 @@ int spell_howl(uint8_t level, Character *ch, Character *victim, class Object *ob
 
   if (saves_spell(ch, victim, 5, SAVE_TYPE_MAGIC) >= 0)
   {
-    return damage(ch, victim, 0, TYPE_SONG, SPELL_HOWL, weap_spell);
+    return ch->getDC()->damage(ch, victim, 0, TYPE_SONG, SPELL_HOWL, weap_spell);
   }
-  retval = damage(ch, victim, 300, TYPE_SONG, SPELL_HOWL, weap_spell);
+  retval = ch->getDC()->damage(ch, victim, 300, TYPE_SONG, SPELL_HOWL, weap_spell);
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -1021,7 +1021,7 @@ int spell_earthquake(uint8_t level, Character *ch, Character *victim, class Obje
       if (dam > 0)
       {
         int retval2 = 0;
-        retval2 = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
+        retval2 = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_EARTHQUAKE, weap_spell);
 
         if (isSet(retval2, ReturnValue::eVICT_DIED))
         {
@@ -1088,7 +1088,7 @@ int spell_life_leech(uint8_t level, Character *ch, Character *victim, class Obje
         ch->addHP(adam * 0.3);
       }
 
-      retval &= damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
+      retval &= ch->getDC()->damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_LIFE_LEECH, weap_spell);
     }
   }
   return retval;
@@ -1176,7 +1176,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
     {
 
       dam = 660;
-      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
+      retval = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
       if (isSet(retval, ReturnValue::eEXTRA_VALUE))
@@ -1211,7 +1211,7 @@ int spell_solar_gate(uint8_t level, Character *ch, Character *victim, class Obje
           sprintf(buf, "You are ENVELOPED in a PAINFUL BRIGHT LIGHT pouring in %s.", desc_dirs[i]);
           act(buf, tmp_victim, 0, ch, TO_CHAR, 0);
 
-          retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
+          retval = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_SOLAR_GATE);
           if (isSet(retval, ReturnValue::eCH_DIED))
             return retval;
 
@@ -1456,11 +1456,11 @@ int spell_firestorm(uint8_t level, Character *ch, Character *victim, class Objec
 
     if (level > 200)
     {
-      retval2 = damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM);
+      retval2 = ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_FIRESTORM);
     }
     else
     {
-      retval2 = damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM);
+      retval2 = ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SPELL_FIRESTORM);
     }
 
     if (isSet(retval2, ReturnValue::eVICT_DIED))
@@ -1552,7 +1552,7 @@ int spell_dispel_evil(uint8_t level, Character *ch, Character *victim, class Obj
       align = 0 - align;
     dam = 370 + align / 10;
 
-    return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, weap_spell);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_EVIL, weap_spell);
   }
 }
 
@@ -1601,7 +1601,7 @@ int spell_dispel_good(uint8_t level, Character *ch, Character *victim, class Obj
       align = 0 - align;
     dam = 370 + align / 10;
 
-    return damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, weap_spell);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_COLD, SPELL_DISPEL_GOOD, weap_spell);
   }
 }
 
@@ -1616,7 +1616,7 @@ int spell_call_lightning(uint8_t level, Character *ch, Character *victim, class 
   if (OUTSIDE(ch) && (weather_info.sky >= SKY_RAINING))
   {
     dam = dice(MIN((int)GET_MANA(ch), 725), 1);
-    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_CALL_LIGHTNING);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_ENERGY, SPELL_CALL_LIGHTNING);
   }
   return ReturnValue::eFAILURE;
 }
@@ -1630,7 +1630,7 @@ int spell_harm(uint8_t level, Character *ch, Character *victim, class Object *ob
   set_cantquit(ch, victim);
   dam = 165;
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, weap_spell);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_HARM, weap_spell);
 }
 
 /* POWER HARM */
@@ -1648,7 +1648,7 @@ int spell_power_harm(uint8_t level, Character *ch, Character *victim, class Obje
   else
     dam = 330;
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, weap_spell);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_POWER_HARM, weap_spell);
 }
 
 /* DIVINE FURY */
@@ -1664,7 +1664,7 @@ int spell_divine_fury(uint8_t level, Character *ch, Character *victim, class Obj
     dam = 0;
   }
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_DIVINE_FURY);
 }
 
 /* TELEPORT */
@@ -1837,7 +1837,7 @@ int spell_paralyze(uint8_t level, Character *ch, Character *victim, class Object
       else
       {
         ch->sendln("The combined magics cause an explosion!");
-        retval = damage(ch, ch, number(5, 10), 0, TYPE_MAGIC);
+        retval = ch->getDC()->damage(ch, ch, number(5, 10), 0, TYPE_MAGIC);
       }
       return retval;
     }
@@ -2195,14 +2195,14 @@ int spell_cure_critic(uint8_t level, Character *ch, Character *victim, class Obj
     sprintf(buf, "$n heals %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n heals | of the more critical wounds on $N.");
-    send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more critical wounds on $N.", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more critical wounds on $N.", TO_ROOM);
   }
   else
   {
     sprintf(buf, "You heal %s of your more critical wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n heals | of $s more critical wounds.");
-    send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more critical wounds.", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more critical wounds.", TO_ROOM);
   }
 
   return ReturnValue::eSUCCESS;
@@ -2262,14 +2262,14 @@ int spell_cure_light(uint8_t level, Character *ch, Character *victim, class Obje
     sprintf(buf, "$n heals %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n heals | of small cuts and scratches on $N.");
-    send_damage(buf, ch, 0, victim, dammsg, "$n heals several small cuts and scratches on $N.", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "$n heals several small cuts and scratches on $N.", TO_ROOM);
   }
   else
   {
     sprintf(buf, "You heal %s of your small cuts and scratches.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n heals | of $s small cuts and scratches.");
-    send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s small cuts and scratches.", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s small cuts and scratches.", TO_ROOM);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2842,14 +2842,14 @@ int spell_heal(uint8_t level, Character *ch, Character *victim, class Object *ob
     sprintf(buf, "$n calls forth an incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n calls forth an incantation that heals $N|.");
-    send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
     sprintf(buf, "Your incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n calls forth an incantation that heals $m|.");
-    send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   return ReturnValue::eSUCCESS;
 }
@@ -2907,14 +2907,14 @@ int spell_power_heal(uint8_t level, Character *ch, Character *victim, class Obje
     sprintf(buf, "$n calls forth a powerful incantation that heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n calls forth a powerful incantation that heals $N|.");
-    send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
     sprintf(buf, "Your powerful incantation heals you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n calls forth a powerful incantation that heals $m|.");
-    send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
 
   return ReturnValue::eSUCCESS;
@@ -2974,14 +2974,14 @@ int spell_full_heal(uint8_t level, Character *ch, Character *victim, class Objec
     sprintf(buf, "$n calls forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n calls forth the magic of the gods to restore $N|.");
-    send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
   else
   {
     sprintf(buf, "You call forth the magic of the gods to restore you%s.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n calls forth the magic of the gods to restore $m|.");
-    send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
   }
 
   return ReturnValue::eSUCCESS;
@@ -3109,7 +3109,7 @@ int spell_locate_object(uint8_t level, Character *ch, char *arg, Character *vict
       room = i->in_obj->in_room;
 
     // If owner, PC, with desc and not con_playing or wizinvis,
-    if (owner && owner->player && is_in_game(owner) &&
+    if (owner && owner->player && ch->getDC()->is_in_game(owner) &&
         (owner->player->wizinvis > ch->getLevel()))
     {
       if (isexact(tmp, i->Name()))
@@ -3577,10 +3577,10 @@ int spell_mend_golem(uint8_t level, Character *ch, Character *victim, class Obje
       }
       sprintf(dammsg, "$B%d$R", heal);
 
-      send_damage("$n focuses $s magical energy and | of the scratches on $s golem are fixed.", ch, 0, 0,
-                  dammsg, "$n focuses $s magical energy and many of the scratches on $s golem are fixed.", TO_ROOM);
-      send_damage("You focus your magical energy and | of the scratches on your golem are fixed.", ch, 0, 0,
-                  dammsg, "You focus your magical enery and many of the scratches on your golem are fixed.", TO_CHAR);
+      ch->getDC()->send_damage("$n focuses $s magical energy and | of the scratches on $s golem are fixed.", ch, 0, 0,
+                               dammsg, "$n focuses $s magical energy and many of the scratches on $s golem are fixed.", TO_ROOM);
+      ch->getDC()->send_damage("You focus your magical energy and | of the scratches on your golem are fixed.", ch, 0, 0,
+                               dammsg, "You focus your magical enery and many of the scratches on your golem are fixed.", TO_CHAR);
       return ReturnValue::eSUCCESS;
     }
   ch->sendln("You don't have a golem.");
@@ -4896,7 +4896,7 @@ int spell_frost_breath(uint8_t level, Character *ch, Character *victim, class Ob
   //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_COLD) >= 0)
   //	   dam >>= 1;
 
-  retval = damage(ch, victim, dam, TYPE_COLD, SPELL_FROST_BREATH);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_COLD, SPELL_FROST_BREATH);
   if (SOMEONE_DIED(retval))
   {
     /* The character's DEAD, don't mess with him */
@@ -4947,13 +4947,13 @@ int spell_acid_breath(uint8_t level, Character *ch, Character *victim, class Obj
   //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ACID) >= 0)
   //	   dam >>= 1;
 
-  retval = damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BREATH);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BREATH);
   if (SOMEONE_DIED(retval))
   {
     return retval;
   }
 
-  /* And now for the damage on equipment */
+  /* And now for the ch->getDC()->damage on equipment */
   /*
   // TODO - make this do something cool
      if(number(0,100)<ch->getLevel())
@@ -5009,7 +5009,7 @@ int spell_fire_breath(uint8_t level, Character *ch, Character *victim, class Obj
       //      if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_FIRE) >= 0)
       //      dam >>= 1;
 
-      retval = damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH);
+      retval = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_FIRE, SPELL_FIRE_BREATH);
       if (SOMEONE_DIED(retval))
         return retval;
     }
@@ -5044,7 +5044,7 @@ int spell_gas_breath(uint8_t level, Character *ch, Character *victim, class Obje
       // if(saves_spell(ch,  tmp_victim, 0, SAVE_TYPE_POISON) >= 0)
       //	dam >>= 1;
 
-      retval = damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH);
+      retval = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_POISON, SPELL_GAS_BREATH);
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
@@ -5070,7 +5070,7 @@ int spell_lightning_breath(uint8_t level, Character *ch, Character *victim, clas
   //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
   //	   dam >>= 1;
 
-  return damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BREATH);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_ENERGY, SPELL_LIGHTNING_BREATH);
 }
 
 /* **************************************************************** */
@@ -5198,10 +5198,10 @@ int spell_refresh(uint8_t level, Character *ch, Character *victim, class Object 
   sprintf(buf, "$B%d$R", dam);
 
   if (ch != victim)
-    send_damage("Your magic flows through $N and $E looks less tired by | fatigue points.", ch, 0, victim, buf, "Your magic flows through $N and $E looks less tired.", TO_CHAR);
+    ch->getDC()->send_damage("Your magic flows through $N and $E looks less tired by | fatigue points.", ch, 0, victim, buf, "Your magic flows through $N and $E looks less tired.", TO_CHAR);
 
-  send_damage("You feel less tired by | fatigue points.", ch, 0, victim, buf, "You feel less tired.", TO_VICT);
-  send_damage("$N feels less tired by | fatigue points.", ch, 0, victim, buf, "$N feels less tired.", TO_ROOM);
+  ch->getDC()->send_damage("You feel less tired by | fatigue points.", ch, 0, victim, buf, "You feel less tired.", TO_VICT);
+  ch->getDC()->send_damage("$N feels less tired by | fatigue points.", ch, 0, victim, buf, "$N feels less tired.", TO_ROOM);
   return ReturnValue::eSUCCESS;
 }
 
@@ -6045,14 +6045,14 @@ int spell_cure_serious(uint8_t level, Character *ch, Character *victim, class Ob
     sprintf(buf, "$n heals %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, victim, TO_VICT, 0);
     sprintf(buf, "$n heals | of the more serious wounds on $N.");
-    send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more serious wounds on $N.", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "$n heals several of the more serious wounds on $N.", TO_ROOM);
   }
   else
   {
     sprintf(buf, "You heal %s of your more serious wounds.", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "several" : "several");
     act(buf, ch, 0, 0, TO_CHAR, 0);
     sprintf(buf, "$n heals | of $s more serious wounds.");
-    send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more serious wounds.", TO_ROOM);
+    ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "$n heals several of $s more serious wounds.", TO_ROOM);
   }
 
   return ReturnValue::eSUCCESS;
@@ -6073,7 +6073,7 @@ int spell_cause_light(uint8_t level, Character *ch, Character *victim, class Obj
 
   set_cantquit(ch, victim);
   dam = dice(1, 9) + (skill / 3);
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, weap_spell);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_LIGHT, weap_spell);
 }
 
 /* CAUSE CRITICAL */
@@ -6093,7 +6093,7 @@ int spell_cause_critical(uint8_t level, Character *ch, Character *victim, class 
 
   dam = dice(3, 9) + skill / 1.5;
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, weap_spell);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_CRITICAL, weap_spell);
 }
 
 /* CAUSE SERIOUS */
@@ -6111,7 +6111,7 @@ int spell_cause_serious(uint8_t level, Character *ch, Character *victim, class O
 
   dam = dice(2, 9) + (skill / 1.75);
 
-  return damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_SERIOUS);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_CAUSE_SERIOUS);
 }
 
 /* FLAMESTRIKE */
@@ -6130,7 +6130,7 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Obj
   set_cantquit(ch, victim);
   dam = 400;
 
-  retval = damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, weap_spell);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SPELL_FLAMESTRIKE, weap_spell);
 
   if (SOMEONE_DIED(retval))
     return retval;
@@ -6151,8 +6151,8 @@ int spell_flamestrike(uint8_t level, Character *ch, Character *victim, class Obj
     GET_MANA(victim) -= mamount;
     GET_KI(victim) -= kamount;
     sprintf(buf, "$B%d$R mana and $B%d$R ki", mamount, kamount);
-    send_damage("$n's fires $4burn$R into your soul tearing away at your being for |.", ch, 0, victim, buf, "The fires $4burn$R into your soul tearing away at your being.", TO_VICT);
-    send_damage("Your fires $4burn$R into $N's soul, tearing away at $S being for |.", ch, 0, victim, buf, "Your fires $4burn$R $N's soul, tearing away at $S being.", TO_CHAR);
+    ch->getDC()->send_damage("$n's fires $4burn$R into your soul tearing away at your being for |.", ch, 0, victim, buf, "The fires $4burn$R into your soul tearing away at your being.", TO_VICT);
+    ch->getDC()->send_damage("Your fires $4burn$R into $N's soul, tearing away at $S being for |.", ch, 0, victim, buf, "Your fires $4burn$R $N's soul, tearing away at $S being.", TO_CHAR);
   }
   return retval;
 }
@@ -6559,7 +6559,7 @@ int spell_acid_blast(uint8_t level, Character *ch, Character *victim, class Obje
   int weap_spell = obj ? WEAR_WIELD : 0;
   set_cantquit(ch, victim);
   dam = 375;
-  return damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BLAST, weap_spell);
+  return ch->getDC()->damage(ch, victim, dam, TYPE_ACID, SPELL_ACID_BLAST, weap_spell);
 }
 
 /* HELLSTREAM */
@@ -6571,9 +6571,9 @@ int spell_hellstream(uint8_t level, Character *ch, Character *victim, class Obje
   set_cantquit(ch, victim);
   dam = 950;
   if (level > 200)
-    return damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_HELLSTREAM);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_HIT + level - 200, SPELL_HELLSTREAM);
   else
-    return damage(ch, victim, dam, TYPE_FIRE, SPELL_HELLSTREAM);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_FIRE, SPELL_HELLSTREAM);
 }
 
 /* PORTAL (Creates the portal "item") */
@@ -11222,7 +11222,7 @@ int spell_bee_sting(uint8_t level, Character *ch, Character *victim, class Objec
   for (i = 0; i < bees; i++)
   {
 
-    retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, weap_spell);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BEE_STING, weap_spell);
     dam = dice(4, 3) + skill / 3;
     if (SOMEONE_DIED(retval))
       return retval;
@@ -11327,7 +11327,7 @@ int spell_bee_swarm(uint8_t level, Character *ch, Character *victim, class Objec
 
       set_cantquit(ch, tmp_victim);
 
-      retval = damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM);
+      retval = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_MAGIC, SPELL_BEE_SWARM);
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
     }
@@ -11387,7 +11387,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
       GET_MANA(ch) = 0;
   }
 
-  retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_CREEPING_DEATH);
+  retval = ch->getDC()->damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_CREEPING_DEATH);
   if (SOMEONE_DIED(retval))
     return retval;
 
@@ -11444,7 +11444,7 @@ int cast_creeping_death(uint8_t level, Character *ch, char *arg, int type, Chara
                    victim);
       act("$N is completely consumed by insects!", ch, 0, victim, TO_ROOM, NOTVICT);
       act("$N is completely consumed by your insects!", ch, 0, victim, TO_CHAR, 0);
-      return damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH);
+      return ch->getDC()->damage(ch, victim, dam, TYPE_UNDEFINED, SPELL_CREEPING_DEATH);
     }
   }
   return ReturnValue::eSUCCESS;
@@ -11560,7 +11560,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       sprintf(buf, "Your herbs heal $N%s and makes $m...hungry?", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, victim, TO_CHAR, 0);
       sprintf(buf, "$n's magic herbs heal $N| and make $M look...hungry?");
-      send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+      ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
       sprintf(dammsg, ", healing you of $B%d$R damage", healamount);
       sprintf(buf, "$n magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, victim, TO_VICT, 0);
@@ -11570,7 +11570,7 @@ int cast_herb_lore(uint8_t level, Character *ch, char *arg, int type, Character 
       sprintf(buf, "Your magic herbs make you feel much better%s!", ch->player ? isSet(ch->player->toggles, Player::PLR_DAMAGE) ? dammsg : "" : "");
       act(buf, ch, 0, 0, TO_CHAR, 0);
       sprintf(buf, "$n magic herbs heal $m| and make $m look...hungry?");
-      send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
+      ch->getDC()->send_damage(buf, ch, 0, victim, dammsg, "", TO_ROOM);
     }
   }
 
@@ -13001,7 +13001,7 @@ int spell_sun_ray(uint8_t level, Character *ch, Character *victim, class Object 
     //	 if(saves_spell(ch, victim, 0, SAVE_TYPE_ENERGY) >= 0)
     //		dam >>= 1;
 
-    return damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY);
+    return ch->getDC()->damage(ch, victim, dam, TYPE_ENERGY, SPELL_SUN_RAY);
   }
   else
     act("The sun ray cannot reach $N!", ch, 0, victim, TO_CHAR, 0);
@@ -13491,7 +13491,7 @@ int spell_icestorm(uint8_t level, Character *ch, Character *victim, class Object
         act("$N shivers and looks very $B$3chilled$R as $E suffers the affects of $n's storm.", ch, 0, tmp_victim, TO_ROOM, NOTVICT);
       }
 
-      retval2 = damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM);
+      retval2 = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_COLD, SPELL_ICESTORM);
 
       if (isSet(retval2, ReturnValue::eVICT_DIED))
         SET_BIT(retval, ReturnValue::eVICT_DIED);
@@ -13659,7 +13659,7 @@ int spell_blue_bird(uint8_t level, Character *ch, Character *victim, class Objec
   dam = number(10, ch_level + 5) + getRealSpellDamage(ch);
   while (!SOMEONE_DIED(retval) && count--)
   {
-    retval = damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD);
+    retval = ch->getDC()->damage(ch, victim, dam, TYPE_PHYSICAL_MAGIC, SPELL_BLUE_BIRD);
     dam = number(10, ch_level + 5);
   }
 
@@ -14722,15 +14722,15 @@ int spell_wrath_of_god(uint8_t level, Character *ch, Character *victim, Object *
 
     dam = victim->getLevel() * 10 + skill * 2;
     sprintf(buf, "$B%d$R", dam_percent(skill, dam));
-    send_damage("The holy tempest damages you for | hitpoints!", victim, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
-    retval &= damage(ch, victim, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
+    ch->getDC()->send_damage("The holy tempest damages you for | hitpoints!", victim, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
+    retval &= ch->getDC()->damage(ch, victim, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
   }
 
   // damage the caster!!
   dam = ch->getLevel() * 10 + skill * 2;
   sprintf(buf, "$B%d$R", dam_percent(skill, dam));
-  send_damage("The holy tempest damages you for | hitpoints!", ch, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
-  retval &= damage(ch, ch, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
+  ch->getDC()->send_damage("The holy tempest damages you for | hitpoints!", ch, 0, 0, buf, "The holy tempest hurts you significantly!", TO_CHAR);
+  retval &= ch->getDC()->damage(ch, ch, dam, TYPE_MAGIC, SPELL_WRATH_OF_GOD);
 
   return retval;
 }
@@ -14957,9 +14957,9 @@ int spell_channel(uint8_t level, Character *ch, Character *victim, Object *obj, 
   victim->addHP(heal);
 
   sprintf(buf, "$B%d$R", heal);
-  send_damage("You channel the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "You channel the power of the gods to heal $N of $S injuries.", TO_CHAR);
-  send_damage("$n channels the power of the gods to heal you of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal you of your injuries.", TO_VICT);
-  send_damage("$n channels the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal $N of $S injuries.", TO_ROOM);
+  ch->getDC()->send_damage("You channel the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "You channel the power of the gods to heal $N of $S injuries.", TO_CHAR);
+  ch->getDC()->send_damage("$n channels the power of the gods to heal you of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal you of your injuries.", TO_VICT);
+  ch->getDC()->send_damage("$n channels the power of the gods to heal $N of | damage.", ch, 0, victim, buf, "$n channels the power of the gods to heal $N of $S injuries.", TO_ROOM);
 
   return ReturnValue::eSUCCESS;
 }

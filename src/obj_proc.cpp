@@ -1629,7 +1629,7 @@ int durendal(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
       continue;
     }
     v->sendln("You feel the evil in your soul being burned away!");
-    damage(ch, v, 250, TYPE_COLD, TYPE_UNDEFINED);
+    ch->getDC()->damage(ch, v, 250, TYPE_COLD, TYPE_UNDEFINED);
     act("The evil in $N's soul is burned away!", ch, 0, v, TO_CHAR, 0);
   }
   SET_BIT(obj->obj_flags.more_flags, ITEM_TOGGLE);
@@ -3330,7 +3330,7 @@ int glove_combat_procs(Character *ch, class Object *obj, cmd_t cmd, char *arg,
     act("The mud on $n's gloves spoils $N's flesh causing boils.", ch, obj, ch->fighting, TO_ROOM, NOTVICT);
     act("The mud on $n's gloves spoils your flesh causing boils.", ch, obj, ch->fighting, TO_VICT, 0);
     ch->sendln("The mud on your gloves spoils the flesh of your enemy.");
-    return damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED);
+    return ch->getDC()->damage(ch, ch->fighting, dam, TYPE_MAGIC, TYPE_UNDEFINED);
     break;
 
   case 4818:
@@ -3494,8 +3494,8 @@ int chaosblade(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     {
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%d", dam);
-      send_damage("The Chaos Blade hungers!  You are drained for | damage.", obj->equipped_by, 0, 0, buf, "The Chaos Blade hungers!  You feel your life force being drained!", TO_CHAR);
-      send_damage("The katana in $n's hand pulses with a dull red glow as it drains their life force for | damage!", obj->equipped_by, 0, 0, buf, "The katana in $n's hand pulses with a dull red glow as it drains their life force!", TO_ROOM);
+      ch->getDC()->send_damage("The Chaos Blade hungers!  You are drained for | damage.", obj->equipped_by, 0, 0, buf, "The Chaos Blade hungers!  You feel your life force being drained!", TO_CHAR);
+      ch->getDC()->send_damage("The katana in $n's hand pulses with a dull red glow as it drains their life force for | damage!", obj->equipped_by, 0, 0, buf, "The katana in $n's hand pulses with a dull red glow as it drains their life force!", TO_ROOM);
       obj->equipped_by->removeHP(dam);
     }
   }
@@ -3531,8 +3531,8 @@ int rubybrooch(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
     {
       char buf[MAX_STRING_LENGTH];
       sprintf(buf, "%d", dam);
-      send_damage("The ruby brooch squeezes your neck painfully for | damage!", obj->equipped_by, 0, 0, buf, "The ruby brooch squeezes your neck painfully!", TO_CHAR);
-      send_damage("A ruby brooch constricts $n's neck for | damage and they cough violently.", obj->equipped_by, 0, 0, buf, "A ruby brooch constricts $n's neck and they cough violently.", TO_ROOM);
+      ch->getDC()->send_damage("The ruby brooch squeezes your neck painfully for | damage!", obj->equipped_by, 0, 0, buf, "The ruby brooch squeezes your neck painfully!", TO_CHAR);
+      ch->getDC()->send_damage("A ruby brooch constricts $n's neck for | damage and they cough violently.", obj->equipped_by, 0, 0, buf, "A ruby brooch constricts $n's neck and they cough violently.", TO_ROOM);
       obj->equipped_by->removeHP(dam);
     }
   }
@@ -4399,7 +4399,7 @@ int angie_proc(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Cha
     c = a->next_in_room; // 'cause mobs get freed
     if (a == b)
       continue;
-    damage(b, a, 1000, TYPE_HIT, 50000);
+    b->getDC()->damage(b, a, 1000, TYPE_HIT, 50000);
   }
 
   end_oproc(b);
@@ -4807,14 +4807,14 @@ int godload_hydratail(Character *ch, class Object *obj, cmd_t cmd, const char *a
 
   strwithdam << "A head on $n's whip lashes out of its own accord unleashing a " << damtypeStr << " blast at you for | damage!";
   strwithoutdam << "A head on $n's whip lashes out of its own accord unleashing a " << damtypeStr << " blast at you!";
-  send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_VICT);
+  ch->getDC()->send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_VICT);
 
   strwithdam.str("");
   strwithoutdam.str("");
 
   strwithdam << "A head on your whip lashes out of its own accord unleashing a " << damtypeStr << " blast at $N for | damage!";
   strwithoutdam << "A head on your whip lashes out of its own accord unleashing a " << damtypeStr << " blast at $N!";
-  send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_CHAR);
+  ch->getDC()->send_damage(strwithdam.str().c_str(), ch, obj, ch->fighting, dammsg, strwithoutdam.str().c_str(), TO_CHAR);
 
-  return damage(ch, victim, dam, damtype, 0);
+  return ch->getDC()->damage(ch, victim, dam, damtype, 0);
 }

@@ -16,7 +16,6 @@
 #include "DC/handler.h"
 #include "DC/connect.h"
 #include "DC/act.h"
-#include "DC/token.h"
 #include "DC/spells.h"
 #include "DC/returnvals.h"
 #include "DC/affect.h"
@@ -29,25 +28,33 @@ extern bool MOBtrigger;
 
 act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
-  return act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+  if (ch)
+    return ch->getDC()->act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+  return DC::getInstance()->act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
 act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
-  return act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+  if (ch)
+    return ch->getDC()->act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+  return DC::getInstance()->act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
 act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
-  return act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+  if (ch)
+    return ch->getDC()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
+  return DC::getInstance()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
 act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
 {
-  return act({.str = str, .ch = ch, .obj = obj, .vict_obj = {}, .destination = destination, .flags = flags, .keyword = keyword});
+  if (ch)
+    return ch->getDC()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = {}, .destination = destination, .flags = flags, .keyword = keyword});
+  return DC::getInstance()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = {}, .destination = destination, .flags = flags, .keyword = keyword});
 }
 
-act_return act(act_input input)
+act_return DC::act(act_input input)
 {
   auto str = input.str;
   auto ch = input.ch;
@@ -215,7 +222,7 @@ void send_message(std::string str, Character *to)
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to, QString keyword)
+send_tokens_return DC::send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to, QString keyword)
 {
   int retval = 0;
   QByteArray buf = tokens->Interpret(ch, obj, vict_obj, to, flags, keyword);

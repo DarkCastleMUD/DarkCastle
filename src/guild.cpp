@@ -712,7 +712,7 @@ int Character::skills_guild(const char *arg, Character *owner)
       skill_quest *sq;
       if ((sq = find_sq(skilllist[skillnumber].skillname)) != nullptr && !sq->message.isEmpty() && isSet(sq->clas, 1 << (GET_CLASS(this) - 1)))
       {
-        mprog_driver(strdup(qPrintable(sq->message)), owner, this, nullptr, nullptr, nullptr, nullptr);
+        dc_->mprog_driver(strdup(qPrintable(sq->message)), owner, this, nullptr, nullptr, nullptr, nullptr);
         switch (skillnumber)
         {
         case SPELL_VAMPIRIC_AURA:

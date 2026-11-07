@@ -132,33 +132,28 @@ int mprog_line_num = 0;
  * Local function prototypes
  */
 
-IfReturnType mprog_veval(auto lhs, QString opr, auto rhs)
+DC::IfReturnType mprog_veval(auto lhs, QString opr, auto rhs)
 {
   if (opr == "==")
-    return IfReturnType(lhs == rhs);
+    return DC::IfReturnType(lhs == rhs);
   if (opr == "!=")
-    return IfReturnType(lhs != rhs);
+    return DC::IfReturnType(lhs != rhs);
   if (opr == ">")
-    return IfReturnType(lhs > rhs);
+    return DC::IfReturnType(lhs > rhs);
   if (opr == "<")
-    return IfReturnType(lhs < rhs);
+    return DC::IfReturnType(lhs < rhs);
   if (opr == "<=")
-    return IfReturnType(lhs <= rhs);
+    return DC::IfReturnType(lhs <= rhs);
   if (opr == ">=")
-    return IfReturnType(lhs >= rhs);
+    return DC::IfReturnType(lhs >= rhs);
   if (opr == "&")
-    return IfReturnType(lhs & rhs);
+    return DC::IfReturnType(lhs & rhs);
   if (opr == "|")
-    return IfReturnType(lhs | rhs);
+    return DC::IfReturnType(lhs | rhs);
 
   logworld(u"Improper MOBprog operator"_s);
-  return IfReturnType::ILLEGAL;
+  return DC::IfReturnType::ILLEGAL;
 }
-
-IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
-char *mprog_process_if(char *ifchck, char *com_list, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, mprog_throw_type *thrw = nullptr);
-void mprog_translate(char ch, char *t, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
-int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
 
 /***************************************************************************
  * Local function code and brief comments.
@@ -203,41 +198,41 @@ char *mprog_next_command(char *clist)
  *  still have trailing spaces so be careful when editing since:
  *  "guard" and "guard " are not equal.
  */
-IfReturnType Character::mprog_seval(const char *lhs, const char *opr, const char *rhs)
+DC::IfReturnType Character::mprog_seval(const char *lhs, const char *opr, const char *rhs)
 {
   if (!lhs || !rhs)
-    return IfReturnType::FALSE;
+    return DC::IfReturnType::FALSE;
   if (!str_cmp(opr, "=="))
-    return IfReturnType(!str_cmp(lhs, rhs));
+    return DC::IfReturnType(!str_cmp(lhs, rhs));
   if (!str_cmp(opr, "!="))
-    return IfReturnType(str_cmp(lhs, rhs));
+    return DC::IfReturnType(str_cmp(lhs, rhs));
   if (!str_cmp(opr, "/"))
-    return IfReturnType(!str_infix(rhs, lhs));
+    return DC::IfReturnType(!str_infix(rhs, lhs));
   if (!str_cmp(opr, "!/"))
-    return IfReturnType(str_infix(rhs, lhs));
+    return DC::IfReturnType(str_infix(rhs, lhs));
 
   prog_error(QStringLiteral("Improper MOBprog operator"));
   logworld(QStringLiteral("Improper MOBprog operator"));
-  return IfReturnType::FALSE;
+  return DC::IfReturnType::FALSE;
 }
 
-IfReturnType Character::mprog_seval(QString lhs, QString opr, QString rhs)
+DC::IfReturnType Character::mprog_seval(QString lhs, QString opr, QString rhs)
 {
   if (lhs.isEmpty() || rhs.isEmpty())
-    return IfReturnType::FALSE;
+    return DC::IfReturnType::FALSE;
 
   if (opr == "==")
-    return IfReturnType(lhs == rhs);
+    return DC::IfReturnType(lhs == rhs);
   if (opr == "!=")
-    return IfReturnType(lhs != rhs);
+    return DC::IfReturnType(lhs != rhs);
   if (opr == "/")
-    return IfReturnType(!str_infix(rhs, lhs));
+    return DC::IfReturnType(!str_infix(rhs, lhs));
   if (opr == "!/")
-    return IfReturnType(str_infix(rhs, lhs));
+    return DC::IfReturnType(str_infix(rhs, lhs));
 
   prog_error(QStringLiteral("Improper MOBprog operator"));
   logworld(QStringLiteral("Improper MOBprog operator"));
-  return IfReturnType::ILLEGAL;
+  return DC::IfReturnType::ILLEGAL;
 }
 
 bool Character::isTank(void)
@@ -1340,51 +1335,11 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **v
 // Azrack -- this was originally returning a bool, but its returning all sorts of values,
 // switched it to int
 
-enum mprog_ifs
-{
-  eRAND = 1, // start this at 1, std::map returns 0 if not found
-  eRAND1K,
-  eAMTITEMS,
-  eNUMPCS,
-  eNUMOFMOBSINWORLD,
-  eNUMOFMOBSINROOM,
-  eISPC,
-  eISWIELDING,
-  eISWEAPPRI,
-  eISWEAPSEC,
-  eISNPC,
-  eISGOOD,
-  eISNEUTRAL,
-  eISEVIL,
-  eISWORN,
-  eISFIGHT,
-  eISTANK,
-  eISIMMORT,
-  eISCHARMED,
-  eISFOLLOW,
-  eISSPELLED,
-  eISAFFECTED,
-  eHITPRCNT,
-  eWEARS,
-  eCARRIES,
-  eNUMBER,
-  eTEMPVAR,
-  eISMOBVNUMINROOM,
-  eISOBJVNUMINROOM,
-  eCANSEE,
-  eHASDONEQUEST1,
-  eINSAMEZONE,
-  eCLAN,
-  eISDAYTIME,
-  eISRAINING,
-  eNUMOFOBJSINWORLD
-};
-
-QMap<QString, mprog_ifs> load_ifchecks(void)
+QMap<QString, DC::mprog_ifs> DC::load_ifchecks(void)
 {
   QMap<QString, mprog_ifs> ifcheck_tmp;
 
-  ifcheck_tmp["rand"] = eRAND;
+  ifcheck_tmp["rand"] = mprog_ifs::eRAND;
   ifcheck_tmp["rand1k"] = eRAND1K;
   ifcheck_tmp["amtitems"] = eAMTITEMS;
   ifcheck_tmp["numpcs"] = eNUMPCS;
@@ -1429,9 +1384,7 @@ QMap<QString, mprog_ifs> load_ifchecks(void)
   return ifcheck_tmp;
 }
 
-QMap<QString, mprog_ifs> ifcheck = load_ifchecks();
-
-IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
+DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -1451,7 +1404,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
   if (*ifchckpt == '\0')
   {
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: null ifchck: '%s'", mob->mobdata->vnum_, ifchck);
-    return IfReturnType::ILLEGAL;
+    return DC::IfReturnType::ILLEGAL;
   }
   /* skip leading spaces */
   while (*ifchckpt == ' ')
@@ -1468,7 +1421,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     else if (*ifchckpt == ' ')
     {
       mob->prog_error(QStringLiteral("ifchck syntax error: '%1'").arg(ifchck));
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == '.')
     {
@@ -1478,7 +1431,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     {
       mob->prog_error(QStringLiteral("ifchck syntax error"));
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == ' ')
       ifchckpt++;
@@ -1500,7 +1453,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     else if (*ifchckpt == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == ' ')
       ifchckpt++;
@@ -1526,7 +1479,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       if (*ifchckpt == '\0')
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck operator without value: '%s'", mob->mobdata->vnum_, ifchck);
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
       }
       else
         *oprpt++ = *ifchckpt++;
@@ -1642,6 +1595,8 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       qDebug("%s vs %s", arg, buf);
   }
 
+  qDebug() << ifcheck[buf];
+
   if (val[0] != '\0' && val2[0] == '\0')
   {
     if (lvali)
@@ -1703,11 +1658,11 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
   switch (ifcheck[buf])
   {
   case eRAND:
-    return IfReturnType(number(1, 100) <= atoi(arg));
+    return DC::IfReturnType(number(1, 100) <= atoi(arg));
     break;
 
   case eRAND1K:
-    return IfReturnType(number(1, 1000) <= atoi(arg));
+    return DC::IfReturnType(number(1, 1000) <= atoi(arg));
     break;
 
   case eAMTITEMS:
@@ -1780,46 +1735,46 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
 
   case eISPC:
     if (fvict)
-      return IfReturnType(fvict->isPlayer());
+      return DC::IfReturnType(fvict->isPlayer());
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     case 'z':
       if (mob->beacon)
-        return IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isNonPlayer());
+        return DC::IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isNonPlayer());
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IfReturnType(actor->isPlayer());
+        return DC::IfReturnType(actor->isPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 't':
       if (vict)
-        return IfReturnType(vict->isPlayer());
+        return DC::IfReturnType(vict->isPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'r':
       if (rndm)
-        return IfReturnType(rndm->isPlayer());
+        return DC::IfReturnType(rndm->isPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'f':
       if (actor && actor->fighting)
-        return IfReturnType(actor->fighting->isPlayer());
+        return DC::IfReturnType(actor->fighting->isPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'g':
       if (mob && mob->fighting)
-        return IfReturnType(mob->fighting->isPlayer());
+        return DC::IfReturnType(mob->fighting->isPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'ispc'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
@@ -1827,7 +1782,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (fvict)
       return fvict->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
@@ -1836,36 +1791,36 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       if (mob->beacon)
         return ((Character *)mob->beacon)->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
         return (actor->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 't':
       if (vict)
         return (vict->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'r':
       if (rndm)
         return (rndm->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'f':
       if (actor && actor->fighting)
         return (actor->fighting->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'g':
       if (mob && mob->fighting)
         return (mob->fighting->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'iswielding'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
@@ -1873,37 +1828,37 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (fvict && fvict->equipment[WEAR_WIELD])
       return mprog_veval(fvict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       if (mob->equipment[WEAR_WIELD])
         return mprog_veval(mob->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'z':
       if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_WIELD])
         return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor && actor->equipment[WEAR_WIELD])
         return mprog_veval(actor->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 't':
       if (vict && vict->equipment[WEAR_WIELD])
         return mprog_veval(vict->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'r':
       if (rndm && rndm->equipment[WEAR_WIELD])
         return mprog_veval(rndm->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isweappri'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
@@ -1911,181 +1866,181 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (fvict && fvict->equipment[WEAR_SECOND_WIELD])
       return mprog_veval(fvict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
       if (mob->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(mob->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'z':
       if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor && actor->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(actor->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 't':
       if (vict && vict->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(vict->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'r':
       if (rndm && rndm->equipment[WEAR_SECOND_WIELD])
         return mprog_veval(rndm->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isweapsec'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISNPC:
     if (fvict)
-      return IfReturnType(fvict->isNonPlayer());
+      return DC::IfReturnType(fvict->isNonPlayer());
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType::TRUE;
+      return DC::IfReturnType::TRUE;
     case 'z':
       if (mob->beacon)
-        return IfReturnType(((Character *)mob->beacon)->isNonPlayer());
+        return DC::IfReturnType(((Character *)mob->beacon)->isNonPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
 
     case 'n':
       if (actor)
-        return IfReturnType(actor->isNonPlayer());
+        return DC::IfReturnType(actor->isNonPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 't':
       if (vict)
-        return IfReturnType(vict->isNonPlayer());
+        return DC::IfReturnType(vict->isNonPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'r':
       if (rndm)
-        return IfReturnType(rndm->isNonPlayer());
+        return DC::IfReturnType(rndm->isNonPlayer());
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isnpc(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     }
     break;
 
   case eISGOOD:
     if (fvict)
-      return IfReturnType(IS_GOOD(fvict));
+      return DC::IfReturnType(IS_GOOD(fvict));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
 
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(IS_GOOD(mob));
+      return DC::IfReturnType(IS_GOOD(mob));
     case 'z':
       if (mob->beacon)
-        return IfReturnType(IS_GOOD(((Character *)mob->beacon)));
+        return DC::IfReturnType(IS_GOOD(((Character *)mob->beacon)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IfReturnType(IS_GOOD(actor));
+        return DC::IfReturnType(IS_GOOD(actor));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(IS_GOOD(vict));
+        return DC::IfReturnType(IS_GOOD(vict));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(IS_GOOD(rndm));
+        return DC::IfReturnType(IS_GOOD(rndm));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISNEUTRAL:
     if (fvict)
-      return IfReturnType(IS_NEUTRAL(fvict));
+      return DC::IfReturnType(IS_NEUTRAL(fvict));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
 
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(IS_NEUTRAL(mob));
+      return DC::IfReturnType(IS_NEUTRAL(mob));
     case 'z':
       if (mob->beacon)
-        return IfReturnType(IS_NEUTRAL(((Character *)mob->beacon)));
+        return DC::IfReturnType(IS_NEUTRAL(((Character *)mob->beacon)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IfReturnType(IS_NEUTRAL(actor));
+        return DC::IfReturnType(IS_NEUTRAL(actor));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(IS_NEUTRAL(vict));
+        return DC::IfReturnType(IS_NEUTRAL(vict));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(IS_NEUTRAL(rndm));
+        return DC::IfReturnType(IS_NEUTRAL(rndm));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISEVIL:
     if (fvict)
-      return IfReturnType(IS_EVIL(fvict));
+      return DC::IfReturnType(IS_EVIL(fvict));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
 
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(IS_EVIL(mob));
+      return DC::IfReturnType(IS_EVIL(mob));
     case 'z':
       if (mob->beacon)
-        return IfReturnType(IS_EVIL(((Character *)mob->beacon)));
+        return DC::IfReturnType(IS_EVIL(((Character *)mob->beacon)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IfReturnType(IS_EVIL(actor));
+        return DC::IfReturnType(IS_EVIL(actor));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(IS_EVIL(vict));
+        return DC::IfReturnType(IS_EVIL(vict));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(IS_EVIL(rndm));
+        return DC::IfReturnType(IS_EVIL(rndm));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
@@ -2097,36 +2052,36 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       o = mob->mobdata->getObject();
     }
     if (fvict)
-      return IfReturnType(is_wearing(fvict, o));
+      return DC::IfReturnType(is_wearing(fvict, o));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
-        return IfReturnType(is_wearing(((Character *)mob->beacon), o));
+        return DC::IfReturnType(is_wearing(((Character *)mob->beacon), o));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'i':
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IfReturnType(is_wearing(actor, o));
+        return DC::IfReturnType(is_wearing(actor, o));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(is_wearing(actor, o));
+        return DC::IfReturnType(is_wearing(actor, o));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(is_wearing(rndm, o));
+        return DC::IfReturnType(is_wearing(rndm, o));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isword(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2135,180 +2090,180 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (fvict)
       return fvict->fighting ? IfReturnType::TRUE : IfReturnType::FALSE;
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
-        return IfReturnType(((Character *)mob->beacon)->fighting ? 1 : 0);
+        return DC::IfReturnType(((Character *)mob->beacon)->fighting ? 1 : 0);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'i':
-      return IfReturnType((mob->fighting) ? 1 : 0);
+      return DC::IfReturnType((mob->fighting) ? 1 : 0);
     case 'n':
       if (actor)
-        return IfReturnType((actor->fighting) ? 1 : 0);
+        return DC::IfReturnType((actor->fighting) ? 1 : 0);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType((vict->fighting) ? 1 : 0);
+        return DC::IfReturnType((vict->fighting) ? 1 : 0);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType((rndm->fighting) ? 1 : 0);
+        return DC::IfReturnType((rndm->fighting) ? 1 : 0);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isfight(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISTANK:
     if (fvict)
-      return IfReturnType(fvict->isTank());
+      return DC::IfReturnType(fvict->isTank());
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
       if (mob->beacon)
-        return IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isTank());
+        return DC::IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isTank());
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'i':
-      return IfReturnType(mob->isTank());
+      return DC::IfReturnType(mob->isTank());
     case 'n':
       if (actor)
-        return IfReturnType(actor->isTank());
+        return DC::IfReturnType(actor->isTank());
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(vict->isTank());
+        return DC::IfReturnType(vict->isTank());
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(rndm->isTank());
+        return DC::IfReturnType(rndm->isTank());
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to istank(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISIMMORT:
     if (fvict)
-      return IfReturnType(fvict->getLevel() > IMMORTAL);
+      return DC::IfReturnType(fvict->getLevel() > IMMORTAL);
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(mob->getLevel() > IMMORTAL);
+      return DC::IfReturnType(mob->getLevel() > IMMORTAL);
     case 'z':
       if (mob->beacon)
-        return IfReturnType(((Character *)mob->beacon)->getLevel() > IMMORTAL);
+        return DC::IfReturnType(((Character *)mob->beacon)->getLevel() > IMMORTAL);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return IfReturnType(actor->getLevel() > IMMORTAL);
+        return DC::IfReturnType(actor->getLevel() > IMMORTAL);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(vict->getLevel() > IMMORTAL);
+        return DC::IfReturnType(vict->getLevel() > IMMORTAL);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(rndm->getLevel() > IMMORTAL);
+        return DC::IfReturnType(rndm->getLevel() > IMMORTAL);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isimmort(): '%s'", mob->mobdata->vnum_, ifchck);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISCHARMED:
     if (fvict)
-      return IfReturnType(IS_AFFECTED(fvict, AFF_CHARM));
+      return DC::IfReturnType(IS_AFFECTED(fvict, AFF_CHARM));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
 
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(IS_AFFECTED(mob, AFF_CHARM));
+      return DC::IfReturnType(IS_AFFECTED(mob, AFF_CHARM));
     case 'z':
       if (mob->beacon)
-        return IfReturnType(IS_AFFECTED(((Character *)mob->beacon), AFF_CHARM));
+        return DC::IfReturnType(IS_AFFECTED(((Character *)mob->beacon), AFF_CHARM));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return IfReturnType(IS_AFFECTED(actor, AFF_CHARM));
+        return DC::IfReturnType(IS_AFFECTED(actor, AFF_CHARM));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(IS_AFFECTED(vict, AFF_CHARM));
+        return DC::IfReturnType(IS_AFFECTED(vict, AFF_CHARM));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(IS_AFFECTED(rndm, AFF_CHARM));
+        return DC::IfReturnType(IS_AFFECTED(rndm, AFF_CHARM));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'ischarmed'", mob->mobdata->vnum_);
 
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISFOLLOW:
     if (fvict)
-      return IfReturnType(fvict->master != nullptr && fvict->master->in_room == fvict->in_room);
+      return DC::IfReturnType(fvict->master != nullptr && fvict->master->in_room == fvict->in_room);
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(mob->master != nullptr && mob->master->in_room == mob->in_room);
+      return DC::IfReturnType(mob->master != nullptr && mob->master->in_room == mob->in_room);
     case 'z':
       if (mob->beacon)
-        return IfReturnType(((Character *)mob->beacon)->master && ((Character *)mob->beacon)->master->in_room == ((Character *)mob->beacon)->in_room);
+        return DC::IfReturnType(((Character *)mob->beacon)->master && ((Character *)mob->beacon)->master->in_room == ((Character *)mob->beacon)->in_room);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'n':
       if (actor)
-        return IfReturnType(actor->master != nullptr && actor->master->in_room == actor->in_room);
+        return DC::IfReturnType(actor->master != nullptr && actor->master->in_room == actor->in_room);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(vict->master != nullptr && vict->master->in_room == vict->in_room);
+        return DC::IfReturnType(vict->master != nullptr && vict->master->in_room == vict->in_room);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(rndm->master != nullptr && rndm->master->in_room == rndm->in_room);
+        return DC::IfReturnType(rndm->master != nullptr && rndm->master->in_room == rndm->in_room);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isfollow'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
@@ -2319,130 +2274,130 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (!str_cmp(val, "fly")) // needs special check.. sigh..
     {
       if (fvict && IS_AFFECTED(fvict, AFF_FLYING))
-        return IfReturnType::TRUE;
+        return DC::IfReturnType::TRUE;
       if (ye)
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
       switch (arg[1])
       {
       case 'i': // mob
         if (IS_AFFECTED(mob, AFF_FLYING))
-          return IfReturnType::TRUE;
+          return DC::IfReturnType::TRUE;
         break;
       case 'z':
         if (mob->beacon)
           if (IS_AFFECTED(((Character *)mob->beacon), AFF_FLYING))
-            return IfReturnType::TRUE;
+            return DC::IfReturnType::TRUE;
         break;
       case 'n': // actor
         if (actor)
           if (IS_AFFECTED(actor, AFF_FLYING))
-            return IfReturnType::TRUE;
+            return DC::IfReturnType::TRUE;
         break;
       case 't': // vict
         if (vict)
           if (IS_AFFECTED(vict, AFF_FLYING))
-            return IfReturnType::TRUE;
+            return DC::IfReturnType::TRUE;
         break;
       case 'r': // rand
         if (rndm)
           if (IS_AFFECTED(rndm, AFF_FLYING))
-            return IfReturnType::TRUE;
+            return DC::IfReturnType::TRUE;
         break;
       case 'f':
         if (actor && actor->fighting)
           if (IS_AFFECTED(actor->fighting, AFF_FLYING))
-            return IfReturnType::TRUE;
+            return DC::IfReturnType::TRUE;
         break;
       case 'g':
         if (mob && mob->fighting)
           if (IS_AFFECTED(mob->fighting, AFF_FLYING))
-            return IfReturnType::TRUE;
+            return DC::IfReturnType::TRUE;
         break;
       default:
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isspelled'", mob->mobdata->vnum_);
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
       }
     }
 
     if (fvict)
-      return IfReturnType((int64_t)(fvict->affected_by_spell(find_skill_num(val))));
+      return DC::IfReturnType((int64_t)(fvict->affected_by_spell(find_skill_num(val))));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1])
     {
     case 'i': // mob
-      return IfReturnType((int64_t)(mob->affected_by_spell(find_skill_num(val))));
+      return DC::IfReturnType((int64_t)(mob->affected_by_spell(find_skill_num(val))));
     case 'z':
       if (mob->beacon)
-        return IfReturnType((int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val))));
+        return DC::IfReturnType((int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val))));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'n': // actor
       if (actor)
-        return IfReturnType((int64_t)(actor->affected_by_spell(find_skill_num(val))));
+        return DC::IfReturnType((int64_t)(actor->affected_by_spell(find_skill_num(val))));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't': // vict
       if (vict)
-        return IfReturnType((int64_t)(vict->affected_by_spell(find_skill_num(val))));
+        return DC::IfReturnType((int64_t)(vict->affected_by_spell(find_skill_num(val))));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r': // rand
       if (rndm)
-        return IfReturnType((int64_t)(rndm->affected_by_spell(find_skill_num(val))));
-      return IfReturnType::ILLEGAL;
+        return DC::IfReturnType((int64_t)(rndm->affected_by_spell(find_skill_num(val))));
+      return DC::IfReturnType::ILLEGAL;
     case 'f':
       if (actor && actor->fighting)
-        return IfReturnType((int64_t)(actor->fighting->affected_by_spell(find_skill_num(val))));
+        return DC::IfReturnType((int64_t)(actor->fighting->affected_by_spell(find_skill_num(val))));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'g':
       if (mob && mob->fighting)
-        return IfReturnType((int64_t)(mob->fighting->affected_by_spell(find_skill_num(val))));
+        return DC::IfReturnType((int64_t)(mob->fighting->affected_by_spell(find_skill_num(val))));
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isspelled'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
   }
   break;
 
   case eISAFFECTED:
     if (fvict)
-      return IfReturnType(ISSET(fvict->affected_by, atoi(val)));
+      return DC::IfReturnType(ISSET(fvict->affected_by, atoi(val)));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
 
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
-      return IfReturnType(ISSET(mob->affected_by, atoi(val)));
+      return DC::IfReturnType(ISSET(mob->affected_by, atoi(val)));
     case 'z':
       if (mob->beacon)
-        return IfReturnType(ISSET(((Character *)mob->beacon)->affected_by, atoi(val)));
+        return DC::IfReturnType(ISSET(((Character *)mob->beacon)->affected_by, atoi(val)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
-        return IfReturnType(ISSET(actor->affected_by, atoi(val)));
+        return DC::IfReturnType(ISSET(actor->affected_by, atoi(val)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(ISSET(vict->affected_by, atoi(val)));
+        return DC::IfReturnType(ISSET(vict->affected_by, atoi(val)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(ISSET(rndm->affected_by, atoi(val)));
+        return DC::IfReturnType(ISSET(rndm->affected_by, atoi(val)));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isaffected'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
@@ -2456,7 +2411,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       return mprog_veval(lhsvl, opr, rhsvl);
     }
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'i':
@@ -2471,7 +2426,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
 
     case 'n':
       if (actor)
@@ -2481,7 +2436,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
       {
@@ -2490,7 +2445,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
       {
@@ -2499,10 +2454,10 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'hitprcnt'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2522,12 +2477,12 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     else
     {
       if (ye)
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
       switch (arg[1])
       {
       case 'z':
         if (!mob->beacon)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), true);
         take = ((Character *)mob->beacon);
       case 'i': // mob
@@ -2536,31 +2491,31 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         break;
       case 'n': // actor
         if (!actor)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(actor, atoi(valu), true);
         take = actor;
         break;
       case 't': // vict
         if (!vict)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(vict, atoi(valu), true);
         take = vict;
         break;
       case 'r': // rndm
         if (!rndm)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(rndm, atoi(valu), true);
         take = rndm;
         break;
       default:
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'carries'", mob->mobdata->vnum_);
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
       }
     }
     if (!obj)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     if (!str_cmp(bufeh, "keep"))
-      return IfReturnType::TRUE;
+      return DC::IfReturnType::TRUE;
     else if (!str_cmp(bufeh, "take"))
     {
       int i;
@@ -2572,9 +2527,9 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
           obj_from_char(take->unequip_char(i));
         }
       extract_obj(obj);
-      return IfReturnType::TRUE;
+      return DC::IfReturnType::TRUE;
     }
-    return IfReturnType::ILLEGAL;
+    return DC::IfReturnType::ILLEGAL;
   }
   break;
 
@@ -2592,12 +2547,12 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     else
     {
       if (ye)
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
       switch (arg[1])
       {
       case 'z':
         if (!mob->beacon)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), false);
         take = ((Character *)mob->beacon);
       case 'i': // mob
@@ -2606,31 +2561,31 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         break;
       case 'n': // actor
         if (!actor)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(actor, atoi(valu), false);
         take = actor;
         break;
       case 't': // vict
         if (!vict)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(vict, atoi(valu), false);
         take = vict;
         break;
       case 'r': // rndm
         if (!rndm)
-          return IfReturnType::ILLEGAL;
+          return DC::IfReturnType::ILLEGAL;
         obj = search_char_for_item(rndm, atoi(valu), false);
         take = rndm;
         break;
       default:
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'carries'", mob->mobdata->vnum_);
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
       }
     }
     if (!obj)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     if (!str_cmp(bufeh, "keep"))
-      return IfReturnType::TRUE;
+      return DC::IfReturnType::TRUE;
     else if (!str_cmp(bufeh, "take"))
     {
       int i;
@@ -2642,9 +2597,9 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
           obj_from_char(take->unequip_char(i));
         }
       extract_obj(obj);
-      return IfReturnType::TRUE;
+      return DC::IfReturnType::TRUE;
     }
-    return IfReturnType::ILLEGAL;
+    return DC::IfReturnType::ILLEGAL;
   }
   break;
 
@@ -2654,13 +2609,13 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (fvict)
     {
       if (fvict->isPlayer())
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
       lhsvl = fvict->mobdata->vnum_;
       rhsvl = atoi(val);
       return mprog_veval(lhsvl, opr, rhsvl);
     }
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
 
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
@@ -2678,10 +2633,10 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
           return mprog_veval(lhsvl, opr, rhsvl);
         }
         else
-          return IfReturnType::FALSE;
+          return DC::IfReturnType::FALSE;
       }
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
 
     case 'n':
       if (actor)
@@ -2694,7 +2649,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         }
       }
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 't':
       if (vict)
       {
@@ -2706,7 +2661,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         }
       }
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'r':
       if (rndm)
       {
@@ -2718,7 +2673,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         }
       }
       else
-        return IfReturnType::FALSE;
+        return DC::IfReturnType::FALSE;
     case 'o':
       if (obj)
       {
@@ -2727,7 +2682,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'p':
       if (v_obj)
       {
@@ -2736,10 +2691,10 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mprog_veval(lhsvl, opr, rhsvl);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'number'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2750,7 +2705,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (arg[2] != '[')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad target  to 'tempvar'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     buf4pt = &arg[3];
     strcpy(buf4, buf4pt);
@@ -2760,7 +2715,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (*buf4pt == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad target to 'tempvar'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     *buf4pt = '\0';
     if (val[0] == '$' && val[1])
@@ -2769,7 +2724,7 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     if (fvict)
       return mob->mprog_seval(fvict->getTemp(buf4), opr, val);
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
@@ -2778,31 +2733,31 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
         return mob->mprog_seval(((Character *)mob->beacon)->getTemp(buf4), opr, val);
       }
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'i':
       return mob->mprog_seval(mob->getTemp(buf4), opr, val);
     case 'n':
       if (actor)
         return mob->mprog_seval(actor->getTemp(buf4), opr, val);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
         return mob->mprog_seval(vict->getTemp(buf4), opr, val);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
         return mob->mprog_seval(rndm->getTemp(buf4), opr, val);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'o':
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     case 'p':
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'tempvar'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
   }
   break;
@@ -2819,9 +2774,9 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
       if (vch->isNonPlayer() &&
           vch != mob &&
           vch->mobdata->vnum_ == target)
-        return IfReturnType::TRUE;
+        return DC::IfReturnType::TRUE;
     }
-    return IfReturnType::FALSE;
+    return DC::IfReturnType::FALSE;
   }
   break;
 
@@ -2835,105 +2790,105 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
          obj = obj->next_content)
     {
       if (obj->vnum_ == target)
-        return IfReturnType::TRUE;
+        return DC::IfReturnType::TRUE;
     }
-    return IfReturnType::FALSE;
+    return DC::IfReturnType::FALSE;
   }
   break;
 
   case eCANSEE:
     if (fvict)
-      return IfReturnType(CAN_SEE(mob, fvict, true));
+      return DC::IfReturnType(CAN_SEE(mob, fvict, true));
     if (ye)
-      return IfReturnType::FALSE;
+      return DC::IfReturnType::FALSE;
     switch (arg[1]) // arg should be "$*" so just get the letter
     {
     case 'z':
-      return IfReturnType::TRUE; // can always see holder
+      return DC::IfReturnType::TRUE; // can always see holder
     case 'i':
-      return IfReturnType::TRUE;
+      return DC::IfReturnType::TRUE;
     case 'n':
       if (actor)
-        return IfReturnType(CAN_SEE(mob, actor, true));
+        return DC::IfReturnType(CAN_SEE(mob, actor, true));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 't':
       if (vict)
-        return IfReturnType(CAN_SEE(mob, vict, true));
+        return DC::IfReturnType(CAN_SEE(mob, vict, true));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
       if (rndm)
-        return IfReturnType(CAN_SEE(mob, rndm, true));
+        return DC::IfReturnType(CAN_SEE(mob, rndm, true));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'isnpc'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eINSAMEZONE:
     if (fvict)
-      return IfReturnType(GET_ZONE(fvict) == GET_ZONE(mob));
+      return DC::IfReturnType(GET_ZONE(fvict) == GET_ZONE(mob));
     else if ((fvict = get_pc(arg)) != nullptr)
-      return IfReturnType(GET_ZONE(fvict) == GET_ZONE(mob));
+      return DC::IfReturnType(GET_ZONE(fvict) == GET_ZONE(mob));
 
     switch (arg[1])
     {
     case 'i':
-      return IfReturnType::TRUE; // always in the same zone as itself
+      return DC::IfReturnType::TRUE; // always in the same zone as itself
     case 'n':
       if (actor)
-        return IfReturnType(GET_ZONE(actor) == GET_ZONE(mob));
+        return DC::IfReturnType(GET_ZONE(actor) == GET_ZONE(mob));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
     case 't':
       if (vict)
-        return IfReturnType(GET_ZONE(vict) == GET_ZONE(mob));
+        return DC::IfReturnType(GET_ZONE(vict) == GET_ZONE(mob));
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'insamezone'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eCLAN:
     if (fvict)
-      return IfReturnType(fvict->clan);
+      return DC::IfReturnType(fvict->clan);
     switch (arg[1])
     {
     case 'i':
-      return IfReturnType(mob->clan); // always in the same zone as itself
+      return DC::IfReturnType(mob->clan); // always in the same zone as itself
     case 'n':
       if (actor)
-        return IfReturnType(actor->clan);
+        return DC::IfReturnType(actor->clan);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     case 'r':
     case 't':
       if (vict)
-        return IfReturnType(vict->clan);
+        return DC::IfReturnType(vict->clan);
       else
-        return IfReturnType::ILLEGAL;
+        return DC::IfReturnType::ILLEGAL;
     default:
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu bad argument to 'clan'", mob->mobdata->vnum_);
-      return IfReturnType::ILLEGAL;
+      return DC::IfReturnType::ILLEGAL;
     }
     break;
 
   case eISDAYTIME:
     if (weather_info.sunlight == SUN_DARK)
-      return IfReturnType::FALSE;
-    return IfReturnType::TRUE;
+      return DC::IfReturnType::FALSE;
+    return DC::IfReturnType::TRUE;
     break;
 
   case eISRAINING:
     if (weather_info.sky == SKY_LIGHTNING || weather_info.sky == SKY_RAINING || weather_info.sky == SKY_HEAVY_RAIN)
-      return IfReturnType::TRUE;
-    return IfReturnType::FALSE;
+      return DC::IfReturnType::TRUE;
+    return DC::IfReturnType::FALSE;
     break;
 
   default:
@@ -2942,9 +2897,10 @@ IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Obj
     //
     logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu unknown ifchck  \"%s\" value %d",
          mob->mobdata->vnum_, buf, ifcheck[buf]);
-    return IfReturnType::ILLEGAL;
+    return DC::IfReturnType::ILLEGAL;
   }
 }
+
 /* Quite a long and arduous function, this guy handles the control
  * flow part of MOBprograms.  Basicially once the driver sees an
  * 'if' attention shifts to here.  While many syntax errors are
@@ -2967,9 +2923,9 @@ char null[1];
 int mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
-char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
-                       Character *actor, Object *obj, void *vo,
-                       Character *rndm, mprog_throw_type *thrw)
+char *DC::mprog_process_if(char *ifchck, char *com_list, Character *mob,
+                           Character *actor, Object *obj, void *vo,
+                           Character *rndm, mprog_throw_type *thrw)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -3259,8 +3215,8 @@ char *mprog_process_if(char *ifchck, char *com_list, Character *mob,
  * would be to change act() so that vo becomes vict & v_obj.
  * but this would require a lot of small changes all over the code.
  */
-void mprog_translate(char ch, char *t, Character *mob, Character *actor,
-                     Object *obj, void *vo, Character *rndm)
+void DC::mprog_translate(char ch, char *t, Character *mob, Character *actor,
+                         Object *obj, void *vo, Character *rndm)
 {
   static char *he_she[] = {"it", "he", "she"};
   static char *him_her[] = {"it", "him", "her"};
@@ -3641,8 +3597,7 @@ void debugpoint() {};
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor,
-                       Object *obj, void *vo, Character *rndm)
+int DC::mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
 {
   char buf[MAX_INPUT_LENGTH * 2];
   char tmp[MAX_INPUT_LENGTH * 2];
@@ -3812,7 +3767,7 @@ bool objExists(Object *obj)
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj, void *vo, mprog_throw_type *thrw, Character *rndm)
+void DC::mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj, void *vo, mprog_throw_type *thrw, Character *rndm)
 {
   char tmpcmndlst[MAX_STRING_LENGTH];
   char buf[MAX_INPUT_LENGTH];
@@ -3947,8 +3902,7 @@ void mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj,
  */
 // Returns true if match
 // false if no match
-int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
-                         Object *obj, void *vo, int type, bool reverse)
+int DC::mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *obj, void *vo, int type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
 
@@ -4050,8 +4004,8 @@ int mprog_wordlist_check(QString arg, Character *mob, Character *actor,
   return retval;
 }
 
-void mprog_percent_check(Character *mob, Character *actor, Object *obj,
-                         void *vo, int type)
+void DC::mprog_percent_check(Character *mob, Character *actor, Object *obj,
+                             void *vo, int type)
 {
   mob_prog_data *mprg{};
   mob_prog_data *next{};
@@ -4095,8 +4049,8 @@ void mprog_percent_check(Character *mob, Character *actor, Object *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
-                      Object *obj, void *vo)
+int DC::mprog_act_trigger(std::string buf, Character *mob, Character *ch,
+                          Object *obj, void *vo)
 {
 
   //  mob_prog_act_list * tmp_act;
@@ -4142,7 +4096,7 @@ int mprog_act_trigger(std::string buf, Character *mob, Character *ch,
   return mprog_cur_result;
 }
 
-int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
+int DC::mprog_bribe_trigger(Character *mob, Character *ch, int amount)
 {
 
   mob_prog_data *mprg = 0;
@@ -4188,7 +4142,7 @@ int mprog_bribe_trigger(Character *mob, Character *ch, int amount)
   return mprog_cur_result;
 }
 
-int mprog_damage_trigger(Character *mob, Character *ch, int amount)
+int DC::mprog_damage_trigger(Character *mob, Character *ch, int amount)
 {
 
   mob_prog_data *mprg = 0;
@@ -4231,7 +4185,7 @@ int mprog_damage_trigger(Character *mob, Character *ch, int amount)
   return mprog_cur_result;
 }
 
-int mprog_death_trigger(Character *mob, Character *killer)
+int DC::mprog_death_trigger(Character *mob, Character *killer)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & DEATH_PROG) && isPaused(mob) == false)
@@ -4243,7 +4197,7 @@ int mprog_death_trigger(Character *mob, Character *killer)
   return mprog_cur_result;
 }
 
-int mprog_entry_trigger(Character *mob)
+int DC::mprog_entry_trigger(Character *mob)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & ENTRY_PROG) && isPaused(mob) == false)
@@ -4252,7 +4206,7 @@ int mprog_entry_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int mprog_fight_trigger(Character *mob, Character *ch)
+int DC::mprog_fight_trigger(Character *mob, Character *ch)
 {
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & FIGHT_PROG) && isPaused(mob) == false)
@@ -4261,7 +4215,7 @@ int mprog_fight_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int mprog_attack_trigger(Character *mob, Character *ch)
+int DC::mprog_attack_trigger(Character *mob, Character *ch)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & ATTACK_PROG) && isPaused(mob) == false)
@@ -4270,7 +4224,7 @@ int mprog_attack_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int mprog_give_trigger(Character *mob, Character *ch, Object *obj)
+int DC::mprog_give_trigger(Character *mob, Character *ch, Object *obj)
 {
 
   QString buf;
@@ -4333,9 +4287,9 @@ int Character::mprog_greet_trigger(void)
     if (vmob->isNonPlayer() && (vmob->fighting == nullptr) && AWAKE(vmob))
     {
       if (this != vmob && CAN_SEE(vmob, this) && (dc_->mob_index[vmob->mobdata->vnum_].progtypes & GREET_PROG) && isPaused(vmob) == false)
-        mprog_percent_check(vmob, this, nullptr, nullptr, GREET_PROG);
+        dc_->mprog_percent_check(vmob, this, nullptr, nullptr, GREET_PROG);
       else if ((dc_->mob_index[vmob->mobdata->vnum_].progtypes & ALL_GREET_PROG) && isPaused(vmob) == false)
-        mprog_percent_check(vmob, this, nullptr, nullptr, ALL_GREET_PROG);
+        dc_->mprog_percent_check(vmob, this, nullptr, nullptr, ALL_GREET_PROG);
 
       if (SOMEONE_DIED(mprog_cur_result) || selfpurge)
         break;
@@ -4343,7 +4297,7 @@ int Character::mprog_greet_trigger(void)
   return mprog_cur_result;
 }
 
-int mprog_hitprcnt_trigger(Character *mob, Character *ch)
+int DC::mprog_hitprcnt_trigger(Character *mob, Character *ch)
 {
   mob_prog_data *mprg{};
   mob_prog_data *next{};
@@ -4385,7 +4339,7 @@ int mprog_hitprcnt_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int mprog_random_trigger(Character *mob)
+int DC::mprog_random_trigger(Character *mob)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4395,7 +4349,7 @@ int mprog_random_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int mprog_load_trigger(Character *mob)
+int DC::mprog_load_trigger(Character *mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4408,7 +4362,7 @@ int mprog_load_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int mprog_arandom_trigger(Character *mob)
+int DC::mprog_arandom_trigger(Character *mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4434,7 +4388,7 @@ int Character::mprog_can_see_trigger(Character *mob)
 
   mprog_cur_result = ReturnValue::eSUCCESS;
   if ((dc_->mob_index[mob->mobdata->vnum_].progtypes & CAN_SEE_PROG) && isPaused(mob) == false)
-    mprog_percent_check(mob, this, nullptr, nullptr, CAN_SEE_PROG);
+    dc_->mprog_percent_check(mob, this, nullptr, nullptr, CAN_SEE_PROG);
 
   return mprog_cur_result;
 }
@@ -4453,14 +4407,14 @@ int Character::mprog_speech_trigger(const char *txt)
   for (vmob = DC::getInstance()->world[in_room].people; vmob != nullptr; vmob = vmob->next_in_room)
     if (vmob->isNonPlayer() && (DC::getInstance()->mob_index[vmob->mobdata->vnum_].progtypes & SPEECH_PROG) && isPaused(vmob) == false)
     {
-      if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
+      if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
         break;
     }
 
   return mprog_cur_result;
 }
 
-int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
+int DC::mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4713,7 +4667,7 @@ int Character::oprog_can_see_trigger(Object *item)
   if (dc_->obj_index[item->vnum_].progtypes & CAN_SEE_PROG)
   {
     vmob = dc_->initiate_oproc(this, item);
-    mprog_percent_check(vmob, this, item, nullptr, CAN_SEE_PROG);
+    dc_->mprog_percent_check(vmob, this, item, nullptr, CAN_SEE_PROG);
     end_oproc(vmob, Trace("oprog_can_see_trigger"));
     return mprog_cur_result;
   }
@@ -4736,7 +4690,7 @@ int Character::oprog_speech_trigger(const char *txt)
     if (dc_->obj_index[item->vnum_].progtypes & SPEECH_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
-      if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
+      if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
       {
         end_oproc(vmob, Trace("oprog_speech_trigger1"));
         return mprog_cur_result;
@@ -4747,7 +4701,7 @@ int Character::oprog_speech_trigger(const char *txt)
     if (dc_->obj_index[item->vnum_].progtypes & SPEECH_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
-      if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
+      if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
       {
         end_oproc(vmob, Trace("oprog_speech_trigger3"));
         return mprog_cur_result;
@@ -4760,7 +4714,7 @@ int Character::oprog_speech_trigger(const char *txt)
       if (dc_->obj_index[equipment[i]->vnum_].progtypes & SPEECH_PROG)
       {
         vmob = dc_->initiate_oproc(this, equipment[i]);
-        if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
+        if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, SPEECH_PROG))
         {
           end_oproc(vmob, Trace("oprog_speech_trigger5"));
         }
@@ -4843,7 +4797,7 @@ int Character::oprog_act_trigger(QString txt)
     if (dc_->obj_index[item->vnum_].progtypes & ACT_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
-      if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
+      if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
       {
         end_oproc(vmob, Trace("oprog_act_trigger1"));
         return mprog_cur_result;
@@ -4854,7 +4808,7 @@ int Character::oprog_act_trigger(QString txt)
     if (dc_->obj_index[item->vnum_].progtypes & ACT_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
-      if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
+      if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
       {
         end_oproc(vmob, Trace("oprog_act_trigger3"));
         return mprog_cur_result;
@@ -4867,7 +4821,7 @@ int Character::oprog_act_trigger(QString txt)
       if (dc_->obj_index[equipment[i]->vnum_].progtypes & ACT_PROG)
       {
         vmob = dc_->initiate_oproc(this, equipment[i]);
-        if (mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
+        if (dc_->mprog_wordlist_check(txt, vmob, this, nullptr, nullptr, ACT_PROG))
         {
           end_oproc(vmob, Trace("oprog_act_trigger5"));
           return mprog_cur_result;
@@ -4890,7 +4844,7 @@ int Character::oprog_greet_trigger(void)
     if (dc_->obj_index[item->vnum_].progtypes & ALL_GREET_PROG)
     {
       auto vmob = dc_->initiate_oproc(this, item);
-      mprog_percent_check(vmob, this, item, nullptr, ALL_GREET_PROG);
+      dc_->mprog_percent_check(vmob, this, item, nullptr, ALL_GREET_PROG);
       end_oproc(vmob, Trace("oprog_greet_trigger"));
       return mprog_cur_result;
     }
@@ -4948,7 +4902,7 @@ int Character::oprog_load_trigger(void)
     if (dc_->obj_index[item->vnum_].progtypes & LOAD_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
-      mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
+      dc_->mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
       end_oproc(vmob);
       return mprog_cur_result;
     }
@@ -4956,7 +4910,7 @@ int Character::oprog_load_trigger(void)
     if (dc_->obj_index[item->vnum_].progtypes & LOAD_PROG)
     {
       vmob = dc_->initiate_oproc(this, item);
-      mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
+      dc_->mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
       end_oproc(vmob);
       return mprog_cur_result;
     }
@@ -4966,7 +4920,7 @@ int Character::oprog_load_trigger(void)
       if (dc_->obj_index[equipment[i]->vnum_].progtypes & LOAD_PROG)
       {
         vmob = dc_->initiate_oproc(this, item);
-        mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
+        dc_->mprog_percent_check(vmob, this, item, nullptr, LOAD_PROG);
         end_oproc(vmob);
         return mprog_cur_result;
       }
@@ -4987,7 +4941,7 @@ int Character::oprog_weapon_trigger(Object *item)
   if (dc_->obj_index[item->vnum_].progtypes & WEAPON_PROG)
   {
     vmob = dc_->initiate_oproc(this, item);
-    mprog_percent_check(vmob, this, item, nullptr, WEAPON_PROG);
+    dc_->mprog_percent_check(vmob, this, item, nullptr, WEAPON_PROG);
     end_oproc(vmob);
     return mprog_cur_result;
   }
@@ -5009,7 +4963,7 @@ int Character::oprog_armour_trigger(Object *item)
   if (dc_->obj_index[item->vnum_].progtypes & ARMOUR_PROG)
   {
     vmob = dc_->initiate_oproc(this, item);
-    mprog_percent_check(vmob, this, item, nullptr, ARMOUR_PROG);
+    dc_->mprog_percent_check(vmob, this, item, nullptr, ARMOUR_PROG);
     end_oproc(vmob);
     return mprog_cur_result;
   }
@@ -5040,7 +4994,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
         }
 
         vmob = dc_->initiate_oproc(this, item);
-        if (mprog_wordlist_check(command, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
+        if (dc_->mprog_wordlist_check(command, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
         {
           end_oproc(vmob);
           return mprog_cur_result;
@@ -5059,7 +5013,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
         do_mpsettemp(QStringLiteral("%1 lasttyped %2").arg(getName()).arg(arguments).split(' '));
       }
       vmob = dc_->initiate_oproc(this, item);
-      if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
+      if (dc_->mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
       {
         end_oproc(vmob);
         return mprog_cur_result;
@@ -5080,7 +5034,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
         }
 
         vmob = dc_->initiate_oproc(this, equipment[i]);
-        if (mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
+        if (dc_->mprog_wordlist_check(arguments, vmob, this, nullptr, nullptr, COMMAND_PROG, true))
         {
           end_oproc(vmob);
           return mprog_cur_result;

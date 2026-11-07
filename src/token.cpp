@@ -21,7 +21,6 @@
 #include "DC/terminal.h"  // colors
 #include "DC/act.h"       // act flags
 #include "DC/handler.h"   // fname()
-#include "DC/token.h"     // fname()
 #include "DC/connect.h"
 #include "DC/common.h"
 #include "DC/levels.h"

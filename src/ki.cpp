@@ -485,7 +485,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
     int prev = vict->getHP();
 
     strcpy(name, GET_SHORT(vict));
-    int retval = damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
+    int retval = ch->getDC()->damage(ch, vict, 100, TYPE_KI, KI_OFFSET + KI_BLAST);
     vict->setSitting();
     SET_BIT(vict->combat, COMBAT_BASH2);
     if (!SOMEONE_DIED(retval) && !vict->fighting && vict->isNonPlayer())
@@ -518,12 +518,12 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
 
     {
       GET_MANA(vict) -= manadam;
-      retval = damage(ch, vict, dam, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH);
+      retval = ch->getDC()->damage(ch, vict, dam, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH);
       return retval;
     }
     else
     {
-      retval = damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH);
+      retval = ch->getDC()->damage(ch, vict, 0, TYPE_UNDEFINED, KI_OFFSET + KI_PUNCH);
 
       ch->removeHP((1 / 8) * (GET_MAX_HIT(ch)));
       WAIT_STATE(ch, DC::PULSE_VIOLENCE);
@@ -577,8 +577,8 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
         (!ARE_GROUPED(ch, tmp_victim)) && can_be_attacked(ch, tmp_victim))
     {
-      retval = damage(ch, tmp_victim, dam, TYPE_KI,
-                      KI_OFFSET + KI_STORM, 0);
+      retval = ch->getDC()->damage(ch, tmp_victim, dam, TYPE_KI,
+                                   KI_OFFSET + KI_STORM, 0);
       if (isSet(retval, ReturnValue::eCH_DIED))
         return retval;
       act("A burst of energy slams into you!", ch, 0, 0, TO_ROOM, 0);
@@ -605,7 +605,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
     if (dam + ch->getHP() > GET_MAX_HIT(ch))
       dam = GET_MAX_HIT(ch) - ch->getHP();
     ch->addHP(dam);
-    send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
+    ch->getDC()->send_damage("The flash of energy surges within you for | life!", ch, 0, 0, dammsg, "The flash of energy surges within you!", TO_CHAR);
   }
   WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   return ReturnValue::eSUCCESS;
@@ -1270,13 +1270,13 @@ int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
       GET_KI(victim) = GET_MAX_KI(victim);
 
     sprintf(amt, "%d", amount);
-    send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.",
-                ch, 0, victim, amt,
-                "You focus intently, bonding briefly with $N's spirit,  transferring a portion of your essence to $M.", TO_CHAR);
+    ch->getDC()->send_damage("You focus intently, bonding briefly with $N's spirit, transferring | ki of your essence to $M.",
+                             ch, 0, victim, amt,
+                             "You focus intently, bonding briefly with $N's spirit,  transferring a portion of your essence to $M.", TO_CHAR);
     sprintf(amt, "%d", temp);
-    send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.",
-                ch, 0, victim, amt,
-                "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);
+    ch->getDC()->send_damage("$n focuses intently, bonding briefly with your spirit, replenishing | ki of your essence with $s own.",
+                             ch, 0, victim, amt,
+                             "$n focuses intently, bonding briefly with your spirit, replenishing your essence with $s own.", TO_VICT);
     act("$n focuses intently upon $N as though briefly bonding with $S spirit.", ch, 0, victim, TO_ROOM, NOTVICT);
   }
   else if (type[0] == 'm')

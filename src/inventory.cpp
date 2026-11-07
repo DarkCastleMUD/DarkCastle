@@ -1665,7 +1665,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
     save();
     vict->save();
     // bribe trigger automatically removes any gold given to mob
-    mprog_bribe_trigger(vict, this, amount);
+    dc_->mprog_bribe_trigger(vict, this, amount);
 
     return ReturnValue::eSUCCESS;
   }
@@ -1894,7 +1894,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   // if I gave a no_trade item to a mob, the mob needs to destroy it
   // otherwise it defeats the purpose of no_trade:)
 
-  retval = mprog_give_trigger(vict, this, obj);
+  retval = dc_->mprog_give_trigger(vict, this, obj);
   bool objExists(Object * obj);
   if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && vict->isNonPlayer() &&
       objExists(obj))
