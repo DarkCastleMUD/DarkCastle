@@ -530,8 +530,8 @@ public:
   static const QString DEFAULT_LIBRARY_PATH;
   static const QStringList connected_states;
   static const QStringList dirs;
-  static QList<bestowable_god_commands_type> bestowable_god_commands;
-  static QMap<QString, mprog_ifs> ifcheck;
+  static const QList<bestowable_god_commands_type> bestowable_god_commands;
+  QMap<QString, mprog_ifs> ifcheck;
 
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;

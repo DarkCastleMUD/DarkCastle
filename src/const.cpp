@@ -3615,7 +3615,7 @@ const char *reserved[] = {
     "durendal resue timer",
     "vampiric aura timer"};
 
-QList<bestowable_god_commands_type> DC::bestowable_god_commands =
+const QList<bestowable_god_commands_type> DC::bestowable_god_commands =
     {
         {"impchan", COMMAND_IMP_CHAN, false},
         {"snoop", COMMAND_SNOOP, false},
