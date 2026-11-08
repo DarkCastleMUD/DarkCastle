@@ -531,7 +531,7 @@ public:
   static const QStringList connected_states;
   static const QStringList dirs;
   static const QList<bestowable_god_commands_type> bestowable_god_commands;
-  QMap<QString, mprog_ifs> ifcheck;
+  static const QMap<QString, mprog_ifs> ifcheck;
 
   Connection *descriptor_list = nullptr; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
@@ -796,7 +796,7 @@ public:
   int oprog_rand_trigger(Object *item);
   int oprog_arand_trigger(Object *item);
   void mobile_activity(void);
-  QMap<QString, mprog_ifs> load_ifchecks(void);
+  static QMap<QString, mprog_ifs> load_ifchecks(void);
   IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
   char *mprog_process_if(char *ifchck, char *com_list, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, class mprog_throw_type *thrw = nullptr);
   void mprog_translate(char ch, char *t, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
