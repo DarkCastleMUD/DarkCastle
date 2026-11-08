@@ -4,6 +4,7 @@
 #include <QString>         // for QString
 #include <cstdint>         // for uint_fast8_t
 #include <string>          // for string
+#include "DC/types.h"
 template <typename Key, typename T>
 class QMap;
 
@@ -175,9 +176,9 @@ enum class load_status_t
 bool operator!(load_status_t ls);
 
 typedef int command_return_t;
-typedef int (*command_gen1_t)(class Character *ch, char *argument, cmd_t cmd);
-typedef int (*command_gen1b_t)(class Character *ch, const char *argument, cmd_t cmd);
-typedef command_return_t (*command_gen2_t)(class Character *ch, std::string argument, cmd_t cmd);
+typedef int (*command_gen1_t)(CharacterPtr ch, char *argument, cmd_t cmd);
+typedef int (*command_gen1b_t)(CharacterPtr ch, const char *argument, cmd_t cmd);
+typedef command_return_t (*command_gen2_t)(CharacterPtr ch, std::string argument, cmd_t cmd);
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
 typedef command_return_t (Character::*command_special_t)(QString arguments, cmd_t cmd);
 typedef quint64 level_t;

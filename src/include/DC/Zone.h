@@ -31,7 +31,7 @@ public:
   QString comment = {}; /* Any comments that went with the command */
   int active = {};      // is it active? alot aren't on the builders' port
   time_t last = {};     // when was it last reset
-  class Character *lastPop = {};
+  CharacterPtr lastPop = {};
   time_t lastSuccess = {};
   quint64 attempts = {};
   quint64 successes = {};

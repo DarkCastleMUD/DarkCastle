@@ -29,6 +29,7 @@
 #include <QMap>
 #include <expected>
 
+#include "DC/types.h"
 #include "DC/DC.h"
 #include "DC/affect.h"   /* MAX_AFFECTS, etc.. */
 #include "DC/structs.h"  /* uint8_t, uint8_t, int16_t, etc.. */
@@ -95,21 +96,21 @@ class ChannelMessage
   QDateTime timestamp_;
 
 public:
-  ChannelMessage(const Character *sender, const DC::LogChannel type, const char *msg)
+  ChannelMessage(const CharacterPtr sender, const DC::LogChannel type, const char *msg)
       : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  ChannelMessage(const Character *sender, const DC::LogChannel type, const QString &msg)
+  ChannelMessage(const CharacterPtr sender, const DC::LogChannel type, const QString &msg)
       : type_(type), msg_(msg), timestamp_(QDateTime::currentDateTime())
   {
     set_wizinvis(sender);
     set_name(sender);
   }
 
-  QString getMessage(Character *ch) const;
+  QString getMessage(CharacterPtr ch) const;
   QString getMessage(const level_t receiver_level, bool show_timestamps = false, QTimeZone timezone = {}, Qt::DateFormat timestamp_format = {}) const
   {
     QString msg;
@@ -157,8 +158,8 @@ public:
     return timestamp_.toTimeZone(timezone).toString(format);
   }
 
-  void set_wizinvis(const class Character *sender);
-  void set_name(const class Character *sender);
+  void set_wizinvis(const CharacterPtr sender);
+  void set_name(const CharacterPtr sender);
 };
 
 class PlayerConfig : public QObject

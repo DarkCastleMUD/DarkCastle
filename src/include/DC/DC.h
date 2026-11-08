@@ -188,7 +188,7 @@ class command_lag
 {
 public:
   command_lag *next;
-  class Character *ch;
+  CharacterPtr ch;
   cmd_t cmd_number;
   int lag;
 };

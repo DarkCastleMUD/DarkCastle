@@ -13,6 +13,7 @@
 #include <QString>
 #include <queue>
 #include <string>
+#include "DC/types.h"
 
 constexpr size_t MAX_CLAN_LEN = 15;
 #define CLAN_RIGHTS_ACCEPT 1
@@ -42,7 +43,7 @@ public:
 class ClanMember
 {
 public:
-  ClanMember(class Character *ch = nullptr);
+  ClanMember(CharacterPtr ch = nullptr);
   ClanMember *next;
 
   [[nodiscard]] inline auto Name() const

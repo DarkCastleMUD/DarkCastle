@@ -6,8 +6,8 @@
 #include <QList>            // for QList
 #include <QString>          // for QString
 #include "DC/dcstdio.h"     // for FILEPtr
+#include "DC/types.h"
 
-class Character;
 enum class cmd_t;
 
 typedef quint64 vnum_t;
@@ -56,9 +56,9 @@ class index_data
 public:
   void vnum(vnum_t v) { vnum_ = v; }
   [[nodiscard]] vnum_t vnum(void) const { return vnum_; }
-  quint64 qty{};                                                                                 /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(class Character *, class Object *, cmd_t, const char *, Character *){}; // non Combat special proc
-  int (*combat_func)(Character *, class Object *, cmd_t, const char *, Character *){};           // combat special proc
+  quint64 qty{};                                                                            /* number of existing units of ths mob/obj */
+  int (*non_combat_func)(CharacterPtr, class Object *, cmd_t, const char *, Character *){}; // non Combat special proc
+  int (*combat_func)(Character *, class Object *, cmd_t, const char *, Character *){};      // combat special proc
   class mob_prog_data *mobprogs{};
   class mob_prog_data *mobspec{};
   int progtypes{};

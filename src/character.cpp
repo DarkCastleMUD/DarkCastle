@@ -1160,7 +1160,7 @@ QString Character::calc_name(bool use_color)
   return name;
 }
 
-void ChannelMessage::set_wizinvis(const class Character *sender)
+void ChannelMessage::set_wizinvis(const CharacterPtr sender)
 {
   if (sender && sender->isPlayer())
   {
@@ -1172,7 +1172,7 @@ void ChannelMessage::set_wizinvis(const class Character *sender)
   }
 }
 
-void ChannelMessage::set_name(const class Character *sender)
+void ChannelMessage::set_name(const CharacterPtr sender)
 {
   if (sender)
   {

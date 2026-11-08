@@ -12,6 +12,7 @@
 #include <string>   // for basic_string, string
 #include <vector>   // for vector
 #include <QSharedPointer>
+#include "DC/types.h"
 
 const size_t MAX_STRING_LENGTH = 8192;
 
@@ -42,8 +43,8 @@ public:
 class snoop_data
 {
 public:
-  class Character *snooping{};
-  class Character *snoop_by{};
+  CharacterPtr snooping{};
+  CharacterPtr snoop_by{};
 };
 
 class msg_type
@@ -85,17 +86,17 @@ public:
 class CVoteData
 {
 public:
-  void SetQuestion(class Character *ch, std::string question);
-  void AddAnswer(class Character *ch, std::string answer);
-  void RemoveAnswer(class Character *ch, unsigned int answer);
-  void StartVote(class Character *ch);
-  void EndVote(class Character *ch);
-  void Reset(class Character *ch);
+  void SetQuestion(CharacterPtr ch, std::string question);
+  void AddAnswer(CharacterPtr ch, std::string answer);
+  void RemoveAnswer(CharacterPtr ch, unsigned int answer);
+  void StartVote(CharacterPtr ch);
+  void EndVote(CharacterPtr ch);
+  void Reset(CharacterPtr ch);
   void OutToFile();
-  bool HasVoted(class Character *ch);
-  bool Vote(class Character *ch, unsigned int vote);
-  void DisplayVote(class Character *ch);
-  void DisplayResults(class Character *ch);
+  bool HasVoted(CharacterPtr ch);
+  bool Vote(CharacterPtr ch, unsigned int vote);
+  void DisplayVote(CharacterPtr ch);
+  void DisplayResults(CharacterPtr ch);
   bool IsActive() { return active; }
   CVoteData();
   ~CVoteData();
