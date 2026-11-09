@@ -40,11 +40,11 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 
-int do_clearaff(Character *ch, char *argument, cmd_t cmd)
+int do_clearaff(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   char buf[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   affected_type *af, *afpk;
   class Object *dummy;
 
@@ -85,7 +85,7 @@ int do_clearaff(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
+int do_reloadhelp(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   extern FILEPtr help_fl;
   extern help_index_element *help_index;
@@ -102,9 +102,9 @@ int do_reloadhelp(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_log(Character *ch, char *argument, cmd_t cmd)
+int do_log(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   class Object *dummy;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
@@ -144,10 +144,10 @@ int do_log(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_showbits(Character *ch, char *argument, cmd_t cmd)
+int do_showbits(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   one_argument(argument, person);
 
   if (!*person)
@@ -251,7 +251,7 @@ int do_showbits(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_debug(Character *ch, char *args, cmd_t cmd)
+int do_debug(CharacterPtr ch, char *args, cmd_t cmd)
 {
   std::string arg1, arg2, arg3;
   std::string remainder;
@@ -394,11 +394,11 @@ int do_debug(Character *ch, char *args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pardon(Character *ch, char *argument, cmd_t cmd)
+int do_pardon(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char person[MAX_INPUT_LENGTH];
   char flag[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -459,7 +459,7 @@ int do_pardon(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_dmg_eq(Character *ch, char *argument, cmd_t cmd)
+int do_dmg_eq(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   class Object *obj_object;
@@ -528,7 +528,7 @@ skill_quest *find_sq(int sq)
   return nullptr;
 }
 
-int do_sqedit(Character *ch, char *argument, cmd_t cmd)
+int do_sqedit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   argument = one_argument(argument, command);
@@ -769,14 +769,14 @@ int wear_bitv[MAX_WEAR] = {
     1024, 2048, 4096, 4096, 8192, 8192, 16384, 16384, 131072,
     262144, 262144};
 
-int do_eqmax(Character *ch, char *argument, cmd_t cmd)
+int do_eqmax(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char arg[MAX_INPUT_LENGTH];
   int a = 0, o;
   argument = one_argument(argument, arg);
-  extern int class_restricted(Character * ch, class Object * obj);
-  extern int size_restricted(Character * ch, class Object * obj);
+  extern int class_restricted(CharacterPtr ch, class Object * obj);
+  extern int size_restricted(CharacterPtr ch, class Object * obj);
 
   if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
@@ -886,7 +886,7 @@ int do_eqmax(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_reload(Character *ch, char *argument, cmd_t cmd)
+int do_reload(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   extern char motd[MAX_STRING_LENGTH];
   extern char imotd[MAX_STRING_LENGTH];
@@ -964,7 +964,7 @@ int do_reload(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_listproc(Character *ch, char *argument, cmd_t cmd)
+int do_listproc(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   int start, i, end, tot;

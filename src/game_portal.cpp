@@ -257,7 +257,7 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
   return (1);
 }
 
-void find_and_remove_player_portal(Character *ch)
+void find_and_remove_player_portal(CharacterPtr ch)
 {
   class Object *k{};
   class Object *next_k{};

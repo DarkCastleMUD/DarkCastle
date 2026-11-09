@@ -45,7 +45,8 @@
 */
 command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
 {
-  Character *victim{}, *next_victim{};
+  CharacterPtr victim{};
+  CharacterPtr next_victim{};
   QString name;
   int dam{};
   command_return_t retval{};
@@ -162,9 +163,9 @@ command_return_t Character::do_kick(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
+int do_deathstroke(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int dam, attacktype;
   int retval;
@@ -278,15 +279,16 @@ int do_deathstroke(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_retreat(Character *ch, char *argument, cmd_t cmd)
+int do_retreat(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int attempt;
   char buf[MAX_INPUT_LENGTH];
   // Azrack -- retval should be initialized to something
   int retval = 0;
-  Character *chTemp, *loop_ch;
+  CharacterPtr chTemp;
+  CharacterPtr loop_ch;
 
-  int is_stunned(Character * ch);
+  int is_stunned(CharacterPtr ch);
 
   if (is_stunned(ch))
     return ReturnValue::eFAILURE;
@@ -382,7 +384,7 @@ int do_retreat(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_hitall(Character *ch, char *argument, cmd_t cmd)
+int do_hitall(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isPlayer() && ch->getLevel() < ARCHANGEL && !ch->has_skill(SKILL_HITALL))
   {
@@ -429,9 +431,9 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE * 3);
 
     const auto &character_list = DC::getInstance()->character_list;
-    for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
+    for_each(character_list.begin(), character_list.end(), [&ch](CharacterPtr vict)
              {
-			if (vict && vict != (Character *) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
+			if (vict && vict != (CharacterPtr ) 0x95959595 && ch->in_room == vict->in_room && !ARE_GROUPED(ch, vict) && vict != ch && can_be_attacked(ch, vict)) {
 				int retval = one_hit(ch, vict, TYPE_UNDEFINED, FIRST);
 				if (isSet(retval, ReturnValue::eCH_DIED)) {
 					REMOVE_BIT(ch->combat, COMBAT_HITALL);
@@ -444,9 +446,9 @@ int do_hitall(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_bash(Character *ch, char *argument, cmd_t cmd)
+int do_bash(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int retval;
   int hit = 0;
@@ -628,9 +630,9 @@ int do_bash(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_redirect(Character *ch, char *argument, cmd_t cmd)
+int do_redirect(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
 
   if (!ch->canPerform(SKILL_REDIRECT, "You aren't skilled enough to change opponents midfight!\n"))
@@ -693,16 +695,16 @@ int do_redirect(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_disarm(Character *ch, char *argument, cmd_t cmd)
+int do_disarm(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   class Object *wielded;
 
   char name[256];
   class Object *obj;
   int retval = 0;
 
-  int is_fighting_mob(Character * ch);
+  int is_fighting_mob(CharacterPtr ch);
 
   if (!ch->canPerform(SKILL_DISARM))
   {
@@ -821,7 +823,7 @@ int do_disarm(Character *ch, char *argument, cmd_t cmd)
 */
 int Character::do_rescue(QStringList arguments, cmd_t cmd)
 {
-  Character *victim{}, *tmp_ch{};
+  CharacterPtr victim{}, tmp_ch{};
   QString victim_name = arguments.value(0);
 
   if (!canPerform(SKILL_RESCUE))
@@ -908,7 +910,7 @@ int Character::do_rescue(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
+int do_bladeshield(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
   int duration = 12;
@@ -965,17 +967,17 @@ int do_bladeshield(Character *ch, char *argument, cmd_t cmd)
 
 // return true on guard doing anything
 // otherwise false
-int handle_any_guard(Character *ch)
+int handle_any_guard(CharacterPtr ch)
 {
   if (!ch->guarded_by)
     return false;
 
-  Character *guard = nullptr;
+  CharacterPtr guard = nullptr;
 
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
   {
-    for (Character *vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
+    for (CharacterPtr vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
         curr = nullptr;
@@ -1000,7 +1002,7 @@ int handle_any_guard(Character *ch)
   return false;
 }
 
-Character *is_guarding_me(Character *ch, Character *guard)
+CharacterPtr is_guarding_me(CharacterPtr ch, CharacterPtr guard)
 {
   follow_type *curr = ch->guarded_by;
 
@@ -1014,12 +1016,12 @@ Character *is_guarding_me(Character *ch, Character *guard)
   return nullptr;
 }
 
-void stop_guarding(Character *guard)
+void stop_guarding(CharacterPtr guard)
 {
   if (!guard->guarding) // i'm not guarding anyone:)  get out
     return;
 
-  Character *victim = guard->guarding;
+  CharacterPtr victim = guard->guarding;
   follow_type *curr = victim->guarded_by;
   follow_type *last = nullptr;
 
@@ -1042,7 +1044,7 @@ void stop_guarding(Character *guard)
   guard->guarding = nullptr;
 }
 
-void start_guarding(Character *guard, Character *victim)
+void start_guarding(CharacterPtr guard, CharacterPtr victim)
 {
   follow_type *curr = (follow_type *)dc_alloc(1, sizeof(follow_type));
 
@@ -1053,7 +1055,7 @@ void start_guarding(Character *guard, Character *victim)
   guard->guarding = victim;
 }
 
-void stop_guarding_me(Character *victim)
+void stop_guarding_me(CharacterPtr victim)
 {
   char buf[200];
   follow_type *curr = victim->guarded_by;
@@ -1074,10 +1076,10 @@ void stop_guarding_me(Character *victim)
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
 
-int do_guard(Character *ch, char *argument, cmd_t cmd)
+int do_guard(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
 
   if (!ch->isNonPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
@@ -1124,7 +1126,7 @@ int do_guard(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_tactics(Character *ch, char *argument, cmd_t cmd)
+int do_tactics(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1146,7 +1148,7 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
   }
 
   int grpsize = 0;
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1175,7 +1177,7 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1201,9 +1203,10 @@ int do_tactics(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_make_camp(Character *ch, char *argument, cmd_t cmd)
+int do_make_camp(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *i, *next_i;
+  CharacterPtr i;
+  CharacterPtr next_i;
   int learned = ch->has_skill(SKILL_MAKE_CAMP);
   affected_type af;
 
@@ -1306,7 +1309,7 @@ int do_make_camp(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_triage(Character *ch, char *argument, cmd_t cmd)
+int do_triage(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_TRIAGE);
   affected_type af;
@@ -1363,7 +1366,7 @@ int do_triage(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_battlesense(Character *ch, char *argument, cmd_t cmd)
+int do_battlesense(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_BATTLESENSE);
   affected_type af;
@@ -1403,9 +1406,9 @@ int do_battlesense(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_smite(Character *ch, char *argument, cmd_t cmd)
+int do_smite(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
   char name[MAX_STRING_LENGTH];
   int learned = ch->has_skill(SKILL_SMITE);
   affected_type af;
@@ -1489,7 +1492,7 @@ int do_smite(Character *ch, char *argument, cmd_t cmd)
   return ch->fighting ? ReturnValue::eSUCCESS : attack(ch, vict, TYPE_UNDEFINED);
 }
 
-int do_leadership(Character *ch, char *argument, cmd_t cmd)
+int do_leadership(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_LEADERSHIP);
   affected_type af;
@@ -1548,7 +1551,7 @@ int do_leadership(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_perseverance(Character *ch, char *argument, cmd_t cmd)
+int do_perseverance(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_PERSEVERANCE);
   affected_type af;
@@ -1588,9 +1591,9 @@ int do_perseverance(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
+int do_defenders_stance(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   affected_type af;
 
@@ -1633,7 +1636,7 @@ int do_defenders_stance(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_onslaught(Character *ch, char *argument, cmd_t cmd)
+int do_onslaught(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_ONSLAUGHT);
   affected_type af;

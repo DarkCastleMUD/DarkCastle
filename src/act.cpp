@@ -26,28 +26,28 @@ class Object;
 
 extern bool MOBtrigger;
 
-act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(QString str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
   return DC::getInstance()->act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const std::string &str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
   return DC::getInstance()->act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const char *str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
   return DC::getInstance()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
+act_return act(const char *str, CharacterPtr ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = {}, .destination = destination, .flags = flags, .keyword = keyword});
@@ -95,7 +95,7 @@ act_return DC::act(act_input input)
 
   if (destination == TO_VICT)
   {
-    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (Character *)vict_obj, keyword);
+    st_return = send_tokens(tokens, ch, obj, vict_obj, flags, (CharacterPtr)vict_obj, keyword);
     retval |= st_return.retval;
     ar.str = st_return.str;
     ar.retval = retval;
@@ -112,7 +112,8 @@ act_return DC::act(act_input input)
   }
   else if (destination == TO_ROOM || destination == TO_GROUP || destination == TO_ROOM_NOT_GROUP)
   {
-    Character *tmp_char, *next_tmp_char;
+    CharacterPtr tmp_char;
+    CharacterPtr next_tmp_char;
     if (ch->in_room >= 1)
     {
       for (tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_tmp_char)
@@ -176,7 +177,7 @@ act_return DC::act(act_input input)
 |   with no interpretation and no checks.
 */
 
-void send_message(QByteArray str, Character *to)
+void send_message(QByteArray str, CharacterPtr to)
 {
   if (str.isEmpty())
     return;
@@ -190,7 +191,7 @@ void send_message(QByteArray str, Character *to)
   SEND_TO_Q(str, to->desc);
 }
 
-void send_message(QString str, Character *to)
+void send_message(QString str, CharacterPtr to)
 {
   if (str.isEmpty())
     return;
@@ -204,7 +205,7 @@ void send_message(QString str, Character *to)
   SEND_TO_Q(str, to->desc);
 }
 
-void send_message(const char *str, Character *to)
+void send_message(const char *str, CharacterPtr to)
 {
   // This will happen when a token shouldn't be interpreted
   if (str == 0)
@@ -217,12 +218,12 @@ void send_message(const char *str, Character *to)
   SEND_TO_Q(str, to->desc);
 }
 
-void send_message(std::string str, Character *to)
+void send_message(std::string str, CharacterPtr to)
 {
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return DC::send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vict_obj, int flags, Character *to, QString keyword)
+send_tokens_return DC::send_tokens(TokenList *tokens, CharacterPtr ch, Object *obj, void *vict_obj, int flags, CharacterPtr to, QString keyword)
 {
   int retval = 0;
   QByteArray buf = tokens->Interpret(ch, obj, vict_obj, to, flags, keyword);

@@ -47,9 +47,9 @@ namespace Combinables
     ~Brew();
     void load(void);
     void save(void);
-    void list(Character *ch);
-    int add(Character *ch, char *argument);
-    int remove(Character *ch, char *argument);
+    void list(CharacterPtr ch);
+    int add(CharacterPtr ch, char *argument);
+    int remove(CharacterPtr ch, char *argument);
     int size(void);
     int find(recipe);
 
@@ -116,9 +116,9 @@ namespace Combinables
     ~Scribe();
     void load(void);
     void save(void);
-    void list(Character *ch);
-    int add(Character *ch, char *argument);
-    int remove(Character *ch, char *argument);
+    void list(CharacterPtr ch);
+    int add(CharacterPtr ch, char *argument);
+    int remove(CharacterPtr ch, char *argument);
     int size(void);
     int find(recipe);
 

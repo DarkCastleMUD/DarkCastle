@@ -132,7 +132,7 @@ void TokenList::Next()
 |   Zero is returned (0) if the std::string should not be sent -- either
 |   the send_to is asleep or the INVIS_NULL flag was used (for example).
 */
-QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags, QString keyword)
+QByteArray TokenList::Interpret(CharacterPtr from, Object *obj, void *vict_obj, CharacterPtr send_to, int flags, QString keyword)
 {
 
   // Reset the string
@@ -159,7 +159,7 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
     return "";
   if (isSet(DC::getInstance()->world[send_to->in_room].room_flags, QUIET) && !(flags & FLAG_FORCE))
     return "";
-  if ((send_to == (Character *)vict_obj) && (flags & NOTVICT))
+  if ((send_to == (CharacterPtr)vict_obj) && (flags & NOTVICT))
     return "";
   if ((send_to->getLevel() < MIN_GOD) && (flags & GODS))
     return "";
@@ -268,26 +268,26 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
                 }
                 break;
               case 'N':
-                if (vict_obj == nullptr || GET_SHORT((Character *)vict_obj) == nullptr)
+                if (vict_obj == nullptr || GET_SHORT((CharacterPtr)vict_obj) == nullptr)
                 {
                   break;
                 }
-                if (!CAN_SEE(send_to, (Character *)vict_obj, true))
+                if (!CAN_SEE(send_to, (CharacterPtr)vict_obj, true))
                 {
                   if (flags & INVIS_NULL)
                     return {};
                   else if (flags & INVIS_VISIBLE)
-                    interp += GET_SHORT((Character *)vict_obj);
+                    interp += GET_SHORT((CharacterPtr)vict_obj);
                   else
                     interp += "someone";
                 }
                 else
                 {
-                  if (vict_obj == nullptr || GET_SHORT((Character *)vict_obj) == nullptr)
+                  if (vict_obj == nullptr || GET_SHORT((CharacterPtr)vict_obj) == nullptr)
                   {
                     break;
                   }
-                  interp += GET_SHORT((Character *)vict_obj);
+                  interp += GET_SHORT((CharacterPtr)vict_obj);
                 }
                 break;
               case 'm':
@@ -302,7 +302,7 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
                 {
                   break;
                 }
-                interp += HMHR((Character *)vict_obj);
+                interp += HMHR((CharacterPtr)vict_obj);
                 break;
               case 's':
                 if (from == nullptr)
@@ -316,7 +316,7 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
                 {
                   break;
                 }
-                interp += HSHR((Character *)vict_obj);
+                interp += HSHR((CharacterPtr)vict_obj);
                 break;
               case 'e':
                 if (from == nullptr)
@@ -330,7 +330,7 @@ QByteArray TokenList::Interpret(Character *from, Object *obj, void *vict_obj, Ch
                 {
                   break;
                 }
-                interp += HSSH((Character *)vict_obj);
+                interp += HSSH((CharacterPtr)vict_obj);
                 break;
               case 'o':
                 if (send_to == nullptr || obj == nullptr || obj->Name().isEmpty())

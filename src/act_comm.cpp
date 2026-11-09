@@ -52,7 +52,7 @@
 
 extern bool MOBtrigger;
 
-int do_report(Character *ch, char *argument, cmd_t cmd)
+int do_report(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[256];
   char report[200];
@@ -242,7 +242,7 @@ int send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   return (1);
 }
 
-int do_channel(Character *ch, char *arg, cmd_t cmd)
+int do_channel(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   int x;
   int y = 0;
@@ -443,7 +443,7 @@ command_return_t Character::do_ignore(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int is_ignoring(const Character *const ch, const Character *const i)
+int is_ignoring(const CharacterPtr ch, const CharacterPtr i)
 {
   if (ch->isNonPlayer() || i->isImmortalPlayer() || ch->player->ignoring.isEmpty())
   {
@@ -464,7 +464,7 @@ int is_ignoring(const Character *const ch, const Character *const i)
 
 #define MAX_NOTE_LENGTH 1000 /* arbitrary */
 
-int do_write(Character *ch, char *argument, cmd_t cmd)
+int do_write(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   class Object *paper = 0, *pen = 0;
   char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
@@ -565,11 +565,11 @@ int do_write(Character *ch, char *argument, cmd_t cmd)
 }
 
 // TODO - Add a bunch of insults to this for the hell of it.
-int do_insult(Character *ch, char *argument, cmd_t cmd)
+int do_insult(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[100];
   char arg[MAX_STRING_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(argument, arg);
 
@@ -621,7 +621,7 @@ int do_insult(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_emote(Character *ch, char *argument, cmd_t cmd)
+int do_emote(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

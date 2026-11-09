@@ -32,8 +32,8 @@ private:
 public:
   class Path *next; // main Path list
 
-  char *determineRoute(Character *, room_t, room_t); // ch, from, to
-  void addRoom(Character *, room_t, bool);           // ch, room, IgnoreConnectingIssues
+  char *determineRoute(CharacterPtr, room_t, room_t); // ch, from, to
+  void addRoom(CharacterPtr, room_t, bool);           // ch, room, IgnoreConnectingIssues
 
   bool isRoomPathed(room_t room);
   bool isRoomConnected(room_t room);

@@ -56,9 +56,9 @@ class index_data
 public:
   void vnum(vnum_t v) { vnum_ = v; }
   [[nodiscard]] vnum_t vnum(void) const { return vnum_; }
-  quint64 qty{};                                                                            /* number of existing units of ths mob/obj */
-  int (*non_combat_func)(CharacterPtr, class Object *, cmd_t, const char *, Character *){}; // non Combat special proc
-  int (*combat_func)(Character *, class Object *, cmd_t, const char *, Character *){};      // combat special proc
+  quint64 qty{};                                                                             /* number of existing units of ths mob/obj */
+  int (*non_combat_func)(CharacterPtr, class Object *, cmd_t, const char *, CharacterPtr){}; // non Combat special proc
+  int (*combat_func)(CharacterPtr, class Object *, cmd_t, const char *, CharacterPtr){};     // combat special proc
   class mob_prog_data *mobprogs{};
   class mob_prog_data *mobspec{};
   int progtypes{};
@@ -83,5 +83,5 @@ public:
   static QString read_next_file(FILEPtr stream);
   static world_file_list_itemPtr new_file_item(QString filename);
   static const QString indexFilename;
-  Character *mob{};
+  CharacterPtr mob{};
 };

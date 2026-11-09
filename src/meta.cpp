@@ -645,8 +645,8 @@ quint64 Character::meta_get_ki_plat_cost(void)
   return static_cast<quint64>(cost * 0.9);
 }
 
-int meta_dude(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-              Character *owner)
+int meta_dude(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+              CharacterPtr owner)
 {
   char argument[MAX_INPUT_LENGTH];
 
@@ -1590,7 +1590,7 @@ char *Character::race_message(int race)
   return &buf[0];
 }
 
-int cardinal(Character *ch, class Object *obj, cmd_t cmd, const char *argument, Character *owner)
+int cardinal(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *argument, CharacterPtr owner)
 {
   if (cmd == cmd_t::LIST) // list
   {

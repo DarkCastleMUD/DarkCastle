@@ -33,9 +33,9 @@
 #include "DC/levels.h"
 #include "DC/timeinfo.h"
 
-int do_plats(Character *ch, char *argument, cmd_t cmd)
+int do_plats(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *i;
+  CharacterPtr i;
   class Connection *d;
   char arg[100];
   char buf[100];
@@ -73,7 +73,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
 {
   class Connection *i = {};
   class Connection *next_i = {};
-  Character *vict = {};
+  CharacterPtr vict = {};
   QString buf = {};
 
   if (isNonPlayer())
@@ -161,7 +161,7 @@ command_return_t Character::do_force(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-typedef command_return_t (*test_function_t)(Character *ch);
+typedef command_return_t (*test_function_t)(CharacterPtr ch);
 
 class Test
 {
@@ -171,7 +171,7 @@ public:
       : name_(name), function_(function)
   {
   }
-  command_return_t run(Character *ch)
+  command_return_t run(CharacterPtr ch)
   {
     if (function_ && ch)
     {
@@ -187,7 +187,7 @@ private:
 };
 typedef QMap<QString, Test> tests_t;
 
-command_return_t run_all_events(Character *ch = nullptr)
+command_return_t run_all_events(CharacterPtr ch = nullptr)
 {
   quint64 counter{};
   while (timer_list != nullptr && counter++ < 1000)
@@ -250,7 +250,7 @@ QString rc_to_qstring(const command_return_t &rc)
   return strings.join(',');
 }
 
-void run_check(Character *ch, command_return_t *rc, auto *function, char *arguments = nullptr, cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, auto *function, char *arguments = nullptr, cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -272,7 +272,7 @@ void run_check(Character *ch, command_return_t *rc, auto *function, char *argume
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std::string arguments = std::string(), cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, command_gen2_t function, std::string arguments = std::string(), cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -294,7 +294,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen2_t function, std
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, command_gen3_t function, QStringList arguments = QStringList(), cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -316,7 +316,7 @@ void run_check(Character *ch, command_return_t *rc, command_gen3_t function, QSt
   }
 }
 
-void run_check(Character *ch, command_return_t *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
+void run_check(CharacterPtr ch, command_return_t *rc, command_special_t function, QString arguments = "", cmd_t cmd = cmd_t::DEFAULT)
 {
   command_return_t new_rc{};
   if (ch)
@@ -338,7 +338,7 @@ void run_check(Character *ch, command_return_t *rc, command_special_t function, 
   }
 }
 
-command_return_t test_casino(Character *ch)
+command_return_t test_casino(CharacterPtr ch)
 {
   if (!ch || !ch->player)
   {

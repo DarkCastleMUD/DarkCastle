@@ -34,9 +34,9 @@
 #include "DC/common.h"
 #include "DC/structs.h"
 
-int do_boot(Character *ch, char *arg, cmd_t cmd)
+int do_boot(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[500];
 
   half_chop(arg, name, type);
@@ -172,7 +172,7 @@ int do_boot(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_disconnect(Character *ch, char *argument, cmd_t cmd)
+int do_disconnect(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -215,9 +215,9 @@ int do_disconnect(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_fsave(Character *ch, std::string argument, cmd_t cmd)
+int do_fsave(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
-  Character *vict = {};
+  CharacterPtr vict = {};
   std::string name = {}, buf = {};
 
   if (ch->isNonPlayer())
@@ -252,10 +252,10 @@ int do_fsave(Character *ch, std::string argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_fighting(Character *ch, char *argument, cmd_t cmd)
+int do_fighting(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   const int CLANTAG_LEN = MAX_CLAN_LEN + 3; // "[Foobar]"
-  Character *i;
+  CharacterPtr i;
   bool arenaONLY = false;
   int countFighters = 0;
   char buf[80];
@@ -309,9 +309,9 @@ int do_fighting(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_peace(Character *ch, char *argument, cmd_t cmd)
+int do_peace(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *rch;
+  CharacterPtr rch;
 
   for (rch = DC::getInstance()->world[ch->in_room].people; rch != nullptr; rch = rch->next_in_room)
   {
@@ -325,7 +325,7 @@ int do_peace(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
+int do_matrixinfo(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;
@@ -350,7 +350,7 @@ int do_matrixinfo(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int lookupClass(Character *ch, char *str)
+int lookupClass(CharacterPtr ch, char *str)
 {
   int c_class;
 
@@ -379,7 +379,7 @@ int lookupClass(Character *ch, char *str)
   return -1;
 }
 
-int lookupRoom(Character *ch, char *str)
+int lookupRoom(CharacterPtr ch, char *str)
 {
   if (str == 0)
     return -1;
@@ -399,7 +399,7 @@ int lookupRoom(Character *ch, char *str)
   return room;
 }
 
-int do_guild(Character *ch, char *argument, cmd_t cmd)
+int do_guild(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int c_class = 0, room = 0, old_room = 0;
   char arg1[MAX_STRING_LENGTH] = {0};

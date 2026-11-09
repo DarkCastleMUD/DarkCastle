@@ -20,10 +20,10 @@
 #include "DC/common.h"
 #include "DC/levels.h"
 
-int do_archive(Character *ch, char *argument, cmd_t cmd)
+int do_archive(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[50];
-  Character *victim;
+  CharacterPtr victim;
 
   argument = one_argument(argument, name);
 
@@ -57,7 +57,7 @@ int do_archive(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_unarchive(Character *ch, char *argument, cmd_t cmd)
+int do_unarchive(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[50];
   argument = one_argument(argument, name);
@@ -89,7 +89,7 @@ command_return_t Character::do_pview(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
 
   if (!this->desc)
     return ReturnValue::eFAILURE;
@@ -175,7 +175,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_stealth(Character *ch, char *argument, cmd_t cmd)
+int do_stealth(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -198,10 +198,10 @@ int do_stealth(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_send(Character *ch, char *argument, cmd_t cmd)
+int do_send(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
-  Character *vict;
+  CharacterPtr vict;
   char name[100], message[200], buf[350];
 
   half_chop(argument, name, message);

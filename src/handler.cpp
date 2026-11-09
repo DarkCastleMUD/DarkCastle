@@ -86,15 +86,15 @@ int strncasecmp(char *s1, const char *s2, int len);
 #endif
 
 /* External procedures */
-int do_fall(Character *ch, short dir);
+int do_fall(CharacterPtr ch, short dir);
 
 // TIMERS
 
-bool isTimer(Character *ch, int spell)
+bool isTimer(CharacterPtr ch, int spell)
 {
   return ch->affected_by_spell(BASE_TIMERS + spell);
 }
-int timerLeft(Character *ch, int spell)
+int timerLeft(CharacterPtr ch, int spell)
 {
   affected_type *af = ch->affected_by_spell(BASE_TIMERS + spell);
   if (af == nullptr)
@@ -102,7 +102,7 @@ int timerLeft(Character *ch, int spell)
   else
     return af->duration;
 }
-void addTimer(Character *ch, int spell, int ticks)
+void addTimer(CharacterPtr ch, int spell, int ticks)
 {
 
   affected_type af;
@@ -116,7 +116,7 @@ void addTimer(Character *ch, int spell, int ticks)
 }
 // END TIMERS
 
-bool is_wearing(Character *ch, Object *item)
+bool is_wearing(CharacterPtr ch, Object *item)
 {
   int i;
   for (i = 0; i < MAX_WEAR; i++)
@@ -273,7 +273,7 @@ int isexact(const char *str, const char *namelist)
   return 0;
 }
 
-int get_max_stat(Character *ch, attribute_t stat)
+int get_max_stat(CharacterPtr ch, attribute_t stat)
 {
   switch (GET_RACE(ch))
   {
@@ -429,7 +429,7 @@ int get_max_stat(Character *ch, attribute_t stat)
   return 0;
 }
 
-bool still_affected_by_poison(Character *ch)
+bool still_affected_by_poison(CharacterPtr ch)
 {
   affected_type *af = ch->affected;
 
@@ -549,7 +549,7 @@ const set_data set_list[] = {
      "\n",
      "\n"}};
 
-void add_set_stats(Character *ch, Object *obj, int flag, int pos)
+void add_set_stats(CharacterPtr ch, Object *obj, int flag, int pos)
 {
   // obj has just been worn
   int obj_vnum = obj->vnum_;
@@ -820,7 +820,7 @@ void add_set_stats(Character *ch, Object *obj, int flag, int pos)
       }
 }
 
-void remove_set_stats(Character *ch, Object *obj, int flag)
+void remove_set_stats(CharacterPtr ch, Object *obj, int flag)
 {
   // obj has just been removed
   int obj_vnum = obj->vnum_;
@@ -863,7 +863,7 @@ void remove_set_stats(Character *ch, Object *obj, int flag)
       }
 }
 
-void check_weapon_weights(Character *ch)
+void check_weapon_weights(CharacterPtr ch)
 {
   class Object *weapon;
 
@@ -906,7 +906,7 @@ void check_weapon_weights(Character *ch)
   }
 }
 
-void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag)
+void affect_modify(CharacterPtr ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag)
 {
   char log_buf[256];
   int i;
@@ -1627,7 +1627,7 @@ void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool a
 // that could be on both eq as well as on spells.
 // Stat (con, str, etc) stuff is handled in affect_modify
 
-void affect_total(Character *ch)
+void affect_total(CharacterPtr ch)
 {
   affected_type *af;
   affected_type *tmp_af;
@@ -1674,7 +1674,7 @@ void affect_total(Character *ch)
 
 /* Insert an affect_type in a Character structure
  Automatically sets apropriate bits and apply's */
-void affect_to_char(Character *ch, affected_type *af, int32_t duration_type)
+void affect_to_char(CharacterPtr ch, affected_type *af, int32_t duration_type)
 {
   //    bool secFix;
   affected_type *affected_alloc;
@@ -1701,7 +1701,7 @@ void affect_to_char(Character *ch, affected_type *af, int32_t duration_type)
 /* Remove an affected_type structure from a char (called when duration
  reaches zero). Pointer *af must never be NIL! Frees mem and calls
  affect_location_apply                                                */
-void affect_remove(Character *ch, affected_type *af, int flags)
+void affect_remove(CharacterPtr ch, affected_type *af, int flags)
 {
   affected_type *hjp;
   char buf[200];
@@ -2170,7 +2170,7 @@ void affect_remove(Character *ch, affected_type *af, int flags)
 }
 
 /* Call affect_remove with every spell of spelltype "skill" */
-void affect_from_char(Character *ch, int skill, int flags)
+void affect_from_char(CharacterPtr ch, int skill, int flags)
 {
   affected_type *hjp, *afc, *recheck;
   //    bool aff2Fix;
@@ -2209,12 +2209,12 @@ affected_type *Character::affected_by_spell(uint32_t skill)
   return nullptr;
 }
 
-affected_type *affected_by_spell(Character *ch, uint32_t skill)
+affected_type *affected_by_spell(CharacterPtr ch, uint32_t skill)
 {
   return ch->affected_by_spell(skill);
 }
 
-affected_type *affected_by_random(Character *ch)
+affected_type *affected_by_random(CharacterPtr ch)
 {
   if (ch->affected == 0)
     return 0;
@@ -2237,7 +2237,7 @@ affected_type *affected_by_random(Character *ch)
   return 0;
 }
 
-void affect_join(Character *ch, affected_type *af, bool avg_dur, bool avg_mod)
+void affect_join(CharacterPtr ch, affected_type *af, bool avg_dur, bool avg_mod)
 {
   affected_type *hjp;
   bool found = false;
@@ -2264,16 +2264,18 @@ void affect_join(Character *ch, affected_type *af, bool avg_dur, bool avg_mod)
     affect_to_char(ch, af);
 }
 
-int char_from_room(Character *ch)
+int char_from_room(CharacterPtr ch)
 {
   return char_from_room(ch, true);
 }
 
 /* move a player out of a room */
 /* Returns 0 on failure, non-zero otherwise */
-int char_from_room(Character *ch, bool stop_all_fighting)
+int char_from_room(CharacterPtr ch, bool stop_all_fighting)
 {
-  Character *i, *fighter, *next_char;
+  CharacterPtr i;
+  CharacterPtr fighter;
+  CharacterPtr next_char;
   bool Other = false, More = false, kimore = false;
 
   if (ch->in_room == DC::NOWHERE)
@@ -2348,7 +2350,7 @@ int char_from_room(Character *ch, bool stop_all_fighting)
   return (1);
 }
 
-bool is_hiding(Character *ch, Character *vict)
+bool is_hiding(CharacterPtr ch, CharacterPtr vict)
 {
   if (ch->isNonPlayer())
     return (number(1, 101) > 70);
@@ -2367,9 +2369,9 @@ bool is_hiding(Character *ch, Character *vict)
 
 /* place a character in a room */
 /* Returns zero on failure, and one on success */
-int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
+int char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting)
 {
-  Character *temp;
+  CharacterPtr temp;
   if (room == DC::NOWHERE || !ch)
     return 0;
 
@@ -2456,7 +2458,7 @@ int char_to_room(Character *ch, room_t room, bool stop_all_fighting)
 }
 
 /* Return the effect of a piece of armor in position eq_pos */
-int apply_ac(Character *ch, int eq_pos)
+int apply_ac(CharacterPtr ch, int eq_pos)
 {
   int value;
   assert(ch->equipment[eq_pos]);
@@ -2866,10 +2868,10 @@ class Object *get_obj_num(int nr)
   return (0);
 }
 /* search a room for a char, and return a pointer if found..  */
-Character *get_char_room(const char *name, room_t room, bool careful)
+CharacterPtr get_char_room(const char *name, room_t room, bool careful)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
   int j, number;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
@@ -2914,7 +2916,7 @@ Character *get_char_room(const char *name, room_t room, bool careful)
   return (partial_match);
 }
 
-Character *get_char_room(QString name, room_t room, bool careful)
+CharacterPtr get_char_room(QString name, room_t room, bool careful)
 {
   auto nameC = strdup(qPrintable(name));
   if (!nameC)
@@ -2927,9 +2929,9 @@ Character *get_char_room(QString name, room_t room, bool careful)
 }
 
 /* search all over the world for a char, and return a pointer if found */
-Character *get_char(QString name)
+CharacterPtr get_char(QString name)
 {
-  Character *partial_match = nullptr;
+  CharacterPtr partial_match = nullptr;
   int j = 0, number = 0;
   QString tmpname = {}, tmp = {};
 
@@ -2939,7 +2941,7 @@ Character *get_char(QString name)
     return (0);
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
                         {
 		if (number == 0 && i->isNonPlayer()) return false;
 		if (number == 1 || number == 0)
@@ -2977,10 +2979,10 @@ Character *get_char(QString name)
 }
 
 /* search all over the world for a mob, and return a pointer if found */
-Character *get_mob(char *name)
+CharacterPtr get_mob(char *name)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
                         {
 		if(!i->isNonPlayer()) {
 			return false;
@@ -2999,10 +3001,10 @@ Character *get_mob(char *name)
 }
 
 /* search all over the world for a char num, and return a pointer if found */
-Character *get_char_num(int nr)
+CharacterPtr get_char_num(int nr)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&nr](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&nr](CharacterPtr const &i)
                         {
  		if (i->isNonPlayer() && i->mobdata->vnum_ == nr) {
  			return true;
@@ -3023,7 +3025,7 @@ int move_obj(Object *obj, int dest)
 {
   int obj_in_room = DC::NOWHERE;
   Object *contained_by = 0;
-  Character *carried_by = 0;
+  CharacterPtr carried_by = 0;
 
   if (!obj)
   {
@@ -3108,7 +3110,7 @@ int move_obj(Object *obj, Object *dest_obj)
 {
   int obj_in_room = DC::NOWHERE;
   Object *contained_by = 0;
-  Character *carried_by = 0;
+  CharacterPtr carried_by = 0;
 
   if (!obj)
   {
@@ -3185,11 +3187,11 @@ int move_obj(Object *obj, Object *dest_obj)
 
 // move an object from its current location into the inventory of the
 // character specified by ch.
-int move_obj(Object *obj, Character *ch)
+int move_obj(Object *obj, CharacterPtr ch)
 {
   int obj_in_room = DC::NOWHERE;
   Object *contained_by = 0;
-  Character *carried_by = 0;
+  CharacterPtr carried_by = 0;
 
   //  char buffer[300];
 
@@ -3284,7 +3286,7 @@ int move_obj(Object *obj, Character *ch)
 
 // give an object to a char
 // 1 if success, 0 if failure
-int obj_to_char(class Object *object, Character *ch)
+int obj_to_char(class Object *object, CharacterPtr ch)
 {
   // class Object *obj;
   /*
@@ -3300,7 +3302,7 @@ int obj_to_char(class Object *object, Character *ch)
   IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
   IS_CARRYING_N(ch)
   ++;
-  extern void pick_up_item(Character * ch, class Object * obj);
+  extern void pick_up_item(CharacterPtr ch, class Object * obj);
 
   pick_up_item(ch, object);
 
@@ -3586,7 +3588,7 @@ int obj_from_obj(class Object *obj)
 }
 
 // Set all carried_by to point to new_new owner
-void object_list_new_new_owner(class Object *list, Character *ch)
+void object_list_new_new_owner(class Object *list, CharacterPtr ch)
 {
   if (list)
   {
@@ -3616,7 +3618,7 @@ void extract_obj(class Object *obj)
   if (obj->equipped_by)
   {
     int iEq;
-    Character *vict = obj->equipped_by;
+    CharacterPtr vict = obj->equipped_by;
     for (iEq = 0; iEq < MAX_WEAR; iEq++)
       if (vict->equipment[iEq] == obj)
       {
@@ -3698,7 +3700,7 @@ void update_object(class Object *obj, int use)
     update_object(obj->next_content, use);
 }
 
-void update_char_objects(Character *ch)
+void update_char_objects(CharacterPtr ch)
 {
   int i;
 
@@ -3742,17 +3744,18 @@ void update_char_objects(Character *ch)
 }
 
 /* Extract a ch completely from the world, and leave his stuff behind */
-void extract_char(Character *ch, bool pull, Trace t)
+void extract_char(CharacterPtr ch, bool pull, Trace t)
 {
   t.addTrack("extract_char");
-  Character *k, *next_char;
+  CharacterPtr k;
+  CharacterPtr next_char;
   class Connection *t_desc;
   int l, was_in;
-  /*Character *i;*/
+  /*CharacterPtr i;*/
   bool isGolem = false;
 
   class Object *i;
-  Character *omast = nullptr;
+  CharacterPtr omast = nullptr;
   int ret = ReturnValue::eSUCCESS;
   if (ch->isPlayer() && !ch->desc)
     for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
@@ -3774,8 +3777,8 @@ void extract_char(Character *ch, bool pull, Trace t)
   remove_totem_stats(ch);
   if (ch->isPlayer())
   {
-    void shatter_message(Character * ch);
-    void release_message(Character * ch);
+    void shatter_message(CharacterPtr ch);
+    void release_message(CharacterPtr ch);
     if (ch->player->golem)
     {
       if (ch->player->golem->in_room)
@@ -3970,9 +3973,9 @@ void extract_char(Character *ch, bool pull, Trace t)
  *
  * Remember that this function can return nullptr!
  */
-Character *Character::get_rand_other_char_room_vis(void)
+CharacterPtr Character::get_rand_other_char_room_vis(void)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
   int count = 0;
 
   // Count the number of players in room
@@ -4006,10 +4009,10 @@ Character *Character::get_rand_other_char_room_vis(void)
   return nullptr;
 }
 
-void lastseen_targeted(Character *ch, Character *victim)
+void lastseen_targeted(CharacterPtr ch, CharacterPtr victim)
 {
-  static Character *last_ch;
-  static Character *last_victim;
+  static CharacterPtr last_ch;
+  static CharacterPtr last_victim;
 
   // Check if we just ran this function already
   if (last_ch == ch && last_victim == victim)
@@ -4048,11 +4051,11 @@ void lastseen_targeted(Character *ch, Character *victim)
   return;
 }
 
-Character *Character::get_char_room_vis(QString name)
+CharacterPtr Character::get_char_room_vis(QString name)
 {
-  Character *i{};
-  Character *partial_match{};
-  Character *rnd{};
+  CharacterPtr i{};
+  CharacterPtr partial_match{};
+  CharacterPtr rnd{};
   int j{};
 
   if (IS_AFFECTED(this, AFF_BLACKJACK))
@@ -4126,15 +4129,15 @@ Character *Character::get_char_room_vis(QString name)
   return (partial_match);
 }
 
-Character *get_char_room_vis(Character *ch, QString name)
+CharacterPtr get_char_room_vis(CharacterPtr ch, QString name)
 {
   return ch->get_char_room_vis(name);
 }
 
-Character *get_mob_room_vis(Character *ch, const char *name)
+CharacterPtr get_mob_room_vis(CharacterPtr ch, const char *name)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
   int j, number;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
@@ -4179,9 +4182,9 @@ Character *get_mob_room_vis(Character *ch, const char *name)
   return (partial_match);
 }
 
-Character *get_pc_room_vis_exact(Character *ch, const char *name)
+CharacterPtr get_pc_room_vis_exact(CharacterPtr ch, const char *name)
 {
-  Character *i;
+  CharacterPtr i;
 
   for (i = DC::getInstance()->world[ch->in_room].people; i; i = i->next_in_room)
   {
@@ -4191,10 +4194,10 @@ Character *get_pc_room_vis_exact(Character *ch, const char *name)
   return nullptr;
 }
 
-Character *get_mob_vis(Character *ch, char *name)
+CharacterPtr get_mob_vis(CharacterPtr ch, char *name)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
   int j = 0, number = 0;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
@@ -4211,7 +4214,7 @@ Character *get_mob_vis(Character *ch, char *name)
     return (0);
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match, &number, &j, &tmp](CharacterPtr const &i)
                         {
     if (number == 1)
     {
@@ -4289,7 +4292,7 @@ Object *get_objindex_vnum(QString vnum_str)
   return get_objindex_vnum(get_vnum(vnum_str));
 }
 
-Character *get_random_mob_vnum(int vnum)
+CharacterPtr get_random_mob_vnum(int vnum)
 {
   int num = vnum;
   int total = DC::getInstance()->mob_index[num].qty;
@@ -4297,7 +4300,7 @@ Character *get_random_mob_vnum(int vnum)
 
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&total, &which, &num](CharacterPtr const &i)
                         {
 		if(i->isNonPlayer() && i->mobdata->vnum_ == num)
 		{
@@ -4317,12 +4320,12 @@ Character *get_random_mob_vnum(int vnum)
   return nullptr;
 }
 
-Character *get_mob_vnum(int vnum)
+CharacterPtr get_mob_vnum(int vnum)
 {
   int number = vnum;
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&number](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&number](CharacterPtr const &i)
                         {
 		if(i->isNonPlayer() && i->mobdata->vnum_ == number) {
 			return true;
@@ -4334,20 +4337,20 @@ Character *get_mob_vnum(int vnum)
   }
   return nullptr;
 }
-Character *get_char_vis(Character *ch, const std::string &name)
+CharacterPtr get_char_vis(CharacterPtr ch, const std::string &name)
 {
   return get_char_vis(ch, name.c_str());
 }
 
-Character *get_char_vis(Character *ch, const QString &name)
+CharacterPtr get_char_vis(CharacterPtr ch, const QString &name)
 {
   return get_char_vis(ch, qPrintable(name));
 }
 
-Character *get_char_vis(Character *ch, const char *name)
+CharacterPtr get_char_vis(CharacterPtr ch, const char *name)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
 
   int j = 0, number = 0;
   char tmpname[MAX_INPUT_LENGTH];
@@ -4365,7 +4368,7 @@ Character *get_char_vis(Character *ch, const char *name)
     return (0);
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&number, &tmp, &ch, &partial_match, &j](CharacterPtr const &i)
                         {
 		if (i->in_room == DC::NOWHERE)
 		{
@@ -4411,10 +4414,10 @@ Character *get_char_vis(Character *ch, const char *name)
   return partial_match;
 }
 
-Character *get_pc(QString name)
+CharacterPtr get_pc(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&name](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&name](CharacterPtr const &i)
                         {
                           if (i->isPlayer() && isexact(name, GET_NAME(i)))
                             return true;
@@ -4429,10 +4432,10 @@ Character *get_pc(QString name)
   return nullptr;
 }
 
-Character *get_active_pc(QString name)
+CharacterPtr get_active_pc(QString name)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
   class Connection *d;
 
   partial_match = 0;
@@ -4459,11 +4462,11 @@ Character *get_active_pc(QString name)
   return (partial_match);
 }
 
-Character *
+CharacterPtr
 get_active_pc(const char *name)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
   class Connection *d;
 
   partial_match = 0;
@@ -4490,9 +4493,9 @@ get_active_pc(const char *name)
   return (partial_match);
 }
 
-Character *get_all_pc(char *name)
+CharacterPtr get_all_pc(char *name)
 {
-  Character *i;
+  CharacterPtr i;
   class Connection *d;
 
   for (d = DC::getInstance()->descriptor_list; d; d = d->next)
@@ -4511,12 +4514,12 @@ Character *get_all_pc(char *name)
   return 0;
 }
 
-Character *Character::getVisiblePlayer(QString name)
+CharacterPtr Character::getVisiblePlayer(QString name)
 {
   return get_pc_vis(this, qPrintable(name));
 }
 
-Character *Character::getVisibleCharacter(QString name)
+CharacterPtr Character::getVisibleCharacter(QString name)
 {
   return get_char_vis(this, name.toStdString());
 }
@@ -4526,22 +4529,22 @@ Object *Character::getVisibleObject(QString name)
   return get_obj_vis(this, name.toStdString());
 }
 
-Character *get_pc_vis(Character *ch, std::string name)
+CharacterPtr get_pc_vis(CharacterPtr ch, std::string name)
 {
   return get_pc_vis(ch, name.c_str());
 }
 
-Character *get_pc_vis(Character *ch, QString name)
+CharacterPtr get_pc_vis(CharacterPtr ch, QString name)
 {
   return get_pc_vis(ch, qPrintable(name));
 }
 
-Character *get_pc_vis(Character *ch, const char *name)
+CharacterPtr get_pc_vis(CharacterPtr ch, const char *name)
 {
-  Character *partial_match = 0;
+  CharacterPtr partial_match = 0;
 
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name, &partial_match](CharacterPtr const &i)
                         {
 		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
@@ -4568,10 +4571,10 @@ Character *get_pc_vis(Character *ch, const char *name)
   return partial_match;
 }
 
-Character *get_pc_vis_exact(Character *ch, const char *name)
+CharacterPtr get_pc_vis_exact(CharacterPtr ch, const char *name)
 {
   const auto &character_list = DC::getInstance()->character_list;
-  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](Character *const &i)
+  auto result = find_if(character_list.begin(), character_list.end(), [&ch, &name](CharacterPtr const &i)
                         {
 		if(i->isPlayer() && CAN_SEE(ch, i))
 		{
@@ -4588,10 +4591,10 @@ Character *get_pc_vis_exact(Character *ch, const char *name)
   return 0;
 }
 
-Character *Character::get_active_pc_vis(QString name)
+CharacterPtr Character::get_active_pc_vis(QString name)
 {
-  Character *i;
-  Character *partial_match;
+  CharacterPtr i;
+  CharacterPtr partial_match;
   class Connection *d;
 
   partial_match = 0;
@@ -4624,7 +4627,7 @@ Character *Character::get_active_pc_vis(QString name)
 }
 
 // search by item number
-class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *list, bool blindfighting)
+class Object *get_obj_in_list_vis(CharacterPtr ch, int item_num, class Object *list, bool blindfighting)
 {
   class Object *i;
   int number = item_num;
@@ -4640,7 +4643,7 @@ class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *lis
   return nullptr;
 }
 
-class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *list, bool blindfighting)
+class Object *get_obj_in_list_vis(CharacterPtr ch, QString name, class Object *list, bool blindfighting)
 {
   class Object *i;
   int j, number;
@@ -4662,14 +4665,14 @@ class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *lis
   return (0);
 }
 
-class Object *get_obj_vis(Character *ch, std::string name, bool loc)
+class Object *get_obj_vis(CharacterPtr ch, std::string name, bool loc)
 {
   /*search the entire world for an object, and return a pointer  */
   return get_obj_vis(ch, name.c_str(), loc);
 }
 
 /*search the entire world for an object, and return a pointer  */
-class Object *get_obj_vis(Character *ch, const char *name, bool loc)
+class Object *get_obj_vis(CharacterPtr ch, const char *name, bool loc)
 {
   class Object *i;
   int j, number;
@@ -4769,7 +4772,7 @@ class Object *create_money(int amount)
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, class Object **tar_obj, bool verbose)
+int generic_find(const char *arg, int bitvector, CharacterPtr ch, CharacterPtr *tar_ch, class Object **tar_obj, bool verbose)
 {
   static const char *ignore[] = {"the", "in", "\n"};
 
@@ -4982,7 +4985,7 @@ void Character::swap_hate_memory(void)
   }
 }
 
-int hates_someone(Character *ch)
+int hates_someone(CharacterPtr ch)
 {
   if (!ch->isNonPlayer())
     return 0;
@@ -4990,7 +4993,7 @@ int hates_someone(Character *ch)
   return (ch->mobdata->hated != nullptr);
 }
 
-int fears_someone(Character *ch)
+int fears_someone(CharacterPtr ch)
 {
   if (!ch->isNonPlayer())
     return 0;
@@ -4998,7 +5001,7 @@ int fears_someone(Character *ch)
   return !ch->mobdata->fears_.isEmpty();
 }
 
-void remove_memory(Character *ch, char type, Character *vict)
+void remove_memory(CharacterPtr ch, char type, CharacterPtr vict)
 {
   char *temp = nullptr;
   char *curr = nullptr;
@@ -5029,11 +5032,11 @@ void remove_memory(Character *ch, char type, Character *vict)
     ch->mobdata->fears_.clear();
 }
 
-void room_mobs_only_hate(Character *ch)
+void room_mobs_only_hate(CharacterPtr ch)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
-  for_each(character_list.begin(), character_list.end(), [&ch](Character *vict)
+  for_each(character_list.begin(), character_list.end(), [&ch](CharacterPtr vict)
            {
 		if ((!ARE_GROUPED(ch, vict)) && (ch->in_room == vict->in_room) &&
 				(vict != ch) && !isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE)) {
@@ -5042,7 +5045,7 @@ void room_mobs_only_hate(Character *ch)
 		} });
 }
 
-void remove_memory(Character *ch, char type)
+void remove_memory(CharacterPtr ch, char type)
 {
   if (!ch || !ch->mobdata)
     return;
@@ -5099,7 +5102,7 @@ void Character::add_memory(QString victim_name, char type)
 }
 
 // function for charging moves, to make it easier to have skills that impact ALL(such as vigor)
-bool charge_moves(Character *ch, int skill, double modifier)
+bool charge_moves(CharacterPtr ch, int skill, double modifier)
 {
   return ch->charge_moves(skill, modifier);
 }

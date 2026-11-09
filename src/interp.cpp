@@ -69,8 +69,8 @@
 
 #define SKILL_HIDE 337
 
-int clan_guard(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner);
-int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
+int clan_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner);
+int check_ethereal_focus(CharacterPtr ch, int trigger_type); // class/cl_mage.cpp
 const char *fillwords[] =
     {
         "in",
@@ -82,7 +82,7 @@ const char *fillwords[] =
         "to",
         "\n"};
 
-int do_motd(Character *ch, char *arg, cmd_t cmd)
+int do_motd(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   extern char motd[];
 
@@ -90,7 +90,7 @@ int do_motd(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_imotd(Character *ch, char *arg, cmd_t cmd)
+int do_imotd(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   extern char imotd[];
 
@@ -101,14 +101,14 @@ int do_imotd(Character *ch, char *arg, cmd_t cmd)
 class LogCommand
 {
   bool logged_{};
-  Character *ch_{};
+  CharacterPtr ch_{};
   QString command_{};
   command_return_t rc_{};
   QString rc_reason_{};
   Timer command_duration_{};
 
 public:
-  explicit LogCommand(QString command, Character *ch) : command_(command), ch_(ch)
+  explicit LogCommand(QString command, CharacterPtr ch) : command_(command), ch_(ch)
   {
     if (ch_ && ch_->isPlayer() &&
         (isSet(ch_->player->punish, PUNISH_LOG) ||
@@ -668,7 +668,7 @@ int search_blocknolow(char *arg, const char **list, bool exact)
   return (-1);
 }
 
-int do_boss(Character *ch, char *arg, cmd_t cmd)
+int do_boss(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[200];
   int x;
@@ -1226,7 +1226,7 @@ void chop_half(char *str, char *arg1, char *arg2)
 command_return_t Character::special(QString arguments, cmd_t cmd)
 {
   class Object *i;
-  Character *k;
+  CharacterPtr k;
   int j;
   int retval;
 

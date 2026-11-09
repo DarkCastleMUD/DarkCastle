@@ -81,10 +81,10 @@ vault_search_parameter::~vault_search_parameter()
 int total_vaults = 0;
 int get_line(FILEPtr fl, char *buf);
 
-Character *find_owner(QString name);
-void vault_log(Character *ch, QString owner);
+CharacterPtr find_owner(QString name);
+void vault_log(CharacterPtr ch, QString owner);
 QString clanVName(quint64 clan_id);
-void vault_search_usage(Character *ch);
+void vault_search_usage(CharacterPtr ch);
 
 vault_data *has_vault(QString name)
 {
@@ -93,7 +93,7 @@ vault_data *has_vault(QString name)
   for (vault = vault_table; vault; vault = vault->next)
     if (vault && !name.compare(vault->owner, Qt::CaseInsensitive))
       return vault;
-  Character *ch = find_owner(name);
+  CharacterPtr ch = find_owner(name);
   if (ch && ch->getLevel() >= 10)
   {
     add_new_vault(GET_NAME(ch), 0);
@@ -141,7 +141,7 @@ void save_vault(QString name)
   if (!(vault = has_vault(name)))
     return;
 
-  Character *ch = find_owner(name);
+  CharacterPtr ch = find_owner(name);
   if (ch)
     if (vault->size < ch->getLevel() * 10)
       vault->size = ch->getLevel() * 10;
@@ -269,7 +269,7 @@ char *vault_usage = "Syntax: vault <list | balance> [vault owner]\n"
 
 char *imm_vault_usage = "        vault <stats> [name]\n";
 
-int do_vault(Character *ch, char *argument, cmd_t cmd)
+int do_vault(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH]{}, arg1[MAX_INPUT_LENGTH]{}, arg2[MAX_INPUT_LENGTH]{};
 
@@ -1267,7 +1267,7 @@ QString clanVName(quint64 clan_id)
   return QStringLiteral("Clan%1").arg(clan_id);
 }
 
-bool DC::has_vault_access(Character *ch, vault_data *vault)
+bool DC::has_vault_access(CharacterPtr ch, vault_data *vault)
 {
   if (ch == nullptr)
   {
@@ -1304,7 +1304,7 @@ bool DC::has_vault_access(Character *ch, vault_data *vault)
 bool DC::has_vault_access(QString name, vault_data *vault)
 {
   Connection d{};
-  Character *ch = get_pc(name);
+  CharacterPtr ch = get_pc(name);
 
   if (!ch)
   {
@@ -1439,7 +1439,7 @@ class Object *exists_in_vault(vault_data *vault, Object *obj)
   return 0;
 }
 
-void vault_get(Character *ch, QString object, QString owner)
+void vault_get(CharacterPtr ch, QString object, QString owner)
 {
   QString sbuf;
   char obj_list[50][100];
@@ -1718,7 +1718,7 @@ int search_vault_by_vnum(int vnum, vault_data *vault)
   return 0;
 }
 
-void vault_deposit(Character *ch, unsigned int amount, char *owner)
+void vault_deposit(CharacterPtr ch, unsigned int amount, char *owner)
 {
   if (!ch)
     return;
@@ -1774,7 +1774,7 @@ void vault_deposit(Character *ch, unsigned int amount, char *owner)
   }
 }
 
-void vault_withdraw(Character *ch, unsigned int amount, char *owner)
+void vault_withdraw(CharacterPtr ch, unsigned int amount, char *owner)
 {
   if (!ch)
     return;
@@ -1827,7 +1827,7 @@ void vault_withdraw(Character *ch, unsigned int amount, char *owner)
   }
 }
 
-int can_put_in_vault(class Object *obj, int self, vault_data *vault, Character *ch)
+int can_put_in_vault(class Object *obj, int self, vault_data *vault, CharacterPtr ch)
 {
   //  class Object *tmp_obj;
 
@@ -1893,7 +1893,7 @@ int can_put_in_vault(class Object *obj, int self, vault_data *vault, Character *
   return 1;
 }
 
-void vault_put(Character *ch, QString object, QString owner)
+void vault_put(CharacterPtr ch, QString object, QString owner)
 {
   if (!ch)
     return;
@@ -2227,7 +2227,7 @@ void add_new_vault(const char *name, int indexonly)
 
   // now create a new vault for the player
 
-  Character *ch = find_owner(name);
+  CharacterPtr ch = find_owner(name);
 
   sprintf(filename, "../vaults/%c/%s.vault", UPPER(*name), name);
   if (!(pvfl = dc_fopen(filename, "w")))
@@ -2264,7 +2264,7 @@ void add_new_vault(const char *name, int indexonly)
   save_vault(name);
 }
 
-Character *find_owner(QString name)
+CharacterPtr find_owner(QString name)
 {
   const auto &character_list = DC::getInstance()->character_list;
   const auto &result = find_if(character_list.begin(), character_list.end(), [&name](const auto &ch)
@@ -2287,7 +2287,7 @@ Character *find_owner(QString name)
   return nullptr;
 }
 
-void vault_log(Character *ch, QString owner)
+void vault_log(CharacterPtr ch, QString owner)
 {
   if (owner.isEmpty())
     return;
@@ -2395,8 +2395,8 @@ void logvault(QString message, QString name)
   // system(cmd);
 }
 
-int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                     Character *owner)
+int sleazy_vault_guy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+                     CharacterPtr owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
     return ReturnValue::eFAILURE;
@@ -2525,7 +2525,7 @@ int sleazy_vault_guy(Character *ch, class Object *obj, cmd_t cmd, const char *ar
   return ReturnValue::eFAILURE;
 }
 
-void vault_search_usage(Character *ch)
+void vault_search_usage(CharacterPtr ch)
 {
   ch->sendln("Usage: vault search [ keyword <keyword> ] | [ level <levels> ] | ...");
   ch->sendln("keyword <keyword>  -  Single word keyword. Can be used multiple times.");
@@ -2537,7 +2537,7 @@ void vault_search_usage(Character *ch)
   ch->sendln("vault search keyword staff level 40-60.\n");
 }
 
-int vault_search(Character *ch, const char *args)
+int vault_search(CharacterPtr ch, const char *args)
 {
   int objects = 0;
   bool owner_shown = false;

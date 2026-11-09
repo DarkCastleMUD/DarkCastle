@@ -70,8 +70,8 @@ static const int COREDUMP_MAX = 10;
 
 #define MOB_WAIT_STATE(ch) ((ch)->deaths)
 
-int GET_WAIT(Character *ch);
-void WAIT_STATE(Character *ch, int cycle);
+int GET_WAIT(CharacterPtr ch);
+void WAIT_STATE(CharacterPtr ch, int cycle);
 
 #define REM_WAIT_STATE(czh, cycle) (((czh)->desc) ? (czh)->desc->wait < (cycle) ? (czh)->desc->wait = 0 : (czh)->desc->wait -= (cycle) : czh->isNonPlayer() ? MOB_WAIT_STATE((czh)) < (cycle) ? MOB_WAIT_STATE((czh)) = 0 : MOB_WAIT_STATE((czh)) -= (cycle) \
                                                                                                                                                             : 0)
@@ -84,7 +84,7 @@ void WAIT_STATE(Character *ch, int cycle);
 #define SKILL_INCREASE_HARD 300
 void check_timer();
 
-bool is_hiding(Character *ch, Character *vict);
+bool is_hiding(CharacterPtr ch, CharacterPtr vict);
 
 // End defines for gradual skill increase code
 
@@ -313,7 +313,7 @@ auto getBitvector(auto value)
 
 #define IS_ANONYMOUS(ch) (ch->isNonPlayer() ? 1 : ((ch->getLevel() >= 101) ? 0 : isSet((ch)->player->toggles, Player::PLR_ANONYMOUS)))
 /*
-inline const short IS_ANONYMOUS(Character *ch)
+inline const short IS_ANONYMOUS(CharacterPtr ch)
 {
   if (ch->isNonPlayer())
      // this should really never be called on mobs
@@ -471,9 +471,9 @@ MatchType str_n_nosp_cmp_begin(T arg1, T arg2)
   }
 }
 
-void clan_death(char *b, Character *ch);
+void clan_death(char *b, CharacterPtr ch);
 
-int move_char(Character *ch, int dest, bool stop_all_fighting = true);
+int move_char(CharacterPtr ch, int dest, bool stop_all_fighting = true);
 // int number(int from, int to);
 
 int dice(int number, int size, QRandomGenerator *rng = QRandomGenerator::global());
@@ -559,22 +559,22 @@ int consttype(char *search_str, const char *names[]);
 int consttype(QString search_str, QStringList names);
 QString constindex(const qsizetype index, const QStringList names);
 time_info_data mud_time_passed(time_t t2, time_t t1);
-bool circle_follow(Character *ch, Character *victim);
-bool ARE_GROUPED(Character *sub, Character *obj);
-bool ARE_CLANNED(Character *sub, Character *obj);
+bool circle_follow(CharacterPtr ch, CharacterPtr victim);
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
+bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj);
 // bool is_number(const char *str);
 bool is_number(QString str);
-void gain_condition(Character *ch, int condition, int value);
-void set_fighting(Character *ch, Character *vict);
-void stop_fighting(Character *ch, int clearlag = 1);
-int do_simple_move(Character *ch, cmd_t cmd, int following);
-int32_t mana_limit(Character *ch);
-int32_t ki_limit(Character *ch);
-int32_t hit_limit(Character *ch);
+void gain_condition(CharacterPtr ch, int condition, int value);
+void set_fighting(CharacterPtr ch, CharacterPtr vict);
+void stop_fighting(CharacterPtr ch, int clearlag = 1);
+int do_simple_move(CharacterPtr ch, cmd_t cmd, int following);
+int32_t mana_limit(CharacterPtr ch);
+int32_t ki_limit(CharacterPtr ch);
+int32_t hit_limit(CharacterPtr ch);
 typedef int16_t skill_t;
 QString get_skill_name(int skillnum);
-void gain_exp_regardless(Character *ch, int gain);
-void advance_level(Character *ch, int is_conversion);
+void gain_exp_regardless(CharacterPtr ch, int gain);
+void advance_level(CharacterPtr ch, int is_conversion);
 int close_socket(class Connection *d);
 
 int isexact(std::string arg, std::string namelist);
@@ -589,21 +589,21 @@ int isexact(const char *arg, joining_t &namelist);
 int isprefix(QString str, QString namel);
 void page_string(class Connection *d, const char *str,
                  int keep_internal);
-void gain_exp(Character *ch, int64_t gain);
-void redo_hitpoints(Character *ch); /* Rua's put in  */
-void redo_mana(Character *ch);      /* Rua's put in  */
-void redo_ki(Character *ch);        /* And Urizen*/
+void gain_exp(CharacterPtr ch, int64_t gain);
+void redo_hitpoints(CharacterPtr ch); /* Rua's put in  */
+void redo_mana(CharacterPtr ch);      /* Rua's put in  */
+void redo_ki(CharacterPtr ch);        /* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
 void free_obj(class Object *obj);
 
-int char_from_room(Character *ch, bool stop_fighting);
-int char_from_room(Character *ch);
-void do_start(Character *ch);
+int char_from_room(CharacterPtr ch, bool stop_fighting);
+int char_from_room(CharacterPtr ch);
+void do_start(CharacterPtr ch);
 
-void update_pos(Character *victim);
+void update_pos(CharacterPtr victim);
 void clear_object(class Object *obj);
-void death_cry(Character *ch);
+void death_cry(CharacterPtr ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
 
@@ -614,13 +614,13 @@ void night_watchman(void);
 int file_to_string(const char *name, char *buf);
 
 #ifdef USE_SQL
-void save_char_obj_db(Character *ch);
+void save_char_obj_db(CharacterPtr ch);
 #endif
 
-void unique_scan(Character *victim);
-void char_to_store(Character *ch, class char_file_u4 *st, time_data &tmpage);
-bool obj_to_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos);
-void check_idling(Character *ch);
+void unique_scan(CharacterPtr victim);
+void char_to_store(CharacterPtr ch, class char_file_u4 *st, time_data &tmpage);
+bool obj_to_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos);
+void check_idling(CharacterPtr ch);
 
 enum class follower_reasons_t
 {
@@ -630,38 +630,38 @@ enum class follower_reasons_t
   BROKE_CHARM,       // 3
   BROKE_CHARM_LILITH // 4
 };
-void stop_follower(Character *ch, follower_reasons_t reason = follower_reasons_t::DEFAULT);
-void add_follower(Character *ch, Character *leader, follower_reasons_t reason = follower_reasons_t::DEFAULT);
-bool CAN_SEE(Character *sub, Character *obj, bool noprog = false);
+void stop_follower(CharacterPtr ch, follower_reasons_t reason = follower_reasons_t::DEFAULT);
+void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reason = follower_reasons_t::DEFAULT);
+bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool bf = false);
-bool check_blind(Character *ch);
-void raw_kill(Character *ch, Character *victim);
-void check_killer(Character *ch, Character *victim);
-int map_eq_level(Character *mob);
-void disarm(Character *ch, Character *victim);
-int shop_keeper(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker);
+bool CAN_SEE_OBJ(CharacterPtr sub, class Object *obj, bool bf = false);
+bool check_blind(CharacterPtr ch);
+void raw_kill(CharacterPtr ch, CharacterPtr victim);
+void check_killer(CharacterPtr ch, CharacterPtr victim);
+int map_eq_level(CharacterPtr mob);
+void disarm(CharacterPtr ch, CharacterPtr victim);
+int shop_keeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker);
 void send_to_all(QString messg);
-void ansi_color(const char *txt, Character *ch);
-void send_to_char(QString messg, Character *ch);
-void send_to_char_nosp(const char *messg, Character *ch);
-void send_to_char_nosp(QString messg, Character *ch);
-void send_to_room(QString messg, room_t room, bool awakeonly = false, Character *nta = nullptr);
-void record_track_data(Character *ch, cmd_t cmd);
+void ansi_color(const char *txt, CharacterPtr ch);
+void send_to_char(QString messg, CharacterPtr ch);
+void send_to_char_nosp(const char *messg, CharacterPtr ch);
+void send_to_char_nosp(QString messg, CharacterPtr ch);
+void send_to_room(QString messg, room_t room, bool awakeonly = false, CharacterPtr nta = nullptr);
+void record_track_data(CharacterPtr ch, cmd_t cmd);
 ssize_t write_to_descriptor_fd(int desc, char *txt);
 void write_to_q(QByteArray txt, std::queue<QByteArray> &queue);
-int use_mana(Character *ch, int sn);
+int use_mana(CharacterPtr ch, int sn);
 void automail(char *name);
 bool file_exists(const char *);
-void util_archive(const char *, Character *);
-void util_unarchive(char *, Character *);
-bool is_busy(Character *ch);
-int is_ignoring(const Character *const ch, const Character *const i);
-void colorCharSend(char *s, Character *ch);
-void send_to_char_regardless(QString messg, Character *ch);
-void send_to_char_regardless(std::string messg, Character *ch);
-int csendf(Character *ch, const char *arg, ...);
+void util_archive(const char *, CharacterPtr);
+void util_unarchive(char *, CharacterPtr);
+bool is_busy(CharacterPtr ch);
+int is_ignoring(const CharacterPtr ch, const CharacterPtr i);
+void colorCharSend(char *s, CharacterPtr ch);
+void send_to_char_regardless(QString messg, CharacterPtr ch);
+void send_to_char_regardless(std::string messg, CharacterPtr ch);
+int csendf(CharacterPtr ch, const char *arg, ...);
 
 template <typename T>
 bool check_range_valid_and_convert(T &value, QString buf, T begin, T end)
@@ -699,23 +699,23 @@ bool check_range_valid_and_convert(T &value, QString buf, T begin, T end)
 }
 
 bool check_valid_and_convert(int &value, char *buf);
-void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t value[]);
-void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint32_t &value);
-void parse_bitstrings_into_int(QStringList bits, QString strings, Character *ch, uint32_t &value);
-void parse_bitstrings_into_int(const char *bits[], const char *strings, Character *ch, uint16_t &value);
-void parse_bitstrings_into_int(const char *bits[], std::string strings, Character *ch, uint32_t value[]);
-void parse_bitstrings_into_int(const char *bits[], std::string strings, Character *ch, uint32_t &value);
-void parse_bitstrings_into_int(const char *bits[], std::string strings, Character *ch, uint16_t &value);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, CharacterPtr ch, uint32_t value[]);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, CharacterPtr ch, uint32_t &value);
+void parse_bitstrings_into_int(QStringList bits, QString strings, CharacterPtr ch, uint32_t &value);
+void parse_bitstrings_into_int(const char *bits[], const char *strings, CharacterPtr ch, uint16_t &value);
+void parse_bitstrings_into_int(const char *bits[], std::string strings, CharacterPtr ch, uint32_t value[]);
+void parse_bitstrings_into_int(const char *bits[], std::string strings, CharacterPtr ch, uint32_t &value);
+void parse_bitstrings_into_int(const char *bits[], std::string strings, CharacterPtr ch, uint16_t &value);
 int contains_no_trade_item(Object *obj);
-int contents_cause_unique_problem(Object *obj, Character *vict);
+int contents_cause_unique_problem(Object *obj, CharacterPtr vict);
 bool check_make_camp(room_t);
-int get_leadership_bonus(Character *);
+int get_leadership_bonus(CharacterPtr);
 void update_make_camp_and_leadership(void);
 bool is_valid_name(QString name);
 
-void mob_suprised_sayings(Character *ch, Character *aggressor);
+void mob_suprised_sayings(CharacterPtr ch, CharacterPtr aggressor);
 
-int get_stat(Character *ch, attribute_t stat);
+int get_stat(CharacterPtr ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(const QStringView str);
@@ -834,13 +834,13 @@ public:
   mprog_throw_type *next;
   bool mob;  // Mob or object.
   char *var; // temporary variable
-  Character *actor;
+  CharacterPtr actor;
   Object *obj;
   void *vo;
-  Character *rndm; // $r
+  CharacterPtr rndm; // $r
 
   // new mppause crap below..
-  Character *tMob;   // it should NOT throw it to another similar mob :P
+  CharacterPtr tMob; // it should NOT throw it to another similar mob :P
   int ifchecks[256]; // Let's hope noone nests more ifs than that.
   int startPos;
   int cPos;
@@ -859,7 +859,7 @@ public:
   char *program;
 };
 
-int handle_poisoned_weapon_attack(Character *ch, Character *vict, int percent);
+int handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, int percent);
 
 enum BACKUP_TYPE
 {
@@ -884,16 +884,16 @@ std::string get_isr_string(uint32_t, int8_t);
 bool file_exists(std::string filename);
 bool file_exists(QString filename);
 bool char_file_exists(std::string name);
-void show_obj_class_size_mini(Object *obj, Character *ch);
+void show_obj_class_size_mini(Object *obj, CharacterPtr ch);
 const char *item_condition(class Object *obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
-bool identify(Character *ch, Object *obj);
-extern void end_oproc(Character *ch, Trace trace = Trace("unknown"));
-QByteArray handle_ansi(QByteArray, Character *ch);
-QString handle_ansi(QString, Character *ch);
-std::string handle_ansi(std::string s, Character *ch);
-char *handle_ansi_(char *s, Character *ch);
+bool identify(CharacterPtr ch, Object *obj);
+extern void end_oproc(CharacterPtr ch, Trace trace = Trace("unknown"));
+QByteArray handle_ansi(QByteArray, CharacterPtr ch);
+QString handle_ansi(QString, CharacterPtr ch);
+std::string handle_ansi(std::string s, CharacterPtr ch);
+char *handle_ansi_(char *s, CharacterPtr ch);
 void show_string(class Connection *d, const char *input);
 void special_log(QString message);
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);

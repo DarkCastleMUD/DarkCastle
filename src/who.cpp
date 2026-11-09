@@ -33,7 +33,7 @@
 // TODO - Figure out the weird bug for why when I do "who <class>" a random player
 //        from another class will pop up who name is DC::NOWHERE near matching.
 
-clan_data *get_clan(Character *);
+clan_data *get_clan(CharacterPtr);
 
 // #define GWHOBUFFERSIZE   (MAX_STRING_LENGTH*2)
 // char gWhoBuffer[GWHOBUFFERSIZE];
@@ -74,11 +74,12 @@ void clear_who_buffer()
   gWhoBufferCurSize = 0; // update the size
 }
 
-int do_whogroup(Character *ch, char *argument, cmd_t cmd)
+int do_whogroup(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   Connection *d;
-  Character *k, *i;
+  CharacterPtr k;
+  CharacterPtr i;
   follow_type *f;
   char target[MAX_INPUT_LENGTH];
   char tempbuffer[800];
@@ -200,10 +201,10 @@ int do_whogroup(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_whosolo(Character *ch, char *argument, cmd_t cmd)
+int do_whosolo(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   Connection *d;
-  Character *i;
+  CharacterPtr i;
   char tempbuffer[800];
   char buf[MAX_INPUT_LENGTH + 1];
   bool foundtarget;
@@ -383,7 +384,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
       continue;
     }
 
-    Character *i{};
+    CharacterPtr i{};
     if (d->original)
     {
       i = d->original;
@@ -577,7 +578,7 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_whoarena(Character *ch, char *argument, cmd_t cmd)
+int do_whoarena(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int count = 0;
   clan_data *clan;
@@ -634,7 +635,7 @@ int do_whoarena(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_where(Character *ch, char *argument, cmd_t cmd)
+int do_where(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   class Connection *d;
   int zonenumber;

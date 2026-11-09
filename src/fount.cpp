@@ -25,7 +25,7 @@
  * Figures out if a fountain is present in the room                       *
  *************************************************************************/
 
-int FOUNTAINisPresent(Character *ch)
+int FOUNTAINisPresent(CharacterPtr ch)
 {
   class Object *tmp;
   bool found = false;
@@ -46,7 +46,7 @@ int FOUNTAINisPresent(Character *ch)
  *  Fill skins and any other drink containers.                           *
  ************************************************************************/
 
-int do_fill(Character *ch, char *argument, cmd_t cmd)
+int do_fill(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   class Object *to_obj;

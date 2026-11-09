@@ -20,7 +20,7 @@ typedef class event_brief eventBrief;
 typedef class event_bucket eventBucket;
 typedef class event_handler eventHandler;
 typedef void (*eventFunc)(eventParams *);
-typedef int (*eventKiller)(Character *, eventData *);
+typedef int (*eventKiller)(CharacterPtr, eventData *);
 
 #define EVT_NORMAL 0
 #define EVT_DEAD 1
@@ -36,9 +36,9 @@ public:
 class event_params
 {
 public:
-  Character *ch;
+  CharacterPtr ch;
   class Object *obj;
-  Character *vict;
+  CharacterPtr vict;
   char str[1024];
   int num;
   void *extra;
@@ -73,9 +73,9 @@ eventData *getNewEvent();
 void initHandler();
 void queueEvent(eventData *event, int time);
 void processEvents();
-void killBrief(Character *ch, eventFunc func);
-eventBrief *addBrief(Character *ch, eventData *event);
-eventBrief *foundBrief(Character *ch, eventFunc func);
-void killCharEvents(Character *ch);
+void killBrief(CharacterPtr ch, eventFunc func);
+eventBrief *addBrief(CharacterPtr ch, eventData *event);
+eventBrief *foundBrief(CharacterPtr ch, eventFunc func);
+void killCharEvents(CharacterPtr ch);
 
 #endif

@@ -83,8 +83,8 @@ extern char *spell_wear_off_msg[];
 int spl_lvl(int lev);
 
 // Extern procedures
-void make_dust(Character *ch);
-int say_spell(Character *ch, int si, room_t room = 0);
+void make_dust(CharacterPtr ch);
+int say_spell(CharacterPtr ch, int si, room_t room = 0);
 
 #if (0)
 uint8_t beats;               /* Waiting time after spell     */
@@ -924,7 +924,7 @@ int dam_percent(int learned, int damage)
   return damage * percent / 100.0;
 }
 
-int use_mana(Character *ch, int sn)
+int use_mana(CharacterPtr ch, int sn)
 {
   int base = spell_info[sn].min_usesmana();
 
@@ -963,7 +963,7 @@ int use_mana(Character *ch, int sn)
 void affect_update(int32_t duration_type)
 {
   static affected_type *af, *next_af_dude;
-  void update_char_objects(Character * ch); /* handler.c */
+  void update_char_objects(CharacterPtr ch); /* handler.c */
 
   if (duration_type != DC::PULSE_REGEN && duration_type != DC::PULSE_TIMER && duration_type != DC::PULSE_VIOLENCE && duration_type != DC::PULSE_TIME) // Default
     return;
@@ -997,8 +997,8 @@ void affect_update(int32_t duration_type)
           af->modifier = 0 - af->duration;
         if (!(af->caster).empty()) // means bard song
         {
-          Character *get_pc_room_vis_exact(Character * ch, const char *name);
-          Character *bard = get_pc_room_vis_exact(i, (af->caster).c_str());
+          CharacterPtr get_pc_room_vis_exact(CharacterPtr ch, const char *name);
+          CharacterPtr bard = get_pc_room_vis_exact(i, (af->caster).c_str());
           if (!bard || !ARE_GROUPED(i, bard))
           {
             i->sendln("Away from the music, the effect weakens...");
@@ -1048,7 +1048,7 @@ void affect_update(int32_t duration_type)
 }
 
 // Sets any ISR's that go with a spell..  (ISR's arent saved)
-void isr_set(Character *ch)
+void isr_set(CharacterPtr ch)
 {
   // char buf[100];
   static affected_type *afisr;
@@ -1072,7 +1072,7 @@ void isr_set(Character *ch)
   }
 }
 
-bool many_charms(Character *ch)
+bool many_charms(CharacterPtr ch)
 {
   follow_type *k;
   for (k = ch->followers; k; k = k->next)
@@ -1084,9 +1084,9 @@ bool many_charms(Character *ch)
   return false;
 }
 /* Stop the familiar without a master floods*/
-void extractFamiliar(Character *ch)
+void extractFamiliar(CharacterPtr ch)
 {
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
   for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
@@ -1101,7 +1101,7 @@ void extractFamiliar(Character *ch)
   extract_char(victim, true);
 }
 
-bool any_charms(Character *ch)
+bool any_charms(CharacterPtr ch)
 {
   return many_charms(ch);
   /*
@@ -1122,9 +1122,9 @@ bool any_charms(Character *ch)
 
 // check if making ch follow victim will create an illegal
 // follow "Loop/circle"
-bool circle_follow(Character *ch, Character *victim)
+bool circle_follow(CharacterPtr ch, CharacterPtr victim)
 {
-  Character *k;
+  CharacterPtr k;
 
   for (k = victim; k; k = k->master)
   {
@@ -1137,7 +1137,7 @@ bool circle_follow(Character *ch, Character *victim)
 
 // Called when stop following persons, or stopping charm
 // This will NOT do if a character quits/dies!!
-void stop_follower(Character *ch, follower_reasons_t reason)
+void stop_follower(CharacterPtr ch, follower_reasons_t reason)
 {
   follow_type *j, *k;
 
@@ -1236,10 +1236,10 @@ void stop_follower(Character *ch, follower_reasons_t reason)
 }
 
 /* Called when a character that follows/is followed dies */
-void die_follower(Character *ch)
+void die_follower(CharacterPtr ch)
 {
   follow_type *j, *k;
-  Character *zombie;
+  CharacterPtr zombie;
 
   if (ch->master)
     stop_follower(ch);
@@ -1270,7 +1270,7 @@ void die_follower(Character *ch)
 
 /* Do NOT call ths before having checked if a circle of followers */
 /* will arise. CH will follow leader                               */
-void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
+void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reason)
 {
   follow_type *k;
 
@@ -1303,13 +1303,13 @@ void add_follower(Character *ch, Character *leader, follower_reasons_t reason)
   }
 }
 
-int say_spell(Character *ch, int si, room_t room)
+int say_spell(CharacterPtr ch, int si, room_t room)
 {
   char buf[MAX_STRING_LENGTH], splwd[MAX_BUF_LENGTH];
   char buf2[MAX_STRING_LENGTH];
 
   int j, offs, retval = 0;
-  Character *temp_char;
+  CharacterPtr temp_char;
 
   class syllable
   {
@@ -1390,7 +1390,7 @@ int say_spell(Character *ch, int si, room_t room)
   sprintf(buf2, "$n utters the words, '%s'", buf);
   sprintf(buf, "$n utters the words, '%s'", spells[si - 1]);
 
-  Character *people;
+  CharacterPtr people;
   if (room > 0)
   {
     people = DC::getInstance()->world[room].people;
@@ -1429,7 +1429,7 @@ int say_spell(Character *ch, int si, room_t room)
 // returns 0 or positive if saving throw is made. The more, the higher it was made.
 // return -number of failure.   The lower, the more it was failed.
 //
-int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type)
+int saves_spell(CharacterPtr ch, CharacterPtr vict, int spell_base, int16_t save_type)
 {
   double save = 0;
 
@@ -1494,7 +1494,7 @@ char *skip_spaces(char *string)
 /*
     Release command.
 */
-int do_release(Character *ch, char *argument, cmd_t cmd)
+int do_release(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type *aff, *aff_next;
   bool printed = false;
@@ -1590,7 +1590,7 @@ int do_release(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int skill_value(Character *ch, int skillnum, int min = 33)
+int skill_value(CharacterPtr ch, int skillnum, int min = 33)
 {
   if (ch->skills.contains(skillnum))
   {
@@ -1618,7 +1618,7 @@ int get_difficulty(int skillnum)
   return 0;
 }
 
-bool Character::skill_success(Character *victim, int skillnum, int mod)
+bool Character::skill_success(CharacterPtr victim, int skillnum, int mod)
 {
   //  extern int stat_mod[];
   //  int modifier = 0;
@@ -1778,12 +1778,12 @@ bool Character::skill_success(Character *victim, int skillnum, int mod)
   }
 }
 
-bool skill_success(Character *ch, Character *victim, int skillnum, int mod)
+bool skill_success(CharacterPtr ch, CharacterPtr victim, int skillnum, int mod)
 {
   return ch->skill_success(victim, skillnum, mod);
 }
 
-void set_conc_loss(Character *ch, int spl)
+void set_conc_loss(CharacterPtr ch, int spl)
 {
   affected_type af;
   af.type = CONC_LOSS_FIXER;
@@ -1795,7 +1795,7 @@ void set_conc_loss(Character *ch, int spl)
   affect_to_char(ch, &af);
   return;
 }
-bool check_conc_loss(Character *ch, int spl)
+bool check_conc_loss(CharacterPtr ch, int spl)
 {
   affected_type *af;
   int afspl;
@@ -1813,10 +1813,10 @@ bool check_conc_loss(Character *ch, int spl)
 }
 
 // Assumes that *argument does start with first letter of chopped string
-int do_cast(Character *ch, char *argument, cmd_t cmd)
+int do_cast(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   class Object *tar_obj;
-  Character *tar_char;
+  CharacterPtr tar_char;
   char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
   int qend, spl, i, learned;
   bool target_ok;
@@ -2459,7 +2459,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
 
         if (group_spell)
         {
-          Character *leader;
+          CharacterPtr leader;
           if (ch->master)
             leader = ch->master;
           else
@@ -2714,7 +2714,7 @@ int do_cast(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_skills(Character *ch, char *arg, cmd_t cmd)
+int do_skills(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -2935,7 +2935,7 @@ int do_skills(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_songs(Character *ch, char *arg, cmd_t cmd)
+int do_songs(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
 
@@ -2962,7 +2962,7 @@ int do_songs(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_spells(Character *ch, char *arg, cmd_t cmd)
+int do_spells(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[16384];
   char buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH];
@@ -3151,7 +3151,7 @@ int Character::has_skill(skill_t skill)
   return 0;
 }
 
-int has_skill(Character *ch, skill_t skill)
+int has_skill(CharacterPtr ch, skill_t skill)
 {
   return ch->has_skill(skill);
 }

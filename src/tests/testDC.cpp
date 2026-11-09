@@ -1451,7 +1451,7 @@ private slots:
 
     auto count = 0;
     QStringList names = {QStringLiteral("Agis"), QStringLiteral("Thalanil"), QStringLiteral("Elluin"), QStringLiteral("Dakath"), QStringLiteral("Reptar")};
-    for (Character *ch : {p1, g1, g2, g3, g4})
+    for (CharacterPtr ch : {p1, g1, g2, g3, g4})
     {
       ch->setName(names.value(count++));
       ch->plat = 1111;
@@ -1494,7 +1494,7 @@ private slots:
     QCOMPARE(do_look(p1, ""), ReturnValue::eSUCCESS);
     p1->desc->output = {};
 
-    for (Character *ch : {g1, g2, g3, g4})
+    for (CharacterPtr ch : {g1, g2, g3, g4})
     {
       ch->desc->output = {};
       p1->desc->output = {};

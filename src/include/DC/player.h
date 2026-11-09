@@ -5,11 +5,9 @@
 | Description: This file defines the player vectors..punishment, specials,
 |   etc...
 */
+#include "DC/types.h"
 #include <qtypes.h> // for quint64
 #include <stdint.h> // for uint8_t
-
-class Character;    // lines 17-17
-
 /************************************************************************
 | Thirst, FULL, etc..
 */
@@ -241,4 +239,4 @@ extern const str_app_type str_app[];
 extern const wis_app_type wis_app[];
 
 /* Various function declarations */
-int get_saves(Character *ch, int savetype);
+int get_saves(CharacterPtr ch, int savetype);

@@ -32,9 +32,9 @@
 #include "DC/common.h"
 #include "DC/structs.h"
 
-int do_abandon(Character *ch, char *argument, cmd_t cmd)
+int do_abandon(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *k;
+  CharacterPtr k;
   char buf[MAX_INPUT_LENGTH + 1];
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -82,7 +82,7 @@ int do_abandon(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_found(Character *ch, char *argument, cmd_t cmd)
+int do_found(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
 
@@ -142,7 +142,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 {
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;
-  Character *k = nullptr;
+  CharacterPtr k = nullptr;
   follow_type *f = nullptr;
 
   if (arguments.isEmpty())
@@ -255,7 +255,7 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void setup_group_buf(char *report, Character *j, Character *i)
+void setup_group_buf(char *report, CharacterPtr j, CharacterPtr i)
 {
   if (j->isNonPlayer() || (IS_ANONYMOUS(j) && (i->clan != j->clan || !i->clan)))
   {
@@ -317,11 +317,13 @@ void setup_group_buf(char *report, Character *j, Character *i)
   }
 }
 
-int do_group(Character *ch, char *argument, cmd_t cmd)
+int do_group(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[256];
   char buf[256], report[256];
-  Character *victim, *k, *j;
+  CharacterPtr victim;
+  CharacterPtr k;
+  CharacterPtr j;
   follow_type *f;
   bool found;
 
@@ -433,11 +435,12 @@ int do_group(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_promote(Character *ch, char *argument, cmd_t cmd)
+int do_promote(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[250];
-  Character *new_new_leader, *k;
+  CharacterPtr new_new_leader;
+  CharacterPtr k;
   follow_type *f, *next_f;
 
   one_argument(argument, name);
@@ -538,11 +541,12 @@ int do_promote(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_disband(Character *ch, char *argument, cmd_t cmd)
+int do_disband(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
   char buf[200];
-  Character *adios, *k;
+  CharacterPtr adios;
+  CharacterPtr k;
   follow_type *f, *next_f;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -642,10 +646,10 @@ int do_disband(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_follow(Character *ch, char *argument, cmd_t cmd)
+int do_follow(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH + 1];
-  Character *leader;
+  CharacterPtr leader;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -729,7 +733,7 @@ int do_follow(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd)
+command_return_t do_autojoin(CharacterPtr ch, std::string str_arguments, cmd_t cmd)
 {
   if (ch->player == nullptr)
   {
@@ -771,11 +775,11 @@ command_return_t do_autojoin(Character *ch, std::string str_arguments, cmd_t cmd
   return ReturnValue::eSUCCESS;
 }
 
-std::vector<Character *> Character::getFollowers(void)
+std::vector<CharacterPtr> Character::getFollowers(void)
 {
-  std::vector<Character *> followers = {};
+  std::vector<CharacterPtr> followers = {};
   follow_type *f = {};
-  Character *leader = nullptr;
+  CharacterPtr leader = nullptr;
 
   if (!IS_AFFECTED(this, AFF_GROUP))
   {

@@ -50,7 +50,7 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 
-int get_max_stat_bonus(Character *ch, int attrs)
+int get_max_stat_bonus(CharacterPtr ch, int attrs)
 {
   int bonus = 0;
 
@@ -94,7 +94,7 @@ int get_max_stat_bonus(Character *ch, int attrs)
 }
 
 // List skill maxes.
-int do_maxes(Character *ch, char *argument, cmd_t cmd)
+int do_maxes(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   class_skill_defines *classskill;
@@ -160,7 +160,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Character *victim = get_pc_vis(this, name);
+  CharacterPtr victim = get_pc_vis(this, name);
   if (!victim)
   {
     this->sendln(QStringLiteral("You don't see anyone named '%1'.").arg(name));
@@ -219,9 +219,9 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 }
 
 // take away a command from a god
-int do_revoke(Character *ch, char *arg, cmd_t cmd)
+int do_revoke(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
   char buf[MAX_INPUT_LENGTH];
   char command[MAX_INPUT_LENGTH];
   int i;
@@ -290,7 +290,7 @@ int do_revoke(Character *ch, char *arg, cmd_t cmd)
 
 /* Thunder is currently in wiz_104.c */
 
-int do_wizlock(Character *ch, char *argument, cmd_t cmd)
+int do_wizlock(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   wizlock = !wizlock;
 
@@ -318,9 +318,9 @@ int do_wizlock(Character *ch, char *argument, cmd_t cmd)
 | Side effects: None
 | Returns: None
 */
-int do_chpwd(Character *ch, char *arg, cmd_t cmd)
+int do_chpwd(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[100], buf[50];
 
   /* Verify preconditions */
@@ -355,7 +355,7 @@ int do_chpwd(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_fakelog(Character *ch, char *argument, cmd_t cmd)
+int do_fakelog(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH];
   char lev_str[MAX_INPUT_LENGTH];
@@ -406,7 +406,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     newname[0] = newname[0].toUpper();
   }
 
-  Character *victim = get_pc(oldname);
+  CharacterPtr victim = get_pc(oldname);
   if (!victim)
   {
     send(QStringLiteral("%1 is not in the game.\n").arg(oldname));
@@ -603,7 +603,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-int do_install(Character *ch, char *arg, cmd_t cmd)
+int do_install(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[256], type[256], arg1[256], err[256], arg2[256];
   int range = 0, type_ok = 0, numrooms = 0;
@@ -704,9 +704,9 @@ int do_install(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_range(Character *ch, char *arg, cmd_t cmd)
+int do_range(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[160], buf[160];
   char kind[160];
   char trail[160];
@@ -811,10 +811,10 @@ int do_range(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_metastat(Character *ch, char *argument, cmd_t cmd)
+int do_metastat(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   argument = one_argument(argument, arg);
   if (arg[0] == '\0' || !(victim = get_pc_vis(ch, arg)))
   {
@@ -857,7 +857,7 @@ int do_metastat(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_acfinder(Character *ch, char *argument, cmd_t cmd)
+int do_acfinder(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   argument = one_argument(argument, arg);
@@ -906,7 +906,7 @@ int do_acfinder(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_testhit(Character *ch, char *argument, cmd_t cmd)
+int do_testhit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -966,7 +966,7 @@ void write_array_csv(QStringList names, std::ofstream &fout)
   }
 }
 
-int do_export(Character *ch, char *args, cmd_t cmd)
+int do_export(CharacterPtr ch, char *args, cmd_t cmd)
 {
   char export_type[MAX_INPUT_LENGTH], filename[MAX_INPUT_LENGTH];
   args = one_argument(args, export_type);
@@ -1015,7 +1015,7 @@ int do_export(Character *ch, char *args, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_world(Character *ch, std::string args, cmd_t cmd)
+command_return_t do_world(CharacterPtr ch, std::string args, cmd_t cmd)
 {
 
   if (args == "rename")

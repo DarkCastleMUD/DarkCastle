@@ -70,8 +70,8 @@
 extern Database db;
 #endif
 
-class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);
-bool put_obj_in_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos);
+class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
+bool put_obj_in_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos);
 void restore_weight(class Object *obj);
 QString fread_alias_string(FILEPtr fpsave);
 
@@ -445,7 +445,7 @@ qsizetype fread_to_tilde(FILEPtr fpsave, QString filename)
   return characters_read;
 }
 
-bool Player::read(FILEPtr fpsave, Character *ch, QString filename)
+bool Player::read(FILEPtr fpsave, CharacterPtr ch, QString filename)
 {
   if (!ch)
   {
@@ -640,7 +640,7 @@ bool Character::save_pc_or_mob_data(FILEPtr fpsave, time_data tmpage)
   return false;
 }
 
-bool read_pc_or_mob_data(Character *ch, FILEPtr fpsave, QString filename)
+bool read_pc_or_mob_data(CharacterPtr ch, FILEPtr fpsave, QString filename)
 {
   if (ch->isNonPlayer())
   {
@@ -663,7 +663,7 @@ bool read_pc_or_mob_data(Character *ch, FILEPtr fpsave, QString filename)
 
 // return 1 on success
 // return 0 on failure
-int store_worn_eq(Character *ch, FILEPtr fpsave)
+int store_worn_eq(CharacterPtr ch, FILEPtr fpsave)
 {
   int wear_pos = -1;
   int iWear = 0;
@@ -754,7 +754,7 @@ void debug_file_info(FILEPtr fpsave)
   logentry(u"file position=%1, maxfile position=%2, eof=%3"_s.arg(file_position).arg(file_maxposition).arg(eof_state));
 }
 
-bool read_skill(Character *ch, FILEPtr fpsave)
+bool read_skill(CharacterPtr ch, FILEPtr fpsave)
 {
   if (!fpsave || !ch)
     return false;
@@ -869,7 +869,7 @@ bool Character::store_to_char_variable_data(FILEPtr fpsave)
 }
 
 #ifdef USE_SQL
-void save_char_obj_db(Character *ch)
+void save_char_obj_db(CharacterPtr ch)
 {
   if (ch == 0)
     return;
@@ -1106,7 +1106,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 }
 
 // read data from file for an item.
-class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont)
+class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont)
 {
   class Object *obj;
   //  extra_descr_dataPtr new_new_descr;
@@ -1343,7 +1343,7 @@ class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *las
   return last_cont;
 }
 
-bool obj_to_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos)
+bool obj_to_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos)
 {
   // class Object *tmp;
 
@@ -1368,7 +1368,7 @@ bool obj_to_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos
 // return true on success
 // return false on error
 // write one object to file
-bool put_obj_in_store(class Object *obj, Character *ch, FILEPtr fpsave, int wear_pos)
+bool put_obj_in_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos)
 {
   obj_file_elem object;
   Object *standard_obj = 0;

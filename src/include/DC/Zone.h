@@ -159,7 +159,7 @@ public:
   void setRealTop(room_t room_key);
 
   void write(FILEPtr fl);
-  [[nodiscard]] int show_info(Character *ch);
+  [[nodiscard]] int show_info(CharacterPtr ch);
 
   zone_t getID(void) const
   {
@@ -196,11 +196,11 @@ private:
   DCPtr dc_ = {};
 };
 
-bool isValidZoneKey(Character *ch, const zone_t zone_key);
-bool isValidZoneCommandKey(Character *ch, const Zone &zone, const qsizetype zone_command_key);
+bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key);
+bool isValidZoneCommandKey(CharacterPtr ch, const Zone &zone, const qsizetype zone_command_key);
 qsizetype getZoneLastCommandNumber(const Zone &zone);
-zone_t getZoneKey(Character *ch, const QString input, bool *ok = nullptr);
-quint64 getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok = nullptr);
+zone_t getZoneKey(CharacterPtr ch, const QString input, bool *ok = nullptr);
+quint64 getZoneCommandKey(CharacterPtr ch, const Zone &zone, const QString input, bool *ok = nullptr);
 
-zone_t zedit_add(Character *ch, QStringList arguments, Zone &zone);
+zone_t zedit_add(CharacterPtr ch, QStringList arguments, Zone &zone);
 #endif

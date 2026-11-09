@@ -54,7 +54,7 @@ void add_timer_bj_dealer(table_data *tbl);
 void addtimer(timer_data *add);
 int hand_number(player_data *plr);
 int hands(player_data *plr);
-bool charExists(Character *ch);
+bool charExists(CharacterPtr ch);
 void reel_spin(varg_t, void *, void *);
 
 /*
@@ -155,7 +155,7 @@ void send_to_table(QString msg, table_data *tbl, player_data *plrSilent = nullpt
   }
 }
 
-bool charExists(Character *ch)
+bool charExists(CharacterPtr ch)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
@@ -172,11 +172,11 @@ bool charExists(Character *ch)
 bool verify(player_data *plr)
 {
   // make sure player didn't quit, die, or whatever
-  // Character *ch;
+  // CharacterPtr ch;
 
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&plr](Character *const &ch)
+  auto result = find_if(character_list.begin(), character_list.end(), [&plr](CharacterPtr const &ch)
                         {
 	  if (ch == plr->ch) {
 		  return true;
@@ -307,7 +307,7 @@ bool canSplit(player_data *plr)
   return false;
 }
 
-player_data *createPlayer(Character *ch, table_data *tbl, int noadd = 0)
+player_data *createPlayer(CharacterPtr ch, table_data *tbl, int noadd = 0)
 {
   player_data *plr = new player_data;
   plr->table = tbl;
@@ -457,7 +457,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
   if ((quint64)arg2 == (((plr->table->handnr + 100) * 2 + 100) * 2))
   { // inactive
     table_data *tbl = plr->table;
-    Character *ch = plr->ch;
+    CharacterPtr ch = plr->ch;
 
     char buf[MAX_STRING_LENGTH];
     sprintf(buf, "Security removes a sleepy %s from the table.\n", GET_NAME(plr->ch));
@@ -878,7 +878,7 @@ void destroy_table(table_data *tbl)
   dc_free(tbl);
 }
 
-bool playing(Character *ch, table_data *tbl)
+bool playing(CharacterPtr ch, table_data *tbl)
 {
   player_data *plr;
   for (plr = tbl->plr; plr; plr = plr->next)
@@ -888,7 +888,7 @@ bool playing(Character *ch, table_data *tbl)
   return false;
 }
 
-player_data *getPlayer(Character *ch, table_data *tbl)
+player_data *getPlayer(CharacterPtr ch, table_data *tbl)
 {
   player_data *plr;
   if (tbl->cr && tbl->cr->ch == ch)
@@ -1143,8 +1143,8 @@ void Character::sendBlackjackPrompt(void)
   send(createBlackjackPrompt());
 }
 
-int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg,
-                    Character *invoker)
+int blackjack_table(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+                    CharacterPtr invoker)
 {
   bool showColor = false;
   if (ch && ch->isPlayer() && (isSet(GET_TOGGLES(ch), Player::PLR_ANSI) || isSet(GET_TOGGLES(ch), Player::PLR_VT100)))
@@ -1237,7 +1237,7 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     send_to_table(buf, obj->table, plr);
     if (obj->table->state == 0)
     {
-      Character *tmpch;
+      CharacterPtr tmpch;
       int i = 0;
       for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
            tmpch = tmpch->next_in_room)
@@ -1251,7 +1251,7 @@ int blackjack_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg
     }
     else
     {
-      Character *tmpch;
+      CharacterPtr tmpch;
       int i = 0;
       for (tmpch = DC::getInstance()->world[ch->in_room].people; tmpch;
            tmpch = tmpch->next_in_room)
@@ -1816,7 +1816,7 @@ int handcompare(int hand1[5], int hand2[5])
   return -1;
 }
 
-int do_testhand(Character *ch, char *argument, cmd_t cmd)
+int do_testhand(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
@@ -1933,8 +1933,8 @@ class machine_data
 {
 public:
   Object *obj;
-  Character *prch;
-  Character *ch;
+  CharacterPtr prch;
+  CharacterPtr ch;
   uint cost;
   uint lastwin;
   int bet;
@@ -2261,7 +2261,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   save_slot_machines();
 }
 
-int slot_machine(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+int slot_machine(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -2398,7 +2398,7 @@ char *roulette_display[] = {
 class roulette_player
 {
 public:
-  Character *ch;
+  CharacterPtr ch;
   uint32_t bet_array[48];
 };
 
@@ -2436,7 +2436,7 @@ void create_wheel(Object *obj)
   obj->wheel = wheel;
 }
 
-void send_wheel_bets(Character *ch, wheel_data *wheel)
+void send_wheel_bets(CharacterPtr ch, wheel_data *wheel)
 {
   int i, j;
   bool found = false;
@@ -2687,7 +2687,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
   }
 }
 
-int roulette_table(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+int roulette_table(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
   uint32_t bet = 0;

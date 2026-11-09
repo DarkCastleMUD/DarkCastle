@@ -51,9 +51,9 @@
 #include "DC/structs.h"
 #include "DC/timeinfo.h"
 
-int check_ethereal_focus(Character *ch, int trigger_type); // class/cl_mage.cpp
+int check_ethereal_focus(CharacterPtr ch, int trigger_type); // class/cl_mage.cpp
 
-int move_player(Character *ch, room_t room)
+int move_player(CharacterPtr ch, room_t room)
 {
   int retval;
 
@@ -70,7 +70,7 @@ int move_player(Character *ch, room_t room)
   return retval;
 }
 
-void move_player_home(Character *victim)
+void move_player_home(CharacterPtr victim)
 {
   int was_in = victim->in_room;
   int found = 0;
@@ -115,7 +115,7 @@ void move_player_home(Character *victim)
 
 // Rewritten 9/1/96
 // -Sadus
-void record_track_data(Character *ch, cmd_t cmd)
+void record_track_data(CharacterPtr ch, cmd_t cmd)
 {
   room_track_data *newScent;
 
@@ -160,7 +160,7 @@ void record_track_data(Character *ch, cmd_t cmd)
 }
 
 // Removed this due to it being a funky cold medina. - Nocturnal 09/28/05
-// void do_muddy(Character *ch)
+// void do_muddy(CharacterPtr ch)
 //{
 //   short chance = number(0,30);
 //
@@ -175,7 +175,7 @@ void record_track_data(Character *ch, cmd_t cmd)
 //   }
 //}
 
-int do_unstable(Character *ch)
+int do_unstable(CharacterPtr ch)
 {
   char death_log[MAX_STRING_LENGTH];
   int retval;
@@ -209,7 +209,7 @@ int do_unstable(Character *ch)
     return ReturnValue::eSUCCESS;
 }
 
-int do_fall(Character *ch, short dir)
+int do_fall(CharacterPtr ch, short dir)
 {
   int target;
   char damage[MAX_STRING_LENGTH];
@@ -256,7 +256,7 @@ int do_fall(Character *ch, short dir)
   if (isSet(DC::getInstance()->world[target].room_flags, TUNNEL))
   {
     int ppl = 0;
-    Character *k;
+    CharacterPtr k;
     for (k = DC::getInstance()->world[target].people; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
@@ -270,7 +270,7 @@ int do_fall(Character *ch, short dir)
   if (isSet(DC::getInstance()->world[target].room_flags, PRIVATE))
   {
     int ppl = 0;
-    Character *k;
+    CharacterPtr k;
     for (k = DC::getInstance()->world[target].people; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
@@ -346,7 +346,7 @@ int do_fall(Character *ch, short dir)
 // Assumes
 // 1. No master and no followers.
 // 2. That the direction exists.
-int do_simple_move(Character *ch, cmd_t cmd, int following)
+int do_simple_move(CharacterPtr ch, cmd_t cmd, int following)
 {
   char tmp[80];
   int was_in;
@@ -587,7 +587,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   if (isSet(rm->room_flags, TUNNEL))
   {
     int ppl = 0;
-    Character *k;
+    CharacterPtr k;
     for (k = rm->people; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
@@ -623,7 +623,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   if (isSet(rm->room_flags, PRIVATE))
   {
     int ppl = 0;
-    Character *k;
+    CharacterPtr k;
     for (k = rm->people; k; k = k->next_in_room)
       if (k->isPlayer())
         ppl++;
@@ -749,7 +749,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   // Fighting
   if (ch->fighting)
   {
-    Character *chaser = ch->fighting;
+    CharacterPtr chaser = ch->fighting;
     if (ch->isNonPlayer())
     {
       ch->add_memory(GET_NAME(chaser), 'f');
@@ -845,7 +845,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
    }
    */
   if ((GET_CLASS(ch) == CLASS_BARD && ch->has_skill(SKILL_SONG_HYPNOTIC_HARMONY)) || GET_CLASS(ch) == CLASS_RANGER)
-    for (Character *tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
+    for (CharacterPtr tmp_ch = DC::getInstance()->world[ch->in_room].people; tmp_ch; tmp_ch = tmp_ch->next_in_room)
     {
       if (tmp_ch->isPlayer())
         continue;
@@ -884,7 +884,7 @@ int do_simple_move(Character *ch, cmd_t cmd, int following)
   return ReturnValue::eSUCCESS;
 }
 
-int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
+int attempt_move(CharacterPtr ch, cmd_t cmd, int is_retreat)
 {
   char tmp[80];
   int return_val;
@@ -1051,12 +1051,12 @@ int attempt_move(Character *ch, cmd_t cmd, int is_retreat)
 //   1 : If success.
 //   0 : If fail
 //  -1 : If dead.
-int do_move(Character *ch, char *argument, cmd_t cmd)
+int do_move(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   return attempt_move(ch, cmd);
 }
 
-int do_leave(Character *ch, char *arguement, cmd_t cmd)
+int do_leave(CharacterPtr ch, char *arguement, cmd_t cmd)
 {
   class Object *k;
   char buf[200];
@@ -1096,12 +1096,12 @@ int do_leave(Character *ch, char *arguement, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_enter(Character *ch, char *argument, cmd_t cmd)
+int do_enter(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int retval;
 
-  Character *sesame;
+  CharacterPtr sesame;
   Object *portal = nullptr;
 
   if ((ch->in_room != DC::NOWHERE) || (ch->in_room))
@@ -1251,7 +1251,7 @@ int do_enter(Character *ch, char *argument, cmd_t cmd)
   return ambush(ch);
 }
 
-int move_char(Character *ch, int dest, bool stop_all_fighting)
+int move_char(CharacterPtr ch, int dest, bool stop_all_fighting)
 {
   if (!ch)
   {
@@ -1288,7 +1288,7 @@ int move_char(Character *ch, int dest, bool stop_all_fighting)
   return ReturnValue::eSUCCESS;
 }
 
-int do_climb(Character *ch, char *argument, cmd_t cmd)
+int do_climb(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH];
   Object *obj = nullptr;
@@ -1338,9 +1338,10 @@ int do_climb(Character *ch, char *argument, cmd_t cmd)
 
 // The End
 
-int ambush(Character *ch)
+int ambush(CharacterPtr ch)
 {
-  Character *i, *next_i;
+  CharacterPtr i;
+  CharacterPtr next_i;
   int retval;
 
   for (i = DC::getInstance()->world[ch->in_room].people; i; i = next_i)

@@ -141,7 +141,7 @@ void DC::removeDead(void)
 
 void DC::handleShooting(void)
 {
-  std::unordered_set<Character *> remove_list;
+  std::unordered_set<CharacterPtr> remove_list;
 
   for (const auto &ch : shooting_list)
   {
@@ -340,7 +340,7 @@ Object *DC::getObject(vnum_t vnum)
   return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
 }
 
-void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, Character *vict)
+void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   if (cf.verbose_mode)
   {
@@ -465,7 +465,7 @@ bool DC::config::isPrimaryImplementer(QString name)
   return name.compare(primary_implementer_, Qt::CaseInsensitive) == 0;
 }
 
-bool DC::config::isPrimaryImplementer(Character *ch)
+bool DC::config::isPrimaryImplementer(CharacterPtr ch)
 {
   if (!ch)
     return false;

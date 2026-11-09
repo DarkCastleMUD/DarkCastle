@@ -34,7 +34,7 @@
 
 extern std::vector<profession> professions;
 
-int do_practice(Character *ch, char *arg, cmd_t cmd)
+int do_practice(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   /* Call "guild" with a null std::string for an argument.
      This displays the character's skills. */
@@ -50,7 +50,7 @@ int do_practice(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_profession(Character *ch, char *args, cmd_t cmd)
+int do_profession(CharacterPtr ch, char *args, cmd_t cmd)
 {
   // Command is enabled by giving someone the profession skill
   if (!ch->has_skill(SKILL_PROFESSION))
@@ -60,7 +60,7 @@ int do_profession(Character *ch, char *args, cmd_t cmd)
   }
 
   // You can only use the command in the same room of a mob named guildmaster
-  Character *victim = get_mob_room_vis(ch, "guildmaster");
+  CharacterPtr victim = get_mob_room_vis(ch, "guildmaster");
   if (victim == nullptr)
   {
     ch->sendln("You can't pick a profession here. You need to find a Guild Master.");
@@ -632,7 +632,7 @@ void Character::output_praclist(class_skill_defines *skilllist)
   }
 }
 
-int Character::skills_guild(const char *arg, Character *owner)
+int Character::skills_guild(const char *arg, CharacterPtr owner)
 {
   char buf[160];
   int known, x;
@@ -849,7 +849,7 @@ int Character::skills_guild(const char *arg, Character *owner)
   return ReturnValue::eSUCCESS;
 }
 
-int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner)
+int guild(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   int64_t exp_needed;
   int x = 0;
@@ -1027,7 +1027,7 @@ int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *invoker)
+int skill_master(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   char buf[MAX_STRING_LENGTH];
   int number, i, percent;
@@ -1119,7 +1119,7 @@ int skill_master(Character *ch, class Object *obj, cmd_t cmd, const char *arg, C
     invoker->do_say("Okay, you've got a deal!");
     ch->learn_skill(skl, 1, 1);
 
-    extern void prepare_character_for_sixty(Character * ch);
+    extern void prepare_character_for_sixty(CharacterPtr ch);
     prepare_character_for_sixty(ch);
     snprintf(buf, sizeof(buf), "$BYou have learned the basics of %s.$R\n", get_skill_name(skl).toStdString().c_str());
     ch->send(buf);

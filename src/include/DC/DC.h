@@ -145,19 +145,19 @@ class QHttpServerRequest;
 class QTextStream;
 
 using namespace Qt::StringLiterals;
-using special_function = int (*)(Character *, class Object *, cmd_t, const char *, Character *);
+using special_function = int (*)(CharacterPtr, class Object *, cmd_t, const char *, CharacterPtr);
 
-typedef std::set<Character *> character_list_t;
+typedef std::set<CharacterPtr> character_list_t;
 typedef std::set<class Object *> obj_list_t;
 typedef std::set<int> client_descriptor_list_t;
 typedef std::set<int> server_descriptor_list_t;
 typedef std::vector<in_port_t> port_list_t;
-typedef std::set<Character *>::iterator character_list_i;
+typedef std::set<CharacterPtr>::iterator character_list_i;
 typedef std::set<int>::iterator client_descriptor_list_i;
 typedef std::set<int>::iterator server_descriptor_list_i;
 typedef std::vector<in_port_t>::iterator port_list_i;
-typedef std::unordered_map<Character *, Trace> death_list_t;
-typedef std::unordered_map<Character *, Trace> free_list_t;
+typedef std::unordered_map<CharacterPtr, Trace> death_list_t;
+typedef std::unordered_map<CharacterPtr, Trace> free_list_t;
 typedef quint64 zone_t;
 typedef quint64 room_t;
 typedef quint64 gold_t;
@@ -297,23 +297,23 @@ public:
   AuctionHouse(QString in_file);
   AuctionHouse();
   ~AuctionHouse();
-  void CollectTickets(Character *ch, unsigned int ticket = 0);
-  void CancelAll(Character *ch);
-  void AddItem(Character *ch, Object *obj, unsigned int price, QString buyer);
-  void RemoveTicket(Character *ch, unsigned int ticket);
-  void BuyItem(Character *ch, unsigned int ticket);
-  void ListItems(Character *ch, ListOptions options, QString name, unsigned int to, unsigned int from);
+  void CollectTickets(CharacterPtr ch, unsigned int ticket = 0);
+  void CancelAll(CharacterPtr ch);
+  void AddItem(CharacterPtr ch, Object *obj, unsigned int price, QString buyer);
+  void RemoveTicket(CharacterPtr ch, unsigned int ticket);
+  void BuyItem(CharacterPtr ch, unsigned int ticket);
+  void ListItems(CharacterPtr ch, ListOptions options, QString name, unsigned int to, unsigned int from);
   void CheckExpire();
-  void Identify(Character *ch, unsigned int ticket);
-  void AddRoom(Character *ch, room_t room);
-  void RemoveRoom(Character *ch, room_t room);
-  void ListRooms(Character *ch);
-  void HandleRename(Character *ch, QString old_name, QString new_name);
+  void Identify(CharacterPtr ch, unsigned int ticket);
+  void AddRoom(CharacterPtr ch, room_t room);
+  void RemoveRoom(CharacterPtr ch, room_t room);
+  void ListRooms(CharacterPtr ch);
+  void HandleRename(CharacterPtr ch, QString old_name, QString new_name);
   void HandleDelete(QString name);
-  void CheckForSoldItems(Character *ch);
+  void CheckForSoldItems(CharacterPtr ch);
   bool IsAuctionHouse(room_t room);
-  void DoModify(Character *ch, unsigned int ticket, unsigned int new_price);
-  void ShowStats(Character *ch);
+  void DoModify(CharacterPtr ch, unsigned int ticket, unsigned int new_price);
+  void ShowStats(CharacterPtr ch);
   void Save();
   void Load();
   [[nodiscard]] unsigned int getItemsPosted(void) { return ItemsPosted; }
@@ -328,9 +328,9 @@ private:
   unsigned int UncollectedGold;
   unsigned int ItemsActive;
   void ParseStats();
-  bool CanSellMore(Character *ch);
+  bool CanSellMore(CharacterPtr ch);
   bool IsOkToSell(Object *obj);
-  bool IsWearable(Character *ch, int vnum);
+  bool IsWearable(CharacterPtr ch, int vnum);
   bool IsNoTrade(int vnum);
   bool IsSeller(QString in_name, QString seller);
   bool IsExist(QString name, int vnum);
@@ -378,16 +378,16 @@ public:
   QString str;
   int retval;
 };
-act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
-act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags);
-act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
-act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+act_return act(const char *str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+act_return act(const char *str, CharacterPtr ch, Object *obj, QString keyword, int16_t destination, int16_t flags);
+act_return act(QString str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
+act_return act(const std::string &str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags);
 
 class act_input
 {
 public:
   const char *str{};
-  Character *ch{};
+  CharacterPtr ch{};
   Object *obj{};
   void *vict_obj{};
   int16_t destination{};
@@ -424,7 +424,7 @@ public:
     QString leaderboard_check;
     QString primary_implementer_;
     bool isPrimaryImplementer(QString name);
-    bool isPrimaryImplementer(Character *ch);
+    bool isPrimaryImplementer(CharacterPtr ch);
   } cf;
 
   enum LogChannel
@@ -540,7 +540,7 @@ public:
   death_list_t death_list;
   obj_list_t active_obj_list;
   obj_list_t obj_free_list;
-  std::unordered_set<Character *> shooting_list;
+  std::unordered_set<CharacterPtr> shooting_list;
   special_function_list_t mob_non_combat_functions;
   special_function_list_t mob_combat_functions;
   special_function_list_t obj_non_combat_functions;
@@ -590,8 +590,8 @@ public:
   void resetZone(zone_t zone_key, Zone::ResetType reset_type = Zone::ResetType::normal);
   Object *getObject(vnum_t vnum);
   void findLibrary(void);
-  int create_one_room(Character *ch, int vnum);
-  void update_wizlist(Character *ch);
+  int create_one_room(CharacterPtr ch, int vnum);
+  void update_wizlist(CharacterPtr ch);
   void do_godlist(void);
   void write_wizlist(std::stringstream &filename);
   void write_wizlist(std::string filename);
@@ -655,7 +655,7 @@ public:
     return QStringLiteral("%1:%2:%3:%4").arg(currentType()).arg(currentName()).arg(QString::number(currentVNUM())).arg(currentFilename());
   }
 
-  void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+  void logverbose(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = nullptr);
   [[nodiscard]] quint64 getConnectionLimit(void) { return PER_IP_CONNECTION_LIMIT; }
 
   void clean_socials_from_memory(void);
@@ -692,7 +692,7 @@ public:
   int load_hotboot_descs(void);
   vnum_t getObjectVNUM(Object *obj, bool *ok = nullptr);
   void add_mobspec(vnum_t vnum);
-  Character *read_mobile(int nr, FILEPtr fl);
+  CharacterPtr read_mobile(int nr, FILEPtr fl);
   class Object *read_object(int nr, FILEPtr fl, bool zz);
   class Object *read_object(int nr, QTextStream &fl, bool zz);
 
@@ -781,7 +781,7 @@ public:
   }
 
   // void load_objects(QHash<vnum_t, class obj_index_data> &index);
-  Character *clone_mobile(vnum_t vnum);
+  CharacterPtr clone_mobile(vnum_t vnum);
   auto create_blank_item(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   auto create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>;
   void game_test_init(void);
@@ -789,58 +789,59 @@ public:
   void finish_hotboot(void);
   load_status_t load_char_obj(Connection *d, QString name);
   bool has_vault_access(QString owner, class vault_data *vault);
-  bool has_vault_access(Character *ch, class vault_data *vault);
+  bool has_vault_access(CharacterPtr ch, class vault_data *vault);
   void update_mprog_throws(void);
-  Character *initiate_oproc(Character *ch, Object *obj);
-  int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm);
+  CharacterPtr initiate_oproc(CharacterPtr ch, Object *obj);
+  int oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, CharacterPtr actor, Object *obj2, void *vo, CharacterPtr rndm);
   int oprog_rand_trigger(Object *item);
   int oprog_arand_trigger(Object *item);
   void mobile_activity(void);
   static QMap<QString, mprog_ifs> load_ifchecks(void);
-  IfReturnType mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
-  char *mprog_process_if(char *ifchck, char *com_list, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, class mprog_throw_type *thrw = nullptr);
-  void mprog_translate(char ch, char *t, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
-  int mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm);
-  void mprog_driver(char *com_list, Character *mob, Character *actor, class Object *obj, void *vo, class mprog_throw_type *thrw, Character *rndm);
-  void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui, QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm, QString &valqstr);
+  IfReturnType mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm);
+  char *mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm, class mprog_throw_type *thrw = nullptr);
+  void mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm);
+  int mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm);
+  void mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, class Object *obj, void *vo, class mprog_throw_type *thrw, CharacterPtr rndm);
+  void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui, QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm, QString &valqstr);
+
   // MOBProgs prototypes
-  int mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *object, void *vo, int type, bool reverse = false);
-  void mprog_percent_check(Character *mob, Character *actor, Object *object, void *vo, int type);
-  int mprog_act_trigger(std::string buf, Character *mob, Character *ch, Object *obj, void *vo);
-  int mprog_bribe_trigger(Character *mob, Character *ch, int amount);
-  int mprog_entry_trigger(Character *mob);
-  int mprog_give_trigger(Character *mob, Character *ch, Object *obj);
-  int mprog_fight_trigger(Character *mob, Character *ch);
-  int mprog_hitprcnt_trigger(Character *mob, Character *ch);
-  int mprog_death_trigger(Character *mob, Character *killer);
-  int mprog_random_trigger(Character *mob);
-  int mprog_arandom_trigger(Character *mob);
-  int mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm);
-  int mprog_attack_trigger(Character *mob, Character *ch);
-  int mprog_load_trigger(Character *mob);
-  int mprog_damage_trigger(Character *mob, Character *ch, int amount);
-  bool is_in_game(Character *ch);
-  send_tokens_return send_tokens(TokenList *tokens, Character *ch, Object *obj, void *vch, int flags, Character *to, QString keyword);
-  void send_damage(char const *, Character *, Object *, Character *, char const *, char const *, int);
-  void send_damage(QString buf, Character *, Object *, Character *, QString dmg, QString buf2, int);
-  void dam_message(int dam, Character *ch, Character *vict, int w_type, int32_t modifier);
-  int damage(Character *ch, Character *victim, int dam, int weapon_type, int attacktype, int weapon = {}, bool is_death_prog = false, Object *obj = {});
+  int mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, Object *object, void *vo, int type, bool reverse = false);
+  void mprog_percent_check(CharacterPtr mob, CharacterPtr actor, Object *object, void *vo, int type);
+  int mprog_act_trigger(std::string buf, CharacterPtr mob, CharacterPtr ch, Object *obj, void *vo);
+  int mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, int amount);
+  int mprog_entry_trigger(CharacterPtr mob);
+  int mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, Object *obj);
+  int mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch);
+  int mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch);
+  int mprog_death_trigger(CharacterPtr mob, CharacterPtr killer);
+  int mprog_random_trigger(CharacterPtr mob);
+  int mprog_arandom_trigger(CharacterPtr mob);
+  int mprog_catch_trigger(CharacterPtr mob, int catch_num, char *var, int opt, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm);
+  int mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch);
+  int mprog_load_trigger(CharacterPtr mob);
+  int mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, int amount);
+  bool is_in_game(CharacterPtr ch);
+  send_tokens_return send_tokens(TokenList *tokens, CharacterPtr ch, Object *obj, void *vch, int flags, CharacterPtr to, QString keyword);
+  void send_damage(char const *, CharacterPtr, Object *, CharacterPtr, char const *, char const *, int);
+  void send_damage(QString buf, CharacterPtr, Object *, CharacterPtr, QString dmg, QString buf2, int);
+  void dam_message(int dam, CharacterPtr ch, CharacterPtr vict, int w_type, int32_t modifier);
+  int damage(CharacterPtr ch, CharacterPtr victim, int dam, int weapon_type, int attacktype, int weapon = {}, bool is_death_prog = false, Object *obj = {});
   void update_characters(void);
   void checkConsecrate(int);
 
-  act_return act(const char *str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+  act_return act(const char *str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
   {
     return ::act(str, ch, obj, vict_obj, destination, flags);
   }
-  act_return act(const char *str, Character *ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
+  act_return act(const char *str, CharacterPtr ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
   {
     return ::act(str, ch, obj, keyword, destination, flags);
   }
-  act_return act(QString str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+  act_return act(QString str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
   {
     return ::act(str, ch, obj, vict_obj, destination, flags);
   }
-  act_return act(const std::string &str, Character *ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+  act_return act(const std::string &str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
   {
     return ::act(str, ch, obj, vict_obj, destination, flags);
   }
@@ -897,7 +898,7 @@ private:
   void nanny(class Connection *d, QString arg = u""_s);
   void object_activity(quint64 pulse_type);
 };
-void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, Character *vict = nullptr);
+void logentry(QString str, quint64 god_level = 0, DC::LogChannel type = DC::LogChannel::LOG_MISC, CharacterPtr vict = nullptr);
 void logf(int level, DC::LogChannel type, const char *arg, ...);
 void logf(int level, DC::LogChannel type, QString arg);
 int send_to_gods(QString message, quint64 god_level, DC::LogChannel type);
@@ -936,7 +937,7 @@ void renum_zone_table(void);
 
 union varg_t
 {
-  Character *ch;
+  CharacterPtr ch;
   clan_t clan;
   class player_data *player;
   class table_data *table;
@@ -959,7 +960,7 @@ public:
 };
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3);
-void clear_hunt(varg_t arg1, Character *arg2, void *arg3);
+void clear_hunt(varg_t arg1, CharacterPtr arg2, void *arg3);
 
 auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_commands_type, search_error>;
 #define REMOVE_BIT(var, bit) ((var) = (var) & ~(bit))

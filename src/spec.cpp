@@ -30,7 +30,7 @@ const spec_data spec_list[] =
         {"Blah", "Blehe", 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
         {nullptr, nullptr, 0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
-int do_spec(Character *ch, char *argument, cmd_t cmd)
+int do_spec(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];

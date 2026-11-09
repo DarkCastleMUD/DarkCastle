@@ -214,7 +214,7 @@ bool operator==(ResetCommand a, ResetCommand b)
   return false;
 }
 
-zone_t getZoneKey(Character *ch, const QString input, bool *ok)
+zone_t getZoneKey(CharacterPtr ch, const QString input, bool *ok)
 {
   zone_t zone_key = input.toULongLong(ok);
   if (!isValidZoneKey(ch, zone_key) && ok)
@@ -225,7 +225,7 @@ zone_t getZoneKey(Character *ch, const QString input, bool *ok)
   return zone_key;
 }
 
-bool isValidZoneKey(Character *ch, const zone_t zone_key)
+bool isValidZoneKey(CharacterPtr ch, const zone_t zone_key)
 {
   const auto dc = DC::getInstance();
   if (!dc->zones.contains(zone_key))
@@ -247,7 +247,7 @@ bool isValidZoneKey(Character *ch, const zone_t zone_key)
   return true;
 }
 
-quint64 getZoneCommandKey(Character *ch, const Zone &zone, const QString input, bool *ok)
+quint64 getZoneCommandKey(CharacterPtr ch, const Zone &zone, const QString input, bool *ok)
 {
   quint64 zone_command_key = input.toULongLong(ok);
   if (!isValidZoneCommandKey(ch, zone, zone_command_key - 1) && ok)
@@ -257,7 +257,7 @@ quint64 getZoneCommandKey(Character *ch, const Zone &zone, const QString input, 
   return zone_command_key - 1;
 }
 
-bool isValidZoneCommandKey(Character *ch, const Zone &zone, const qsizetype zone_command_key)
+bool isValidZoneCommandKey(CharacterPtr ch, const Zone &zone, const qsizetype zone_command_key)
 {
   if (zone.cmd.isEmpty() || zone_command_key >= zone.cmd.size())
   {

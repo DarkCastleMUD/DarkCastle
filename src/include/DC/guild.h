@@ -6,10 +6,10 @@
  *      Author: jhhudso
  */
 
-class Character;
+#include "DC/types.h"
 class class_skill_defines;
 enum class cmd_t;
 
 int search_skills(char *arg, class_skill_defines *list_skills);
 int search_skills2(int arg, class_skill_defines *list_skills);
-int guild(Character *ch, class Object *obj, cmd_t cmd, const char *arg, Character *owner);
+int guild(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner);

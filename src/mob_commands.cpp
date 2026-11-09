@@ -72,9 +72,9 @@
 extern bool MOBtrigger;
 extern mprog_throw_type *g_mprog_throw_list;
 
-extern Character *activeActor;
-extern Character *activeRndm;
-extern Character *activeTarget;
+extern CharacterPtr activeActor;
+extern CharacterPtr activeRndm;
+extern CharacterPtr activeTarget;
 extern Object *activeObj;
 extern void *activeVo;
 extern int mprog_line_num;    // From mob_prog.cpp
@@ -141,7 +141,7 @@ char *mprog_type_to_name(int type)
  * show the MOBprograms which are set.
  */
 
-void mpstat(Character *ch, Character *victim)
+void mpstat(CharacterPtr ch, CharacterPtr victim)
 {
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -177,7 +177,7 @@ void mpstat(Character *ch, Character *victim)
 
 /* prints the argument to all the rooms aroud the mobile */
 
-int do_mpasound(Character *ch, char *argument, cmd_t cmd)
+int do_mpasound(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   int32_t was_in_room;
@@ -216,10 +216,10 @@ int do_mpasound(Character *ch, char *argument, cmd_t cmd)
 
 /* lets the mobile kill any player or mobile without murder*/
 
-int do_mpkill(Character *ch, char *argument, cmd_t cmd)
+int do_mpkill(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -262,10 +262,10 @@ int do_mpkill(Character *ch, char *argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-int do_mphit(Character *ch, char *argument, cmd_t cmd)
+int do_mphit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -308,11 +308,11 @@ int do_mphit(Character *ch, char *argument, cmd_t cmd)
   return one_hit(ch, victim, TYPE_UNDEFINED, FIRST);
 }
 
-int do_mpaddlag(Character *ch, char *argument, cmd_t cmd)
+int do_mpaddlag(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -347,7 +347,7 @@ int do_mpaddlag(Character *ch, char *argument, cmd_t cmd)
    it can also destroy a worn object and it can destroy
    just plain everything  */
 
-int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
+int do_mpjunk(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   Object *obj;
@@ -405,10 +405,10 @@ int do_mpjunk(Character *ch, char *argument, cmd_t cmd)
 
 /* prints the message to everyone in the room other than the mob and victim */
 
-int do_mpechoaround(Character *ch, char *argument, cmd_t cmd)
+int do_mpechoaround(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -434,10 +434,11 @@ int do_mpechoaround(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
+int do_mpechoaroundnotbad(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
-  Character *victim, *victim2;
+  CharacterPtr victim;
+  CharacterPtr victim2;
 
   if (ch->isPlayer())
   {
@@ -471,10 +472,10 @@ int do_mpechoaroundnotbad(Character *ch, char *argument, cmd_t cmd)
 
 /* prints the message to only the victim */
 
-int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
+int do_mpechoat(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -502,7 +503,7 @@ int do_mpechoat(Character *ch, char *argument, cmd_t cmd)
 
 /* prints the message to the room at large */
 
-int do_mpecho(Character *ch, char *argument, cmd_t cmd)
+int do_mpecho(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -524,11 +525,11 @@ int do_mpecho(Character *ch, char *argument, cmd_t cmd)
 are loaded into inventory.  you can specify a level with
 the load object portion as well. */
 
-int do_mpmload(Character *ch, char *argument, cmd_t cmd)
+int do_mpmload(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   int realnum;
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -565,7 +566,7 @@ int do_mpmload(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mpoload(Character *ch, char *argument, cmd_t cmd)
+int do_mpoload(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   char arg1[MAX_INPUT_LENGTH] = {0};
@@ -623,10 +624,10 @@ int do_mpoload(Character *ch, char *argument, cmd_t cmd)
    itself, but this had best be the last command in the MOBprogram
    otherwise ugly stuff will happen */
 
-int do_mppurge(Character *ch, char *argument, cmd_t cmd)
+int do_mppurge(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
   Object *obj;
 
   if (ch->isPlayer())
@@ -640,7 +641,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
   if (arg[0] == '\0')
   {
     /* 'purge' */
-    Character *vnext;
+    CharacterPtr vnext;
     Object *obj_next;
 
     for (victim = DC::getInstance()->world[ch->in_room].people; victim != nullptr; victim = vnext)
@@ -708,7 +709,7 @@ int do_mppurge(Character *ch, char *argument, cmd_t cmd)
 
 /* lets the mobile goto any location it wishes that is not private */
 
-int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
+int do_mpgoto(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   int32_t location = -1;
@@ -728,7 +729,7 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
 
   // TODO - make this work with strings (goto chode) too
 
-  Character *vict;
+  CharacterPtr vict;
   if (!str_cmp(arg, "mob"))
   {
     one_argument(argument, arg);
@@ -793,7 +794,7 @@ int do_mpgoto(Character *ch, char *argument, cmd_t cmd)
 
 /* lets the mobile do a command at another location. Very useful */
 
-int do_mpat(Character *ch, char *argument, cmd_t cmd)
+int do_mpat(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   int32_t location;
@@ -815,7 +816,7 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
   }
 
   // TODO - make location take args
-  Character *vict;
+  CharacterPtr vict;
   if (!(vict = get_char_vis(ch, arg)))
   {
     location = atoi(arg);
@@ -859,14 +860,14 @@ int do_mpat(Character *ch, char *argument, cmd_t cmd)
 
 // Reward the player with some XP
 // Also works with -xp to penalize
-int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
+int do_mpxpreward(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   int reward;
-  Character *vict;
+  CharacterPtr vict;
 
-  Character *get_pc_room_vis_exact(Character * ch, const char *name);
+  CharacterPtr get_pc_room_vis_exact(CharacterPtr ch, const char *name);
 
   if (ch->isPlayer())
   {
@@ -904,13 +905,13 @@ int do_mpxpreward(Character *ch, char *argument, cmd_t cmd)
 /* lets the mobile transfer people.  the all argument transfers
    everyone in the current room to the specified location */
 
-int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
+int do_mptransfer(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   int32_t location;
   Connection *d;
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->isPlayer())
   {
@@ -989,7 +990,7 @@ int do_mptransfer(Character *ch, char *argument, cmd_t cmd)
 /* lets the mobile force someone to do something.  must be mortal level
    and the all argument only affects those in the room with the mobile */
 
-int do_mpforce(Character *ch, char *argument, cmd_t cmd)
+int do_mpforce(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
 
@@ -1012,8 +1013,8 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 
   if (!str_cmp(arg, "all"))
   {
-    Character *vch;
-    Character *vch_next;
+    CharacterPtr vch;
+    CharacterPtr vch_next;
 
     for (vch = DC::getInstance()->world[ch->in_room].people; vch != nullptr; vch = vch_next)
     {
@@ -1027,7 +1028,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
   }
   else
   {
-    Character *victim;
+    CharacterPtr victim;
 
     if ((victim = ch->get_char_room_vis(arg)) == nullptr)
     {
@@ -1058,7 +1059,7 @@ int do_mpforce(Character *ch, char *argument, cmd_t cmd)
 // "Throw" a message to another mob.  Right now, it's only an int specifying which
 // 'catch' should handle it
 // argument should be <mob> <catchnum> <delay>
-int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
+int do_mpthrow(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   mprog_throw_type *throwitem = nullptr;
   int mob_num;
@@ -1135,7 +1136,7 @@ int do_mpthrow(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
+int do_mpteachskill(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char skill[MAX_INPUT_LENGTH];
@@ -1154,7 +1155,7 @@ int do_mpteachskill(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  Character *victim;
+  CharacterPtr victim;
 
   if ((victim = get_char_room(arg, ch->in_room)) == nullptr)
   {
@@ -1237,7 +1238,7 @@ QString Character::getTemp(QString name)
 
 command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   QString arg = arguments.value(0);
   QString temp = arguments.value(1);
   QString arg2 = arguments.value(2);
@@ -1305,9 +1306,9 @@ command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mpsetalign(Character *ch, char *argument, cmd_t cmd)
+int do_mpsetalign(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char arg[MAX_INPUT_LENGTH], align[MAX_INPUT_LENGTH];
   if (ch->isPlayer())
   {
@@ -1349,7 +1350,7 @@ void free_dmg_list()
   dmg_list = nullptr;
 }
 
-void add_dmg(Character *ch, int dmg)
+void add_dmg(CharacterPtr ch, int dmg)
 {
   damage_list *c;
 
@@ -1377,7 +1378,7 @@ void add_dmg(Character *ch, int dmg)
   dmg_list = c;
 }
 
-int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
+int do_mpdamage(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   char temp[MAX_INPUT_LENGTH];
@@ -1400,7 +1401,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
 
   // if it's 'all' leave victim nullptr and skip
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
@@ -1526,7 +1527,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
       continue;
     }
 
-    Character *next_vict;
+    CharacterPtr next_vict;
     for (victim = DC::getInstance()->world[ch->in_room].people; victim; victim = next_vict)
     {
       next_vict = victim->next_in_room;
@@ -1589,7 +1590,7 @@ int do_mpdamage(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mpothrow(Character *ch, char *argument, cmd_t cmd)
+int do_mpothrow(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   mprog_throw_type *throwitem = nullptr;
   int mob_num;
@@ -1673,11 +1674,12 @@ int skill_aff[] =
         SPELL_KNOW_ALIGNMENT, 0, SPELL_WATER_BREATHING, 0, 0,
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
+int do_mpbestow(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
-  Character *victim, *owner = nullptr;
+  CharacterPtr victim;
+  CharacterPtr owner = nullptr;
   if (ch->isPlayer())
   {
     ch->sendln("Huh?");
@@ -1701,7 +1703,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
   check_range_valid_and_convert(o, arg3, 0, 10000);
   int a = 0;
   if (ch->beacon)
-    owner = (Character *)ch->beacon;
+    owner = (CharacterPtr)ch->beacon;
 
   if (!victim)
     victim = DC::getInstance()->world[ch->in_room].people;
@@ -1764,7 +1766,7 @@ int do_mpbestow(Character *ch, char *argument, cmd_t cmd)
 
 // simulate a pause in proc execution
 // stops prog, mpthrow a special kinda throw, picks it up again when delay is over
-int do_mppause(Character *ch, char *argument, cmd_t cmd)
+int do_mppause(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1822,8 +1824,8 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
   throwitem->tMob = ch;
   throwitem->delay = delay;
 
-  extern Character *activeActor;
-  extern Character *activeRndm;
+  extern CharacterPtr activeActor;
+  extern CharacterPtr activeRndm;
   extern Object *activeObj;
   extern void *activeVo;
   throwitem->actor = activeActor;
@@ -1850,9 +1852,9 @@ int do_mppause(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS | ReturnValue::eDELAYED_EXEC;
 }
 
-int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
+int do_mpteleport(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char person[MAX_INPUT_LENGTH], type[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   room_t to_room = 0;
 
@@ -1932,7 +1934,7 @@ int do_mpteleport(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mppeace(Character *ch, char *argument, cmd_t cmd)
+int do_mppeace(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1942,7 +1944,8 @@ int do_mppeace(Character *ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
 
-  Character *rch, *vict = nullptr;
+  CharacterPtr rch;
+  CharacterPtr vict = nullptr;
 
   if (arg[0])
   {
@@ -1968,7 +1971,7 @@ int do_mppeace(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mpretval(Character *ch, char *argument, cmd_t cmd)
+int do_mpretval(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -1993,7 +1996,7 @@ int do_mpretval(Character *ch, char *argument, cmd_t cmd)
 }
 
 // Yes, I'm sure there's a better way to do this. Stop whining.
-int process_math(Character *ch, char *string)
+int process_math(CharacterPtr ch, char *string)
 {
   int result = 0, curr = 0;
   char lastsign = '\0';
@@ -2062,7 +2065,7 @@ int process_math(Character *ch, char *string)
 }
 
 // Unreadable code > you
-char *expand_data(Character *ch, char *orig)
+char *expand_data(CharacterPtr ch, char *orig)
 {
   static char buf[MAX_STRING_LENGTH];
   char buf1[MAX_STRING_LENGTH];
@@ -2164,7 +2167,7 @@ char *expand_data(Character *ch, char *orig)
 char *allowedData[] = {
     "hitpoints", "mana", "move", nullptr};
 
-int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
+int do_mpsetmath(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (ch->isPlayer())
   {
@@ -2172,7 +2175,7 @@ int do_mpsetmath(Character *ch, char *arg, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vict;
+  CharacterPtr vict;
   //  if (activeActor) activeActor->send(QStringLiteral("{%1}\n").arg(arg));
   //  vict = get_pc("Urizen");
   //  if (vict) vict->send(QStringLiteral("{%1}\n").arg(arg));

@@ -43,7 +43,7 @@
 #define TP_OBJ 1
 #define TP_ERROR 2
 
-void check_for_awaymsgs(Character *ch);
+void check_for_awaymsgs(CharacterPtr ch);
 void page_string_dep(class Connection *d, const char *str, int keep_internal);
 
 const char *string_fields[] = {"name", "short", "long", "description", "title", "delete-description", "\n"};
@@ -61,7 +61,7 @@ const char *skill_fields[] = {"learned", "recognize", "\n"};
 void string_hash_add(class Connection *d, QString str)
 {
   int terminator = 0;
-  Character *ch = d->character;
+  CharacterPtr ch = d->character;
 
   auto scan = str;
   if (scan.contains('~'))
@@ -141,12 +141,12 @@ void quad_arg(char *arg, int *type, char *name, int *field, char *string)
   return;
 }
 
-int do_string(Character *ch, char *arg, cmd_t cmd)
+int do_string(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
   char message[100];
   int field, type, ctr;
-  Character *mob = nullptr;
+  CharacterPtr mob = nullptr;
   class Object *obj;
 
   if (ch->isNonPlayer())

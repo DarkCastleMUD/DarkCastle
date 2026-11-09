@@ -52,11 +52,11 @@
 #include "DC/obj.h"
 #include "DC/player.h"
 
-void perform_wear(Character *ch, class Object *obj_object,
+void perform_wear(CharacterPtr ch, class Object *obj_object,
                   int keyword);
-bool is_protected(Character *vict, Character *ch);
-void scavenge(Character *ch);
-bool is_r_denied(Character *ch, room_t room)
+bool is_protected(CharacterPtr vict, CharacterPtr ch);
+void scavenge(CharacterPtr ch);
+bool is_r_denied(CharacterPtr ch, room_t room)
 {
   deny_data *d;
   if (ch->isPlayer())
@@ -68,7 +68,8 @@ bool is_r_denied(Character *ch, room_t room)
 }
 void DC::mobile_activity(void)
 {
-  Character *tmp_ch, *pch;
+  CharacterPtr tmp_ch;
+  CharacterPtr pch;
   class Object *obj, *best_obj;
   char buf[1000];
   int door, max;
@@ -283,8 +284,8 @@ void DC::mobile_activity(void)
     if ((ch->mobdata->hated != nullptr)) //  && (!ch->fighting)) (we check fighting earlier)
     {
       ch->sendln("You're hating.");
-      Character *next_blah;
-      //      Character *temp = get_char(get_random_hate(ch));
+      CharacterPtr next_blah;
+      //      CharacterPtr temp = get_char(get_random_hate(ch));
       done = 0;
 
       for (tmp_ch = world[ch->in_room].people; tmp_ch; tmp_ch = next_blah)
@@ -348,7 +349,7 @@ void DC::mobile_activity(void)
       if (ISSET(ch->mobdata->actflags, ACT_AGGRESSIVE) &&
           !isSet(world[ch->in_room].room_flags, SAFE))
       {
-        Character *next_aggro;
+        CharacterPtr next_aggro;
         int targets = 1;
         done = 0;
 
@@ -611,7 +612,7 @@ void DC::mobile_activity(void)
 // Just a function to have mobs say random stuff when they are "suprised"
 // about finding a player doing something and decide to attack them.
 // For example, when a mob finds a player casting "spell" on them.
-void mob_suprised_sayings(Character *ch, Character *aggressor)
+void mob_suprised_sayings(CharacterPtr ch, CharacterPtr aggressor)
 {
   switch (number(0, 6))
   {
@@ -643,7 +644,7 @@ void mob_suprised_sayings(Character *ch, Character *aggressor)
 /* check to see if the player is protected from the mob */
 // PROTECTION_FROM_EVIL and GOOD modifier contains the level
 // protected from.  PAL's ANTI's take spell/level whichever higher
-bool is_protected(Character *vict, Character *ch)
+bool is_protected(CharacterPtr vict, CharacterPtr ch)
 {
   affected_type *aff = vict->affected_by_spell(SPELL_PROTECT_FROM_EVIL);
   int level_protected = aff ? aff->modifier : 0;
@@ -684,7 +685,7 @@ bool is_protected(Character *vict, Character *ch)
   return (false);
 }
 
-void scavenge(Character *ch)
+void scavenge(CharacterPtr ch)
 {
   class Object *obj;
   int done;
@@ -972,10 +973,10 @@ void scavenge(Character *ch)
 
 void clear_hunt(varg_t arg1, void *arg2, void *arg3)
 {
-  clear_hunt(arg1, (Character *)arg2, nullptr);
+  clear_hunt(arg1, (CharacterPtr)arg2, nullptr);
 }
 
-void clear_hunt(varg_t arg1, Character *arg2, void *arg3)
+void clear_hunt(varg_t arg1, CharacterPtr arg2, void *arg3)
 {
   const auto &character_list = DC::getInstance()->character_list;
   for (const auto &curr : character_list)

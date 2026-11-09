@@ -51,7 +51,7 @@
 #include "DC/structs.h"
 #include "DC/timeinfo.h"
 
-int FOUNTAINisPresent(Character *ch);
+int FOUNTAINisPresent(CharacterPtr ch);
 
 /* When age < 15 return the value p0 */
 /* When age in 15..29 calculate the line between p1 & p2 */
@@ -78,7 +78,7 @@ int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
 
 /* The three MAX functions define a characters Effective maximum */
 /* Which is NOT the same as the ch->max_xxxx !!!          */
-int32_t mana_limit(Character *ch)
+int32_t mana_limit(CharacterPtr ch)
 {
   int max;
 
@@ -91,12 +91,12 @@ int32_t mana_limit(Character *ch)
 }
 
 // Previously any NPC got 0 returned.
-int32_t ki_limit(Character *ch)
+int32_t ki_limit(CharacterPtr ch)
 {
   return ch->max_ki;
 }
 
-int32_t hit_limit(Character *ch)
+int32_t hit_limit(CharacterPtr ch)
 {
   int max;
 
@@ -333,7 +333,7 @@ int Character::move_gain_lookup(int extra)
   return MAX(1, gain);
 }
 
-void redo_hitpoints(Character *ch)
+void redo_hitpoints(CharacterPtr ch)
 {
   /*affected_type *af;*/
   int i, j, bonus = 0;
@@ -365,7 +365,7 @@ void redo_hitpoints(Character *ch)
   add_totem_stats(ch, APPLY_HIT);
 }
 
-void redo_mana(Character *ch)
+void redo_mana(CharacterPtr ch)
 
 {
   /*affected_type *af;*/
@@ -407,7 +407,7 @@ void redo_mana(Character *ch)
   add_totem_stats(ch, APPLY_MANA);
 }
 
-void redo_ki(Character *ch)
+void redo_ki(CharacterPtr ch)
 {
   int i, j;
   ch->max_ki = ch->raw_ki;
@@ -438,7 +438,7 @@ void redo_ki(Character *ch)
 }
 
 /* Gain maximum in various */
-void advance_level(Character *ch, int is_conversion)
+void advance_level(CharacterPtr ch, int is_conversion)
 {
   int add_hp = 0;
   int add_mana = 1;
@@ -617,7 +617,7 @@ void advance_level(Character *ch, int is_conversion)
     ch->sendln("The protective covenant of your corpse weakens, upon death players may steal 1 item from you. (See help LOOT for details)");
 }
 
-void gain_exp(Character *ch, int64_t gain)
+void gain_exp(CharacterPtr ch, int64_t gain)
 {
   int x = 0;
   int64_t y;
@@ -639,7 +639,7 @@ void gain_exp(Character *ch, int64_t gain)
   if (GET_EXP(ch) < 0)
     GET_EXP(ch) = 0;
 
-  void golem_gain_exp(Character * ch);
+  void golem_gain_exp(CharacterPtr ch);
 
   if (ch->isPlayer() && ch->player->golem && ch->in_room == ch->player->golem->in_room) // Golems get mage's exp, when they're in the same room
     gain_exp(ch->player->golem, gain);
@@ -661,7 +661,7 @@ void gain_exp(Character *ch, int64_t gain)
   return;
 }
 
-void gain_exp_regardless(Character *ch, int gain)
+void gain_exp_regardless(CharacterPtr ch, int gain)
 {
   GET_EXP(ch) += (int64_t)gain;
 
@@ -681,7 +681,7 @@ void gain_exp_regardless(Character *ch, int gain)
   return;
 }
 
-void gain_condition(Character *ch, int condition, int value)
+void gain_condition(CharacterPtr ch, int condition, int value)
 {
   bool intoxicated;
 
@@ -793,7 +793,7 @@ void point_update(void)
       continue;
 
     int a;
-    Character *temp;
+    CharacterPtr temp;
     if (i->isPlayer() && ISSET(i->affected_by, AFF_HIDE) && (a = i->has_skill(SKILL_HIDE)))
     {
       int o;
@@ -925,7 +925,7 @@ void update_corpses_and_portals(void)
 
               if (isSet(oo->obj_flags.more_flags, ITEM_NO_TRADE))
               {
-                log_sacrifice((Character *)j, oo, true);
+                log_sacrifice((CharacterPtr)j, oo, true);
                 extract_obj(oo);
               }
             }
@@ -984,7 +984,7 @@ void update_corpses_and_portals(void)
   // process_portals();
 }
 
-void prepare_character_for_sixty(Character *ch)
+void prepare_character_for_sixty(CharacterPtr ch)
 {
   if (ch->isPlayer() && DC::MAX_MORTAL_LEVEL == 60)
   {

@@ -105,8 +105,8 @@ class QRandomGenerator;
 extern std::map<int, std::map<uint8_t, std::string>> professions;
 
 // extern funcs
-clan_data *get_clan(Character *);
-void release_message(Character *ch);
+clan_data *get_clan(CharacterPtr);
+void release_message(CharacterPtr ch);
 timer_data *timer_list = nullptr;
 
 // tested in TestUtility::test_nocolor_strlen_qstring
@@ -343,7 +343,7 @@ FILEPtr quest_log = 0;
 FILEPtr vault_log = 0;
 
 // writes a std::string to the log
-void logentry(QString str, quint64 god_level, DC::LogChannel type, Character *vict)
+void logentry(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)
 {
   FILEPtr *f = 0;
   int stream = 1;
@@ -922,7 +922,7 @@ bool file_exists(const char *filename)
   return true;
 }
 
-void util_archive(const char *char_name, Character *caller)
+void util_archive(const char *char_name, CharacterPtr caller)
 {
   char buf[256];
   char buf2[256];
@@ -980,7 +980,7 @@ void util_archive(const char *char_name, Character *caller)
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
-void util_unarchive(char *char_name, Character *caller)
+void util_unarchive(char *char_name, CharacterPtr caller)
 {
   char buf[256];
   char buf2[256];
@@ -1034,7 +1034,7 @@ void util_unarchive(char *char_name, Character *caller)
   logentry(buf, IMMORTAL, DC::LogChannel::LOG_GOD);
 }
 
-bool ARE_CLANNED(Character *sub, Character *obj)
+bool ARE_CLANNED(CharacterPtr sub, CharacterPtr obj)
 {
   if (sub->isPlayer() &&
       obj->isNonPlayer() &&
@@ -1084,10 +1084,10 @@ bool Room::isDark(void)
   return false;
 }
 
-bool ARE_GROUPED(Character *sub, Character *obj)
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj)
 {
   follow_type *f;
-  Character *k;
+  CharacterPtr k;
 
   if (obj == sub)
     return true;
@@ -1143,7 +1143,7 @@ bool SOMEONE_DIED(int value)
   return false;
 }
 
-bool CAN_SEE(Character *sub, Character *obj, bool noprog)
+bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
 {
   if (obj == sub)
     return true;
@@ -1231,7 +1231,7 @@ bool CAN_SEE(Character *sub, Character *obj, bool noprog)
   return false;
 }
 
-bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
+bool CAN_SEE_OBJ(CharacterPtr sub, class Object *obj, bool blindfighting)
 {
   int skill = 0;
   affected_type *cur_af;
@@ -1297,7 +1297,7 @@ bool CAN_SEE_OBJ(Character *sub, class Object *obj, bool blindfighting)
   return true;
 }
 
-bool check_blind(Character *ch)
+bool check_blind(CharacterPtr ch)
 {
 
   //   if (IS_AFFECTED(ch, AFF_true_SIGHT))
@@ -1315,14 +1315,14 @@ bool check_blind(Character *ch)
   return false;
 }
 
-int do_order(Character *ch, char *argument, cmd_t cmd)
+int do_order(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
   char buf[256];
   bool found = false;
   int org_room;
   int retval;
-  Character *victim;
+  CharacterPtr victim;
   follow_type *k;
 
   half_chop(argument, name, message);
@@ -1393,7 +1393,7 @@ int do_order(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_idea(Character *ch, char *argument, cmd_t cmd)
+int do_idea(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   FILEPtr fl;
   char str[MAX_STRING_LENGTH];
@@ -1427,7 +1427,7 @@ int do_idea(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_typo(Character *ch, char *argument, cmd_t cmd)
+int do_typo(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   FILEPtr fl;
   char str[MAX_STRING_LENGTH];
@@ -1462,7 +1462,7 @@ int do_typo(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_bug(Character *ch, char *argument, cmd_t cmd)
+int do_bug(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   FILEPtr fl;
   char str[MAX_STRING_LENGTH];
@@ -1500,8 +1500,8 @@ int do_bug(Character *ch, char *argument, cmd_t cmd)
 command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
 {
   int location = {}, level = {}, cost = {}, x = {};
-  Character *victim = {};
-  Character *loop_ch = {};
+  CharacterPtr victim = {};
+  CharacterPtr loop_ch = {};
   float cf = {};
   QString name;
   clan_data *clan = {};
@@ -1710,13 +1710,13 @@ command_return_t Character::do_recall(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-int do_qui(Character *ch, char *argument, cmd_t cmd)
+int do_qui(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   ch->sendln("You have to write quit - no less, to quit!");
   return ReturnValue::eSUCCESS;
 }
 
-int do_quit(Character *ch, char *argument, cmd_t cmd)
+int do_quit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int iWear;
   follow_type *k;
@@ -1726,7 +1726,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   Object *obj, *tmp_obj;
 
-  void find_and_remove_player_portal(Character * ch);
+  void find_and_remove_player_portal(CharacterPtr ch);
 
   /*
   | Code inserted by Morc 9 Apr 1997 to fix crasher
@@ -1856,7 +1856,7 @@ int do_quit(Character *ch, char *argument, cmd_t cmd)
     {
       tmp_obj = obj->next;
       if (obj->vnum_ == CONSECRATE_OBJ_NUMBER)
-        if (ch == (Character *)(obj->obj_flags.origin))
+        if (ch == (CharacterPtr)(obj->obj_flags.origin))
           extract_obj(obj);
     }
   }
@@ -1974,7 +1974,7 @@ command_return_t Character::do_save(QStringList arguments, cmd_t cmd)
   return save(cmd);
 }
 
-int do_home(Character *ch, char *argument, cmd_t cmd)
+int do_home(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   clan_data *clan;
   clan_room_data *room;
@@ -2047,7 +2047,7 @@ command_return_t Character::generic_command(QStringList argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_beep(Character *ch, char *argument, cmd_t cmd)
+int do_beep(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   ch->sendln("Beep!\a");
   return ReturnValue::eSUCCESS;
@@ -2088,7 +2088,7 @@ bool check_valid_and_convert(int &value, char *buf)
 }
 
 // modified for new SETBIT et al. commands
-void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, CharacterPtr ch, uint value[])
 {
   bool found = false;
 
@@ -2138,7 +2138,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
   }
 }
 
-void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(QStringList bits, QString arg1, CharacterPtr ch, uint32_t &value)
 {
   int found = false;
 
@@ -2172,13 +2172,13 @@ void parse_bitstrings_into_int(QStringList bits, QString arg1, Character *ch, ui
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint value[])
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, CharacterPtr ch, uint value[])
 {
   return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
 }
 
 // calls below uint32_t version
-void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint16_t &value)
+void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, CharacterPtr ch, uint16_t &value)
 {
   int found = false;
 
@@ -2229,7 +2229,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
   }
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint16_t &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, CharacterPtr ch, uint16_t &value)
 {
   return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
 }
@@ -2238,7 +2238,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, C
 // Finds the bits[] strings listed in "strings" and toggles the bit in "value"
 // Informs 'ch' of what has happened
 //
-void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, CharacterPtr ch, uint32_t &value)
 {
   bool found = false;
 
@@ -2288,7 +2288,7 @@ void parse_bitstrings_into_int(const char *bits[], std::string remainder_args, C
     ch->send("No matching bits found.\n\n");
 }
 
-void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, Character *ch, uint32_t &value)
+void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, CharacterPtr ch, uint32_t &value)
 {
   return parse_bitstrings_into_int(bits, std::string(remainder_args), ch, value);
 }
@@ -2377,7 +2377,7 @@ int random_percent_change(int from, int to, int value)
   return round((number(from, to) / 100.0) * value) + value;
 }
 
-bool is_in_game(Character *ch)
+bool is_in_game(CharacterPtr ch)
 {
   // Bug in code if this happens
   if (ch == 0)
@@ -2579,7 +2579,8 @@ void remove_familiars(QString name, BACKUP_TYPE backup)
 
 bool check_make_camp(room_t room)
 {
-  Character *i, *next_i;
+  CharacterPtr i;
+  CharacterPtr next_i;
   bool campok = false;
 
   for (i = DC::getInstance()->world[room].people; i; i = next_i)
@@ -2597,9 +2598,9 @@ bool check_make_camp(room_t room)
   return campok;
 }
 
-int get_leadership_bonus(Character *ch)
+int get_leadership_bonus(CharacterPtr ch)
 {
-  Character *leader;
+  CharacterPtr leader;
   follow_type *f, *next_f;
   int highlevel = 0, bonus = 0;
 
@@ -2650,7 +2651,7 @@ void update_make_camp_and_leadership(void)
   const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
-           [&af, &bonus](Character *i)
+           [&af, &bonus](CharacterPtr i)
            {
              if (!i->fighting)
              {
@@ -2731,7 +2732,7 @@ void update_make_camp_and_leadership(void)
            });
 }
 
-void unique_scan(Character *victim)
+void unique_scan(CharacterPtr victim)
 {
   if (!victim)
     return;
@@ -3297,7 +3298,7 @@ bool operator!(load_status_t ls)
   return ls != load_status_t::success;
 }
 
-void WAIT_STATE(Character *ch, int cycle)
+void WAIT_STATE(CharacterPtr ch, int cycle)
 {
   if (ch->desc && !ch->isImmortalPlayer())
   {
@@ -3308,7 +3309,7 @@ void WAIT_STATE(Character *ch, int cycle)
     ch->deaths = cycle;
 }
 
-int GET_WAIT(Character *ch)
+int GET_WAIT(CharacterPtr ch)
 {
   if (ch->isNonPlayer())
     return ch->deaths;

@@ -29,10 +29,10 @@ public:
   void write_file(std::string &filename);
   void write_file(std::stringstream &filename);
   void write_file(const char filename[]);
-  int pdscore(Character *ch);
+  int pdscore(CharacterPtr ch);
   void rename(QString oldname, QString newname);
   void setHP(unsigned int placement, std::string name, int value);
-  int scan(Character *ch);
+  int scan(CharacterPtr ch);
 
 private:
   char *hpactivename[5];

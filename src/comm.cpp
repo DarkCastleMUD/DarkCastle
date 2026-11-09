@@ -1007,7 +1007,7 @@ void DC::game_test_init(void)
   assert(!strcmp(name, "1"));
 
   auto d = new Connection;
-  Character *ch = new Character(this);
+  CharacterPtr ch = new Character(this);
   ch->setName(u"Debugimp"_s);
   ch->player = new Player;
   ch->setType(Character::Type::Player);
@@ -1291,7 +1291,7 @@ void telnet_ga(Connection *d)
   SEND_TO_Q(QByteArray(go_ahead), d);
 }
 
-int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
+int do_lastprompt(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (ch->getLastPrompt().isEmpty())
     ch->sendln("Last prompt: unset");
@@ -1301,7 +1301,7 @@ int do_lastprompt(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_prompt(Character *ch, char *arg, cmd_t cmd)
+int do_prompt(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   while (*arg == ' ')
     arg++;
@@ -1402,7 +1402,7 @@ char *cond_txtc[] = {
     BOLD GREY "near death" NTEXT,
     "dead as a doornail"};
 
-char *calc_condition(Character *ch, bool colour)
+char *calc_condition(CharacterPtr ch, bool colour)
 {
   int percent;
   char *cond_txt[8]; // = cond_txtz;
@@ -1481,7 +1481,7 @@ QString Connection::createPrompt(void)
   return prompt;
 }
 
-Character *get_charmie(Character *ch)
+CharacterPtr get_charmie(CharacterPtr ch)
 {
   if (!ch)
     return 0;
@@ -2210,7 +2210,7 @@ int close_socket(class Connection *d)
     {
       d->character->save_char_obj();
       // clan area stuff
-      extern void check_quitter(Character * ch);
+      extern void check_quitter(CharacterPtr ch);
       check_quitter(d->character);
 
       // end any performances
@@ -2263,8 +2263,8 @@ int close_socket(class Connection *d)
     // if there is NOONE on (everyone got disconnected) loop through and
     // boot all of the linkdeads.  That way if the mud's link is cut, the
     // first person back on can't RK everyone
-    Character * next_i;
-    for(Character * i = character_list; i; i = next_i) {
+    CharacterPtr  next_i;
+    for(CharacterPtr  i = character_list; i; i = next_i) {
        next_i = i->next;
        if(i->isNonPlayer())
          continue;
@@ -2504,7 +2504,7 @@ void signal_setup(void)
  *       Public routines for system-to-player-communication        *
  **************************************************************** */
 
-void send_to_char_regardless(QString messg, Character *ch)
+void send_to_char_regardless(QString messg, CharacterPtr ch)
 {
   if (ch->desc && !messg.isEmpty())
   {
@@ -2512,7 +2512,7 @@ void send_to_char_regardless(QString messg, Character *ch)
   }
 }
 
-void send_to_char_regardless(std::string messg, Character *ch)
+void send_to_char_regardless(std::string messg, CharacterPtr ch)
 {
   if (ch->desc && !messg.empty())
   {
@@ -2520,19 +2520,19 @@ void send_to_char_regardless(std::string messg, Character *ch)
   }
 }
 
-void send_to_char_nosp(const char *messg, Character *ch)
+void send_to_char_nosp(const char *messg, CharacterPtr ch)
 {
   char *tmp = str_nospace(messg);
   ch->send(tmp);
   dc_free(tmp);
 }
 
-void send_to_char_nosp(QString messg, Character *ch)
+void send_to_char_nosp(QString messg, CharacterPtr ch)
 {
   send_to_char_nosp(messg.toStdString().c_str(), ch);
 }
 
-void record_msg(QString messg, Character *ch)
+void record_msg(QString messg, CharacterPtr ch)
 {
   if (messg.isEmpty() || !ch->isImmortalPlayer())
     return;
@@ -2543,7 +2543,7 @@ void record_msg(QString messg, Character *ch)
   }
 }
 
-int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
+int do_awaymsgs(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int lines = 0;
   QString tmp;
@@ -2575,7 +2575,7 @@ int do_awaymsgs(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void check_for_awaymsgs(Character *ch)
+void check_for_awaymsgs(CharacterPtr ch)
 {
   if (!ch)
     return;
@@ -2592,7 +2592,7 @@ void check_for_awaymsgs(Character *ch)
   ch->sendln("Type awaymsgs to view them.");
 }
 
-void send_to_char(QString messg, Character *ch)
+void send_to_char(QString messg, CharacterPtr ch)
 {
   if (ch->isNonPlayer() && !ch->desc && MOBtrigger && !messg.isEmpty())
     ch->getDC()->mprog_act_trigger(messg.toStdString(), ch, 0, 0, 0);
@@ -2637,7 +2637,7 @@ void send_to_all(QString message)
   }
 }
 
-void ansi_color(const char *txt, Character *ch)
+void ansi_color(const char *txt, CharacterPtr ch)
 {
   // mobs don't have toggles, so they automatically get ansi on
   if (txt != nullptr && ch->desc != nullptr)
@@ -2709,9 +2709,9 @@ void send_to_zone(char *messg, int zone)
   }
 }
 
-void send_to_room(QString messg, room_t room, bool awakeonly, Character *nta)
+void send_to_room(QString messg, room_t room, bool awakeonly, CharacterPtr nta)
 {
-  Character *i = nullptr;
+  CharacterPtr i = nullptr;
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == DC::NOWHERE)
@@ -2728,7 +2728,7 @@ void send_to_room(QString messg, room_t room, bool awakeonly, Character *nta)
           SEND_TO_Q(messg, i->desc);
 }
 
-bool is_busy(Character *ch)
+bool is_busy(CharacterPtr ch)
 {
   if (ch->desc && ch->desc->isEditing())
   {
@@ -2775,7 +2775,7 @@ char *any_one_arg(char *argument, char *first_arg)
   return argument;
 }
 
-bool is_multi(Character *ch)
+bool is_multi(CharacterPtr ch)
 {
   for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
@@ -2788,7 +2788,7 @@ bool is_multi(Character *ch)
   return false;
 }
 
-void warn_if_duplicate_ip(Character *ch)
+void warn_if_duplicate_ip(CharacterPtr ch)
 {
   char buf[256];
   int highlev = 51;
@@ -2831,7 +2831,7 @@ void warn_if_duplicate_ip(Character *ch)
   }
 }
 
-int do_editor(Character *ch, char *argument, cmd_t cmd)
+int do_editor(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (argument == 0)

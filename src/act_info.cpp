@@ -29,7 +29,7 @@ int max_who = 0;
 
 void page_string(class Connection *d, const char *str, int keep_internal);
 
-int do_levels(Character *ch, char *argument, cmd_t cmd)
+int do_levels(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

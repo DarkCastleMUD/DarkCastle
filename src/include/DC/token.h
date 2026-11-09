@@ -1,7 +1,7 @@
 #pragma once
+#include "DC/types.h"
 #include <qcontainerfwd.h>
 #include <QByteArray>
-class Character;
 class Object;
 /*-----------------------------------------------------------------------
 | Token section.  This section begins the Token class and methods.
@@ -49,7 +49,7 @@ public:
 
   TokenList(const char *);
   ~TokenList();
-  QByteArray Interpret(Character *from, Object *obj, void *vict_obj, Character *send_to, int flags, QString keyword);
+  QByteArray Interpret(CharacterPtr from, Object *obj, void *vict_obj, CharacterPtr send_to, int flags, QString keyword);
 
 private:
   //--

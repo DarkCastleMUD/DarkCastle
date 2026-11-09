@@ -117,10 +117,10 @@ command_return_t Character::do_say(QStringList arguments, cmd_t cmd)
 
 // Psay works like 'say', just it's directed at a person
 // TODO - after this gets used alot, maybe switch speech triggers to it
-command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_psay(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   std::string vict = {}, message = {}, buf = {};
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
   extern bool MOBtrigger;
 
   if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
@@ -188,7 +188,7 @@ command_return_t do_psay(Character *ch, std::string argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pray(Character *ch, char *arg, cmd_t cmd)
+int do_pray(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   class Connection *i;
@@ -241,7 +241,7 @@ int do_pray(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_gossip(Character *ch, char *argument, cmd_t cmd)
+int do_gossip(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
@@ -449,7 +449,7 @@ command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_shout(Character *ch, char *argument, cmd_t cmd)
+int do_shout(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -526,7 +526,7 @@ int do_shout(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_trivia(Character *ch, char *argument, cmd_t cmd)
+int do_trivia(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -628,7 +628,7 @@ int do_trivia(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_dream(Character *ch, char *argument, cmd_t cmd)
+int do_dream(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH] = {0};
   char buf2[MAX_STRING_LENGTH] = {0};
@@ -702,7 +702,7 @@ int do_dream(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_tellhistory(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   if (ch == nullptr)
   {
@@ -740,7 +740,7 @@ command_return_t do_tellhistory(Character *ch, std::string argument, cmd_t cmd)
 
 command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 {
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
   QString name = {}, message = {}, buf = {}, log_buf = {};
   Object *tmp_obj = nullptr;
 
@@ -961,10 +961,10 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_reply(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   std::string buf = {};
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
 
   if (ch->isNonPlayer() || ch->player->last_tell.isEmpty())
   {
@@ -1002,9 +1002,9 @@ command_return_t do_reply(Character *ch, std::string argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_whisper(Character *ch, char *argument, cmd_t cmd)
+int do_whisper(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
       buf[MAX_STRING_LENGTH];
 
@@ -1047,9 +1047,9 @@ int do_whisper(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_ask(Character *ch, char *argument, cmd_t cmd)
+int do_ask(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
   Object *tmp_obj;
@@ -1092,10 +1092,10 @@ int do_ask(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_grouptell(Character *ch, char *argument, cmd_t cmd)
+int do_grouptell(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  Character *k;
+  CharacterPtr k;
   follow_type *f;
   Object *tmp_obj;
   bool silence = false;
@@ -1188,7 +1188,7 @@ int do_grouptell(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_newbie(Character *ch, char *argument, cmd_t cmd)
+int do_newbie(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -1275,7 +1275,7 @@ int do_newbie(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void Character::tell_history(Character *ch, QString message)
+void Character::tell_history(CharacterPtr ch, QString message)
 {
   if (!isPlayer())
   {
@@ -1291,7 +1291,7 @@ void Character::tell_history(Character *ch, QString message)
   }
 }
 
-void Character::gtell_history(Character *ch, QString message)
+void Character::gtell_history(CharacterPtr ch, QString message)
 {
   if (this->player == nullptr)
   {
@@ -1307,7 +1307,7 @@ void Character::gtell_history(Character *ch, QString message)
   }
 }
 
-communication::communication(Character *ch, QString message)
+communication::communication(CharacterPtr ch, QString message)
 {
   this->sender = GET_NAME(ch);
   this->sender_ispc = ch->isPlayer();

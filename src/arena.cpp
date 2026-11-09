@@ -70,7 +70,7 @@ auto Character::do_arena(QStringList arguments, cmd_t cmd) -> command_return_t
   return ReturnValue::eSUCCESS;
 }
 
-auto do_joinarena(Character *ch, char *arg, cmd_t cmd) -> int
+auto do_joinarena(CharacterPtr ch, char *arg, cmd_t cmd) -> int
 {
   char buf[256];
   int send_to = DC::NOWHERE;

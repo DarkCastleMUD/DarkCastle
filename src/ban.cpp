@@ -122,7 +122,7 @@ void write_ban_list(void)
   _write_one_node(fl, ban_list); /* recursively write from end to start */
 }
 
-int do_ban(Character *ch, char *argument, cmd_t cmd)
+int do_ban(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char flag[MAX_INPUT_LENGTH], format[MAX_INPUT_LENGTH], site[MAX_INPUT_LENGTH], *nextchar;
   int i;
@@ -220,7 +220,7 @@ int do_ban(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_unban(Character *ch, char *argument, cmd_t cmd)
+int do_unban(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char site[MAX_INPUT_LENGTH + 1];
   ban_list_element *ban_node, *temp;

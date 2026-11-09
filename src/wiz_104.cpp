@@ -70,7 +70,7 @@ int count_rooms(int start, int end)
   return count;
 }
 
-int do_thunder(Character *ch, char *argument, cmd_t cmd)
+int do_thunder(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
@@ -118,7 +118,7 @@ int do_thunder(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_incognito(Character *ch, char *argument, cmd_t cmd)
+int do_incognito(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -138,7 +138,7 @@ int do_incognito(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_load(Character *ch, char *arg, cmd_t cmd)
+int do_load(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char type[MAX_INPUT_LENGTH] = {0};
   char name[MAX_INPUT_LENGTH] = {0};
@@ -352,9 +352,10 @@ int do_load(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_purge(Character *ch, char *argument, cmd_t cmd)
+int do_purge(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict, *next_v;
+  CharacterPtr vict;
+  CharacterPtr next_v;
   class Object *obj, *next_o;
 
   char name[100], buf[300];
@@ -460,7 +461,7 @@ char *dirNumToChar(int dir)
   return "ERROR";
 }
 
-int Zone::show_info(Character *ch)
+int Zone::show_info(CharacterPtr ch)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -507,7 +508,7 @@ int Zone::show_info(Character *ch)
   return ReturnValue::eSUCCESS;
 }
 
-int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 num_to_show, bool stats)
+int show_zone_commands(CharacterPtr ch, const Zone &zone, quint64 start, quint64 num_to_show, bool stats)
 {
   char buf[MAX_STRING_LENGTH];
   int k = 0;
@@ -764,7 +765,7 @@ int show_zone_commands(Character *ch, const Zone &zone, quint64 start, quint64 n
   return ReturnValue::eSUCCESS;
 }
 
-int show_zone_commands(Character *ch, zone_t zone_key, quint64 start, quint64 num_to_show, bool stats)
+int show_zone_commands(CharacterPtr ch, zone_t zone_key, quint64 start, quint64 num_to_show, bool stats)
 {
   if (!isValidZoneKey(ch, zone_key))
   {
@@ -775,7 +776,7 @@ int show_zone_commands(Character *ch, zone_t zone_key, quint64 start, quint64 nu
   return show_zone_commands(ch, zone, start, num_to_show, stats);
 }
 
-void show_legacy_files(Character *ch, const world_file_list_t &list)
+void show_legacy_files(CharacterPtr ch, const world_file_list_t &list)
 {
   quint64 i = 0;
 
@@ -809,7 +810,7 @@ void show_legacy_files(Character *ch, const world_file_list_t &list)
   }
 }
 
-int do_show(Character *ch, char *argument, cmd_t cmd)
+int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH], buf[200];
   char beginrange[MAX_INPUT_LENGTH];
@@ -1789,7 +1790,7 @@ int do_show(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
+command_return_t do_transfer(CharacterPtr ch, std::string arguments, cmd_t cmd)
 {
   if (ch->isNonPlayer() || ch == nullptr)
   {
@@ -1811,7 +1812,7 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
   room_t source_room = {};
   Connection *i = nullptr;
   if (arg1 == "all")
@@ -1860,9 +1861,11 @@ command_return_t do_transfer(Character *ch, std::string arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_teleport(Character *ch, char *argument, cmd_t cmd)
+int do_teleport(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim, *target_mob, *pers;
+  CharacterPtr victim;
+  CharacterPtr target_mob;
+  CharacterPtr pers;
   char person[MAX_INPUT_LENGTH], room[MAX_INPUT_LENGTH];
   int target;
   int loop;
@@ -1955,10 +1958,10 @@ int do_teleport(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 } /* do_teleport */
 
-int do_gtrans(Character *ch, char *argument, cmd_t cmd)
+int do_gtrans(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   // class Connection *i;
-  Character *victim;
+  CharacterPtr victim;
   char buf[100];
   int target;
   follow_type *k, *next_dude;
@@ -2045,7 +2048,7 @@ char *oprog_type_to_name(int type)
   }
 }
 
-void opstat(Character *ch, vnum_t vnum)
+void opstat(CharacterPtr ch, vnum_t vnum)
 {
   auto num = vnum;
   Object *obj;
@@ -2083,7 +2086,7 @@ void opstat(Character *ch, vnum_t vnum)
   }
 }
 
-int do_opstat(Character *ch, char *argument, cmd_t cmd)
+int do_opstat(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   vnum_t vnum = {};
@@ -2126,7 +2129,7 @@ void update_objprog_bits(int num)
   }
 }
 
-int do_opedit(Character *ch, char *argument, cmd_t cmd)
+int do_opedit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i = -1, a = -1;
   vnum_t num{}, vnum{};
@@ -2383,7 +2386,7 @@ int do_opedit(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_oclone(Character *ch, char *argument, cmd_t cmd)
+int do_oclone(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -2457,7 +2460,7 @@ int do_oclone(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_mclone(Character *ch, char *argument, cmd_t cmd)
+int do_mclone(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
@@ -2467,7 +2470,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
     ch->sendln("Syntax: mclone <source vnum> <destination vnum>");
     return ReturnValue::eFAILURE;
   }
-  Character *mob;
+  CharacterPtr mob;
   int vdst = atoi(arg2), vsrc = atoi(arg1);
   int dst = vdst, src = vsrc;
   if (!DC::getInstance()->mob_index.contains(src))
@@ -2513,7 +2516,7 @@ int do_mclone(Character *ch, char *argument, cmd_t cmd)
   mob->mobdata->vnum_ = dst;
 
   // Find old mobile in world and remove
-  Character *old_mob = DC::getInstance()->mob_index[dst].mob;
+  CharacterPtr old_mob = DC::getInstance()->mob_index[dst].mob;
   if (old_mob && old_mob->mobdata)
   {
     const auto &character_list = DC::getInstance()->character_list;

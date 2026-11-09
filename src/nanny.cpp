@@ -74,7 +74,7 @@
 
 #define STATE(d) ((d)->connected)
 
-bool is_bracing(Character *bracee, room_direction_data *exit);
+bool is_bracing(CharacterPtr bracee, room_direction_data *exit);
 void show_question_race(Connection *d);
 
 const char menu[] = "\nWelcome to Dark Castle Mud\n\n"
@@ -99,21 +99,21 @@ extern Object *object_list;
 
 int _parse_email(char *arg);
 bool check_deny(class Connection *d, const char *name);
-void isr_set(Character *ch);
+void isr_set(CharacterPtr ch);
 bool check_reconnect(class Connection *d, QString name, bool fReconnect);
 bool check_playing(class Connection *d, QString name);
 char *str_str(char *first, char *second);
-bool apply_race_attributes(Character *ch, int race = 0);
-bool check_race_attributes(Character *ch, int race = 0);
+bool apply_race_attributes(CharacterPtr ch, int race = 0);
+bool check_race_attributes(CharacterPtr ch, int race = 0);
 bool handle_get_race(Connection *d, QString arg);
 void show_question_race(Connection *d);
 void show_question_class(Connection *d);
 bool handle_get_class(Connection *d, QString arg);
-int is_clss_race_compat(Character *ch, int clss);
+int is_clss_race_compat(CharacterPtr ch, int clss);
 void show_question_stats(Connection *d);
 bool handle_get_stats(Connection *d, QString arg);
 
-int is_race_eligible(Character *ch, int race)
+int is_race_eligible(CharacterPtr ch, int race)
 {
   if (race == 2 && (GET_RAW_DEX(ch) < 10 || GET_RAW_INT(ch) < 10))
     return false;
@@ -134,7 +134,7 @@ int is_race_eligible(Character *ch, int race)
   return true;
 }
 
-int is_clss_race_compat(const Character *ch, int clss, int race)
+int is_clss_race_compat(const CharacterPtr ch, int clss, int race)
 {
   bool compat = false;
 
@@ -189,7 +189,7 @@ int is_clss_race_compat(const Character *ch, int clss, int race)
   return (compat);
 }
 
-int is_clss_eligible(Character *ch, int clss)
+int is_clss_eligible(CharacterPtr ch, int clss)
 {
   int x = 0;
 
@@ -829,7 +829,7 @@ void DC::nanny(class Connection *d, QString arg)
   unsigned selection{};
   int y{};
   char badclssmsg[] = "You must choose a class that matches your stats. These are marked by a '*'.\nSelect a class-> ";
-  Character *ch{};
+  CharacterPtr ch{};
   QString buf;
   QString str_tmp;
   QString password;
@@ -1801,7 +1801,7 @@ void DC::nanny(class Connection *d, QString arg)
                        ch);
         }
       }
-      extern void zap_eq_check(Character * ch);
+      extern void zap_eq_check(CharacterPtr ch);
       zap_eq_check(ch);
       break;
 
@@ -2081,7 +2081,7 @@ bool check_reconnect(class Connection *d, QString name, bool fReconnect)
 bool check_playing(class Connection *d, QString name)
 {
   class Connection *dold, *next_d;
-  Character *compare = 0;
+  CharacterPtr compare = 0;
 
   for (dold = DC::getInstance()->descriptor_list; dold; dold = next_d)
   {
@@ -2139,18 +2139,18 @@ void short_activity()
 
 // these are for my special lag that only keeps you from doing certain
 // commands, while still allowing other.
-void add_command_lag(Character *ch, int amount)
+void add_command_lag(CharacterPtr ch, int amount)
 {
   if (ch->isMortalPlayer())
     ch->timer += amount;
 }
 
-int check_command_lag(Character *ch)
+int check_command_lag(CharacterPtr ch)
 {
   return ch->timer;
 }
 
-void remove_command_lag(Character *ch)
+void remove_command_lag(CharacterPtr ch)
 {
   ch->timer = 0;
 }
@@ -2277,7 +2277,9 @@ void check_silence_beacons(void)
 void DC::checkConsecrate(int pulseType)
 {
   Object *obj, *tmp_obj;
-  Character *ch = nullptr, *tmp_ch, *next_ch;
+  CharacterPtr ch{};
+  CharacterPtr tmp_ch{};
+  CharacterPtr next_ch{};
   int align, amount, spl = 0;
   char buf[MAX_STRING_LENGTH];
 
@@ -2521,7 +2523,7 @@ void show_question_race(Connection *d)
     return;
   }
 
-  Character *ch = d->character;
+  CharacterPtr ch = d->character;
   QString buffer, races_buffer;
   buffer += "\nRacial Bonuses and Pentalties:\n";
   buffer += "$B$7   Race   STR DEX CON INT WIS$R\n";
@@ -2590,7 +2592,7 @@ void show_question_class(Connection *d)
     return;
   }
 
-  Character *ch = d->character;
+  CharacterPtr ch = d->character;
   std::string buffer, classes_buffer;
   buffer += "\n   Class$R\n";
   int clss;
@@ -2633,7 +2635,7 @@ bool handle_get_class(Connection *d, QString arg)
     return false;
   }
 
-  const Character *ch = d->character;
+  const CharacterPtr ch = d->character;
 
   for (unsigned clss = 1; clss <= CLASS_MAX_PROD; clss++)
   {
@@ -2702,7 +2704,7 @@ void show_question_stats(Connection *d)
   {
     d->stats = new stat_data;
 
-    Character *ch = d->character;
+    CharacterPtr ch = d->character;
     int32_t race = d->stats->race = GET_RACE(ch);
     int8_t clss = d->stats->clss = GET_CLASS(ch);
 
@@ -2718,7 +2720,7 @@ void show_question_stats(Connection *d)
     d->stats->setMin();
   }
 
-  Character *ch = d->character;
+  CharacterPtr ch = d->character;
   unsigned race = GET_RACE(ch);
   unsigned clss = GET_CLASS(ch);
   std::string buffer = fmt::format("\nRace: {}\n", races[race].singular_name);
@@ -2852,7 +2854,7 @@ bool handle_get_stats(Connection *d, QString arg)
         return false;
       }
 
-      Character *ch = d->character;
+      CharacterPtr ch = d->character;
       unsigned race = GET_RACE(ch);
       GET_RAW_STR(ch) = d->stats->str[0];
       GET_RAW_DEX(ch) = d->stats->dex[0];
@@ -2879,7 +2881,7 @@ bool handle_get_stats(Connection *d, QString arg)
   return false;
 }
 
-bool apply_race_attributes(Character *ch, int race)
+bool apply_race_attributes(CharacterPtr ch, int race)
 {
   if (ch == nullptr)
   {
@@ -2993,7 +2995,7 @@ bool apply_race_attributes(Character *ch, int race)
   return false;
 }
 
-bool check_race_attributes(Character *ch, int race)
+bool check_race_attributes(CharacterPtr ch, int race)
 {
   if (ch == nullptr)
   {

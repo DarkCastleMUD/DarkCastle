@@ -43,9 +43,9 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 
-Character *origsing = nullptr;
+CharacterPtr origsing = nullptr;
 
-void check_eq(Character *ch);
+void check_eq(CharacterPtr ch);
 
 //        uint8_t beats;     /* Waiting time after ki */
 //        uint8_t minimum_position; /* min position for use */
@@ -206,15 +206,15 @@ const QList<song_info_type> song_info = {
      nullptr, SKILL_INCREASE_MEDIUM},
 };
 
-int16_t use_song(Character *ch, int kn);
-bool ARE_GROUPED(Character *sub, Character *obj);
+int16_t use_song(CharacterPtr ch, int kn);
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
 
-int16_t use_song(Character *ch, int kn)
+int16_t use_song(CharacterPtr ch, int kn)
 {
   return (song_info[kn].min_useski());
 }
 
-int getTotalRating(Character *ch)
+int getTotalRating(CharacterPtr ch)
 {
   int rating = 0;
   std::vector<songInfo>::iterator i;
@@ -227,9 +227,9 @@ int getTotalRating(Character *ch)
   return rating;
 }
 
-void stop_grouped_bards(Character *ch, int bardsing)
+void stop_grouped_bards(CharacterPtr ch, int bardsing)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
 
   if (IS_SINGING(ch))
@@ -276,7 +276,7 @@ void stop_grouped_bards(Character *ch, int bardsing)
   }
 }
 
-void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
+void get_instrument_bonus(CharacterPtr ch, int &comb, int &non_comb)
 {
   comb = 0;
   non_comb = 0;
@@ -290,9 +290,9 @@ void get_instrument_bonus(Character *ch, int &comb, int &non_comb)
   non_comb = ch->equipment[WEAR_HOLD]->obj_flags.value[0];
 }
 
-int do_sing(Character *ch, char *arg, cmd_t cmd)
+int do_sing(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *tar_char = 0;
+  CharacterPtr tar_char = 0;
   Object *tar_obj = 0;
   char name[MAX_STRING_LENGTH];
   char spellarg[MAX_STRING_LENGTH];
@@ -712,7 +712,7 @@ int do_sing(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void update_character_singing(Character *ch)
+void update_character_singing(CharacterPtr ch)
 {
   for (std::vector<songInfo>::iterator j = ch->songs.begin(); j != ch->songs.end(); ++j)
   {
@@ -892,7 +892,7 @@ void update_bard_singing()
   DC::getInstance()->removeDead();
 }
 
-int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_hypnotic_harmony(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -917,7 +917,7 @@ int song_hypnotic_harmony(uint8_t level, Character *ch, char *arg, Character *vi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Character *victim, int skill)
+int execute_song_hypnotic_harmony(uint8_t level, CharacterPtr ch, char *Arg, CharacterPtr victim, int skill)
 {
   affected_type af;
   std::vector<songInfo>::iterator i;
@@ -958,7 +958,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
     return ReturnValue::eFAILURE;
   }
 
-  int charm_levels(Character * ch);
+  int charm_levels(CharacterPtr ch);
   int charm_space(int level);
 
   if (charm_levels(ch) - charm_space(victim->getLevel()) < 0 && victim->master != ch)
@@ -990,7 +990,7 @@ int execute_song_hypnotic_harmony(uint8_t level, Character *ch, char *Arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_disrupt(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   if (!victim || !ch)
   {
@@ -1039,7 +1039,7 @@ int song_disrupt(uint8_t level, Character *ch, char *arg, Character *victim, int
   return spell_dispel_magic(ch->getLevel() - 1, ch, victim, 0, 0);
 }
 
-int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_whistle_sharp(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int dam = 0;
   int retval;
@@ -1098,7 +1098,7 @@ int song_whistle_sharp(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int song_healing_melody(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_healing_melody(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1117,7 +1117,7 @@ int song_healing_melody(uint8_t level, Character *ch, char *arg, Character *vict
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_healing_melody(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int heal = 0;
   int combat, non_combat;
@@ -1138,7 +1138,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
   }
   GET_KI(ch) -= 2;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1189,7 +1189,7 @@ int execute_song_healing_melody(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_revealing_stacato(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1205,9 +1205,9 @@ int song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *v
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_revealing_stacato(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *i;
+  CharacterPtr i;
   Room *room;
   char buf[MAX_STRING_LENGTH];
   char *direction[] = {
@@ -1290,7 +1290,7 @@ int execute_song_revealing_stacato(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1309,10 +1309,10 @@ int song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *v
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   Object *obj = nullptr;
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
   Object *corpse = nullptr;
   char buf[MAX_STRING_LENGTH];
   std::vector<songInfo>::iterator i;
@@ -1350,7 +1350,7 @@ int execute_song_note_of_knowledge(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_terrible_clef(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1365,7 +1365,7 @@ int song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_terrible_clef(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int dam = 0;
   int retval;
@@ -1428,7 +1428,7 @@ int execute_song_terrible_clef(uint8_t level, Character *ch, char *arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_listsongs(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   char buf[200];
 
@@ -1444,7 +1444,7 @@ int song_listsongs(uint8_t level, Character *ch, char *arg, Character *victim, i
   return ReturnValue::eSUCCESS;
 }
 
-int song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_soothing_remembrance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1459,7 +1459,7 @@ int song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_soothing_remembrance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int heal = 0;
   char buf[MAX_STRING_LENGTH];
@@ -1481,7 +1481,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
   int combat, non_combat;
   get_instrument_bonus(ch, combat, non_combat);
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1526,7 +1526,7 @@ int execute_song_soothing_remembrance(uint8_t level, Character *ch, char *arg, C
   return ReturnValue::eSUCCESS;
 }
 
-int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_traveling_march(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1545,7 +1545,7 @@ int song_traveling_march(uint8_t level, Character *ch, char *arg, Character *vic
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_traveling_march(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int heal;
   affected_type af;
@@ -1577,7 +1577,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
   af.bitvector = -1;
   af.caster = GET_NAME(ch);
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -1626,7 +1626,7 @@ int execute_song_traveling_march(uint8_t level, Character *ch, char *arg, Charac
   return ReturnValue::eSUCCESS;
 }
 
-int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_stop(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   if (origsing)
     return ReturnValue::eFAILURE;
@@ -1677,7 +1677,7 @@ int song_stop(uint8_t level, Character *ch, char *arg, Character *victim, int sk
   return ReturnValue::eSUCCESS;
 }
 
-int song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_astral_chanty(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1695,7 +1695,7 @@ int song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-void do_astral_chanty_movement(Character *victim, Character *target)
+void do_astral_chanty_movement(CharacterPtr victim, CharacterPtr target)
 {
   int retval;
 
@@ -1732,7 +1732,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
     return;
   }
 
-  Character *tmpch;
+  CharacterPtr tmpch;
 
   for (tmpch = DC::getInstance()->world[target->in_room].people; tmpch; tmpch = tmpch->next_in_room)
     if (search_char_for_item(tmpch, 76, false) || search_char_for_item(tmpch, 51, false))
@@ -1756,7 +1756,7 @@ void do_astral_chanty_movement(Character *victim, Character *target)
   act("$n appears out of nowhere in a chorus of light and song.", victim, 0, 0, TO_ROOM, 0);
 }
 
-int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_astral_chanty(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int status = 0;
   std::vector<songInfo>::iterator i;
@@ -1789,7 +1789,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
   else
   {
 
-    Character *tmpch;
+    CharacterPtr tmpch;
 
     for (tmpch = DC::getInstance()->world[victim->in_room].people; tmpch; tmpch = tmpch->next_in_room)
       if (search_char_for_item(tmpch, 51, false))
@@ -1825,8 +1825,8 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
         }
       }
 
-      Character *next_char = 0;
-      for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_char)
+      CharacterPtr next_char = 0;
+      for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = next_char)
       {
         next_char = tmp_char->next_in_room;
         if (!ARE_GROUPED(ch, tmp_char))
@@ -1851,7 +1851,7 @@ int execute_song_astral_chanty(uint8_t level, Character *ch, char *arg, Characte
   return status;
 }
 
-int pulse_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int pulse_song_astral_chanty(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   if (number(1, 3) == 3)
     act("$n sings a rousing chanty!", ch, 0, 0, TO_ROOM, 0);
@@ -1859,7 +1859,7 @@ int pulse_song_astral_chanty(uint8_t level, Character *ch, char *arg, Character 
   return ReturnValue::eSUCCESS;
 }
 
-int song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_forgetful_rhythm(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1878,7 +1878,7 @@ int song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *vi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_forgetful_rhythm(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int retval;
   std::vector<songInfo>::iterator i;
@@ -1929,7 +1929,7 @@ int execute_song_forgetful_rhythm(uint8_t level, Character *ch, char *arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -1951,7 +1951,7 @@ int song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   Object *obj = nullptr;
   Object *tobj = nullptr;
@@ -2035,7 +2035,7 @@ int execute_song_shattering_resonance(uint8_t level, Character *ch, char *arg, C
   return ReturnValue::eSUCCESS;
 }
 
-int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_insane_chant(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2050,7 +2050,7 @@ int song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_insane_chant(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   affected_type af;
 
@@ -2088,7 +2088,7 @@ int execute_song_insane_chant(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_flight_of_bee(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2104,7 +2104,7 @@ int song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_flight_of_bee(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   affected_type af;
 
@@ -2115,7 +2115,7 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
   af.caster = GET_NAME(ch);
   af.bitvector = AFF_FLYING;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2138,7 +2138,7 @@ int execute_song_flight_of_bee(uint8_t level, Character *ch, char *arg, Characte
   return ReturnValue::eSUCCESS;
 }
 
-int song_searching_song(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_searching_song(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2158,9 +2158,9 @@ int song_searching_song(uint8_t level, Character *ch, char *arg, Character *vict
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_searching_song(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *target = nullptr;
+  CharacterPtr target = nullptr;
   char buf[200];
   std::vector<songInfo>::iterator i;
 
@@ -2226,7 +2226,7 @@ int execute_song_searching_song(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2242,7 +2242,7 @@ int song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vic
   return ReturnValue::eSUCCESS;
 }
 
-int song_fanatical_fanfare(uint8_t level, Character *ch, char *Aag, Character *victim, int skill)
+int song_fanatical_fanfare(uint8_t level, CharacterPtr ch, char *Aag, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2257,7 +2257,7 @@ int song_fanatical_fanfare(uint8_t level, Character *ch, char *Aag, Character *v
 
   return ReturnValue::eSUCCESS;
 }
-int song_summon_song(uint8_t level, Character *ch, char *Aag, Character *victim, int skill)
+int song_summon_song(uint8_t level, CharacterPtr ch, char *Aag, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2272,7 +2272,7 @@ int song_summon_song(uint8_t level, Character *ch, char *Aag, Character *victim,
 
   return ReturnValue::eSUCCESS;
 }
-int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_summon_song(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   bool summoned = false;
   follow_type *fvictim = nullptr;
@@ -2295,7 +2295,7 @@ int execute_song_summon_song(uint8_t level, Character *ch, char *arg, Character 
   }
   return ReturnValue::eSUCCESS;
 }
-int song_mking_charge(uint8_t level, Character *ch, char *Aag, Character *victim, int skill)
+int song_mking_charge(uint8_t level, CharacterPtr ch, char *Aag, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2311,7 +2311,7 @@ int song_mking_charge(uint8_t level, Character *ch, char *Aag, Character *victim
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   // Note, the jig effects everyone in the group BUT the bard.
   std::vector<songInfo>::iterator i;
@@ -2335,7 +2335,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
   af.caster = GET_NAME(ch);
   af.bitvector = AFF_HASTE;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2382,7 +2382,7 @@ int execute_song_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Charac
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_fanatical_fanfare(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   affected_type af1, af2, af3;
 
@@ -2407,7 +2407,7 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
   af3.bitvector = AFF_NO_PARA;
   af3.caster = GET_NAME(ch);
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2439,7 +2439,7 @@ int execute_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_mking_charge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2466,7 +2466,7 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
   else
     af.bitvector = -1;
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -2518,28 +2518,28 @@ int execute_song_mking_charge(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-/*int pulse_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+/*int pulse_song_fanatical_fanfare(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
  {
  if (number(1,5) == 2)
  act("$n combines singing and poking the people with a stick, getting people worked up.", ch, 0, 0, TO_ROOM,0);
  return ReturnValue::eSUCCESS;
  }*/
 
-int pulse_mking_charge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int pulse_mking_charge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   return ReturnValue::eSUCCESS;
 }
 
-int pulse_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int pulse_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   if (number(1, 5) == 3)
     act("$n prances around like a fairy.", ch, 0, 0, TO_ROOM, 0);
   return ReturnValue::eSUCCESS;
 }
 
-int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int intrp_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
@@ -2567,9 +2567,9 @@ int intrp_jig_of_alacrity(uint8_t level, Character *ch, char *arg, Character *vi
   return ReturnValue::eSUCCESS;
 }
 
-int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int intrp_song_fanatical_fanfare(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
@@ -2604,9 +2604,9 @@ int intrp_song_fanatical_fanfare(uint8_t level, Character *ch, char *arg, Charac
 
   return ReturnValue::eSUCCESS;
 }
-int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int intrp_mking_charge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
@@ -2634,7 +2634,7 @@ int intrp_mking_charge(uint8_t level, Character *ch, char *arg, Character *victi
   return ReturnValue::eSUCCESS;
 }
 
-int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_glitter_dust(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2650,7 +2650,7 @@ int song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_glitter_dust(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   affected_type af;
   affected_type af2;
@@ -2712,7 +2712,7 @@ int execute_song_glitter_dust(uint8_t level, Character *ch, char *arg, Character
   return ReturnValue::eSUCCESS;
 }
 
-int song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_bountiful_sonnet(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2728,9 +2728,9 @@ int song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *vi
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_bountiful_sonnet(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
 
   if (ch->master && ch->master->in_room == ch->in_room && ISSET(ch->affected_by, AFF_GROUP))
@@ -2768,9 +2768,9 @@ int execute_song_bountiful_sonnet(uint8_t level, Character *ch, char *arg, Chara
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_dischordant_dirge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *target = nullptr;
+  CharacterPtr target = nullptr;
   // char buf[400];
   std::vector<songInfo>::iterator i;
 
@@ -2871,7 +2871,7 @@ int execute_song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_dischordant_dirge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2893,7 +2893,7 @@ int song_dischordant_dirge(uint8_t level, Character *ch, char *arg, Character *v
   return ReturnValue::eSUCCESS;
 }
 
-int song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_synchronous_chord(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -2915,9 +2915,9 @@ int song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *v
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_synchronous_chord(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *target = nullptr;
+  CharacterPtr target = nullptr;
   char buf[400];
   std::vector<songInfo>::iterator i;
 
@@ -2991,7 +2991,7 @@ int execute_song_synchronous_chord(uint8_t level, Character *ch, char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_sticky_lullaby(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -3013,7 +3013,7 @@ int song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *vict
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_sticky_lullaby(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -3052,7 +3052,7 @@ int execute_song_sticky_lullaby(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_vigilant_siren(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -3068,7 +3068,7 @@ int song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vict
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_vigilant_siren(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   if (GET_KI(ch) < 2) // we don't have the ki to keep the song going
   {
@@ -3106,7 +3106,7 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
   af3.bitvector = AFF_NO_BEHEAD;
   af3.caster = GET_NAME(ch);
 
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (!ARE_GROUPED(ch, tmp_char))
       continue;
@@ -3148,16 +3148,16 @@ int execute_song_vigilant_siren(uint8_t level, Character *ch, char *arg, Charact
   return ReturnValue::eSUCCESS;
 }
 
-int pulse_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int pulse_vigilant_siren(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   if (number(1, 5) == 3)
     act("$n chatters a ditty about being alert and ever watchful.", ch, 0, 0, TO_ROOM, 0);
   return ReturnValue::eSUCCESS;
 }
 
-int intrp_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int intrp_vigilant_siren(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
@@ -3194,7 +3194,7 @@ int intrp_vigilant_siren(uint8_t level, Character *ch, char *arg, Character *vic
   return ReturnValue::eSUCCESS;
 }
 
-void make_person_dance(Character *ch)
+void make_person_dance(CharacterPtr ch)
 {
   char *dances[] = {"dance",                                         // 0
                     "tango", "boogie", "jig", "waltz", "bellydance", // 5
@@ -3208,7 +3208,7 @@ void make_person_dance(Character *ch)
   ch->command_interpreter(dothis);
 }
 
-int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_unresistable_ditty(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -3224,9 +3224,9 @@ int song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_unresistable_ditty(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *i;
+  CharacterPtr i;
 
   act("$n finishs $s song, 'Ahhhhh!  Macarena!'", ch, 0, 0, TO_ROOM, 0);
   ch->sendln("Ahhh....such beautiful music.");
@@ -3256,7 +3256,7 @@ int execute_song_unresistable_ditty(uint8_t level, Character *ch, char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_crushing_crescendo(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -3273,7 +3273,7 @@ int song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_crushing_crescendo(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   int dam = 0;
   int retval;
@@ -3401,7 +3401,7 @@ int execute_song_crushing_crescendo(uint8_t level, Character *ch, char *arg, Cha
   return ReturnValue::eSUCCESS;
 }
 
-int song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int song_submariners_anthem(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   std::vector<songInfo>::iterator i;
 
@@ -3417,9 +3417,9 @@ int song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *
   return ReturnValue::eSUCCESS;
 }
 
-int execute_song_submariners_anthem(uint8_t level, Character *ch, char *arg, Character *victim, int skill)
+int execute_song_submariners_anthem(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Character *master = nullptr;
+  CharacterPtr master = nullptr;
   follow_type *fvictim = nullptr;
   affected_type af;
   af.type = SKILL_SONG_SUBMARINERS_ANTHEM;

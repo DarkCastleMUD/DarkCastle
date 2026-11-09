@@ -49,8 +49,8 @@
 
 extern int rev_dir[];
 
-int saves_spell(Character *ch, Character *vict, int spell_base, int16_t save_type);
-void check_eq(Character *ch);
+int saves_spell(CharacterPtr ch, CharacterPtr vict, int spell_base, int16_t save_type);
+void check_eq(CharacterPtr ch);
 
 int get_difficulty(int);
 
@@ -69,7 +69,7 @@ int charm_space(int level)
   return 1;
 }
 
-int charm_levels(Character *ch)
+int charm_levels(CharacterPtr ch)
 {
   int i = ch->getLevel() / 5;
   int z = 3;
@@ -85,9 +85,9 @@ int charm_levels(Character *ch)
   return i;
 }
 
-int do_free_animal(Character *ch, char *arg, cmd_t cmd)
+int do_free_animal(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
   char buf[MAX_INPUT_LENGTH];
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
@@ -133,10 +133,10 @@ int do_free_animal(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_tame(Character *ch, char *arg, cmd_t cmd)
+int do_tame(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   affected_type af;
-  Character *victim;
+  CharacterPtr victim;
   char buf[MAX_INPUT_LENGTH];
 
   while (*arg == ' ')
@@ -190,7 +190,7 @@ int do_tame(Character *ch, char *arg, cmd_t cmd)
   {
     ch->sendln("How you plan on controlling so many followers?");
     return ReturnValue::eFAILURE;
-    /*   Character * vict = nullptr;
+    /*   CharacterPtr  vict = nullptr;
        for(follow_type *k = ch->followers; k; k = k->next)
          if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
@@ -265,8 +265,8 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   char condition[60];
   char weight[40];
 
-  Character *quarry;
-  Character *tmp_ch = nullptr; // For checking room stuff
+  CharacterPtr quarry;
+  CharacterPtr tmp_ch = nullptr; // For checking room stuff
   room_track_data *pScent = 0;
 
   QString victim = arguments.value(0);
@@ -719,7 +719,7 @@ forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
      {28301, {36, 34, 32, 30}}},
 };
 
-int do_forage(Character *ch, char *arg, cmd_t cmd)
+int do_forage(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   int learned;
   class Object *new_obj = 0;
@@ -826,7 +826,7 @@ int do_forage(Character *ch, char *arg, cmd_t cmd)
    also, checks level to make sure char is high enough
    return 0 for failure */
 
-int parse_arrow(Character *ch, char *arrow)
+int parse_arrow(CharacterPtr ch, char *arrow)
 {
 
   if (GET_CLASS(ch) != CLASS_RANGER && ch->getLevel() < 100)
@@ -867,7 +867,7 @@ class Object *find_arrow(class Object *quiver)
   return target;
 }
 
-void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *found)
+void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, int dir, class Object *found)
 {
   char buf[200];
 
@@ -941,7 +941,7 @@ void do_arrow_miss(Character *ch, Character *victim, int dir, class Object *foun
   }
 }
 
-int mob_arrow_response(Character *ch, Character *victim,
+int mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
                        int dir)
 {
   int dir2 = 0;
@@ -1042,14 +1042,14 @@ int mob_arrow_response(Character *ch, Character *victim,
 }
 
 /* no need anymore
-int do_arrow_damage(Character *ch, Character *victim,
+int do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
                      int dir, int dam, int artype,
                      class Object *found)
 {
   char buf[200];
   int retval;
 
-  void inform_victim(Character *, Character *, int);
+  void inform_victim(CharacterPtr , CharacterPtr , int);
 
   buf[199] = '\0'; // just cause I'm paranoid
 
@@ -1130,9 +1130,9 @@ int do_arrow_damage(Character *ch, Character *victim,
 }
 */
 
-int do_fire(Character *ch, char *arg, cmd_t cmd)
+int do_fire(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   int dam, dir = -1, artype, cost, retval, victroom;
   class Object *found;
   unsigned cur_room, new_room = 0;
@@ -1744,10 +1744,10 @@ int do_fire(Character *ch, char *arg, cmd_t cmd)
   return retval;
 }
 
-int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
+int do_mind_delve(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[1000];
-  Character *target = nullptr;
+  CharacterPtr target = nullptr;
   //  int learned, specialization;
 
   if (!*arg)
@@ -1800,7 +1800,7 @@ int do_mind_delve(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void check_eq(Character *ch)
+void check_eq(CharacterPtr ch)
 {
   int pos;
 
@@ -1811,7 +1811,7 @@ void check_eq(Character *ch)
   }
 }
 
-int do_natural_selection(Character *ch, char *arg, cmd_t cmd)
+int do_natural_selection(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

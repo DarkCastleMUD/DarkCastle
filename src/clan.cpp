@@ -426,7 +426,7 @@ ClanMember *get_member(QString strName, int nClanId)
   return pcurr;
 }
 
-bool is_in_clan(clan_data *theClan, Character *ch)
+bool is_in_clan(clan_data *theClan, CharacterPtr ch)
 {
   ClanMember *pcurr = theClan->members;
 
@@ -442,7 +442,7 @@ bool is_in_clan(clan_data *theClan, Character *ch)
   return false;
 }
 
-void remove_clan_member(int clannumber, Character *ch)
+void remove_clan_member(int clannumber, CharacterPtr ch)
 {
   clan_data *pclan = nullptr;
 
@@ -452,7 +452,7 @@ void remove_clan_member(int clannumber, Character *ch)
   remove_clan_member(pclan, ch);
 }
 
-void remove_clan_member(clan_data *theClan, Character *ch)
+void remove_clan_member(clan_data *theClan, CharacterPtr ch)
 {
   ClanMember *pcurr = nullptr;
   ClanMember *plast = nullptr;
@@ -477,7 +477,7 @@ void remove_clan_member(clan_data *theClan, Character *ch)
 }
 
 // Add someone.  Just makes the class, fills it, then calls the other add_clan_member
-void add_clan_member(clan_data *theClan, Character *ch)
+void add_clan_member(clan_data *theClan, CharacterPtr ch)
 {
   ClanMember *pmember = nullptr;
 
@@ -653,7 +653,7 @@ void delete_clan(clan_data *dead_clan)
     }
 }
 
-int plr_rights(Character *ch)
+int plr_rights(CharacterPtr ch)
 {
   ClanMember *pmember = nullptr;
 
@@ -664,7 +664,7 @@ int plr_rights(Character *ch)
 }
 
 // see if ch has rights to 'bit' in his clan
-int has_right(Character *ch, uint32_t bit)
+int has_right(CharacterPtr ch, uint32_t bit)
 {
   ClanMember *pmember = nullptr;
 
@@ -699,7 +699,7 @@ clan_data *get_clan(int nClan)
   return 0;
 }
 
-clan_data *get_clan(Character *ch)
+clan_data *get_clan(CharacterPtr ch)
 {
   if (ch == 0)
   {
@@ -727,7 +727,7 @@ QString get_clan_name(int nClan)
   return "no clan";
 }
 
-QString get_clan_name(Character *ch)
+QString get_clan_name(CharacterPtr ch)
 {
   clan_data *clan = get_clan(ch);
 
@@ -745,9 +745,9 @@ QString get_clan_name(clan_data *clan)
   return "no clan";
 }
 
-void message_to_clan(Character *ch, QString buf)
+void message_to_clan(CharacterPtr ch, QString buf)
 {
-  Character *pch{};
+  CharacterPtr pch{};
 
   for (auto d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
@@ -768,7 +768,7 @@ void message_to_clan(Character *ch, QString buf)
   }
 }
 
-void clan_death(Character *ch, Character *killer)
+void clan_death(CharacterPtr ch, CharacterPtr killer)
 {
   if (!ch || ch->clan == 0)
     return;
@@ -807,7 +807,7 @@ void clan_death(Character *ch, Character *killer)
   message_to_clan(ch, qPrintable(buf));
 }
 
-void clan_login(Character *ch)
+void clan_login(CharacterPtr ch)
 {
   if (ch->clan == 0)
     return;
@@ -850,7 +850,7 @@ void clan_login(Character *ch)
   message_to_clan(ch, buf);
 }
 
-void clan_logout(Character *ch)
+void clan_logout(CharacterPtr ch)
 {
   if (ch->clan == 0)
     return;
@@ -882,9 +882,9 @@ void clan_logout(Character *ch)
   message_to_clan(ch, QString(clan->logout_message).replace("%", GET_NAME(ch)));
 }
 
-int do_accept(Character *ch, char *arg, cmd_t cmd)
+int do_accept(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   clan_data *clan;
   char buf[MAX_STRING_LENGTH];
 
@@ -965,7 +965,7 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   //   arg1 = arg1.toUpper();
   // }
 
-  Character *victim = get_pc(arg1);
+  CharacterPtr victim = get_pc(arg1);
   bool victim_connected = true;
   if (!victim)
   {
@@ -1043,9 +1043,9 @@ command_return_t Character::do_outcast(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_cpromote(Character *ch, char *arg, cmd_t cmd)
+int do_cpromote(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   clan_data *clan;
   char buf[MAX_STRING_LENGTH];
 
@@ -1104,7 +1104,7 @@ int do_cpromote(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int clan_desc(Character *ch, char *arg)
+int clan_desc(CharacterPtr ch, char *arg)
 {
   auto argumentsStr = QString(arg);
   auto arguments = argumentsStr.split(' ');
@@ -1150,7 +1150,7 @@ int clan_desc(Character *ch, char *arg)
   return 1;
 }
 
-int clan_motd(Character *ch, char *arg)
+int clan_motd(CharacterPtr ch, char *arg)
 {
   auto argumentsStr = QString(arg);
   auto arguments = argumentsStr.split(' ');
@@ -1197,7 +1197,7 @@ int clan_motd(Character *ch, char *arg)
   return 1;
 }
 
-int clan_death_message(Character *ch, char *arg)
+int clan_death_message(CharacterPtr ch, char *arg)
 {
   auto argumentsStr = QString(arg);
   auto arguments = argumentsStr.split(' ');
@@ -1262,7 +1262,7 @@ int clan_death_message(Character *ch, char *arg)
   return 1;
 }
 
-int clan_logout_message(Character *ch, char *arg)
+int clan_logout_message(CharacterPtr ch, char *arg)
 {
   auto argumentsStr = QString(arg);
   auto arguments = argumentsStr.split(' ');
@@ -1306,7 +1306,7 @@ int clan_logout_message(Character *ch, char *arg)
   return 1;
 }
 
-int clan_login_message(Character *ch, char *arg)
+int clan_login_message(CharacterPtr ch, char *arg)
 {
   auto argumentsStr = QString(arg);
   auto arguments = argumentsStr.split(' ');
@@ -1351,7 +1351,7 @@ int clan_login_message(Character *ch, char *arg)
   return 1;
 }
 
-int clan_email(Character *ch, char *arg)
+int clan_email(CharacterPtr ch, char *arg)
 {
   auto argumentsStr = QString(arg);
   auto arguments = argumentsStr.split(' ');
@@ -1388,9 +1388,9 @@ int clan_email(Character *ch, char *arg)
   return 1;
 }
 
-int do_ctell(Character *ch, char *arg, cmd_t cmd)
+int do_ctell(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  Character *pch;
+  CharacterPtr pch;
   class Connection *desc;
   char buf[MAX_STRING_LENGTH];
 
@@ -1484,7 +1484,7 @@ int do_ctell(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void do_clan_list(Character *ch)
+void do_clan_list(CharacterPtr ch)
 {
   if (ch->getLevel() > 103)
   {
@@ -1519,7 +1519,7 @@ void do_clan_list(Character *ch)
   }
 }
 
-void do_clan_member_list(Character *ch)
+void do_clan_member_list(CharacterPtr ch)
 {
   ClanMember *pmember = 0;
   clan_data *pclan = 0;
@@ -1558,7 +1558,7 @@ void do_clan_member_list(Character *ch)
   }
 }
 
-int is_clan_leader(Character *ch)
+int is_clan_leader(CharacterPtr ch)
 {
   clan_data *pclan = nullptr;
 
@@ -1568,10 +1568,10 @@ int is_clan_leader(Character *ch)
   return (!(strcmp(GET_NAME(ch), qPrintable(pclan->leader))));
 }
 
-void do_clan_rights(Character *ch, char *arg)
+void do_clan_rights(CharacterPtr ch, char *arg)
 {
   ClanMember *pmember = nullptr;
-  Character *victim = nullptr;
+  CharacterPtr victim = nullptr;
   // extern char * clan_rights[]~;
 
   char buf[MAX_STRING_LENGTH];
@@ -1648,7 +1648,7 @@ void do_clan_rights(Character *ch, char *arg)
   save_clans();
 }
 
-void do_god_clans(Character *ch, char *arg, cmd_t cmd)
+void do_god_clans(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   clan_data *clan = 0;
   clan_data *tarclan = 0;
@@ -2213,7 +2213,7 @@ void do_god_clans(Character *ch, char *arg, cmd_t cmd)
   }
 }
 
-void do_leader_clans(Character *ch, char *arg, cmd_t cmd)
+void do_leader_clans(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   ClanMember *pmember = 0;
   //  clan_data * tarclan = 0;
@@ -2423,7 +2423,7 @@ void clan_data::log(QString log_entry)
   file.close();
 }
 
-void show_clan_log(Character *ch)
+void show_clan_log(CharacterPtr ch)
 {
   std::string s;
   std::ifstream fin;
@@ -2457,7 +2457,7 @@ void show_clan_log(Character *ch)
   page_string(ch->desc, const_cast<char *>(buffer.str().c_str()), 1);
 }
 
-int needs_clan_command(Character *ch)
+int needs_clan_command(CharacterPtr ch)
 {
   if (has_right(ch, CLAN_RIGHTS_MEMBER_LIST))
     return 1;
@@ -2467,7 +2467,7 @@ int needs_clan_command(Character *ch)
   return 0;
 }
 
-int do_clans(Character *ch, char *arg, cmd_t cmd)
+int do_clans(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   clan_data *clan = 0;
   char *tmparg;
@@ -2519,7 +2519,7 @@ int do_clans(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_cinfo(Character *ch, char *arg, cmd_t cmd)
+int do_cinfo(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   clan_data *clan;
   int nClan;
@@ -2579,11 +2579,11 @@ int do_cinfo(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_whoclan(Character *ch, char *arg, cmd_t cmd)
+int do_whoclan(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   clan_data *clan;
   class Connection *desc;
-  Character *pch;
+  CharacterPtr pch;
   char buf[100];
   int found;
 
@@ -2626,7 +2626,7 @@ int do_whoclan(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_cmotd(Character *ch, char *arg, cmd_t cmd)
+int do_cmotd(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   clan_data *clan;
 
@@ -2646,7 +2646,7 @@ int do_cmotd(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_ctax(Character *ch, char *arg, cmd_t cmd)
+int do_ctax(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (!ch->clan)
@@ -2745,7 +2745,7 @@ command_return_t Character::do_cdeposit(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
+int do_cwithdraw(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   if (!ch->clan)
@@ -2807,7 +2807,7 @@ int do_cwithdraw(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_cbalance(Character *ch, char *arg, cmd_t cmd)
+int do_cbalance(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (!ch->clan)
   {
@@ -2837,7 +2837,7 @@ void remove_totem(Object *altar, Object *totem)
   const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
-           [&altar, totem](Character *const &t)
+           [&altar, totem](CharacterPtr const &t)
            {
              if (t->isPlayer() && t->altar == altar)
              {
@@ -2857,7 +2857,7 @@ void add_totem(Object *altar, Object *totem)
   const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
-           [&altar, totem](Character *const &t)
+           [&altar, totem](CharacterPtr const &t)
            {
              if (t->isPlayer() && t->altar == altar)
              {
@@ -2869,7 +2869,7 @@ void add_totem(Object *altar, Object *totem)
            });
 }
 
-void remove_totem_stats(Character *ch, int stat)
+void remove_totem_stats(CharacterPtr ch, int stat)
 {
   Object *a;
   if (!ch->altar)
@@ -2895,7 +2895,7 @@ void remove_totem_stats(Character *ch, int stat)
   }
 }
 
-void add_totem_stats(Character *ch, int stat)
+void add_totem_stats(CharacterPtr ch, int stat)
 {
   Object *a;
   if (!ch->altar)
@@ -2932,7 +2932,7 @@ int count_plrs(int zone, int clan)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
-  int i = std::count_if(character_list.begin(), character_list.end(), [&zone, &clan](Character *const &tmpch)
+  int i = std::count_if(character_list.begin(), character_list.end(), [&zone, &clan](CharacterPtr const &tmpch)
                         {
       if (tmpch->isPlayer() && DC::getInstance()->world[tmpch->in_room].zone == zone && clan == tmpch->clan &&
 	  tmpch->getLevel() < 100 && tmpch->getLevel() > 10)
@@ -3080,7 +3080,7 @@ int online_clan_members(int clan)
   const auto &character_list = DC::getInstance()->character_list;
 
   int i = std::count_if(character_list.begin(), character_list.end(),
-                        [&clan](Character *const &Tmpch)
+                        [&clan](CharacterPtr const &Tmpch)
                         {
                           if (Tmpch->isPlayer() && Tmpch->clan == clan && Tmpch->getLevel() < 100 && Tmpch->desc && Tmpch->getLevel() > 10)
                             return true;
@@ -3149,7 +3149,7 @@ void check_quitter(varg_t arg1, void *arg2, void *arg3)
   }
 }
 
-void check_quitter(Character *ch)
+void check_quitter(CharacterPtr ch)
 {
   if (!ch->clan || ch->getLevel() >= 100)
     return;
@@ -3161,7 +3161,7 @@ void check_quitter(Character *ch)
   addtimer(timer);
 }
 
-void pk_check(Character *ch, Character *victim)
+void pk_check(CharacterPtr ch, CharacterPtr victim)
 {
   if (!ch || !victim)
     return;
@@ -3182,7 +3182,7 @@ bool can_lose(takeover_pulse_data *take)
 {
   const auto &character_list = DC::getInstance()->character_list;
 
-  auto result = find_if(character_list.begin(), character_list.end(), [&take](Character *const &ch)
+  auto result = find_if(character_list.begin(), character_list.end(), [&take](CharacterPtr const &ch)
                         {
 		if (ch->isPlayer() && DC::getInstance()->world[ch->in_room].zone == take->zone
 				&& (take->clan1 == ch->clan || take->clan2 == ch->clan)) {
@@ -3502,7 +3502,7 @@ command_return_t Character::do_clanarea(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-bool others_clan_room(Character *ch, Room *room)
+bool others_clan_room(CharacterPtr ch, Room *room)
 {
   // Passed null values
   if (ch == 0 || room == 0)
@@ -3578,7 +3578,7 @@ void clan_data::setBalance(const quint64 &value)
   balance = value;
 }
 
-ClanMember::ClanMember(Character *ch)
+ClanMember::ClanMember(CharacterPtr ch)
     : next(nullptr), name_(QString()), unused1_(0), unused2_(0), unused3_(0), unused4_(QString()), rights_(0), rank_(0), time_joined_(0)
 {
   if (ch)

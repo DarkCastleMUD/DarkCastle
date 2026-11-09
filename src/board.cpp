@@ -77,7 +77,7 @@ public:
 class BOARD_INFO
 {
 public:
-  Character *locked_for = {};
+  CharacterPtr locked_for = {};
   bool lock = {};
   int min_read_level = {};
   int min_write_level = {};
@@ -90,14 +90,14 @@ public:
 using boards_t = std::map<QString, BOARD_INFO>;
 
 // These are the binary files in which to save/load messages
-void board_do_write(Character *ch, QStringList arg, boards_t::iterator board);
-int board_do_read(Character *ch, QStringList arg, boards_t::iterator board);
-int board_do_erase(Character *ch, QStringList arg, boards_t::iterator board);
-int board_do_look(Character *ch, QStringList arg, boards_t::iterator board);
+void board_do_write(CharacterPtr ch, QStringList arg, boards_t::iterator board);
+int board_do_read(CharacterPtr ch, QStringList arg, boards_t::iterator board);
+int board_do_erase(CharacterPtr ch, QStringList arg, boards_t::iterator board);
+int board_do_look(CharacterPtr ch, QStringList arg, boards_t::iterator board);
 
 void board_save_board(boards_t::iterator board);
 void board_load_board();
-void new_edit_board_unlock_board(Character *ch, int abort);
+void new_edit_board_unlock_board(CharacterPtr ch, int abort);
 
 char *fread_string(FILEPtr fl, int hasher);
 
@@ -148,7 +148,7 @@ public:
 };
 
 // std::map to hold callback information for writing
-std::map<Character *, RESERVATION_DATA *> wait_for_write;
+std::map<CharacterPtr, RESERVATION_DATA *> wait_for_write;
 
 /*
 Function to populate the board_db with all of the current clan info
@@ -619,7 +619,7 @@ Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
 
-int board(Character *ch, class Object *obj, cmd_t cmd, const char *c_arguments, Character *invoker)
+int board(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *c_arguments, CharacterPtr invoker)
 {
   auto arguments = QString(c_arguments).split(' ');
   auto arg1 = arguments.value(0);
@@ -704,7 +704,7 @@ function call new_add_string()
 It notifies us when the user is done writing the post
 and we can copy the QString to the board
 */
-void new_edit_board_unlock_board(Character *ch, int abort)
+void new_edit_board_unlock_board(CharacterPtr ch, int abort)
 {
   RESERVATION_DATA *reserve = wait_for_write[ch];
   message new_msg;
@@ -728,7 +728,7 @@ void new_edit_board_unlock_board(Character *ch, int abort)
   delete reserve;
 }
 
-void board_do_write(Character *ch, QStringList arguments, boards_t::iterator board)
+void board_do_write(CharacterPtr ch, QStringList arguments, boards_t::iterator board)
 {
   auto arg = arguments.value(0);
   QString buf;
@@ -803,7 +803,7 @@ void board_do_write(Character *ch, QStringList arguments, boards_t::iterator boa
   ch->desc->max_str = MAX_MESSAGE_LENGTH;
 }
 
-int board_do_erase(Character *ch, QStringList arguments, boards_t::iterator board)
+int board_do_erase(CharacterPtr ch, QStringList arguments, boards_t::iterator board)
 {
   auto arg1 = arguments.value(0);
   bool ok = false;
@@ -958,7 +958,7 @@ void board_load_board()
   }
 }
 
-int board_do_read(Character *ch, QStringList arguments, boards_t::iterator board)
+int board_do_read(CharacterPtr ch, QStringList arguments, boards_t::iterator board)
 {
   QString buf, board_msg;
   auto numberStr = arguments.value(0);
@@ -1072,7 +1072,7 @@ int board_do_read(Character *ch, QStringList arguments, boards_t::iterator board
   return ReturnValue::eSUCCESS;
 }
 
-int board_do_look(Character *ch, QStringList arguments, boards_t::iterator board)
+int board_do_look(CharacterPtr ch, QStringList arguments, boards_t::iterator board)
 {
   int i{};
   QString board_msg;

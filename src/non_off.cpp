@@ -55,7 +55,7 @@
 #include "DC/levels.h"
 
 // decay variable means it's from a decaying corpse, not a player
-void log_sacrifice(Character *ch, Object *obj, bool decay = false)
+void log_sacrifice(CharacterPtr ch, Object *obj, bool decay = false)
 {
 
   if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
@@ -79,7 +79,7 @@ void log_sacrifice(Character *ch, Object *obj, bool decay = false)
   }
 }
 
-int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
+int do_sacrifice(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   class Object *obj;
   char name[MAX_INPUT_LENGTH + 1];
@@ -169,7 +169,7 @@ int do_sacrifice(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_visible(Character *ch, char *argument, cmd_t cmd)
+int do_visible(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->affected_by_spell(SPELL_INVISIBLE))
   {
@@ -190,7 +190,7 @@ int do_visible(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_donate(Character *ch, char *argument, cmd_t cmd)
+int do_donate(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   class Object *obj{};
   char name[MAX_INPUT_LENGTH + 1]{};
@@ -355,7 +355,7 @@ auto Character::do_notitle(QStringList arguments, cmd_t cmd) -> command_return_t
   return ReturnValue::eSUCCESS;
 }
 
-int do_title(Character *ch, char *argument, cmd_t cmd)
+int do_title(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[100];
   int ctr;
@@ -1042,7 +1042,7 @@ command_return_t Character::do_beep_set(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_stand(Character *ch, char *argument, cmd_t cmd)
+int do_stand(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   switch (GET_POS(ch))
   {
@@ -1094,7 +1094,7 @@ int do_stand(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_sit(Character *ch, char *argument, cmd_t cmd)
+int do_sit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1148,7 +1148,7 @@ int do_sit(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_rest(Character *ch, char *argument, cmd_t cmd)
+int do_rest(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1200,7 +1200,7 @@ int do_rest(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_sleep(Character *ch, char *argument, cmd_t cmd)
+int do_sleep(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type *paf;
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1268,7 +1268,7 @@ int do_sleep(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-command_return_t Character::wake(Character *victim)
+command_return_t Character::wake(CharacterPtr victim)
 {
   if (!isSleeping())
   {
@@ -1291,7 +1291,7 @@ command_return_t Character::wake(Character *victim)
 
 command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 {
-  Character *tmp_char{};
+  CharacterPtr tmp_char{};
   QString arg1 = arguments.value(0);
   if (arg1.isEmpty())
   {
@@ -1379,12 +1379,12 @@ command_return_t Character::do_wake(QStringList arguments, cmd_t cmd)
 }
 
 // global tag var
-Character *tagged_person;
+CharacterPtr tagged_person;
 
-int do_tag(Character *ch, char *argument, cmd_t cmd)
+int do_tag(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  Character *victim;
+  CharacterPtr victim;
 
   one_argument(name, argument);
 
@@ -1397,7 +1397,7 @@ int do_tag(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void CVoteData::DisplayVote(Character *ch)
+void CVoteData::DisplayVote(CharacterPtr ch)
 {
   char buf[MAX_STRING_LENGTH];
   std::vector<SVoteData>::iterator answer_it;
@@ -1417,7 +1417,7 @@ void CVoteData::DisplayVote(Character *ch)
   ch->send("\n");
 }
 
-void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
+void CVoteData::RemoveAnswer(CharacterPtr ch, unsigned int answer)
 {
   if (active)
   {
@@ -1439,7 +1439,7 @@ void CVoteData::RemoveAnswer(Character *ch, unsigned int answer)
   ch->sendln("Answer removed!");
 }
 
-void CVoteData::StartVote(Character *ch)
+void CVoteData::StartVote(CharacterPtr ch)
 {
   if (active)
   {
@@ -1465,7 +1465,7 @@ void CVoteData::StartVote(Character *ch)
   return;
 }
 
-void CVoteData::EndVote(Character *ch)
+void CVoteData::EndVote(CharacterPtr ch)
 {
   if (!active)
   {
@@ -1478,7 +1478,7 @@ void CVoteData::EndVote(Character *ch)
   send_info("\n##The vote has ended! Type \"Vote Results\" to see the results!\n");
 }
 
-void CVoteData::AddAnswer(Character *ch, std::string answer)
+void CVoteData::AddAnswer(CharacterPtr ch, std::string answer)
 {
   if (active)
   {
@@ -1492,12 +1492,12 @@ void CVoteData::AddAnswer(Character *ch, std::string answer)
   answers.push_back(tmp);
 }
 
-bool CVoteData::HasVoted(Character *ch)
+bool CVoteData::HasVoted(CharacterPtr ch)
 {
   return (ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] || char_voted[GET_NAME(ch)]);
 }
 
-bool CVoteData::Vote(Character *ch, unsigned int vote)
+bool CVoteData::Vote(CharacterPtr ch, unsigned int vote)
 {
   if (!ch->desc)
   {
@@ -1527,7 +1527,7 @@ bool CVoteData::Vote(Character *ch, unsigned int vote)
   return true;
 }
 
-void CVoteData::DisplayResults(Character *ch)
+void CVoteData::DisplayResults(CharacterPtr ch)
 {
   if (active && ch->getLevel() > 39 && !ip_voted[ch->desc->getPeerOriginalAddress().toString().toStdString().c_str()] && ch->isMortalPlayer())
   {
@@ -1559,7 +1559,7 @@ void CVoteData::DisplayResults(Character *ch)
   ch->sendln("");
 }
 
-void CVoteData::Reset(Character *ch)
+void CVoteData::Reset(CharacterPtr ch)
 {
   if (active)
   {
@@ -1623,7 +1623,7 @@ void CVoteData::OutToFile()
   return;
 }
 
-void CVoteData::SetQuestion(Character *ch, std::string question)
+void CVoteData::SetQuestion(CharacterPtr ch, std::string question)
 {
   if (active)
   {
@@ -1733,7 +1733,7 @@ CVoteData::~CVoteData()
 {
 }
 
-int do_vote(Character *ch, char *arg, cmd_t cmd)
+int do_vote(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int vote;
@@ -1769,7 +1769,7 @@ int do_vote(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_random(Character *ch, char *argument, cmd_t cmd)
+int do_random(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int i = 0;

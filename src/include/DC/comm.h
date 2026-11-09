@@ -74,12 +74,12 @@ ssize_t write_to_descriptor(int desc, QByteArray txt);
 
 void scramble_text(char *txt);
 QString scramble_text(QString txt);
-void warn_if_duplicate_ip(Character *ch);
-void record_msg(QString messg, Character *ch);
+void warn_if_duplicate_ip(CharacterPtr ch);
+void record_msg(QString messg, CharacterPtr ch);
 void send_info(QString messg);
 void send_info(std::string messg);
 void send_info(const char *messg);
-bool is_multi(Character *ch);
+bool is_multi(CharacterPtr ch);
 void telnet_ga(Connection *d);
 void telnet_sga(Connection *d);
 void telnet_echo_off(class Connection *d);
@@ -88,6 +88,6 @@ void update_bard_singing(void);
 void affect_update(int32_t duration_type); /* In spells.c */
 char *calc_color(int hit, int max_hit);
 char *calc_color_align(int align);
-char *calc_condition(Character *ch, bool colour = false);
-Character *get_charmie(Character *ch);
+char *calc_condition(CharacterPtr ch, bool colour = false);
+CharacterPtr get_charmie(CharacterPtr ch);
 #endif

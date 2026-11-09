@@ -259,7 +259,7 @@ public:
   uint32_t more_flags = {};  /* A second bitvector (extra_flags2)*/
   level_t eq_level = {};     /* Min level to use it for eq       */
   int16_t timer = {};        /* Timer for object                 */
-  Character *origin = {};    /* Creator of object, previously was stored at value[3] */
+  CharacterPtr origin = {};  /* Creator of object, previously was stored at value[3] */
   bool Value(qsizetype i, object_value_t v)
   {
     if (i >= 0 && i < 4)
@@ -334,8 +334,8 @@ public:
   QString long_description = {};          /* When in room                     */
   QString short_description = {};         /* when worn/carry/in cont.         */
   ex_descriptions_t ex_descriptions = {}; /* extra descriptions     */
-  Character *carried_by = {};             /* Carried by :NULL in room/conta   */
-  Character *equipped_by = {};            /* so I can access the player :)    */
+  CharacterPtr carried_by = {};           /* Carried by :NULL in room/conta   */
+  CharacterPtr equipped_by = {};          /* so I can access the player :)    */
 
   Object *in_obj = {};   /* In what object NULL when none    */
   Object *contains = {}; /* Contains objects                 */
@@ -660,8 +660,8 @@ void add_obj_affect(Object *obj, int loc, int mod);
 void remove_obj_affect_by_index(Object *obj, int index);
 void remove_obj_affect_by_type(Object *obj, int loc);
 bool fullSave(Object *obj);
-void heightweight(Character *ch, bool add);
-void wear(Character *ch, class Object *obj_object, int keyword);
+void heightweight(CharacterPtr ch, bool add);
+void wear(CharacterPtr ch, class Object *obj_object, int keyword);
 int obj_from(Object *obj);
 
 typedef QStringList item_types_t;

@@ -55,7 +55,7 @@ External: (explained more below)
 #include "DC/levels.h"
 #include "DC/structs.h"
 
-void AuctionHouse::ShowStats(Character *ch)
+void AuctionHouse::ShowStats(CharacterPtr ch)
 {
   ch->sendln("Vendor Statistics:");
   ch->send(QStringLiteral("Items Posted:     %1\n").arg(ItemsPosted));
@@ -174,7 +174,7 @@ bool AuctionHouse::IsSeller(QString in_name, QString seller)
 DO MODIFY
 modify an existing tickets price
 */
-void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new_price)
+void AuctionHouse::DoModify(CharacterPtr ch, unsigned int ticket, unsigned int new_price)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   if (new_price < AUC_MIN_PRICE || new_price > AUC_MAX_PRICE)
@@ -211,7 +211,7 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
   csendf(ch, "The new price of ticket %u (%s) is now %u.\n",
          ticket, Item_it->item_name.toStdString().c_str(), new_price);
 
-  for (Character *tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
+  for (CharacterPtr tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
   {
     if (tmp != ch)
     {
@@ -227,7 +227,7 @@ void AuctionHouse::DoModify(Character *ch, unsigned int ticket, unsigned int new
 /*
 check for sold items
 */
-void AuctionHouse::CheckForSoldItems(Character *ch)
+void AuctionHouse::CheckForSoldItems(CharacterPtr ch)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   bool has_sold_items = false;
@@ -300,7 +300,7 @@ void AuctionHouse::HandleDelete(QString name)
 /*
 Handle Renames
 */
-void AuctionHouse::HandleRename(Character *ch, QString old_name, QString new_name)
+void AuctionHouse::HandleRename(CharacterPtr ch, QString old_name, QString new_name)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   unsigned int i = 0;
@@ -327,7 +327,7 @@ void AuctionHouse::HandleRename(Character *ch, QString old_name, QString new_nam
 /*
 Is the player selling the max # of items already?
 */
-bool AuctionHouse::CanSellMore(Character *ch)
+bool AuctionHouse::CanSellMore(CharacterPtr ch)
 {
   return true;
 }
@@ -373,9 +373,9 @@ bool AuctionHouse::IsOkToSell(Object *obj)
 /*
 Identify an item.
 */
-void AuctionHouse::Identify(Character *ch, unsigned int ticket)
+void AuctionHouse::Identify(CharacterPtr ch, unsigned int ticket)
 {
-  int spell_identify(uint8_t level, Character *ch, Character *victim, class Object *obj, int skill);
+  int spell_identify(uint8_t level, CharacterPtr ch, CharacterPtr victim, class Object *obj, int skill);
   auto Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
@@ -523,10 +523,10 @@ bool AuctionHouse::IsSlot(QString slot, int vnum)
 /*
 Is the item wearable by the player?
 */
-bool AuctionHouse::IsWearable(Character *ch, int vnum)
+bool AuctionHouse::IsWearable(CharacterPtr ch, int vnum)
 {
-  int class_restricted(Character * ch, class Object * obj);
-  int size_restricted(Character * ch, class Object * obj);
+  int class_restricted(CharacterPtr ch, class Object * obj);
+  int size_restricted(CharacterPtr ch, class Object * obj);
   int nr = vnum;
 
   if (!DC::getInstance()->obj_index.contains(nr))
@@ -613,7 +613,7 @@ bool AuctionHouse::IsAuctionHouse(room_t room)
 /*
 LIST ROOMS
 */
-void AuctionHouse::ListRooms(Character *ch)
+void AuctionHouse::ListRooms(CharacterPtr ch)
 {
   QMap<int, int>::iterator room_it;
   ch->send("Auction Rooms:");
@@ -630,7 +630,7 @@ void AuctionHouse::ListRooms(Character *ch)
 /*
 ADD ROOM
 */
-void AuctionHouse::AddRoom(Character *ch, room_t room)
+void AuctionHouse::AddRoom(CharacterPtr ch, room_t room)
 {
   if (auction_rooms.end() == auction_rooms.find(room))
   {
@@ -648,7 +648,7 @@ void AuctionHouse::AddRoom(Character *ch, room_t room)
 /*
 REMOVE ROOM
 */
-void AuctionHouse::RemoveRoom(Character *ch, room_t room)
+void AuctionHouse::RemoveRoom(CharacterPtr ch, room_t room)
 {
   if (1 == auction_rooms.remove(room))
   {
@@ -901,7 +901,7 @@ AuctionHouse::AuctionHouse(QString in_file)
 /*
 CANCEL ALL
 */
-void AuctionHouse::CancelAll(Character *ch)
+void AuctionHouse::CancelAll(CharacterPtr ch)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   QQueue<unsigned int> tickets_to_cancel;
@@ -926,7 +926,7 @@ void AuctionHouse::CancelAll(Character *ch)
 /*
 COLLECT EXPIRED
 */
-void AuctionHouse::CollectTickets(Character *ch, unsigned int ticket)
+void AuctionHouse::CollectTickets(CharacterPtr ch, unsigned int ticket)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   if (ticket > 0)
@@ -974,7 +974,7 @@ CHECK EXPIRE
 void AuctionHouse::CheckExpire()
 {
   unsigned int cur_time = time(0);
-  Character *ch;
+  CharacterPtr ch;
   bool something_expired = false;
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
 
@@ -998,11 +998,11 @@ void AuctionHouse::CheckExpire()
 /*
 BUY ITEM
 */
-void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
+void AuctionHouse::BuyItem(CharacterPtr ch, unsigned int ticket)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   Object *obj;
-  Character *vict;
+  CharacterPtr vict;
   FILEPtr fl;
   char *buf[10];
   int i = 0;
@@ -1109,7 +1109,7 @@ void AuctionHouse::BuyItem(Character *ch, unsigned int ticket)
 
   ch->sendln(u"You have purchased %1 for %2 coins."_s.arg(obj->short_description).arg(Item_it->price));
 
-  Character *tmp;
+  CharacterPtr tmp;
   for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
     if (tmp != ch)
       tmp->sendln(u"%1 just purchased %2's %3"_s.arg(GET_NAME(ch)).arg(Item_it->seller).arg(obj->short_description));
@@ -1230,7 +1230,7 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
 /*
 CANCEL ITEM
 */
-void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
+void AuctionHouse::RemoveTicket(CharacterPtr ch, unsigned int ticket)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   Object *obj;
@@ -1365,7 +1365,7 @@ void AuctionHouse::RemoveTicket(Character *ch, unsigned int ticket)
 /*
 LIST ITEMS
 */
-void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, unsigned int to, unsigned int from)
+void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name, unsigned int to, unsigned int from)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
   QQueue<QString> recent;
@@ -1499,7 +1499,7 @@ void AuctionHouse::ListItems(Character *ch, ListOptions options, QString name, u
 /*
 ADD ITEM
 */
-void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QString buyer)
+void AuctionHouse::AddItem(CharacterPtr ch, Object *obj, unsigned int price, QString buyer)
 {
   char buf[20];
   strncpy(buf, buyer.toStdString().c_str(), 19);
@@ -1656,9 +1656,9 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
 
   if (advertise == true && NewTicket.buyer.isEmpty())
   {
-    Character *find_mob_in_room(Character * ch, int iFriendId);
+    CharacterPtr find_mob_in_room(CharacterPtr ch, int iFriendId);
     char auc_buf[MAX_STRING_LENGTH];
-    Character *Broker = find_mob_in_room(ch, 5258);
+    CharacterPtr Broker = find_mob_in_room(ch, 5258);
     if (!Broker)
     {
       Broker = get_mob_vnum(5258);
@@ -1671,7 +1671,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
     else
     {
       ch->sendln("The Consignment Broker couldn't auction. Contact an imm.");
-      logentry(QStringLiteral("Character *Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
+      logentry(QStringLiteral("CharacterPtr Broker was nullptr in AuctionHouse::AddItem([%1], [%2], [%3], [%4])").arg(GET_NAME(ch)).arg(GET_OBJ_SHORT(obj)).arg(price).arg(buyer));
     }
   }
 
@@ -1700,7 +1700,7 @@ void AuctionHouse::AddItem(Character *ch, Object *obj, unsigned int price, QStri
   return;
 }
 
-int do_vend(Character *ch, char *argument, cmd_t cmd)
+int do_vend(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   Object *obj;

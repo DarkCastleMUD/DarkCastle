@@ -35,14 +35,13 @@ class affected_type;
 enum class attribute_t : uint_fast8_t;
 
 /* handling the affected-structures */
-void affect_total(Character *ch);
-void affect_modify(Character *ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
-void affect_to_char(Character *ch, affected_type *af, int32_t duration_type = DC::PULSE_TIME);
-void affect_from_char(Character *ch, int skill, int flags = 0);
-void affect_remove(Character *ch, affected_type *af, int flags);
-void affect_join(Character *ch, affected_type *af,
-                 bool avg_dur, bool avg_mod);
-affected_type *affected_by_random(Character *ch);
+void affect_total(CharacterPtr ch);
+void affect_modify(CharacterPtr ch, int32_t loc, int32_t mod, int32_t bitv, bool add, int flag = 0);
+void affect_to_char(CharacterPtr ch, affected_type *af, int32_t duration_type = DC::PULSE_TIME);
+void affect_from_char(CharacterPtr ch, int skill, int flags = 0);
+void affect_remove(CharacterPtr ch, affected_type *af, int flags);
+void affect_join(CharacterPtr ch, affected_type *af, bool avg_dur, bool avg_mod);
+affected_type *affected_by_random(CharacterPtr ch);
 
 /* flag bit values for affect_remove() */
 #define SUPPRESS_CONSEQUENCES 1
@@ -53,18 +52,18 @@ affected_type *affected_by_random(Character *ch);
 class Object *create_money(int amount);
 QString fname(QString namelist);
 int isprefix(const char *str, const char *namel);
-int get_max_stat(Character *ch, attribute_t stat);
+int get_max_stat(CharacterPtr ch, attribute_t stat);
 // TIMERS
-bool isTimer(Character *ch, int spell);
-void addTimer(Character *ch, int spell, int ticks);
+bool isTimer(CharacterPtr ch, int spell);
+void addTimer(CharacterPtr ch, int spell, int ticks);
 // END TIMERS
 /* ******** objects *********** */
 
 int move_obj(Object *obj, int dest);
-int move_obj(Object *obj, Character *ch);
+int move_obj(Object *obj, CharacterPtr ch);
 int move_obj(Object *obj, Object *dest_obj);
 
-int obj_to_char(class Object *object, Character *ch);
+int obj_to_char(class Object *object, CharacterPtr ch);
 int obj_from_char(class Object *object);
 
 int obj_to_room(class Object *object, room_t room);
@@ -79,60 +78,60 @@ class Object *get_obj(char *name);
 class Object *get_obj(int vnum);
 class Object *get_obj_num(int nr);
 
-void object_list_new_new_owner(class Object *list, Character *ch);
+void object_list_new_new_owner(class Object *list, CharacterPtr ch);
 
 void extract_obj(class Object *obj);
 
 /* ******* characters ********* */
 
-Character *get_char_room(QString name, room_t room, bool careful = false);
-Character *get_char_room(const char *name, room_t room, bool careful = false);
+CharacterPtr get_char_room(QString name, room_t room, bool careful = false);
+CharacterPtr get_char_room(const char *name, room_t room, bool careful = false);
 
-Character *get_char_num(int nr);
-Character *get_char(QString name);
-Character *get_mob(char *name);
-Character *get_pc(QString name);
+CharacterPtr get_char_num(int nr);
+CharacterPtr get_char(QString name);
+CharacterPtr get_mob(char *name);
+CharacterPtr get_pc(QString name);
 
-int char_from_room(Character *ch, bool stop_all_fighting);
-int char_from_room(Character *ch);
-int char_to_room(Character *ch, room_t room, bool stop_all_fighting = true);
+int char_from_room(CharacterPtr ch, bool stop_all_fighting);
+int char_from_room(CharacterPtr ch);
+int char_to_room(CharacterPtr ch, room_t room, bool stop_all_fighting = true);
 
 /* find if character can see */
-Character *get_active_pc(const char *name);
-Character *get_active_pc(QString name);
-Character *get_all_pc(char *name);
-Character *get_char_room_vis(Character *ch, QString name);
-Character *get_char_vis(Character *ch, const char *name);
-Character *get_char_vis(Character *ch, const std::string &name);
-Character *get_char_vis(Character *ch, const QString &name);
-Character *get_pc_vis(Character *ch, const char *name);
-Character *get_pc_vis(Character *ch, QString name);
-Character *get_pc_vis_exact(Character *ch, const char *name);
-Character *get_mob_vis(Character *ch, char *name);
-Character *get_random_mob_vnum(int vnum);
-Character *get_mob_room_vis(Character *ch, const char *name);
-Character *get_mob_vnum(int vnum);
+CharacterPtr get_active_pc(const char *name);
+CharacterPtr get_active_pc(QString name);
+CharacterPtr get_all_pc(char *name);
+CharacterPtr get_char_room_vis(CharacterPtr ch, QString name);
+CharacterPtr get_char_vis(CharacterPtr ch, const char *name);
+CharacterPtr get_char_vis(CharacterPtr ch, const std::string &name);
+CharacterPtr get_char_vis(CharacterPtr ch, const QString &name);
+CharacterPtr get_pc_vis(CharacterPtr ch, const char *name);
+CharacterPtr get_pc_vis(CharacterPtr ch, QString name);
+CharacterPtr get_pc_vis_exact(CharacterPtr ch, const char *name);
+CharacterPtr get_mob_vis(CharacterPtr ch, char *name);
+CharacterPtr get_random_mob_vnum(int vnum);
+CharacterPtr get_mob_room_vis(CharacterPtr ch, const char *name);
+CharacterPtr get_mob_vnum(int vnum);
 Object *get_obj_vnum(int vnum);
 Object *get_obj_vnum(QString vnum);
 Object *get_objindex_vnum(vnum_t vnum);
 Object *get_objindex_vnum(QString vnum);
 vnum_t get_vnum(QString vnum_str);
-class Object *get_obj_in_list_vis(Character *ch, QString name, class Object *list, bool bf = false);
-class Object *get_obj_in_list_vis(Character *ch, int item_num, class Object *list, bool bf = false);
-class Object *get_obj_vis(Character *ch, const char *name, bool loc = false);
-class Object *get_obj_vis(Character *ch, std::string name, bool loc = false);
+class Object *get_obj_in_list_vis(CharacterPtr ch, QString name, class Object *list, bool bf = false);
+class Object *get_obj_in_list_vis(CharacterPtr ch, int item_num, class Object *list, bool bf = false);
+class Object *get_obj_vis(CharacterPtr ch, const char *name, bool loc = false);
+class Object *get_obj_vis(CharacterPtr ch, std::string name, bool loc = false);
 
-void extract_char(Character *ch, bool pull, Trace t = Trace("unknown"));
+void extract_char(CharacterPtr ch, bool pull, Trace t = Trace("unknown"));
 /* wiz_102.cpp */
 int find_skill_num(char *name);
 
 typedef QMap<QString, quint64> skill_results_t;
 skill_results_t find_skills_by_name(QString name);
-Character *get_pc_vis(Character *ch, std::string name);
+CharacterPtr get_pc_vis(CharacterPtr ch, std::string name);
 
 /* Generic Find */
 
-int generic_find(const char *arg, int bitvector, Character *ch, Character **tar_ch, class Object **tar_obj, bool verbose = false);
+int generic_find(const char *arg, int bitvector, CharacterPtr ch, CharacterPtr *tar_ch, class Object **tar_obj, bool verbose = false);
 
 int get_number(char **name);
 int get_number(std::string &name);
@@ -145,7 +144,7 @@ int get_number(QString &name);
 #define FIND_OBJ_WORLD 16
 #define FIND_OBJ_EQUIP 32
 
-bool is_wearing(Character *ch, Object *item);
+bool is_wearing(CharacterPtr ch, Object *item);
 
 class ErrorHandler
 {
@@ -159,12 +158,12 @@ public:
 };
 
 bool objExists(Object *obj);
-bool charge_moves(Character *ch, int skill, double modifier = 1);
+bool charge_moves(CharacterPtr ch, int skill, double modifier = 1);
 
-void die_follower(Character *ch);
-void stop_guarding_me(Character *victim);
-void stop_guarding(Character *guard);
-void remove_memory(Character *ch, char type);
-void remove_memory(Character *ch, char type, Character *vict);
+void die_follower(CharacterPtr ch);
+void stop_guarding_me(CharacterPtr victim);
+void stop_guarding(CharacterPtr guard);
+void remove_memory(CharacterPtr ch, char type);
+void remove_memory(CharacterPtr ch, char type, CharacterPtr vict);
 
 #endif

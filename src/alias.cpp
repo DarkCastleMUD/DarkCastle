@@ -137,7 +137,7 @@ command_return_t Character::do_alias(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-QString pet_info(Character *ch, QString type, unsigned victim_count)
+QString pet_info(CharacterPtr ch, QString type, unsigned victim_count)
 {
   unsigned attacks = 1;
 

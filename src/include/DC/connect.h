@@ -148,8 +148,8 @@ public:
   QByteArray output = {};      /* output buffer for writing to connection	*/
   QByteArray inbuf = {};
   std::queue<QByteArray> input = {}; /* queue of unprocessed input	*/
-  Character *character = {};         /* linked to char		*/
-  Character *original = {};          /* for switch / return		*/
+  CharacterPtr character = {};       /* linked to char		*/
+  CharacterPtr original = {};        /* for switch / return		*/
   class Connection *snooping = {};   /* Who is this char snooping       */
   class Connection *snoop_by = {};   /* And who is snooping this char   */
   class Connection *next = {};       /* link to next descriptor	*/
@@ -240,7 +240,7 @@ private:
 class Sockets
 {
 public:
-  Sockets(Character *ch = nullptr, QString searchkey = "");
+  Sockets(CharacterPtr ch = nullptr, QString searchkey = "");
   QMap<QString, quint64> getIPs(void) const { return IPs_; }
   QList<Connection *> getConnections(void) const { return connections_; }
   quint64 getLongestNameSize(void) const { return longest_name_size_; }

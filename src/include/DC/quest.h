@@ -2,6 +2,7 @@
 /************************************
 one liner quest shit
 ************************************/
+#include "DC/types.h"
 #include <QString>
 class Character;
 class Object;
@@ -38,31 +39,31 @@ int load_quests();
 int save_quests();
 quest_info *get_quest_struct(int);
 quest_info *get_quest_struct(char *);
-int do_add_quest(Character *, char *);
-void list_quests(Character *);
-void show_quest_info(Character *, int);
-bool check_available_quest(Character *, quest_info *);
-bool check_quest_current(Character *, int);
-bool check_quest_pass(Character *, int);
-bool check_quest_complete(Character *, int);
+int do_add_quest(CharacterPtr, char *);
+void list_quests(CharacterPtr);
+void show_quest_info(CharacterPtr, int);
+bool check_available_quest(CharacterPtr, quest_info *);
+bool check_quest_current(CharacterPtr, int);
+bool check_quest_pass(CharacterPtr, int);
+bool check_quest_complete(CharacterPtr, int);
 int get_quest_price(quest_info *);
-void show_quest_header(Character *);
-void show_quest_amount(Character *);
-void show_quest_closer(Character *);
-int show_one_quest(Character *, quest_info *, int);
-int show_one_complete_quest(Character *, quest_info *, int);
-int show_one_available_quest(Character *, quest_info *, int);
-void show_available_quests(Character *);
-void show_pass_quests(Character *);
-void show_current_quests(Character *);
-void show_complete_quests(Character *);
-int start_quest(Character *, quest_info *);
-int pass_quest(Character *, quest_info *);
-int complete_quest(Character *, quest_info *);
-int stop_current_quest(Character *, quest_info *);
-int stop_current_quest(Character *, int);
-int stop_all_quests(Character *);
+void show_quest_header(CharacterPtr);
+void show_quest_amount(CharacterPtr);
+void show_quest_closer(CharacterPtr);
+int show_one_quest(CharacterPtr, quest_info *, int);
+int show_one_complete_quest(CharacterPtr, quest_info *, int);
+int show_one_available_quest(CharacterPtr, quest_info *, int);
+void show_available_quests(CharacterPtr);
+void show_pass_quests(CharacterPtr);
+void show_current_quests(CharacterPtr);
+void show_complete_quests(CharacterPtr);
+int start_quest(CharacterPtr, quest_info *);
+int pass_quest(CharacterPtr, quest_info *);
+int complete_quest(CharacterPtr, quest_info *);
+int stop_current_quest(CharacterPtr, quest_info *);
+int stop_current_quest(CharacterPtr, int);
+int stop_all_quests(CharacterPtr);
 void quest_update();
-int quest_handler(Character *, Character *, int, char *);
-int quest_master(Character *, Object *, int, char *, Character *);
-int do_quest(Character *, char *, int);
+int quest_handler(CharacterPtr, CharacterPtr, int, char *);
+int quest_master(CharacterPtr, Object *, int, char *, CharacterPtr);
+int do_quest(CharacterPtr, char *, int);

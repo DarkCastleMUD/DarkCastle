@@ -57,9 +57,9 @@ public:
   int result; // last item in array must be -1 for this
   int trivial;
 };
-void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial);
+void determine_trade_skill_increase(CharacterPtr ch, int skillnum, int learned, int trivial);
 int determine_trade_skill_chance(int learned, int trivial);
-int valid_trade_skill_combine(class Object *container, class trade_data_type *data, Character *ch);
+int valid_trade_skill_combine(class Object *container, class trade_data_type *data, CharacterPtr ch);
 
 // POISON DEFINES
 trade_data_type poison_vial_data[] =
@@ -122,7 +122,7 @@ thief_poison_data poison_vial_combat_data[] =
 ////////////////////////////////////////////////////////////////////////////
 // command functions
 
-int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
+int do_poisonmaking(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int learned = ch->has_skill(SKILL_TRADE_POISON);
 
@@ -198,7 +198,7 @@ int do_poisonmaking(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
+int do_poisonweapon(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() <= IMMORTAL)
   {
@@ -275,7 +275,7 @@ int do_poisonweapon(Character *ch, char *argument, cmd_t cmd)
 // Return index of match on successful find
 // Return -1 on failure
 // Return -2 if there's nothing in the container
-int valid_trade_skill_combine(Object *container, trade_data_type *data, Character *ch)
+int valid_trade_skill_combine(Object *container, trade_data_type *data, CharacterPtr ch)
 {
   if (!(container->contains))
   {
@@ -328,7 +328,7 @@ int determine_trade_skill_chance(int learned, int trivial)
   return chance;
 }
 
-void determine_trade_skill_increase(Character *ch, int skillnum, int learned, int trivial)
+void determine_trade_skill_increase(CharacterPtr ch, int skillnum, int learned, int trivial)
 {
   // can't learn past item's trivial value
   if (learned >= trivial)
@@ -343,7 +343,7 @@ void determine_trade_skill_increase(Character *ch, int skillnum, int learned, in
   ch->learn_skill(skillnum, 1, 500);
 }
 
-int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
+int handle_poisoned_weapon_attack(CharacterPtr ch, CharacterPtr vict, int type)
 {
   int retval = ReturnValue::eSUCCESS;
   // unused   int dam;
@@ -402,7 +402,7 @@ int handle_poisoned_weapon_attack(Character *ch, Character *vict, int type)
   return retval;
 }
 
-int do_brew(Character *ch, char *argument, cmd_t cmd)
+int do_brew(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH], liquid[MAX_STRING_LENGTH], container[MAX_STRING_LENGTH], buffer[MAX_STRING_LENGTH];
   Object *herbobj, *liquidobj, *containerobj;
@@ -772,7 +772,7 @@ void Brew::save(void)
   }
 }
 
-void Brew::list(Character *ch)
+void Brew::list(CharacterPtr ch)
 {
   char buffer[MAX_STRING_LENGTH] = {};
   int i = {};
@@ -793,7 +793,7 @@ void Brew::list(Character *ch)
   }
 }
 
-int Brew::add(Character *ch, char *argument)
+int Brew::add(CharacterPtr ch, char *argument)
 {
   vnum_t herb_vnum = {}, container_vnum = {};
   int liquid_type = {}, spell = {};
@@ -858,7 +858,7 @@ int Brew::add(Character *ch, char *argument)
   return ReturnValue::eSUCCESS;
 }
 
-int Brew::remove(Character *ch, char *argument)
+int Brew::remove(CharacterPtr ch, char *argument)
 {
   if (!ch)
   {
@@ -907,7 +907,7 @@ int Brew::find(Brew::recipe r)
   return spell;
 }
 
-int do_scribe(Character *ch, char *argument, cmd_t cmd)
+int do_scribe(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH], dust[MAX_STRING_LENGTH], pen[MAX_STRING_LENGTH], paper[MAX_STRING_LENGTH];
   Object *inkobj, *dustobj, *penobj, *paperobj;
@@ -1224,7 +1224,7 @@ void Scribe::save(void)
   }
 }
 
-void Scribe::list(Character *ch)
+void Scribe::list(CharacterPtr ch)
 {
   char buffer[MAX_STRING_LENGTH];
   int i = 0;
@@ -1245,7 +1245,7 @@ void Scribe::list(Character *ch)
   }
 }
 
-int Scribe::add(Character *ch, char *argument)
+int Scribe::add(CharacterPtr ch, char *argument)
 {
   vnum_t ink_vnum = {}, dust_vnum = {}, pen_vnum = {}, paper_vnum = {};
   int spell = {};
@@ -1311,7 +1311,7 @@ int Scribe::add(Character *ch, char *argument)
   return ReturnValue::eSUCCESS;
 }
 
-int Scribe::remove(Character *ch, char *argument)
+int Scribe::remove(CharacterPtr ch, char *argument)
 {
   if (!ch)
   {

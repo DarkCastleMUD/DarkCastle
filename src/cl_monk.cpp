@@ -25,9 +25,9 @@
 /************************************************************************
 | OFFENSIVE commands.
 */
-int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
+int do_eagle_claw(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[MAX_INPUT_LENGTH];
   int dam;
   int retval;
@@ -120,11 +120,11 @@ int do_eagle_claw(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
+int do_quivering_palm(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   affected_type af;
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int dam, retval;
   int duration = 100;
@@ -227,9 +227,9 @@ int do_quivering_palm(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_stun(Character *ch, char *argument, cmd_t cmd)
+int do_stun(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int retval;
 

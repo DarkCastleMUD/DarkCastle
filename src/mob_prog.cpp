@@ -70,13 +70,13 @@
 
 // Extern variables
 
-Character *rndm2;
+CharacterPtr rndm2;
 
 int activeProgs = 0; // loop protection
 
-Character *activeActor = nullptr;
-Character *activeRndm = nullptr;
-Character *activeTarget = nullptr;
+CharacterPtr activeActor = nullptr;
+CharacterPtr activeRndm = nullptr;
+CharacterPtr activeTarget = nullptr;
 Object *activeObj = nullptr;
 void *activeVo = nullptr;
 
@@ -102,7 +102,7 @@ SelfPurge::operator bool() const
   return state;
 }
 
-void SelfPurge::setOwner(Character *c, std::string m)
+void SelfPurge::setOwner(CharacterPtr c, std::string m)
 {
   owner = c;
   function = m;
@@ -245,10 +245,10 @@ bool Character::isTank(void)
   return false;
 }
 
-void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
-                     QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb,
-                     Character *mob, Character *actor, Object *obj, void *vo,
-                     Character *rndm, QString &valqstr)
+void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
+                         QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb,
+                         CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo,
+                         CharacterPtr rndm, QString &valqstr)
 {
   /*
    $n.age
@@ -261,7 +261,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **v
    'hasskill' = right
    */
 
-  Character *target = nullptr;
+  CharacterPtr target = nullptr;
   Object *otarget = nullptr;
   int rtarget = -1, ztarget = -1;
   bool valset = false; // done like that to determine if value is set, since it can be 0
@@ -297,7 +297,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **v
 
     const auto &character_list = DC::getInstance()->character_list;
     auto result = find_if(character_list.begin(), character_list.end(),
-                          [&target, &left](Character *const &tmp)
+                          [&target, &left](CharacterPtr const &tmp)
                           {
                             if (isexact(left, GET_NAME(tmp)))
                             {
@@ -316,7 +316,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **v
 
     const auto &character_list = DC::getInstance()->character_list;
     auto result = find_if(character_list.begin(), character_list.end(),
-                          [&target, &left, &mob](Character *const &tmp)
+                          [&target, &left, &mob](CharacterPtr const &tmp)
                           {
                             if (tmp->in_room != DC::NOWHERE && DC::getInstance()->world[mob->in_room].zone == DC::getInstance()->world[tmp->in_room].zone && isexact(left, GET_NAME(tmp)))
                             {
@@ -332,7 +332,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **v
   else if (!str_prefix("mroom_", left))
   {
     left += 6;
-    Character *tmp;
+    CharacterPtr tmp;
     for (tmp = DC::getInstance()->world[mob->in_room].people; tmp; tmp = tmp->next_in_room)
     {
       if (isexact(left, GET_NAME(tmp)))
@@ -406,7 +406,7 @@ void translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **v
       break;
 
     case 't':
-      target = (Character *)vo;
+      target = (CharacterPtr)vo;
       break;
     case 'o':
       otarget = obj;
@@ -1384,7 +1384,7 @@ QMap<QString, DC::mprog_ifs> DC::load_ifchecks(void)
   return ifcheck_tmp;
 }
 
-DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
+DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -1392,7 +1392,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
   char opr[MAX_INPUT_LENGTH];
   char val[MAX_INPUT_LENGTH];
   char val2[MAX_INPUT_LENGTH]; // used for non-traditional
-  Character *vict = (Character *)vo;
+  CharacterPtr vict = (CharacterPtr)vo;
   Object *v_obj = (Object *)vo;
   char *bufpt = buf;
   char *argpt = arg;
@@ -1518,7 +1518,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
    *  send the lhs,opr,rhs off to be evaluated.
    */
 
-  Character *fvict = nullptr;
+  CharacterPtr fvict = nullptr;
   bool ye = false;
   if (arg[0] == '$' && arg[1] == 'v')
   {
@@ -1551,7 +1551,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
   }
   if (!(arg[0] == '$') && is_number(arg) && traditional)
   {
-    Character *te;
+    CharacterPtr te;
     int vnum = atoi(arg);
     for (te = DC::getInstance()->world[mob->in_room].people; te; te = te->next)
     {
@@ -1671,7 +1671,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
 
   case eNUMPCS:
   {
-    Character *p;
+    CharacterPtr p;
     int count = 0;
     for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
       if (p->isPlayer())
@@ -1687,7 +1687,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
 
     const auto &character_list = DC::getInstance()->character_list;
     count = std::count_if(character_list.begin(), character_list.end(),
-                          [&target](Character *vch)
+                          [&target](CharacterPtr vch)
                           {
                             if (vch->isNonPlayer() && vch->in_room != DC::NOWHERE && vch->mobdata->vnum_ == target)
                             {
@@ -1723,7 +1723,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
   case eNUMOFMOBSINROOM:
   {
     int target = atoi(arg);
-    Character *p;
+    CharacterPtr p;
     int count = 0;
     for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
       if (p->isNonPlayer() && p->mobdata->vnum_ == target)
@@ -1744,7 +1744,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType::FALSE;
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isNonPlayer());
+        return DC::IfReturnType(reinterpret_cast<CharacterPtr>(mob->beacon)->isNonPlayer());
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -1789,7 +1789,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return (mob->equipment[WEAR_WIELD]) ? IfReturnType::TRUE : IfReturnType::FALSE;
     case 'z':
       if (mob->beacon)
-        return ((Character *)mob->beacon)->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
+        return ((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD] ? IfReturnType::TRUE : IfReturnType::FALSE;
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -1837,8 +1837,8 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       else
         return DC::IfReturnType::FALSE;
     case 'z':
-      if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_WIELD])
-        return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
+      if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD])
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -1875,8 +1875,8 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       else
         return DC::IfReturnType::FALSE;
     case 'z':
-      if (mob->beacon && ((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD])
-        return mprog_veval(((Character *)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
+      if (mob->beacon && ((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD])
+        return mprog_veval(((CharacterPtr)mob->beacon)->equipment[WEAR_SECOND_WIELD]->obj_flags.value[3], opr, atoi(val));
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -1911,7 +1911,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType::TRUE;
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(((Character *)mob->beacon)->isNonPlayer());
+        return DC::IfReturnType(((CharacterPtr)mob->beacon)->isNonPlayer());
       else
         return DC::IfReturnType::FALSE;
 
@@ -1948,7 +1948,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(IS_GOOD(mob));
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(IS_GOOD(((Character *)mob->beacon)));
+        return DC::IfReturnType(IS_GOOD(((CharacterPtr)mob->beacon)));
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -1984,7 +1984,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(IS_NEUTRAL(mob));
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(IS_NEUTRAL(((Character *)mob->beacon)));
+        return DC::IfReturnType(IS_NEUTRAL(((CharacterPtr)mob->beacon)));
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -2020,7 +2020,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(IS_EVIL(mob));
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(IS_EVIL(((Character *)mob->beacon)));
+        return DC::IfReturnType(IS_EVIL(((CharacterPtr)mob->beacon)));
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -2059,7 +2059,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
     {
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(is_wearing(((Character *)mob->beacon), o));
+        return DC::IfReturnType(is_wearing(((CharacterPtr)mob->beacon), o));
       else
         return DC::IfReturnType::ILLEGAL;
     case 'i':
@@ -2095,7 +2095,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
     {
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(((Character *)mob->beacon)->fighting ? 1 : 0);
+        return DC::IfReturnType(((CharacterPtr)mob->beacon)->fighting ? 1 : 0);
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -2131,7 +2131,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
     {
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(reinterpret_cast<Character *>(mob->beacon)->isTank());
+        return DC::IfReturnType(reinterpret_cast<CharacterPtr>(mob->beacon)->isTank());
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -2169,7 +2169,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(mob->getLevel() > IMMORTAL);
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(((Character *)mob->beacon)->getLevel() > IMMORTAL);
+        return DC::IfReturnType(((CharacterPtr)mob->beacon)->getLevel() > IMMORTAL);
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -2206,7 +2206,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(IS_AFFECTED(mob, AFF_CHARM));
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(IS_AFFECTED(((Character *)mob->beacon), AFF_CHARM));
+        return DC::IfReturnType(IS_AFFECTED(((CharacterPtr)mob->beacon), AFF_CHARM));
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -2243,7 +2243,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(mob->master != nullptr && mob->master->in_room == mob->in_room);
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(((Character *)mob->beacon)->master && ((Character *)mob->beacon)->master->in_room == ((Character *)mob->beacon)->in_room);
+        return DC::IfReturnType(((CharacterPtr)mob->beacon)->master && ((CharacterPtr)mob->beacon)->master->in_room == ((CharacterPtr)mob->beacon)->in_room);
       else
         return DC::IfReturnType::ILLEGAL;
     case 'n':
@@ -2285,7 +2285,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
         break;
       case 'z':
         if (mob->beacon)
-          if (IS_AFFECTED(((Character *)mob->beacon), AFF_FLYING))
+          if (IS_AFFECTED(((CharacterPtr)mob->beacon), AFF_FLYING))
             return DC::IfReturnType::TRUE;
         break;
       case 'n': // actor
@@ -2329,7 +2329,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType((int64_t)(mob->affected_by_spell(find_skill_num(val))));
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType((int64_t)((Character *)mob->beacon)->affected_by_spell((find_skill_num(val))));
+        return DC::IfReturnType((int64_t)((CharacterPtr)mob->beacon)->affected_by_spell((find_skill_num(val))));
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -2376,7 +2376,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       return DC::IfReturnType(ISSET(mob->affected_by, atoi(val)));
     case 'z':
       if (mob->beacon)
-        return DC::IfReturnType(ISSET(((Character *)mob->beacon)->affected_by, atoi(val)));
+        return DC::IfReturnType(ISSET(((CharacterPtr)mob->beacon)->affected_by, atoi(val)));
       else
         return DC::IfReturnType::ILLEGAL;
 
@@ -2421,7 +2421,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
     case 'z':
       if (mob->beacon)
       {
-        lhsvl = (((Character *)mob->beacon)->hit * 100) / ((Character *)mob->beacon)->max_hit;
+        lhsvl = (((CharacterPtr)mob->beacon)->hit * 100) / ((CharacterPtr)mob->beacon)->max_hit;
         rhsvl = atoi(val);
         return mprog_veval(lhsvl, opr, rhsvl);
       }
@@ -2465,7 +2465,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
   case eWEARS:
   {
     class Object *obj = 0;
-    Character *take;
+    CharacterPtr take;
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
 
@@ -2483,8 +2483,8 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       case 'z':
         if (!mob->beacon)
           return DC::IfReturnType::ILLEGAL;
-        obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), true);
-        take = ((Character *)mob->beacon);
+        obj = search_char_for_item(((CharacterPtr)mob->beacon), atoi(valu), true);
+        take = ((CharacterPtr)mob->beacon);
       case 'i': // mob
         obj = search_char_for_item(mob, atoi(valu), true);
         take = mob;
@@ -2536,7 +2536,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
   case eCARRIES:
   {
     class Object *obj = 0;
-    Character *take;
+    CharacterPtr take;
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
     if (fvict)
@@ -2553,8 +2553,8 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
       case 'z':
         if (!mob->beacon)
           return DC::IfReturnType::ILLEGAL;
-        obj = search_char_for_item(((Character *)mob->beacon), atoi(valu), false);
-        take = ((Character *)mob->beacon);
+        obj = search_char_for_item(((CharacterPtr)mob->beacon), atoi(valu), false);
+        take = ((CharacterPtr)mob->beacon);
       case 'i': // mob
         obj = search_char_for_item(mob, atoi(valu), false);
         take = mob;
@@ -2626,9 +2626,9 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
     case 'z':
       if (mob->beacon)
       {
-        if (((Character *)mob->beacon)->isNonPlayer())
+        if (((CharacterPtr)mob->beacon)->isNonPlayer())
         {
-          lhsvl = ((Character *)mob->beacon)->mobdata->vnum_;
+          lhsvl = ((CharacterPtr)mob->beacon)->mobdata->vnum_;
           rhsvl = atoi(val);
           return mprog_veval(lhsvl, opr, rhsvl);
         }
@@ -2730,7 +2730,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
     case 'z':
       if (mob->beacon)
       {
-        return mob->mprog_seval(((Character *)mob->beacon)->getTemp(buf4), opr, val);
+        return mob->mprog_seval(((CharacterPtr)mob->beacon)->getTemp(buf4), opr, val);
       }
       else
         return DC::IfReturnType::ILLEGAL;
@@ -2767,7 +2767,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, Character *mob, Character *ac
   {
     int target = atoi(arg);
 
-    for (Character *vch = DC::getInstance()->world[mob->in_room].people;
+    for (CharacterPtr vch = DC::getInstance()->world[mob->in_room].people;
          vch;
          vch = vch->next_in_room)
     {
@@ -2923,9 +2923,9 @@ char null[1];
 int mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
-char *DC::mprog_process_if(char *ifchck, char *com_list, Character *mob,
-                           Character *actor, Object *obj, void *vo,
-                           Character *rndm, mprog_throw_type *thrw)
+char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
+                           CharacterPtr actor, Object *obj, void *vo,
+                           CharacterPtr rndm, mprog_throw_type *thrw)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -3215,13 +3215,13 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, Character *mob,
  * would be to change act() so that vo becomes vict & v_obj.
  * but this would require a lot of small changes all over the code.
  */
-void DC::mprog_translate(char ch, char *t, Character *mob, Character *actor,
-                         Object *obj, void *vo, Character *rndm)
+void DC::mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor,
+                         Object *obj, void *vo, CharacterPtr rndm)
 {
   static char *he_she[] = {"it", "he", "she"};
   static char *him_her[] = {"it", "him", "her"};
   static char *his_her[] = {"its", "his", "her"};
-  Character *vict = (Character *)vo;
+  CharacterPtr vict = (CharacterPtr)vo;
   Object *v_obj = (Object *)vo;
 
   *t = '\0';
@@ -3238,14 +3238,14 @@ void DC::mprog_translate(char ch, char *t, Character *mob, Character *actor,
   case 'z':
     if (mob->beacon)
     {
-      one_argument(((Character *)mob->beacon)->getNameC(), t);
+      one_argument(((CharacterPtr)mob->beacon)->getNameC(), t);
       break;
     }
     strcpy(t, "error");
     break;
   case 'Z':
     if (mob->beacon)
-      strcpy(t, qPrintable(((Character *)mob->beacon)->short_desc));
+      strcpy(t, qPrintable(((CharacterPtr)mob->beacon)->short_desc));
     else
       strcpy(t, "error");
     break;
@@ -3253,8 +3253,8 @@ void DC::mprog_translate(char ch, char *t, Character *mob, Character *actor,
     strcpy(t, qPrintable(mob->short_desc));
     break;
   case 'x':
-    if (mob->beacon && ((Character *)mob->beacon)->fighting)
-      one_argument(((Character *)mob->beacon)->fighting->getNameC(), t);
+    if (mob->beacon && ((CharacterPtr)mob->beacon)->fighting)
+      one_argument(((CharacterPtr)mob->beacon)->fighting->getNameC(), t);
     else
       strcpy(t, "error");
     *t = UPPER(*t);
@@ -3597,7 +3597,7 @@ void debugpoint() {};
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-int DC::mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object *obj, void *vo, Character *rndm)
+int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm)
 {
   char buf[MAX_INPUT_LENGTH * 2];
   char tmp[MAX_INPUT_LENGTH * 2];
@@ -3709,13 +3709,13 @@ int DC::mprog_process_cmnd(char *cmnd, Character *mob, Character *actor, Object 
         while (*str != ']' && *str != '\0')
           *tmp1++ = *str++;
         *tmp1 = '\0';
-        Character *who = nullptr;
+        CharacterPtr who = nullptr;
         if (a == 'v')
           who = mob;
         else if (a == 'V')
           who = actor;
         else if (a == 'w')
-          who = (Character *)vo;
+          who = (CharacterPtr)vo;
         else if (a == 'W')
           who = rndm;
         if (who)
@@ -3767,15 +3767,15 @@ bool objExists(Object *obj)
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void DC::mprog_driver(char *com_list, Character *mob, Character *actor, Object *obj, void *vo, mprog_throw_type *thrw, Character *rndm)
+void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, mprog_throw_type *thrw, CharacterPtr rndm)
 {
   char tmpcmndlst[MAX_STRING_LENGTH];
   char buf[MAX_INPUT_LENGTH];
   char *morebuf;
   char *command_list;
   char *cmnd;
-  // Character *rndm  = nullptr;
-  Character *vch = nullptr;
+  // CharacterPtr rndm  = nullptr;
+  CharacterPtr vch = nullptr;
   int count = 0;
   if (IS_AFFECTED(mob, AFF_CHARM))
     return;
@@ -3902,7 +3902,7 @@ void DC::mprog_driver(char *com_list, Character *mob, Character *actor, Object *
  */
 // Returns true if match
 // false if no match
-int DC::mprog_wordlist_check(QString arg, Character *mob, Character *actor, Object *obj, void *vo, int type, bool reverse)
+int DC::mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, int type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
 
@@ -4004,7 +4004,7 @@ int DC::mprog_wordlist_check(QString arg, Character *mob, Character *actor, Obje
   return retval;
 }
 
-void DC::mprog_percent_check(Character *mob, Character *actor, Object *obj,
+void DC::mprog_percent_check(CharacterPtr mob, CharacterPtr actor, Object *obj,
                              void *vo, int type)
 {
   mob_prog_data *mprg{};
@@ -4049,7 +4049,7 @@ void DC::mprog_percent_check(Character *mob, Character *actor, Object *obj,
  * make sure you remember to modify the variable names to the ones in the
  * trigger calls.
  */
-int DC::mprog_act_trigger(std::string buf, Character *mob, Character *ch,
+int DC::mprog_act_trigger(std::string buf, CharacterPtr mob, CharacterPtr ch,
                           Object *obj, void *vo)
 {
 
@@ -4096,7 +4096,7 @@ int DC::mprog_act_trigger(std::string buf, Character *mob, Character *ch,
   return mprog_cur_result;
 }
 
-int DC::mprog_bribe_trigger(Character *mob, Character *ch, int amount)
+int DC::mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, int amount)
 {
 
   mob_prog_data *mprg = 0;
@@ -4142,7 +4142,7 @@ int DC::mprog_bribe_trigger(Character *mob, Character *ch, int amount)
   return mprog_cur_result;
 }
 
-int DC::mprog_damage_trigger(Character *mob, Character *ch, int amount)
+int DC::mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, int amount)
 {
 
   mob_prog_data *mprg = 0;
@@ -4185,7 +4185,7 @@ int DC::mprog_damage_trigger(Character *mob, Character *ch, int amount)
   return mprog_cur_result;
 }
 
-int DC::mprog_death_trigger(Character *mob, Character *killer)
+int DC::mprog_death_trigger(CharacterPtr mob, CharacterPtr killer)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & DEATH_PROG) && isPaused(mob) == false)
@@ -4197,7 +4197,7 @@ int DC::mprog_death_trigger(Character *mob, Character *killer)
   return mprog_cur_result;
 }
 
-int DC::mprog_entry_trigger(Character *mob)
+int DC::mprog_entry_trigger(CharacterPtr mob)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & ENTRY_PROG) && isPaused(mob) == false)
@@ -4206,7 +4206,7 @@ int DC::mprog_entry_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int DC::mprog_fight_trigger(Character *mob, Character *ch)
+int DC::mprog_fight_trigger(CharacterPtr mob, CharacterPtr ch)
 {
 
   if (mob->isNonPlayer() && MOB_WAIT_STATE(mob) <= 0 && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & FIGHT_PROG) && isPaused(mob) == false)
@@ -4215,7 +4215,7 @@ int DC::mprog_fight_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int DC::mprog_attack_trigger(Character *mob, Character *ch)
+int DC::mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
 {
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & ATTACK_PROG) && isPaused(mob) == false)
@@ -4224,7 +4224,7 @@ int DC::mprog_attack_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int DC::mprog_give_trigger(Character *mob, Character *ch, Object *obj)
+int DC::mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, Object *obj)
 {
 
   QString buf;
@@ -4297,7 +4297,7 @@ int Character::mprog_greet_trigger(void)
   return mprog_cur_result;
 }
 
-int DC::mprog_hitprcnt_trigger(Character *mob, Character *ch)
+int DC::mprog_hitprcnt_trigger(CharacterPtr mob, CharacterPtr ch)
 {
   mob_prog_data *mprg{};
   mob_prog_data *next{};
@@ -4339,7 +4339,7 @@ int DC::mprog_hitprcnt_trigger(Character *mob, Character *ch)
   return mprog_cur_result;
 }
 
-int DC::mprog_random_trigger(Character *mob)
+int DC::mprog_random_trigger(CharacterPtr mob)
 {
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4349,7 +4349,7 @@ int DC::mprog_random_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int DC::mprog_load_trigger(Character *mob)
+int DC::mprog_load_trigger(CharacterPtr mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4362,7 +4362,7 @@ int DC::mprog_load_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int DC::mprog_arandom_trigger(Character *mob)
+int DC::mprog_arandom_trigger(CharacterPtr mob)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4374,7 +4374,7 @@ int DC::mprog_arandom_trigger(Character *mob)
   return mprog_cur_result;
 }
 
-int Character::mprog_can_see_trigger(Character *mob)
+int Character::mprog_can_see_trigger(CharacterPtr mob)
 {
   if (isDead() || isNowhere())
   {
@@ -4400,7 +4400,7 @@ int Character::mprog_speech_trigger(const char *txt)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4414,7 +4414,7 @@ int Character::mprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-int DC::mprog_catch_trigger(Character *mob, int catch_num, char *var, int opt, Character *actor, Object *obj, void *vo, Character *rndm)
+int DC::mprog_catch_trigger(CharacterPtr mob, int catch_num, char *var, int opt, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4502,7 +4502,7 @@ void DC::update_mprog_throws(void)
   mprog_throw_type *curr;
   mprog_throw_type *action;
   mprog_throw_type *last = nullptr;
-  Character *vict;
+  CharacterPtr vict;
   Object *vobj;
   for (curr = g_mprog_throw_list; curr;)
   {
@@ -4599,9 +4599,9 @@ void DC::update_mprog_throws(void)
   }
 }
 
-Character *DC::initiate_oproc(Character *ch, Object *obj)
+CharacterPtr DC::initiate_oproc(CharacterPtr ch, Object *obj)
 { // Sneakiness.
-  Character *temp;
+  CharacterPtr temp;
   temp = clone_mobile(12);
   mob_index[12].mobprogs = obj_index[obj->vnum_].mobprogs;
   mob_index[12].progtypes = obj_index[obj->vnum_].progtypes;
@@ -4632,7 +4632,7 @@ Character *DC::initiate_oproc(Character *ch, Object *obj)
   return temp;
 }
 
-void end_oproc(Character *ch, Trace trace)
+void end_oproc(CharacterPtr ch, Trace trace)
 {
   static int core_counter = 0;
   if (selfpurge)
@@ -4661,7 +4661,7 @@ int Character::oprog_can_see_trigger(Object *item)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
   mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (dc_->obj_index[item->vnum_].progtypes & CAN_SEE_PROG)
@@ -4681,7 +4681,7 @@ int Character::oprog_speech_trigger(const char *txt)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob = nullptr;
+  CharacterPtr vmob = nullptr;
   Object *item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
@@ -4723,12 +4723,12 @@ int Character::oprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, Character *actor, Object *obj2, void *vo, Character *rndm)
+int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, CharacterPtr actor, Object *obj2, void *vo, CharacterPtr rndm)
 {
   mob_prog_data *mprg{};
   int curr_catch;
   mprog_cur_result = ReturnValue::eFAILURE;
-  Character *vmob;
+  CharacterPtr vmob;
 
   if (obj_index[obj->vnum_].progtypes & CATCH_PROG)
   {
@@ -4785,7 +4785,7 @@ int Character::oprog_act_trigger(QString txt)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
   Object *item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
@@ -4853,9 +4853,9 @@ int Character::oprog_greet_trigger(void)
 
 int DC::oprog_rand_trigger(Object *item)
 {
-  Character *vmob;
+  CharacterPtr vmob;
   //  Object *item;
-  Character *ch;
+  CharacterPtr ch;
   mprog_cur_result = ReturnValue::eSUCCESS;
   if (item->carried_by)
     ch = item->carried_by;
@@ -4873,8 +4873,8 @@ int DC::oprog_rand_trigger(Object *item)
 
 int DC::oprog_arand_trigger(Object *item)
 {
-  Character *vmob;
-  Character *ch;
+  CharacterPtr vmob;
+  CharacterPtr ch;
   mprog_cur_result = ReturnValue::eSUCCESS;
 
   if (item->carried_by)
@@ -4893,7 +4893,7 @@ int DC::oprog_arand_trigger(Object *item)
 
 int Character::oprog_load_trigger(void)
 {
-  Character *vmob;
+  CharacterPtr vmob;
   Object *item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
@@ -4934,7 +4934,7 @@ int Character::oprog_weapon_trigger(Object *item)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4956,7 +4956,7 @@ int Character::oprog_armour_trigger(Object *item)
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob;
+  CharacterPtr vmob;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4978,7 +4978,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
     return ReturnValue::eFAILURE;
   }
 
-  Character *vmob = nullptr;
+  CharacterPtr vmob = nullptr;
   Object *item = nullptr;
   mprog_cur_result = ReturnValue::eFAILURE;
   QString buf;
@@ -5046,9 +5046,9 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
   return mprog_cur_result;
 }
 
-bool isPaused(Character *mob)
+bool isPaused(CharacterPtr mob)
 {
-  if (mob == nullptr || mob == (Character *)0x95959595)
+  if (mob == nullptr || mob == (CharacterPtr)0x95959595)
   {
     return false;
   }

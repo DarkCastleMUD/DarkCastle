@@ -473,7 +473,7 @@ void funny_boot_message()
  It checks if ch exists everywhere it is used,
  so this can be called from other places without
  a character attached. */
-int do_write_skillquest(Character *ch, char *argument, cmd_t cmd)
+int do_write_skillquest(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   skill_quest *curr;
   FILEPtr fl;
@@ -704,7 +704,7 @@ void DC::boot_db(void)
 }
 
 /*
- int do_motdload(Character *ch, char *argument, cmd_t cmd)
+ int do_motdload(CharacterPtr ch, char *argument, cmd_t cmd)
  {
  file_to_string(MOTD_FILE, motd);
  file_to_string(IMOTD_FILE, imotd);
@@ -782,7 +782,7 @@ void DC::write_wizlist(const char filename[])
   wizlist_file.close();
 }
 
-void DC::update_wizlist(Character *ch)
+void DC::update_wizlist(CharacterPtr ch)
 {
   int x;
 
@@ -824,7 +824,7 @@ void DC::update_wizlist(Character *ch)
   write_wizlist(ssbuffer.str().c_str());
 }
 
-int do_wizlist(Character *ch, char *argument, cmd_t cmd)
+int do_wizlist(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH], lines[500], space[80];
   int x{}, z{1};
@@ -994,7 +994,7 @@ void DC::add_mobspec(vnum_t vnum)
   if (!DC::getInstance()->mob_index.contains(vnum))
     return;
 
-  Character *a = DC::getInstance()->mob_index[vnum].mob;
+  CharacterPtr a = DC::getInstance()->mob_index[vnum].mob;
   if (!a)
     return;
   if (!a->c_class)
@@ -1166,7 +1166,7 @@ void DC::remove_all_mobs_from_world(void)
   const auto &character_list = DC::getInstance()->character_list;
 
   for_each(character_list.begin(), character_list.end(),
-           [](Character *const &curr)
+           [](CharacterPtr const &curr)
            {
              if (curr->isNonPlayer())
                extract_char(curr, true, QStringLiteral("DC::remove_all_mobs_from_world"));
@@ -1467,7 +1467,7 @@ QString read_next_zonefile_name(FILEPtr stream)
   return read_next_filename(stream, u"zonefiles"_s);
 }
 
-bool can_modify_this_room(Character *ch, room_t room)
+bool can_modify_this_room(CharacterPtr ch, room_t room)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
@@ -1481,7 +1481,7 @@ bool can_modify_this_room(Character *ch, room_t room)
   return true;
 }
 
-bool can_modify_room(Character *ch, room_t vnum)
+bool can_modify_room(CharacterPtr ch, room_t vnum)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
@@ -1495,7 +1495,7 @@ bool can_modify_room(Character *ch, room_t vnum)
   return true;
 }
 
-bool can_modify_this_mobile(Character *ch, int32_t vnum)
+bool can_modify_this_mobile(CharacterPtr ch, int32_t vnum)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
@@ -1509,12 +1509,12 @@ bool can_modify_this_mobile(Character *ch, int32_t vnum)
   return true;
 }
 
-bool can_modify_mobile(Character *ch, vnum_t vnum)
+bool can_modify_mobile(CharacterPtr ch, vnum_t vnum)
 {
   return can_modify_this_mobile(ch, vnum);
 }
 
-bool can_modify_this_object(Character *ch, vnum_t vnum)
+bool can_modify_this_object(CharacterPtr ch, vnum_t vnum)
 {
   if (ch->has_skill(COMMAND_RANGE))
     return true;
@@ -1528,7 +1528,7 @@ bool can_modify_this_object(Character *ch, vnum_t vnum)
   return true;
 }
 
-bool can_modify_object(Character *ch, vnum_t vnum)
+bool can_modify_object(CharacterPtr ch, vnum_t vnum)
 {
   return can_modify_this_object(ch, vnum);
 }
@@ -1749,7 +1749,7 @@ void Room::setup_dir(QTextStream &fl, int dir)
 }
 
 // return true for success
-int DC::create_one_room(Character *ch, int vnum)
+int DC::create_one_room(CharacterPtr ch, int vnum)
 {
   Room *rp{};
   int x{};
@@ -2208,12 +2208,12 @@ void DC::boot_zones(void)
  *********************************************************************** */
 
 /* read a mobile from MOB_FILE */
-Character *DC::read_mobile(int nr, FILEPtr fl)
+CharacterPtr DC::read_mobile(int nr, FILEPtr fl)
 {
   char buf[200];
   int i, j;
   int32_t tmp, tmp2, tmp3;
-  Character *mob;
+  CharacterPtr mob;
   char letter;
 
   i = nr;
@@ -2436,7 +2436,7 @@ void write_mprog_recur(FILEPtr fl, mob_prog_data *mprg, bool mob)
 // Write a mob to file
 // Assume valid mob, and file open for writing
 //
-void write_mobile(LegacyFile &lf, Character *mob)
+void write_mobile(LegacyFile &lf, CharacterPtr mob)
 {
   FILEPtr fl = lf.file_handle_;
   int i = 0;
@@ -2524,7 +2524,7 @@ void write_mobile(LegacyFile &lf, Character *mob)
 // If a mob is set to 0d0 we need to give it hps depending upon it's level
 // and class.  And then since it's a mob, a bonus:)
 //
-void handle_automatic_mob_damdice(Character *mob)
+void handle_automatic_mob_damdice(CharacterPtr mob)
 {
   int nodice = 1;
   int sizedice = 1;
@@ -2626,7 +2626,7 @@ void handle_automatic_mob_damdice(Character *mob)
   mob->mobdata->damsizedice = sizedice;
 }
 
-void handle_automatic_mob_hitpoints(Character *mob)
+void handle_automatic_mob_hitpoints(CharacterPtr mob)
 {
   quint64 base{};
 
@@ -2688,7 +2688,7 @@ void handle_automatic_mob_hitpoints(Character *mob)
 }
 
 // currently hit and dam are the same
-void handle_automatic_mob_hitdamroll(Character *mob)
+void handle_automatic_mob_hitdamroll(CharacterPtr mob)
 {
   int curhit;
 
@@ -2722,7 +2722,7 @@ void handle_automatic_mob_hitdamroll(Character *mob)
   mob->damroll = curhit;
 }
 
-void handle_automatic_mob_settings(Character *mob)
+void handle_automatic_mob_settings(CharacterPtr mob)
 {
   extern mob_matrix_data mob_matrix[];
   // New matrix is handled here.
@@ -2876,7 +2876,7 @@ void handle_automatic_mob_settings(Character *mob)
   mob->max_hit = mob->raw_hit = mob->hit = mob_matrix[baselevel].hitpoints + ((mob_matrix[baselevel].hitpoints / 100) * percent);
 }
 
-Character *DC::clone_mobile(vnum_t vnum)
+CharacterPtr DC::clone_mobile(vnum_t vnum)
 {
   if (!vnum)
     return {};
@@ -3044,7 +3044,7 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   // update index of all mobiles in game
   // const auto &character_list = character_list;
   // for_each(character_list.begin(), character_list.end(),
-  //         [&vnum](Character *const &curr)
+  //         [&vnum](CharacterPtr const &curr)
   //         {
   //           if (curr->isNonPlayer())
   //             if (curr->mobdata->vnum_ >= vnum)
@@ -4025,7 +4025,7 @@ void Zone::reset(ResetType reset_type)
 
   int reset_cmd_index, last_cmd, last_percent;
   vnum_t last_mob{}, last_obj{};
-  Character *mob = nullptr;
+  CharacterPtr mob = nullptr;
   class Object *obj, *obj_to;
   last_cmd = last_percent = -1;
 
@@ -5079,7 +5079,7 @@ char fread_char(FILEPtr fl)
 }
 
 /* release memory allocated for a char  */
-void free_char(Character *ch, Trace trace)
+void free_char(CharacterPtr ch, Trace trace)
 {
   int iWear;
   //  affected_type *af;
@@ -5243,7 +5243,7 @@ int file_to_string(const char *name, char *buf)
 }
 
 /* clear some of the the working variables of a char */
-void reset_char(Character *ch)
+void reset_char(CharacterPtr ch)
 {
   int i;
 
@@ -5378,7 +5378,7 @@ void clear_object(class Object *obj)
 }
 
 // Roll up the random modifiers to saving throw for new character
-void apply_initial_saves(Character *ch)
+void apply_initial_saves(CharacterPtr ch)
 {
   for (int i = 0; i <= SAVE_TYPE_MAX; i++)
     if (number(0, 1))
@@ -5387,7 +5387,7 @@ void apply_initial_saves(Character *ch)
       ch->player->saves_mods[i] = 0;
 }
 
-void init_char(Character *ch)
+void init_char(CharacterPtr ch)
 {
   GET_TITLE(ch) = str_dup("is still a virgin.");
 

@@ -121,7 +121,7 @@ public:
   QString general_description; /* When look DIR.                  */
   QString keyword;             /* for open/close                  */
   int16_t exit_info;           /* Exit info                       */
-  Character *bracee;           /* This is who is bracing the door */
+  CharacterPtr bracee;         /* This is who is bracing the door */
   int16_t key;                 /* Key's number (-1 for no key)    */
   int16_t to_room;             /* Where direction leeds (NOWHERE) */
 };
@@ -206,10 +206,10 @@ public:
   uint32_t temp_room_flags = {}; // A second bitvector for flags that do NOT get saved.  These are temporary runtime flags.
   int16_t light = {};            // Light factor of room
 
-  int (*funct)(Character *, cmd_t, const char *) = {}; // special procedure
+  int (*funct)(CharacterPtr, cmd_t, const char *) = {}; // special procedure
 
-  class Object *contents = {}; // List of items in room
-  Character *people = nullptr; // List of NPC / PC in room
+  class Object *contents = {};   // List of items in room
+  CharacterPtr people = nullptr; // List of NPC / PC in room
 
   int nTracks = {};                 // number of tracks in the room
   room_track_data *tracks = {};     // beginning of the list of scents

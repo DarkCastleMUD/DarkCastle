@@ -6,6 +6,7 @@
 |   control.
 */
 
+#include "DC/types.h"
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 #include <fmt/base.h>
@@ -15,12 +16,11 @@
 #include <QString>
 #include <QMetaEnum>
 
-class Character;
 class QString;
 
 char *mprog_next_command(char *clist);
 
-bool charExists(Character *ch);
+bool charExists(CharacterPtr ch);
 
 #define BASE_STAT 0
 
@@ -79,15 +79,15 @@ class SelfPurge
 public:
   SelfPurge(void);
   SelfPurge(bool);
-  void setOwner(Character *, std::string);
+  void setOwner(CharacterPtr, std::string);
   explicit operator bool(void) const;
   std::string getFunction(void) const;
   bool getState(void) const;
-  Character *getOwner(void) const { return owner; }
+  CharacterPtr getOwner(void) const { return owner; }
 
 private:
   bool state = {};
-  Character *owner = {};
+  CharacterPtr owner = {};
   std::string function = {};
 };
 
@@ -164,5 +164,5 @@ public:
   int gold;
 };
 
-void save_golem_data(Character *ch);
-void save_charmie_data(Character *ch);
+void save_golem_data(CharacterPtr ch);
+void save_charmie_data(CharacterPtr ch);

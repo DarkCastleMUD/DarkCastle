@@ -61,19 +61,19 @@ public:
 extern vault_data *vault_table;
 vault_data *has_vault(QString name);
 
-void vault_withdraw(Character *ch, unsigned int amount, char *owner);
-void vault_deposit(Character *ch, unsigned int amount, char *owner);
+void vault_withdraw(CharacterPtr ch, unsigned int amount, char *owner);
+void vault_deposit(CharacterPtr ch, unsigned int amount, char *owner);
 void save_vault(QString name);
-void my_vault_access(Character *ch);
-void vault_get(Character *ch, QString object, QString owner);
-void vault_put(Character *ch, QString object, QString owner);
+void my_vault_access(CharacterPtr ch);
+void vault_get(CharacterPtr ch, QString object, QString owner);
+void vault_put(CharacterPtr ch, QString object, QString owner);
 void add_new_vault(const char *name, int indexonly);
-void vault_cost(Character *ch, char *object, char *arg);
+void vault_cost(CharacterPtr ch, char *object, char *arg);
 void remove_vault(QString name, BACKUP_TYPE backup = NONE);
 void rename_vault_owner(QString oldname, QString newname);
 void access_remove(QString name, vault_data *vault);
 void remove_vault_accesses(QString name);
-void vault_sell(Character *ch, char *object, char *arg);
+void vault_sell(CharacterPtr ch, char *object, char *arg);
 int vault_log_to_string(const char *name, char *buf);
 void logvault(QString message, QString name);
 void item_remove(Object *obj, vault_data *vault);
@@ -88,5 +88,5 @@ vault_items_data *get_unique_item_in_vault(vault_data *vault, char *object, int 
 class Object *get_obj_in_all_vaults(char *object, int num);
 vault_items_data *get_items_in_all_vaults(char *object, int num);
 
-int vault_search(Character *ch, const char *keyword);
+int vault_search(CharacterPtr ch, const char *keyword);
 void sort_vault(const vault_data &vault, sorted_vault &sv);

@@ -50,7 +50,7 @@
 extern int rev_dir[];
 
 /* procedures related to get */
-void get(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd)
+void get(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd)
 {
   QString buffer;
 
@@ -277,7 +277,7 @@ void get(Character *ch, class Object *obj_object, class Object *sub_object, bool
 // code at the end that would affect any attempted 'get' it looks really nasty and
 // is never utilized.  Restructure it so it is clear.  Pay proper attention to 'saving'
 // however so as not to introduce a potential dupe-bug.
-int do_get(Character *ch, char *argument, cmd_t cmd)
+int do_get(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
@@ -969,10 +969,10 @@ int do_get(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_consent(Character *ch, char *arg, cmd_t cmd)
+int do_consent(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   class Object *obj{};
-  Character *vict{};
+  CharacterPtr vict{};
 
   auto arguments = QString(arg).trimmed().split(' ');
   auto arg1 = arguments.value(0);
@@ -1036,7 +1036,7 @@ int do_consent(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int contents_cause_unique_problem(Object *obj, Character *vict)
+int contents_cause_unique_problem(Object *obj, CharacterPtr vict)
 {
   int lastnum = -1;
 
@@ -1069,7 +1069,7 @@ int contains_no_trade_item(Object *obj)
   return false;
 }
 
-int do_drop(Character *ch, char *argument, cmd_t cmd)
+int do_drop(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   int amount;
@@ -1267,7 +1267,7 @@ int do_drop(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void do_putalldot(Character *ch, char *name, char *target, cmd_t cmd)
+void do_putalldot(CharacterPtr ch, char *name, char *target, cmd_t cmd)
 {
   class Object *tmp_object;
   class Object *next_object;
@@ -1310,14 +1310,14 @@ int weight_in(class Object *obj)
   return w;
 }
 
-int do_put(Character *ch, char *argument, cmd_t cmd)
+int do_put(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buffer[MAX_STRING_LENGTH];
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   class Object *obj_object;
   class Object *sub_object;
-  Character *tmp_char;
+  CharacterPtr tmp_char;
   int bits;
   char allbuf[MAX_STRING_LENGTH];
 
@@ -1562,7 +1562,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   command_return_t retval{};
-  Character *vict{};
+  CharacterPtr vict{};
   class Object *obj{};
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
@@ -1911,7 +1911,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
 // and try to put it in his inv.  If sucessful, return pointer to the item.
-class Object *bring_type_to_front(Character *ch, int item_type)
+class Object *bring_type_to_front(CharacterPtr ch, int item_type)
 {
   class Object *item_carried = nullptr;
   class Object *container_item = nullptr;
@@ -1946,7 +1946,7 @@ class Object *bring_type_to_front(Character *ch, int item_type)
 }
 
 // Find an item on a character
-class Object *search_char_for_item(Character *ch, vnum_t vnum, bool wearonly)
+class Object *search_char_for_item(CharacterPtr ch, vnum_t vnum, bool wearonly)
 {
   class Object *i = nullptr;
   class Object *j = nullptr;
@@ -1988,7 +1988,7 @@ class Object *search_char_for_item(Character *ch, vnum_t vnum, bool wearonly)
 }
 
 // Find out how many of an item exists on character
-int search_char_for_item_count(Character *ch, vnum_t vnum, bool wearonly)
+int search_char_for_item_count(CharacterPtr ch, vnum_t vnum, bool wearonly)
 {
   class Object *i = nullptr;
   class Object *j = nullptr;
@@ -2078,7 +2078,7 @@ bool search_container_for_vnum(Object *obj, int vnum)
   return false;
 }
 
-int find_door(Character *ch, char *type, char *dir)
+int find_door(CharacterPtr ch, char *type, char *dir)
 {
   int door;
   const char *dirs[] =
@@ -2130,7 +2130,7 @@ int find_door(Character *ch, char *type, char *dir)
 in_room == exit->in_room
 
 */
-bool is_bracing(Character *bracee, room_direction_data *exit)
+bool is_bracing(CharacterPtr bracee, room_direction_data *exit)
 {
   // this could happen on a repop of the zone
   if (!isSet(exit->exit_info, EX_CLOSED))
@@ -2161,17 +2161,17 @@ bool is_bracing(Character *bracee, room_direction_data *exit)
   return false;
 }
 
-int do_open(Character *ch, char *argument, cmd_t cmd)
+int do_open(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   int door, other_room, retval;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   room_direction_data *back;
   class Object *obj;
-  Character *victim;
-  Character *next_vict;
+  CharacterPtr victim;
+  CharacterPtr next_vict;
 
-  int do_fall(Character * ch, short dir);
+  int do_fall(CharacterPtr ch, short dir);
 
   retval = 0;
 
@@ -2319,14 +2319,14 @@ int do_open(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_close(Character *ch, char *argument, cmd_t cmd)
+int do_close(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   bool found = false;
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   room_direction_data *back;
   class Object *obj;
-  Character *victim;
+  CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
 
@@ -2394,7 +2394,7 @@ int do_close(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-bool has_key(Character *ch, int key)
+bool has_key(CharacterPtr ch, int key)
 {
   // if key vnum is 0, there is no key
   if (key == 0)
@@ -2427,13 +2427,13 @@ bool has_key(Character *ch, int key)
   return false;
 }
 
-int do_lock(Character *ch, char *argument, cmd_t cmd)
+int do_lock(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
   class Object *obj;
-  Character *victim;
+  CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
 
@@ -2500,13 +2500,13 @@ int do_lock(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_unlock(Character *ch, char *argument, cmd_t cmd)
+int do_unlock(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
   class Object *obj;
-  Character *victim;
+  CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
 
@@ -2585,7 +2585,7 @@ int do_unlock(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int palm(Character *ch, class Object *obj_object, class Object *sub_object, bool has_consent)
+int palm(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 

@@ -20,7 +20,7 @@
 #include "DC/affect.h"
 #include "DC/common.h"
 
-int spellcraft(Character *ch, int spell)
+int spellcraft(CharacterPtr ch, int spell)
 {
   int a = ch->has_skill(SKILL_SPELLCRAFT);
   if (!a)
@@ -91,7 +91,7 @@ int spellcraft(Character *ch, int spell)
   return false;
 }
 
-int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
+int do_focused_repelance(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   // uint8_t percent;
   affected_type af;
@@ -138,7 +138,7 @@ int do_focused_repelance(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_imbue(Character *ch, char *argument, cmd_t cmd)
+int do_imbue(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int lvl = ch->has_skill(SKILL_IMBUE);
@@ -289,9 +289,12 @@ int do_imbue(Character *ch, char *argument, cmd_t cmd)
 // Remember that ch is the person triggering the call, meaning they are actually the victim
 // ReturnValue::eSUCCESS means the character is unaffected and can keep doing whatever.
 // ReturnValue::eFAILURE means the character was interrupted
-int check_ethereal_focus(Character *ch, int trigger_type)
+int check_ethereal_focus(CharacterPtr ch, int trigger_type)
 {
-  Character *i, *next_i, *ally, *next_ally;
+  CharacterPtr i;
+  CharacterPtr next_i;
+  CharacterPtr ally;
+  CharacterPtr next_ally;
   char buf[MAX_STRING_LENGTH];
   int retval;
 

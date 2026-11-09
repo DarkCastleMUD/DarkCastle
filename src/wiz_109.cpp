@@ -43,7 +43,7 @@
 command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 {
   class Connection d;
-  Character *new_new;
+  CharacterPtr new_new;
 
   if (arguments.isEmpty())
   {
@@ -86,7 +86,7 @@ command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_processes(Character *ch, char *arg, cmd_t cmd)
+int do_processes(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   FILEPtr fl;
   char *tmp;
@@ -124,7 +124,7 @@ int do_processes(Character *ch, char *arg, cmd_t cmd)
 
 command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
 {
-  Character *victim{};
+  CharacterPtr victim{};
   QString name = arguments.value(0);
 
   if (!name.isEmpty())
@@ -159,13 +159,13 @@ command_return_t Character::do_guide(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_advance(Character *ch, char *argument, cmd_t cmd)
+int do_advance(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[100], level[100], buf[300], passwd[100];
   int new_newlevel;
 
-  void gain_exp(Character * ch, int gain);
+  void gain_exp(CharacterPtr ch, int gain);
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -272,10 +272,10 @@ int do_advance(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
 {
-  Character *victim{};
+  CharacterPtr victim{};
   room_t room{};
 
-  void remove_clan_member(int clannumber, Character *ch);
+  void remove_clan_member(int clannumber, CharacterPtr ch);
 
   QString name = arguments.value(0);
 
@@ -353,7 +353,7 @@ command_return_t Character::do_zap(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_global(Character *ch, char *argument, cmd_t cmd)
+int do_global(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
@@ -425,7 +425,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     {
       if (victim->isPlayer())
       {
-        std::vector<Character *> followers = victim->getFollowers();
+        std::vector<CharacterPtr> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
           if (follower->isNonPlayer() && IS_AFFECTED(follower, AFF_CHARM))
@@ -468,7 +468,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   else if (arg1 == "crash")
   {
     // let's crash the mud!
-    Character *crashus = nullptr;
+    CharacterPtr crashus = nullptr;
     if (crashus->in_room == DC::NOWHERE)
     {
       return ReturnValue::eFAILURE; // this should never be reached
@@ -485,7 +485,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     try_to_hotboot_on_crash = 0;
 
     // let's crash the mud!
-    Character *crashus = nullptr;
+    CharacterPtr crashus = nullptr;
     if (crashus->in_room == DC::NOWHERE)
     {
       return ReturnValue::eFAILURE; // this should never be reached
@@ -497,7 +497,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     {
       if (victim->isPlayer())
       {
-        std::vector<Character *> followers = victim->getFollowers();
+        std::vector<CharacterPtr> followers = victim->getFollowers();
         for (const auto &follower : followers)
         {
           if (follower->isNonPlayer())
@@ -532,7 +532,7 @@ command_return_t Character::do_shutdow(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_testport(Character *ch, char *argument, cmd_t cmd)
+int do_testport(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int errnosave = 0;
   static pid_t child = 0;
@@ -585,7 +585,7 @@ int do_testport(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_testuser(Character *ch, char *argument, cmd_t cmd)
+int do_testuser(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   QString savefile;
   QString bsavefile;
@@ -659,7 +659,7 @@ int do_testuser(Character *ch, char *argument, cmd_t cmd)
 }
 
 #ifdef BANDWIDTH
-int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
+int do_bandwidth(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   csendf(ch, "Bytes sent in %ld seconds: %ld\n",
          get_bandwidth_start(), get_bandwidth_amount());
@@ -667,9 +667,9 @@ int do_bandwidth(Character *ch, char *argument, cmd_t cmd)
 }
 #endif
 
-int do_skilledit(Character *ch, char *argument, cmd_t cmd)
+int do_skilledit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[MAX_INPUT_LENGTH];
   char type[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];

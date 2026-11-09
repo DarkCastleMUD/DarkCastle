@@ -18,9 +18,9 @@
 #include "DC/structs.h"
 
 // send_to_char("Write your note.  (/s saves /h for help)
-void new_edit_board_unlock_board(Character *ch, int abort);
+void new_edit_board_unlock_board(CharacterPtr ch, int abort);
 QString format_text(QString str, int mode);
-void check_for_awaymsgs(Character *);
+void check_for_awaymsgs(CharacterPtr);
 
 std::pair<QString, unsigned long long> replace_str(QString str, QString pattern, QString replacement, bool rep_all)
 {

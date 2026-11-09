@@ -58,9 +58,9 @@ char *valid_fields[] = {
     "brownie",
     nullptr};
 
-extern void wear(Character *, Object *, int);
+extern void wear(CharacterPtr, Object *, int);
 
-extern char *gl_item(Object *obj, int number, Character *ch, bool platinum);
+extern char *gl_item(Object *obj, int number, CharacterPtr ch, bool platinum);
 
 int load_quests(void)
 {
@@ -178,7 +178,7 @@ quest_info *get_quest_(char *name)
   return 0;
 }
 
-int do_add_quest(Character *ch, char *name)
+int do_add_quest(CharacterPtr ch, char *name)
 {
   quest_info *quest; // new quest
 
@@ -216,7 +216,7 @@ int do_add_quest(Character *ch, char *name)
   return ReturnValue::eSUCCESS;
 }
 
-void list_quests(Character *ch, int lownum, int highnum)
+void list_quests(CharacterPtr ch, int lownum, int highnum)
 {
   char buffer[MAX_STRING_LENGTH];
   quest_info *quest;
@@ -237,7 +237,7 @@ void list_quests(Character *ch, int lownum, int highnum)
   return;
 }
 
-void show_quest_info(Character *ch, int num)
+void show_quest_info(CharacterPtr ch, int num)
 {
   quest_info *quest;
 
@@ -280,7 +280,7 @@ void show_quest_info(Character *ch, int num)
   ch->sendln("That quest doesn't exist.");
 }
 
-bool check_available_quest(Character *ch, quest_info *quest)
+bool check_available_quest(CharacterPtr ch, quest_info *quest)
 {
   if (!quest)
     return false;
@@ -291,7 +291,7 @@ bool check_available_quest(Character *ch, quest_info *quest)
   return false;
 }
 
-bool check_quest_current(Character *ch, int number)
+bool check_quest_current(CharacterPtr ch, int number)
 {
   for (int i = 0; i < QUEST_MAX; i++)
     if (ch->player->quest_current[i] == number)
@@ -299,7 +299,7 @@ bool check_quest_current(Character *ch, int number)
   return false;
 }
 
-bool check_quest_cancel(Character *ch, int number)
+bool check_quest_cancel(CharacterPtr ch, int number)
 {
   for (int i = 0; i < QUEST_MAX_CANCEL; i++)
     if (ch->player->quest_cancel[i] == number)
@@ -307,7 +307,7 @@ bool check_quest_cancel(Character *ch, int number)
   return false;
 }
 
-bool check_quest_complete(Character *ch, int number)
+bool check_quest_complete(CharacterPtr ch, int number)
 {
   if (ISSET(ch->player->quest_complete, number))
     return true;
@@ -319,7 +319,7 @@ int get_quest_price(quest_info *quest)
   return MIN(500, (int)(3.76 * pow(2.71828, quest->level * 0.0976) + 1));
 }
 
-void show_quest_header(Character *ch)
+void show_quest_header(CharacterPtr ch)
 {
   csendf(ch, "  .-------------------------------------------------------------------------.\n"
              " /.-.                                                                     .-.\\\n"
@@ -331,14 +331,14 @@ void show_quest_header(Character *ch)
   return;
 }
 
-void show_quest_amount(Character *ch, int remaining)
+void show_quest_amount(CharacterPtr ch, int remaining)
 {
   csendf(ch,
          "\n $B$2Completed: $7%-4d $2Remaining: $7%-4d $2Total: $7%-4d$R\n", quest_list.size() - remaining, remaining, quest_list.size());
   return;
 }
 
-void show_quest_footer(Character *ch)
+void show_quest_footer(CharacterPtr ch)
 {
   quest_info *quest;
   int attempting = 0;
@@ -381,7 +381,7 @@ void show_quest_footer(Character *ch)
   return;
 }
 
-int show_one_quest(Character *ch, quest_info *quest, int count)
+int show_one_quest(CharacterPtr ch, quest_info *quest, int count)
 {
   int i, amount = 0;
 
@@ -418,13 +418,13 @@ int show_one_quest(Character *ch, quest_info *quest, int count)
   return ++count;
 }
 
-int show_one_complete_quest(Character *ch, quest_info *quest, int count)
+int show_one_complete_quest(CharacterPtr ch, quest_info *quest, int count)
 {
   ch->send(QStringLiteral(" $B$2Name:$7 %1 $2Reward:$7 %2$R\n").arg(quest->name, -35).arg(quest->reward, -5));
   return ++count;
 }
 
-int show_one_available_quest(Character *ch, quest_info *quest, int count)
+int show_one_available_quest(CharacterPtr ch, quest_info *quest, int count)
 {
   char buffer[MAX_STRING_LENGTH];
   // Create a format std::string based on a space offset that takes color codes into account
@@ -434,7 +434,7 @@ int show_one_available_quest(Character *ch, quest_info *quest, int count)
   return ++count;
 }
 
-void show_available_quests(Character *ch)
+void show_available_quests(CharacterPtr ch)
 {
   int count = 0;
   quest_info *quest;
@@ -461,7 +461,7 @@ void show_available_quests(Character *ch)
   return;
 }
 
-void show_canceled_quests(Character *ch)
+void show_canceled_quests(CharacterPtr ch)
 {
   int count = 0;
   quest_info *quest;
@@ -481,7 +481,7 @@ void show_canceled_quests(Character *ch)
   return;
 }
 
-void show_current_quests(Character *ch)
+void show_current_quests(CharacterPtr ch)
 {
   int num_attempting = 0;
   quest_info *quest;
@@ -500,7 +500,7 @@ void show_current_quests(Character *ch)
   return;
 }
 
-void show_complete_quests(Character *ch)
+void show_complete_quests(CharacterPtr ch)
 {
   int count = 0;
   quest_info *quest;
@@ -520,14 +520,14 @@ void show_complete_quests(Character *ch)
   return;
 }
 
-int start_quest(Character *ch, quest_info *quest)
+int start_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
   uint16_t price;
   Object *obj, *brownie = 0;
-  Character *mob;
+  CharacterPtr mob;
   char buf[MAX_STRING_LENGTH];
-  Character *qmaster = get_mob_vnum(QUEST_MASTER);
+  CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
 
   if (check_quest_current(ch, quest->number))
   {
@@ -635,7 +635,7 @@ int start_quest(Character *ch, quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-int cancel_quest(Character *ch, quest_info *quest)
+int cancel_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
 
@@ -660,7 +660,7 @@ int cancel_quest(Character *ch, quest_info *quest)
   return stop_current_quest(ch, quest);
 }
 
-int complete_quest(Character *ch, quest_info *quest)
+int complete_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
   Object *obj;
@@ -701,7 +701,7 @@ int complete_quest(Character *ch, quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-int stop_current_quest(Character *ch, quest_info *quest)
+int stop_current_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
   Object *obj;
@@ -731,7 +731,7 @@ int stop_current_quest(Character *ch, quest_info *quest)
   return ReturnValue::eSUCCESS;
 }
 
-int stop_current_quest(Character *ch, int number)
+int stop_current_quest(CharacterPtr ch, int number)
 {
   if (!number)
     return ReturnValue::eFAILURE;
@@ -740,7 +740,7 @@ int stop_current_quest(Character *ch, int number)
   return stop_current_quest(ch, quest);
 }
 
-int stop_all_quests(Character *ch)
+int stop_all_quests(CharacterPtr ch)
 {
   if (!ch->player)
   {
@@ -759,7 +759,7 @@ int stop_all_quests(Character *ch)
 void quest_update()
 {
   char buf[MAX_STRING_LENGTH];
-  Character *mob;
+  CharacterPtr mob;
   Object *obj;
   quest_info *quest;
 
@@ -812,7 +812,7 @@ void quest_update()
   DC::getInstance()->removeDead();
 }
 
-int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
+int quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, char *name)
 {
   int retval = 0;
   char buf[MAX_STRING_LENGTH];
@@ -926,7 +926,7 @@ int quest_handler(Character *ch, Character *qmaster, cmd_t cmd, char *name)
 }
 
 // Not used currently. Use quest list or quest start <name> instead of list or buy.
-int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *owner)
+int quest_master(CharacterPtr ch, Object *obj, cmd_t cmd, char *arg, CharacterPtr owner)
 {
   int choice;
   char buf[MAX_STRING_LENGTH];
@@ -969,12 +969,12 @@ int quest_master(Character *ch, Object *obj, cmd_t cmd, char *arg, Character *ow
   return ReturnValue::eSUCCESS;
 }
 
-int do_quest(Character *ch, char *arg, cmd_t cmd)
+int do_quest(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   int retval = 0;
   char name[MAX_STRING_LENGTH];
   char new_arg[MAX_STRING_LENGTH] = " ";
-  Character *qmaster = get_mob_vnum(QUEST_MASTER);
+  CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
 
   if (arg && strlen(arg) > 0 && arg[0] != ' ')
   {
@@ -1125,7 +1125,7 @@ int do_quest(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_qedit(Character *ch, char *argument, cmd_t cmd)
+int do_qedit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char field[MAX_STRING_LENGTH];
@@ -1133,7 +1133,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   int holdernum;
   int i, lownum, highnum;
   quest_info *quest = nullptr;
-  Character *vict = nullptr;
+  CharacterPtr vict = nullptr;
 
   half_chop(argument, arg, argument);
   for (; *argument == ' '; argument++)
@@ -1471,7 +1471,7 @@ int do_qedit(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int quest_vendor(Character *ch, Object *obj, cmd_t cmd, const char *arg, Character *owner)
+int quest_vendor(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   char buf[MAX_STRING_LENGTH];
   int rnum = 0;

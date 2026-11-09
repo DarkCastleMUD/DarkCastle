@@ -20,9 +20,9 @@ class TokenList;
 // Function interface
 //--
 
-void send_message(const char *str, Character *to);
-void send_message(QString str, Character *to);
-void send_message(QByteArray str, Character *to);
+void send_message(const char *str, CharacterPtr to);
+void send_message(QString str, CharacterPtr to);
+void send_message(QByteArray str, CharacterPtr to);
 //--
 // Constants
 //--

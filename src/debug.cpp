@@ -38,9 +38,9 @@
 class Leaderboard;
 
 void load_char_obj_error(FILEPtr fpsave, char strsave[MAX_INPUT_LENGTH]);
-class Object *my_obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);
+class Object *my_obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
 qsizetype fread_to_tilde(FILEPtr fpsave, QString filename);
-bool read_pc_or_mob_data(Character *ch, FILEPtr fpsave, QString filename);
+bool read_pc_or_mob_data(CharacterPtr ch, FILEPtr fpsave, QString filename);
 void load_vaults();
 
 extern vault_data *vault_table;
@@ -51,7 +51,7 @@ bool verbose_mode = false;
 void test_handle_ansi(QString test)
 {
   // std::cerr <<  "Testing '" << test << "'" << std::endl;
-  Character *ch = new Character(DC::getInstance());
+  CharacterPtr ch = new Character(DC::getInstance());
   ch->player = new Player;
   ch->setType(Character::Type::Player);
   SET_BIT(ch->player->toggles, Player::PLR_ANSI);
@@ -172,7 +172,7 @@ QString showObjectVault(Object *obj)
   return buffer;
 }
 
-void showObject(Character *ch, Object *obj)
+void showObject(CharacterPtr ch, Object *obj)
 {
   // std::cerr <<  obj->vnum_ << ":";
   char buf[255];
@@ -285,7 +285,7 @@ int main(int argc, char **argv)
   }
 
   d = new Connection;
-  Character *ch = new Character(&debug);
+  CharacterPtr ch = new Character(&debug);
   ch->setName("Debugimp");
   ch->player = new Player;
   ch->setType(Character::Type::Player);
@@ -419,7 +419,7 @@ int main(int argc, char **argv)
 
             if (argv[1] == QStringLiteral("all"))
             {
-              Character *ch = d->character;
+              CharacterPtr ch = d->character;
               for (int iWear = 0; iWear < MAX_WEAR; iWear++)
               {
                 if (ch->equipment[iWear])
@@ -551,7 +551,7 @@ int main(int argc, char **argv)
         d->character->save();
       }
 
-      Character *ch = d->character;
+      CharacterPtr ch = d->character;
       for (int iWear = 0; iWear < MAX_WEAR; iWear++)
       {
         if (ch->equipment[iWear])

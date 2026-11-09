@@ -611,7 +611,7 @@ void Leaderboard::check(void)
 
 void Leaderboard::check_offline(void)
 {
-  Character *ch;
+  CharacterPtr ch;
   int i, j, k;
 
   DC::getInstance()->currentType("leaderboard");
@@ -1362,7 +1362,7 @@ void Leaderboard::write_file(const char filename[])
   }
 }
 
-int Leaderboard::pdscore(Character *ch)
+int Leaderboard::pdscore(CharacterPtr ch)
 {
   return ch->player->pdeaths;
 }
@@ -1373,7 +1373,7 @@ int Leaderboard::pdscore(Character *ch)
  things, otherwise renames will crash the server hard.
  */
 
-int do_leaderboard(Character *ch, char *argument, cmd_t cmd)
+int do_leaderboard(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   class Connection *d;
   FILEPtr fl;
@@ -2072,7 +2072,7 @@ void Leaderboard::setHP(unsigned int placement, std::string name, int value)
   hpactivename[placement] = name.data();
 }
 
-int Leaderboard::scan(Character *ch)
+int Leaderboard::scan(CharacterPtr ch)
 {
   check_offline();
 

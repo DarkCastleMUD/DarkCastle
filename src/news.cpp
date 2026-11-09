@@ -138,7 +138,7 @@ const char *newsify(char *string)
   //  return str_dup(tmp);
 }
 
-int do_news(Character *ch, char *argument, cmd_t cmd)
+int do_news(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   bool up;
   if (ch->isNonPlayer())
@@ -187,7 +187,7 @@ int do_news(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_addnews(Character *ch, char *argument, cmd_t cmd)
+int do_addnews(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   if (!ch->has_skill(COMMAND_ADDNEWS))

@@ -128,7 +128,7 @@ void logf(int level, DC::LogChannel type, const char *arg, ...)
   logentry(s, level, type);
 }
 
-int csendf(Character *ch, const char *arg, ...)
+int csendf(CharacterPtr ch, const char *arg, ...)
 {
   va_list args;
   char s[MAX_STRING_LENGTH];
@@ -143,7 +143,7 @@ int csendf(Character *ch, const char *arg, ...)
   return (1);
 }
 
-char *handle_ansi_(char *s, Character *ch)
+char *handle_ansi_(char *s, CharacterPtr ch)
 {
   char *t;
   char *tp, *sp, *i;
@@ -266,12 +266,12 @@ char *handle_ansi_(char *s, Character *ch)
   return t;
 }
 
-QString handle_ansi(QString haystack, Character *ch)
+QString handle_ansi(QString haystack, CharacterPtr ch)
 {
   return handle_ansi(QByteArray(haystack.toStdString().c_str()), ch);
 }
 
-QByteArray handle_ansi(QByteArray haystack, Character *ch)
+QByteArray handle_ansi(QByteArray haystack, CharacterPtr ch)
 {
   QMap<size_t, bool> ignore;
   QMap<char, QPair<QByteArray, QByteArray>> rep;

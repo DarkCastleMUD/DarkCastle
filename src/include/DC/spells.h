@@ -36,9 +36,9 @@ std::map<int, int> fill_skill_cost();
 
 const std::map<int, int> skill_cost = fill_skill_cost();
 
-void extractFamiliar(Character *ch);
+void extractFamiliar(CharacterPtr ch);
 
-bool skill_success(Character *ch, Character *victim, int skillnum, int mod = 0);
+bool skill_success(CharacterPtr ch, CharacterPtr victim, int skillnum, int mod = 0);
 
 /* New skill quest thingy. */
 class skill_quest
@@ -62,7 +62,7 @@ public:
   int difficulty(void) const { return difficulty_; }
 };
 
-void barb_magic_resist(Character *ch, int old, int nw);
+void barb_magic_resist(CharacterPtr ch, int old, int nw);
 skill_quest *find_sq(int sq);
 skill_quest *find_sq(char *);
 int dam_percent(int learned, int damage);
@@ -639,18 +639,18 @@ int dam_percent(int learned, int damage);
 
 ////////////////////////////////////////////////////////////////////////
 
-typedef int SPELL_FUN(uint8_t level, Character *ch,
+typedef int SPELL_FUN(uint8_t level, CharacterPtr ch,
                       char *arg, int type,
-                      Character *tar_ch,
+                      CharacterPtr tar_ch,
                       class Object *tar_obj,
                       int skill);
-typedef int SPELL_FUN2(uint8_t level, Character *ch,
+typedef int SPELL_FUN2(uint8_t level, CharacterPtr ch,
                        char *arg, int type,
-                       Character *tar_ch,
+                       CharacterPtr tar_ch,
                        class Object *tar_obj,
                        int skill, quint64 mana_cost);
-// typedef int (*spell_gen1_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill);
-// typedef command_return_t (*spell_gen2_t)(uint8_t level, Character *ch, char *arg, int type, Character *tar_ch, class Object *tar_obj, int skill, quint64 mana_cost);
+// typedef int (*spell_gen1_t)(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, class Object *tar_obj, int skill);
+// typedef command_return_t (*spell_gen2_t)(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, class Object *tar_obj, int skill, quint64 mana_cost);
 
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C
 // The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is

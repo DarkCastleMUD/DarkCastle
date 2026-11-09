@@ -47,8 +47,8 @@
 #include "DC/timeinfo.h"
 #include "DC/weather.h"
 
-void set_golem(Character *golem, int golemtype);
-class Object *obj_store_to_char(Character *ch, FILEPtr fpsave, class Object *last_cont);
+void set_golem(CharacterPtr golem, int golemtype);
+class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
 
 char_file_u4::char_file_u4()
 {
@@ -312,7 +312,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return false;
   }
 
-  Character *charmie = dc_->clone_mobile(8);
+  CharacterPtr charmie = dc_->clone_mobile(8);
   if (charmie == nullptr)
   {
     logentry(QStringLiteral("Error. clone_mobile(8) returned nullptr."));
@@ -514,7 +514,7 @@ const QStringList Object::apply_types =
         "DETECT MAGIC",
         "WILD MAGIC"};
 
-Sockets::Sockets(Character *ch, QString searchkey)
+Sockets::Sockets(CharacterPtr ch, QString searchkey)
 {
   for (Connection *d = DC::getInstance()->descriptor_list; d; d = d->next)
   {
@@ -1185,7 +1185,7 @@ void ChannelMessage::set_name(const CharacterPtr sender)
   }
 }
 
-QString ChannelMessage::getMessage(Character *ch) const
+QString ChannelMessage::getMessage(CharacterPtr ch) const
 {
   if (!ch)
     return {};

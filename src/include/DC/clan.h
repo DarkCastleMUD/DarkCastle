@@ -168,27 +168,27 @@ private:
 
 void add_totem(class Object *altar, Object *totem);
 void remove_totem(Object *altar, Object *totem);
-void add_totem_stats(Character *ch, int stat = 0);
-void remove_totem_stats(Character *ch, int stat = 0);
-bool others_clan_room(Character *ch, class Room *room);
-void clan_login(Character *ch);
-void clan_logout(Character *ch);
-int has_right(Character *ch, uint32_t bit);
+void add_totem_stats(CharacterPtr ch, int stat = 0);
+void remove_totem_stats(CharacterPtr ch, int stat = 0);
+bool others_clan_room(CharacterPtr ch, class Room *room);
+void clan_login(CharacterPtr ch);
+void clan_logout(CharacterPtr ch);
+int has_right(CharacterPtr ch, uint32_t bit);
 clan_data *get_clan(int nClan);
-clan_data *get_clan(Character *ch);
+clan_data *get_clan(CharacterPtr ch);
 QString get_clan_name(int nClan);
-QString get_clan_name(Character *ch);
+QString get_clan_name(CharacterPtr ch);
 QString get_clan_name(clan_data *clan);
 void save_clans();
-int plr_rights(Character *ch);
+int plr_rights(CharacterPtr ch);
 void add_clan(clan_data *new_new_clan);
 void add_clan_member(clan_data *theClan, ClanMember *new_new_member);
-void add_clan_member(clan_data *theClan, Character *ch);
-void remove_clan_member(clan_data *theClan, Character *ch);
-void remove_clan_member(int clannumber, Character *ch);
+void add_clan_member(clan_data *theClan, CharacterPtr ch);
+void remove_clan_member(clan_data *theClan, CharacterPtr ch);
+void remove_clan_member(int clannumber, CharacterPtr ch);
 void free_member(ClanMember *member);
 ClanMember *get_member(QString strName, int nClanId);
-void show_clan_log(Character *ch);
-void clan_death(Character *ch, Character *killer);
+void show_clan_log(CharacterPtr ch);
+void clan_death(CharacterPtr ch, CharacterPtr killer);
 
 #endif /* CLAN_H_ */

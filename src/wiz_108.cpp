@@ -34,7 +34,7 @@
 
 int get_number(char **name);
 
-int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
+int do_zoneexits(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   //  try
   // {
@@ -161,7 +161,7 @@ int do_zoneexits(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_purloin(Character *ch, char *argument, cmd_t cmd)
+int do_purloin(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char bufName[200], *pBuf;
   class Object *k;
@@ -223,7 +223,7 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
 
     if (j == nIndex)
     {
-      Character *vict = nullptr;
+      CharacterPtr vict = nullptr;
       if (k->carried_by)
       {
         vict = k->carried_by;
@@ -271,10 +271,10 @@ int do_purloin(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_set(Character *ch, char *argument, cmd_t cmd)
+int do_set(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   //   renamed the command "setup" so don't need this anymore
-  //    void do_mortal_set(Character *ch, char *argument, cmd_t cmd);
+  //    void do_mortal_set(CharacterPtr ch, char *argument, cmd_t cmd);
   //
   //    if(!ch->isImmortalPlayer() || ch->isNonPlayer()) {
   //      do_mortal_set(ch, argument, cmd);
@@ -289,7 +289,7 @@ int do_set(Character *ch, char *argument, cmd_t cmd)
       "sessions", "alignment", "thirst", "drunk", "full", "race",
       "bank", "platinum", "ki", "clan", "saves_base", "hpmeta",
       "manameta", "movemeta", "armor", "profession", "\n"};
-  Character *vict;
+  CharacterPtr vict;
   char name[100], buf2[100], buf[100], help[MAX_STRING_LENGTH];
   int skill, value, i, x;
 

@@ -36,10 +36,10 @@
 
 // Note that most of the (anti)paladin skills are already in "cl_warrior.C"
 
-int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
+int do_harmtouch(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
-  // Character *tmp_ch;
+  CharacterPtr victim;
+  // CharacterPtr tmp_ch;
   char victim_name[MAX_INPUT_LENGTH];
   affected_type af;
   int retval = ReturnValue::eSUCCESS, dam;
@@ -130,10 +130,10 @@ int do_harmtouch(Character *ch, char *argument, cmd_t cmd)
 
 // Again note that alot of them are in cl_warrior.C
 
-int do_layhands(Character *ch, char *argument, cmd_t cmd)
+int do_layhands(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
-  // Character *tmp_ch;
+  CharacterPtr victim;
+  // CharacterPtr tmp_ch;
   char victim_name[240];
   affected_type af;
   int duration = 24;
@@ -206,14 +206,14 @@ int do_layhands(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_behead(Character *ch, char *argument, cmd_t cmd)
+int do_behead(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   double modifier = 0.0;
   double enemy_hp = 0.0;
   int chance = 0;
   int retval = ReturnValue::eSUCCESS;
   char buf[MAX_STRING_LENGTH];
-  Character *vict;
+  CharacterPtr vict;
 
   one_argument(argument, buf);
 

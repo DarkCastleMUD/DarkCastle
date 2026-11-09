@@ -51,7 +51,7 @@
 #include "DC/structs.h"
 #include "DC/timeinfo.h"
 
-int getRealSpellDamage(Character *ch);
+int getRealSpellDamage(CharacterPtr ch);
 
 int number_or_name(char **name, int *num)
 {
@@ -115,11 +115,11 @@ int number_or_name(char **name, int *num)
 }
 #endif
 
-void do_mload(Character *ch, int rnum, int cnt)
+void do_mload(CharacterPtr ch, int rnum, int cnt)
 {
   if (!ch)
     return;
-  Character *mob = nullptr;
+  CharacterPtr mob = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
   if (cnt == 0)
@@ -183,7 +183,7 @@ void do_mload(Character *ch, int rnum, int cnt)
   }
 }
 
-obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
+obj_list_t oload(CharacterPtr ch, int rnum, int cnt, bool random)
 {
   Object *obj = nullptr;
   obj_list_t obj_list = {};
@@ -232,7 +232,7 @@ obj_list_t oload(Character *ch, int rnum, int cnt, bool random)
   return obj_list;
 }
 
-void do_oload(Character *ch, int rnum, int cnt, bool random)
+void do_oload(CharacterPtr ch, int rnum, int cnt, bool random)
 {
   class Object *obj = nullptr;
   char buf[MAX_STRING_LENGTH];
@@ -299,7 +299,7 @@ void do_oload(Character *ch, int rnum, int cnt, bool random)
  * k, the mob or player that is being stated.  It prints it in a format similar to score.
  *  -- Borodin  Dec 23 2001 */
 
-void boro_mob_stat(Character *ch, Character *k)
+void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
 {
   int i, i2;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -603,7 +603,7 @@ void boro_mob_stat(Character *ch, Character *k)
   ch->send(buf);
 }
 
-command_return_t mob_stat(Character *ch, Character *k)
+command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
 {
   if (!ch || !k)
   {
@@ -987,7 +987,7 @@ command_return_t mob_stat(Character *ch, Character *k)
   return ReturnValue::eSUCCESS;
 }
 
-void obj_stat(Character *ch, class Object *j)
+void obj_stat(CharacterPtr ch, class Object *j)
 {
   class Object *j2 = 0;
   char buf[MAX_STRING_LENGTH];
@@ -1368,7 +1368,7 @@ void obj_stat(Character *ch, class Object *j)
   return;
 }
 
-void do_start(Character *ch)
+void do_start(CharacterPtr ch)
 {
   char buf[256];
 
@@ -1433,7 +1433,7 @@ void do_start(Character *ch)
   ch->player->time.logon = time(0);
 }
 
-command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
+command_return_t do_repop(CharacterPtr ch, std::string arguments, cmd_t cmd)
 {
   if (ch->getLevel() < DEITY && !can_modify_room(ch, ch->in_room))
   {
@@ -1462,7 +1462,7 @@ command_return_t do_repop(Character *ch, std::string arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_clear(Character *ch, char *argument, cmd_t cmd)
+int do_clear(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
   int zone = DC::getInstance()->world[ch->in_room].zone;
@@ -1509,7 +1509,7 @@ int do_clear(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_linkdead(Character *ch, char *arg, cmd_t cmd)
+int do_linkdead(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   int x = 0;
   char buf[100];
@@ -1536,11 +1536,11 @@ int do_linkdead(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_echo(Character *ch, char *argument, cmd_t cmd)
+int do_echo(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];
-  Character *vict;
+  CharacterPtr vict;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -1560,13 +1560,13 @@ int do_echo(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_restore(Character *ch, char *argument, cmd_t cmd)
+int do_restore(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char buf[100];
   class Connection *i;
 
-  void update_pos(Character * victim);
+  void update_pos(CharacterPtr victim);
 
   if (!ch->has_skill(COMMAND_RESTORE))
   {
@@ -1764,7 +1764,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
   }
 }
 
-int do_huntclear(Character *ch, char *arg, cmd_t cmd)
+int do_huntclear(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char arg1[MAX_INPUT_LENGTH];
   arg = one_argument(arg, arg1);
@@ -1927,7 +1927,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   for (int i = 0; i < amount; i++)
   {
     vnum_t mob = {};
-    Character *vict;
+    CharacterPtr vict;
     while (1)
     {
       // pick a random mob vnum
@@ -1944,7 +1944,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
         continue;
 
       // Skip mobs marked NO_HUNT
-      Character *m = static_cast<Character *>(DC::getInstance()->mob_index[mob].mob);
+      CharacterPtr m = static_cast<CharacterPtr>(DC::getInstance()->mob_index[mob].mob);
       if (m && m->mobdata && ISSET(m->mobdata->actflags, ACT_NO_HUNT))
       {
         continue;
@@ -1973,7 +1973,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   }
 }
 
-void pick_up_item(Character *ch, class Object *obj)
+void pick_up_item(CharacterPtr ch, class Object *obj)
 {
   hunt_items *i, *p = nullptr, *in;
   char buf[MAX_STRING_LENGTH];
@@ -2098,7 +2098,7 @@ void pulse_hunts()
   }
 }
 
-int do_showhunt(Character *ch, char *arg, cmd_t cmd)
+int do_showhunt(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   std::string buf;
   hunt_data *h;
@@ -2151,7 +2151,7 @@ int do_showhunt(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_huntstart(Character *ch, char *argument, cmd_t cmd)
+int do_huntstart(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
 #ifdef TWITTER

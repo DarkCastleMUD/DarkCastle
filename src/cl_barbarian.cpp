@@ -42,7 +42,7 @@
 
 extern int rev_dir[];
 
-int do_batter(Character *ch, char *argument, cmd_t cmd)
+int do_batter(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   bool battervbrace = false;
   bool batterwins = false;
@@ -234,7 +234,7 @@ int do_batter(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_brace(Character *ch, char *argument, cmd_t cmd)
+int do_brace(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int door, other_room;
   room_direction_data *back, *exit;
@@ -364,7 +364,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
 
   QString name = arguments.value(0);
 
-  Character *victim = get_char_room_vis(name);
+  CharacterPtr victim = get_char_room_vis(name);
   if (!victim)
   {
     if (fighting)
@@ -441,7 +441,7 @@ command_return_t Character::do_rage(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_battlecry(Character *ch, char *argument, cmd_t cmd)
+int do_battlecry(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   follow_type *f = 0;
 
@@ -513,9 +513,9 @@ int do_battlecry(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_berserk(Character *ch, char *argument, cmd_t cmd)
+int do_berserk(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int bSuccess = 0;
   int retval = 0;
@@ -636,9 +636,9 @@ int do_berserk(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_headbutt(Character *ch, char *argument, cmd_t cmd)
+int do_headbutt(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int retval = 0;
 
@@ -782,7 +782,7 @@ int do_headbutt(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
+int do_bloodfury(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
   float modifier;
@@ -836,7 +836,7 @@ int do_bloodfury(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
+int do_crazedassault(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
   int duration = 20;
@@ -882,20 +882,20 @@ int do_crazedassault(Character *ch, char *argument, cmd_t cmd)
 
 void rush_reset(varg_t arg1, void *arg2, void *arg3)
 {
-  Character *ch = arg1.ch;
-  extern bool charExists(Character * ch);
+  CharacterPtr ch = arg1.ch;
+  extern bool charExists(CharacterPtr ch);
   if (!charExists(ch))
     return;
   REMBIT(ch->affected_by, AFF_RUSH_CD);
 }
 
-int do_bullrush(Character *ch, char *argument, cmd_t cmd)
+int do_bullrush(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char direction[MAX_INPUT_LENGTH];
   char who[MAX_INPUT_LENGTH];
   int dir = 0;
   int retval;
-  Character *victim;
+  CharacterPtr victim;
 
   if (ch->getHP() == 1)
   {
@@ -998,7 +998,7 @@ int do_bullrush(Character *ch, char *argument, cmd_t cmd)
   return attack(ch, victim, TYPE_UNDEFINED);
 }
 
-int do_ferocity(Character *ch, char *argument, cmd_t cmd)
+int do_ferocity(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1018,7 +1018,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   }
 
   int grpsize = 0;
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -1047,7 +1047,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
     af.modifier = 0;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1074,7 +1074,7 @@ int do_ferocity(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void barb_magic_resist(Character *ch, int old, int nw)
+void barb_magic_resist(CharacterPtr ch, int old, int nw)
 {
   int bonus = 0, i;
   int oldbonus = (old / 10) + 1;
@@ -1084,9 +1084,9 @@ void barb_magic_resist(Character *ch, int old, int nw)
       ch->saves[i] += bonus;
 }
 
-int do_knockback(Character *ch, char *argument, cmd_t cmd)
+int do_knockback(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char buf[MAX_STRING_LENGTH], where[MAX_STRING_LENGTH], who[MAX_STRING_LENGTH];
   int dir = 0;
   int retval, dam, dampercent, learned;
@@ -1288,7 +1288,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
           remove_memory(victim, 'f');
         }
 
-        Character *tmp;
+        CharacterPtr tmp;
         for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
           if (tmp->fighting == victim)
             stop_fighting(tmp);
@@ -1328,7 +1328,7 @@ int do_knockback(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_primalfury(Character *ch, char *argument, cmd_t cmd)
+int do_primalfury(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1395,7 +1395,7 @@ int do_primalfury(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pursue(Character *ch, char *argument, cmd_t cmd)
+int do_pursue(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (!ch->has_skill(SKILL_PURSUIT))
   {

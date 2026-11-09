@@ -5,8 +5,8 @@
  * spells.h, so that must be included
  */
 /* $Id: sing.h,v 1.17 2012/01/11 03:28:37 jhhudso Exp $ */
+#include "DC/types.h"
 #include <stdint.h>                   // for int16_t, uint8_t, uint_fast8_t
-class Character;                      // lines 17-17
 class QDebug;                         // lines 18-18
 enum class position_t : uint_fast8_t; // lines 19-19
 template <typename T>
@@ -14,7 +14,7 @@ class QList; // lines 20-20
 
 #define BARD_MAX_RATING 3
 
-typedef int SING_FUN(uint8_t level, Character *ch, char *arg, Character *victim, int skill);
+typedef int SING_FUN(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill);
 
 class song_info_type
 {
@@ -67,9 +67,9 @@ public:
 */
 QDebug operator<<(QDebug debug, const songInfo &song);
 char *skip_spaces(char *string);
-void stop_grouped_bards(Character *ch, int action);
-void update_character_singing(Character *ch);
-void get_instrument_bonus(Character *ch, int &comb, int &non_comb);
+void stop_grouped_bards(CharacterPtr ch, int action);
+void update_character_singing(CharacterPtr ch);
+void get_instrument_bonus(CharacterPtr ch, int &comb, int &non_comb);
 
 SING_FUN song_whistle_sharp;
 SING_FUN song_disrupt;

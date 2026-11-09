@@ -42,14 +42,14 @@
 
 extern int rev_dir[];
 
-int find_door(Character *ch, char *type, char *dir);
+int find_door(CharacterPtr ch, char *type, char *dir);
 int get_weapon_damage_type(class Object *wielded);
-int check_autojoiners(Character *ch, int skill = 0);
-int check_joincharmie(Character *ch, int skill = 0);
+int check_autojoiners(CharacterPtr ch, int skill = 0);
+int check_joincharmie(CharacterPtr ch, int skill = 0);
 
-int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
+int do_eyegouge(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int level = ch->has_skill(SKILL_EYEGOUGE);
 
@@ -130,7 +130,7 @@ int do_eyegouge(Character *ch, char *argument, cmd_t cmd)
 
 command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
 
   int was_in = 0;
   int retval;
@@ -349,9 +349,9 @@ command_return_t Character::do_backstab(QStringList arguments, cmd_t cmd)
   return retval;
 }
 
-int do_circle(Character *ch, char *argument, cmd_t cmd)
+int do_circle(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   int retval;
 
   if (!ch->canPerform(SKILL_CIRCLE))
@@ -513,9 +513,9 @@ int do_circle(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_trip(Character *ch, char *argument, cmd_t cmd)
+int do_trip(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim = 0;
+  CharacterPtr victim = 0;
   char name[256];
   int retval;
 
@@ -625,7 +625,7 @@ int do_trip(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_sneak(Character *ch, char *argument, cmd_t cmd)
+int do_sneak(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   auto &arena = DC::getInstance()->arena_;
@@ -672,10 +672,10 @@ int do_sneak(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_stalk(Character *ch, char *argument, cmd_t cmd)
+int do_stalk(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_STRING_LENGTH];
-  Character *leader;
+  CharacterPtr leader;
 
   if (!ch->canPerform(SKILL_STALK))
   {
@@ -732,7 +732,7 @@ int do_stalk(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_hide(Character *ch, const char *argument, cmd_t cmd)
+int do_hide(CharacterPtr ch, const char *argument, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (!ch->canPerform(SKILL_HIDE))
@@ -749,7 +749,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  for (Character *curr = DC::getInstance()->world[ch->in_room].people;
+  for (CharacterPtr curr = DC::getInstance()->world[ch->in_room].people;
        curr;
        curr = curr->next_in_room)
   {
@@ -770,7 +770,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
     SETBIT(ch->affected_by, AFF_HIDE);
   /* See how well it worked on those currently in the room. */
   int a, i;
-  Character *temp;
+  CharacterPtr temp;
   if (ch->isPlayer() && (a = ch->has_skill(SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
@@ -797,7 +797,7 @@ int do_hide(Character *ch, const char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int max_level(Character *ch)
+int max_level(CharacterPtr ch)
 {
   int i = 0, lvl = 0;
   for (; i < MAX_WEAR; i++)
@@ -810,9 +810,9 @@ int max_level(Character *ch)
 }
 
 // steal an ITEM... not gold
-int do_steal(Character *ch, char *argument, cmd_t cmd)
+int do_steal(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   class Object *obj, *loop_obj, *next_obj;
   affected_type pthiefaf, *paf;
   char victim_name[240];
@@ -1272,9 +1272,9 @@ int do_steal(Character *ch, char *argument, cmd_t cmd)
 }
 
 // Steal gold
-int do_pocket(Character *ch, char *argument, cmd_t cmd)
+int do_pocket(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   affected_type pthiefaf;
   char victim_name[240];
   char buf[240];
@@ -1455,13 +1455,13 @@ int do_pocket(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_pick(Character *ch, char *argument, cmd_t cmd)
+int do_pick(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
   class Object *obj;
-  Character *victim;
+  CharacterPtr victim;
   bool has_lockpicks = false;
 
   argument_interpreter(argument, type, dir);
@@ -1605,12 +1605,12 @@ int do_pick(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_slip(Character *ch, char *argument, cmd_t cmd)
+int do_slip(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char obj_name[200], vict_name[200], buf[200];
   char arg[MAX_INPUT_LENGTH];
   int amount;
-  Character *vict;
+  CharacterPtr vict;
   class Object *obj, *tmp_object, *container;
 
   extern int weight_in(Object *);
@@ -1916,7 +1916,7 @@ int do_slip(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
+int do_vitalstrike(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1975,7 +1975,7 @@ int do_vitalstrike(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_deceit(Character *ch, char *argument, cmd_t cmd)
+int do_deceit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   affected_type af;
 
@@ -1997,7 +1997,7 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
   }
 
   int grpsize = 0;
-  for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+  for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
   {
     if (tmp_char == ch)
       continue;
@@ -2026,7 +2026,7 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
     af.bitvector = -1;
     affect_to_char(ch, &af);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -2055,7 +2055,7 @@ int do_deceit(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_jab(Character *ch, char *argument, cmd_t cmd)
+int do_jab(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int retval = ReturnValue::eFAILURE, learned;
 
@@ -2079,7 +2079,7 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
 
   char arg[MAX_INPUT_LENGTH];
   one_argument(argument, arg);
-  Character *victim;
+  CharacterPtr victim;
 
   if (!*arg && ch->fighting)
     victim = ch->fighting;
@@ -2205,9 +2205,9 @@ int do_jab(Character *ch, char *argument, cmd_t cmd)
   }
 }
 
-int do_appraise(Character *ch, char *argument, cmd_t cmd)
+int do_appraise(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim = {};
+  CharacterPtr victim = {};
   Object *obj = {};
   char name[MAX_STRING_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   char item[MAX_STRING_LENGTH] = {};
@@ -2348,9 +2348,9 @@ int do_appraise(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_cripple(Character *ch, char *argument, cmd_t cmd)
+int do_cripple(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *vict;
+  CharacterPtr vict;
   char name[MAX_STRING_LENGTH];
   int skill;
 

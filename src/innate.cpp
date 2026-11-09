@@ -26,15 +26,15 @@
 ////////////////////////////////////////////////////////////////////////////
 // local function declarations
 
-int innate_powerwield(Character *ch, char *argument, cmd_t cmd);
-int innate_regeneration(Character *ch, char *argument, cmd_t cmd);
-int innate_illusion(Character *ch, char *argument, cmd_t cmd);
-int innate_repair(Character *ch, char *argument, cmd_t cmd);
-int innate_focus(Character *ch, char *argument, cmd_t cmd);
-int innate_evasion(Character *ch, char *argument, cmd_t cmd);
-int innate_shadowslip(Character *ch, char *argument, cmd_t cmd);
-int innate_bloodlust(Character *ch, char *argument, cmd_t cmd);
-int innate_fly(Character *ch, char *argument, cmd_t cmd);
+int innate_powerwield(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_regeneration(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_illusion(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_repair(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_focus(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_evasion(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_shadowslip(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_bloodlust(CharacterPtr ch, char *argument, cmd_t cmd);
+int innate_fly(CharacterPtr ch, char *argument, cmd_t cmd);
 
 ////////////////////////////////////////////////////////////////////////////
 // local definitions
@@ -74,7 +74,7 @@ char *innate_skills[] =
 
 ////////////////////////////////////////////////////////////////////////////
 // command functions
-int do_innate(Character *ch, char *arg, cmd_t cmd)
+int do_innate(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   auto &arena = DC::getInstance()->arena_;
   if (ch && ch->in_room > 0 &&
@@ -154,7 +154,7 @@ int do_innate(Character *ch, char *arg, cmd_t cmd)
   }
 }
 
-int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
+int innate_regeneration(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_REGENERATION;
@@ -167,7 +167,7 @@ int innate_regeneration(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
+int innate_powerwield(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_POWERWIELD;
@@ -181,7 +181,7 @@ int innate_powerwield(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_focus(Character *ch, char *arg, cmd_t cmd)
+int innate_focus(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (IS_AFFECTED(ch, AFF_FOCUS))
   {
@@ -202,7 +202,7 @@ int innate_focus(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_illusion(Character *ch, char *arg, cmd_t cmd)
+int innate_illusion(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (IS_AFFECTED(ch, AFF_INVISIBLE))
   {
@@ -224,7 +224,7 @@ int innate_illusion(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
+int innate_bloodlust(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (!ch->fighting)
   {
@@ -237,7 +237,7 @@ int innate_bloodlust(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_repair(Character *ch, char *arg, cmd_t cmd)
+int innate_repair(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   class Object *obj;
   char buf[MAX_STRING_LENGTH];
@@ -290,7 +290,7 @@ int innate_repair(Character *ch, char *arg, cmd_t cmd)
   }
 }
 
-int innate_evasion(Character *ch, char *arg, cmd_t cmd)
+int innate_evasion(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_EVASION;
@@ -303,7 +303,7 @@ int innate_evasion(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
+int innate_shadowslip(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   affected_type af;
   af.type = SKILL_INNATE_SHADOWSLIP;
@@ -316,7 +316,7 @@ int innate_shadowslip(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int innate_fly(Character *ch, char *arg, cmd_t cmd)
+int innate_fly(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (ch->affected_by_spell(SKILL_INNATE_FLY))
   {

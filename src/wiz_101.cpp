@@ -136,8 +136,9 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
 {
   int loc_nr = {}, location = -1, i = {}, start_room = {};
   zone_t zone_nr = {};
-  Character *target_mob = {}, *pers = {};
-  Character *tmp_ch = {};
+  CharacterPtr target_mob = {};
+  CharacterPtr pers = {};
+  CharacterPtr tmp_ch = {};
   follow_type *k = {}, *next_dude = {};
   class Object *target_obj = {};
 
@@ -377,7 +378,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_poof(Character *ch, char *arg, cmd_t cmd)
+int do_poof(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char inout[100], buf[100];
   int ctr, nope;
@@ -479,11 +480,11 @@ int do_poof(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_at(Character *ch, char *argument, cmd_t cmd)
+int do_at(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
   int loc_nr, location, original_loc;
-  Character *target_mob;
+  CharacterPtr target_mob;
   class Object *target_obj;
 
   if (ch->isNonPlayer())
@@ -551,9 +552,9 @@ int do_at(Character *ch, char *argument, cmd_t cmd)
   return retval;
 }
 
-int do_highfive(Character *ch, char *argument, cmd_t cmd)
+int do_highfive(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char buf[200];
 
   if (ch->isNonPlayer())
@@ -585,7 +586,7 @@ int do_highfive(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_holylite(Character *ch, char *argument, cmd_t cmd)
+int do_holylite(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -608,7 +609,7 @@ int do_holylite(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
+int do_wizinvis(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[200];
 
@@ -646,7 +647,7 @@ int do_wizinvis(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_nohassle(Character *ch, char *argument, cmd_t cmd)
+int do_nohassle(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
@@ -666,7 +667,7 @@ int do_nohassle(Character *ch, char *argument, cmd_t cmd)
 
 // cmd == cmd_t::DEFAULT - imm
 // cmd == 8 - /
-command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
+command_return_t do_wiz(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   std::string buf1 = {};
   Connection *i = nullptr;
@@ -756,7 +757,7 @@ command_return_t do_wiz(Character *ch, std::string argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_findfix(Character *ch, char *argument, cmd_t cmd)
+int do_findfix(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   for (auto [zone_key, zone] : DC::getInstance()->zones.asKeyValueRange())
   {
@@ -813,11 +814,11 @@ int do_findfix(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_varstat(Character *ch, char *argument, cmd_t cmd)
+int do_varstat(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg);
-  Character *vict;
+  CharacterPtr vict;
 
   if ((vict = get_char_vis(ch, arg)) == nullptr)
   {

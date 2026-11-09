@@ -37,15 +37,15 @@ void help_string_to_file(FILEPtr f, QString helpstr);
 help_index_element_new *find_help(QString keyword);
 int strn_cmp(char *arg1, char *arg2, int n);
 int count_hash_records(FILEPtr fl);
-void show_hedit_usage(Character *ch);
-void save_help(Character *ch);
+void show_hedit_usage(CharacterPtr ch);
+void save_help(CharacterPtr ch);
 int get_line_with_space(FILEPtr fl, char *buf);
-int show_one_help_entry(int entry, Character *ch, int count);
-void show_help_header(Character *ch);
-void show_help_bar(Character *ch);
+int show_one_help_entry(int entry, CharacterPtr ch, int count);
+void show_help_header(CharacterPtr ch);
+void show_help_bar(CharacterPtr ch);
 
 // da functions
-int do_mortal_help(Character *ch, char *argument, cmd_t cmd)
+int do_mortal_help(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   extern char new_help[MAX_STRING_LENGTH];
   ch->send(new_help);
@@ -277,7 +277,7 @@ help_index_element_new *find_help(QString keyword)
 
 #define ENTRY_MAX 32384
 
-int load_new_help(FILEPtr fl, int reload, Character *ch)
+int load_new_help(FILEPtr fl, int reload, CharacterPtr ch)
 {
   char entry[ENTRY_MAX], line[READ_SIZE + 1], tmpentry[ENTRY_MAX], buf[256], tmpbuffer[ENTRY_MAX];
   help_index_element_new new_help;
@@ -377,7 +377,7 @@ int load_new_help(FILEPtr fl, int reload, Character *ch)
   return ReturnValue::eSUCCESS;
 }
 
-int do_areas(Character *ch, char *arg, cmd_t cmd)
+int do_areas(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   strcpy(arg, "areas");
   return ch->do_new_help(QString(arg).split(' '), cmd);
@@ -385,7 +385,7 @@ int do_areas(Character *ch, char *arg, cmd_t cmd)
 
 char help_buf[MAX_STRING_LENGTH * 4];
 
-int do_hindex(Character *ch, char *argument, cmd_t cmd)
+int do_hindex(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i, minlen, count = 0;
   char arg[256];
@@ -530,7 +530,7 @@ int do_hindex(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_index(Character *ch, char *argument, cmd_t cmd)
+int do_index(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i, minlen, count = 0;
   char arg[256];
@@ -613,7 +613,7 @@ int do_index(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int show_one_help_entry(int entry, Character *ch, int count)
+int show_one_help_entry(int entry, CharacterPtr ch, int count)
 {
 
   csendf(ch, "$B$6%3d $7- $5%3d $7[$3%-20.20s$7] [$3%-20.20s$B$7] [$3%-20.20s$B$7] "
@@ -628,7 +628,7 @@ int show_one_help_entry(int entry, Character *ch, int count)
   return ++count;
 }
 
-void show_help_header(Character *ch)
+void show_help_header(CharacterPtr ch)
 {
   send_to_char("$B$6ID# $B$7- $RLVL $3 Keyword 1              Keyword 2              Keyword 3"
                "              Keyword 4              Keyword 5\n",
@@ -636,7 +636,7 @@ void show_help_header(Character *ch)
   show_help_bar(ch);
 }
 
-void show_help_bar(Character *ch)
+void show_help_bar(CharacterPtr ch)
 {
   send_to_char("$B$7--------------------------------------------------------------------------"
                "--------------------------------------------------\n$R",
@@ -663,7 +663,7 @@ int strn_cmp(char *arg1, char *arg2, int n)
   return (0);
 }
 
-int do_reload_help(Character *ch, char *argument, cmd_t cmd)
+int do_reload_help(CharacterPtr ch, char *argument, cmd_t cmd)
 {
 
   FILEPtr new_help_fl;
@@ -703,7 +703,7 @@ int do_reload_help(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_hedit(Character *ch, char *argument, cmd_t cmd)
+int do_hedit(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[200], buf2[200], field[200], buf3[200], value[200];
   help_index_element_new new_help;
@@ -882,7 +882,7 @@ int do_hedit(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void show_hedit_usage(Character *ch)
+void show_hedit_usage(CharacterPtr ch)
 {
 
   send_to_char("$3Syntax$R: hedit <id#> <field> [arg] [value]\n"
@@ -894,7 +894,7 @@ void show_hedit_usage(Character *ch)
                ch);
 }
 
-void save_help(Character *ch)
+void save_help(CharacterPtr ch)
 {
   int i;
   char file[256], buf[256];

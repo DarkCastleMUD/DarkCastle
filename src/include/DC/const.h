@@ -42,8 +42,8 @@ extern int max_who;
 extern char globalBuf[MAX_STRING_LENGTH];
 extern bool wizlock;
 
-extern Character *character_list;
-extern Character *combat_list;
+extern CharacterPtr character_list;
+extern CharacterPtr combat_list;
 extern char *ban_list[30];
 extern char *nonew_new_list[30];
 extern const char *zone_modes[];

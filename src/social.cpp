@@ -39,7 +39,7 @@ command_return_t Character::check_social(QString pcomm)
 {
   QString arg = {}, buf = {};
   social_messg *action = {};
-  Character *vict = {};
+  CharacterPtr vict = {};
 
   std::tie(pcomm, arg) = half_chop(pcomm);
 
@@ -322,7 +322,7 @@ void DC::clean_socials_from_memory()
   soc_mess_list = nullptr;
 }
 
-int do_social(Character *ch, char *argument, cmd_t cmd)
+int do_social(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
   char buf[MAX_STRING_LENGTH];

@@ -103,17 +103,17 @@ const char *ki[] = {
     "transfer",
     "\n"};
 
-int16_t use_ki(Character *ch, int kn);
-bool ARE_GROUPED(Character *sub, Character *obj);
+int16_t use_ki(CharacterPtr ch, int kn);
+bool ARE_GROUPED(CharacterPtr sub, CharacterPtr obj);
 
-int16_t use_ki(Character *ch, int kn)
+int16_t use_ki(CharacterPtr ch, int kn)
 {
   return (ki_info[kn].min_useski());
 }
 
-int do_ki(Character *ch, char *argument, cmd_t cmd)
+int do_ki(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *tar_char = ch;
+  CharacterPtr tar_char = ch;
   char name[MAX_STRING_LENGTH];
   int qend, spl = -1;
   bool target_ok;
@@ -352,7 +352,7 @@ int do_ki(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-void reduce_ki(Character *ch, int type)
+void reduce_ki(CharacterPtr ch, int type)
 {
   int amount = 0;
 
@@ -412,7 +412,7 @@ int Character::ki_gain_lookup(void)
   return MAX(gain, 1);
 }
 
-int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_blast(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   int success = 0;
   int exit = number(0, 5); /* Chooses an exit */
@@ -467,7 +467,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
         vict->add_memory(GET_NAME(ch), 'h');
         remove_memory(vict, 'f');
       }
-      Character *tmp;
+      CharacterPtr tmp;
       for (tmp = DC::getInstance()->world[ch->in_room].people; tmp; tmp = tmp->next_in_room)
         if (tmp->fighting == vict)
           stop_fighting(tmp);
@@ -496,7 +496,7 @@ int ki_blast(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_punch(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   if (!vict)
   {
@@ -542,7 +542,7 @@ int ki_punch(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS; // shouldn't get here
 }
 
-int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_sense(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   affected_type af;
   if (IS_AFFECTED(ch, AFF_INFRARED))
@@ -561,17 +561,18 @@ int ki_sense(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_storm(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   int dam;
   int retval;
-  Character *tmp_victim, *temp;
+  CharacterPtr tmp_victim;
+  CharacterPtr temp;
 
   dam = number(135, 165);
   //  ch->sendln("Your wholeness of spirit purges the souls of those around you!");
   //  act("$n's eyes flash as $e pools the energy within $m!\nA burst of energy slams into you!\n",
   room_t room = ch->in_room;
-  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (Character *)0x95959595; tmp_victim = temp)
+  for (tmp_victim = DC::getInstance()->world[ch->in_room].people; tmp_victim && tmp_victim != (CharacterPtr)0x95959595; tmp_victim = temp)
   {
     temp = tmp_victim->next_in_room;
     if ((ch->in_room == tmp_victim->in_room) && (ch != tmp_victim) &&
@@ -611,7 +612,7 @@ int ki_storm(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_speed(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   affected_type af;
 
@@ -644,7 +645,7 @@ int ki_speed(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_purify(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   if (!vict)
   {
@@ -707,7 +708,7 @@ int ki_purify(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
+int ki_disrupt(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim)
 {
   if (!victim)
   {
@@ -1106,7 +1107,7 @@ int ki_disrupt(uint8_t level, Character *ch, char *arg, Character *victim)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_stance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   affected_type af;
 
@@ -1139,7 +1140,7 @@ int ki_stance(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_agility(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   int learned, chance, percent;
   affected_type af;
@@ -1174,7 +1175,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
     ch->sendln("You instruct your party on more graceful movement.");
     act("$n holds a quick tai chi class.", ch, 0, 0, TO_ROOM, 0);
 
-    for (Character *tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
+    for (CharacterPtr tmp_char = DC::getInstance()->world[ch->in_room].people; tmp_char; tmp_char = tmp_char->next_in_room)
     {
       if (tmp_char == ch)
         continue;
@@ -1200,7 +1201,7 @@ int ki_agility(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
+int ki_meditation(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr vict)
 {
   int gain;
 
@@ -1217,7 +1218,7 @@ int ki_meditation(uint8_t level, Character *ch, char *arg, Character *vict)
   return ReturnValue::eSUCCESS;
 }
 
-int ki_transfer(uint8_t level, Character *ch, char *arg, Character *victim)
+int ki_transfer(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim)
 {
   char amt[MAX_STRING_LENGTH], type[MAX_STRING_LENGTH];
   int amount, temp = 0;

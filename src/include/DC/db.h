@@ -145,16 +145,16 @@ public:
 
 /* public procedures in db.c */
 world_file_list_itemPtr one_new_world_file_item(QString filename);
-bool can_modify_this_room(Character *ch, room_t room);
-bool can_modify_room(Character *ch, room_t room);
-bool can_modify_mobile(Character *ch, room_t room);
-bool can_modify_object(Character *ch, room_t room);
+bool can_modify_this_room(CharacterPtr ch, room_t room);
+bool can_modify_room(CharacterPtr ch, room_t room);
+bool can_modify_mobile(CharacterPtr ch, room_t room);
+bool can_modify_object(CharacterPtr ch, room_t room);
 
 void write_one_room(LegacyFile &fl, int nr);
-void write_mobile(LegacyFile &lf, Character *mob);
+void write_mobile(LegacyFile &lf, CharacterPtr mob);
 void write_object(LegacyFile &lf, Object *obj);
 void write_mprog_recur(FILEPtr fl, mob_prog_data *mprg, bool mob);
-int load_new_help(FILEPtr fl, int reload = 0, Character *ch = nullptr);
+int load_new_help(FILEPtr fl, int reload = 0, CharacterPtr ch = nullptr);
 int count_hash_records(FILEPtr fl);
 void load_hints();
 void write_wizlist(std::stringstream &filename);
@@ -284,10 +284,10 @@ auto &operator<<(auto &out, const Room &room)
 void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
-void init_char(Character *ch);
+void init_char(CharacterPtr ch);
 void clear_object(class Object *obj);
-void reset_char(Character *ch);
-void free_char(Character *ch, Trace trace = Trace("Unknown"));
+void reset_char(CharacterPtr ch);
+void free_char(CharacterPtr ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
 char *fread_string(QTextStream &stream, bool hasher, bool *ok = nullptr);
 QString fread_qstring(QTextStream &stream, bool *ok = nullptr);
@@ -355,7 +355,7 @@ extern time_t start_time; /* mud start time */
 class pulse_data
 { /* list for keeping tract of 'pulsing' chars */
 public:
-  Character *thechar;
+  CharacterPtr thechar;
   pulse_data *next;
 };
 
@@ -393,7 +393,7 @@ typename T::const_iterator const find_file_list(T &file_list, vnum_t vnum)
 }
 
 template <typename T>
-typename T::const_iterator const do_find_file_list(Character *ch, T &file_list, vnum_t vnum)
+typename T::const_iterator const do_find_file_list(CharacterPtr ch, T &file_list, vnum_t vnum)
 {
   const auto &it = find_file_list(file_list, vnum);
   if (it == file_list.cend())

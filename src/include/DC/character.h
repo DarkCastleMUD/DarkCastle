@@ -224,7 +224,7 @@ class mob_prog_act_list
 public:
   mob_prog_act_list *next{};
   char *buf{};
-  Character *ch{};
+  CharacterPtr ch{};
   Object *obj{};
   void *vo{};
 };
@@ -339,14 +339,14 @@ public:
   int32_t bitvector = {}; /* Tells which bits to set (AFF_XXX)       */
   std::string caster = {};
   affected_type *next = {};
-  Character *origin = {};
-  Character *victim = {};
+  CharacterPtr origin = {};
+  CharacterPtr victim = {};
 };
 
 class follow_type
 {
 public:
-  Character *follower;
+  CharacterPtr follower;
   follow_type *next;
 };
 typedef command_return_t (Character::*command_gen3_t)(QStringList arguments, cmd_t cmd);
@@ -399,7 +399,7 @@ public:
   QString poofin;           /* poofin message */
   QString poofout;          /* poofout message */
   Object *skillchange = {}; /* Skill changing equipment. */
-  Character *golem = {};    // CURRENT golem.
+  CharacterPtr golem = {};  // CURRENT golem.
 
   constexpr static uint32_t PLR_BRIEF = 1U;
   constexpr static uint32_t PLR_BRIEF_BIT = 0;
@@ -522,7 +522,7 @@ public:
   bool possesing = {};  /*  is the person possessing? */
   bool unjoinable = {}; // Do NOT autojoin
   bool hide[MAX_HIDE] = {};
-  Character *hiding_from[MAX_HIDE] = {};
+  CharacterPtr hiding_from[MAX_HIDE] = {};
   QQueue<QString> away_msgs = {};
   QQueue<ChannelMessage> tell_history = {};
   history_t gtell_history = {};
@@ -543,7 +543,7 @@ public:
   void save_char_aliases(FILEPtr fpsave);
   QString perform_alias(QString orig);
   void save(FILEPtr fpsave, time_data tmpage);
-  bool read(FILEPtr fpsave, Character *ch, QString filename);
+  bool read(FILEPtr fpsave, CharacterPtr ch, QString filename);
 
   aliases_t aliases_; /* Aliases */
 };
@@ -960,20 +960,20 @@ public:
   QString hunting = {}; // Name of "track" target
   QString ambush = {};  // Name of "ambush" target
 
-  Character *guarding = {};     // Pointer to who I am guarding
+  CharacterPtr guarding = {};   // Pointer to who I am guarding
   follow_type *guarded_by = {}; // List of people guarding me
 
   uint32_t affected_by[AFF_MAX / ASIZE + 1] = {}; // Quick reference bitvector for spell affects
   uint32_t combat = {};                           // Bitvector for combat related flags (bash, stun, shock)
   uint32_t misc = {};                             // Bitvector for logs/channels.  So possessed mobs can channel
 
-  Character *fighting = {};      /* Opponent     */
-  Character *next = {};          /* Next anywhere in game */
-  Character *next_in_room = {};  /* Next in room */
-  Character *next_fighting = {}; /* Next fighting */
+  CharacterPtr fighting = {};      /* Opponent     */
+  CharacterPtr next = {};          /* Next anywhere in game */
+  CharacterPtr next_in_room = {};  /* Next in room */
+  CharacterPtr next_fighting = {}; /* Next fighting */
   Object *altar = {};
   follow_type *followers = {}; /* List of followers */
-  Character *master = {};      /* Who is char following? */
+  CharacterPtr master = {};    /* Who is char following? */
   char *group_name = {};       /* Name of group */
 
   int32_t timer = {};           // Timer for update
@@ -1035,7 +1035,7 @@ public:
   void check_hw(void);
   void add_to_bard_list(void);
 
-  command_return_t check_pursuit(Character *victim, QString dircommand);
+  command_return_t check_pursuit(CharacterPtr victim, QString dircommand);
   command_return_t check_social(QString pcomm);
   command_return_t command_interpreter(QString argument, bool procced = 0);
   Object *get_object_in_equip_vis(char *arg, Object *equipment[], int *j, bool blindfighting);
@@ -1216,30 +1216,30 @@ public:
   auto do_arena_cancel(QStringList arguments) -> command_return_t;
   auto do_arena_usage(QStringList arguments) -> command_return_t;
 
-  command_return_t wake(Character *victim = nullptr);
+  command_return_t wake(CharacterPtr victim = nullptr);
   command_return_t oprog_command_trigger(QString command, QString arguments);
   command_return_t save(cmd_t cmd = cmd_t::DEFAULT);
   command_return_t special(QString arg, cmd_t cmd = cmd_t::DEFAULT);
 
   void show_obj_to_char(Object *object, int mode);
   void list_obj_to_char(Object *list, int mode, bool show);
-  void list_char_to_char(Character *list, int mode);
+  void list_char_to_char(CharacterPtr list, int mode);
 
   DC::IfReturnType mprog_seval(QString lhs, QString opr, QString rhs);
   QString getTemp(QString name);
 
   QString get_random_hate(void);
-  Character *getVisiblePlayer(QString name);
-  Character *getVisibleCharacter(QString name);
+  CharacterPtr getVisiblePlayer(QString name);
+  CharacterPtr getVisibleCharacter(QString name);
   Object *getVisibleObject(QString name);
   QString getStatDiff(int base, int random, bool swapcolors = false);
-  void tell_history(Character *sender, QString message);
-  void gtell_history(Character *sender, QString message);
+  void tell_history(CharacterPtr sender, QString message);
+  void gtell_history(CharacterPtr sender, QString message);
   void setPOSFighting();
   int32_t getHP(void);
-  void setHP(int hp, Character *causer = nullptr);
-  void addHP(int hp, Character *causer = nullptr);
-  void removeHP(int dam, Character *causer = nullptr);
+  void setHP(int hp, CharacterPtr causer = nullptr);
+  void addHP(int hp, CharacterPtr causer = nullptr);
+  void removeHP(int dam, CharacterPtr causer = nullptr);
   void fillHP(void);
   void fillHPLimit(void);
   void send(const char *buffer);
@@ -1250,9 +1250,9 @@ public:
     buffer = buffer.append("\n");
     send(buffer);
   }
-  command_return_t tell(Character *, QString);
+  command_return_t tell(CharacterPtr, QString);
   void sendRaw(QString);
-  std::vector<Character *> getFollowers(void);
+  std::vector<CharacterPtr> getFollowers(void);
   void setPlayerLastMob(vnum_t mobvnum);
 
   void swapSkill(skill_t oldSkill, skill_t newSkill);
@@ -1282,11 +1282,11 @@ public:
   bool load_charmie_equipment(QString name, bool previous = false);
   int has_skill(skill_t skill);
   affected_type *affected_by_spell(uint32_t skill);
-  bool skill_success(Character *victim, int skillnum, int mod = 0);
+  bool skill_success(CharacterPtr victim, int skillnum, int mod = 0);
   int skillmax(int skill, int eh);
   char charthing(int known, int skill, int maximum);
   void output_praclist(class_skill_defines *skilllist);
-  int skills_guild(const char *arg, Character *owner);
+  int skills_guild(const char *arg, CharacterPtr owner);
   int get_stat(attribute_t stat);
   int get_stat_bonus(int stat);
   void skill_increase_check(int skill, int learned, int difficulty);
@@ -1294,8 +1294,8 @@ public:
   int get_max(int skill);
   int learn_skill(int skill, int amount, int maximum);
   class_skill_defines *get_skill_list(void);
-  Character *get_char_room_vis(QString name);
-  Character *get_rand_other_char_room_vis(void);
+  CharacterPtr get_char_room_vis(QString name);
+  CharacterPtr get_rand_other_char_room_vis(void);
   int hit_gain(position_t position, bool improve = true);
   int hit_gain(void)
   {
@@ -1318,7 +1318,7 @@ public:
   {
     return position_to_string(getPosition());
   }
-  Character *get_active_pc_vis(QString name);
+  CharacterPtr get_active_pc_vis(QString name);
   void swap_hate_memory(void);
   void set_hw(void);
   void roll_and_display_stats(void);
@@ -1406,7 +1406,7 @@ public:
   void vault_list(QString owner);
   void load_golem_data(int golemtype);
   int mprog_greet_trigger(void);
-  int mprog_can_see_trigger(Character *mob);
+  int mprog_can_see_trigger(CharacterPtr mob);
   int mprog_speech_trigger(const char *txt);
   int oprog_can_see_trigger(Object *item);
   int oprog_speech_trigger(const char *txt);
@@ -1435,7 +1435,7 @@ private:
 };
 
 template <typename T>
-T parse_bitstrings(QString arg1, Character *ch = nullptr, T value = {})
+T parse_bitstrings(QString arg1, CharacterPtr ch = nullptr, T value = {})
 {
   bool found = false;
   auto metaEnum = QMetaEnum::fromType<T>();
@@ -1470,7 +1470,7 @@ T parse_bitstrings(QString arg1, Character *ch = nullptr, T value = {})
 class communication
 {
 public:
-  communication(Character *ch, QString message);
+  communication(CharacterPtr ch, QString message);
   QString sender;
   bool sender_ispc;
   QString message;
@@ -1615,5 +1615,5 @@ public:
   uint8_t c_class;
 };
 
-void prepare_character_for_sixty(Character *ch);
-bool isPaused(Character *mob);
+void prepare_character_for_sixty(CharacterPtr ch);
+bool isPaused(CharacterPtr mob);

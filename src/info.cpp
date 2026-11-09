@@ -93,14 +93,14 @@ extern int max_who;
 /* extern functions */
 
 void page_string(class Connection *d, const char *str, int keep_internal);
-clan_data *get_clan(Character *);
-extern int getRealSpellDamage(Character *ch);
+clan_data *get_clan(CharacterPtr);
+extern int getRealSpellDamage(CharacterPtr ch);
 
 /* intern functions */
 
-void showStatDiff(Character *ch, int base, int random, bool swapcolors = false);
+void showStatDiff(CharacterPtr ch, int base, int random, bool swapcolors = false);
 
-int get_saves(Character *ch, int savetype)
+int get_saves(CharacterPtr ch, int savetype)
 {
   int save = ch->saves[savetype];
   switch (savetype)
@@ -429,7 +429,7 @@ void Character::list_obj_to_char(class Object *list, int mode, bool show)
     this->sendln("Nothing");
 }
 
-void show_spells(Character *i, Character *ch)
+void show_spells(CharacterPtr i, CharacterPtr ch)
 {
   std::string strbuf;
 
@@ -498,7 +498,7 @@ void show_spells(Character *i, Character *ch)
   }
 }
 
-void show_char_to_char(Character *i, Character *ch, int mode)
+void show_char_to_char(CharacterPtr i, CharacterPtr ch, int mode)
 {
   QString buffer;
   int j, found, percent;
@@ -790,12 +790,12 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
   }
 
   QString name2 = "0." + name;
-  Character *victim = get_char(name2);
+  CharacterPtr victim = get_char(name2);
 
   if (!victim && name == "all")
   {
     Connection *d;
-    Character *i;
+    CharacterPtr i;
 
     for (d = DC::getInstance()->descriptor_list; d; d = d->next)
     {
@@ -871,10 +871,10 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-void Character::list_char_to_char(Character *list, int mode)
+void Character::list_char_to_char(CharacterPtr list, int mode)
 {
   bool clear_lastseen = false;
-  Character *i;
+  CharacterPtr i;
   int known = this->has_skill(SKILL_BLINDFIGHTING);
   timeval tv, tv_zero = {0, 0};
 
@@ -914,7 +914,7 @@ void Character::list_char_to_char(Character *list, int mode)
   }
 }
 
-void try_to_peek_into_container(Character *vict, Character *ch,
+void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
                                 char *container)
 {
   class Object *obj = nullptr;
@@ -1011,12 +1011,12 @@ QString Character::getStatDiff(int base, int random, bool swapcolors)
 
   return buf;
 }
-void showStatDiff(Character *ch, int base, int random, bool swapcolors)
+void showStatDiff(CharacterPtr ch, int base, int random, bool swapcolors)
 {
   ch->send(ch->getStatDiff(base, random, swapcolors));
 }
 
-bool identify(Character *ch, Object *obj)
+bool identify(CharacterPtr ch, Object *obj)
 {
   if (ch == nullptr || obj == nullptr)
   {
@@ -1288,7 +1288,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
   }
   else
   {
-    Character *tmp_char;
+    CharacterPtr tmp_char;
     int bits = generic_find(arg1.toStdString().c_str(), FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM, this, &tmp_char, &obj, true);
     if (bits && obj)
     {
@@ -1306,7 +1306,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
   return ReturnValue::eFAILURE;
 }
 
-int do_look(Character *ch, const char *argument, cmd_t cmd)
+int do_look(CharacterPtr ch, const char *argument, cmd_t cmd)
 {
   char buffer[MAX_STRING_LENGTH] = {0};
   char arg1[MAX_STRING_LENGTH] = {0};
@@ -1318,7 +1318,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
   int door = 0, original_loc = 0;
   bool found = 0;
   class Object *tmp_object = nullptr, *found_object = nullptr;
-  Character *tmp_char = nullptr;
+  CharacterPtr tmp_char = nullptr;
   QString tmp_desc;
   static const char *keywords[] = {"north", "east", "south", "west", "up", "down",
                                    "in", "at", "out", "through", "", /* Look at '' case */
@@ -1826,7 +1826,7 @@ int do_look(Character *ch, const char *argument, cmd_t cmd)
 
 /* end of look */
 
-int do_read(Character *ch, char *arg, cmd_t cmd)
+int do_read(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[200];
 
@@ -1838,10 +1838,10 @@ int do_read(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_examine(Character *ch, char *argument, cmd_t cmd)
+int do_examine(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[200], buf[200];
-  Character *tmp_char;
+  CharacterPtr tmp_char;
   class Object *tmp_object;
 
   sprintf(buf, "at %s", argument);
@@ -1869,7 +1869,7 @@ int do_examine(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_exits(Character *ch, char *argument, cmd_t cmd)
+int do_exits(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int door;
   char buf[MAX_STRING_LENGTH];
@@ -1925,7 +1925,7 @@ char frills[] = {
     '~',
     '\\'};
 
-int do_score(Character *ch, char *argument, cmd_t cmd)
+int do_score(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char race[100];
   char buf[MAX_STRING_LENGTH], scratch;
@@ -2239,7 +2239,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
       if(++level == 4)
         level = 0;
     }*/
-  extern bool elemental_score(Character * ch, int level);
+  extern bool elemental_score(CharacterPtr ch, int level);
   if (!found)
     found = elemental_score(ch, level);
   else
@@ -2299,7 +2299,7 @@ int do_score(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_time(Character *ch, char *argument, cmd_t cmd)
+int do_time(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[100];
   char const *suf;
@@ -2392,7 +2392,7 @@ int do_time(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_weather(Character *ch, char *argument, cmd_t cmd)
+int do_weather(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   extern weather_data weather_info;
   char buf[256];
@@ -2423,7 +2423,7 @@ int do_weather(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_help(Character *ch, const char *argument, cmd_t cmd)
+int do_help(CharacterPtr ch, const char *argument, cmd_t cmd)
 {
   extern help_index_element *help_index;
   extern FILEPtr help_fl;
@@ -2486,10 +2486,10 @@ int do_help(Character *ch, const char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_count(Character *ch, char *arg, cmd_t cmd)
+int do_count(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   class Connection *d;
-  Character *i;
+  CharacterPtr i;
   int clss[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   int race[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   int immortal = 0;
@@ -2526,14 +2526,14 @@ int do_count(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_inventory(Character *ch, char *argument, cmd_t cmd)
+int do_inventory(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   ch->sendln("You are carrying:");
   ch->list_obj_to_char(ch->carrying, 1, true);
   return ReturnValue::eSUCCESS;
 }
 
-int do_equipment(Character *ch, char *argument, cmd_t cmd)
+int do_equipment(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int j;
   bool found;
@@ -2569,33 +2569,33 @@ int do_equipment(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_credits(Character *ch, char *argument, cmd_t cmd)
+int do_credits(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   page_string(ch->desc, credits, 0);
   return ReturnValue::eSUCCESS;
 }
 
-int do_story(Character *ch, char *argument, cmd_t cmd)
+int do_story(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   page_string(ch->desc, story, 0);
   return ReturnValue::eSUCCESS;
 }
 /*
-int do_news(Character *ch, char *argument, cmd_t cmd)
+int do_news(CharacterPtr ch, char *argument, cmd_t cmd)
 {
    page_string(ch->desc, news, 0);
    return ReturnValue::eSUCCESS;
 }
 
 */
-int do_info(Character *ch, char *argument, cmd_t cmd)
+int do_info(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   page_string(ch->desc, info, 0);
   return ReturnValue::eSUCCESS;
 }
 
 /*********------------ locate objects -----------------***************/
-int do_olocate(Character *ch, char *name, cmd_t cmd)
+int do_olocate(CharacterPtr ch, char *name, cmd_t cmd)
 {
   char buf[300], buf2[MAX_STRING_LENGTH];
   class Object *k;
@@ -2714,7 +2714,7 @@ int do_olocate(Character *ch, char *name, cmd_t cmd)
 
 /* -----------------   MOB LOCATE FUNCTION ---------------------------- */
 // locates ONLY mobiles.  If cmd == 18, it locates pc's AND mobiles
-int do_mlocate(Character *ch, char *name, cmd_t cmd)
+int do_mlocate(CharacterPtr ch, char *name, cmd_t cmd)
 {
   char buf[300], buf2[MAX_STRING_LENGTH];
   int count = 0;
@@ -2774,9 +2774,9 @@ int do_mlocate(Character *ch, char *name, cmd_t cmd)
 }
 /* --------------------- End of Mob locate function -------------------- */
 
-int do_consider(Character *ch, char *argument, cmd_t cmd)
+int do_consider(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  Character *victim;
+  CharacterPtr victim;
   char name[256];
   int mod = 0;
   int percent, x, y;
@@ -3160,10 +3160,10 @@ int do_consider(Character *ch, char *argument, cmd_t cmd)
 }
 
 /* Shows characters in adjacent rooms -- Sadus */
-int do_scan(Character *ch, char *argument, cmd_t cmd)
+int do_scan(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
-  Character *vict;
+  CharacterPtr vict;
   Room *room;
   int32_t was_in;
 
@@ -3299,7 +3299,7 @@ int do_scan(Character *ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_tick(Character *ch, char *argument, cmd_t cmd)
+int do_tick(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int ntick;
   char buf[256];
@@ -3437,7 +3437,7 @@ void check_champion_and_website_who_list()
   flwo.close();
 }
 
-int do_sector(Character *ch, char *arg, cmd_t cmd)
+int do_sector(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   std::string art = "a";
 
@@ -3460,7 +3460,7 @@ int do_sector(Character *ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int do_version(Character *ch, char *arg, cmd_t cmd)
+int do_version(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   if (ch)
   {

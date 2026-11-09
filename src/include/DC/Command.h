@@ -101,7 +101,7 @@ public:
   QString name_;
 
   // int (*command_pointer_)(CharacterPtr ch, char *argument, cmd_t cmd);               /* Function that does it            */
-  // command_return_t (*command_pointer2_)(Character *ch, std::string argument, cmd_t cmd); /* Function that does it            */
+  // command_return_t (*command_pointer2_)(CharacterPtr ch, std::string argument, cmd_t cmd); /* Function that does it            */
   // command_return_t (Character::*command_pointer3_)(QStringList arguments, cmd_t cmd);    /* Function that does it            */
 
   command_gen1_t command_pointer1_;
