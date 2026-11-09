@@ -1595,7 +1595,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       qDebug("%s vs %s", arg, buf);
   }
 
-  qDebug() << ifcheck[buf];
+  // qDebug() << ifchck << ifcheck[buf] << val[0] << val2[0];
 
   if (val[0] != '\0' && val2[0] == '\0')
   {

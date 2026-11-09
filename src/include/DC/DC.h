@@ -461,7 +461,8 @@ public:
 
   enum mprog_ifs
   {
-    eRAND = 1, // start this at 1, std::map returns 0 if not found
+    eUNKNOWN,
+    eRAND,
     eRAND1K,
     eAMTITEMS,
     eNUMPCS,
