@@ -322,7 +322,7 @@ command_return_t Character::command_interpreter(QString pcomm, bool procced)
         }
       }
 
-      if (this->isNonPlayer() && this->desc && this->desc->original && this->desc->original->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
+      if (this->isNonPlayer() && this->desc && this->desc->original_character && this->desc->original_character->getLevel() <= DC::MAX_MORTAL_LEVEL && !found->isCharmieAllowed())
       {
         this->sendln("The spirit cannot perform that action.");
         return logcmd.setReturn(ReturnValue::eFAILURE, QStringLiteral("spirit not allowed"));

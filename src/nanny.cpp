@@ -2089,7 +2089,7 @@ bool check_playing(class Connection *d, QString name)
     if ((dold == d) || (dold->character == 0))
       continue;
 
-    compare = ((dold->original != 0) ? dold->original : dold->character);
+    compare = ((dold->original_character != 0) ? dold->original_character : dold->character);
 
     // If this is the case we fail our precondition to str_cmp
     if (name.isEmpty())

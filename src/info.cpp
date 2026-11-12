@@ -801,7 +801,7 @@ command_return_t Character::do_botcheck(QStringList arguments, cmd_t cmd)
     {
       if (d->connected || !d->character)
         continue;
-      if (!(i = d->original))
+      if (!(i = d->original_character))
         i = d->character;
       if (!CAN_SEE(this, i))
         continue;
@@ -2499,7 +2499,7 @@ int do_count(CharacterPtr ch, char *arg, cmd_t cmd)
   {
     if (d->connected || !d->character)
       continue;
-    if (!(i = d->original))
+    if (!(i = d->original_character))
       i = d->character;
     if (!CAN_SEE(ch, i))
       continue;

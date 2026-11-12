@@ -1825,7 +1825,7 @@ int do_cast(CharacterPtr ch, char *argument, cmd_t cmd)
   //    return ReturnValue::eFAILURE;
   // Need to allow mob_progs to use cast without allowing charmies to
 
-  if (ch->isNonPlayer() && ch->desc && ch->desc->original && ch->desc->original != ch->desc->character && ch->desc->original->isMortalPlayer())
+  if (ch->isNonPlayer() && ch->desc && ch->desc->original_character && ch->desc->original_character != ch->desc->character && ch->desc->original_character->isMortalPlayer())
   {
     ch->sendln("You cannot cast in this form.");
     return ReturnValue::eFAILURE;

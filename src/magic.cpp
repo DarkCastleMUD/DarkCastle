@@ -14476,7 +14476,7 @@ int spell_ghost_walk(uint8_t level, CharacterPtr ch, CharacterPtr victim, Object
   ch->sendln("(Use the 'return' command to return to your body).");
   ch->player->possesing = 1;
   ch->desc->character = mob;
-  ch->desc->original = ch;
+  ch->desc->original_character = ch;
   mob->desc = ch->desc;
   ch->desc = 0;
   return ReturnValue::eSUCCESS;

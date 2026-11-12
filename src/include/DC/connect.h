@@ -141,18 +141,16 @@ public:
   int showstr_page = {};
 
   QString *hashstr = {};
-  std::string buf = {};        /* buffer for raw input	*/
-  std::string last_input = {}; /* the last input	*/
-  QByteArray output = {};      /* output buffer for writing to connection	*/
+  QByteArray output = {}; /* output buffer for writing to connection	*/
   QByteArray inbuf = {};
-  std::queue<QByteArray> input = {}; /* queue of unprocessed input	*/
-  CharacterPtr character = {};       /* linked to char		*/
-  CharacterPtr original = {};        /* for switch / return		*/
-  class Connection *snooping = {};   /* Who is this char snooping       */
-  class Connection *snoop_by = {};   /* And who is snooping this char   */
-  class Connection *next = {};       /* link to next descriptor	*/
-  int tick_wait = {};                /* # ticks desired to wait	*/
-  int reallythere = {};              /* Goddamm #&@$*% sig 13 (hack) */
+  std::queue<QByteArray> input = {};    /* queue of unprocessed input	*/
+  CharacterPtr character = {};          /* linked to char		*/
+  CharacterPtr original_character = {}; /* for switch / return		*/
+  class Connection *snooping = {};      /* Who is this char snooping       */
+  class Connection *snoop_by = {};      /* And who is snooping this char   */
+  class Connection *next = {};          /* link to next descriptor	*/
+  int tick_wait = {};                   /* # ticks desired to wait	*/
+  int reallythere = {};                 /* Goddamm #&@$*% sig 13 (hack) */
   int prompt_mode = {};
   uint8_t idle_tics = {};
   time_t login_time = {};

@@ -380,8 +380,8 @@ void DC::mobile_activity(void)
               continue;
             if (ISSET(ch->mobdata->actflags, ACT_WIMPY) && AWAKE(tmp_ch))
               continue;
-            if ((!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original &&
-                                                                                                     isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE)))
+            if ((!tmp_ch->isNonPlayer() && isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) || (tmp_ch->desc && tmp_ch->desc->original_character &&
+                                                                                                     isSet(tmp_ch->desc->original_character->player->toggles, Player::PLR_NOHASSLE)))
               continue;
 
             /* check for PFG/PFE, (anti)pal perma-protections, etc. */
@@ -473,7 +473,7 @@ void DC::mobile_activity(void)
           if ((tmp_ch->isPlayer() && !tmp_ch->fighting && CAN_SEE(ch, tmp_ch) &&
                !isSet(world[ch->in_room].room_flags, SAFE) &&
                !isSet(tmp_ch->player->toggles, Player::PLR_NOHASSLE)) ||
-              (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
+              (tmp_ch->isNonPlayer() && tmp_ch->desc && tmp_ch->desc->original_character && CAN_SEE(ch, tmp_ch) && !isSet(tmp_ch->desc->original_character->player->toggles, Player::PLR_NOHASSLE) // this is safe, cause we checked isPlayer() first
                ))
           {
             int i = 0;

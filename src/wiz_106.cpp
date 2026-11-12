@@ -55,8 +55,8 @@ int do_plats(CharacterPtr ch, char *argument, cmd_t cmd)
     if ((d->connected) || (!CAN_SEE(ch, d->character)))
       continue;
 
-    if (d->original)
-      i = d->original;
+    if (d->original_character)
+      i = d->original_character;
     else
       i = d->character;
 

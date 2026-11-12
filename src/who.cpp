@@ -385,9 +385,9 @@ command_return_t Character::do_who(QStringList arguments, cmd_t cmd)
     }
 
     CharacterPtr i{};
-    if (d->original)
+    if (d->original_character)
     {
-      i = d->original;
+      i = d->original_character;
     }
     else
     {
@@ -650,9 +650,9 @@ int do_where(CharacterPtr ch, char *argument, cmd_t cmd)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
       {
-        if (d->original)
+        if (d->original_character)
         { // If switched
-          csendf(ch, "%-20s - %s$R [%d] In body of %s\n", d->original->getNameC(), qPrintable(DC::getInstance()->world[d->character->in_room].name),
+          csendf(ch, "%-20s - %s$R [%d] In body of %s\n", d->original_character->getNameC(), qPrintable(DC::getInstance()->world[d->character->in_room].name),
                  DC::getInstance()->world[d->character->in_room].number, fname(d->character->getNameC()).toStdString().c_str());
         }
         else
@@ -672,12 +672,12 @@ int do_where(CharacterPtr ch, char *argument, cmd_t cmd)
     {
       if (d->character && (d->connected == Connection::states::PLAYING) && (CAN_SEE(ch, d->character)) && (d->character->in_room != DC::NOWHERE))
       {
-        if (d->original)
+        if (d->original_character)
         { // If switched
-          if (is_abbrev(buf, d->original->getName()))
+          if (is_abbrev(buf, d->original_character->getName()))
           {
             ch->sendln(u"%1 - %2$R [%3] In body of %4"_s
-                           .arg(d->original->getName(), -20)
+                           .arg(d->original_character->getName(), -20)
                            .arg(DC::getInstance()->world[d->character->in_room].name)
                            .arg(DC::getInstance()->world[d->character->in_room].number)
                            .arg(fname(d->character->getName())));

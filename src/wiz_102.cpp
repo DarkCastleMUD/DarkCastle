@@ -5390,7 +5390,7 @@ int do_possess(CharacterPtr ch, char *argument, cmd_t cmd)
         logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
         ch->player->possesing = 1;
         ch->desc->character = victim;
-        ch->desc->original = ch;
+        ch->desc->original_character = ch;
 
         victim->desc = ch->desc;
         ch->desc = 0;
@@ -5409,7 +5409,7 @@ int do_return(CharacterPtr ch, char *argument, cmd_t cmd)
   if (!ch->desc)
     return ReturnValue::eFAILURE;
 
-  if (!ch->desc->original)
+  if (!ch->desc->original_character)
   {
     ch->sendln("Huh!?!");
     return ReturnValue::eFAILURE;
@@ -5418,9 +5418,9 @@ int do_return(CharacterPtr ch, char *argument, cmd_t cmd)
   {
     ch->sendln("You return to your original body.");
 
-    ch->desc->original->player->possesing = 0;
-    ch->desc->character = ch->desc->original;
-    ch->desc->original = 0;
+    ch->desc->original_character->player->possesing = 0;
+    ch->desc->character = ch->desc->original_character;
+    ch->desc->original_character = 0;
 
     ch->desc->character->desc = ch->desc;
     ch->desc = 0;

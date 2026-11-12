@@ -3759,7 +3759,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
   int ret = ReturnValue::eSUCCESS;
   if (ch->isPlayer() && !ch->desc)
     for (t_desc = DC::getInstance()->descriptor_list; t_desc; t_desc = t_desc->next)
-      if (t_desc->original == ch)
+      if (t_desc->original_character == ch)
         ret = do_return(t_desc->character, "");
   if (SOMEONE_DIED(ret))
   { // already taken care of
@@ -3938,7 +3938,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
 
   GET_AC(ch) -= GET_AC_METAS(ch);
 
-  if (ch->desc && ch->desc->original)
+  if (ch->desc && ch->desc->original_character)
     do_return(ch, "", cmd_t::LOOK);
 
   if (ch->isNonPlayer() && DC::getInstance()->mob_index.contains(ch->mobdata->vnum_))

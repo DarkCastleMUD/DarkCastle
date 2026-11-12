@@ -231,15 +231,15 @@ int DC::write_hotboot_file(void)
       else
       {
         STATE(d) = Connection::states::PLAYING; // if editors.
-        if (d->original)
+        if (d->original_character)
         {
-          dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original), qPrintable(d->getPeerOriginalAddress().toString()));
-          if (d->original->player)
+          dc_fprintf(fp, "%d\n%s\n%s\n", d->descriptor, GET_NAME(d->original_character), qPrintable(d->getPeerOriginalAddress().toString()));
+          if (d->original_character->player)
           {
-            d->original->player->last_site = d->original->desc->getPeerOriginalAddress().toString();
-            d->original->player->time.logon = time(0);
+            d->original_character->player->last_site = d->original_character->desc->getPeerOriginalAddress().toString();
+            d->original_character->player->time.logon = time(0);
           }
-          d->original->save_char_obj();
+          d->original_character->save_char_obj();
         }
         else
         {
@@ -2239,8 +2239,8 @@ int close_socket(class Connection *d)
   }
 
   /* JE 2/22/95 -- part of my unending quest to make switch stable */
-  if (d->original && d->original->desc)
-    d->original->desc = {};
+  if (d->original_character && d->original_character->desc)
+    d->original_character->desc = {};
 
   // if we're closing the socket that is next to be processed, we want to
   // go ahead and move on to the next one
