@@ -361,8 +361,8 @@ int do_string(CharacterPtr ch, char *arg, cmd_t cmd)
     }
     else
     {
-      *ch->desc->hashstr = str_hsh(string);
-      ch->desc->hashstr = 0;
+      *ch->desc->hashstr = string;
+      ch->desc->hashstr = {};
     }
     ch->sendln("Ok.");
   }
