@@ -1,6 +1,2 @@
-#ifndef STAT_H
-#define STAT_H
-
+#pragma once
 void getAreaData(unsigned int zone, int mob, unsigned int xps, unsigned int gold);
-
-#endif

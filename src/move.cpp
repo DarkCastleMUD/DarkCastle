@@ -20,7 +20,6 @@
 #include <cstring>
 #include <expected>
 #include <string>
-#include <utility>
 
 #include "DC/character.h"
 #include "DC/affect.h"

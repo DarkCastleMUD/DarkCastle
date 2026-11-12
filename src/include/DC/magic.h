@@ -1,3 +1,4 @@
+#pragma once
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                           *
  *        The prototypes for functions defined in magic.c that can/are       *
@@ -6,9 +7,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /* $Id: magic.h,v 1.41 2015/06/14 02:38:12 pirahna Exp $ */
-#ifndef MAGIC_H_
-#define MAGIC_H_
-
 #include <qtypes.h>
 #include <stdint.h>
 
@@ -724,5 +722,3 @@ int spell_ethereal_focus(uint8_t level, CharacterPtr ch,
                          CharacterPtr victim, ObjectPtr obj, int skill);
 int cast_ethereal_focus(uint8_t level, CharacterPtr ch, char *arg, int type,
                         CharacterPtr victim, ObjectPtr tar_obj, int skill);
-
-#endif

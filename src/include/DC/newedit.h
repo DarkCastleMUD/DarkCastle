@@ -1,4 +1,4 @@
-
+#pragma once
 /* action modes for parse_action */
 
 enum class parse_t

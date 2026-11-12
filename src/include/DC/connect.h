@@ -1,5 +1,4 @@
-#ifndef CONNECT_H_
-#define CONNECT_H_
+#pragma once
 #include <qbytearray.h>
 #include <qhostaddress.h>
 #include <qlist.h>
@@ -251,5 +250,3 @@ private:
   qsizetype longest_connection_state_size_{};
   qsizetype longest_idle_size_{};
 };
-
-#endif

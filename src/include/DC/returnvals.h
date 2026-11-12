@@ -1,11 +1,9 @@
+#pragma once
 /*   returnvals.h
  *   Created by:  Pirahna
  *
  *   Contains return values everything should use unless specified otherwise.
  */
-
-#ifndef _RETURNVALS_H_
-#define _RETURNVALS_H_
 
 enum ReturnValue
 {
@@ -25,5 +23,3 @@ enum ReturnValue
 #define SOCIAL_false 0
 #define SOCIAL_true 1
 #define SOCIAL_true_WITH_NOISE 2
-
-#endif // _RETURNVALS_H_

@@ -1,6 +1,4 @@
-#ifndef SSH_H
-#define SSH_H
-
+#pragma once
 #include <libssh/libssh.h>
 #include <libssh/server.h>
 #include <qobject.h>
@@ -13,26 +11,24 @@
 namespace SSH
 {
 
-    class SSH : public QObject
-    {
-        Q_OBJECT
-    public:
-        explicit SSH(QObject *parent = nullptr);
-        void setup(void);
-        int poll(void);
-        void close(void);
-        ~SSH();
+  class SSH : public QObject
+  {
+    Q_OBJECT
+  public:
+    explicit SSH(QObject *parent = nullptr);
+    void setup(void);
+    int poll(void);
+    void close(void);
+    ~SSH();
 
-    signals:
+  signals:
 
-    public slots:
-        void run(void);
+  public slots:
+    void run(void);
 
-    private:
-        ssh_bind sshbind = {};
-        ssh_session sshsession = {};
-        char *data = {};
-    };
+  private:
+    ssh_bind sshbind = {};
+    ssh_session sshsession = {};
+    char *data = {};
+  };
 }
-
-#endif

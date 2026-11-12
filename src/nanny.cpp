@@ -37,7 +37,6 @@
 #include <cstring>
 #include <queue>
 #include <string>
-#include <sstream>
 #include <utility>
 
 #include "DC/dcstdio.h"
@@ -60,7 +59,6 @@
 #include "DC/const.h"
 #include "DC/guild.h"
 #include "DC/meta.h"
-#include "DC/memory.h"
 #include "DC/DC.h"
 #include "DC/Trace.h"
 #include "DC/affect.h"

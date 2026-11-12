@@ -1,5 +1,4 @@
-#ifndef _EVENT_H
-#define _EVENT_H
+#pragma once
 /*
  * Important!!!!
  *
@@ -77,5 +76,3 @@ void killBrief(CharacterPtr ch, eventFunc func);
 eventBrief *addBrief(CharacterPtr ch, eventData *event);
 eventBrief *foundBrief(CharacterPtr ch, eventFunc func);
 void killCharEvents(CharacterPtr ch);
-
-#endif

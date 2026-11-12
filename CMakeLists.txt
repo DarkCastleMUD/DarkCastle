@@ -218,7 +218,6 @@ add_library(DC SHARED
     src/include/DC/act.h
     src/include/DC/affect.h
     src/include/DC/alias.h
-    src/include/DC/bandwidth.h
     src/include/DC/buildinfo.h
     src/include/DC/character.h
     src/include/DC/clan.h

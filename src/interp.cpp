@@ -41,7 +41,6 @@
 #include <tuple>
 #include <algorithm>
 #include <expected>
-#include <utility>
 
 #include "DC/dcstdio.h"
 #include "DC/structs.h" // MAX_STRING_LENGTH

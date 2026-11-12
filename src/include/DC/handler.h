@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: handler.h , Handler module.                      Part of DIKUMUD *
  *  Usage: Various routines for moving about objects/players               *
@@ -13,9 +14,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: handler.h,v 1.33 2012/01/17 01:03:26 jhhudso Exp $ */
-
-#ifndef HANDLER_H_
-#define HANDLER_H_
 
 #include <qstring.h>
 #include <qtypes.h>
@@ -165,5 +163,3 @@ void stop_guarding_me(CharacterPtr victim);
 void stop_guarding(CharacterPtr guard);
 void remove_memory(CharacterPtr ch, char type);
 void remove_memory(CharacterPtr ch, char type, CharacterPtr vict);
-
-#endif

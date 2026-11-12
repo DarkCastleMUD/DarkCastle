@@ -1,3 +1,4 @@
+#pragma once
 /* Set eq stuff. defines. */
 
 class set_data

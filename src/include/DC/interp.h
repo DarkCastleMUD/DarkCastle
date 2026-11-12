@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: Interpreter.h , Command interpreter module.      Part of DIKUMUD *
  *  Usage: Procedures interpreting user command                            *
@@ -13,8 +14,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: interp.h,v 1.115 2011/12/28 01:26:50 jhhudso Exp $ */
-
-#pragma once
 
 #include <qcontainerfwd.h>
 #include <QString>

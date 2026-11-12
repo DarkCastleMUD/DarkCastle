@@ -1,6 +1,4 @@
-#ifndef FIGHT_H_
-#define FIGHT_H_
-
+#pragma once
 #include <qstring.h>
 #include <stdint.h>
 
@@ -137,5 +135,3 @@ void remove_active_potato(CharacterPtr vict);
 #define DAMAGE_TYPE_PHYSICAL 0
 #define DAMAGE_TYPE_MAGIC 1
 #define DAMAGE_TYPE_SONG 2
-
-#endif

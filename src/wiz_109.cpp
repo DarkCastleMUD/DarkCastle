@@ -36,10 +36,6 @@
 #include "DC/levels.h"
 #include "DC/structs.h"
 
-#ifdef BANDWIDTH
-#include "DC/bandwidth.h"
-#endif
-
 command_return_t Character::do_linkload(QStringList arguments, cmd_t cmd)
 {
   class Connection d;
@@ -657,15 +653,6 @@ int do_testuser(CharacterPtr ch, char *argument, cmd_t cmd)
 
   return ReturnValue::eSUCCESS;
 }
-
-#ifdef BANDWIDTH
-int do_bandwidth(CharacterPtr ch, char *argument, cmd_t cmd)
-{
-  csendf(ch, "Bytes sent in %ld seconds: %ld\n",
-         get_bandwidth_start(), get_bandwidth_amount());
-  return ReturnValue::eSUCCESS;
-}
-#endif
 
 int do_skilledit(CharacterPtr ch, char *argument, cmd_t cmd)
 {

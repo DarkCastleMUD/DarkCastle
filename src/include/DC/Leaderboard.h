@@ -1,12 +1,10 @@
+#pragma once
 /*
  * Leaderboard.h
  *
  *  Created on: Jul 13, 2014
  *      Author: jhhudso
  */
-
-#ifndef LEADERBOARD_H_
-#define LEADERBOARD_H_
 
 #include <qstring.h>
 #include <sstream>
@@ -66,5 +64,3 @@ private:
 };
 
 extern Leaderboard leaderboard;
-
-#endif /* LEADERBOARD_H_ */

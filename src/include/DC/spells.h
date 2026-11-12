@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: spells.h , Implementation of magic spells.       Part of DIKUMUD *
  *  Usage : Spells                                                         *
@@ -14,16 +15,11 @@
  ***************************************************************************/
 /* $Id: spells.h,v 1.142 2015/06/14 02:38:12 pirahna Exp $ */
 
-#ifndef SPELLS_H_
-#define SPELLS_H_
-
 #include <qtypes.h>
 #include <stdint.h>
 #include <map>
 
 #include "DC/structs.h" // uint8_t, int16_t
-#include "DC/character.h"
-#include "DC/obj.h"
 
 class Character;
 enum class position_t : uint_fast8_t;
@@ -761,5 +757,3 @@ public:
 #define INSOMNIA_VNUM 6311
 #define HASTE_VNUM 6312
 #define true_VNUM 6305
-
-#endif

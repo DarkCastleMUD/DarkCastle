@@ -1,10 +1,8 @@
+#pragma once
 /*
  * Copyright 2017-2023 Jared H. Hudson
  * Licensed under the LGPL.
  */
-#ifndef DC_H_
-#define DC_H_
-
 #define SAVE_DIR "../save"
 #define BSAVE_DIR "../bsave"
 #define QSAVE_DIR "../save/qdata"
@@ -562,7 +560,7 @@ public:
   world_file_list_t world_file_list{}; // List of the world files
   world_file_list_t mob_file_list{};   // List of the mob files
   world_file_list_t obj_file_list{};   // List of the obj files
-  ObjectPtr object_list = 0;     // the global linked list of obj's
+  ObjectPtr object_list = 0;           // the global linked list of obj's
   class pulse_data *bard_list = 0;     // global l-list of bards
   int top_of_helpt = 0;                // top of help index table
   int new_top_of_helpt = 0;            // top of help index table
@@ -1150,5 +1148,3 @@ struct VNUM_Range
   vnum_t last{};
 };
 struct VNUM_Range &operator<<(struct VNUM_Range &vnum_range, const QString &filename);
-
-#endif

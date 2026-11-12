@@ -1,9 +1,6 @@
 #include <qstring.h>
 #include <qtypes.h>
 #include <stdint.h>
-#include <map>
-#include <string>
-#include <vector>
 
 #include "DC/utility.h"
 

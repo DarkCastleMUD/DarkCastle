@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: db.h , Database module.                          Part of DIKUMUD *
  *  Usage: Loading/Saving chars booting world.                             *
@@ -13,7 +14,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: db.h,v 1.40 2012/02/08 22:54:25 jhhudso Exp $ */
-#pragma once
 #include <qchar.h>
 #include <qmap.h>
 #include <qobject.h>

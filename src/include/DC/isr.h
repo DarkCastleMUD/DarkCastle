@@ -1,5 +1,4 @@
-#ifndef ISR_H_
-#define ISR_H_
+#pragma once
 /************************************************************************
 | $Id: isr.h,v 1.4 2012/04/16 03:09:54 shane Exp $
 | isr.h
@@ -46,5 +45,3 @@
 
 // If you decide to add a new saving throw type you
 // will have to be a little tricky:) -pir 12/13/01 3:32am
-
-#endif

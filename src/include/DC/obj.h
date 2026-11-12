@@ -1,3 +1,4 @@
+#pragma once
 /***************************************************************************
  *  file: obj.h , Structures                               Part of DIKUMUD *
  *  Usage: Declarations of object data structures                          *
@@ -13,8 +14,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 /* $Id: obj.h,v 1.36 2015/06/16 04:10:54 pirahna Exp $ */
-#ifndef OBJ_H_
-#define OBJ_H_
 
 #include <qchar.h>
 #include <qcontainerfwd.h>
@@ -665,5 +664,3 @@ void wear(CharacterPtr ch, ObjectPtr obj_object, int keyword);
 int obj_from(ObjectPtr obj);
 
 typedef QStringList item_types_t;
-
-#endif

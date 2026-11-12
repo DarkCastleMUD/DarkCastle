@@ -1,5 +1,4 @@
-#ifndef __ROOM_H__
-#define __ROOM_H__
+#pragma once
 /************************************************************************
 | $Id: room.h,v 1.21 2015/06/14 02:38:12 pirahna Exp $
 | room.h
@@ -11,7 +10,6 @@
 #include <qtypes.h>
 #include <stdint.h>
 #include <QSharedPointer>
-#include <expected>
 
 #include "DC/structs.h" // uint8_t
 #include "DC/class.h"
@@ -208,7 +206,7 @@ public:
 
   int (*funct)(CharacterPtr, cmd_t, const char *) = {}; // special procedure
 
-  ObjectPtr contents = {}; // List of items in room
+  ObjectPtr contents = {};       // List of items in room
   CharacterPtr people = nullptr; // List of NPC / PC in room
 
   int nTracks = {};                 // number of tracks in the room
@@ -308,5 +306,3 @@ public:
   auto room(void) -> Room &;
   room_t in_room = {};
 };
-
-#endif // __ROOM_H__

@@ -218,7 +218,6 @@ command_return_t do_ask(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFA
 command_return_t do_at(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_auction(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_ban(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
-command_return_t do_bandwidth(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_bash(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_batter(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);
 command_return_t do_battlecry(CharacterPtr ch, char *argument, cmd_t cmd = cmd_t::DEFAULT);

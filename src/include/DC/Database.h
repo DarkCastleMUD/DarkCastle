@@ -1,6 +1,4 @@
-#ifndef DATABASE_H
-#define DATABASE_H
-
+#pragma once
 #include <qcompare.h>
 #include <qswap.h>
 #include <QSqlDatabase>
@@ -57,5 +55,3 @@ private:
   QString name_;
   QString type_;
 };
-
-#endif

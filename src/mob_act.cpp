@@ -23,8 +23,6 @@
 #include <stdio.h>
 #include <expected>
 #include <map>
-#include <string>
-#include <utility>
 
 #include "DC/character.h"
 #include "DC/room.h"
@@ -50,7 +48,6 @@
 #include "DC/common.h"
 #include "DC/levels.h"
 #include "DC/obj.h"
-#include "DC/player.h"
 
 void perform_wear(CharacterPtr ch, ObjectPtr obj_object,
                   int keyword);

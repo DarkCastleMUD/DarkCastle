@@ -13,7 +13,6 @@
  *  share your changes too.  What goes around, comes around.               *
  ***************************************************************************/
 #include <fmt/format.h>
-#include <ctype.h>
 #include <qchar.h>
 #include <qdebug.h>
 #include <qiodevice.h>

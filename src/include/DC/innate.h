@@ -1,7 +1,6 @@
+#pragma once
 // innate.h
 // Global defines for innate skill abilities
-
-
 
 // Innate skills can go from 1500 - 1599
 

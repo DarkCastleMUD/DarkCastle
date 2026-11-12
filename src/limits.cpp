@@ -14,9 +14,6 @@
  ***************************************************************************/
 /* $Id: limits.cpp,v 1.99 2014/07/04 22:00:04 jhhudso Exp $ */
 
-#ifdef BANDWIDTH
-#include "DC/bandwidth.h"
-#endif
 #include <qcompare.h>
 #include <qchar.h>
 #include <qcoreapplication.h>

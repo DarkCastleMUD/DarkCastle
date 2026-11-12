@@ -1,8 +1,6 @@
-#ifndef __MOBACTIVITYH__
-#define __MOBACTIVITYH__
-/*
-  New DC Mob AI
-*/
+#pragma once /*  \
+   New DC Mob AI \
+ */
 
 #include <map>
 
@@ -48,4 +46,3 @@ public:
 /*			 END PATHFINDING 			*/
 /*			 END PATHFINDING 			*/
 /*			 END PATHFINDING 			*/
-#endif

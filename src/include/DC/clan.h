@@ -1,6 +1,4 @@
-#ifndef CLAN_H_
-#define CLAN_H_
-
+#pragma once
 /************************************************************************
 | $Id: clan.h,v 1.27 2013/12/30 22:46:43 jhhudso Exp $
 | clan.h
@@ -190,5 +188,3 @@ void free_member(ClanMember *member);
 ClanMember *get_member(QString strName, int nClanId);
 void show_clan_log(CharacterPtr ch);
 void clan_death(CharacterPtr ch, CharacterPtr killer);
-
-#endif /* CLAN_H_ */

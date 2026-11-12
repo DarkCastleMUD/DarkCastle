@@ -1,5 +1,4 @@
-#ifndef CLASS_H
-#define CLASS_H
+#pragma once
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -41,5 +40,3 @@ public:
 typedef std::vector<class_data> classes_t;
 
 extern classes_t classes;
-
-#endif

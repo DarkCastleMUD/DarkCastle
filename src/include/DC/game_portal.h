@@ -1,5 +1,4 @@
-#ifndef GAME_PORTAL_H_
-#define GAME_PORTAL_H_
+#pragma once
 #include <QtTypes>
 
 #define MAX_GAME_PORTALS 9
@@ -20,5 +19,3 @@ public:
 
 void load_game_portals();
 void process_portals();
-
-#endif

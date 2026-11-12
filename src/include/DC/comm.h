@@ -1,8 +1,7 @@
+#pragma once
 /***************************************************************************
 | comm.h: New comm stuff to make the rewrite of comm.C work properly
 */
-#ifndef __COMM_H__
-#define __COMM_H__
 
 #include <qcontainerfwd.h>
 #include <qlist.h>
@@ -90,4 +89,3 @@ char *calc_color(int hit, int max_hit);
 char *calc_color_align(int align);
 char *calc_condition(CharacterPtr ch, bool colour = false);
 CharacterPtr get_charmie(CharacterPtr ch);
-#endif

@@ -1,9 +1,7 @@
+#pragma once
 // Copyright 2023 Jared H. Hudson
 // Licensed under LGPL
 //
-#ifndef SHOPS_H
-#define SHOPS_H
-
 #include <qcontainerfwd.h>
 #include <qmap.h>
 #include <qstring.h>
@@ -56,5 +54,3 @@ public:
 
 private:
 };
-
-#endif

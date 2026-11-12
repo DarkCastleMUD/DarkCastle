@@ -40,10 +40,8 @@
 #include <fstream>
 #include <algorithm>
 #include <QRegularExpression>
-#include <iterator>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include "DC/DC.h"
 #include "DC/structs.h"
