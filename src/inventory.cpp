@@ -18,7 +18,6 @@
 #include <cstring>
 #include <queue>
 #include <string>
-#include <utility>
 
 #include "DC/obj.h"
 #include "DC/character.h"

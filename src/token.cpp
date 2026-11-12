@@ -11,7 +11,6 @@
 #include <qstring.h>
 #include <cstring>
 #include <qstringview.h>
-#include <string>
 
 #include "DC/obj.h"
 #include "DC/room.h"
