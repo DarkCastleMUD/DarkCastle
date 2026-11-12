@@ -69,29 +69,7 @@ void string_hash_add(class Connection *d, QString str)
     scan.truncate(scan.indexOf('~'));
   }
 
-  if ((*d->hashstr).isEmpty())
-  {
-    if (str.size() > (unsigned)d->max_str)
-    {
-      d->character->sendln("String too long - Truncated.");
-      str.truncate(d->max_str);
-      terminator = 1;
-    }
-
-    *d->hashstr = str;
-  }
-  else
-  {
-    if (str.size() + (*d->hashstr).length() > (unsigned)d->max_str)
-    {
-      d->character->sendln("String too long. Last line skipped.");
-      terminator = 1;
-    }
-    else
-    {
-      *d->hashstr += str;
-    }
-  }
+  *d->hashstr += str;
 
   if (terminator)
   {
@@ -310,7 +288,6 @@ int do_string(CharacterPtr ch, char *arg, cmd_t cmd)
           description = {};
           ch->desc->hashstr = &description;
           ch->sendln("Modifying description.");
-          ch->desc->max_str = MAX_STRING_LENGTH;
           return 1;
         }
       }
@@ -385,7 +362,6 @@ int do_string(CharacterPtr ch, char *arg, cmd_t cmd)
 #else
       (*ch->desc->hashstr) = (char *)dc_alloc(length[field - 1], sizeof(char));
 #endif
-    ch->desc->max_str = length[field - 1];
     ch->desc->connected = Connection::states::EDITING;
   }
   return 1;

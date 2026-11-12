@@ -654,7 +654,6 @@ int do_sqedit(CharacterPtr ch, char *argument, cmd_t cmd)
     ch->sendln("Enter new message. End with \\s.");
     ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(skill->message);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
     break;
   case 3:
     if (is_number(arg2))

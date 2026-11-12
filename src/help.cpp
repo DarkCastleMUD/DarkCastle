@@ -865,7 +865,6 @@ int do_hedit(CharacterPtr ch, char *argument, cmd_t cmd)
 
       ch->desc->connected = Connection::states::EDITING;
       ch->desc->strnew = &(new_help_table[help_id].entry);
-      ch->desc->max_str = MAX_HELP_LENGTH;
     }
     else
     { // no idea wtf they are doing

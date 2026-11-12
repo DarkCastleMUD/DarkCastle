@@ -1133,7 +1133,6 @@ int clan_desc(CharacterPtr ch, char *arg)
 
   //  ch->desc->connected = Connection::states::EDITING;
   //  ch->desc->str = &clan->description;
-  //  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   ch->desc->backstr = nullptr;
   send_to_char("        Write your description and stay within the line.  (/s saves /h for help)\n"
                "   |--------------------------------------------------------------------------------|\n",
@@ -1146,7 +1145,6 @@ int clan_desc(CharacterPtr ch, char *arg)
 
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(clan->description);
-  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
 
@@ -1179,7 +1177,6 @@ int clan_motd(CharacterPtr ch, char *arg)
 
   // ch->desc->connected = Connection::states::EDITING;
   // ch->desc->str = &clan->clanmotd;
-  // ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
 
   ch->desc->backstr = nullptr;
   send_to_char("        Write your motd and stay within the line.  (/s saves /h for help)\n"
@@ -1193,7 +1190,6 @@ int clan_motd(CharacterPtr ch, char *arg)
 
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(clan->clanmotd);
-  ch->desc->max_str = MAX_CLAN_DESC_LENGTH;
   return 1;
 }
 

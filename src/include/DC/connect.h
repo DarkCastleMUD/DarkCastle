@@ -127,22 +127,20 @@ public:
     QUESTION_STATS,
     GET_STATS
   };
+  Q_ENUM(states)
 
   Proxy proxy = {};
+  qintptr descriptor = {};
+  states connected = {};
+  states web_connected = {};
+  quint64 wait = {}; /* wait before processing additional commands */
 
-  qintptr descriptor = {}; /* file descriptor for socket	*/
-  states connected = {};   /* mode of 'connectedness'	*/
-  int web_connected = {};
-  int wait = {};           /* wait for how many loops	*/
   char *showstr_head = {}; /* for paging through texts	*/
   const char **showstr_vector = {};
   int showstr_count = {};
   int showstr_page = {};
-  bool new_newline = {}; /* prepend newline in output	*/
-  //  char	**str;			/* for the modify-str system	*/
+
   QString *hashstr = {};
-  char *astr = {};
-  int max_str = {};
   std::string buf = {};        /* buffer for raw input	*/
   std::string last_input = {}; /* the last input	*/
   QByteArray output = {};      /* output buffer for writing to connection	*/
@@ -161,7 +159,6 @@ public:
   stat_data *stats = {}; // for rolling up a char
 
   QString *strnew = {}; /* for the modify-str system	*/
-  QString qstrnew = {};
   QString backstr = {};
   int idle_time = {}; // How long the descriptor has been idle, overall.
   bool color = {};

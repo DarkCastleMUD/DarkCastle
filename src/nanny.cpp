@@ -1816,7 +1816,6 @@ void DC::nanny(class Connection *d, QString arg)
       }
 
       d->strnew = &ch->description;
-      d->max_str = 539;
       STATE(d) = Connection::states::EXDSCR;
       break;
 

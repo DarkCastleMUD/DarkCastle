@@ -559,7 +559,6 @@ int do_write(CharacterPtr ch, char *argument, cmd_t cmd)
     act("$n begins to jot down a note.", ch, 0, 0, TO_ROOM, INVIS_NULL);
     // TODO BROKEN
     // ch->desc->strnew = &paper->ActionDescription();
-    ch->desc->max_str = MAX_NOTE_LENGTH;
   }
   return ReturnValue::eSUCCESS;
 }

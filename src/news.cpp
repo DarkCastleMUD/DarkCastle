@@ -265,7 +265,6 @@ int do_addnews(CharacterPtr ch, char *argument, cmd_t cmd)
   //  nnews->news = str_dup("Temporary data.\n");
   ch->desc->connected = Connection::states::EDITING;
   ch->desc->strnew = &(nnews->news);
-  ch->desc->max_str = 2096;
 
   return ReturnValue::eSUCCESS;
 }

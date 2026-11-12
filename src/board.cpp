@@ -800,7 +800,6 @@ void board_do_write(CharacterPtr ch, QStringList arguments, boards_t::iterator b
   wait_for_write[ch] = reserve;
   ch->desc->connected = Connection::states::WRITE_BOARD;
   ch->desc->strnew = &reserve->buf;
-  ch->desc->max_str = MAX_MESSAGE_LENGTH;
 }
 
 int board_do_erase(CharacterPtr ch, QStringList arguments, boards_t::iterator board)

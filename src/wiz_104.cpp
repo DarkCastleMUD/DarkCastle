@@ -2347,7 +2347,6 @@ int do_opedit(CharacterPtr ch, char *argument, cmd_t cmd)
 
     ch->desc->backstr = nullptr;
     ch->desc->strnew = &(currprog->comlist);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {

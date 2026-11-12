@@ -1664,7 +1664,6 @@ int new_descriptor(int s)
   newd->output = {};
   newd->next = DC::getInstance()->descriptor_list;
   newd->login_time = time(0);
-  newd->astr = 0;
   DC::getInstance()->descriptor_list = newd;
   newd->connected = Connection::states::PRE_DISPLAY_ENTRANCE;
   return 0;

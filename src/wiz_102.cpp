@@ -1688,7 +1688,6 @@ int oedit_exdesc(CharacterPtr ch, int item_num, char *buf)
 
     ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &obj->ex_descriptions[select];
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     break;
   }
@@ -2560,7 +2559,6 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
     sendln("Write your object's description. End with /s.");
     desc->connected = Connection::states::EDITING;
-    desc->max_str = MAX_MESSAGE_LENGTH;
   }
   break;
   default:
@@ -2937,7 +2935,6 @@ int do_procedit(CharacterPtr ch, char *argument, cmd_t cmd)
 
     ch->desc->backstr = nullptr;
     ch->desc->strnew = &(currprog->comlist);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
     {
@@ -3176,9 +3173,7 @@ int do_medit(CharacterPtr ch, char *argument, cmd_t cmd)
     //        (DC::getInstance()->mob_index[mob_num].mob)->description = nullptr;
     ch->desc->connected = Connection::states::EDITING;
     (DC::getInstance()->mob_index[mob_num].mob)->description = str_dup("");
-    ch->desc->strnew =
-        &((DC::getInstance()->mob_index[mob_num].mob)->description);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
+    ch->desc->strnew = &((DC::getInstance()->mob_index[mob_num].mob)->description);
   }
   break;
 
@@ -4158,7 +4153,6 @@ int do_redit(CharacterPtr ch, char *argument, cmd_t cmd)
     ch->sendln("        Write your room's description.  (/s saves /h for help)");
     ch->desc->connected = Connection::states::EDITING;
     ch->desc->strnew = &(DC::getInstance()->world[ch->in_room].description);
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
   }
   break;
 
@@ -4428,7 +4422,6 @@ int do_redit(CharacterPtr ch, char *argument, cmd_t cmd)
 
     ch->sendln("Write your extra description. (/s saves /h for help)");
     ch->desc->strnew = &DC::getInstance()->world[ch->in_room].ex_descriptions[arg2.c_str()];
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = Connection::states::EDITING;
     if (ch->desc->strnew && !ch->desc->strnew->isEmpty())
     {
@@ -4475,7 +4468,6 @@ int do_redit(CharacterPtr ch, char *argument, cmd_t cmd)
         }
    */
     ch->desc->strnew = &DC::getInstance()->world[ch->in_room].dir_option[x]->general_description;
-    ch->desc->max_str = MAX_MESSAGE_LENGTH;
     ch->desc->connected = Connection::states::EDITING;
   }
   break;
