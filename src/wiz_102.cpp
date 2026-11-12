@@ -5213,7 +5213,7 @@ int do_rstat(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH * 2];
   char buf2[MAX_STRING_LENGTH];
-  Room *rm = 0;
+  RoomPtr rm = 0;
   CharacterPtr k = 0;
   class Object *j = 0;
   int i, x, loc;

@@ -1751,7 +1751,7 @@ void Room::setup_dir(QTextStream &fl, int dir)
 // return true for success
 int DC::create_one_room(CharacterPtr ch, int vnum)
 {
-  Room *rp{};
+  RoomPtr rp{};
   int x{};
 
   char buf[256]{};

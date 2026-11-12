@@ -3164,7 +3164,7 @@ int do_scan(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   int i;
   CharacterPtr vict;
-  Room *room;
+  RoomPtr room;
   int32_t was_in;
 
   char *possibilities[] =
