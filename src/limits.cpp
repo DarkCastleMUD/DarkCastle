@@ -23,7 +23,6 @@
 #include <qswap.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <utility>
 
 #include "DC/room.h"
 #include "DC/character.h"

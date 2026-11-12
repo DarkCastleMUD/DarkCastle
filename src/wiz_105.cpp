@@ -28,7 +28,6 @@
 #include "DC/const.h"
 #include "DC/Timer.h"
 #include "DC/common.h"
-#include "DC/memory.h"
 #include "DC/DC.h"
 #include "DC/Index.h"
 #include "DC/act.h"

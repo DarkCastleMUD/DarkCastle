@@ -36,7 +36,7 @@
 #include "DC/race.h"
 #include "DC/const.h"
 #include "DC/corpse.h"
-#include "DC/memory.h"
+
 #include "DC/Index.h"
 #include "DC/Zone.h"
 #include "DC/act.h"
