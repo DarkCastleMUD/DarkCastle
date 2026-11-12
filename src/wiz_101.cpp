@@ -140,7 +140,7 @@ command_return_t Character::do_goto(QStringList arguments, cmd_t cmd)
   CharacterPtr pers = {};
   CharacterPtr tmp_ch = {};
   follow_type *k = {}, *next_dude = {};
-  class Object *target_obj = {};
+  ObjectPtr target_obj = {};
 
   if (this->isNonPlayer())
   {
@@ -485,7 +485,7 @@ int do_at(CharacterPtr ch, char *argument, cmd_t cmd)
   char command[MAX_INPUT_LENGTH], loc_str[MAX_INPUT_LENGTH];
   int loc_nr, location, original_loc;
   CharacterPtr target_mob;
-  class Object *target_obj;
+  ObjectPtr target_obj;
 
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;

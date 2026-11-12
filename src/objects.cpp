@@ -49,7 +49,7 @@ extern const char *drinks[];
 extern const char *dirs[];
 extern int drink_aff[][3];
 
-void add_obj_affect(Object *obj, int loc, int mod)
+void add_obj_affect(ObjectPtr obj, int loc, int mod)
 {
   obj->num_affects++;
 #ifdef LEAK_CHECK
@@ -63,7 +63,7 @@ void add_obj_affect(Object *obj, int loc, int mod)
   obj->affected[obj->num_affects - 1].modifier = mod;
 }
 
-void remove_obj_affect_by_index(Object *obj, int index)
+void remove_obj_affect_by_index(ObjectPtr obj, int index)
 {
   // shift everyone to right of the one we're deleting to the left
   // TODO - redo this with memmove
@@ -84,7 +84,7 @@ void remove_obj_affect_by_index(Object *obj, int index)
   }
 }
 
-void remove_obj_affect_by_type(Object *obj, int loc)
+void remove_obj_affect_by_type(ObjectPtr obj, int loc)
 {
   for (int i = 0; i < obj->num_affects; i++)
     if (obj->affected[i].location == loc)
@@ -93,7 +93,7 @@ void remove_obj_affect_by_type(Object *obj, int loc)
 
 // given an object, return the maximum points of damage the item
 // can take before being scrapped
-int eq_max_damage(Object *obj)
+int eq_max_damage(ObjectPtr obj)
 {
   int amount = 0;
 
@@ -126,7 +126,7 @@ int eq_max_damage(Object *obj)
   return amount;
 }
 
-int eq_current_damage(Object *obj)
+int eq_current_damage(ObjectPtr obj)
 {
   for (int i = 0; i < obj->num_affects; i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
@@ -137,7 +137,7 @@ int eq_current_damage(Object *obj)
 
 // when repairing eq, we just leave the affect of 0 in there.  That way when
 // it gets damaged again, we don't have to realloc the affect list again
-void eq_remove_damage(Object *obj)
+void eq_remove_damage(ObjectPtr obj)
 {
   for (int i = 0; i < obj->num_affects; i++)
     if (obj->affected[i].location == APPLY_DAMAGED)
@@ -148,7 +148,7 @@ void eq_remove_damage(Object *obj)
 }
 
 // Damage a piece of eq once and return the amount of damage currently on it
-int damage_eq_once(Object *obj)
+int damage_eq_once(ObjectPtr obj)
 {
   if (obj->vnum_ == SPIRIT_SHIELD_OBJ_NUMBER && obj->carried_by && obj->carried_by->in_room)
   {
@@ -185,7 +185,7 @@ void DC::object_activity(quint64 pulse_type)
     }
     else if (obj->obj_flags.type_flag == ITEM_MEGAPHONE && !obj->ex_descriptions.isEmpty() && obj->obj_flags.value[0]-- == 0)
     {
-      obj->obj_flags.value[0] = ((Object *)obj_index[item_number].item)->obj_flags.value[1];
+      obj->obj_flags.value[0] = ((ObjectPtr)obj_index[item_number].item)->obj_flags.value[1];
       send_to_room(obj->ex_descriptions.value(0), obj->in_room, true);
     }
     else
@@ -210,7 +210,7 @@ void DC::object_activity(quint64 pulse_type)
 
 int do_switch(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  class Object *between;
+  ObjectPtr between;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -254,7 +254,7 @@ int do_switch(CharacterPtr ch, char *arg, cmd_t cmd)
 int do_quaff(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
-  class Object *temp;
+  ObjectPtr temp;
   int i /*,j*/;
   bool equipped;
   int retval = ReturnValue::eSUCCESS;
@@ -355,7 +355,7 @@ int do_quaff(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_recite(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH + 1];
-  class Object *scroll, *obj;
+  ObjectPtr scroll, obj;
   CharacterPtr victim;
   int i, bits;
   bool equipped;
@@ -489,10 +489,10 @@ int do_recite(CharacterPtr ch, char *argument, cmd_t cmd)
 
 #define GOD_TRAP_ITEM 193
 
-void set_movement_trap(CharacterPtr ch, class Object *obj)
+void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
 {
   char buf[200];
-  class Object *trap_obj = nullptr;
+  ObjectPtr trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people moving around in the area.\n", qPrintable(obj->short_description));
   ch->send(buf);
@@ -510,10 +510,10 @@ void set_movement_trap(CharacterPtr ch, class Object *obj)
   obj_to_room(trap_obj, ch->in_room);
 }
 
-void set_exit_trap(CharacterPtr ch, class Object *obj, char *arg)
+void set_exit_trap(CharacterPtr ch, ObjectPtr obj, char *arg)
 {
   char buf[200];
-  class Object *trap_obj = nullptr;
+  ObjectPtr trap_obj = nullptr;
 
   sprintf(buf, "You set up the %s to catch people trying to leave the area.\n", qPrintable(obj->short_description));
   ch->send(buf);
@@ -535,11 +535,11 @@ void set_exit_trap(CharacterPtr ch, class Object *obj, char *arg)
 
 // Return false if there was a command problem
 // Return true if it went off
-bool set_utility_mortar(CharacterPtr ch, class Object *obj, char *arg)
+bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, char *arg)
 {
   char direct[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  class Object *trap_obj = nullptr;
+  ObjectPtr trap_obj = nullptr;
   int dir;
 
   one_argument(arg, direct);
@@ -609,7 +609,7 @@ bool set_utility_mortar(CharacterPtr ch, class Object *obj, char *arg)
 }
 
 // With catstink, the value[1] is the sector type it was designed for
-void set_catstink(CharacterPtr ch, class Object *obj)
+void set_catstink(CharacterPtr ch, ObjectPtr obj)
 {
   char buf[200];
   extern const char *sector_types[];
@@ -641,9 +641,9 @@ void set_catstink(CharacterPtr ch, class Object *obj)
   DC::getInstance()->world[ch->in_room].FreeTracks();
 }
 
-void set_utility_item(CharacterPtr ch, class Object *obj, char *argument)
+void set_utility_item(CharacterPtr ch, ObjectPtr obj, char *argument)
 {
-  int class_restricted(CharacterPtr ch, class Object * obj);
+  int class_restricted(CharacterPtr ch, ObjectPtr obj);
 
   if (class_restricted(ch, obj))
   {
@@ -678,7 +678,7 @@ void set_utility_item(CharacterPtr ch, class Object *obj, char *argument)
 
 int do_mortal_set(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  class Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
 
@@ -718,7 +718,7 @@ int do_use(CharacterPtr ch, char *argument, cmd_t cmd)
   char targ[MAX_INPUT_LENGTH + 1];
   char xtra_arg[MAX_INPUT_LENGTH + 1];
   CharacterPtr tmp_char;
-  class Object *tmp_object, *stick;
+  ObjectPtr tmp_object, stick;
   int lvl;
   int bits;
 
@@ -912,7 +912,7 @@ int do_name(CharacterPtr ch, char *arg, cmd_t cmd)
 
 command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 {
-  class Object *temp{};
+  ObjectPtr temp{};
   affected_type af{};
   int amount{};
 
@@ -1059,7 +1059,7 @@ command_return_t Character::do_drink(QStringList arguments, cmd_t cmd)
 
 command_return_t Character::do_eat(QStringList arguments, cmd_t cmd)
 {
-  class Object *temp{};
+  ObjectPtr temp{};
   affected_type af{};
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
@@ -1126,8 +1126,8 @@ int do_pour(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  class Object *from_obj;
-  class Object *to_obj;
+  ObjectPtr from_obj;
+  ObjectPtr to_obj;
   int amount;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -1243,7 +1243,7 @@ int do_sip(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  class Object *temp;
+  ObjectPtr temp;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -1305,7 +1305,7 @@ int do_sip(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_taste(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_STRING_LENGTH];
-  class Object *temp;
+  ObjectPtr temp;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
   {
@@ -1353,7 +1353,7 @@ int do_taste(CharacterPtr ch, char *argument, cmd_t cmd)
 
 /* functions related to wear */
 
-void perform_wear(CharacterPtr ch, class Object *obj_object,
+void perform_wear(CharacterPtr ch, ObjectPtr obj_object,
                   int keyword)
 {
   switch (keyword)
@@ -1426,7 +1426,7 @@ void perform_wear(CharacterPtr ch, class Object *obj_object,
   }
 }
 
-int class_restricted(CharacterPtr ch, class Object *obj)
+int class_restricted(CharacterPtr ch, ObjectPtr obj)
 {
   if (ch->isNonPlayer())
     return false;
@@ -1448,7 +1448,7 @@ int class_restricted(CharacterPtr ch, class Object *obj)
   return true;
 }
 
-int charmie_restricted(CharacterPtr ch, class Object *obj, int wear_loc)
+int charmie_restricted(CharacterPtr ch, ObjectPtr obj, int wear_loc)
 {
   return false; // sigh, work for nohin'
   if (ch->isNonPlayer() && ISSET(ch->affected_by, AFF_CHARM) && ch->master && ch->mobdata)
@@ -1497,7 +1497,7 @@ int charmie_restricted(CharacterPtr ch, class Object *obj, int wear_loc)
   return false;
 }
 
-int size_restricted(CharacterPtr ch, class Object *obj)
+int size_restricted(CharacterPtr ch, ObjectPtr obj)
 {
   if (isSet(obj->obj_flags.size, SIZE_ANY))
     return false;
@@ -1550,7 +1550,7 @@ int size_restricted(CharacterPtr ch, class Object *obj)
 // it wearing in terms of sizes vs. height
 // ch = player obj = obj to remove/wear add = 1(wear) or 0(remove)
 // function WILL tell the character if anything is wrong
-int will_screwup_worn_sizes(CharacterPtr ch, Object *obj, int add)
+int will_screwup_worn_sizes(CharacterPtr ch, ObjectPtr obj, int add)
 {
   int j;
   int mod = 0;
@@ -1622,9 +1622,9 @@ int will_screwup_worn_sizes(CharacterPtr ch, Object *obj, int add)
   return false;
 }
 
-void wear(CharacterPtr ch, class Object *obj_object, int keyword)
+void wear(CharacterPtr ch, ObjectPtr obj_object, int keyword)
 {
-  class Object *obj;
+  ObjectPtr obj;
   char buffer[MAX_STRING_LENGTH];
   if (!obj_object)
     return;
@@ -2162,7 +2162,7 @@ void wear(CharacterPtr ch, class Object *obj_object, int keyword)
         return;
       }
 
-      class Object *obj_temp = ch->equipment[WEAR_WIELD];
+      ObjectPtr obj_temp = ch->equipment[WEAR_WIELD];
       obj_to_char(ch->unequip_char(WEAR_WIELD), ch);
       wear(ch, obj_object, 12);
       wear(ch, obj_temp, 12);
@@ -2197,7 +2197,7 @@ void wear(CharacterPtr ch, class Object *obj_object, int keyword)
 
 int Object::keywordfind(void)
 {
-  Object *obj_object = this;
+  ObjectPtr obj_object = this;
   int keyword;
 
   keyword = -2;
@@ -2255,7 +2255,7 @@ int do_wear(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg2[MAX_STRING_LENGTH];
   char buf[256];
   char buffer[MAX_STRING_LENGTH];
-  class Object *obj_object, *tmp_object, *next_obj;
+  ObjectPtr obj_object, tmp_object, next_obj;
   int keyword;
   bool blindlag = false;
   static char const *keywords[] = {
@@ -2351,7 +2351,7 @@ int do_wield(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  class Object *obj_object;
+  ObjectPtr obj_object;
   bool blindlag = false;
   int keyword = 12;
 
@@ -2401,7 +2401,7 @@ int do_grab(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  class Object *obj_object;
+  ObjectPtr obj_object;
   bool blindlag = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -2444,7 +2444,7 @@ int do_grab(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int Character::hands_are_free(int number)
 {
-  class Object *wielded;
+  ObjectPtr wielded;
   int hands = 0;
 
   wielded = this->equipment[WEAR_WIELD];
@@ -2493,7 +2493,7 @@ int Character::hands_are_free(int number)
 int do_remove(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg1[MAX_STRING_LENGTH];
-  class Object *obj_object;
+  ObjectPtr obj_object;
   bool blindlag = false;
   int j;
 
@@ -2621,7 +2621,7 @@ int do_remove(CharacterPtr ch, char *argument, cmd_t cmd)
 int Character::recheck_height_wears(void)
 {
   int j;
-  class Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   if (isNonPlayer())
     return ReturnValue::eFAILURE; // NPCs get to wear the stuff.
 
@@ -2641,7 +2641,7 @@ int Character::recheck_height_wears(void)
   return ReturnValue::eSUCCESS;
 }
 
-bool fullSave(Object *obj)
+bool fullSave(ObjectPtr obj)
 {
   if (!obj)
     return 0;
@@ -2649,7 +2649,7 @@ bool fullSave(Object *obj)
   if (eq_current_damage(obj))
     return 1;
 
-  Object *tmp_obj = get_obj(GET_OBJ_VNUM(obj));
+  ObjectPtr tmp_obj = get_obj(GET_OBJ_VNUM(obj));
   if (!tmp_obj)
   {
     char buf[MAX_STRING_LENGTH];
@@ -2733,7 +2733,7 @@ bool Character::allowColor(void)
   return false;
 }
 
-int obj_from(Object *obj)
+int obj_from(ObjectPtr obj)
 {
   if (obj == nullptr)
   {

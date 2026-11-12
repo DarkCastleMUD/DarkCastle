@@ -188,10 +188,10 @@ int do_load(CharacterPtr ch, char *arg, cmd_t cmd)
     {
       num = x;
 
-      if (isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
+      if (isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->Name()))
       {
         cnt++;
-        sprintf(buf, "[%3d] [%5llu] %s\n", cnt, x, qPrintable(((class Object *)(DC::getInstance()->obj_index[num].item))->short_description));
+        sprintf(buf, "[%3d] [%5llu] %s\n", cnt, x, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[num].item))->short_description));
         ch->send(buf);
       }
 
@@ -289,12 +289,12 @@ int do_load(CharacterPtr ch, char *arg, cmd_t cmd)
         return ReturnValue::eFAILURE;
       }
       if ((ch->getLevel() < 108) &&
-          isSet(((class Object *)(DC::getInstance()->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
+          isSet(((ObjectPtr)(DC::getInstance()->obj_index[number].item))->obj_flags.extra_flags, ITEM_SPECIAL))
       {
         ch->sendln("Why would you want to load that?");
         return ReturnValue::eFAILURE;
       }
-      else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[number].item))->Name()))
+      else if (cmd == cmd_t::PRIZE && !isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[number].item))->Name()))
       {
         ch->sendln("This command can only load prize items.");
         return ReturnValue::eFAILURE;
@@ -307,7 +307,7 @@ int do_load(CharacterPtr ch, char *arg, cmd_t cmd)
 
       if (random[0] == 'r')
       {
-        Object *obj = (Object *)(DC::getInstance()->obj_index[number].item);
+        ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[number].item);
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
           ch->send(QStringLiteral("You cannot random load vnum %1 because extra flag ITEM_SPECIAL is set.\n").arg(num));
@@ -334,13 +334,13 @@ int do_load(CharacterPtr ch, char *arg, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     if ((ch->getLevel() < IMPLEMENTER) &&
-        isSet(((class Object *)(DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
+        isSet(((ObjectPtr)(DC::getInstance()->obj_index[num].item))->obj_flags.extra_flags,
               ITEM_SPECIAL))
     {
       ch->sendln("Why would you want to load that?");
       return ReturnValue::eFAILURE;
     }
-    else if (cmd == cmd_t::PRIZE && !isexact("prize", ((class Object *)(DC::getInstance()->obj_index[num].item))->Name()))
+    else if (cmd == cmd_t::PRIZE && !isexact("prize", ((ObjectPtr)(DC::getInstance()->obj_index[num].item))->Name()))
     {
       ch->sendln("This command can only load prize items.");
       return ReturnValue::eFAILURE;
@@ -356,7 +356,7 @@ int do_purge(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   CharacterPtr vict;
   CharacterPtr next_v;
-  class Object *obj, *next_o;
+  ObjectPtr obj, next_o;
 
   char name[100], buf[300];
 
@@ -996,7 +996,7 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
         nr = begin;
         if (DC::getInstance()->obj_index.contains(nr))
         {
-          sprintf(buf, "[  1] [%5d] [%2llu] %s\n", begin, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+          sprintf(buf, "[  1] [%5d] [%2llu] %s\n", begin, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description));
           ch->send(buf);
         }
       }
@@ -1011,7 +1011,7 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
             continue;
 
           count++;
-          sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, i, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+          sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, i, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description));
           ch->send(buf);
 
           if (count > 200)
@@ -1649,37 +1649,37 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
         for (i = 0; i < 20; i++)
           if (isSet(wear, 1 << i))
             if (!isSet(
-                    ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.wear_flags,
+                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.wear_flags,
                     1 << i))
               goto endLoop;
       if (type)
-        if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != type)
+        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != type)
           continue;
       if (lweight != -555)
-        if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight < lweight)
+        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight < lweight)
           continue;
       if (hweight != -555)
-        if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight > hweight)
+        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.weight > hweight)
           continue;
 
       if (levhigh != -555)
-        if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level > levhigh)
+        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level > levhigh)
           continue;
       if (levlow != -555)
-        if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level < levlow)
+        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level < levlow)
           continue;
       if (size)
         for (i = 0; i < 10; i++)
           if (isSet(size, 1 << i))
             if (!isSet(
-                    ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.size,
+                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.size,
                     1 << i))
               goto endLoop;
-      if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
+      if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag == ITEM_WEAPON)
       {
-        int get_weapon_damage_type(class Object * wielded);
+        int get_weapon_damage_type(ObjectPtr wielded);
         its = get_weapon_damage_type(
-            ((class Object *)(DC::getInstance()->obj_index[nr].item)));
+            ((ObjectPtr)(DC::getInstance()->obj_index[nr].item)));
       }
       if (dam && dam != (its - 1000))
         continue;
@@ -1687,10 +1687,10 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
         for (i = 0; i < 30; i++)
           if (isSet(extra, 1 << i))
             if (!isSet(
-                    ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
+                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
                     1 << i) &&
                 !(any && isSet(
-                             ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
+                             ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.extra_flags,
                              1 << any)))
               goto endLoop;
 
@@ -1698,16 +1698,16 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
         for (i = 0; i < 10; i++)
           if (isSet(more, 1 << i))
             if (!isSet(
-                    ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags,
+                    ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags,
                     1 << i))
               goto endLoop;
       //      int aff,total = 0;
       //    bool found = false;
       if (!item_type)
         for (aff = 0;
-             aff < ((class Object *)(DC::getInstance()->obj_index[nr].item))->num_affects;
+             aff < ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->num_affects;
              aff++)
-          if (affect == ((class Object *)(DC::getInstance()->obj_index[nr].item))->affected[aff].location)
+          if (affect == ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->affected[aff].location)
             found = true;
       if (affect && !item_type)
         if (!found)
@@ -1716,14 +1716,14 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
       if (item_type)
       {
         bool spell_found = false;
-        if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != item_type)
+        if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.type_flag != item_type)
           continue;
         if (item_type == ITEM_POTION || item_type == ITEM_SCROLL)
           for (i = 1; i < 4; i++)
-            if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[i] == spellnum)
+            if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[i] == spellnum)
               spell_found = true;
         if (item_type == ITEM_STAFF || item_type == ITEM_WAND)
-          if (((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[3] == spellnum)
+          if (((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.value[3] == spellnum)
             spell_found = true;
 
         if (!spell_found)
@@ -1736,7 +1736,7 @@ int do_show(CharacterPtr ch, char *argument, cmd_t cmd)
         ch->sendln("Limit reached.");
         break;
       }
-      sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, c, ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+      sprintf(buf, "[%3d] [%5d] [%2llu] %s\n", count, c, ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level, qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description));
       ch->send(buf);
     endLoop:
       continue;
@@ -2051,7 +2051,7 @@ char *oprog_type_to_name(int type)
 void opstat(CharacterPtr ch, vnum_t vnum)
 {
   auto num = vnum;
-  Object *obj;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
   if (num < 0)
   {
@@ -2396,7 +2396,7 @@ int do_oclone(CharacterPtr ch, char *argument, cmd_t cmd)
     ch->sendln("Syntax: oclone <source vnum> <destination vnum>");
     return ReturnValue::eFAILURE;
   }
-  Object *obj, *otmp;
+  ObjectPtr obj, otmp;
   int v1 = atoi(arg1), v2 = atoi(arg2);
   int r1 = v1, r2 = v2;
   if (r1 < 0)

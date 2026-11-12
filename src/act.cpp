@@ -26,28 +26,28 @@ class Object;
 
 extern bool MOBtrigger;
 
-act_return act(QString str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(QString str, CharacterPtr ch, ObjectPtr obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
   return DC::getInstance()->act({.str = qPrintable(str), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(const std::string &str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const std::string &str, CharacterPtr ch, ObjectPtr obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
   return DC::getInstance()->act({.str = str.c_str(), .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(const char *str, CharacterPtr ch, Object *obj, void *vict_obj, int16_t destination, int16_t flags)
+act_return act(const char *str, CharacterPtr ch, ObjectPtr obj, void *vict_obj, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
   return DC::getInstance()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = vict_obj, .destination = destination, .flags = flags, .keyword = {}});
 }
 
-act_return act(const char *str, CharacterPtr ch, Object *obj, QString keyword, int16_t destination, int16_t flags)
+act_return act(const char *str, CharacterPtr ch, ObjectPtr obj, QString keyword, int16_t destination, int16_t flags)
 {
   if (ch)
     return ch->getDC()->act({.str = str, .ch = ch, .obj = obj, .vict_obj = {}, .destination = destination, .flags = flags, .keyword = keyword});
@@ -223,7 +223,7 @@ void send_message(std::string str, CharacterPtr to)
   return send_message(str.c_str(), to);
 }
 
-send_tokens_return DC::send_tokens(TokenList *tokens, CharacterPtr ch, Object *obj, void *vict_obj, int flags, CharacterPtr to, QString keyword)
+send_tokens_return DC::send_tokens(TokenList *tokens, CharacterPtr ch, ObjectPtr obj, void *vict_obj, int flags, CharacterPtr to, QString keyword)
 {
   int retval = 0;
   QByteArray buf = tokens->Interpret(ch, obj, vict_obj, to, flags, keyword);

@@ -40,7 +40,7 @@ void advance_golem_level(CharacterPtr golem);
 
 // save.cpp
 int store_worn_eq(CharacterPtr ch, FILEPtr fpsave);
-class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, ObjectPtr last_cont);
 
 class golem_data
 { // This is how a golem looks.
@@ -107,7 +107,7 @@ int verify_existing_components(CharacterPtr ch, int golemtype)
 
   // check_components didn't suit me.
   int i;
-  class Object *curr, *next_content;
+  ObjectPtr curr, next_content;
   char buf[MAX_STRING_LENGTH];
   SET_BIT(retval, ReturnValue::eSUCCESS);
   for (i = 0; i < 5; i++)
@@ -295,14 +295,14 @@ void Character::load_golem_data(int golemtype)
   }
 
   dc_fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
-  class Object *last_cont = nullptr; // Last container.
+  ObjectPtr last_cont = nullptr; // Last container.
   while (!dc_feof(fpfile))
   {
     last_cont = obj_store_to_char(golem, fpfile, last_cont);
   }
 }
 
-int cast_create_golem(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, class Object *tar_obj, int skill)
+int cast_create_golem(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, ObjectPtr tar_obj, int skill)
 {
   CharacterPtr golem;
   int i;
@@ -639,7 +639,7 @@ int do_golem_score(CharacterPtr ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int spell_release_golem(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, class Object *tar_obj, int skill)
+int spell_release_golem(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, ObjectPtr tar_obj, int skill)
 {
   follow_type *fol;
   for (fol = ch->followers; fol; fol = fol->next)

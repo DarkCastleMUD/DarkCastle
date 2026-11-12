@@ -846,7 +846,7 @@ void pulse_table_bj(table_data *tbl, int recall)
   }
 }
 
-void create_table(class Object *obj)
+void create_table(ObjectPtr obj)
 {
   table_data *table;
 #ifdef LEAK_CHECK
@@ -1143,7 +1143,7 @@ void Character::sendBlackjackPrompt(void)
   send(createBlackjackPrompt());
 }
 
-int blackjack_table(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int blackjack_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                     CharacterPtr invoker)
 {
   bool showColor = false;
@@ -1932,7 +1932,7 @@ void pulse_holdem(class ttbl *tbl)
 class machine_data
 {
 public:
-  Object *obj;
+  ObjectPtr obj;
   CharacterPtr prch;
   CharacterPtr ch;
   uint cost;
@@ -2054,7 +2054,7 @@ void save_slot_machines(void)
   }
 }
 
-void create_slot(Object *obj)
+void create_slot(ObjectPtr obj)
 {
   machine_data *slot;
 #ifdef LEAK_CHECK
@@ -2100,7 +2100,7 @@ void update_linked_slots(machine_data *machine)
   // Find all the slot machines
   for (int i = 21906; i < 21918; i++)
   {
-    Object *slot_obj = DC::getInstance()->obj_index[i].item;
+    ObjectPtr slot_obj = DC::getInstance()->obj_index[i].item;
 
     // Find all the slot machines linked to the same slot machine as us
     // and update their v1 jackpot, their machine's jackpot (if applicable)
@@ -2115,7 +2115,7 @@ void update_linked_slots(machine_data *machine)
         slot_obj->slot->jackpot = machine->jackpot;
 
       // Update instances of the original slot obj
-      for (Object *j = DC::getInstance()->object_list; j; j = j->next)
+      for (ObjectPtr j = DC::getInstance()->object_list; j; j = j->next)
       {
         if (j->vnum_ == i)
         {
@@ -2261,7 +2261,7 @@ void reel_spin(varg_t arg1, void *arg2, void *arg3)
   save_slot_machines();
 }
 
-int slot_machine(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
+int slot_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   char buf[MAX_STRING_LENGTH];
 
@@ -2405,13 +2405,13 @@ public:
 class wheel_data
 {
 public:
-  Object *obj;
+  ObjectPtr obj;
   roulette_player *plr[6];
   int countdown;
   bool spinning;
 };
 
-void create_wheel(Object *obj)
+void create_wheel(ObjectPtr obj)
 {
   wheel_data *wheel;
 #ifdef LEAK_CHECK
@@ -2687,7 +2687,7 @@ void pulse_countdown(varg_t arg1, void *arg2, void *arg3)
   }
 }
 
-int roulette_table(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
+int roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
   uint32_t bet = 0;

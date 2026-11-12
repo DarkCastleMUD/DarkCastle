@@ -132,7 +132,7 @@ void DC::removeDead(void)
 
   while (!obj_free_list.empty())
   {
-    Object *obj = *(obj_free_list.cbegin());
+    ObjectPtr obj = *(obj_free_list.cbegin());
     active_obj_list.erase(obj);
     obj_free_list.erase(obj);
     delete obj;
@@ -328,7 +328,7 @@ bool DC::isAllowedHost(QHostAddress address)
   return false;
 }
 
-Object *DC::getObject(vnum_t vnum)
+ObjectPtr DC::getObject(vnum_t vnum)
 {
   vnum_t rnum = vnum;
 
@@ -337,7 +337,7 @@ Object *DC::getObject(vnum_t vnum)
     return nullptr;
   }
 
-  return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
+  return static_cast<ObjectPtr>(DC::getInstance()->obj_index[rnum].item);
 }
 
 void DC::logverbose(QString str, quint64 god_level, DC::LogChannel type, CharacterPtr vict)

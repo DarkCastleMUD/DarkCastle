@@ -642,15 +642,15 @@ int dam_percent(int learned, int damage);
 typedef int SPELL_FUN(uint8_t level, CharacterPtr ch,
                       char *arg, int type,
                       CharacterPtr tar_ch,
-                      class Object *tar_obj,
+                      ObjectPtr tar_obj,
                       int skill);
 typedef int SPELL_FUN2(uint8_t level, CharacterPtr ch,
                        char *arg, int type,
                        CharacterPtr tar_ch,
-                       class Object *tar_obj,
+                       ObjectPtr tar_obj,
                        int skill, quint64 mana_cost);
-// typedef int (*spell_gen1_t)(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, class Object *tar_obj, int skill);
-// typedef command_return_t (*spell_gen2_t)(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, class Object *tar_obj, int skill, quint64 mana_cost);
+// typedef int (*spell_gen1_t)(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, ObjectPtr tar_obj, int skill);
+// typedef command_return_t (*spell_gen2_t)(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr tar_ch, ObjectPtr tar_obj, int skill, quint64 mana_cost);
 
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C
 // The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is

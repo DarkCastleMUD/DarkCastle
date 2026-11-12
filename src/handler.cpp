@@ -79,7 +79,7 @@
 
 class table_data;
 
-void huntclear_item(class Object *obj);
+void huntclear_item(ObjectPtr obj);
 
 #ifdef WIN32
 int strncasecmp(char *s1, const char *s2, int len);
@@ -116,7 +116,7 @@ void addTimer(CharacterPtr ch, int spell, int ticks)
 }
 // END TIMERS
 
-bool is_wearing(CharacterPtr ch, Object *item)
+bool is_wearing(CharacterPtr ch, ObjectPtr item)
 {
   int i;
   for (i = 0; i < MAX_WEAR; i++)
@@ -549,7 +549,7 @@ const set_data set_list[] = {
      "\n",
      "\n"}};
 
-void add_set_stats(CharacterPtr ch, Object *obj, int flag, int pos)
+void add_set_stats(CharacterPtr ch, ObjectPtr obj, int flag, int pos)
 {
   // obj has just been worn
   int obj_vnum = obj->vnum_;
@@ -820,7 +820,7 @@ void add_set_stats(CharacterPtr ch, Object *obj, int flag, int pos)
       }
 }
 
-void remove_set_stats(CharacterPtr ch, Object *obj, int flag)
+void remove_set_stats(CharacterPtr ch, ObjectPtr obj, int flag)
 {
   // obj has just been removed
   int obj_vnum = obj->vnum_;
@@ -865,7 +865,7 @@ void remove_set_stats(CharacterPtr ch, Object *obj, int flag)
 
 void check_weapon_weights(CharacterPtr ch)
 {
-  class Object *weapon;
+  ObjectPtr weapon;
 
   if (ISSET(ch->affected_by, AFF_IGNORE_WEAPON_WEIGHT))
     return;
@@ -1841,7 +1841,7 @@ void affect_remove(CharacterPtr ch, affected_type *af, int flags)
       ch->sendln("Your regeneration slows back to normal.");
     break;
   case SKILL_INNATE_POWERWIELD:
-    class Object *obj;
+    ObjectPtr obj;
     obj = ch->equipment[WEAR_WIELD];
     if (obj)
       if (obj->obj_flags.extra_flags & ITEM_TWO_HANDED)
@@ -2480,7 +2480,7 @@ int apply_ac(CharacterPtr ch, int eq_pos)
 
 // return 0 on failure
 // 1 on success
-bool Character::equip_char(class Object *obj, int pos, bool flag)
+bool Character::equip_char(ObjectPtr obj, int pos, bool flag)
 {
   int j;
 
@@ -2620,10 +2620,10 @@ bool Character::equip_char(class Object *obj, int pos, bool flag)
   return 1;
 }
 
-class Object *Character::unequip_char(int pos, bool flag)
+ObjectPtr Character::unequip_char(int pos, bool flag)
 {
   int j;
-  class Object *obj;
+  ObjectPtr obj;
 
   assert(pos >= 0 && pos < MAX_WEAR);
   assert(equipment[pos]);
@@ -2650,12 +2650,12 @@ class Object *Character::unequip_char(int pos, bool flag)
     GET_AC(this) += apply_ac(this, pos);
 
   remove_set_stats(this, obj, flag);
-  class Object *a, *b = nullptr;
+  ObjectPtr a, b = nullptr;
 b: // ew
   if (this->isPlayer())
     for (a = player->skillchange; a; a = a->next_skill)
     {
-      if (a == (Object *)0x95959595)
+      if (a == (ObjectPtr)0x95959595)
       {
         int i;
         player->skillchange = nullptr;
@@ -2790,9 +2790,9 @@ int get_number(char **name)
 }
 
 /* Search a given list for an object, and return a pointer to that object */
-class Object *get_obj_in_list(char *name, class Object *list)
+ObjectPtr get_obj_in_list(char *name, ObjectPtr list)
 {
-  class Object *i;
+  ObjectPtr i;
   int j, number;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
@@ -2814,9 +2814,9 @@ class Object *get_obj_in_list(char *name, class Object *list)
 }
 
 /* Search a given list for an object number, and return a ptr to that obj */
-class Object *get_obj_in_list_num(int num, class Object *list)
+ObjectPtr get_obj_in_list_num(int num, ObjectPtr list)
 {
-  class Object *i;
+  ObjectPtr i;
 
   for (i = list; i; i = i->next_content)
     if (i->vnum_ == num)
@@ -2826,9 +2826,9 @@ class Object *get_obj_in_list_num(int num, class Object *list)
 }
 
 /*search the entire world for an object, and return a pointer  */
-class Object *get_obj(char *name)
+ObjectPtr get_obj(char *name)
 {
-  class Object *i;
+  ObjectPtr i;
   int j, number;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
@@ -2849,7 +2849,7 @@ class Object *get_obj(char *name)
   return (0);
 }
 
-class Object *get_obj(int vnum)
+ObjectPtr get_obj(int vnum)
 {
   int num = vnum;
 
@@ -2857,9 +2857,9 @@ class Object *get_obj(int vnum)
 }
 
 /*search the entire world for an object number, and return a pointer  */
-class Object *get_obj_num(int nr)
+ObjectPtr get_obj_num(int nr)
 {
-  class Object *i;
+  ObjectPtr i;
 
   for (i = DC::getInstance()->object_list; i; i = i->next)
     if (i->vnum_ == nr)
@@ -3021,10 +3021,10 @@ CharacterPtr get_char_num(int nr)
 
 // move an object from its current location into the room
 // specified by dest.
-int move_obj(Object *obj, int dest)
+int move_obj(ObjectPtr obj, int dest)
 {
   int obj_in_room = DC::NOWHERE;
-  Object *contained_by = 0;
+  ObjectPtr contained_by = 0;
   CharacterPtr carried_by = 0;
 
   if (!obj)
@@ -3106,10 +3106,10 @@ int move_obj(Object *obj, int dest)
 
 // move an object from its current location into the container
 // specified by dest_obj.
-int move_obj(Object *obj, Object *dest_obj)
+int move_obj(ObjectPtr obj, ObjectPtr dest_obj)
 {
   int obj_in_room = DC::NOWHERE;
-  Object *contained_by = 0;
+  ObjectPtr contained_by = 0;
   CharacterPtr carried_by = 0;
 
   if (!obj)
@@ -3187,10 +3187,10 @@ int move_obj(Object *obj, Object *dest_obj)
 
 // move an object from its current location into the inventory of the
 // character specified by ch.
-int move_obj(Object *obj, CharacterPtr ch)
+int move_obj(ObjectPtr obj, CharacterPtr ch)
 {
   int obj_in_room = DC::NOWHERE;
-  Object *contained_by = 0;
+  ObjectPtr contained_by = 0;
   CharacterPtr carried_by = 0;
 
   //  char buffer[300];
@@ -3286,9 +3286,9 @@ int move_obj(Object *obj, CharacterPtr ch)
 
 // give an object to a char
 // 1 if success, 0 if failure
-int obj_to_char(class Object *object, CharacterPtr ch)
+int obj_to_char(ObjectPtr object, CharacterPtr ch)
 {
-  // class Object *obj;
+  // ObjectPtr obj;
   /*
    if(!(obj = ch->carrying) ||
    (!obj->next_content && obj->vnum_ > object->vnum_))
@@ -3302,7 +3302,7 @@ int obj_to_char(class Object *object, CharacterPtr ch)
   IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
   IS_CARRYING_N(ch)
   ++;
-  extern void pick_up_item(CharacterPtr ch, class Object * obj);
+  extern void pick_up_item(CharacterPtr ch, ObjectPtr obj);
 
   pick_up_item(ch, object);
 
@@ -3334,9 +3334,9 @@ int obj_to_char(class Object *object, CharacterPtr ch)
 }
 
 // take an object from a char
-int obj_from_char(class Object *object)
+int obj_from_char(ObjectPtr object)
 {
-  class Object *tmp;
+  ObjectPtr tmp;
 
   if (!object->carried_by)
   {
@@ -3374,9 +3374,9 @@ int obj_from_char(class Object *object)
 }
 
 // put an object in a room
-int obj_to_room(class Object *object, room_t room)
+int obj_to_room(ObjectPtr object, room_t room)
 {
-  class Object *obj;
+  ObjectPtr obj;
 
   if (!object)
     return 0;
@@ -3458,9 +3458,9 @@ int obj_to_room(class Object *object, room_t room)
 }
 
 // Take an object from a room
-int obj_from_room(class Object *object)
+int obj_from_room(ObjectPtr object)
 {
-  class Object *i;
+  ObjectPtr i;
 
   if (object->in_room == DC::NOWHERE)
   {
@@ -3498,9 +3498,9 @@ int obj_from_room(class Object *object)
 }
 
 // put an object in an object (quaint)
-int obj_to_obj(class Object *obj, class Object *obj_to)
+int obj_to_obj(ObjectPtr obj, ObjectPtr obj_to)
 {
-  class Object *tobj;
+  ObjectPtr tobj;
 
   obj->in_obj = obj_to;
 
@@ -3535,9 +3535,9 @@ int obj_to_obj(class Object *obj, class Object *obj_to)
 }
 
 // remove an object from an object
-int obj_from_obj(class Object *obj)
+int obj_from_obj(ObjectPtr obj)
 {
-  class Object *tmp, *obj_from;
+  ObjectPtr tmp, obj_from;
 
   if (!obj->in_obj)
   {
@@ -3588,7 +3588,7 @@ int obj_from_obj(class Object *obj)
 }
 
 // Set all carried_by to point to new_new owner
-void object_list_new_new_owner(class Object *list, CharacterPtr ch)
+void object_list_new_new_owner(ObjectPtr list, CharacterPtr ch)
 {
   if (list)
   {
@@ -3599,9 +3599,9 @@ void object_list_new_new_owner(class Object *list, CharacterPtr ch)
 }
 
 // Extract an object from the world
-void extract_obj(class Object *obj)
+void extract_obj(ObjectPtr obj)
 {
-  class Object *temp1;
+  ObjectPtr temp1;
   huntclear_item(obj);
 
   // if we're going away, unhook myself from my owner
@@ -3690,7 +3690,7 @@ void extract_obj(class Object *obj)
   DC::getInstance()->obj_free_list.insert(obj);
 }
 
-void update_object(class Object *obj, int use)
+void update_object(ObjectPtr obj, int use)
 {
   if (obj->obj_flags.timer > 0 && (obj->vnum_ != 30010 && obj->vnum_ != 30036 && obj->vnum_ != 30033 && obj->vnum_ != 30097 && obj->vnum_ != 30019))
     obj->obj_flags.timer -= use;
@@ -3754,7 +3754,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
   /*CharacterPtr i;*/
   bool isGolem = false;
 
-  class Object *i;
+  ObjectPtr i;
   CharacterPtr omast = nullptr;
   int ret = ReturnValue::eSUCCESS;
   if (ch->isPlayer() && !ch->desc)
@@ -3863,7 +3863,7 @@ void extract_char(CharacterPtr ch, bool pull, Trace t)
     }
     if (ch->carrying)
     {
-      class Object *inext;
+      ObjectPtr inext;
       for (i = ch->carrying; i; i = inext)
       {
         inext = i->next_content;
@@ -4249,9 +4249,9 @@ CharacterPtr get_mob_vis(CharacterPtr ch, char *name)
   return partial_match;
 }
 
-Object *get_obj_vnum(int vnum)
+ObjectPtr get_obj_vnum(int vnum)
 {
-  Object *i;
+  ObjectPtr i;
   int num = vnum;
   for (i = DC::getInstance()->object_list; i; i = i->next)
     if (i->vnum_ == num)
@@ -4273,21 +4273,21 @@ vnum_t get_vnum(QString vnum_str)
   return vnum;
 }
 
-Object *get_obj_vnum(QString vnum_str)
+ObjectPtr get_obj_vnum(QString vnum_str)
 {
   return get_obj_vnum(get_vnum(vnum_str));
 }
 
-Object *get_objindex_vnum(vnum_t vnum)
+ObjectPtr get_objindex_vnum(vnum_t vnum)
 {
   rnum_t rnum = vnum;
   if (!DC::getInstance()->obj_index.contains(rnum))
     return nullptr;
 
-  return static_cast<Object *>(DC::getInstance()->obj_index[rnum].item);
+  return static_cast<ObjectPtr>(DC::getInstance()->obj_index[rnum].item);
 }
 
-Object *get_objindex_vnum(QString vnum_str)
+ObjectPtr get_objindex_vnum(QString vnum_str)
 {
   return get_objindex_vnum(get_vnum(vnum_str));
 }
@@ -4524,7 +4524,7 @@ CharacterPtr Character::getVisibleCharacter(QString name)
   return get_char_vis(this, name.toStdString());
 }
 
-Object *Character::getVisibleObject(QString name)
+ObjectPtr Character::getVisibleObject(QString name)
 {
   return get_obj_vis(this, name.toStdString());
 }
@@ -4627,9 +4627,9 @@ CharacterPtr Character::get_active_pc_vis(QString name)
 }
 
 // search by item number
-class Object *get_obj_in_list_vis(CharacterPtr ch, int item_num, class Object *list, bool blindfighting)
+ObjectPtr get_obj_in_list_vis(CharacterPtr ch, int item_num, ObjectPtr list, bool blindfighting)
 {
-  class Object *i;
+  ObjectPtr i;
   int number = item_num;
 
   // never match invalid items
@@ -4643,9 +4643,9 @@ class Object *get_obj_in_list_vis(CharacterPtr ch, int item_num, class Object *l
   return nullptr;
 }
 
-class Object *get_obj_in_list_vis(CharacterPtr ch, QString name, class Object *list, bool blindfighting)
+ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, bool blindfighting)
 {
-  class Object *i;
+  ObjectPtr i;
   int j, number;
 
   QString tmpname = name;
@@ -4665,16 +4665,16 @@ class Object *get_obj_in_list_vis(CharacterPtr ch, QString name, class Object *l
   return (0);
 }
 
-class Object *get_obj_vis(CharacterPtr ch, std::string name, bool loc)
+ObjectPtr get_obj_vis(CharacterPtr ch, std::string name, bool loc)
 {
   /*search the entire world for an object, and return a pointer  */
   return get_obj_vis(ch, name.c_str(), loc);
 }
 
 /*search the entire world for an object, and return a pointer  */
-class Object *get_obj_vis(CharacterPtr ch, const char *name, bool loc)
+ObjectPtr get_obj_vis(CharacterPtr ch, const char *name, bool loc)
 {
-  class Object *i;
+  ObjectPtr i;
   int j, number;
   char tmpname[MAX_INPUT_LENGTH];
   char *tmp;
@@ -4713,7 +4713,7 @@ class Object *get_obj_vis(CharacterPtr ch, const char *name, bool loc)
   return (0);
 }
 
-class Object *create_money(int amount)
+ObjectPtr create_money(int amount)
 {
   if (amount <= 0)
   {
@@ -4772,7 +4772,7 @@ class Object *create_money(int amount)
 /* The routine returns a pointer to the next word in *arg (just like the  */
 /* one_argument routine).                                                 */
 
-int generic_find(const char *arg, int bitvector, CharacterPtr ch, CharacterPtr *tar_ch, class Object **tar_obj, bool verbose)
+int generic_find(const char *arg, int bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose)
 {
   static const char *ignore[] = {"the", "in", "\n"};
 

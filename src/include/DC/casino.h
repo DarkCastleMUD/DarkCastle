@@ -26,7 +26,7 @@ public:
 class table_data
 {
 public:
-  class Object *obj; // linked to obj
+  ObjectPtr obj; // linked to obj
   cDeck *deck;
   player_data *plr;
   player_data *cr; // current

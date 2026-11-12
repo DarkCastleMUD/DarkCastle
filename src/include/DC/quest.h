@@ -65,5 +65,5 @@ int stop_current_quest(CharacterPtr, int);
 int stop_all_quests(CharacterPtr);
 void quest_update();
 int quest_handler(CharacterPtr, CharacterPtr, int, char *);
-int quest_master(CharacterPtr, Object *, int, char *, CharacterPtr);
+int quest_master(CharacterPtr, ObjectPtr, int, char *, CharacterPtr);
 int do_quest(CharacterPtr, char *, int);

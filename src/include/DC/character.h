@@ -225,7 +225,7 @@ public:
   mob_prog_act_list *next{};
   char *buf{};
   CharacterPtr ch{};
-  Object *obj{};
+  ObjectPtr obj{};
   void *vo{};
 };
 
@@ -395,11 +395,11 @@ public:
   | Player vectors
   | Character->player->toggles
   */
-  QString last_site;        /* Last login from.. */
-  QString poofin;           /* poofin message */
-  QString poofout;          /* poofout message */
-  Object *skillchange = {}; /* Skill changing equipment. */
-  CharacterPtr golem = {};  // CURRENT golem.
+  QString last_site;          /* Last login from.. */
+  QString poofin;             /* poofin message */
+  QString poofout;            /* poofout message */
+  ObjectPtr skillchange = {}; /* Skill changing equipment. */
+  CharacterPtr golem = {};    // CURRENT golem.
 
   constexpr static uint32_t PLR_BRIEF = 1U;
   constexpr static uint32_t PLR_BRIEF_BIT = 0;
@@ -601,14 +601,14 @@ public:
   mob_flag_data mob_flags = {}; /* Mobile information               */
   bool paused = {};
 
-  void setObject(Object *);
-  Object *getObject(void);
+  void setObject(ObjectPtr);
+  ObjectPtr getObject(void);
   bool isObject(void);
   void save(FILEPtr fpsave);
   void read(FILEPtr fpsave);
 
 private:
-  Object *object = {};
+  ObjectPtr object = {};
 };
 
 typedef uint_fast8_t class_t;
@@ -662,7 +662,7 @@ public:
 
   MobilePtr mobdata = {};
   class Player *player = nullptr;
-  class Object *objdata = nullptr;
+  ObjectPtr objdata = nullptr;
 
   class Connection *desc = nullptr; // nullptr normally for mobs
 
@@ -939,18 +939,18 @@ public:
 
   int16_t glow_factor = {}; // Amount that the character glows
 
-  Object *beacon = nullptr; /* pointer to my beacon */
+  ObjectPtr beacon = nullptr; /* pointer to my beacon */
 
   std::vector<songInfo> songs = {}; // Song list
                                     //     int16_t song_timer = {};       /* status for songs being sung */
                                     //     int16_t song_number = {};      /* number of song being sung */
                                     //     char * song_data = {};        /* args for the songs */
 
-  class Object *equipment[MAX_WEAR] = {}; // Equipment List
+  ObjectPtr equipment[MAX_WEAR] = {}; // Equipment List
 
-  skill_list_t skills = {};          // Skills List
-  affected_type *affected = nullptr; // Affected by list
-  class Object *carrying = nullptr;  // Inventory List
+  skill_list_t skills = {};           // Skills List
+  affected_type *affected = nullptr;  // Affected by list
+  ObjectPtr carrying = nullptr; // Inventory List
 
   int16_t poison_amount = {}; // How much poison damage I'm taking every few seconds
 
@@ -971,7 +971,7 @@ public:
   CharacterPtr next = {};          /* Next anywhere in game */
   CharacterPtr next_in_room = {};  /* Next in room */
   CharacterPtr next_fighting = {}; /* Next fighting */
-  Object *altar = {};
+  ObjectPtr altar = {};
   follow_type *followers = {}; /* List of followers */
   CharacterPtr master = {};    /* Who is char following? */
   char *group_name = {};       /* Name of group */
@@ -1029,7 +1029,7 @@ public:
   time_info_data age(void);
   void add_memory(QString victim_name, char type);
   bool can_use_command(cmd_t cmd);
-  Object *clan_altar(void);
+  ObjectPtr clan_altar(void);
   void do_inate_race_abilities(void);
   void do_on_login_stuff(void);
   void check_hw(void);
@@ -1038,7 +1038,7 @@ public:
   command_return_t check_pursuit(CharacterPtr victim, QString dircommand);
   command_return_t check_social(QString pcomm);
   command_return_t command_interpreter(QString argument, bool procced = 0);
-  Object *get_object_in_equip_vis(char *arg, Object *equipment[], int *j, bool blindfighting);
+  ObjectPtr get_object_in_equip_vis(char *arg, ObjectPtr equipment[], int *j, bool blindfighting);
 
   command_return_t do_clanarea(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
@@ -1221,8 +1221,8 @@ public:
   command_return_t save(cmd_t cmd = cmd_t::DEFAULT);
   command_return_t special(QString arg, cmd_t cmd = cmd_t::DEFAULT);
 
-  void show_obj_to_char(Object *object, int mode);
-  void list_obj_to_char(Object *list, int mode, bool show);
+  void show_obj_to_char(ObjectPtr object, int mode);
+  void list_obj_to_char(ObjectPtr list, int mode, bool show);
   void list_char_to_char(CharacterPtr list, int mode);
 
   DC::IfReturnType mprog_seval(QString lhs, QString opr, QString rhs);
@@ -1231,7 +1231,7 @@ public:
   QString get_random_hate(void);
   CharacterPtr getVisiblePlayer(QString name);
   CharacterPtr getVisibleCharacter(QString name);
-  Object *getVisibleObject(QString name);
+  ObjectPtr getVisibleObject(QString name);
   QString getStatDiff(int base, int random, bool swapcolors = false);
   void tell_history(CharacterPtr sender, QString message);
   void gtell_history(CharacterPtr sender, QString message);
@@ -1408,19 +1408,19 @@ public:
   int mprog_greet_trigger(void);
   int mprog_can_see_trigger(CharacterPtr mob);
   int mprog_speech_trigger(const char *txt);
-  int oprog_can_see_trigger(Object *item);
+  int oprog_can_see_trigger(ObjectPtr item);
   int oprog_speech_trigger(const char *txt);
   int oprog_act_trigger(QString txt);
   int oprog_greet_trigger(void);
   int oprog_load_trigger(void);
-  int oprog_weapon_trigger(Object *item);
-  int oprog_armour_trigger(Object *item);
+  int oprog_weapon_trigger(ObjectPtr item);
+  int oprog_armour_trigger(ObjectPtr item);
   DC::IfReturnType mprog_seval(const char *lhs, const char *opr, const char *rhs);
   bool isTank(void);
   void save_char_obj(void);
   void char_to_store(class char_file_u4 *st, time_data &tmpage);
-  bool equip_char(Object *obj, int pos, bool flag = false);
-  Object *unequip_char(int pos, bool flag = false);
+  bool equip_char(ObjectPtr obj, int pos, bool flag = false);
+  ObjectPtr unequip_char(int pos, bool flag = false);
   void load(char_file_u4 *st);
 
 private:

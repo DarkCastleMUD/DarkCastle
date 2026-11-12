@@ -147,7 +147,7 @@ int do_string(CharacterPtr ch, char *arg, cmd_t cmd)
   char message[100];
   int field, type, ctr;
   CharacterPtr mob = nullptr;
-  class Object *obj;
+  ObjectPtr obj;
 
   if (ch->isNonPlayer())
     return 1;

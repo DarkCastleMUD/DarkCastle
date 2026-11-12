@@ -182,13 +182,13 @@ void process_portals()
 int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 {
 
-  class Object *from_portal;
+  ObjectPtr from_portal;
   char log_buf[256];
 
 #ifdef LEAK_CHECK
-  from_portal = (class Object *)calloc(1, sizeof(class Object));
+  from_portal = (ObjectPtr)calloc(1, sizeof(class Object));
 #else
-  from_portal = (class Object *)dc_alloc(1, sizeof(class Object));
+  from_portal = (ObjectPtr)dc_alloc(1, sizeof(class Object));
 #endif
   clear_object(from_portal);
 
@@ -259,8 +259,8 @@ int make_arbitrary_portal(int from_room, int to_room, int duplicate, int timer)
 
 void find_and_remove_player_portal(CharacterPtr ch)
 {
-  class Object *k{};
-  class Object *next_k{};
+  ObjectPtr k{};
+  ObjectPtr next_k{};
   QString searchstr;
 
   if (GET_CLASS(ch) == CLASS_CLERIC)

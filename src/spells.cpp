@@ -1815,7 +1815,7 @@ bool check_conc_loss(CharacterPtr ch, int spl)
 // Assumes that *argument does start with first letter of chopped string
 int do_cast(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  class Object *tar_obj;
+  ObjectPtr tar_obj;
   CharacterPtr tar_char;
   char name[MAX_STRING_LENGTH], filter[MAX_STRING_LENGTH];
   int qend, spl, i, learned;
@@ -1837,7 +1837,7 @@ int do_cast(CharacterPtr ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -3106,7 +3106,7 @@ int spl_lvl(int lev)
 // if not, return 0
 int Character::has_skill(skill_t skill)
 {
-  class Object *o;
+  ObjectPtr o;
   int bonus = 0;
 
   if (isNonPlayer() || !isPlayer())

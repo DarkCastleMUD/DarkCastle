@@ -43,10 +43,10 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 
-extern int class_restricted(CharacterPtr ch, class Object *obj);
-extern int size_restricted(CharacterPtr ch, class Object *obj);
+extern int class_restricted(CharacterPtr ch, ObjectPtr obj);
+extern int size_restricted(CharacterPtr ch, ObjectPtr obj);
 
-void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, int price, Object *obj)
+void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, int price, ObjectPtr obj)
 {
 
   ch->removeGold(price);
@@ -60,7 +60,7 @@ void repair_shop_fix_eq(CharacterPtr ch, CharacterPtr owner, int price, Object *
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, int price, Object *obj)
+void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, int price, ObjectPtr obj)
 {
   owner->do_say("Trying to sucker me for a free repair job?");
   auto buf = u"It would cost %1 coins to repair %2, which you don't have!"_s.arg(price).arg(obj->short_description);
@@ -69,7 +69,7 @@ void repair_shop_complain_no_cash(CharacterPtr ch, CharacterPtr owner, int price
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, int price, Object *obj)
+void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, int price, ObjectPtr obj)
 {
   char buf[256];
 
@@ -79,7 +79,7 @@ void repair_shop_price_check(CharacterPtr ch, CharacterPtr owner, int price, Obj
   act("$N gives $n $p.", ch, obj, owner, TO_ROOM, INVIS_NULL);
 }
 
-int repair_guy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   char item[256];
   int value0, cost, price;
@@ -157,7 +157,7 @@ int repair_guy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, C
   return ReturnValue::eSUCCESS;
 }
 
-int super_repair_guy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int super_repair_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   char item[256];
   int value0, value2, cost, price;
@@ -258,7 +258,7 @@ int super_repair_guy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
 }
 
 // Fingers
-int repair_shop(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   char item[256];
   int value0, value2, cost, price;
@@ -364,9 +364,9 @@ int repair_shop(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, 
 int corpse_cost(CharacterPtr ch)
 {
   int cost = 0;
-  Object *curr_cont;
+  ObjectPtr curr_cont;
 
-  for (Object *obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
+  for (ObjectPtr obj2 = ch->carrying; obj2; obj2 = obj2->next_content)
   {
     if (obj2->obj_flags.type_flag == ITEM_MONEY)
       continue;
@@ -393,12 +393,12 @@ int corpse_cost(CharacterPtr ch)
   return cost;
 }
 
-int corpse_cost(Object *obj)
+int corpse_cost(ObjectPtr obj)
 {
   int cost = 0;
-  Object *curr_cont;
+  ObjectPtr curr_cont;
 
-  for (Object *obj2 = obj->contains; obj2; obj2 = obj2->next_content)
+  for (ObjectPtr obj2 = obj->contains; obj2; obj2 = obj2->next_content)
   {
     if (obj2->obj_flags.type_flag == ITEM_MONEY)
       continue;
@@ -409,7 +409,7 @@ int corpse_cost(Object *obj)
   return cost;
 }
 
-int mortician(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int mortician(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   int x = 0, cost = 0, which;
   int count = 0;
@@ -510,7 +510,7 @@ int mortician(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, Ch
   return ReturnValue::eSUCCESS;
 }
 
-char *gl_item(Object *obj, int number, CharacterPtr ch, bool platinum = true)
+char *gl_item(ObjectPtr obj, int number, CharacterPtr ch, bool platinum = true)
 {
   QString buf;
   if (platinum)
@@ -662,7 +662,7 @@ const platsmith platsmith_list[] = {{10019, {512, 513, 514, 515, 537, 538, 539, 
                                     {0, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}};
 
 // Apoc enjoys the dirty mooselove. Honest.
-int godload_sales(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int godload_sales(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
 
   int mobvnum = owner->mobdata->vnum_;
@@ -728,7 +728,7 @@ int godload_sales(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
       owner->do_tell(QStringLiteral("%1 Don't have that I'm afraid. Type \"list\" to see my wares.").arg(GET_NAME(ch)).split(' '));
       return ReturnValue::eSUCCESS;
     }
-    class Object *obj;
+    ObjectPtr obj;
     obj = clone_object(platsmith_list[o].sales[k]);
 
     if (class_restricted(ch, obj) || size_restricted(ch, obj) || search_char_for_item(ch, obj->vnum_, false))
@@ -752,7 +752,7 @@ int godload_sales(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
   }
   else if (cmd == cmd_t::SELL)
   {
-    Object *obj;
+    ObjectPtr obj;
     char arg2[MAX_INPUT_LENGTH];
     one_argument(arg, arg2);
     obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
@@ -790,7 +790,7 @@ int godload_sales(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
 }
 
 // gl_repair_guy
-int gl_repair_shop(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int gl_repair_shop(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   char item[256];
   int value0, value2, cost, price;

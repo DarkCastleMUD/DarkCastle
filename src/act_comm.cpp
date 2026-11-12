@@ -466,7 +466,7 @@ int is_ignoring(const CharacterPtr ch, const CharacterPtr i)
 
 int do_write(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  class Object *paper = 0, *pen = 0;
+  ObjectPtr paper = 0, pen = 0;
   char papername[MAX_INPUT_LENGTH], penname[MAX_INPUT_LENGTH],
       buf[MAX_STRING_LENGTH];
 

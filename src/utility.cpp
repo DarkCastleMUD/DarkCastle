@@ -1231,7 +1231,7 @@ bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog)
   return false;
 }
 
-bool CAN_SEE_OBJ(CharacterPtr sub, class Object *obj, bool blindfighting)
+bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool blindfighting)
 {
   int skill = 0;
   affected_type *cur_af;
@@ -1724,7 +1724,7 @@ int do_quit(CharacterPtr ch, char *argument, cmd_t cmd)
   clan_room_data *room;
   int found = 0;
   char buf[MAX_STRING_LENGTH];
-  Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
 
   void find_and_remove_player_portal(CharacterPtr ch);
 
@@ -2737,11 +2737,11 @@ void unique_scan(CharacterPtr victim)
   if (!victim)
     return;
 
-  class Object *i = nullptr;
-  class Object *j = nullptr;
+  ObjectPtr i = nullptr;
+  ObjectPtr j = nullptr;
   int k;
   std::map<int, int> virtnums;
-  std::queue<Object *> found_items;
+  std::queue<ObjectPtr> found_items;
 
   for (k = 0; k < MAX_WEAR; k++)
   {

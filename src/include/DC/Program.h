@@ -141,7 +141,7 @@ class Programs
   QList<ProgramPtr> list_;
 
 public:
-  friend int mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, int type, bool reverse);
+  friend int mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, int type, bool reverse);
   [[nodiscard]] bool isEmpty(void) const { return list_.isEmpty(); }
   [[nodiscard]] ProgramPtr value(qsizetype i) { return list_.value(i); }
   [[nodiscard]] int types(void) const

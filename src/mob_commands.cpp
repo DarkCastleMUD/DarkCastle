@@ -75,7 +75,7 @@ extern mprog_throw_type *g_mprog_throw_list;
 extern CharacterPtr activeActor;
 extern CharacterPtr activeRndm;
 extern CharacterPtr activeTarget;
-extern Object *activeObj;
+extern ObjectPtr activeObj;
 extern void *activeVo;
 extern int mprog_line_num;    // From mob_prog.cpp
 extern int mprog_command_num; // From mob_prog.cpp
@@ -350,7 +350,7 @@ int do_mpaddlag(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_mpjunk(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
-  Object *obj;
+  ObjectPtr obj;
   int location;
   bool dot = false;
   char dotbuf[MAX_INPUT_LENGTH];
@@ -391,7 +391,7 @@ int do_mpjunk(CharacterPtr ch, char *argument, cmd_t cmd)
         if (!dot || isexact(dotbuf, ch->equipment[l]->Name()))
           extract_obj(ch->unequip_char(l));
 
-    Object *x, *v;
+    ObjectPtr x, v;
     for (x = ch->carrying; x; x = v)
     {
       v = x->next_content;
@@ -571,7 +571,7 @@ int do_mpoload(CharacterPtr ch, char *argument, cmd_t cmd)
   auto &arena = DC::getInstance()->arena_;
   char arg1[MAX_INPUT_LENGTH] = {0};
   char arg2[MAX_INPUT_LENGTH] = {0};
-  Object *obj;
+  ObjectPtr obj;
   int realnum;
 
   if (ch->isPlayer())
@@ -628,7 +628,7 @@ int do_mppurge(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char arg[MAX_INPUT_LENGTH];
   CharacterPtr victim;
-  Object *obj;
+  ObjectPtr obj;
 
   if (ch->isPlayer())
   {
@@ -642,7 +642,7 @@ int do_mppurge(CharacterPtr ch, char *argument, cmd_t cmd)
   {
     /* 'purge' */
     CharacterPtr vnext;
-    Object *obj_next;
+    ObjectPtr obj_next;
 
     for (victim = DC::getInstance()->world[ch->in_room].people; victim != nullptr; victim = vnext)
     {
@@ -759,7 +759,7 @@ int do_mpgoto(CharacterPtr ch, char *argument, cmd_t cmd)
   }
   else
   {
-    Object *obj;
+    ObjectPtr obj;
     if ((vict = get_char_vis(ch, arg)))
     {
       location = vict->in_room;
@@ -1826,7 +1826,7 @@ int do_mppause(CharacterPtr ch, char *argument, cmd_t cmd)
 
   extern CharacterPtr activeActor;
   extern CharacterPtr activeRndm;
-  extern Object *activeObj;
+  extern ObjectPtr activeObj;
   extern void *activeVo;
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;

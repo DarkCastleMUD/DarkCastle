@@ -143,7 +143,7 @@ int do_imbue(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   int lvl = ch->has_skill(SKILL_IMBUE);
   int charges = 0, manacost = 0;
-  Object *wand;
+  ObjectPtr wand;
   affected_type af;
 
   *buf = '\0';

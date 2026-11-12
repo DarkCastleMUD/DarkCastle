@@ -1178,7 +1178,7 @@ void DC::remove_all_mobs_from_world(void)
 
 void DC::remove_all_objs_from_world()
 {
-  Object *curr = nullptr;
+  ObjectPtr curr = nullptr;
 
   while ((curr = DC::getInstance()->object_list))
     extract_obj(curr);
@@ -3114,7 +3114,7 @@ QString qDebugQTextStreamLine(QTextStream &stream, QString message)
 }
 
 /* read an object from OBJ_FILE */
-class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
+ObjectPtr DC::read_object(int nr, QTextStream &fl, bool ignore)
 {
   int loc{}, mod{};
 
@@ -3125,7 +3125,7 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
     return 0;
   }
 
-  class Object *obj = new Object;
+  ObjectPtr obj = new Object;
   clear_object(obj);
 
   /* *** std::string data *** */
@@ -3261,7 +3261,7 @@ class Object *DC::read_object(int nr, QTextStream &fl, bool ignore)
 }
 
 /* read an object from OBJ_FILE */
-class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
+ObjectPtr DC::read_object(int nr, FILEPtr fl, bool ignore)
 {
   int loc, mod;
 
@@ -3271,7 +3271,7 @@ class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
     return 0;
   }
 
-  Object *obj = new Object;
+  ObjectPtr obj = new Object;
   assert(obj);
 
   clear_object(obj);
@@ -3402,7 +3402,7 @@ class Object *DC::read_object(int nr, FILEPtr fl, bool ignore)
   return obj;
 }
 
-std::ifstream &operator>>(std::ifstream &in, Object *obj)
+std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
 {
   int loc, mod, nr;
 
@@ -3523,7 +3523,7 @@ std::ifstream &operator>>(std::ifstream &in, Object *obj)
 // write an object to file
 // This assumes that the object is valid, and the file is open for writing
 //
-void write_object(LegacyFile &lf, Object *obj)
+void write_object(LegacyFile &lf, ObjectPtr obj)
 {
   FILEPtr fl = lf.file_handle_;
 
@@ -3573,7 +3573,7 @@ void write_object(LegacyFile &lf, Object *obj)
   dc_fprintf(fl, "S\n");
 }
 
-std::ofstream &operator<<(std::ofstream &out, Object *obj)
+std::ofstream &operator<<(std::ofstream &out, ObjectPtr obj)
 {
   out << "#" << obj->vnum_ << "\n";
   string_to_file(out, obj->Name());
@@ -3688,7 +3688,7 @@ void write_bitvector_csv(uint32_t vector, const char *const *array, std::ofstrea
   return;
 }
 
-void write_object_csv(Object *obj, std::ofstream &fout)
+void write_object_csv(ObjectPtr obj, std::ofstream &fout)
 {
   try
   {
@@ -3740,13 +3740,13 @@ void write_object_csv(Object *obj, std::ofstream &fout)
   fout << std::endl;
 }
 
-bool has_random(Object *obj)
+bool has_random(ObjectPtr obj)
 {
   return ((DC::getInstance()->obj_index[obj->vnum_].progtypes & RAND_PROG) || (DC::getInstance()->obj_index[obj->vnum_].progtypes & ARAND_PROG));
 }
 
 /* clone an object from DC::getInstance()->obj_index */
-class Object *clone_object(int nr)
+ObjectPtr clone_object(int nr)
 {
   if (!DC::getInstance()->obj_index.contains(nr))
     return {};
@@ -3792,7 +3792,7 @@ class Object *clone_object(int nr)
   return obj;
 }
 
-void randomize_object_affects(Object *obj)
+void randomize_object_affects(ObjectPtr obj)
 {
   if (obj == nullptr)
   {
@@ -3889,7 +3889,7 @@ void randomize_object_affects(Object *obj)
   }
 }
 
-void randomize_object(Object *obj)
+void randomize_object(ObjectPtr obj)
 {
   if (obj == nullptr)
   {
@@ -4026,7 +4026,7 @@ void Zone::reset(ResetType reset_type)
   int reset_cmd_index, last_cmd, last_percent;
   vnum_t last_mob{}, last_obj{};
   CharacterPtr mob = nullptr;
-  class Object *obj, *obj_to;
+  ObjectPtr obj, obj_to;
   last_cmd = last_percent = -1;
 
   char buf[MAX_STRING_LENGTH];
@@ -5201,7 +5201,7 @@ void free_char(CharacterPtr ch, Trace trace)
 }
 
 /* release memory allocated for an obj  */
-void free_obj(class Object *obj)
+void free_obj(ObjectPtr obj)
 {
   dc_free(obj->affected);
   delete obj;
@@ -5340,7 +5340,7 @@ void reset_char(CharacterPtr ch)
   ch->guarded_by = 0;
 }
 
-void clear_object(class Object *obj)
+void clear_object(ObjectPtr obj)
 {
   if (obj == nullptr)
   {
@@ -5520,9 +5520,9 @@ int obj_in_index(char *name, int index)
   int i, j;
 
   for (i = 0, j = 1; (i < MAX_INDEX) && (j <= index) &&
-                     ((class Object *)(DC::getInstance()->obj_index[i].item));
+                     ((ObjectPtr)(DC::getInstance()->obj_index[i].item));
        i++)
-    if (isexact(name, ((class Object *)(DC::getInstance()->obj_index[i].item))->Name()))
+    if (isexact(name, ((ObjectPtr)(DC::getInstance()->obj_index[i].item))->Name()))
     {
       if (j == index)
         return i;
@@ -5814,7 +5814,7 @@ void string_to_file(QTextStream &fl, QString str)
 {
   fl << str + "~\n";
 }
-void copySaveData(Object *target, Object *source)
+void copySaveData(ObjectPtr target, ObjectPtr source)
 {
   int i;
   if ((i = eq_current_damage(source)) > 0)
@@ -5919,7 +5919,7 @@ void copySaveData(Object *target, Object *source)
   return;
 }
 
-bool fullItemMatch(Object *obj, Object *obj2)
+bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2)
 {
   if (GET_OBJ_SHORT(obj) != GET_OBJ_SHORT(obj2))
   {
@@ -5993,7 +5993,7 @@ bool fullItemMatch(Object *obj, Object *obj2)
 }
 
 // Function to ensure an item is not bugged. If it is, replace it with the original.
-bool verify_item(class Object **ptr_to_obj_ptr)
+bool verify_item(ObjectPtr *ptr_to_obj_ptr)
 {
   if (!ptr_to_obj_ptr)
     return false;

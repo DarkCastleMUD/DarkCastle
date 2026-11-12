@@ -27,7 +27,7 @@
 #include "DC/common.h"
 #include "DC/levels.h"
 
-typedef int SPEC_FUN(CharacterPtr ch, Object *obj, cmd_t cmd, const char *argument, CharacterPtr owner);
+typedef int SPEC_FUN(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *argument, CharacterPtr owner);
 typedef int ROOM_PROC(CharacterPtr ch, cmd_t cmd, const char *argument);
 
 void boot_the_shops();

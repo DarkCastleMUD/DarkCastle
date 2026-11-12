@@ -477,7 +477,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     }
     if (victim->equipment[iWear] && victim->equipment[iWear]->obj_flags.type_flag == ITEM_CONTAINER)
     {
-      for (Object *obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
+      for (ObjectPtr obj = victim->equipment[iWear]->contains; obj; obj = obj->next_content)
       {
         if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
         {
@@ -494,7 +494,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     }
   }
 
-  Object *obj = victim->carrying;
+  ObjectPtr obj = victim->carrying;
   while (obj)
   {
     if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -510,7 +510,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
     }
     if (GET_ITEM_TYPE(obj) == ITEM_CONTAINER)
     {
-      Object *obj2;
+      ObjectPtr obj2;
       for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
       {
         if (isSet(obj2->obj_flags.extra_flags, ITEM_SPECIAL))
@@ -879,7 +879,7 @@ int do_acfinder(CharacterPtr ch, char *argument, cmd_t cmd)
   }
   i = 1 << i;
   int o = 1;
-  Object *obj;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
   auto obj_index_vnums = DC::getInstance()->obj_index.keys();
   std::ranges::sort(obj_index_vnums);

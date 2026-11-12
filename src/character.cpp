@@ -48,7 +48,7 @@
 #include "DC/weather.h"
 
 void set_golem(CharacterPtr golem, int golemtype);
-class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, ObjectPtr last_cont);
 
 char_file_u4::char_file_u4()
 {
@@ -94,12 +94,12 @@ QString Character::getSetting(QString key, QString defaultValue)
   return defaultValue;
 }
 
-void Mobile::setObject(Object *o)
+void Mobile::setObject(ObjectPtr o)
 {
   object = o;
 }
 
-Object *Mobile::getObject(void)
+ObjectPtr Mobile::getObject(void)
 {
   return object;
 }
@@ -319,7 +319,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return false;
   }
   charmie->setLevel(1);
-  class Object *last_cont = nullptr; // Last container.
+  ObjectPtr last_cont = nullptr; // Last container.
   while (!dc_feof(fpfile))
   {
     last_cont = obj_store_to_char(charmie, fpfile, last_cont);

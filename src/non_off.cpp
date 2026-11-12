@@ -55,7 +55,7 @@
 #include "DC/levels.h"
 
 // decay variable means it's from a decaying corpse, not a player
-void log_sacrifice(CharacterPtr ch, Object *obj, bool decay = false)
+void log_sacrifice(CharacterPtr ch, ObjectPtr obj, bool decay = false)
 {
 
   if (GET_OBJ_RNUM(obj) == DC::NOWHERE)
@@ -67,10 +67,10 @@ void log_sacrifice(CharacterPtr ch, Object *obj, bool decay = false)
   }
   else
   {
-    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", qPrintable(GET_OBJ_SHORT((Object *)ch)), qPrintable(GET_OBJ_SHORT(obj)), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
+    logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "%s just poofed from decaying corpse %s[%d] in room %d\n", qPrintable(GET_OBJ_SHORT((ObjectPtr)ch)), qPrintable(GET_OBJ_SHORT(obj)), GET_OBJ_VNUM(obj), GET_ROOM_VNUM(obj->in_room));
   }
 
-  for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
   {
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]\n",
          qPrintable(GET_OBJ_SHORT(obj)),
@@ -81,7 +81,7 @@ void log_sacrifice(CharacterPtr ch, Object *obj, bool decay = false)
 
 int do_sacrifice(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  class Object *obj;
+  ObjectPtr obj;
   char name[MAX_INPUT_LENGTH + 1];
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -192,7 +192,7 @@ int do_visible(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int do_donate(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  class Object *obj{};
+  ObjectPtr obj{};
   char name[MAX_INPUT_LENGTH + 1]{};
   char buf[MAX_STRING_LENGTH]{};
   int location{};
@@ -328,7 +328,7 @@ int do_donate(CharacterPtr ch, char *argument, cmd_t cmd)
     char log_buf[MAX_STRING_LENGTH] = {};
     sprintf(log_buf, "%s donates %s[%llu]", GET_NAME(ch), qPrintable(obj->Name()), obj->vnum_);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-    for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj->short_description), qPrintable(loop_obj->short_description), DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
 

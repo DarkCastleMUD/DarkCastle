@@ -50,7 +50,7 @@
 extern int rev_dir[];
 
 /* procedures related to get */
-void get(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bool has_consent, cmd_t cmd)
+void get(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent, cmd_t cmd)
 {
   QString buffer;
 
@@ -156,7 +156,7 @@ void get(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bo
     if (sub_object->in_room && obj_object->obj_flags.type_flag != ITEM_MONEY && sub_object->carried_by != ch)
     { // Logging gold gets from corpses would just be too much.
       logobjects(QStringLiteral("%1 gets %2[%3] from %4[%5]").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->vnum_].vnum()).arg(sub_object->Name()).arg(DC::getInstance()->obj_index[sub_object->vnum_].vnum()));
-      for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
         logobjects(QStringLiteral("The %1[%2] contained %3[%4]").arg(obj_object->short_description).arg(DC::getInstance()->obj_index[obj_object->vnum_].vnum()).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->vnum_].vnum()));
     }
     move_obj(obj_object, ch);
@@ -179,14 +179,14 @@ void get(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bo
     if (obj_object->obj_flags.type_flag != ITEM_MONEY)
     {
       logobjects(QStringLiteral("%1 gets %2[%3] from room %4").arg(GET_NAME(ch)).arg(obj_object->Name()).arg(DC::getInstance()->obj_index[obj_object->vnum_].vnum()).arg(ch->in_room));
-      for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+      for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
         logobjects(QStringLiteral("The %1 contained %2[%3]").arg(obj_object->short_description).arg(loop_obj->short_description).arg(DC::getInstance()->obj_index[loop_obj->vnum_].vnum()));
     }
 
     if (DC::getInstance()->obj_index[obj_object->vnum_].vnum() == CHAMPION_ITEM)
     {
       SETBIT(ch->affected_by, AFF_CHAMPION);
-      buffer = QStringLiteral("\n##%1 has just picked up %2!\n").arg(GET_NAME(ch)).arg(static_cast<Object *>(DC::getInstance()->obj_index[obj_object->vnum_].item)->short_description);
+      buffer = QStringLiteral("\n##%1 has just picked up %2!\n").arg(GET_NAME(ch)).arg(static_cast<ObjectPtr>(DC::getInstance()->obj_index[obj_object->vnum_].item)->short_description);
       send_info(buffer);
     }
   }
@@ -282,9 +282,9 @@ int do_get(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
   char buffer[MAX_STRING_LENGTH];
-  class Object *sub_object;
-  class Object *obj_object;
-  class Object *next_obj;
+  ObjectPtr sub_object;
+  ObjectPtr obj_object;
+  ObjectPtr next_obj;
   bool found = false;
   bool fail = false;
   bool has_consent = false;
@@ -666,7 +666,7 @@ int do_get(CharacterPtr ch, char *argument, cmd_t cmd)
             csendf(ch, "%s : It seems magically attached to the corpse.\n", qPrintable(fname(obj_object->Name())));
             continue;
           } /*
-       class Object *temp,*next_contentthing;
+       ObjectPtr temp,next_contentthing;
        for (temp = obj_object->contains;temp;temp = next_contentthing)
        {
       next_contentthing = temp->next_content;
@@ -971,7 +971,7 @@ int do_get(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int do_consent(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  class Object *obj{};
+  ObjectPtr obj{};
   CharacterPtr vict{};
 
   auto arguments = QString(arg).trimmed().split(' ');
@@ -1036,11 +1036,11 @@ int do_consent(CharacterPtr ch, char *arg, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int contents_cause_unique_problem(Object *obj, CharacterPtr vict)
+int contents_cause_unique_problem(ObjectPtr obj, CharacterPtr vict)
 {
   int lastnum = -1;
 
-  for (Object *inside = obj->contains; inside; inside = inside->next_content)
+  for (ObjectPtr inside = obj->contains; inside; inside = inside->next_content)
   {
     if (!DC::getInstance()->obj_index.contains(inside->vnum_)) // skip -1 items
       continue;
@@ -1055,9 +1055,9 @@ int contents_cause_unique_problem(Object *obj, CharacterPtr vict)
   return false;
 }
 
-int contains_no_trade_item(Object *obj)
+int contains_no_trade_item(ObjectPtr obj)
 {
-  Object *inside = obj->contains;
+  ObjectPtr inside = obj->contains;
 
   while (inside)
   {
@@ -1074,8 +1074,8 @@ int do_drop(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg[MAX_STRING_LENGTH];
   int amount;
   char buffer[MAX_STRING_LENGTH];
-  class Object *tmp_object;
-  class Object *next_obj;
+  ObjectPtr tmp_object;
+  ObjectPtr next_obj;
   bool test = false, blindlag = false;
   char alldot[MAX_STRING_LENGTH];
 
@@ -1176,7 +1176,7 @@ int do_drop(CharacterPtr ch, char *argument, cmd_t cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), qPrintable(tmp_object->short_description), DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-            for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    qPrintable(tmp_object->short_description),
                    qPrintable(loop_obj->short_description),
@@ -1244,7 +1244,7 @@ int do_drop(CharacterPtr ch, char *argument, cmd_t cmd)
             char log_buf[MAX_STRING_LENGTH] = {};
             sprintf(log_buf, "%s drops %s[%llu] in room %llu", GET_NAME(ch), qPrintable(tmp_object->short_description), DC::getInstance()->obj_index[tmp_object->vnum_].vnum(), ch->in_room);
             logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-            for (Object *loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+            for (ObjectPtr loop_obj = tmp_object->contains; loop_obj; loop_obj = loop_obj->next_content)
               logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]",
                    qPrintable(tmp_object->short_description),
                    qPrintable(loop_obj->short_description),
@@ -1269,8 +1269,8 @@ int do_drop(CharacterPtr ch, char *argument, cmd_t cmd)
 
 void do_putalldot(CharacterPtr ch, char *name, char *target, cmd_t cmd)
 {
-  class Object *tmp_object;
-  class Object *next_object;
+  ObjectPtr tmp_object;
+  ObjectPtr next_object;
   char buf[200];
   bool found = false;
 
@@ -1301,10 +1301,10 @@ void do_putalldot(CharacterPtr ch, char *name, char *target, cmd_t cmd)
     ch->sendln("You don't have one.");
 }
 
-int weight_in(class Object *obj)
+int weight_in(ObjectPtr obj)
 { // Sheldon backpack. Damn procs.
   int w = 0;
-  class Object *obj2;
+  ObjectPtr obj2;
   for (obj2 = obj->contains; obj2; obj2 = obj2->next_content)
     w += obj2->obj_flags.weight;
   return w;
@@ -1315,8 +1315,8 @@ int do_put(CharacterPtr ch, char *argument, cmd_t cmd)
   char buffer[MAX_STRING_LENGTH];
   char arg1[MAX_STRING_LENGTH];
   char arg2[MAX_STRING_LENGTH];
-  class Object *obj_object;
-  class Object *sub_object;
+  ObjectPtr obj_object;
+  ObjectPtr sub_object;
   CharacterPtr tmp_char;
   int bits;
   char allbuf[MAX_STRING_LENGTH];
@@ -1563,7 +1563,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   auto &arena = DC::getInstance()->arena_;
   command_return_t retval{};
   CharacterPtr vict{};
-  class Object *obj{};
+  ObjectPtr obj{};
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
   {
@@ -1874,7 +1874,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   act("You give $p to $N.", this, obj, vict, TO_CHAR, 0);
 
   logobjects(QStringLiteral("%1 gives %2 to %3").arg(GET_NAME(this)).arg(obj->Name()).arg(GET_NAME(vict)));
-  for (Object *loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
+  for (ObjectPtr loop_obj = obj->contains; loop_obj; loop_obj = loop_obj->next_content)
     logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s[%d] contained %s[%d]",
          qPrintable(obj->short_description),
          obj->vnum_,
@@ -1895,7 +1895,7 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
   // otherwise it defeats the purpose of no_trade:)
 
   retval = dc_->mprog_give_trigger(vict, this, obj);
-  bool objExists(Object * obj);
+  bool objExists(ObjectPtr obj);
   if (!isSet(retval, ReturnValue::eEXTRA_VALUE) && isSet(obj->obj_flags.more_flags, ITEM_NO_TRADE) && vict->isNonPlayer() &&
       objExists(obj))
     extract_obj(obj);
@@ -1911,12 +1911,12 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 
 // Find an item on a character (in inv, or containers in inv (NOT WORN!))
 // and try to put it in his inv.  If sucessful, return pointer to the item.
-class Object *bring_type_to_front(CharacterPtr ch, int item_type)
+ObjectPtr bring_type_to_front(CharacterPtr ch, int item_type)
 {
-  class Object *item_carried = nullptr;
-  class Object *container_item = nullptr;
+  ObjectPtr item_carried = nullptr;
+  ObjectPtr container_item = nullptr;
 
-  std::queue<Object *> container_queue;
+  std::queue<ObjectPtr> container_queue;
 
   for (item_carried = ch->carrying; item_carried; item_carried = item_carried->next_content)
   {
@@ -1946,10 +1946,10 @@ class Object *bring_type_to_front(CharacterPtr ch, int item_type)
 }
 
 // Find an item on a character
-class Object *search_char_for_item(CharacterPtr ch, vnum_t vnum, bool wearonly)
+ObjectPtr search_char_for_item(CharacterPtr ch, vnum_t vnum, bool wearonly)
 {
-  class Object *i = nullptr;
-  class Object *j = nullptr;
+  ObjectPtr i = nullptr;
+  ObjectPtr j = nullptr;
   int k;
 
   for (k = 0; k < MAX_WEAR; k++)
@@ -1990,8 +1990,8 @@ class Object *search_char_for_item(CharacterPtr ch, vnum_t vnum, bool wearonly)
 // Find out how many of an item exists on character
 int search_char_for_item_count(CharacterPtr ch, vnum_t vnum, bool wearonly)
 {
-  class Object *i = nullptr;
-  class Object *j = nullptr;
+  ObjectPtr i = nullptr;
+  ObjectPtr j = nullptr;
   int k;
   int count = 0;
 
@@ -2032,7 +2032,7 @@ int search_char_for_item_count(CharacterPtr ch, vnum_t vnum, bool wearonly)
   return count;
 }
 
-bool search_container_for_item(Object *obj, vnum_t vnum)
+bool search_container_for_item(ObjectPtr obj, vnum_t vnum)
 {
   if (obj == nullptr)
   {
@@ -2044,7 +2044,7 @@ bool search_container_for_item(Object *obj, vnum_t vnum)
     return false;
   }
 
-  for (Object *i = obj->contains; i; i = i->next_content)
+  for (ObjectPtr i = obj->contains; i; i = i->next_content)
   {
     if (i->vnum_ == vnum)
     {
@@ -2055,7 +2055,7 @@ bool search_container_for_item(Object *obj, vnum_t vnum)
   return false;
 }
 
-bool search_container_for_vnum(Object *obj, int vnum)
+bool search_container_for_vnum(ObjectPtr obj, int vnum)
 {
   if (obj == nullptr)
   {
@@ -2067,7 +2067,7 @@ bool search_container_for_vnum(Object *obj, int vnum)
     return false;
   }
 
-  for (Object *i = obj->contains; i; i = i->next_content)
+  for (ObjectPtr i = obj->contains; i; i = i->next_content)
   {
     if (i->vnum_ == vnum)
     {
@@ -2167,7 +2167,7 @@ int do_open(CharacterPtr ch, char *argument, cmd_t cmd)
   int door, other_room, retval;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   room_direction_data *back;
-  class Object *obj;
+  ObjectPtr obj;
   CharacterPtr victim;
   CharacterPtr next_vict;
 
@@ -2325,7 +2325,7 @@ int do_close(CharacterPtr ch, char *argument, cmd_t cmd)
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   room_direction_data *back;
-  class Object *obj;
+  ObjectPtr obj;
   CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
@@ -2402,7 +2402,7 @@ bool has_key(CharacterPtr ch, int key)
     return false;
   }
 
-  Object *obj = ch->equipment[WEAR_HOLD];
+  ObjectPtr obj = ch->equipment[WEAR_HOLD];
   if (obj && IS_KEY(obj))
   {
     if (obj->vnum_ == key)
@@ -2432,7 +2432,7 @@ int do_lock(CharacterPtr ch, char *argument, cmd_t cmd)
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
-  class Object *obj;
+  ObjectPtr obj;
   CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
@@ -2505,7 +2505,7 @@ int do_unlock(CharacterPtr ch, char *argument, cmd_t cmd)
   int door, other_room;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
-  class Object *obj;
+  ObjectPtr obj;
   CharacterPtr victim;
 
   argument_interpreter(argument, type, dir);
@@ -2585,7 +2585,7 @@ int do_unlock(CharacterPtr ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int palm(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bool has_consent)
+int palm(CharacterPtr ch, ObjectPtr obj_object, ObjectPtr sub_object, bool has_consent)
 {
   char buffer[MAX_STRING_LENGTH];
 
@@ -2619,7 +2619,7 @@ int palm(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bo
       return ReturnValue::eFAILURE;
     SETBIT(ch->affected_by, AFF_CHAMPION);
 
-    Object *o = static_cast<Object *>(DC::getInstance()->obj_index[obj_object->vnum_].item);
+    ObjectPtr o = static_cast<ObjectPtr>(DC::getInstance()->obj_index[obj_object->vnum_].item);
 
     if (o && !o->short_description.isEmpty())
       send_info(QStringLiteral("\n##%1 has just picked up %2!\n").arg(GET_NAME(ch)).arg(o->short_description));
@@ -2686,7 +2686,7 @@ int palm(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bo
     //"%s palms %s[%d] from %s", GET_NAME(ch), obj_object->Name(), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), qPrintable(sub_object->Name()));
 
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-    for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj_object->short_description), qPrintable(loop_obj->short_description),
            DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }
@@ -2694,7 +2694,7 @@ int palm(CharacterPtr ch, class Object *obj_object, class Object *sub_object, bo
   {
     sprintf(log_buf, "%s palms %s[%llu] from room %llu", GET_NAME(ch), qPrintable(obj_object->Name()), DC::getInstance()->obj_index[obj_object->vnum_].vnum(), ch->in_room);
     logentry(log_buf, IMPLEMENTER, DC::LogChannel::LOG_OBJECTS);
-    for (Object *loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
+    for (ObjectPtr loop_obj = obj_object->contains; loop_obj; loop_obj = loop_obj->next_content)
       logf(IMPLEMENTER, DC::LogChannel::LOG_OBJECTS, "The %s contained %s[%d]", qPrintable(obj_object->short_description), qPrintable(loop_obj->short_description),
            DC::getInstance()->obj_index[loop_obj->vnum_].vnum());
   }

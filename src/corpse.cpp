@@ -46,28 +46,28 @@
 
 /* External Structures / Variables */
 
-class Object *obj_proto;
+ObjectPtr obj_proto;
 /* index table for object file   */
 int16_t frozen_start_room = 1;
 
 /* Local Function Declerations */
 int count_hash_records(FILEPtr fl);
-class Object *create_obj_new(void);
+ObjectPtr create_obj_new(void);
 void save_corpses(void);
-int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree);
-int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate);
+int corpse_save(ObjectPtr obj, FILEPtr fp, int location, bool recurse_this_tree);
+int write_corpse_to_disk(FILEPtr fp, ObjectPtr obj, int locate);
 int get_line_new(FILEPtr fl, char *buf);
 char *fread_string_new(FILEPtr fl, char *error);
 
 /* Tada! THE FUNCTIONS ! Yaaa! */
 
-int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_tree)
+int corpse_save(ObjectPtr obj, FILEPtr fp, int location, bool recurse_this_tree)
 {
   /* This function basically is responsible for taking the    */
   /* supplied obj and figuring out if it has any contents. If */
   /* it does then we write those to disk.. Ad Nasum.          */
 
-  // class Object *tmp;
+  // ObjectPtr tmp;
   int result;
 
   if (obj)
@@ -100,7 +100,7 @@ int corpse_save(class Object *obj, FILEPtr fp, int location, bool recurse_this_t
   return (true);
 }
 
-int write_corpse_to_disk(FILEPtr fp, class Object *obj, int locate)
+int write_corpse_to_disk(FILEPtr fp, ObjectPtr obj, int locate)
 {
   /* This is basically Patrick's my_obj_save_to_disk function with    */
   /* a few minor tweaks to make it work for corpses. Basically it     */
@@ -186,7 +186,7 @@ void save_corpses(void)
   /* directly or indirectly you need to call this function */
 
   FILEPtr fp;
-  class Object *i, *next;
+  ObjectPtr i, next;
   int location = 0;
   char buf1[256] = {0};
   extern int do_not_save_corpses;
@@ -239,10 +239,10 @@ void DC::load_corpses(void)
   int t[15], zwei = 0;
   int num_objs = 0;
   vnum_t nr{};
-  class Object *temp = nullptr, *obj = nullptr, *next_obj = nullptr;
+  ObjectPtr temp = nullptr, obj = nullptr, next_obj = nullptr;
   char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = false;
-  class Object *money;
+  ObjectPtr money;
   int debug = false;
 
   if (!(fp = dc_fopen(CORPSE_FILE, "r")))
@@ -545,9 +545,9 @@ int get_line_new(FILEPtr fl, char *buf)
   }
 }
 
-class Object *create_obj_new(void)
+ObjectPtr create_obj_new(void)
 {
-  class Object *obj = new Object;
+  ObjectPtr obj = new Object;
   clear_object(obj);
   obj->next = DC::getInstance()->object_list;
   DC::getInstance()->object_list = obj;

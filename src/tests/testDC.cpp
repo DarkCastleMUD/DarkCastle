@@ -416,9 +416,9 @@ private slots:
     QCOMPARE(new_rnum.error(), create_error::entry_exists);
     vnum_t vnum = 1;
     assert(dc.obj_index.contains(1));
-    Object *o1 = clone_object(vnum);
-    Object *o2 = clone_object(vnum);
-    Object *o3 = clone_object(vnum);
+    ObjectPtr o1 = clone_object(vnum);
+    ObjectPtr o2 = clone_object(vnum);
+    ObjectPtr o3 = clone_object(vnum);
     QVERIFY(o1);
     QVERIFY(o2);
     QVERIFY(o3);

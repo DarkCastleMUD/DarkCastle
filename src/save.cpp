@@ -70,9 +70,9 @@
 extern Database db;
 #endif
 
-class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
-bool put_obj_in_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos);
-void restore_weight(class Object *obj);
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, ObjectPtr last_cont);
+bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos);
+void restore_weight(ObjectPtr obj);
 QString fread_alias_string(FILEPtr fpsave);
 
 // return 1 on success
@@ -1038,7 +1038,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   FILEPtr fpsave{};
   QString strsave;
   char_file_u4 uchar;
-  class Object *last_cont = nullptr;
+  ObjectPtr last_cont = nullptr;
 
   name[0] = name[0].toUpper();
 
@@ -1106,9 +1106,9 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
 }
 
 // read data from file for an item.
-class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont)
+ObjectPtr obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, ObjectPtr last_cont)
 {
-  class Object *obj;
+  ObjectPtr obj;
   //  extra_descr_dataPtr new_new_descr;
   //  extra_descr_dataPtr ed, *next_ed;
 
@@ -1343,9 +1343,9 @@ class Object *obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *l
   return last_cont;
 }
 
-bool obj_to_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos)
+bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos)
 {
-  // class Object *tmp;
+  // ObjectPtr tmp;
 
   if (obj == nullptr)
     return true;
@@ -1368,10 +1368,10 @@ bool obj_to_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_p
 // return true on success
 // return false on error
 // write one object to file
-bool put_obj_in_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos)
+bool put_obj_in_store(ObjectPtr obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos)
 {
   obj_file_elem object;
-  Object *standard_obj = 0;
+  ObjectPtr standard_obj = 0;
   uint16_t length = 0; // do not change this type
 
   memset(&object, 0, sizeof(object));
@@ -1612,9 +1612,9 @@ bool put_obj_in_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int we
 /*
  * Restore container weights after a save.
  */
-void restore_weight(class Object *obj)
+void restore_weight(ObjectPtr obj)
 {
-  class Object *tmp;
+  ObjectPtr tmp;
 
   if (obj == nullptr)
     return;
@@ -1709,7 +1709,7 @@ void Character::load(char_file_u4 *st)
 // return 'age' of character unmodified
 void Character::char_to_store(char_file_u4 *st, time_data &tmpage)
 {
-  QVector<class Object *> char_eq(MAX_WEAR);
+  QVector<ObjectPtr> char_eq(MAX_WEAR);
 
   // Remove all the eq and store it in temp storage
   for (auto i = 0; i < char_eq.size(); ++i)

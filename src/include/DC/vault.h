@@ -42,7 +42,7 @@ class vault_items_data
 public:
   int item_vnum;
   int count;
-  Object *obj; // for full-save items
+  ObjectPtr obj; // for full-save items
   vault_items_data *next;
 };
 
@@ -50,7 +50,7 @@ class sorted_vault
 {
 public:
   // This stores the quantity of each item found in a vault
-  QMap<QString, std::pair<Object *, uint32_t>> vault_content_qty{};
+  QMap<QString, std::pair<ObjectPtr, uint32_t>> vault_content_qty{};
 
   // This stores the order in which vault items are found
   QList<QString> vault_contents{};
@@ -76,16 +76,16 @@ void remove_vault_accesses(QString name);
 void vault_sell(CharacterPtr ch, char *object, char *arg);
 int vault_log_to_string(const char *name, char *buf);
 void logvault(QString message, QString name);
-void item_remove(Object *obj, vault_data *vault);
+void item_remove(ObjectPtr obj, vault_data *vault);
 void item_add(int vnum, vault_data *vault);
 
-class Object *get_obj_in_vault(vault_data *vault, QString object, int num);
+ObjectPtr get_obj_in_vault(vault_data *vault, QString object, int num);
 vault_items_data *get_item_in_vault(vault_data *vault, char *object, int num);
 
-class Object *get_unique_obj_in_vault(vault_data *vault, char *object, int num);
+ObjectPtr get_unique_obj_in_vault(vault_data *vault, char *object, int num);
 vault_items_data *get_unique_item_in_vault(vault_data *vault, char *object, int num);
 
-class Object *get_obj_in_all_vaults(char *object, int num);
+ObjectPtr get_obj_in_all_vaults(char *object, int num);
 vault_items_data *get_items_in_all_vaults(char *object, int num);
 
 int vault_search(CharacterPtr ch, const char *keyword);

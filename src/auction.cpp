@@ -79,7 +79,7 @@ bool AuctionHouse::IsRace(int vnum, QString israce)
   if (!DC::getInstance()->obj_index.contains(nr))
     return false;
 
-  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -129,7 +129,7 @@ bool AuctionHouse::IsClass(int vnum, QString isclass)
   if (!DC::getInstance()->obj_index.contains(nr))
     return false;
 
-  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
 
   if (!obj)
     return false;
@@ -335,7 +335,7 @@ bool AuctionHouse::CanSellMore(CharacterPtr ch)
 /*
 Is item type ok to sell?
 */
-bool AuctionHouse::IsOkToSell(Object *obj)
+bool AuctionHouse::IsOkToSell(ObjectPtr obj)
 {
   if (isSet(obj->obj_flags.more_flags, ITEM_24H_SAVE))
   {
@@ -375,7 +375,7 @@ Identify an item.
 */
 void AuctionHouse::Identify(CharacterPtr ch, unsigned int ticket)
 {
-  int spell_identify(uint8_t level, CharacterPtr ch, CharacterPtr victim, class Object *obj, int skill);
+  int spell_identify(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill);
   auto Item_it = Items_For_Sale.find(ticket);
   if (Item_it == Items_For_Sale.end())
   {
@@ -403,7 +403,7 @@ void AuctionHouse::Identify(CharacterPtr ch, unsigned int ticket)
     return;
   }
 
-  Object *obj = ticket_object_load(Item_it, ticket);
+  ObjectPtr obj = ticket_object_load(Item_it, ticket);
 
   if (!obj)
   {
@@ -459,7 +459,7 @@ bool AuctionHouse::IsSlot(QString slot, int vnum)
   if (!DC::getInstance()->obj_index.contains(nr))
     return true;
 
-  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
   switch (keyword)
   {
   case 0:
@@ -525,14 +525,14 @@ Is the item wearable by the player?
 */
 bool AuctionHouse::IsWearable(CharacterPtr ch, int vnum)
 {
-  int class_restricted(CharacterPtr ch, class Object * obj);
-  int size_restricted(CharacterPtr ch, class Object * obj);
+  int class_restricted(CharacterPtr ch, ObjectPtr obj);
+  int size_restricted(CharacterPtr ch, ObjectPtr obj);
   int nr = vnum;
 
   if (!DC::getInstance()->obj_index.contains(nr))
     return true;
 
-  Object *obj = (class Object *)(DC::getInstance()->obj_index[nr].item);
+  ObjectPtr obj = (ObjectPtr)(DC::getInstance()->obj_index[nr].item);
   return !(class_restricted(ch, obj) || size_restricted(ch, obj) || (obj->obj_flags.eq_level > ch->getLevel()));
 }
 
@@ -558,7 +558,7 @@ bool AuctionHouse::IsNoTrade(int vnum)
   int nr = vnum;
   if (!DC::getInstance()->obj_index.contains(nr))
     return false;
-  return isSet(((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
+  return isSet(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.more_flags, ITEM_NO_TRADE);
 }
 
 /*
@@ -580,7 +580,7 @@ bool AuctionHouse::IsLevel(unsigned int to, unsigned int from, int vnum)
   if (!DC::getInstance()->obj_index.contains(nr))
     return false;
 
-  eq_level = ((class Object *)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
+  eq_level = ((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->obj_flags.eq_level;
 
   return (eq_level >= to && eq_level <= from);
 }
@@ -590,7 +590,7 @@ SEARCH BY NAME
 */
 bool AuctionHouse::IsName(QString name, int vnum)
 {
-  Object *obj = DC::getInstance()->getObject(vnum);
+  ObjectPtr obj = DC::getInstance()->getObject(vnum);
   if (!obj)
   {
     return false;
@@ -1001,7 +1001,7 @@ BUY ITEM
 void AuctionHouse::BuyItem(CharacterPtr ch, unsigned int ticket)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
-  Object *obj;
+  ObjectPtr obj;
   CharacterPtr vict;
   FILEPtr fl;
   char *buf[10];
@@ -1156,7 +1156,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, unsigned int ticket)
   }
 }
 
-Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket)
+ObjectPtr ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, int ticket)
 {
   // If obj is nullptr then either we haven't loaded this object yet or it's not custom
   if (Item_it->obj == nullptr)
@@ -1204,12 +1204,12 @@ Object *ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it, 
     }
   }
 
-  Object *obj;
+  ObjectPtr obj;
   int rnum = Item_it->vitem;
   // If load was successful use it as a copy reference for a clone
   if (Item_it->obj)
   {
-    Object *reference_obj = Item_it->obj;
+    ObjectPtr reference_obj = Item_it->obj;
 
     obj = clone_object(rnum);
     copySaveData(obj, reference_obj);
@@ -1233,7 +1233,7 @@ CANCEL ITEM
 void AuctionHouse::RemoveTicket(CharacterPtr ch, unsigned int ticket)
 {
   QMap<unsigned int, AuctionTicket>::iterator Item_it;
-  Object *obj;
+  ObjectPtr obj;
   bool expired = false;
 
   Item_it = Items_For_Sale.find(ticket);
@@ -1285,7 +1285,7 @@ void AuctionHouse::RemoveTicket(CharacterPtr ch, unsigned int ticket)
       return;
     }
 
-    if (isSet(((class Object *)(DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
+    if (isSet(((ObjectPtr)(DC::getInstance()->obj_index[rnum].item))->obj_flags.more_flags, ITEM_UNIQUE) && search_char_for_item(ch, rnum, false))
     {
       ch->sendln("Why would you want another one of those?");
       return;
@@ -1485,7 +1485,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
     if (DC::getInstance()->obj_index.contains(nr))
     {
       sprintf(buf, "\n'$4N$R' indicates an item is NO_TRADE and requires %s to purchase.\n",
-              qPrintable(((class Object *)(DC::getInstance()->obj_index[nr].item))->short_description));
+              qPrintable(((ObjectPtr)(DC::getInstance()->obj_index[nr].item))->short_description));
       output_buf += buf;
     }
     output_buf += "'$4*$R' indicates you are unable to use this item.\n";
@@ -1499,7 +1499,7 @@ void AuctionHouse::ListItems(CharacterPtr ch, ListOptions options, QString name,
 /*
 ADD ITEM
 */
-void AuctionHouse::AddItem(CharacterPtr ch, Object *obj, unsigned int price, QString buyer)
+void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, unsigned int price, QString buyer)
 {
   char buf[20];
   strncpy(buf, buyer.toStdString().c_str(), 19);
@@ -1703,7 +1703,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, Object *obj, unsigned int price, QSt
 int do_vend(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  Object *obj;
+  ObjectPtr obj;
   unsigned int price;
 
   if (!DC::getInstance()->TheAuctionHouse.IsAuctionHouse(ch->in_room) && ch->getLevel() < 104)

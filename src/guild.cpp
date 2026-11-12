@@ -849,7 +849,7 @@ int Character::skills_guild(const char *arg, CharacterPtr owner)
   return ReturnValue::eSUCCESS;
 }
 
-int guild(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   int64_t exp_needed;
   int x = 0;
@@ -1027,7 +1027,7 @@ int guild(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, Charac
   return ReturnValue::eSUCCESS;
 }
 
-int skill_master(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
+int skill_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   char buf[MAX_STRING_LENGTH];
   int number, i, percent;

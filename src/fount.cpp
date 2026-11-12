@@ -27,7 +27,7 @@
 
 int FOUNTAINisPresent(CharacterPtr ch)
 {
-  class Object *tmp;
+  ObjectPtr tmp;
   bool found = false;
 
   for (tmp = DC::getInstance()->world[ch->in_room].contents;
@@ -49,7 +49,7 @@ int FOUNTAINisPresent(CharacterPtr ch)
 int do_fill(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  class Object *to_obj;
+  ObjectPtr to_obj;
   one_argument(argument, buf);
 
   if (!*buf) /* No arguments */

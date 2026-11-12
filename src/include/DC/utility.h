@@ -595,14 +595,14 @@ void redo_mana(CharacterPtr ch);      /* Rua's put in  */
 void redo_ki(CharacterPtr ch);        /* And Urizen*/
 void assign_rooms(void);
 void assign_objects(void);
-void free_obj(class Object *obj);
+void free_obj(ObjectPtr obj);
 
 int char_from_room(CharacterPtr ch, bool stop_fighting);
 int char_from_room(CharacterPtr ch);
 void do_start(CharacterPtr ch);
 
 void update_pos(CharacterPtr victim);
-void clear_object(class Object *obj);
+void clear_object(ObjectPtr obj);
 void death_cry(CharacterPtr ch);
 std::vector<std::string> splitstring(std::string splitme, std::string delims, bool ignore_empty = false);
 std::string joinstring(std::vector<std::string> joinme, std::string delims, bool ignore_empty = false);
@@ -619,7 +619,7 @@ void save_char_obj_db(CharacterPtr ch);
 
 void unique_scan(CharacterPtr victim);
 void char_to_store(CharacterPtr ch, class char_file_u4 *st, time_data &tmpage);
-bool obj_to_store(class Object *obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos);
+bool obj_to_store(ObjectPtr obj, CharacterPtr ch, FILEPtr fpsave, int wear_pos);
 void check_idling(CharacterPtr ch);
 
 enum class follower_reasons_t
@@ -635,13 +635,13 @@ void add_follower(CharacterPtr ch, CharacterPtr leader, follower_reasons_t reaso
 bool CAN_SEE(CharacterPtr sub, CharacterPtr obj, bool noprog = false);
 int SWAP_CH_VICT(int value);
 bool SOMEONE_DIED(int value);
-bool CAN_SEE_OBJ(CharacterPtr sub, class Object *obj, bool bf = false);
+bool CAN_SEE_OBJ(CharacterPtr sub, ObjectPtr obj, bool bf = false);
 bool check_blind(CharacterPtr ch);
 void raw_kill(CharacterPtr ch, CharacterPtr victim);
 void check_killer(CharacterPtr ch, CharacterPtr victim);
 int map_eq_level(CharacterPtr mob);
 void disarm(CharacterPtr ch, CharacterPtr victim);
-int shop_keeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker);
+int shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr invoker);
 void send_to_all(QString messg);
 void ansi_color(const char *txt, CharacterPtr ch);
 void send_to_char(QString messg, CharacterPtr ch);
@@ -706,8 +706,8 @@ void parse_bitstrings_into_int(const char *bits[], const char *strings, Characte
 void parse_bitstrings_into_int(const char *bits[], std::string strings, CharacterPtr ch, uint32_t value[]);
 void parse_bitstrings_into_int(const char *bits[], std::string strings, CharacterPtr ch, uint32_t &value);
 void parse_bitstrings_into_int(const char *bits[], std::string strings, CharacterPtr ch, uint16_t &value);
-int contains_no_trade_item(Object *obj);
-int contents_cause_unique_problem(Object *obj, CharacterPtr vict);
+int contains_no_trade_item(ObjectPtr obj);
+int contents_cause_unique_problem(ObjectPtr obj, CharacterPtr vict);
 bool check_make_camp(room_t);
 int get_leadership_bonus(CharacterPtr);
 void update_make_camp_and_leadership(void);
@@ -835,7 +835,7 @@ public:
   bool mob;  // Mob or object.
   char *var; // temporary variable
   CharacterPtr actor;
-  Object *obj;
+  ObjectPtr obj;
   void *vo;
   CharacterPtr rndm; // $r
 
@@ -884,11 +884,11 @@ std::string get_isr_string(uint32_t, int8_t);
 bool file_exists(std::string filename);
 bool file_exists(QString filename);
 bool char_file_exists(std::string name);
-void show_obj_class_size_mini(Object *obj, CharacterPtr ch);
-const char *item_condition(class Object *obj);
+void show_obj_class_size_mini(ObjectPtr obj, CharacterPtr ch);
+const char *item_condition(ObjectPtr obj);
 int random_percent_change(uint percentage, int value);
 int random_percent_change(int from, int to, int value);
-bool identify(CharacterPtr ch, Object *obj);
+bool identify(CharacterPtr ch, ObjectPtr obj);
 extern void end_oproc(CharacterPtr ch, Trace trace = Trace("unknown"));
 QByteArray handle_ansi(QByteArray, CharacterPtr ch);
 QString handle_ansi(QString, CharacterPtr ch);

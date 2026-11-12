@@ -46,7 +46,7 @@ int do_clearaff(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf[MAX_INPUT_LENGTH];
   CharacterPtr victim;
   affected_type *af, *afpk;
-  class Object *dummy;
+  ObjectPtr dummy;
 
   one_argument(argument, buf);
 
@@ -105,7 +105,7 @@ int do_reloadhelp(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_log(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   CharacterPtr vict;
-  class Object *dummy;
+  ObjectPtr dummy;
   char buf[MAX_INPUT_LENGTH];
   char buf2[MAX_INPUT_LENGTH];
 
@@ -462,7 +462,7 @@ int do_pardon(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_dmg_eq(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_STRING_LENGTH];
-  class Object *obj_object;
+  ObjectPtr obj_object;
   int eqdam;
 
   one_argument(argument, buf);
@@ -739,7 +739,7 @@ int do_sqedit(CharacterPtr ch, char *argument, cmd_t cmd)
   }
   return ReturnValue::eSUCCESS;
 }
-int max_aff(class Object *obj, int type)
+int max_aff(ObjectPtr obj, int type)
 {
   int a, b = -1;
   for (a = 0; a < obj->num_affects; a++)
@@ -775,8 +775,8 @@ int do_eqmax(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   int a = 0, o;
   argument = one_argument(argument, arg);
-  extern int class_restricted(CharacterPtr ch, class Object * obj);
-  extern int size_restricted(CharacterPtr ch, class Object * obj);
+  extern int class_restricted(CharacterPtr ch, ObjectPtr obj);
+  extern int size_restricted(CharacterPtr ch, ObjectPtr obj);
 
   if ((vict = get_pc_vis(ch, arg)) == nullptr)
   {
@@ -817,7 +817,7 @@ int do_eqmax(CharacterPtr ch, char *argument, cmd_t cmd)
   if (!str_cmp(arg, "nodouble"))
     nodouble = true;
   int i = 1;
-  class Object *obj;
+  ObjectPtr obj;
   for (i = 1; i < 32000; i++)
   {
     if (i < 0)

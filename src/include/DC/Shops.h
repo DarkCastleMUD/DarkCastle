@@ -45,7 +45,7 @@ public:
   room_t in_room{};        /* Where is the shop?                   */
   int open1{}, open2{};    /* When does the shop open?             */
   int close1{}, close2{};  /* When does the shop close?            */
-  Object *inventory{};     /* list of things shop never runs out of
+  ObjectPtr inventory{};   /* list of things shop never runs out of
                             */
 };
 

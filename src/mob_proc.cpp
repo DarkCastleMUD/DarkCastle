@@ -267,7 +267,7 @@ CharacterPtr find_mob_in_room(CharacterPtr ch, int iFriendId)
 }
 
 // Spellcraft golem stuff.
-int sc_golem(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int sc_golem(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
              CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -301,11 +301,11 @@ int sc_golem(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // Couple mobs actually still use this.
-int fighter(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int fighter(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
             CharacterPtr owner)
 {
-  /*class Object *obj;*/
-  class Object *wielded;
+  /*ObjectPtr obj;*/
+  ObjectPtr wielded;
   CharacterPtr vict;
 
   if (cmd != cmd_t::UNDEFINED)
@@ -359,7 +359,7 @@ int fighter(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int active_tarrasque(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int active_tarrasque(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                      CharacterPtr owner)
 {
   CharacterPtr vict;
@@ -407,7 +407,7 @@ int active_tarrasque(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
   return cast_acid_blast(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int active_grandmaster(CharacterPtr ch, class Object *obj, cmd_t command, const char *arg,
+int active_grandmaster(CharacterPtr ch, ObjectPtr obj, cmd_t command, const char *arg,
                        CharacterPtr owner)
 {
   CharacterPtr vict;
@@ -488,7 +488,7 @@ static char *frostyYellText[] = {
 
 #define FROSTY_YELL_TEXT_SIZE (sizeof(frostyYellText) / sizeof(char *))
 
-int frosty(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int frosty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
            CharacterPtr owner)
 {
   quint64 x;
@@ -548,7 +548,7 @@ static char *poetEmoteText[] = {
 #define POET_SAY_TEXT_SIZE (sizeof(poetSayText) / sizeof(char *))
 #define POET_EMOTE_TEXT_SIZE (sizeof(poetEmoteText) / sizeof(char *))
 
-int poet(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int poet(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
          CharacterPtr owner)
 {
   int x;
@@ -583,7 +583,7 @@ static char *stcrewEmoteText[] = {
 
 #define STCREW_EMOTE_TEXT_SIZE (sizeof(stcrewEmoteText) / sizeof(char *))
 
-int stcrew(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int stcrew(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
            CharacterPtr owner)
 {
   int x;
@@ -610,7 +610,7 @@ static char *stofficerEmoteText[] = {
 
 #define OFFICER_EMOTE_TEXT_SIZE (sizeof(stofficerEmoteText) / sizeof(char *))
 
-int stofficer(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int stofficer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
               CharacterPtr owner)
 {
   int x;
@@ -631,7 +631,7 @@ int stofficer(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int backstabber(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int backstabber(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   CharacterPtr tch;
   /*CharacterPtr mob;
@@ -701,7 +701,7 @@ int backstabber(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, 
   return ReturnValue::eFAILURE;
 }
 
-int white_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int white_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   CharacterPtr vict = ch->fighting;
@@ -724,7 +724,7 @@ int white_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int black_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int black_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   CharacterPtr vict = ch->fighting;
@@ -747,7 +747,7 @@ int black_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return cast_acid_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int red_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int red_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                CharacterPtr owner)
 {
 
@@ -767,7 +767,7 @@ int red_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return cast_fire_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
-int green_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int green_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
 
@@ -787,7 +787,7 @@ int green_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return cast_gas_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
-int brass_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int brass_dragon(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   CharacterPtr vict;
@@ -833,7 +833,7 @@ int brass_dragon(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return cast_lightning_breath(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int francis_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int francis_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   if (cmd != cmd_t::NORTH)
@@ -851,7 +851,7 @@ int francis_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
  *  Special procedures for mobiles                                      *
  ******************************************************************** */
 
-int guild_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                 CharacterPtr owner)
 {
   if (!isCommandTypeDirection(cmd))
@@ -998,7 +998,7 @@ int guild_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int clan_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                CharacterPtr owner)
 {
   int in_room = ch->in_room;
@@ -1904,7 +1904,7 @@ std::vector<std::string> ChainSayText =
 
 // ENDOFCHAIN
 
-int chain_gossips(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int chain_gossips(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   int x;
 
@@ -1937,9 +1937,9 @@ int chain_gossips(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
 }
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int fido(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int fido(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
-  class Object *i, *temp, *next_obj, *deep, *next_deep;
+  ObjectPtr i, temp, next_obj, deep, next_deep;
 
   if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
     return ReturnValue::eFAILURE;
@@ -1970,10 +1970,10 @@ int fido(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, Charact
   return ReturnValue::eFAILURE;
 }
 
-int janitor(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int janitor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
             CharacterPtr owner)
 {
-  class Object *i;
+  ObjectPtr i;
 
   if (cmd != cmd_t::UNDEFINED || !AWAKE(ch))
     return ReturnValue::eFAILURE;
@@ -1996,7 +1996,7 @@ int janitor(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int mother_moat_and_moad(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int mother_moat_and_moad(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                          CharacterPtr owner)
 {
   CharacterPtr temp, tmp_victim;
@@ -2047,7 +2047,7 @@ int mother_moat_and_moad(CharacterPtr ch, class Object *obj, cmd_t cmd, const ch
   return ReturnValue::eFAILURE;
 }
 
-int adept(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
           CharacterPtr owner)
 {
   CharacterPtr tch;
@@ -2089,7 +2089,7 @@ int adept(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
 
 /*--+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+--*/
 
-int mud_school_adept(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int mud_school_adept(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                      CharacterPtr owner)
 {
   CharacterPtr tch;
@@ -2156,7 +2156,7 @@ int mud_school_adept(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-int bee(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int bee(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
         CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -2197,7 +2197,7 @@ static char *apiary_workerEmoteText[] = {
 
 #define APIARY_WORKER_EMOTE_TEXT_SIZE (sizeof(apiary_workerEmoteText) / sizeof(char *))
 
-int apiary_worker(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int apiary_worker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   int x;
@@ -2302,7 +2302,7 @@ int pet_shops(CharacterPtr ch, cmd_t cmd, char const *arg)
   return ReturnValue::eFAILURE;
 }
 
-int newbie_zone_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int newbie_zone_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                       CharacterPtr owner)
 {
   if (!isCommandTypeDirection(cmd))
@@ -2346,7 +2346,7 @@ int newbie_zone_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char 
 }
 
 // I just like to hellstream every other round.
-int hellstreamer(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int hellstreamer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   CharacterPtr vict;
@@ -2383,7 +2383,7 @@ int hellstreamer(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // I just firestorm every round...stupid groupies!
-int firestormer(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int firestormer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                 CharacterPtr owner)
 {
   CharacterPtr vict = nullptr;
@@ -2394,7 +2394,7 @@ int firestormer(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return cast_firestorm(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, vict, 0, ch->getLevel());
 }
 
-int humaneater(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int humaneater(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                CharacterPtr owner)
 {
   CharacterPtr tch;
@@ -2488,7 +2488,7 @@ static char *pir_slutSayText[] = {
 
 #define PIR_SAY_TEXT_SIZE (sizeof(pir_slutSayText) / sizeof(char *))
 
-int pir_slut(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int pir_slut(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
              CharacterPtr owner)
 {
   int x;
@@ -2505,11 +2505,11 @@ int pir_slut(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int clutchdrone_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int clutchdrone_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                        CharacterPtr owner)
 {
-  /*class Object *obj;*/
-  // class Object *wielded;
+  /*ObjectPtr obj;*/
+  // ObjectPtr wielded;
   CharacterPtr vict;
   // int dam;
   int retval;
@@ -2554,7 +2554,7 @@ int clutchdrone_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char
   return ReturnValue::eFAILURE;
 }
 
-int generic_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int generic_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   if (!isCommandTypeDirection(cmd))
@@ -2572,7 +2572,7 @@ int generic_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
   return ReturnValue::eFAILURE;
 }
 
-int portal_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int portal_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   char buf[200];
@@ -2594,7 +2594,7 @@ int portal_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int blindingparrot(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int blindingparrot(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                    CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -2618,7 +2618,7 @@ int blindingparrot(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *ar
   return ReturnValue::eFAILURE;
 }
 
-int doorcloser(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int doorcloser(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                CharacterPtr owner)
 {
   // int x;
@@ -2648,7 +2648,7 @@ int doorcloser(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int panicprisoner(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int panicprisoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   // int x;
@@ -2692,7 +2692,7 @@ int panicprisoner(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
 }
 
 // let's teleport people around the mud:)
-int bounder(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int bounder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
             CharacterPtr owner)
 {
   CharacterPtr vict;
@@ -2724,7 +2724,7 @@ int bounder(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
 }
 
 // I love to dispel stuff!
-int dispelguy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int dispelguy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
               CharacterPtr owner)
 {
   CharacterPtr vict;
@@ -2764,11 +2764,11 @@ int dispelguy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int marauder(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int marauder(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
              CharacterPtr owner)
 {
-  /*class Object *obj;*/
-  class Object *wielded;
+  /*ObjectPtr obj;*/
+  ObjectPtr wielded;
   CharacterPtr vict;
 
   if (cmd != cmd_t::UNDEFINED)
@@ -2814,7 +2814,7 @@ int marauder(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int foggy_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   if (!ch)
@@ -2854,7 +2854,7 @@ int foggy_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int foggy_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int foggy_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
               CharacterPtr owner)
 {
   // n s e s u d are commands 1-6.  For anything but that, ignore
@@ -2872,7 +2872,7 @@ int foggy_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int iasenko_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int iasenko_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                    CharacterPtr owner)
 {
   CharacterPtr vict = nullptr;
@@ -2927,7 +2927,7 @@ int iasenko_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *ar
   return ReturnValue::eSUCCESS;
 }
 
-int iasenko_non_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int iasenko_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                        CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -2936,7 +2936,7 @@ int iasenko_non_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char
   return protect(ch, 8543); // rescue Koban if he's fighting
 }
 
-int koban_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int koban_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   CharacterPtr iasenko = nullptr;
@@ -2972,7 +2972,7 @@ int koban_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return cast_call_lightning(ch->getLevel(), ch, "", SPELL_TYPE_SPELL, ch->fighting, 0, ch->getLevel());
 }
 
-int koban_non_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int koban_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                      CharacterPtr owner)
 {
   CharacterPtr iasenko = nullptr;
@@ -3020,7 +3020,7 @@ int koban_non_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
   return ReturnValue::eFAILURE;
 }
 
-int kogiro_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int kogiro_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   CharacterPtr vict = nullptr;
@@ -3064,7 +3064,7 @@ int kogiro_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
   return ReturnValue::eSUCCESS;
 }
 
-int takahashi_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int takahashi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                      CharacterPtr owner)
 {
   int retval;
@@ -3098,7 +3098,7 @@ int takahashi_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-int askari_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int askari_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   int dam;
@@ -3137,7 +3137,7 @@ int askari_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg
   return ReturnValue::eSUCCESS;
 }
 
-int surimoto_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int surimoto_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                     CharacterPtr owner)
 {
   int dam;
@@ -3165,7 +3165,7 @@ int surimoto_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int hiryushi_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                     CharacterPtr owner)
 {
   CharacterPtr victim = nullptr;
@@ -3202,7 +3202,7 @@ int hiryushi_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eSUCCESS;
 }
 
-int izumi_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int izumi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
   int retval;
@@ -3230,7 +3230,7 @@ int izumi_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eSUCCESS;
 }
 
-int shogura_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int shogura_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                    CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3271,7 +3271,7 @@ int shogura_combat(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *ar
 }
 
 // Proc for the arena mobs to make DAMN sure they stay in the arena.
-int arena_only(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int arena_only(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED || ch->fighting)
@@ -3298,7 +3298,7 @@ int arena_only(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int druid_elemental(CharacterPtr ch, class Object *obj,
+int druid_elemental(CharacterPtr ch, ObjectPtr obj,
                     cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3324,7 +3324,7 @@ int druid_elemental(CharacterPtr ch, class Object *obj,
   return ReturnValue::eSUCCESS;
 }
 
-int mage_golem(CharacterPtr ch, class Object *obj, cmd_t cmd,
+int mage_golem(CharacterPtr ch, ObjectPtr obj, cmd_t cmd,
                const char *arg, CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED || !ch->master || ch->fighting || ch->in_room != ch->master->in_room)
@@ -3357,14 +3357,14 @@ int gremlinthing(CharacterPtr ch)
   return ReturnValue::eFAILURE;
 }
 
-int mage_familiar_gremlin(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int mage_familiar_gremlin(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   if (number(0, 1))
     return ReturnValue::eFAILURE;
   return gremlinthing(ch);
 }
 
-int mage_familiar_gremlin_non(CharacterPtr ch, class Object *obj,
+int mage_familiar_gremlin_non(CharacterPtr ch, ObjectPtr obj,
                               cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3406,7 +3406,7 @@ int mage_familiar_gremlin_non(CharacterPtr ch, class Object *obj,
   return gremlinthing(ch);
 }
 
-int mage_familiar_imp(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int mage_familiar_imp(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                       CharacterPtr owner)
 {
   if (number(0, 1))
@@ -3415,7 +3415,7 @@ int mage_familiar_imp(CharacterPtr ch, class Object *obj, cmd_t cmd, const char 
   return ReturnValue::eFAILURE;
 }
 
-int mage_familiar_imp_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int mage_familiar_imp_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                           CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3461,7 +3461,7 @@ int mage_familiar_imp_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const c
   return ReturnValue::eFAILURE;
 }
 
-int druid_familiar_owl_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int druid_familiar_owl_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   if (ch->fighting)
     return ReturnValue::eFAILURE;
@@ -3549,7 +3549,7 @@ int druid_familiar_owl_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const 
   return ReturnValue::eFAILURE;
 }
 
-int druid_familiar_chipmunk_non(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int druid_familiar_chipmunk_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                                 CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3606,7 +3606,7 @@ int druid_familiar_chipmunk_non(CharacterPtr ch, class Object *obj, cmd_t cmd, c
 
 // This is here so we don't need 2398429 procs that are just for a bodyguard
 // Just add a case for your mob, and the mob he's supposed to protect
-int bodyguard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int bodyguard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
               CharacterPtr owner)
 {
   if (cmd != cmd_t::UNDEFINED)
@@ -3629,7 +3629,7 @@ int bodyguard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
   return ReturnValue::eFAILURE;
 }
 
-int generic_blocker(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int generic_blocker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                     CharacterPtr owner)
 {
   if (!isCommandTypeDirection(cmd))
@@ -3648,7 +3648,7 @@ int generic_blocker(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *a
   return ReturnValue::eFAILURE;
 }
 
-int generic_doorpick_blocker(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int generic_doorpick_blocker(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                              CharacterPtr owner)
 {
   if (cmd != cmd_t::PICK) // pick
@@ -3669,7 +3669,7 @@ int generic_doorpick_blocker(CharacterPtr ch, class Object *obj, cmd_t cmd, cons
   return ReturnValue::eFAILURE;
 }
 
-int startrek_miles(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int startrek_miles(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                    CharacterPtr owner)
 {
   if (cmd != cmd_t::PUSH)

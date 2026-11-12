@@ -166,8 +166,8 @@ private:
 };
 // if you add to the clan rights, update clan_rights[] in clan.C
 
-void add_totem(class Object *altar, Object *totem);
-void remove_totem(Object *altar, Object *totem);
+void add_totem(ObjectPtr altar, ObjectPtr totem);
+void remove_totem(ObjectPtr altar, ObjectPtr totem);
 void add_totem_stats(CharacterPtr ch, int stat = 0);
 void remove_totem_stats(CharacterPtr ch, int stat = 0);
 bool others_clan_room(CharacterPtr ch, RoomPtr room);

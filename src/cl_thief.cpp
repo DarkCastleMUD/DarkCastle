@@ -43,7 +43,7 @@
 extern int rev_dir[];
 
 int find_door(CharacterPtr ch, char *type, char *dir);
-int get_weapon_damage_type(class Object *wielded);
+int get_weapon_damage_type(ObjectPtr wielded);
 int check_autojoiners(CharacterPtr ch, int skill = 0);
 int check_joincharmie(CharacterPtr ch, int skill = 0);
 
@@ -813,7 +813,7 @@ int max_level(CharacterPtr ch)
 int do_steal(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  class Object *obj, *loop_obj, *next_obj;
+  ObjectPtr obj, loop_obj, next_obj;
   affected_type pthiefaf, *paf;
   char victim_name[240];
   char obj_name[240];
@@ -821,7 +821,7 @@ int do_steal(CharacterPtr ch, char *argument, cmd_t cmd)
   int eq_pos;
   int _exp;
   int retval;
-  Object *has_item = nullptr;
+  ObjectPtr has_item = nullptr;
   bool ohoh = false;
   int chance = GET_HITROLL(ch) + ch->has_skill(SKILL_STEAL) / 4;
 
@@ -1460,7 +1460,7 @@ int do_pick(CharacterPtr ch, char *argument, cmd_t cmd)
   int door, other_room, j;
   char type[MAX_INPUT_LENGTH], dir[MAX_INPUT_LENGTH];
   room_direction_data *back;
-  class Object *obj;
+  ObjectPtr obj;
   CharacterPtr victim;
   bool has_lockpicks = false;
 
@@ -1611,9 +1611,9 @@ int do_slip(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH];
   int amount;
   CharacterPtr vict;
-  class Object *obj, *tmp_object, *container;
+  ObjectPtr obj, tmp_object, container;
 
-  extern int weight_in(Object *);
+  extern int weight_in(ObjectPtr);
 
   if (!ch->isNonPlayer() && ch->isPlayerObjectThief())
   {
@@ -2208,7 +2208,7 @@ int do_jab(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_appraise(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   CharacterPtr victim = {};
-  Object *obj = {};
+  ObjectPtr obj = {};
   char name[MAX_STRING_LENGTH] = {}, buf[MAX_STRING_LENGTH] = {};
   char item[MAX_STRING_LENGTH] = {};
   int appraised = {}, bits = {}, learned = {};

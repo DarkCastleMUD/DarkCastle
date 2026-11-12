@@ -239,7 +239,7 @@ int innate_bloodlust(CharacterPtr ch, char *arg, cmd_t cmd)
 
 int innate_repair(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  class Object *obj;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
   int i, chance = 60 - ch->getLevel();
   bool found = false;

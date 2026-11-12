@@ -184,7 +184,7 @@ typedef quint64 room_t;
 
 class active_object
 {
-  class Object *obj = {};
+  ObjectPtr obj = {};
   active_object *next = {};
 };
 
@@ -337,12 +337,12 @@ public:
   CharacterPtr carried_by = {};           /* Carried by :NULL in room/conta   */
   CharacterPtr equipped_by = {};          /* so I can access the player :)    */
 
-  Object *in_obj = {};   /* In what object NULL when none    */
-  Object *contains = {}; /* Contains objects                 */
+  ObjectPtr in_obj = {};   /* In what object NULL when none    */
+  ObjectPtr contains = {}; /* Contains objects                 */
 
-  Object *next_content = {}; /* For 'contains' lists             */
-  Object *next = {};         /* For the object list              */
-  Object *next_skill = {};
+  ObjectPtr next_content = {}; /* For 'contains' lists             */
+  ObjectPtr next = {};         /* For the object list              */
+  ObjectPtr next_skill = {};
   table_data *table = {};
   class machine_data *slot = {};
   class wheel_data *wheel = {};
@@ -652,17 +652,17 @@ public:
 };
 
 // functions from objects.cpp
-int eq_max_damage(Object *obj);
-int damage_eq_once(Object *obj);
-int eq_current_damage(Object *obj);
-void eq_remove_damage(Object *obj);
-void add_obj_affect(Object *obj, int loc, int mod);
-void remove_obj_affect_by_index(Object *obj, int index);
-void remove_obj_affect_by_type(Object *obj, int loc);
-bool fullSave(Object *obj);
+int eq_max_damage(ObjectPtr obj);
+int damage_eq_once(ObjectPtr obj);
+int eq_current_damage(ObjectPtr obj);
+void eq_remove_damage(ObjectPtr obj);
+void add_obj_affect(ObjectPtr obj, int loc, int mod);
+void remove_obj_affect_by_index(ObjectPtr obj, int index);
+void remove_obj_affect_by_type(ObjectPtr obj, int loc);
+bool fullSave(ObjectPtr obj);
 void heightweight(CharacterPtr ch, bool add);
-void wear(CharacterPtr ch, class Object *obj_object, int keyword);
-int obj_from(Object *obj);
+void wear(CharacterPtr ch, ObjectPtr obj_object, int keyword);
+int obj_from(ObjectPtr obj);
 
 typedef QStringList item_types_t;
 

@@ -108,7 +108,7 @@ void do_champ_flag_death(CharacterPtr victim)
 {
 
   char buf[MAX_STRING_LENGTH];
-  Object *obj;
+  ObjectPtr obj;
   obj = get_obj_in_list_num(CHAMPION_ITEM, victim->carrying);
   if (obj)
   {
@@ -556,7 +556,7 @@ int attack(CharacterPtr ch, CharacterPtr vict, int type, int weapon)
 {
   int result = 0;
   int chance;
-  Object *wielded = 0;
+  ObjectPtr wielded = 0;
   int handle_any_guard(CharacterPtr ch);
 
   if (!ch || !vict)
@@ -1310,7 +1310,7 @@ int do_boneshield(CharacterPtr ch, CharacterPtr vict, int dam)
   return ReturnValue::eSUCCESS;
 }
 
-void check_weapon_skill_bonus(CharacterPtr ch, int type, Object *wielded,
+void check_weapon_skill_bonus(CharacterPtr ch, int type, ObjectPtr wielded,
                               int &weapon_skill_hit_bonus, int &weapon_skill_dam_bonus)
 {
   int specialization;
@@ -1383,7 +1383,7 @@ void check_weapon_skill_bonus(CharacterPtr ch, int type, Object *wielded,
   }
 }
 
-int get_weapon_damage_type(class Object *wielded)
+int get_weapon_damage_type(ObjectPtr wielded)
 {
   char log_buf[256];
 
@@ -1465,8 +1465,8 @@ int calculate_paladin_damage_bonus(CharacterPtr ch, CharacterPtr victim)
 // standard "returnvals.h" returns
 int one_hit(CharacterPtr ch, CharacterPtr vict, int type, int weapon)
 {
-  class Object *wielded; /* convenience */
-  int w_type;            /* Holds type info for damage() */
+  ObjectPtr wielded; /* convenience */
+  int w_type;        /* Holds type info for damage() */
   int weapon_type;
   int dam = 0; /* Self explan. */
   int retval = 0;
@@ -1737,7 +1737,7 @@ int one_hit(CharacterPtr ch, CharacterPtr vict, int type, int weapon)
 } // one_hit
 
 // pos of -1 means inventory
-void eq_destroyed(CharacterPtr ch, Object *obj, int pos)
+void eq_destroyed(CharacterPtr ch, ObjectPtr obj, int pos)
 {
   if (isSet(obj->obj_flags.extra_flags, ITEM_SPECIAL))
     return;
@@ -1755,7 +1755,7 @@ void eq_destroyed(CharacterPtr ch, Object *obj, int pos)
     }
     else if ((pos == WEAR_WIELD) && (ch->equipment[WEAR_SECOND_WIELD]))
     {
-      Object *temp;
+      ObjectPtr temp;
       temp = ch->unequip_char(WEAR_SECOND_WIELD);
       ch->equip_char(temp, WEAR_WIELD);
     }
@@ -1796,7 +1796,7 @@ void eq_damage(CharacterPtr ch, CharacterPtr victim,
                int dam, int weapon_type, int attacktype)
 {
   int count, eqdam, chance, value;
-  class Object *obj;
+  ObjectPtr obj;
   int pos;
 
   if (ch->room().isArena()) // Don't damage eq in arena
@@ -2065,11 +2065,11 @@ void Character::addHP(int newhp, CharacterPtr causer)
 }
 
 // returns standard returnvals.h return codes
-int DC::damage(CharacterPtr ch, CharacterPtr victim, int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog, Object *obj)
+int DC::damage(CharacterPtr ch, CharacterPtr victim, int dam, int weapon_type, int attacktype, int weapon, bool is_death_prog, ObjectPtr obj)
 {
   int can_miss = 1;
   int32_t weapon_bit;
-  class Object *wielded;
+  ObjectPtr wielded;
   int typeofdamage;
   int damage_type(int weapon_type);
   int32_t get_weapon_bit(int weapon_type);
@@ -2970,12 +2970,12 @@ int is_pkill(CharacterPtr ch, CharacterPtr vict)
   return false;
 }
 
-void DC::send_damage(QString buf, CharacterPtr ch, Object *obj, CharacterPtr victim, QString dmg, QString buf2, int to)
+void DC::send_damage(QString buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victim, QString dmg, QString buf2, int to)
 {
   send_damage(qPrintable(buf), ch, obj, victim, qPrintable(dmg), qPrintable(buf2), to);
 }
 
-void DC::send_damage(char const *buf, CharacterPtr ch, Object *obj, CharacterPtr victim, char const *dmg, char const *buf2, int to)
+void DC::send_damage(char const *buf, CharacterPtr ch, ObjectPtr obj, CharacterPtr victim, char const *dmg, char const *buf2, int to)
 {
   CharacterPtr tmpch;
   char string1[MAX_INPUT_LENGTH], string2[MAX_INPUT_LENGTH];
@@ -4387,9 +4387,9 @@ void stop_fighting(CharacterPtr ch, int clearlag)
   return;
 }
 
-void make_scraps(CharacterPtr ch, class Object *obj)
+void make_scraps(CharacterPtr ch, ObjectPtr obj)
 {
-  class Object *corpse /*, *o*/;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
   /*int i;*/
 
@@ -4428,8 +4428,8 @@ static constexpr quint64 MAX_PC_CORPSE_TIME = 30;
 
 void make_corpse(CharacterPtr ch)
 {
-  class Object *corpse{}, *o{}, *o_in_container{}, *next_o_in_container{};
-  class Object *money{}, *next_obj{};
+  ObjectPtr corpse{}, o{}, o_in_container{}, next_o_in_container{};
+  ObjectPtr money{}, next_obj{};
 
   char buf[MAX_STRING_LENGTH]{};
   int i{};
@@ -4564,7 +4564,7 @@ void make_corpse(CharacterPtr ch)
 
     if (ch->isNonPlayer() && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
     {
-      class Object *recipeitem = nullptr;
+      ObjectPtr recipeitem = nullptr;
       int rarity = number(1, 100);
       auto itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
@@ -4627,7 +4627,7 @@ void make_corpse(CharacterPtr ch)
           recipeitem = clone_object(6320);
         }
       }
-      if (recipeitem > (Object *)0)
+      if (recipeitem > (ObjectPtr)0)
       {
         obj_to_obj(recipeitem, corpse);
       }
@@ -4677,8 +4677,8 @@ void make_corpse(CharacterPtr ch)
 
 void make_dust(CharacterPtr ch)
 {
-  class Object *o, *tmp_o, *blah;
-  class Object *money, *next_obj;
+  ObjectPtr o, tmp_o, blah;
+  ObjectPtr money, next_obj;
   int i;
 
   for (i = 0; i < MAX_WEAR; i++)
@@ -4753,7 +4753,7 @@ void change_alignment(CharacterPtr ch, CharacterPtr victim)
 
 void make_husk(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   corpse = new Object;
@@ -4788,7 +4788,7 @@ void make_husk(CharacterPtr ch)
 
 void make_head(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   corpse = new Object;
@@ -4829,7 +4829,7 @@ void make_head(CharacterPtr ch)
 
 void make_arm(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   corpse = new Object;
@@ -4871,7 +4871,7 @@ void make_arm(CharacterPtr ch)
 
 void make_leg(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   corpse = new Object;
@@ -4913,7 +4913,7 @@ void make_leg(CharacterPtr ch)
 
 void make_bowels(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   corpse = new Object;
@@ -4955,7 +4955,7 @@ void make_bowels(CharacterPtr ch)
 
 void make_blood(CharacterPtr ch)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   corpse = new Object;
@@ -4997,7 +4997,7 @@ void make_blood(CharacterPtr ch)
 
 void make_heart(CharacterPtr ch, CharacterPtr vict)
 {
-  class Object *corpse;
+  ObjectPtr corpse;
   char buf[MAX_STRING_LENGTH];
 
   if (!ch->hands_are_free(1))
@@ -6353,7 +6353,7 @@ void DC::dam_message(int dam, CharacterPtr ch, CharacterPtr victim, int w_type, 
  */
 void disarm(CharacterPtr ch, CharacterPtr victim)
 {
-  class Object *obj;
+  ObjectPtr obj;
 
   if (victim->equipment[WEAR_WIELD] == nullptr)
     return;
@@ -6766,7 +6766,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, int type, bool vict_is_attac
   if (IS_AFFECTED(victim, AFF_CHAMPION) && ch && ch != victim)
   {
     REMBIT(victim->affected_by, AFF_CHAMPION);
-    Object *obj = nullptr;
+    ObjectPtr obj = nullptr;
     if (!(obj = get_obj_in_list_num(CHAMPION_ITEM, victim->carrying)))
     {
       logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -7127,7 +7127,7 @@ int can_be_attacked(CharacterPtr ch, CharacterPtr vict)
 int weapon_spells(CharacterPtr ch, CharacterPtr vict, int weapon)
 {
   int i, current_affect, chance, percent, retval;
-  Object *weap;
+  ObjectPtr weap;
 
   if (!ch || !vict)
   {
@@ -7690,7 +7690,7 @@ int32_t get_weapon_bit(int weapon_type)
 
 void remove_nosave(CharacterPtr vict)
 {
-  class Object *o, *next_obj, *blah, *tmp_o;
+  ObjectPtr o, next_obj, blah, tmp_o;
 
   if (!vict)
   {
@@ -7724,7 +7724,7 @@ void remove_nosave(CharacterPtr vict)
 
 void remove_active_potato(CharacterPtr vict)
 {
-  class Object *obj, *next_obj;
+  ObjectPtr obj, next_obj;
   // char buf[256];
 
   if (!vict)

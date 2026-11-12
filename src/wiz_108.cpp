@@ -43,7 +43,7 @@ int do_zoneexits(CharacterPtr ch, char *argument, cmd_t cmd)
   room_direction_data *curExits;
   int curZone = GET_ZONE(ch);
   int curRoom = ch->in_room;
-  Object *portal;
+  ObjectPtr portal;
   int i, dir;
   int low, high;
   int last_good = curRoom;
@@ -164,7 +164,7 @@ int do_zoneexits(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_purloin(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char bufName[200], *pBuf;
-  class Object *k;
+  ObjectPtr k;
   int j, nIndex = 0;
 
   if (!ch->has_skill(COMMAND_PURLOIN))

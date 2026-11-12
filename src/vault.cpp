@@ -107,9 +107,9 @@ vault_data *has_vault(QString name)
   return 0;
 }
 
-void remove_from_object_list(Object *obj)
+void remove_from_object_list(ObjectPtr obj)
 {
-  Object *tObj, *pObj = nullptr;
+  ObjectPtr tObj, pObj = nullptr;
   for (tObj = DC::getInstance()->object_list; tObj; tObj = tObj->next)
   {
     if (tObj == obj)
@@ -161,7 +161,7 @@ void save_vault(QString name)
 
   for (items = vault->items; items; items = items->next)
   {
-    Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
+    ObjectPtr obj = items->obj ? items->obj : get_obj(items->item_vnum);
     if (obj == 0)
       continue;
 
@@ -476,7 +476,7 @@ void Character::vault_stats(QString name)
   vault_data *vault = nullptr;
   vault_items_data *item;
   vault_access_data *access;
-  class Object *obj;
+  ObjectPtr obj;
   int items = 0, weight = 0, accesses = 0, num = 0, unique = 0, count = 0, skipped = 0;
   char buf[MAX_STRING_LENGTH * 4], buf1[MAX_STRING_LENGTH];
 
@@ -762,7 +762,7 @@ void DC::testing_load_vaults(void)
   vault_data *vault;
   vault_access_data *access;
   vault_items_data *items;
-  class Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   struct stat statbuf = {};
   int vnum = 0, full = 0, count = 0;
   quint64 gold = 0;
@@ -984,7 +984,7 @@ void DC::load_vaults(void)
   vault_data *vault;
   vault_access_data *access;
   vault_items_data *items;
-  class Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   struct stat statbuf = {};
   FILEPtr fl, index;
   int vnum = 0, full = 0, count = 0;
@@ -1326,7 +1326,7 @@ bool DC::has_vault_access(QString name, vault_data *vault)
 vault_items_data *get_unique_item_in_vault(vault_data *vault, char *object, int num)
 {
   vault_items_data *items;
-  class Object *obj;
+  ObjectPtr obj;
   int i = 1;
 
   for (items = vault->items; items; items = items->next)
@@ -1344,10 +1344,10 @@ vault_items_data *get_unique_item_in_vault(vault_data *vault, char *object, int 
   return 0;
 }
 
-class Object *get_unique_obj_in_vault(vault_data *vault, char *object, int num)
+ObjectPtr get_unique_obj_in_vault(vault_data *vault, char *object, int num)
 {
   vault_items_data *items;
-  class Object *obj;
+  ObjectPtr obj;
   int i = 1;
 
   for (items = vault->items; items; items = items->next)
@@ -1369,7 +1369,7 @@ class Object *get_unique_obj_in_vault(vault_data *vault, char *object, int num)
 vault_items_data *get_item_in_vault(vault_data *vault, char *object, int num)
 {
   vault_items_data *items;
-  class Object *obj;
+  ObjectPtr obj;
   int i = 1, j;
 
   for (items = vault->items; items; items = items->next)
@@ -1397,10 +1397,10 @@ vault_items_data *get_item_in_vault(vault_data *vault, char *object, int num)
   return 0;
 }
 
-class Object *get_obj_in_vault(vault_data *vault, QString object, int num)
+ObjectPtr get_obj_in_vault(vault_data *vault, QString object, int num)
 {
   vault_items_data *items;
-  class Object *obj;
+  ObjectPtr obj;
   int i = 1, j;
 
   for (items = vault->items; items; items = items->next)
@@ -1425,7 +1425,7 @@ class Object *get_obj_in_vault(vault_data *vault, QString object, int num)
   return 0;
 }
 
-class Object *exists_in_vault(vault_data *vault, Object *obj)
+ObjectPtr exists_in_vault(vault_data *vault, ObjectPtr obj)
 {
   vault_items_data *items;
   if (!obj)
@@ -1443,7 +1443,7 @@ void vault_get(CharacterPtr ch, QString object, QString owner)
 {
   QString sbuf;
   char obj_list[50][100];
-  class Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
   vault_items_data *items;
   vault_data *vault;
   int self = 0, i;
@@ -1648,7 +1648,7 @@ void item_add(int vnum, vault_data *vault)
   vault->weight += GET_OBJ_WEIGHT(get_obj(vnum));
 }
 
-void item_add(Object *obj, vault_data *vault)
+void item_add(ObjectPtr obj, vault_data *vault)
 {
   vault_items_data *item;
   int vnum = GET_OBJ_VNUM(obj);
@@ -1674,7 +1674,7 @@ void item_add(Object *obj, vault_data *vault)
   vault->weight += GET_OBJ_WEIGHT(obj);
 }
 
-void item_remove(Object *obj, vault_data *vault)
+void item_remove(ObjectPtr obj, vault_data *vault)
 {
   vault_items_data *item, *next_item, *prev_item = nullptr;
   int vnum = GET_OBJ_VNUM(obj);
@@ -1827,9 +1827,9 @@ void vault_withdraw(CharacterPtr ch, unsigned int amount, char *owner)
   }
 }
 
-int can_put_in_vault(class Object *obj, int self, vault_data *vault, CharacterPtr ch)
+int can_put_in_vault(ObjectPtr obj, int self, vault_data *vault, CharacterPtr ch)
 {
-  //  class Object *tmp_obj;
+  //  ObjectPtr tmp_obj;
 
   if (GET_OBJ_VNUM(obj) == -1)
   {
@@ -1898,7 +1898,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
   if (!ch)
     return;
 
-  class Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
   vault_data *vault;
   char buf[MAX_INPUT_LENGTH];
   int self = 0;
@@ -2063,7 +2063,7 @@ void vault_put(CharacterPtr ch, QString object, QString owner)
 
 void sort_vault(const vault_data &vault, sorted_vault &sv)
 {
-  class Object *obj;
+  ObjectPtr obj;
 
   for (vault_items_data *items = vault.items; items; items = items->next)
   {
@@ -2092,7 +2092,7 @@ void Character::vault_list(QString owner)
 {
   vault_items_data *items;
   vault_data *vault;
-  class Object *obj;
+  ObjectPtr obj;
   int objects = 0, self = 0;
   int diff_len = 0;
   int sectionbuf_len = 0;
@@ -2395,7 +2395,7 @@ void logvault(QString message, QString name)
   // system(cmd);
 }
 
-int sleazy_vault_guy(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg,
+int sleazy_vault_guy(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                      CharacterPtr owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)

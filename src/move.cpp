@@ -352,7 +352,7 @@ int do_simple_move(CharacterPtr ch, cmd_t cmd, int following)
   int was_in;
   int need_movement, learned, mvinroom = 0, mvtoroom = 0;
   int retval;
-  class Object *obj;
+  ObjectPtr obj;
   bool has_boat;
 
   /*
@@ -731,7 +731,7 @@ int do_simple_move(CharacterPtr ch, cmd_t cmd, int following)
     WAIT_STATE(ch, DC::PULSE_VIOLENCE);
   }
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
       ch->sendln("The sounds around you fade to nothing as the silence takes hold...");
@@ -1058,7 +1058,7 @@ int do_move(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int do_leave(CharacterPtr ch, char *arguement, cmd_t cmd)
 {
-  class Object *k;
+  ObjectPtr k;
   char buf[200];
   int retval;
 
@@ -1102,7 +1102,7 @@ int do_enter(CharacterPtr ch, char *argument, cmd_t cmd)
   int retval;
 
   CharacterPtr sesame;
-  Object *portal = nullptr;
+  ObjectPtr portal = nullptr;
 
   if ((ch->in_room != DC::NOWHERE) || (ch->in_room))
   {
@@ -1291,7 +1291,7 @@ int move_char(CharacterPtr ch, int dest, bool stop_all_fighting)
 int do_climb(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH];
-  Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
 
   one_argument(argument, buf);
 

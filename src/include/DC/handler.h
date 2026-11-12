@@ -49,7 +49,7 @@ affected_type *affected_by_random(CharacterPtr ch);
 #define SUPPRESS_ALL (SUPPRESS_CONSEQUENCES | SUPPRESS_MESSAGES)
 
 /* utility */
-class Object *create_money(int amount);
+ObjectPtr create_money(int amount);
 QString fname(QString namelist);
 int isprefix(const char *str, const char *namel);
 int get_max_stat(CharacterPtr ch, attribute_t stat);
@@ -59,28 +59,28 @@ void addTimer(CharacterPtr ch, int spell, int ticks);
 // END TIMERS
 /* ******** objects *********** */
 
-int move_obj(Object *obj, int dest);
-int move_obj(Object *obj, CharacterPtr ch);
-int move_obj(Object *obj, Object *dest_obj);
+int move_obj(ObjectPtr obj, int dest);
+int move_obj(ObjectPtr obj, CharacterPtr ch);
+int move_obj(ObjectPtr obj, ObjectPtr dest_obj);
 
-int obj_to_char(class Object *object, CharacterPtr ch);
-int obj_from_char(class Object *object);
+int obj_to_char(ObjectPtr object, CharacterPtr ch);
+int obj_from_char(ObjectPtr object);
 
-int obj_to_room(class Object *object, room_t room);
-int obj_from_room(class Object *object);
+int obj_to_room(ObjectPtr object, room_t room);
+int obj_from_room(ObjectPtr object);
 
-int obj_to_obj(class Object *obj, class Object *obj_to);
-int obj_from_obj(class Object *obj);
+int obj_to_obj(ObjectPtr obj, ObjectPtr obj_to);
+int obj_from_obj(ObjectPtr obj);
 
-class Object *get_obj_in_list(char *name, class Object *list);
-class Object *get_obj_in_list_num(int num, class Object *list);
-class Object *get_obj(char *name);
-class Object *get_obj(int vnum);
-class Object *get_obj_num(int nr);
+ObjectPtr get_obj_in_list(char *name, ObjectPtr list);
+ObjectPtr get_obj_in_list_num(int num, ObjectPtr list);
+ObjectPtr get_obj(char *name);
+ObjectPtr get_obj(int vnum);
+ObjectPtr get_obj_num(int nr);
 
-void object_list_new_new_owner(class Object *list, CharacterPtr ch);
+void object_list_new_new_owner(ObjectPtr list, CharacterPtr ch);
 
-void extract_obj(class Object *obj);
+void extract_obj(ObjectPtr obj);
 
 /* ******* characters ********* */
 
@@ -111,15 +111,15 @@ CharacterPtr get_mob_vis(CharacterPtr ch, char *name);
 CharacterPtr get_random_mob_vnum(int vnum);
 CharacterPtr get_mob_room_vis(CharacterPtr ch, const char *name);
 CharacterPtr get_mob_vnum(int vnum);
-Object *get_obj_vnum(int vnum);
-Object *get_obj_vnum(QString vnum);
-Object *get_objindex_vnum(vnum_t vnum);
-Object *get_objindex_vnum(QString vnum);
+ObjectPtr get_obj_vnum(int vnum);
+ObjectPtr get_obj_vnum(QString vnum);
+ObjectPtr get_objindex_vnum(vnum_t vnum);
+ObjectPtr get_objindex_vnum(QString vnum);
 vnum_t get_vnum(QString vnum_str);
-class Object *get_obj_in_list_vis(CharacterPtr ch, QString name, class Object *list, bool bf = false);
-class Object *get_obj_in_list_vis(CharacterPtr ch, int item_num, class Object *list, bool bf = false);
-class Object *get_obj_vis(CharacterPtr ch, const char *name, bool loc = false);
-class Object *get_obj_vis(CharacterPtr ch, std::string name, bool loc = false);
+ObjectPtr get_obj_in_list_vis(CharacterPtr ch, QString name, ObjectPtr list, bool bf = false);
+ObjectPtr get_obj_in_list_vis(CharacterPtr ch, int item_num, ObjectPtr list, bool bf = false);
+ObjectPtr get_obj_vis(CharacterPtr ch, const char *name, bool loc = false);
+ObjectPtr get_obj_vis(CharacterPtr ch, std::string name, bool loc = false);
 
 void extract_char(CharacterPtr ch, bool pull, Trace t = Trace("unknown"));
 /* wiz_102.cpp */
@@ -131,7 +131,7 @@ CharacterPtr get_pc_vis(CharacterPtr ch, std::string name);
 
 /* Generic Find */
 
-int generic_find(const char *arg, int bitvector, CharacterPtr ch, CharacterPtr *tar_ch, class Object **tar_obj, bool verbose = false);
+int generic_find(const char *arg, int bitvector, CharacterPtr ch, CharacterPtr *tar_ch, ObjectPtr *tar_obj, bool verbose = false);
 
 int get_number(char **name);
 int get_number(std::string &name);
@@ -144,7 +144,7 @@ int get_number(QString &name);
 #define FIND_OBJ_WORLD 16
 #define FIND_OBJ_EQUIP 32
 
-bool is_wearing(CharacterPtr ch, Object *item);
+bool is_wearing(CharacterPtr ch, ObjectPtr item);
 
 class ErrorHandler
 {
@@ -157,7 +157,7 @@ public:
   };
 };
 
-bool objExists(Object *obj);
+bool objExists(ObjectPtr obj);
 bool charge_moves(CharacterPtr ch, int skill, double modifier = 1);
 
 void die_follower(CharacterPtr ch);

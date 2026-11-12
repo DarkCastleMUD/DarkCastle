@@ -135,7 +135,7 @@ command_return_t do_psay(CharacterPtr ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Object *tmp_obj = nullptr;
+  ObjectPtr tmp_obj = nullptr;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (tmp_obj && tmp_obj->vnum_ >= 0 && DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -245,7 +245,7 @@ int do_gossip(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -357,7 +357,7 @@ int do_gossip(CharacterPtr ch, char *argument, cmd_t cmd)
 command_return_t Character::do_auction(QStringList arguments, cmd_t cmd)
 {
   class Connection *i{};
-  Object *tmp_obj{};
+  ObjectPtr tmp_obj{};
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[in_room].room_flags, QUIET))
@@ -454,7 +454,7 @@ int do_shout(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -531,7 +531,7 @@ int do_trivia(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))
@@ -742,7 +742,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 {
   CharacterPtr vict = nullptr;
   QString name = {}, message = {}, buf = {}, log_buf = {};
-  Object *tmp_obj = nullptr;
+  ObjectPtr tmp_obj = nullptr;
 
   if (!this->isNonPlayer() && isSet(this->player->punish, PUNISH_NOTELL))
   {
@@ -972,7 +972,7 @@ command_return_t do_reply(CharacterPtr ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -1008,7 +1008,7 @@ int do_whisper(CharacterPtr ch, char *argument, cmd_t cmd)
   char name[MAX_INPUT_LENGTH + 1], message[MAX_STRING_LENGTH],
       buf[MAX_STRING_LENGTH];
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -1052,7 +1052,7 @@ int do_ask(CharacterPtr ch, char *argument, cmd_t cmd)
   CharacterPtr vict;
   char name[MAX_INPUT_LENGTH + 1], message[MAX_INPUT_LENGTH + 1], buf[MAX_STRING_LENGTH];
 
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -1097,7 +1097,7 @@ int do_grouptell(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf[MAX_STRING_LENGTH];
   CharacterPtr k;
   follow_type *f;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (ch == nullptr || ch->player == nullptr)
@@ -1193,7 +1193,7 @@ int do_newbie(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   class Connection *i;
-  Object *tmp_obj;
+  ObjectPtr tmp_obj;
   bool silence = false;
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, QUIET))

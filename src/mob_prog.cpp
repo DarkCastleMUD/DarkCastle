@@ -77,7 +77,7 @@ int activeProgs = 0; // loop protection
 CharacterPtr activeActor = nullptr;
 CharacterPtr activeRndm = nullptr;
 CharacterPtr activeTarget = nullptr;
-Object *activeObj = nullptr;
+ObjectPtr activeObj = nullptr;
 void *activeVo = nullptr;
 
 char *activeProg;
@@ -247,7 +247,7 @@ bool Character::isTank(void)
 
 void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t **valui,
                          QString **valstr, int64_t **vali64, quint64 **valui64, int8_t **valb,
-                         CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo,
+                         CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo,
                          CharacterPtr rndm, QString &valqstr)
 {
   /*
@@ -262,7 +262,7 @@ void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t
    */
 
   CharacterPtr target = nullptr;
-  Object *otarget = nullptr;
+  ObjectPtr otarget = nullptr;
   int rtarget = -1, ztarget = -1;
   bool valset = false; // done like that to determine if value is set, since it can be 0
   tempvariable *mobTempVar = nullptr;
@@ -358,11 +358,11 @@ void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t
   else if (!str_prefix("ozone_", left))
   {
     left += 6;
-    Object *otmp;
+    ObjectPtr otmp;
     int z = DC::getInstance()->world[mob->in_room].zone;
     for (otmp = DC::getInstance()->object_list; otmp; otmp = otmp->next)
     {
-      Object *cmp = otmp->in_obj ? otmp->in_obj : otmp;
+      ObjectPtr cmp = otmp->in_obj ? otmp->in_obj : otmp;
       if ((cmp->in_room != DC::NOWHERE && DC::getInstance()->world[cmp->in_room].zone == z) || (cmp->carried_by && DC::getInstance()->world[cmp->carried_by->in_room].zone == z) || (cmp->equipped_by && DC::getInstance()->world[cmp->equipped_by->in_room].zone == z))
         if (isexact(left, otmp->Name()))
         {
@@ -412,7 +412,7 @@ void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t
       otarget = obj;
       break;
     case 'p':
-      otarget = (Object *)vo;
+      otarget = (ObjectPtr)vo;
       break;
     case 'f':
       if (actor)
@@ -1384,7 +1384,7 @@ QMap<QString, DC::mprog_ifs> DC::load_ifchecks(void)
   return ifcheck_tmp;
 }
 
-DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm)
+DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
 
   char buf[MAX_INPUT_LENGTH];
@@ -1393,7 +1393,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
   char val[MAX_INPUT_LENGTH];
   char val2[MAX_INPUT_LENGTH]; // used for non-traditional
   CharacterPtr vict = (CharacterPtr)vo;
-  Object *v_obj = (Object *)vo;
+  ObjectPtr v_obj = (ObjectPtr)vo;
   char *bufpt = buf;
   char *argpt = arg;
   char *oprpt = opr;
@@ -1707,7 +1707,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     int target = atoi(arg);
     int count = 0;
 
-    Object *p;
+    ObjectPtr p;
     for (p = DC::getInstance()->object_list; p; p = p->next)
     {
       if (p->vnum_ == target)
@@ -2046,7 +2046,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   case eISWORN:
   {
-    Object *o = nullptr;
+    ObjectPtr o = nullptr;
     if (mob->mobdata->isObject())
     {
       o = mob->mobdata->getObject();
@@ -2464,7 +2464,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   case eWEARS:
   {
-    class Object *obj = 0;
+    ObjectPtr obj = 0;
     CharacterPtr take;
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
@@ -2535,7 +2535,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   case eCARRIES:
   {
-    class Object *obj = 0;
+    ObjectPtr obj = 0;
     CharacterPtr take;
     char bufeh[MAX_STRING_LENGTH];
     char *valu = one_argument(val, bufeh);
@@ -2785,7 +2785,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
   {
     int target = atoi(arg);
 
-    for (Object *obj = DC::getInstance()->world[mob->in_room].contents;
+    for (ObjectPtr obj = DC::getInstance()->world[mob->in_room].contents;
          obj;
          obj = obj->next_content)
     {
@@ -2924,7 +2924,7 @@ int mprog_cur_result;
 #define DIFF(a, b) ((a - b) > 0 ? (a - b) : (b - a))
 
 char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
-                           CharacterPtr actor, Object *obj, void *vo,
+                           CharacterPtr actor, ObjectPtr obj, void *vo,
                            CharacterPtr rndm, mprog_throw_type *thrw)
 {
 
@@ -3216,13 +3216,13 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
  * but this would require a lot of small changes all over the code.
  */
 void DC::mprog_translate(char ch, char *t, CharacterPtr mob, CharacterPtr actor,
-                         Object *obj, void *vo, CharacterPtr rndm)
+                         ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   static char *he_she[] = {"it", "he", "she"};
   static char *him_her[] = {"it", "him", "her"};
   static char *his_her[] = {"its", "his", "her"};
   CharacterPtr vict = (CharacterPtr)vo;
-  Object *v_obj = (Object *)vo;
+  ObjectPtr v_obj = (ObjectPtr)vo;
 
   *t = '\0';
 
@@ -3597,7 +3597,7 @@ void debugpoint() {};
  * any variables by calling the translate procedure.  The observant
  * code scrutinizer will notice that this is taken from act()
  */
-int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm)
+int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   char buf[MAX_INPUT_LENGTH * 2];
   char tmp[MAX_INPUT_LENGTH * 2];
@@ -3750,9 +3750,9 @@ int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Obj
   return mob->command_interpreter(buf, true);
 }
 
-bool objExists(Object *obj)
+bool objExists(ObjectPtr obj)
 {
-  Object *tobj;
+  ObjectPtr tobj;
 
   for (tobj = DC::getInstance()->object_list; tobj; tobj = tobj->next)
     if (tobj == obj)
@@ -3767,7 +3767,7 @@ bool objExists(Object *obj)
  *  the command list and figuring out what to do. However, like all
  *  complex procedures, everything is farmed out to the other guys.
  */
-void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, mprog_throw_type *thrw, CharacterPtr rndm)
+void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, mprog_throw_type *thrw, CharacterPtr rndm)
 {
   char tmpcmndlst[MAX_STRING_LENGTH];
   char buf[MAX_INPUT_LENGTH];
@@ -3902,7 +3902,7 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
  */
 // Returns true if match
 // false if no match
-int DC::mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, Object *obj, void *vo, int type, bool reverse)
+int DC::mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, ObjectPtr obj, void *vo, int type, bool reverse)
 // reverse ALSO IMPLIES IT ALSO ONLY CHECKS THE FIRST WORD
 {
 
@@ -4004,7 +4004,7 @@ int DC::mprog_wordlist_check(QString arg, CharacterPtr mob, CharacterPtr actor, 
   return retval;
 }
 
-void DC::mprog_percent_check(CharacterPtr mob, CharacterPtr actor, Object *obj,
+void DC::mprog_percent_check(CharacterPtr mob, CharacterPtr actor, ObjectPtr obj,
                              void *vo, int type)
 {
   mob_prog_data *mprg{};
@@ -4050,7 +4050,7 @@ void DC::mprog_percent_check(CharacterPtr mob, CharacterPtr actor, Object *obj,
  * trigger calls.
  */
 int DC::mprog_act_trigger(std::string buf, CharacterPtr mob, CharacterPtr ch,
-                          Object *obj, void *vo)
+                          ObjectPtr obj, void *vo)
 {
 
   //  mob_prog_act_list * tmp_act;
@@ -4101,7 +4101,7 @@ int DC::mprog_bribe_trigger(CharacterPtr mob, CharacterPtr ch, int amount)
 
   mob_prog_data *mprg = 0;
   mob_prog_data *next = 0;
-  Object *obj = 0;
+  ObjectPtr obj = 0;
   bool done = false;
 
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & BRIBE_PROG) && isPaused(mob) == false)
@@ -4147,7 +4147,7 @@ int DC::mprog_damage_trigger(CharacterPtr mob, CharacterPtr ch, int amount)
 
   mob_prog_data *mprg = 0;
   mob_prog_data *next = 0;
-  Object *obj = 0;
+  ObjectPtr obj = 0;
   bool done = false;
   if (mob->isNonPlayer() && (DC::getInstance()->mob_index[mob->mobdata->vnum_].progtypes & DAMAGE_PROG) && isPaused(mob) == false)
   {
@@ -4224,7 +4224,7 @@ int DC::mprog_attack_trigger(CharacterPtr mob, CharacterPtr ch)
   return mprog_cur_result;
 }
 
-int DC::mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, Object *obj)
+int DC::mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, ObjectPtr obj)
 {
 
   QString buf;
@@ -4268,7 +4268,7 @@ int DC::mprog_give_trigger(CharacterPtr mob, CharacterPtr ch, Object *obj)
 
   if (okay && !SOMEONE_DIED(mprog_cur_result))
   {
-    Object *a;
+    ObjectPtr a;
     SET_BIT(mprog_cur_result, ReturnValue::eEXTRA_VALUE);
     for (a = mob->carrying; a; a = a->next_content)
       if (a == obj)
@@ -4414,7 +4414,7 @@ int Character::mprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-int DC::mprog_catch_trigger(CharacterPtr mob, int catch_num, char *var, int opt, CharacterPtr actor, Object *obj, void *vo, CharacterPtr rndm)
+int DC::mprog_catch_trigger(CharacterPtr mob, int catch_num, char *var, int opt, CharacterPtr actor, ObjectPtr obj, void *vo, CharacterPtr rndm)
 {
   if (!mob || mob->isDead() || mob->isNowhere())
   {
@@ -4503,7 +4503,7 @@ void DC::update_mprog_throws(void)
   mprog_throw_type *action;
   mprog_throw_type *last = nullptr;
   CharacterPtr vict;
-  Object *vobj;
+  ObjectPtr vobj;
   for (curr = g_mprog_throw_list; curr;)
   {
     // update
@@ -4599,7 +4599,7 @@ void DC::update_mprog_throws(void)
   }
 }
 
-CharacterPtr DC::initiate_oproc(CharacterPtr ch, Object *obj)
+CharacterPtr DC::initiate_oproc(CharacterPtr ch, ObjectPtr obj)
 { // Sneakiness.
   CharacterPtr temp;
   temp = clone_mobile(12);
@@ -4611,7 +4611,7 @@ CharacterPtr DC::initiate_oproc(CharacterPtr ch, Object *obj)
   else
     char_to_room(temp, obj->in_room);
   if (ch)
-    temp->beacon = (Object *)ch;
+    temp->beacon = (ObjectPtr)ch;
   temp->mobdata->setObject(obj);
   //  temp->master = ch;
   // dc_free(temp->short_desc);
@@ -4654,7 +4654,7 @@ void end_oproc(CharacterPtr ch, Trace trace)
   }
 }
 
-int Character::oprog_can_see_trigger(Object *item)
+int Character::oprog_can_see_trigger(ObjectPtr item)
 {
   if (!isDead() || isNowhere())
   {
@@ -4682,7 +4682,7 @@ int Character::oprog_speech_trigger(const char *txt)
   }
 
   CharacterPtr vmob = nullptr;
-  Object *item;
+  ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4723,7 +4723,7 @@ int Character::oprog_speech_trigger(const char *txt)
   return mprog_cur_result;
 }
 
-int DC::oprog_catch_trigger(Object *obj, int catch_num, char *var, int opt, CharacterPtr actor, Object *obj2, void *vo, CharacterPtr rndm)
+int DC::oprog_catch_trigger(ObjectPtr obj, int catch_num, char *var, int opt, CharacterPtr actor, ObjectPtr obj2, void *vo, CharacterPtr rndm)
 {
   mob_prog_data *mprg{};
   int curr_catch;
@@ -4786,7 +4786,7 @@ int Character::oprog_act_trigger(QString txt)
   }
 
   CharacterPtr vmob;
-  Object *item;
+  ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4851,10 +4851,10 @@ int Character::oprog_greet_trigger(void)
   return mprog_cur_result;
 }
 
-int DC::oprog_rand_trigger(Object *item)
+int DC::oprog_rand_trigger(ObjectPtr item)
 {
   CharacterPtr vmob;
-  //  Object *item;
+  //  ObjectPtr item;
   CharacterPtr ch;
   mprog_cur_result = ReturnValue::eSUCCESS;
   if (item->carried_by)
@@ -4871,7 +4871,7 @@ int DC::oprog_rand_trigger(Object *item)
   return mprog_cur_result;
 }
 
-int DC::oprog_arand_trigger(Object *item)
+int DC::oprog_arand_trigger(ObjectPtr item)
 {
   CharacterPtr vmob;
   CharacterPtr ch;
@@ -4894,7 +4894,7 @@ int DC::oprog_arand_trigger(Object *item)
 int Character::oprog_load_trigger(void)
 {
   CharacterPtr vmob;
-  Object *item;
+  ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
 
@@ -4927,7 +4927,7 @@ int Character::oprog_load_trigger(void)
   return mprog_cur_result;
 }
 
-int Character::oprog_weapon_trigger(Object *item)
+int Character::oprog_weapon_trigger(ObjectPtr item)
 {
   if (isDead() || isNowhere())
   {
@@ -4949,7 +4949,7 @@ int Character::oprog_weapon_trigger(Object *item)
   return mprog_cur_result;
 }
 
-int Character::oprog_armour_trigger(Object *item)
+int Character::oprog_armour_trigger(ObjectPtr item)
 {
   if (isDead() || isNowhere())
   {
@@ -4979,7 +4979,7 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
   }
 
   CharacterPtr vmob = nullptr;
-  Object *item = nullptr;
+  ObjectPtr item = nullptr;
   mprog_cur_result = ReturnValue::eFAILURE;
   QString buf;
   if (in_room >= 0)

@@ -734,7 +734,7 @@ void gain_condition(CharacterPtr ch, int condition, int value)
 
 void food_update(void)
 {
-  class Object *food = nullptr;
+  ObjectPtr food = nullptr;
 
   const auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
   for (const auto &i : character_list)
@@ -840,15 +840,15 @@ void point_update(void)
 void update_corpses_and_portals(void)
 {
   // char buf[256];
-  class Object *j, *next_thing;
-  class Object *jj, *next_thing2;
+  ObjectPtr j, next_thing;
+  ObjectPtr jj, next_thing2;
   int proc = 0; // Processed items. Debugging.
   bool corpses_need_saving = false;
-  void extract_obj(class Object * obj); /* handler.c */
+  void extract_obj(ObjectPtr obj); /* handler.c */
   /* objects */
   for (j = DC::getInstance()->object_list; j; j = next_thing, proc++)
   {
-    if (j == (class Object *)0x95959595)
+    if (j == (ObjectPtr)0x95959595)
       break;
     next_thing = j->next; /* Next in object list */
     /* Type 1 is a permanent game portal, and type 3 is a look_only
@@ -918,7 +918,7 @@ void update_corpses_and_portals(void)
 
           if (GET_ITEM_TYPE(jj) == ITEM_CONTAINER)
           {
-            Object *oo, *oon;
+            ObjectPtr oo, oon;
             for (oo = jj->contains; oo; oo = oon)
             {
               oon = oo->next_content;

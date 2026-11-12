@@ -208,7 +208,7 @@ public:
 
   int (*funct)(CharacterPtr, cmd_t, const char *) = {}; // special procedure
 
-  class Object *contents = {};   // List of items in room
+  ObjectPtr contents = {}; // List of items in room
   CharacterPtr people = nullptr; // List of NPC / PC in room
 
   int nTracks = {};                 // number of tracks in the room

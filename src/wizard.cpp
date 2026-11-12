@@ -185,7 +185,7 @@ void do_mload(CharacterPtr ch, int rnum, int cnt)
 
 obj_list_t oload(CharacterPtr ch, int rnum, int cnt, bool random)
 {
-  Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   obj_list_t obj_list = {};
   std::string buf;
 
@@ -234,7 +234,7 @@ obj_list_t oload(CharacterPtr ch, int rnum, int cnt, bool random)
 
 void do_oload(CharacterPtr ch, int rnum, int cnt, bool random)
 {
-  class Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   char buf[MAX_STRING_LENGTH];
   int i;
 
@@ -305,7 +305,7 @@ void boro_mob_stat(CharacterPtr ch, CharacterPtr k)
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
   follow_type *fol;
-  class Object *j = 0;
+  ObjectPtr j = 0;
   affected_type *aff;
 
   sprinttype(k->c_class, pc_clss_types, buf2);
@@ -615,7 +615,7 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   follow_type *fol;
   int i2;
   char buf2[MAX_STRING_LENGTH];
-  class Object *j = 0;
+  ObjectPtr j = 0;
   affected_type *aff;
 
   if (k->isNonPlayer())
@@ -987,9 +987,9 @@ command_return_t mob_stat(CharacterPtr ch, CharacterPtr k)
   return ReturnValue::eSUCCESS;
 }
 
-void obj_stat(CharacterPtr ch, class Object *j)
+void obj_stat(CharacterPtr ch, ObjectPtr j)
 {
-  class Object *j2 = 0;
+  ObjectPtr j2 = 0;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char buf3[MAX_STRING_LENGTH];
@@ -1115,7 +1115,7 @@ void obj_stat(CharacterPtr ch, class Object *j)
             j->obj_flags.value[2]);
     break;
   case ITEM_WEAPON:
-    int get_weapon_damage_type(class Object * wielded);
+    int get_weapon_damage_type(ObjectPtr wielded);
     its = get_weapon_damage_type(j) - 1000;
     extern char *strs_damage_types[];
     sprintf(buf, "$3Unused(v1)$R: %d (make 0)\n$3Todam(v2)d(v3)$R: %dD%d\n$3Type(v4)$R: %d (%s)",
@@ -1679,7 +1679,7 @@ class hunt_items
 public:
   hunt_items *next;
   hunt_data *hunt;
-  class Object *obj;
+  ObjectPtr obj;
   QString mobname;
 };
 
@@ -1788,7 +1788,7 @@ int do_huntclear(CharacterPtr ch, char *arg, cmd_t cmd)
   }
 }
 
-void huntclear_item(class Object *obj)
+void huntclear_item(ObjectPtr obj)
 {
   hunt_items *hi, *hin, *hip = nullptr;
   for (hi = hunt_items_list; hi; hi = hin)
@@ -1962,7 +1962,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 
       break;
     }
-    class Object *obj = clone_object(rnum);
+    ObjectPtr obj = clone_object(rnum);
     obj_to_char(obj, vict);
     auto ni = new hunt_items;
     ni->hunt = n;
@@ -1973,7 +1973,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
   }
 }
 
-void pick_up_item(CharacterPtr ch, class Object *obj)
+void pick_up_item(CharacterPtr ch, ObjectPtr obj)
 {
   hunt_items *i, *p = nullptr, *in;
   char buf[MAX_STRING_LENGTH];
@@ -1993,7 +1993,7 @@ void pick_up_item(CharacterPtr ch, class Object *obj)
                     .arg(i->mobname)
                     .arg(ch->getName()));
       hunt_data *h = i->hunt;
-      class Object *oitem = nullptr, *citem;
+      ObjectPtr oitem = nullptr, citem;
       int r1 = 0;
       switch (vnum)
       {
@@ -2085,7 +2085,7 @@ void pulse_hunts()
       return;
     }
 
-    class Object *obj, *onext;
+    ObjectPtr obj, onext;
     for (obj = DC::getInstance()->world[6345].contents; obj; obj = onext)
     {
       onext = obj->next_content;

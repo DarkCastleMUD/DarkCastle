@@ -722,7 +722,7 @@ forage_lookup forage_lookup_table[SECT_MAX_SECT + 1][6] = {
 int do_forage(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   int learned;
-  class Object *new_obj = 0;
+  ObjectPtr new_obj = 0;
   affected_type af;
 
   if (ch->affected_by_spell(SKILL_FORAGE))
@@ -850,11 +850,11 @@ int parse_arrow(CharacterPtr ch, char *arrow)
 /* go through and find an arrow */
 /* return nullptr if failure
  *  return pointer if success */
-class Object *find_arrow(class Object *quiver)
+ObjectPtr find_arrow(ObjectPtr quiver)
 {
-  class Object *target;
+  ObjectPtr target;
 
-  class Object *get_obj_in_list(char *, class Object *);
+  ObjectPtr get_obj_in_list(char *, ObjectPtr);
 
   target = get_obj_in_list("arrow", quiver->contains);
 
@@ -867,7 +867,7 @@ class Object *find_arrow(class Object *quiver)
   return target;
 }
 
-void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, int dir, class Object *found)
+void do_arrow_miss(CharacterPtr ch, CharacterPtr victim, int dir, ObjectPtr found)
 {
   char buf[200];
 
@@ -1044,7 +1044,7 @@ int mob_arrow_response(CharacterPtr ch, CharacterPtr victim,
 /* no need anymore
 int do_arrow_damage(CharacterPtr ch, CharacterPtr victim,
                      int dir, int dam, int artype,
-                     class Object *found)
+                     ObjectPtr found)
 {
   char buf[200];
   int retval;
@@ -1134,7 +1134,7 @@ int do_fire(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   CharacterPtr victim;
   int dam, dir = -1, artype, cost, retval, victroom;
-  class Object *found;
+  ObjectPtr found;
   unsigned cur_room, new_room = 0;
   char direct[MAX_STRING_LENGTH], arrow[MAX_STRING_LENGTH],
       target[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH],
@@ -1610,7 +1610,7 @@ int do_fire(CharacterPtr ch, char *arg, cmd_t cmd)
       // just in case
       if (isSet(retval, ReturnValue::eCH_DIED))
       {
-        Object *corpse, *next;
+        ObjectPtr corpse, next;
         for (corpse = DC::getInstance()->object_list; corpse; corpse = next)
         {
           next = corpse->next;

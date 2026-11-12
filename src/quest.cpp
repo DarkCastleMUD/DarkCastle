@@ -58,9 +58,9 @@ char *valid_fields[] = {
     "brownie",
     nullptr};
 
-extern void wear(CharacterPtr, Object *, int);
+extern void wear(CharacterPtr, ObjectPtr, int);
 
-extern char *gl_item(Object *obj, int number, CharacterPtr ch, bool platinum);
+extern char *gl_item(ObjectPtr obj, int number, CharacterPtr ch, bool platinum);
 
 int load_quests(void)
 {
@@ -524,7 +524,7 @@ int start_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
   uint16_t price;
-  Object *obj, *brownie = 0;
+  ObjectPtr obj, brownie = 0;
   CharacterPtr mob;
   char buf[MAX_STRING_LENGTH];
   CharacterPtr qmaster = get_mob_vnum(QUEST_MASTER);
@@ -663,7 +663,7 @@ int cancel_quest(CharacterPtr ch, quest_info *quest)
 int complete_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
-  Object *obj;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
 
   if (!quest)
@@ -704,7 +704,7 @@ int complete_quest(CharacterPtr ch, quest_info *quest)
 int stop_current_quest(CharacterPtr ch, quest_info *quest)
 {
   int count = 0;
-  Object *obj;
+  ObjectPtr obj;
   char buf[MAX_STRING_LENGTH];
 
   if (!quest)
@@ -760,7 +760,7 @@ void quest_update()
 {
   char buf[MAX_STRING_LENGTH];
   CharacterPtr mob;
-  Object *obj;
+  ObjectPtr obj;
   quest_info *quest;
 
   const auto &character_list = DC::getInstance()->character_list;
@@ -926,7 +926,7 @@ int quest_handler(CharacterPtr ch, CharacterPtr qmaster, cmd_t cmd, char *name)
 }
 
 // Not used currently. Use quest list or quest start <name> instead of list or buy.
-int quest_master(CharacterPtr ch, Object *obj, cmd_t cmd, char *arg, CharacterPtr owner)
+int quest_master(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg, CharacterPtr owner)
 {
   int choice;
   char buf[MAX_STRING_LENGTH];
@@ -1084,7 +1084,7 @@ int do_quest(CharacterPtr ch, char *arg, cmd_t cmd)
       return ReturnValue::eEXTRA_VAL2;
     }
 
-    Object *brownie = get_obj_in_list_num(27906, ch->carrying);
+    ObjectPtr brownie = get_obj_in_list_num(27906, ch->carrying);
     if (!brownie)
     {
       ch->sendln("You need a brownie point to reset all quests!");
@@ -1471,7 +1471,7 @@ int do_qedit(CharacterPtr ch, char *argument, cmd_t cmd)
   return ReturnValue::eSUCCESS;
 }
 
-int quest_vendor(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int quest_vendor(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   char buf[MAX_STRING_LENGTH];
   int rnum = 0;
@@ -1611,7 +1611,7 @@ int quest_vendor(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, Chara
       return ReturnValue::eSUCCESS;
     }
 
-    class Object *obj;
+    ObjectPtr obj;
     obj = clone_object(rnum);
 
     /*      if (class_restricted(ch, obj)) {
@@ -1655,7 +1655,7 @@ int quest_vendor(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, Chara
     char arg2[MAX_INPUT_LENGTH];
     one_argument(arg, arg2);
 
-    Object *obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
+    ObjectPtr obj = get_obj_in_list_vis(ch, arg2, ch->carrying);
     if (!obj)
     {
       owner->do_tell(QStringLiteral("%1 Try that on the kooky meta-physician..").arg(GET_NAME(ch)).split(' '));

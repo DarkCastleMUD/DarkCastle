@@ -52,7 +52,7 @@
 #include "DC/obj.h"
 #include "DC/player.h"
 
-void perform_wear(CharacterPtr ch, class Object *obj_object,
+void perform_wear(CharacterPtr ch, ObjectPtr obj_object,
                   int keyword);
 bool is_protected(CharacterPtr vict, CharacterPtr ch);
 void scavenge(CharacterPtr ch);
@@ -70,7 +70,7 @@ void DC::mobile_activity(void)
 {
   CharacterPtr tmp_ch;
   CharacterPtr pch;
-  class Object *obj, *best_obj;
+  ObjectPtr obj, best_obj;
   char buf[1000];
   int door, max;
   int done;
@@ -687,7 +687,7 @@ bool is_protected(CharacterPtr vict, CharacterPtr ch)
 
 void scavenge(CharacterPtr ch)
 {
-  class Object *obj;
+  ObjectPtr obj;
   int done;
   int keyword;
 

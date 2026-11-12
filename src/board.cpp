@@ -619,7 +619,7 @@ Entry function called from assign_proc.
 handles commands and calls appropriate functions
 */
 
-int board(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *c_arguments, CharacterPtr invoker)
+int board(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *c_arguments, CharacterPtr invoker)
 {
   auto arguments = QString(c_arguments).split(' ');
   auto arg1 = arguments.value(0);

@@ -69,7 +69,7 @@
 
 #define SKILL_HIDE 337
 
-int clan_guard(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner);
+int clan_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner);
 int check_ethereal_focus(CharacterPtr ch, int trigger_type); // class/cl_mage.cpp
 const char *fillwords[] =
     {
@@ -1225,7 +1225,7 @@ void chop_half(char *str, char *arg1, char *arg2)
 
 command_return_t Character::special(QString arguments, cmd_t cmd)
 {
-  class Object *i;
+  ObjectPtr i;
   CharacterPtr k;
   int j;
   int retval;

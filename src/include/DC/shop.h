@@ -1,4 +1,5 @@
 #pragma once
+#include "DC/types.h"
 #include <qtypes.h> // for quint64
 #include <stdint.h> // for int32_t, uint32_t, uint8_t
 #include <map>      // for map
@@ -37,11 +38,11 @@ void redo_shop_profit(void);
 class reroll_t
 {
 public:
-  class Object *choice1_obj = nullptr;
-  Object *choice2_obj = nullptr;
+  ObjectPtr choice1_obj = nullptr;
+  ObjectPtr choice2_obj = nullptr;
   quint64 orig_rnum = {};
   vnum_t orig_vnum = {};
-  Object *orig_obj = nullptr;
+  ObjectPtr orig_obj = nullptr;
 
   enum reroll_states_t
   {
@@ -54,11 +55,11 @@ public:
 class redeem_t
 {
 public:
-  class Object *choice1_obj = nullptr;
-  Object *choice2_obj = nullptr;
+  ObjectPtr choice1_obj = nullptr;
+  ObjectPtr choice2_obj = nullptr;
   quint64 orig_rnum = {};
   vnum_t orig_vnum = {};
-  Object *orig_obj = nullptr;
+  ObjectPtr orig_obj = nullptr;
   uint8_t token_count = {};
   bool random = false;
 

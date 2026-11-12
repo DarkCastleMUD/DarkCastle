@@ -23,7 +23,7 @@ void save_nonew_new_list(void);
 int is_in_range(CharacterPtr ch, int virt);
 void isr_set(CharacterPtr ch);
 command_return_t mob_stat(CharacterPtr ch, CharacterPtr k);
-void obj_stat(CharacterPtr ch, class Object *j);
+void obj_stat(CharacterPtr ch, ObjectPtr j);
 int number_or_name(char **name, int *num);
 int mob_in_index(char *name, int index);
 int obj_in_index(char *name, int index);

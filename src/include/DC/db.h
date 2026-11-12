@@ -152,7 +152,7 @@ bool can_modify_object(CharacterPtr ch, room_t room);
 
 void write_one_room(LegacyFile &fl, int nr);
 void write_mobile(LegacyFile &lf, CharacterPtr mob);
-void write_object(LegacyFile &lf, Object *obj);
+void write_object(LegacyFile &lf, ObjectPtr obj);
 void write_mprog_recur(FILEPtr fl, mob_prog_data *mprg, bool mob);
 int load_new_help(FILEPtr fl, int reload = 0, CharacterPtr ch = nullptr);
 int count_hash_records(FILEPtr fl);
@@ -180,7 +180,7 @@ auto &operator<<(auto &out, ex_descriptions_t ex_descriptions)
   return out;
 }
 
-void affects_to_file(auto &out, Object *obj)
+void affects_to_file(auto &out, ObjectPtr obj)
 {
   for (int i = 0; i < obj->num_affects; i++)
   {
@@ -199,7 +199,7 @@ auto &operator<<(auto &out, mob_prog_data *mobprogs)
   return out;
 }
 
-void write_object(Object *obj, auto &out)
+void write_object(ObjectPtr obj, auto &out)
 {
   out << QStringLiteral("#%1\n").arg(obj->vnum_);
   string_to_file(out, obj->Name());
@@ -285,7 +285,7 @@ void load_emoting_objects(void);
 int create_entry(char *name);
 void zone_update(void);
 void init_char(CharacterPtr ch);
-void clear_object(class Object *obj);
+void clear_object(ObjectPtr obj);
 void reset_char(CharacterPtr ch);
 void free_char(CharacterPtr ch, Trace trace = Trace("Unknown"));
 room_t real_room(room_t virt);
@@ -331,19 +331,19 @@ T fread_bitvector(auto &in)
   return flags;
 }
 
-void write_object_csv(Object *obj, std::ofstream &fout);
+void write_object_csv(ObjectPtr obj, std::ofstream &fout);
 extern skill_quest *skill_list;
 #define REAL 0
 #define VIRTUAL 1
 
-class Object *clone_object(int nr);
-void randomize_object(Object *obj);
-std::ofstream &operator<<(std::ofstream &out, Object *obj);
-std::ifstream &operator>>(std::ifstream &in, Object *obj);
-void copySaveData(Object *new_obj, Object *obj);
-bool verify_item(class Object **obj);
-bool fullItemMatch(Object *obj, Object *obj2);
-bool has_random(Object *obj);
+ObjectPtr clone_object(int nr);
+void randomize_object(ObjectPtr obj);
+std::ofstream &operator<<(std::ofstream &out, ObjectPtr obj);
+std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj);
+void copySaveData(ObjectPtr new_obj, ObjectPtr obj);
+bool verify_item(ObjectPtr *obj);
+bool fullItemMatch(ObjectPtr obj, ObjectPtr obj2);
+bool has_random(ObjectPtr obj);
 FILEPtr legacyFileOpen(QString directory, QString filename, QString error_message);
 void load_messages(char *file, int base = 0);
 void boot_social_messages(void);

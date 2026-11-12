@@ -37,7 +37,7 @@ class event_params
 {
 public:
   CharacterPtr ch;
-  class Object *obj;
+  ObjectPtr obj;
   CharacterPtr vict;
   char str[1024];
   int num;

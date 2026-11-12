@@ -293,7 +293,7 @@ void get_instrument_bonus(CharacterPtr ch, int &comb, int &non_comb)
 int do_sing(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   CharacterPtr tar_char = 0;
-  Object *tar_obj = 0;
+  ObjectPtr tar_obj = 0;
   char name[MAX_STRING_LENGTH];
   char spellarg[MAX_STRING_LENGTH];
   char *argument = nullptr;
@@ -1311,9 +1311,9 @@ int song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, CharacterP
 
 int execute_song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   CharacterPtr vict = nullptr;
-  Object *corpse = nullptr;
+  ObjectPtr corpse = nullptr;
   char buf[MAX_STRING_LENGTH];
   std::vector<songInfo>::iterator i;
 
@@ -1953,8 +1953,8 @@ int song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg, Charact
 
 int execute_song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  Object *obj = nullptr;
-  Object *tobj = nullptr;
+  ObjectPtr obj = nullptr;
+  ObjectPtr tobj = nullptr;
   std::vector<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -2699,7 +2699,7 @@ int execute_song_glitter_dust(uint8_t level, CharacterPtr ch, char *arg, Charact
     }
   }
 
-  Object *item;
+  ObjectPtr item;
   for (item = DC::getInstance()->world[ch->in_room].contents; item; item = item->next_content)
   {
     if (GET_ITEM_TYPE(item) == ITEM_BEACON && isSet(item->obj_flags.extra_flags, ITEM_INVISIBLE))

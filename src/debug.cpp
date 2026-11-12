@@ -38,7 +38,7 @@
 class Leaderboard;
 
 void load_char_obj_error(FILEPtr fpsave, char strsave[MAX_INPUT_LENGTH]);
-class Object *my_obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, class Object *last_cont);
+ObjectPtr my_obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, ObjectPtr last_cont);
 qsizetype fread_to_tilde(FILEPtr fpsave, QString filename);
 bool read_pc_or_mob_data(CharacterPtr ch, FILEPtr fpsave, QString filename);
 void load_vaults();
@@ -123,7 +123,7 @@ void test_random_stats(void)
   }
 }
 
-QString showObjectAffects(Object *obj)
+QString showObjectAffects(ObjectPtr obj)
 {
   QString buffer;
   for (int i = 0; i < obj->num_affects; ++i)
@@ -151,7 +151,7 @@ QString showObjectAffects(Object *obj)
   return buffer;
 }
 
-QString showObjectVault(Object *obj)
+QString showObjectVault(ObjectPtr obj)
 {
   // std::cerr <<  obj->vnum_ << ":";
   QString buffer = QFlagsToStrings(obj->obj_flags.wear_flags);
@@ -172,7 +172,7 @@ QString showObjectVault(Object *obj)
   return buffer;
 }
 
-void showObject(CharacterPtr ch, Object *obj)
+void showObject(CharacterPtr ch, ObjectPtr obj)
 {
   // std::cerr <<  obj->vnum_ << ":";
   char buf[255];
@@ -392,7 +392,7 @@ int main(int argc, char **argv)
 
   if (argc > 1 && (QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard"))
   {
-    Object *obj = nullptr;
+    ObjectPtr obj = nullptr;
     QString savepath = dclib + "../save/";
     for (const auto &entry : std::filesystem::directory_iterator(savepath.toStdString()))
     {
@@ -435,7 +435,7 @@ int main(int argc, char **argv)
                 }
               }
 
-              for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+              for (ObjectPtr obj = ch->carrying; obj; obj = obj->next_content)
               {
                 if (vnum == 0 || (DC::getInstance()->obj_index.contains(vnum) && obj->vnum_ == vnum))
                 {
@@ -444,7 +444,7 @@ int main(int argc, char **argv)
 
                 if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
                 {
-                  for (Object *container = obj->contains; container; container = container->next_content)
+                  for (ObjectPtr container = obj->contains; container; container = container->next_content)
                   {
                     if (DC::getInstance()->obj_index.contains(vnum) && container->vnum_ == vnum)
                     {
@@ -524,7 +524,7 @@ int main(int argc, char **argv)
     {
       for (vault_items_data *items = vault->items; items; items = items->next)
       {
-        Object *obj = items->obj ? items->obj : get_obj(items->item_vnum);
+        ObjectPtr obj = items->obj ? items->obj : get_obj(items->item_vnum);
         if (DC::getInstance()->obj_index.contains(vnum) && obj->vnum_ == vnum)
         {
           ch->send(showObjectVault(obj));
@@ -540,7 +540,7 @@ int main(int argc, char **argv)
   {
     try
     {
-      Object *obj;
+      ObjectPtr obj;
       if (debug.load_char_obj(d, argv[1]) != load_status_t::success)
       {
         std::cerr << "Unable to load " << argv[1] << std::endl;
@@ -564,13 +564,13 @@ int main(int argc, char **argv)
         }
       }
 
-      for (Object *obj = ch->carrying; obj; obj = obj->next_content)
+      for (ObjectPtr obj = ch->carrying; obj; obj = obj->next_content)
       {
         showObject(ch, obj);
 
         if (GET_OBJ_TYPE(obj) == ITEM_CONTAINER && obj->contains)
         {
-          for (Object *container = obj->contains; container; container = container->next_content)
+          for (ObjectPtr container = obj->contains; container; container = container->next_content)
           {
             showObject(ch, container);
           }

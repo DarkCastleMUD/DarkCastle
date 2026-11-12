@@ -170,7 +170,7 @@ void argument_split_3(const char *argument, char *first_arg, char *second_arg, c
   begin += look_at;
 }
 
-class Object *Character::get_object_in_equip_vis(char *arg, class Object *equipment[], int *j, bool blindfighting)
+ObjectPtr Character::get_object_in_equip_vis(char *arg, ObjectPtr equipment[], int *j, bool blindfighting)
 {
   int k, num;
   char tmpname[MAX_STRING_LENGTH];
@@ -203,7 +203,7 @@ QString find_ex_description(QString word, ex_descriptions_t list)
   return {};
 }
 
-const char *item_condition(class Object *object)
+const char *item_condition(ObjectPtr object)
 {
   int percent = 100 - (int)(100 * ((float)eq_current_damage(object) / (float)eq_max_damage(object)));
 
@@ -223,7 +223,7 @@ const char *item_condition(class Object *object)
     return " [$5Pile of Scraps$R]";
 }
 
-void Character::show_obj_to_char(class Object *object, int mode)
+void Character::show_obj_to_char(ObjectPtr object, int mode)
 {
   QString buffer;
   QString flagbuf;
@@ -396,9 +396,9 @@ void Character::show_obj_to_char(class Object *object, int mode)
   page_string(this->desc, qPrintable(buffer), 1);
 }
 
-void Character::list_obj_to_char(class Object *list, int mode, bool show)
+void Character::list_obj_to_char(ObjectPtr list, int mode, bool show)
 {
-  class Object *i;
+  ObjectPtr i;
   bool found = false;
   int number = 1;
   int can_see;
@@ -502,7 +502,7 @@ void show_char_to_char(CharacterPtr i, CharacterPtr ch, int mode)
 {
   QString buffer;
   int j, found, percent;
-  class Object *tmp_obj;
+  ObjectPtr tmp_obj;
   QString buf2;
   clan_data *clan;
   QString buf;
@@ -917,8 +917,8 @@ void Character::list_char_to_char(CharacterPtr list, int mode)
 void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
                                 char *container)
 {
-  class Object *obj = nullptr;
-  class Object *cont = nullptr;
+  ObjectPtr obj = nullptr;
+  ObjectPtr cont = nullptr;
   int found = false;
 
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() < DEITY)
@@ -1016,7 +1016,7 @@ void showStatDiff(CharacterPtr ch, int base, int random, bool swapcolors)
   ch->send(ch->getStatDiff(base, random, swapcolors));
 }
 
-bool identify(CharacterPtr ch, Object *obj)
+bool identify(CharacterPtr ch, ObjectPtr obj)
 {
   if (ch == nullptr || obj == nullptr)
   {
@@ -1067,7 +1067,7 @@ bool identify(CharacterPtr ch, Object *obj)
   ch->send(QStringLiteral("$3Weight: $R%1\n").arg(obj->obj_flags.weight));
   ch->send(QStringLiteral("$3Value: $R%1\n").arg(obj->obj_flags.cost));
 
-  const Object *vobj = nullptr;
+  ObjectPtr vobj = {};
   if (DC::getInstance()->obj_index.contains(obj->vnum_))
   {
     const int vnum = obj->vnum_;
@@ -1149,7 +1149,7 @@ bool identify(CharacterPtr ch, Object *obj)
     }
     ch->sendln("");
 
-    int get_weapon_damage_type(Object * wielded);
+    int get_weapon_damage_type(ObjectPtr wielded);
     bits = get_weapon_damage_type(obj) - 1000;
     extern char *strs_damage_types[];
     csendf(ch, "$3Damage type$R: %s\n", strs_damage_types[bits]);
@@ -1265,7 +1265,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
 
   QRegularExpression re("^v(?<vnum>\\d+)$");
   QRegularExpressionMatch match = re.match(arg1);
-  Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   if (match.hasMatch())
   {
     QString buffer = match.captured("vnum");
@@ -1317,14 +1317,14 @@ int do_look(CharacterPtr ch, const char *argument, cmd_t cmd)
   int j = 0, bits = 0, temp = 0;
   int door = 0, original_loc = 0;
   bool found = 0;
-  class Object *tmp_object = nullptr, *found_object = nullptr;
+  ObjectPtr tmp_object = nullptr, found_object = nullptr;
   CharacterPtr tmp_char = nullptr;
   QString tmp_desc;
   static const char *keywords[] = {"north", "east", "south", "west", "up", "down",
                                    "in", "at", "out", "through", "", /* Look at '' case */
                                    "\n"};
 
-  int weight_in(class Object * obj);
+  int weight_in(ObjectPtr obj);
   if (!ch->desc)
     return 1;
   if (GET_POS(ch) < position_t::SLEEPING)
@@ -1470,7 +1470,7 @@ int do_look(CharacterPtr ch, const char *argument, cmd_t cmd)
               if (tmp_object->obj_flags.value[0] && tmp_object->obj_flags.weight)
               {
 
-                int weight_in(class Object * obj);
+                int weight_in(ObjectPtr obj);
                 if (DC::getInstance()->obj_index[tmp_object->vnum_].vnum() == 536)
                   temp = (3 * weight_in(tmp_object)) / tmp_object->obj_flags.value[0];
                 else
@@ -1842,7 +1842,7 @@ int do_examine(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[200], buf[200];
   CharacterPtr tmp_char;
-  class Object *tmp_object;
+  ObjectPtr tmp_object;
 
   sprintf(buf, "at %s", argument);
   do_look(ch, buf);
@@ -2598,7 +2598,7 @@ int do_info(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_olocate(CharacterPtr ch, char *name, cmd_t cmd)
 {
   char buf[300], buf2[MAX_STRING_LENGTH];
-  class Object *k;
+  ObjectPtr k;
   int in_room = 0, count = 0;
   int vnum = 0;
   int searchnum = 0;
@@ -3373,7 +3373,7 @@ command_return_t Character::do_experience(QStringList arguments, cmd_t cmd)
 
 void check_champion_and_website_who_list()
 {
-  Object *obj;
+  ObjectPtr obj;
   std::stringstream buf, buf2;
   int addminute = 0;
   std::string name;
@@ -3506,7 +3506,7 @@ public:
     in_clan_vault,
     in_object_database
   };
-  bool operator==(const Object *obj);
+  bool operator==(const ObjectPtr obj);
   void setType(types type) { type_ = type; }
   types getType(void) const { return type_; }
 
@@ -3602,26 +3602,26 @@ private:
 class Result
 {
   Search::locations location_ = {};
-  Object *object_ = {};
+  ObjectPtr object_ = {};
   QString name_;
 
 public:
-  Result(Search::locations location, Object *object)
+  Result(Search::locations location, ObjectPtr object)
       : location_(location), object_(object)
   {
   }
 
-  Result(Search::locations location, Object *object, QString name)
+  Result(Search::locations location, ObjectPtr object, QString name)
       : location_(location), object_(object), name_(name)
   {
   }
 
   Search::locations getLocation() const { return location_; }
-  Object *getObject() const { return object_; }
+  ObjectPtr getObject() const { return object_; }
   QString getName() const { return name_; }
 };
 
-bool Search::operator==(const Object *obj)
+bool Search::operator==(const ObjectPtr obj)
 {
   if (obj == nullptr)
   {
@@ -3780,7 +3780,7 @@ bool Search::operator==(const Object *obj)
   return false;
 }
 
-bool search_object(Object *obj, QList<Search> sl)
+bool search_object(ObjectPtr obj, QList<Search> sl)
 {
   bool matches = false;
   for (auto i = 0; i < sl.size(); ++i)
@@ -4397,7 +4397,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
   {
     for (const auto &vnum : DC::getInstance()->obj_index.keys())
     {
-      Object *obj = DC::getInstance()->obj_index[vnum].item;
+      ObjectPtr obj = DC::getInstance()->obj_index[vnum].item;
       if (obj == nullptr || (obj->isDark() && !isImmortalPlayer()))
         continue;
 
@@ -4588,7 +4588,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
     }
 
     // Needed to show details or affects below
-    const Object *vobj = nullptr;
+    ObjectPtr vobj = {};
     if (DC::getInstance()->obj_index.contains(obj->vnum_))
     {
       const int vnum = obj->vnum_;
@@ -4625,7 +4625,7 @@ command_return_t Character::do_search(QStringList arguments, cmd_t cmd)
       }
       custom_columns += QStringLiteral(" [%1]").arg(buffer, -21);
       /*
-               int get_weapon_damage_type(Object * wielded);
+               int get_weapon_damage_type(ObjectPtr  wielded);
                bits = get_weapon_damage_type(obj) - 1000;
                extern char *strs_damage_types[];
                csendf(ch, "$3Damage type$R: %s\n", strs_damage_types[bits]);

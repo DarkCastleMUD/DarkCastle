@@ -269,7 +269,7 @@ int do_stat(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   class Connection d;
   CharacterPtr vict;
-  class Object *obj;
+  ObjectPtr obj;
   char type[MAX_INPUT_LENGTH];
   char name[MAX_INPUT_LENGTH];
   char *c;
@@ -1547,7 +1547,7 @@ int oedit_exdesc(CharacterPtr ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   int num;
 
   const char *fields[] =
@@ -1709,7 +1709,7 @@ int oedit_affects(CharacterPtr ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  Object *obj = nullptr;
+  ObjectPtr obj = nullptr;
   int num;
   int modifier;
 
@@ -2477,7 +2477,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
 
     vault_data *vault, *tvault;
     vault_items_data *items, *titems;
-    class Object *obj;
+    ObjectPtr obj;
     int num = 0, real_num = 0;
 
     for (vault = vault_table; vault; vault = tvault, num++)
@@ -2498,7 +2498,7 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
           if (obj->vnum_ == rnum)
           {
 
-            void item_remove(Object * obj, vault_data * vault);
+            void item_remove(ObjectPtr obj, vault_data * vault);
             item_remove(obj, vault);
             // items->obj = 0;
             logf(0, DC::LogChannel::LOG_MISC, "Removing deleted item %d from %s's vault.", vnum, vault->owner.toStdString().c_str());
@@ -2507,9 +2507,9 @@ command_return_t Character::do_oedit(QStringList arguments, cmd_t cmd)
       }
     }
 
-    Object *next_k;
+    ObjectPtr next_k;
     // remove the item from players in world
-    for (Object *k = DC::getInstance()->object_list; k; k = next_k)
+    for (ObjectPtr k = DC::getInstance()->object_list; k; k = next_k)
     {
       next_k = k->next;
       if (k->vnum_ == rnum)
@@ -4936,7 +4936,7 @@ int do_instazone(CharacterPtr ch, char *arg, cmd_t cmd)
   int /*number,*/ count;
   CharacterPtr mob;
   CharacterPtr mob_list;
-  class Object *obj, *tmp_obj, /**next_obj,*/ *obj_list;
+  ObjectPtr obj, tmp_obj, obj_list;
 
   bool found_room = false;
 
@@ -5042,8 +5042,7 @@ int do_instazone(CharacterPtr ch, char *arg, cmd_t cmd)
 
         count = 0;
 
-        for (obj_list = DC::getInstance()->object_list; obj_list; obj_list =
-                                                                      obj_list->next)
+        for (obj_list = DC::getInstance()->object_list; obj_list; obj_list = obj_list->next)
         {
           if (obj_list->vnum_ == obj->vnum_)
             count++;
@@ -5215,7 +5214,7 @@ int do_rstat(CharacterPtr ch, char *argument, cmd_t cmd)
   char buf2[MAX_STRING_LENGTH];
   RoomPtr rm = 0;
   CharacterPtr k = 0;
-  class Object *j = 0;
+  ObjectPtr j = 0;
   int i, x, loc;
 
   if (ch->isNonPlayer())

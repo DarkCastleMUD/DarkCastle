@@ -698,10 +698,10 @@ int do_redirect(CharacterPtr ch, char *argument, cmd_t cmd)
 int do_disarm(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   CharacterPtr victim;
-  class Object *wielded;
+  ObjectPtr wielded;
 
   char name[256];
-  class Object *obj;
+  ObjectPtr obj;
   int retval = 0;
 
   int is_fighting_mob(CharacterPtr ch);

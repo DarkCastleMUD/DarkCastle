@@ -132,7 +132,7 @@ int is_ok(CharacterPtr keeper, CharacterPtr ch, int shop_nr)
 /*
  * See if a shop will buy an item.
  */
-int trade_with(class Object *item, int shop_nr)
+int trade_with(ObjectPtr item, int shop_nr)
 {
   int counter;
 
@@ -148,9 +148,9 @@ int trade_with(class Object *item, int shop_nr)
   return false;
 }
 
-int unlimited_supply(class Object *item, int shop_nr)
+int unlimited_supply(ObjectPtr item, int shop_nr)
 {
-  class Object *obj;
+  ObjectPtr obj;
 
   for (obj = DC::getInstance()->shop_index[shop_nr].inventory; obj; obj = obj->next_content)
   {
@@ -163,7 +163,7 @@ int unlimited_supply(class Object *item, int shop_nr)
 
 void restock_keeper(CharacterPtr keeper, int shop_nr)
 {
-  class Object *obj, *obj2;
+  ObjectPtr obj, obj2;
   char buf[50];
 
   sprintf(buf, "Restocking shop keeper: %d", shop_nr);
@@ -184,7 +184,7 @@ void shopping_buy(const char *arg, CharacterPtr ch,
 {
   char buf[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
-  class Object *obj;
+  ObjectPtr obj;
   uint32_t cost;
 
   if (!is_ok(keeper, ch, shop_nr))
@@ -292,7 +292,7 @@ void shopping_sell(const char *arg, CharacterPtr ch,
 {
   char buf[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
-  class Object *obj;
+  ObjectPtr obj;
   uint32_t cost;
 
   if (!is_ok(keeper, ch, shop_nr))
@@ -396,7 +396,7 @@ void shopping_value(const char *arg, CharacterPtr ch,
 {
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
   char argm[MAX_INPUT_LENGTH + 1];
-  class Object *obj;
+  ObjectPtr obj;
   int cost;
   bool keeperhas = false;
 
@@ -628,7 +628,7 @@ void shopping_list(const char *arg, CharacterPtr ch,
                    CharacterPtr keeper, int shop_nr)
 {
   char buf[MAX_STRING_LENGTH];
-  class Object *obj, *tobj;
+  ObjectPtr obj, tobj;
   int cost;
   //    extern char *drinks[];
   int found;
@@ -700,7 +700,7 @@ void shopping_list(const char *arg, CharacterPtr ch,
 
 // Spec proc for shop keepers.
 // TODO - Remove goto's from this....I hate goto's.  This is C, not BASIC....
-int shop_keeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
+int shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   switch (cmd)
   {
@@ -885,7 +885,7 @@ void fix_shopkeepers_inventory()
   int shop_nr;
 
   CharacterPtr keeper = 0;
-  class Object *obj, *last_obj, *cloned;
+  ObjectPtr obj, last_obj, cloned;
 
   // set up the unlimited supply items. Those the shop_keeper has on start up.
 
@@ -1131,7 +1131,7 @@ void player_shopping_stock(const char *arg, CharacterPtr ch, CharacterPtr keeper
   }
 
   // find item
-  Object *obj;
+  ObjectPtr obj;
 
   if ((obj = get_obj_in_list_vis(ch, item, ch->carrying)) == nullptr)
   {
@@ -1210,7 +1210,7 @@ void player_shopping_buy(const char *arg, CharacterPtr ch, CharacterPtr keeper)
   }
 
   // give it to them, thank them, take the money
-  Object *obj = clone_object(robj);
+  ObjectPtr obj = clone_object(robj);
   obj_to_char(obj, ch);
   ch->removeGold(item->price);
   shop->money_on_hand += item->price;
@@ -1433,7 +1433,7 @@ void player_shopping_list(const char *arg, CharacterPtr ch, CharacterPtr keeper)
     ch->send(QStringLiteral("\nYour shop has %1 cash in the till.\n").arg(QString::number(shop->money_on_hand)));
 }
 
-int player_shop_keeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
+int player_shop_keeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr invoker)
 {
   CharacterPtr keeper;
 
@@ -1642,7 +1642,7 @@ obj_exchange eddie[MAX_EDDIE_ITEMS] = {
     {1, OBJ_APOCALYPSE, 2, OBJ_MEATBALL, 0, 0},
     {1, OBJ_BROWNIE, 10, OBJ_CLOVERLEAF, 0, 0}};
 
-int eddie_shopkeeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int eddie_shopkeeper(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   if (cmd != cmd_t::LIST && cmd != cmd_t::BUY)
     return ReturnValue::eFAILURE;
@@ -1799,7 +1799,7 @@ int eddie_shopkeeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
 
       for (int i = 0; i < eddie[choice - 1].cost_qty; i++)
       {
-        Object *obj = search_char_for_item(ch, eddie[choice - 1].cost_vnum, false);
+        ObjectPtr obj = search_char_for_item(ch, eddie[choice - 1].cost_vnum, false);
         if (obj != 0)
         {
           if (obj->in_obj)
@@ -1829,7 +1829,7 @@ int eddie_shopkeeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
 
     for (int i = 0; i < eddie[choice - 1].item_qty; i++)
     {
-      Object *item = clone_object(eddie[choice - 1].item_vnum);
+      ObjectPtr item = clone_object(eddie[choice - 1].item_vnum);
       if (item != 0)
       {
         obj_to_char(item, ch);
@@ -1854,7 +1854,7 @@ int eddie_shopkeeper(CharacterPtr ch, class Object *obj, cmd_t cmd, const char *
   return ReturnValue::eSUCCESS;
 }
 
-int reroll_trader(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int reroll_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   if (ch == nullptr || ch->isNonPlayer())
   {
@@ -2113,7 +2113,7 @@ int reroll_trader(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, Char
   return ReturnValue::eSUCCESS;
 }
 
-int redeem_trader(CharacterPtr ch, Object *obj, cmd_t cmd, const char *arg, CharacterPtr owner)
+int redeem_trader(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner)
 {
   switch (cmd)
   {

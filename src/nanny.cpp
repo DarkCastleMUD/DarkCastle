@@ -95,7 +95,7 @@ extern char webpage[MAX_STRING_LENGTH];
 extern char motd[MAX_STRING_LENGTH];
 extern char imotd[MAX_STRING_LENGTH];
 
-extern Object *object_list;
+extern ObjectPtr object_list;
 
 int _parse_email(char *arg);
 bool check_deny(class Connection *d, const char *name);
@@ -338,7 +338,7 @@ void Character::do_inate_race_abilities(void)
   }
 }
 
-Object *Character::clan_altar(void)
+ObjectPtr Character::clan_altar(void)
 {
   if (clan)
     for (auto c = DC::getInstance()->clan_list; c; c = c->next)
@@ -348,7 +348,7 @@ Object *Character::clan_altar(void)
         {
           if (real_room(room->room_number) == DC::NOWHERE)
             continue;
-          Object *t = DC::getInstance()->world[real_room(room->room_number)].contents;
+          ObjectPtr t = DC::getInstance()->world[real_room(room->room_number)].contents;
           for (; t; t = t->next_content)
           {
             if (t->obj_flags.type_flag == ITEM_ALTAR)
@@ -2257,7 +2257,7 @@ void DC::update_characters(void)
 
 void check_silence_beacons(void)
 {
-  Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
 
   for (obj = DC::getInstance()->object_list; obj; obj = tmp_obj)
   {
@@ -2276,7 +2276,7 @@ void check_silence_beacons(void)
 
 void DC::checkConsecrate(int pulseType)
 {
-  Object *obj, *tmp_obj;
+  ObjectPtr obj, tmp_obj;
   CharacterPtr ch{};
   CharacterPtr tmp_ch{};
   CharacterPtr next_ch{};

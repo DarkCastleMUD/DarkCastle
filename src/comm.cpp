@@ -370,7 +370,7 @@ int DC::load_hotboot_descs(void)
   return 1;
 }
 
-vnum_t DC::getObjectVNUM(Object *obj, bool *ok)
+vnum_t DC::getObjectVNUM(ObjectPtr obj, bool *ok)
 {
   if (obj)
   {
