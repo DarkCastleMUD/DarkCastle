@@ -777,9 +777,6 @@ void DC::game_loop(void)
     {
 
       comm = get_from_q(d->input);
-#ifdef DEBUG_INPUT
-      // std::cerr << "Got command [" << comm << "] from the d->input queue" << std::endl;
-#endif
       /* reset the idle timer & pull char back from void if necessary */
       d->wait = 1;
       d->prompt_mode = 1;
@@ -1492,9 +1489,6 @@ CharacterPtr get_charmie(CharacterPtr ch)
 
 void write_to_q(QByteArray txt, std::queue<QByteArray> &input_queue)
 {
-#ifdef DEBUG_INPUT
-  // std::cerr << "Writing to queue '" << txt << "'" << std::endl;
-#endif
   input_queue.push(txt);
 }
 
@@ -1860,28 +1854,16 @@ std::string removeUnprintable(std::string input)
   return input;
 }
 
-std::string makePrintable(std::string input)
+QByteArray makePrintable(QByteArray input)
 {
-  size_t found_pos = input.npos;
-  do
+  const static QMap<char, QByteArray> replacements = {{'\n', QByteArrayLiteral("\\n")},
+                                                      {'\r', QByteArrayLiteral("\\r")},
+                                                      {'\b', QByteArrayLiteral("\\b")},
+                                                      {'\t', QByteArrayLiteral("\\t")}};
+  for (const auto [c, str] : replacements.asKeyValueRange())
   {
-    found_pos = input.find('\n');
-    if (found_pos != input.npos)
-    {
-      input.erase(found_pos, 1);
-      input.insert(found_pos, "\\n");
-    }
-  } while (found_pos != input.npos);
-
-  do
-  {
-    found_pos = input.find('\b');
-    if (found_pos != input.npos)
-    {
-      input.erase(found_pos, 1);
-      input.insert(found_pos, "\\b");
-    }
-  } while (found_pos != input.npos);
+    input.replace(c, str);
+  }
 
   return input;
 }
@@ -1935,6 +1917,7 @@ int process_input(class Connection *t)
     // \b (backspace)
     // \x7F (delete)
     // \n (new line)
+    // telnet control characters which process_iac will process after this
     buffer.erase(std::remove_if(buffer.begin(), buffer.end(), [](char c)
                                 { return (c < ' ' || c > '~') &&
                                          c != '\b' &&   // backspace
@@ -1955,6 +1938,7 @@ int process_input(class Connection *t)
     {
       write_to_descriptor(t->descriptor, buffer);
     }
+    qDebug("[%s](%lld)", qPrintable(makePrintable(t->inbuf)), t->inbuf.size());
     // Keep looping until client sends us a \n or
     // if read() above has nothing then we return
   } while (t->inbuf.indexOf('\n') == -1);
@@ -1970,18 +1954,8 @@ int process_input(class Connection *t)
       erase = 1;
     }
 
-#ifdef DEBUG_INPUT
-    // std::cerr << "old t->inbuf [" << makePrintable(t->inbuf) << "]"
-    << "(" << t->inbuf.length() << ")" << std::endl;
-#endif
     auto buffer = t->inbuf.slice(0, eoc_pos);
     t->inbuf.remove(0, eoc_pos + erase);
-#ifdef DEBUG_INPUT
-    // std::cerr << "new t->inbuf [" << makePrintable(t->inbuf) << "]"
-    << "(" << t->inbuf.length() << ")" << std::endl;
-    // std::cerr << "buffer [" << makePrintable(buffer) << "]"
-    << "(" << buffer.length() << ")" << std::endl;
-#endif
 
     if (t->character == nullptr || t->character->isMortalPlayer())
     {

@@ -280,26 +280,28 @@ QString format_text(QString str, int mode)
 
 void Connection::editor_parse_line(QString str)
 {
-  assert(strnew);
-  if (str.isEmpty())
-    return;
+  qDebug("[%s](%lld)", qPrintable(makePrintable(qPrintable(str))), str.size());
   if (str.contains("~"))
   {
     write_to_output("Cannot add tildes.\n");
     return;
   }
-  str.remove('\n');
-  if (str.trimmed()[0] != '/')
+
+  if (str.isEmpty() || str[0] != '/')
   {
+    assert(strnew);
     *strnew += str + u"\n"_s;
+    qDebug("*strnew=[%s](%lld)", qPrintable(makePrintable(qPrintable(*strnew))), strnew->size());
     return;
   }
 
-  auto arguments = str;
-  arguments.remove(0, 2);
+  auto argumentsStr = str;
+  if (argumentsStr.size() < 2)
+    return;
+  argumentsStr.remove(0, 2);
+
   bool abort_edit = false;
   bool save_edit = false;
-
   switch (str[1].toLatin1())
   {
   case 'a':
@@ -310,28 +312,28 @@ void Connection::editor_parse_line(QString str)
     write_to_output("Current buffer cleared.\n");
     break;
   case 'd':
-    parse_action(parse_t::DELETE, arguments);
+    parse_action(parse_t::DELETE, argumentsStr);
     break;
   case 'e':
-    parse_action(parse_t::EDIT, arguments);
+    parse_action(parse_t::EDIT, argumentsStr);
     break;
   case 'f':
-    parse_action(parse_t::FORMAT, arguments);
+    parse_action(parse_t::FORMAT, argumentsStr);
     break;
   case 'i':
-    parse_action(parse_t::INSERT, arguments);
+    parse_action(parse_t::INSERT, argumentsStr);
     break;
   case 'h':
-    parse_action(parse_t::HELP, arguments);
+    parse_action(parse_t::HELP, argumentsStr);
     break;
   case 'l':
-    parse_action(parse_t::LIST_NORM, arguments);
+    parse_action(parse_t::LIST_NORM, argumentsStr);
     break;
   case 'n':
-    parse_action(parse_t::LIST_NUM, arguments);
+    parse_action(parse_t::LIST_NUM, argumentsStr);
     break;
   case 'r':
-    parse_action(parse_t::REPLACE, arguments);
+    parse_action(parse_t::REPLACE, argumentsStr);
     break;
   case 's':
     save_edit = true;

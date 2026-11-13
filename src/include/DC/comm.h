@@ -70,7 +70,7 @@ void write_to_output(QByteArray txt, class Connection *d);
 void write_to_output(std::string txt, class Connection *d);
 void write_to_output(QString txt, class Connection *t);
 ssize_t write_to_descriptor(int desc, QByteArray txt);
-
+QByteArray makePrintable(QByteArray input);
 void scramble_text(char *txt);
 QString scramble_text(QString txt);
 void warn_if_duplicate_ip(CharacterPtr ch);
