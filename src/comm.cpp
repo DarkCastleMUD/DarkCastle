@@ -1954,7 +1954,7 @@ int process_input(class Connection *t)
       erase = 1;
     }
 
-    auto buffer = t->inbuf.slice(0, eoc_pos);
+    auto buffer = t->inbuf.sliced(0, eoc_pos);
     t->inbuf.remove(0, eoc_pos + erase);
 
     if (t->character == nullptr || t->character->isMortalPlayer())
@@ -1971,7 +1971,7 @@ int process_input(class Connection *t)
         pipe_pos = buffer.indexOf('|');
         if (pipe_pos != -1)
         {
-          auto new_buffer = buffer.slice(0, pipe_pos);
+          auto new_buffer = buffer.sliced(0, pipe_pos);
           write_to_q(new_buffer, t->input);
 
           buffer.remove(0, pipe_pos + 1);
