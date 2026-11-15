@@ -52,11 +52,6 @@ void Connection::parse_action(parse_t action, QString str)
   auto arg_remaining = arguments_copy.join(' ');
 
   auto s = *strnew;
-  if (s.endsWith("\n"))
-  {
-    s.removeLast();
-    s.removeLast();
-  }
   auto lines = s.split("\n");
   while (!lines.isEmpty() && lines.first().isEmpty())
     lines.removeFirst();
