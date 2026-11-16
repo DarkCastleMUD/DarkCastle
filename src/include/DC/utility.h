@@ -840,8 +840,8 @@ public:
   CharacterPtr rndm; // $r
 
   // new mppause crap below..
-  CharacterPtr tMob; // it should NOT throw it to another similar mob :P
-  int ifchecks[256]; // Let's hope noone nests more ifs than that.
+  CharacterPtr tMob;              // it should NOT throw it to another similar mob :P
+  DC::IfReturnType ifchecks[256]; // Let's hope noone nests more ifs than that.
   int startPos;
   int cPos;
   char *orig;

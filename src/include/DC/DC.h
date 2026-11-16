@@ -499,7 +499,7 @@ public:
   };
   Q_ENUM(mprog_ifs)
 
-  enum IfReturnType
+  enum class IfReturnType
   {
     TRUE = 1,
     FALSE = 0,

@@ -120,7 +120,7 @@ bool SelfPurge::getState(void) const
 
 selfpurge_t selfpurge = {};
 
-int cIfs[256]; // for MPPAUSE
+DC::IfReturnType cIfs[256]; // for MPPAUSE
 int ifpos;
 
 // This 2 variables keep track of what command and line number a mprog script
@@ -1595,63 +1595,67 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       qDebug("%s vs %s", arg, buf);
   }
 
-  // qDebug() << ifchck << ifcheck[buf] << val[0] << val2[0];
+  if (mob->mobdata->vnum_ == 23)
+    qDebug() << "\"" << ifchck << "\"" << ifcheck.value(buf) << val[0] << val2[0];
 
-  if (val[0] != '\0' && val2[0] == '\0')
+  if (ifcheck.value(buf) == eUNKNOWN)
   {
-    if (lvali)
-      return mprog_veval(*lvali, opr, atoi(val));
-    if (lvalui)
-      return mprog_veval(*lvalui, opr, (uint)atoi(val));
-    if (lvali64)
-      return mprog_veval((int)*lvali64, opr, atoi(val));
-    if (lvalui64)
-      return mprog_veval((int)*lvalui64, opr, atoi(val));
-    if (lvalb)
-      return mprog_veval((int)*lvalb, opr, atoi(val));
-    if (lvalstr)
-      return mob->mprog_seval(*lvalstr, opr, val);
-    if (!lvalqstr.isEmpty())
-      return mob->mprog_seval(lvalqstr, opr, val);
-  }
-  else if (val2[0] != '\0')
-  {
-    int16_t *rvali = nullptr;
-    uint32_t *rvalui = nullptr;
-    QString rvalstr_buffer;
-    QString *rvalstr = &rvalstr_buffer;
-    QString rvalqstr;
-    int64_t *rvali64 = nullptr;
-    quint64 *rvalui64 = nullptr;
-    int8_t *rvalb = nullptr;
-    translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm, rvalqstr);
-    int64_t rval = 0;
-    if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
+    if (val[0] != '\0' && val2[0] == '\0')
     {
-      if (rvalstr && lvalstr)
-        return mob->mprog_seval(*lvalstr, opr, *rvalstr);
-      // The rest fit in an int64_t, so let's just use that.
-      if (rvalstr)
-        rval = (*rvalstr).toInt();
-      if (rvali)
-        rval = *rvali;
-      if (rvalui)
-        rval = *rvalui;
-      if (rvalb)
-        rval = *rvalb;
-      if (rvali64)
-        rval = *rvali64;
-      if (rvalui64)
-        rval = *rvalui64;
-
       if (lvali)
-        return mprog_veval(*lvali, opr, rval);
+        return mprog_veval(*lvali, opr, atoi(val));
       if (lvalui)
-        return mprog_veval(*lvalui, opr, rval);
+        return mprog_veval(*lvalui, opr, (uint)atoi(val));
       if (lvali64)
-        return mprog_veval(*lvali64, opr, rval);
+        return mprog_veval((int)*lvali64, opr, atoi(val));
+      if (lvalui64)
+        return mprog_veval((int)*lvalui64, opr, atoi(val));
       if (lvalb)
-        return mprog_veval((int)*lvalb, opr, rval);
+        return mprog_veval((int)*lvalb, opr, atoi(val));
+      if (lvalstr)
+        return mob->mprog_seval(*lvalstr, opr, val);
+      if (!lvalqstr.isEmpty())
+        return mob->mprog_seval(lvalqstr, opr, val);
+    }
+    else if (val2[0] != '\0')
+    {
+      int16_t *rvali = nullptr;
+      uint32_t *rvalui = nullptr;
+      QString rvalstr_buffer;
+      QString *rvalstr = &rvalstr_buffer;
+      QString rvalqstr;
+      int64_t *rvali64 = nullptr;
+      quint64 *rvalui64 = nullptr;
+      int8_t *rvalb = nullptr;
+      translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm, rvalqstr);
+      int64_t rval = 0;
+      if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
+      {
+        if (rvalstr && lvalstr)
+          return mob->mprog_seval(*lvalstr, opr, *rvalstr);
+        // The rest fit in an int64_t, so let's just use that.
+        if (rvalstr)
+          rval = (*rvalstr).toInt();
+        if (rvali)
+          rval = *rvali;
+        if (rvalui)
+          rval = *rvalui;
+        if (rvalb)
+          rval = *rvalb;
+        if (rvali64)
+          rval = *rvali64;
+        if (rvalui64)
+          rval = *rvalui64;
+
+        if (lvali)
+          return mprog_veval(*lvali, opr, rval);
+        if (lvalui)
+          return mprog_veval(*lvalui, opr, rval);
+        if (lvali64)
+          return mprog_veval(*lvali64, opr, rval);
+        if (lvalb)
+          return mprog_veval((int)*lvalb, opr, rval);
+      }
     }
   }
 
@@ -1722,10 +1726,12 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   case eNUMOFMOBSINROOM:
   {
-    int target = atoi(arg);
-    CharacterPtr p;
+    bool ok = false;
+    auto target = QString(arg).toULongLong(&ok);
+    if (!ok)
+      return DC::IfReturnType::ILLEGAL;
     int count = 0;
-    for (p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
+    for (auto p = DC::getInstance()->world[mob->in_room].people; p; p = p->next_in_room)
       if (p->isNonPlayer() && p->mobdata->vnum_ == target)
         count++;
 
@@ -2933,16 +2939,17 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
   char *cmnd = 0;
   bool loopdone = false;
   bool flag = false;
-  int legal;
+  DC::IfReturnType legal;
 
   *null = '\0';
 
   if (!thrw || DIFF(ifchck, activeProgTmpBuf) >= thrw->startPos)
   {
     /* check for trueness of the ifcheck */
-    if ((cIfs[ifpos++] = legal = mprog_do_ifchck(ifchck, mob, actor, obj, vo, rndm)))
+    cIfs[ifpos++] = legal = mprog_do_ifchck(ifchck, mob, actor, obj, vo, rndm);
+    if (legal != DC::IfReturnType::ILLEGAL)
     {
-      if (legal >= 1)
+      if (legal == DC::IfReturnType::TRUE)
         flag = true;
       else
         return null;
@@ -2952,9 +2959,9 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
   {
     legal = thrw->ifchecks[thrw->cPos++];
     cIfs[ifpos++] = legal;
-    if (legal >= 1)
+    if (legal == DC::IfReturnType::TRUE)
       flag = true;
-    else if (legal < 0)
+    else if (legal == DC::IfReturnType::ILLEGAL)
       return nullptr;
   }
 
@@ -2975,9 +2982,10 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
 
       if (!thrw || DIFF(morebuf, activeProgTmpBuf) >= thrw->startPos)
       {
-        if ((cIfs[ifpos++] = legal = mprog_do_ifchck(morebuf, mob, actor, obj, vo, rndm)))
+        cIfs[ifpos++] = legal = mprog_do_ifchck(morebuf, mob, actor, obj, vo, rndm);
+        if (legal != DC::IfReturnType::ILLEGAL)
         {
-          if (legal == 1)
+          if (legal == DC::IfReturnType::TRUE)
             flag = true;
           else
             return null;
@@ -2987,9 +2995,9 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
       {
         legal = thrw->ifchecks[thrw->cPos++];
         cIfs[ifpos++] = legal;
-        if (legal == 1)
+        if (legal == DC::IfReturnType::TRUE)
           flag = true;
-        else if (legal < 0)
+        else if (legal == DC::IfReturnType::ILLEGAL)
           return nullptr;
       }
     }
