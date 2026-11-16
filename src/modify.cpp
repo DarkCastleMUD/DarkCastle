@@ -124,7 +124,7 @@ int do_string(CharacterPtr ch, char *arg, cmd_t cmd)
   char name[MAX_STRING_LENGTH], string[MAX_STRING_LENGTH];
   char message[100];
   int field, type, ctr;
-  CharacterPtr mob = nullptr;
+  CharacterPtr mob = {};
   ObjectPtr obj;
 
   if (ch->isNonPlayer())
@@ -424,7 +424,7 @@ void DC::free_help_from_memory(void)
       dc_free(help_index[i].keyword);
 
   dc_free(help_index);
-  help_index = nullptr;
+  help_index = {};
 }
 
 help_index_element *build_help_index(FILEPtr fl, int *num)
@@ -503,9 +503,9 @@ const char *next_page(const char *str)
   int chars = 0;
   for (;; str++)
   {
-    // If end of string, return nullptr.
+    // If end of string, return {}.
     if (*str == '\0')
-      return nullptr;
+      return {};
 
     // Check for $ ANSI codes.  They have to be kept together
     // Might wanna put a && *(str+1) != '$' so that $'s are wrapped...
@@ -515,7 +515,7 @@ const char *next_page(const char *str)
       { // this should never happen
         logentry(QStringLiteral("String ended in $ in next_page"), ANGEL, DC::LogChannel::LOG_BUG);
         //*str = '\0'; // overwrite the $ so it doesn't mess up anything
-        return nullptr;
+        return {};
       }
       str++; // skip the $
              // This causes the next char to get skipped in the loop iteration
@@ -554,7 +554,7 @@ const char *next_page(const char *str)
       }
     }
   }
-  return nullptr;
+  return {};
 }
 
 // Function that returns the number of pages in the string.
@@ -696,7 +696,7 @@ void show_string(class Connection *d, const char *input)
     if (d->showstr_head)
     {
       dc_free(d->showstr_head);
-      d->showstr_head = nullptr;
+      d->showstr_head = {};
     }
   }
   /* Or if we have more to show.... */

@@ -1338,9 +1338,9 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
   QString target;
   QString text;
   QString value;
-  CharacterPtr vict = nullptr;
-  char_skill_data *skill = nullptr;
-  char_skill_data *lastskill = nullptr;
+  CharacterPtr vict = {};
+  char_skill_data *skill = {};
+  char_skill_data *lastskill = {};
   int16_t field = 0;
   int16_t skillnum = 0;
   int16_t learned = 0;
@@ -1547,7 +1547,7 @@ int oedit_exdesc(CharacterPtr ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   int num;
 
   const char *fields[] =
@@ -1708,7 +1708,7 @@ int oedit_affects(CharacterPtr ch, int item_num, char *buf)
   char select[MAX_INPUT_LENGTH];
   char value[MAX_INPUT_LENGTH];
   int x;
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   int num;
   int modifier;
 
@@ -2702,7 +2702,7 @@ int do_procedit(CharacterPtr ch, char *argument, cmd_t cmd)
     prog->type = GREET_PROG;
     prog->arglist = strdup("80");
     prog->comlist = strdup("say This is my new mob prog!\n");
-    prog->next = nullptr;
+    prog->next = {};
 
     int prog_num = 1;
     if ((currprog = DC::getInstance()->mob_index[mob_num].mobprogs))
@@ -2740,7 +2740,7 @@ int do_procedit(CharacterPtr ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     // find program number "intval"
-    prog = nullptr;
+    prog = {};
     for (i = 1, currprog = DC::getInstance()->mob_index[mob_num].mobprogs; currprog && i != intval; i++, prog = currprog, currprog = currprog->next)
       ;
 
@@ -2933,7 +2933,7 @@ int do_procedit(CharacterPtr ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->desc->backstr = nullptr;
+    ch->desc->backstr = {};
     ch->desc->strnew = &(currprog->comlist);
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
@@ -3170,7 +3170,7 @@ int do_medit(CharacterPtr ch, char *argument, cmd_t cmd)
                  " Terminate with '/s' on a new line.\n\n",
                  ch);
     // TODO - this causes a memory leak if you edit the desc twice (first one is hsh'd)
-    //        (DC::getInstance()->mob_index[mob_num].mob)->description = nullptr;
+    //        (DC::getInstance()->mob_index[mob_num].mob)->description = {};
     ch->desc->connected = Connection::states::EDITING;
     (DC::getInstance()->mob_index[mob_num].mob)->description = str_dup("");
     ch->desc->strnew = &((DC::getInstance()->mob_index[mob_num].mob)->description);
@@ -4200,7 +4200,7 @@ int do_redit(CharacterPtr ch, char *argument, cmd_t cmd)
           int16_t destination_room = DC::getInstance()->world[ch->in_room].dir_option[x]->to_room;
           csendf(ch, "Deleting %s exit from room %d to %d.\n", qPrintable(DC::dirs[x]), ch->in_room, destination_room);
           free(DC::getInstance()->world[ch->in_room].dir_option[x]);
-          DC::getInstance()->world[ch->in_room].dir_option[x] = nullptr;
+          DC::getInstance()->world[ch->in_room].dir_option[x] = {};
 
           if (ch->isPlayer() && !isSet(ch->player->toggles, Player::PLR_ONEWAY))
           {
@@ -4212,7 +4212,7 @@ int do_redit(CharacterPtr ch, char *argument, cmd_t cmd)
               {
                 csendf(ch, "Deleting %s exit from room %d to %d.\n", qPrintable(DC::dirs[reverse_number[x]]), destination_room, ch->in_room);
                 free(DC::getInstance()->world[destination_room].dir_option[reverse_number[x]]);
-                DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = nullptr;
+                DC::getInstance()->world[destination_room].dir_option[reverse_number[x]] = {};
                 return ReturnValue::eSUCCESS;
               }
               else
@@ -4557,7 +4557,7 @@ int do_redit(CharacterPtr ch, char *argument, cmd_t cmd)
     {
       mob = 0;
     }
-    deny_data *nd, *pd = nullptr;
+    deny_data *nd, *pd = {};
     for (nd = DC::getInstance()->world[ch->in_room].denied; nd; nd = nd->next)
     {
       if (nd->vnum == mob)
@@ -4781,7 +4781,7 @@ command_return_t Character::do_zsave(QStringList arguments, cmd_t cmd)
     return eFAILURE;
   }
 
-  FILEPtr f = nullptr;
+  FILEPtr f = {};
   if ((f = dc_fopen(filename.toStdString().c_str(), "w")) == nullptr)
   {
     logbug(QStringLiteral("do_zsave: couldn't open zone save file '%1' for '%2'.").arg(filename).arg(getName()));

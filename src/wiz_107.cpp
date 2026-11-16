@@ -167,7 +167,7 @@ command_return_t Character::do_snoop(QStringList arguments, cmd_t cmd)
   sendln("Ok.");
 
   if (this->desc->snooping)
-    this->desc->snooping->snoop_by = nullptr;
+    this->desc->snooping->snoop_by = {};
 
   this->desc->snooping = victim->desc;
   victim->desc->snoop_by = this->desc;

@@ -221,7 +221,7 @@ command_return_t Character::do_bestow(QStringList arguments, cmd_t cmd)
 // take away a command from a god
 int do_revoke(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   char buf[MAX_INPUT_LENGTH];
   char command[MAX_INPUT_LENGTH];
   int i;
@@ -244,7 +244,7 @@ int do_revoke(CharacterPtr ch, char *arg, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  char_skill_data *last = nullptr;
+  char_skill_data *last = {};
 
   if (!strcmp(command, "all"))
   {
@@ -587,7 +587,7 @@ command_return_t Character::do_rename_char(QStringList arguments, cmd_t cmd)
   }
   do_name(victim, " %");
 
-  ClanMember *pmember = nullptr;
+  ClanMember *pmember = {};
 
   if (clan)
   {

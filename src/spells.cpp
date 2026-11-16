@@ -1086,7 +1086,7 @@ bool many_charms(CharacterPtr ch)
 /* Stop the familiar without a master floods*/
 void extractFamiliar(CharacterPtr ch)
 {
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
   for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
     {
@@ -2602,7 +2602,7 @@ int do_cast(CharacterPtr ch, char *argument, cmd_t cmd)
         }
 
         uint8_t level = ch->getLevel();
-        char *argument_ptr = nullptr;
+        char *argument_ptr = {};
 
         if (group_spell)
         {

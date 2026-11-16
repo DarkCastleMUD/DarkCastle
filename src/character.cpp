@@ -24,7 +24,6 @@
 #include <QFile>
 #include <QMetaEnum>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "DC/character.h"
@@ -287,7 +286,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return false;
   }
 
-  FILEPtr fpfile = nullptr;
+  FILEPtr fpfile = {};
 
   if (this->isNonPlayer() || level_ < IMMORTAL)
   {
@@ -319,7 +318,7 @@ bool Character::load_charmie_equipment(QString player_name, bool previous)
     return false;
   }
   charmie->setLevel(1);
-  ObjectPtr last_cont = nullptr; // Last container.
+  ObjectPtr last_cont = {}; // Last container.
   while (!dc_feof(fpfile))
   {
     last_cont = obj_store_to_char(charmie, fpfile, last_cont);

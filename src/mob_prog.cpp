@@ -74,11 +74,11 @@ CharacterPtr rndm2;
 
 int activeProgs = 0; // loop protection
 
-CharacterPtr activeActor = nullptr;
-CharacterPtr activeRndm = nullptr;
-CharacterPtr activeTarget = nullptr;
-ObjectPtr activeObj = nullptr;
-void *activeVo = nullptr;
+CharacterPtr activeActor = {};
+CharacterPtr activeRndm = {};
+CharacterPtr activeTarget = {};
+ObjectPtr activeObj = {};
+void *activeVo = {};
 
 char *activeProg;
 char *activePos;
@@ -261,17 +261,17 @@ void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t
    'hasskill' = right
    */
 
-  CharacterPtr target = nullptr;
-  ObjectPtr otarget = nullptr;
+  CharacterPtr target = {};
+  ObjectPtr otarget = {};
   int rtarget = -1, ztarget = -1;
   bool valset = false; // done like that to determine if value is set, since it can be 0
-  tempvariable *mobTempVar = nullptr;
+  tempvariable *mobTempVar = {};
   if (mob)
   {
     mobTempVar = mob->tempVariable;
   }
 
-  activeTarget = nullptr;
+  activeTarget = {};
   char *tmp, half[MAX_INPUT_LENGTH];
   half[0] = '\0';
   if ((tmp = strchr(leftptr, ',')) != nullptr)
@@ -493,12 +493,12 @@ void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t
   activeTarget = target;
   // target acquired. fucking boring code.
   // more boring code. FUCK.
-  int16_t *intval = nullptr;
-  uint32_t *uintval = nullptr;
-  QString *stringval = nullptr;
-  int64_t *llval = nullptr;
-  quint64 *ullval = nullptr;
-  int8_t *sbval = nullptr;
+  int16_t *intval = {};
+  uint32_t *uintval = {};
+  QString *stringval = {};
+  int64_t *llval = {};
+  quint64 *ullval = {};
+  int8_t *sbval = {};
   bool tError = false;
 
   /*
@@ -623,7 +623,7 @@ void DC::translate_value(char *leftptr, char *rightptr, int16_t **vali, uint32_t
         valqstr = otarget->in_obj->equipped_by->getName();
       }
       else
-        stringval = nullptr;
+        stringval = {};
     }
     else if (!str_cmp(right, "carryingitems"))
     {
@@ -1518,7 +1518,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
    *  send the lhs,opr,rhs off to be evaluated.
    */
 
-  CharacterPtr fvict = nullptr;
+  CharacterPtr fvict = {};
   bool ye = false;
   if (arg[0] == '$' && arg[1] == 'v')
   {
@@ -1566,14 +1566,14 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     ye = true;
   }
 
-  int16_t *lvali = nullptr;
-  uint32_t *lvalui = nullptr;
+  int16_t *lvali = {};
+  uint32_t *lvalui = {};
   QString lval;
   QString *lvalstr = &lval;
   QString lvalqstr;
-  int64_t *lvali64 = nullptr;
-  quint64 *lvalui64 = nullptr;
-  int8_t *lvalb = nullptr;
+  int64_t *lvali64 = {};
+  quint64 *lvalui64 = {};
+  int8_t *lvalb = {};
   //  int type = 0;
 
   if (!traditional)
@@ -1619,14 +1619,14 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     }
     else if (val2[0] != '\0')
     {
-      int16_t *rvali = nullptr;
-      uint32_t *rvalui = nullptr;
+      int16_t *rvali = {};
+      uint32_t *rvalui = {};
       QString rvalstr_buffer;
       QString *rvalstr = &rvalstr_buffer;
       QString rvalqstr;
-      int64_t *rvali64 = nullptr;
-      quint64 *rvalui64 = nullptr;
-      int8_t *rvalb = nullptr;
+      int64_t *rvali64 = {};
+      quint64 *rvalui64 = {};
+      int8_t *rvalb = {};
       translate_value(val, val2, &rvali, &rvalui, &rvalstr, &rvali64, &rvalui64, &rvalb, mob, actor, obj, vo, rndm, rvalqstr);
       int64_t rval = 0;
       if (rvalstr || rvali || rvalui || rvali64 || rvalui64 || rvalb)
@@ -2052,7 +2052,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   case eISWORN:
   {
-    ObjectPtr o = nullptr;
+    ObjectPtr o = {};
     if (mob->mobdata->isObject())
     {
       o = mob->mobdata->getObject();
@@ -2962,7 +2962,7 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
     if (legal == DC::IfReturnType::TRUE)
       flag = true;
     else if (legal == DC::IfReturnType::ILLEGAL)
-      return nullptr;
+      return {};
   }
 
   while (loopdone == false) /*scan over any existing or statements */
@@ -2998,7 +2998,7 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
         if (legal == DC::IfReturnType::TRUE)
           flag = true;
         else if (legal == DC::IfReturnType::ILLEGAL)
-          return nullptr;
+          return {};
       }
     }
     else
@@ -3209,7 +3209,7 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
     }
   }
 
-  return nullptr;
+  return {};
 }
 
 /* This routine handles the variables for command expansion.
@@ -3717,7 +3717,7 @@ int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Obj
         while (*str != ']' && *str != '\0')
           *tmp1++ = *str++;
         *tmp1 = '\0';
-        CharacterPtr who = nullptr;
+        CharacterPtr who = {};
         if (a == 'v')
           who = mob;
         else if (a == 'V')
@@ -3782,8 +3782,8 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
   char *morebuf;
   char *command_list;
   char *cmnd;
-  // CharacterPtr rndm  = nullptr;
-  CharacterPtr vch = nullptr;
+  // CharacterPtr rndm  = {};
+  CharacterPtr vch = {};
   int count = 0;
   if (IS_AFFECTED(mob, AFF_CHARM))
     return;
@@ -3805,9 +3805,9 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
   memset(&cIfs[0], 0, sizeof(int) * 256);
 
   if (!charExists(actor))
-    actor = nullptr;
+    actor = {};
   if (!objExists(obj))
-    obj = nullptr;
+    obj = {};
 
   activeActor = actor;
   activeObj = obj;
@@ -3817,9 +3817,9 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
 
   if (!com_list) // this can happen when someone is editing
   {
-    activeActor = activeRndm = nullptr;
-    activeObj = nullptr;
-    activeVo = nullptr;
+    activeActor = activeRndm = {};
+    activeObj = {};
+    activeVo = {};
     activeProgs--;
     return;
   }
@@ -3867,9 +3867,9 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
                                                   actor, obj, vo, rndm, thrw);
       if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
       {
-        activeActor = activeRndm = nullptr;
-        activeObj = nullptr;
-        activeVo = nullptr;
+        activeActor = activeRndm = {};
+        activeObj = {};
+        activeVo = {};
         activeProgs--;
         return;
       }
@@ -3882,9 +3882,9 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
         SET_BIT(mprog_cur_result, mprog_process_cmnd(cmnd, mob, actor, obj, vo, rndm));
         if (isSet(mprog_cur_result, ReturnValue::eCH_DIED) || selfpurge || isSet(mprog_cur_result, ReturnValue::eDELAYED_EXEC))
         {
-          activeActor = activeRndm = nullptr;
-          activeObj = nullptr;
-          activeVo = nullptr;
+          activeActor = activeRndm = {};
+          activeObj = {};
+          activeVo = {};
           activeProgs--;
           return;
         }
@@ -3893,9 +3893,9 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
     cmnd = command_list;
     activePos = command_list = mprog_next_command(command_list);
   }
-  activeActor = activeRndm = nullptr;
-  activeObj = nullptr;
-  activeVo = nullptr;
+  activeActor = activeRndm = {};
+  activeObj = {};
+  activeVo = {};
   activeProgs--;
   return;
 }
@@ -4092,7 +4092,7 @@ int DC::mprog_act_trigger(std::string buf, CharacterPtr mob, CharacterPtr ch,
                   curr->next = tmp_act;
             }
 
-            tmp_act->next = nullptr;
+            tmp_act->next = {};
             tmp_act->buf = str_dup( buf );
             tmp_act->ch  = ch;
             tmp_act->obj = obj;
@@ -4509,7 +4509,7 @@ void DC::update_mprog_throws(void)
 {
   mprog_throw_type *curr;
   mprog_throw_type *action;
-  mprog_throw_type *last = nullptr;
+  mprog_throw_type *last = {};
   CharacterPtr vict;
   ObjectPtr vobj;
   for (curr = g_mprog_throw_list; curr;)
@@ -4522,8 +4522,8 @@ void DC::update_mprog_throws(void)
       curr = curr->next;
       continue;
     }
-    vobj = nullptr;
-    vict = nullptr;
+    vobj = {};
+    vict = {};
 
     //		if (curr->data_num == -999)
     //			debugpoint();
@@ -4689,7 +4689,7 @@ int Character::oprog_speech_trigger(const char *txt)
     return ReturnValue::eFAILURE;
   }
 
-  CharacterPtr vmob = nullptr;
+  CharacterPtr vmob = {};
   ObjectPtr item;
 
   mprog_cur_result = ReturnValue::eSUCCESS;
@@ -4868,7 +4868,7 @@ int DC::oprog_rand_trigger(ObjectPtr item)
   if (item->carried_by)
     ch = item->carried_by;
   else
-    ch = nullptr;
+    ch = {};
   if (obj_index[item->vnum_].progtypes & RAND_PROG)
   {
     vmob = initiate_oproc(ch, item);
@@ -4888,7 +4888,7 @@ int DC::oprog_arand_trigger(ObjectPtr item)
   if (item->carried_by)
     ch = item->carried_by;
   else
-    ch = nullptr;
+    ch = {};
   if (obj_index[item->vnum_].progtypes & ARAND_PROG)
   {
     vmob = initiate_oproc(ch, item);
@@ -4986,8 +4986,8 @@ command_return_t Character::oprog_command_trigger(QString command, QString argum
     return ReturnValue::eFAILURE;
   }
 
-  CharacterPtr vmob = nullptr;
-  ObjectPtr item = nullptr;
+  CharacterPtr vmob = {};
+  ObjectPtr item = {};
   mprog_cur_result = ReturnValue::eFAILURE;
   QString buf;
   if (in_room >= 0)

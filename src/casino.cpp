@@ -20,9 +20,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <algorithm>
-#include <map>
 #include <string>
-#include <utility>
 
 #include "DC/structs.h"
 #include "DC/room.h"
@@ -91,7 +89,7 @@ void switch_cards(cDeck *tDeck, int pos1, int pos2)
 
 void free_player(player_data *plr)
 {
-  player_data *tmp, *prev = nullptr;
+  player_data *tmp, *prev = {};
   table_data *tbl = plr->table;
   for (tmp = tbl->plr; tmp; tmp = tmp->next)
   {
@@ -137,7 +135,7 @@ void nextturn(table_data *tbl)
   }
   else
   {
-    tbl->cr = nullptr;
+    tbl->cr = {};
     add_timer_bj_dealer(tbl);
   }
 }
@@ -331,7 +329,7 @@ player_data *createPlayer(CharacterPtr ch, table_data *tbl, int noadd = 0)
       tmp->next = plr;
     else
       tbl->plr = plr;
-    plr->next = nullptr;
+    plr->next = {};
   }
   return plr;
 }
@@ -431,7 +429,7 @@ void check_active(varg_t arg1, void *arg2, void *arg3)
 {
   player_data *plr = arg1.player;
   table_data *tbl = (table_data *)arg3;
-  player_data *ptmp = nullptr;
+  player_data *ptmp = {};
   for (ptmp = tbl->plr; ptmp; ptmp = ptmp->next)
     if (ptmp == plr)
       break;
@@ -553,7 +551,7 @@ void reset_table(table_data *tbl)
 { // called both on error and regular reset
   while (tbl->plr)
     free_player(tbl->plr);
-  tbl->cr = nullptr;
+  tbl->cr = {};
   tbl->state = 0;
   for (int i = 0; i < 21; i++)
     tbl->hand_data[i] = 0;
@@ -860,7 +858,7 @@ void create_table(ObjectPtr obj)
   else
     table->gold = true;
   table->deck = create_deck(6);
-  table->plr = table->cr = nullptr;
+  table->plr = table->cr = {};
   table->deck->table = table;
   for (int i = 0; i < 21; i++)
     table->hand_data[i] = 0;
@@ -873,7 +871,7 @@ void create_table(ObjectPtr obj)
 
 void destroy_table(table_data *tbl)
 {
-  tbl->obj->table = nullptr;
+  tbl->obj->table = {};
   reset_table(tbl);
   dc_free(tbl);
 }
@@ -896,7 +894,7 @@ player_data *getPlayer(CharacterPtr ch, table_data *tbl)
   for (plr = tbl->plr; plr; plr = plr->next)
     if (plr->ch == ch)
       return plr;
-  return nullptr;
+  return {};
 }
 
 int players(table_data *tbl)
@@ -1847,7 +1845,7 @@ tplayer *createTplayer(ttable *ttbl)
 {
   int seat = has_seat(ttbl);
   if (seat < 0)
-    return nullptr;
+    return {};
   tplayer *tplr;
 
 #ifdef LEAK_CHECK
@@ -2064,8 +2062,8 @@ void create_slot(ObjectPtr obj)
 #endif
 
   slot->obj = obj;
-  slot->ch = nullptr;
-  slot->prch = nullptr;
+  slot->ch = {};
+  slot->prch = {};
   slot->cost = obj->obj_flags.value[0];
   slot->jackpot = obj->obj_flags.value[1];
   slot->linkedto = obj->obj_flags.value[3];
@@ -2427,7 +2425,7 @@ void create_wheel(ObjectPtr obj)
 #else
     wheel->plr[i] = (roulette_player *)dc_alloc(1, sizeof(roulette_player));
 #endif
-    wheel->plr[i]->ch = nullptr;
+    wheel->plr[i]->ch = {};
     for (int j = 0; j < 48; j++)
       wheel->plr[i]->bet_array[j] = 0;
   }
@@ -2634,7 +2632,7 @@ void wheel_stop(wheel_data *wheel)
     }
     for (int j = 0; j < 48; j++)
       wheel->plr[i]->bet_array[j] = 0;
-    wheel->plr[i]->ch = nullptr;
+    wheel->plr[i]->ch = {};
   }
   wheel->spinning = false;
   wheel->countdown = 11;
@@ -2736,9 +2734,9 @@ int roulette_table(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, C
         return ReturnValue::eSUCCESS;
       }
       if (obj->wheel->plr[i]->ch && charExists(obj->wheel->plr[i]->ch) && obj->wheel->plr[i]->ch->in_room != obj->in_room)
-        obj->wheel->plr[i]->ch = nullptr;
+        obj->wheel->plr[i]->ch = {};
       else if (obj->wheel->plr[i]->ch && !charExists(obj->wheel->plr[i]->ch))
-        obj->wheel->plr[i]->ch = nullptr;
+        obj->wheel->plr[i]->ch = {};
       if (!obj->wheel->plr[i]->ch)
       {
         obj->wheel->plr[i]->ch = ch;

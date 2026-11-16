@@ -915,8 +915,8 @@ void Character::list_char_to_char(CharacterPtr list, int mode)
 void try_to_peek_into_container(CharacterPtr vict, CharacterPtr ch,
                                 char *container)
 {
-  ObjectPtr obj = nullptr;
-  ObjectPtr cont = nullptr;
+  ObjectPtr obj = {};
+  ObjectPtr cont = {};
   int found = false;
 
   if (GET_CLASS(ch) != CLASS_THIEF && ch->getLevel() < DEITY)
@@ -1263,7 +1263,7 @@ command_return_t Character::do_identify(QStringList arguments, cmd_t cmd)
 
   QRegularExpression re("^v(?<vnum>\\d+)$");
   QRegularExpressionMatch match = re.match(arg1);
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   if (match.hasMatch())
   {
     QString buffer = match.captured("vnum");
@@ -1315,8 +1315,8 @@ int do_look(CharacterPtr ch, const char *argument, cmd_t cmd)
   int j = 0, bits = 0, temp = 0;
   int door = 0, original_loc = 0;
   bool found = 0;
-  ObjectPtr tmp_object = nullptr, found_object = nullptr;
-  CharacterPtr tmp_char = nullptr;
+  ObjectPtr tmp_object = nullptr, found_object = {};
+  CharacterPtr tmp_char = {};
   QString tmp_desc;
   static const char *keywords[] = {"north", "east", "south", "west", "up", "down",
                                    "in", "at", "out", "through", "", /* Look at '' case */
@@ -2308,7 +2308,7 @@ int do_time(CharacterPtr ch, char *argument, cmd_t cmd)
   extern time_info_data time_info;
   extern char *weekdays[];
   extern char *month_name[];
-  tm *pTime = nullptr;
+  tm *pTime = {};
 
   /* 35 days in a month */
   weekday = ((35 * time_info.month) + time_info.day + 1) % 7;

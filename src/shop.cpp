@@ -915,14 +915,14 @@ void fix_shopkeepers_inventory()
   return;
 }
 
-// return nullptr for failure
+// return {} for failure
 // return pointer to new shop on success
 player_shop *read_one_player_shop(FILEPtr fp)
 {
   int32_t count;
   char code[4];
 
-  player_shop_item *item = nullptr;
+  player_shop_item *item = {};
   player_shop *shop = (player_shop *)dc_alloc(1, sizeof(player_shop));
 
   dc_fread(&shop->owner, sizeof(char), PC_SHOP_OWNER_SIZE, fp);
@@ -944,7 +944,7 @@ player_shop *read_one_player_shop(FILEPtr fp)
 
   dc_fread(&count, sizeof(int32_t), 1, fp);
 
-  shop->sale_list = nullptr;
+  shop->sale_list = {};
   for (int i = 0; i < count; i++)
   {
     item = (player_shop_item *)dc_alloc(1, sizeof(player_shop_item));
@@ -1052,7 +1052,7 @@ void boot_player_shops()
   char *filename;
   char buf[80];
 
-  g_playershops = nullptr;
+  g_playershops = {};
 
   if ((fp = dc_fopen(PLAYER_SHOP_INDEX, "r")) == nullptr)
   {
@@ -1539,7 +1539,7 @@ int do_pshopedit(CharacterPtr  ch, char * arg, cmd_t cmd)
       *shop->sell_message = '\0';
       shop->room_num = i;
       shop->money_on_hand = 0;
-      shop->sale_list = nullptr;
+      shop->sale_list = {};
       shop->next = g_playershops;
       g_playershops = shop;
       save_shop_list();

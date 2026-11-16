@@ -669,7 +669,7 @@ int do_nohassle(CharacterPtr ch, char *argument, cmd_t cmd)
 command_return_t do_wiz(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   std::string buf1 = {};
-  Connection *i = nullptr;
+  Connection *i = {};
 
   if (ch->isNonPlayer())
   {

@@ -272,7 +272,7 @@ help_index_element_new *find_help(QString keyword)
         keyword == new_help_table[i].keyword5)
       return (new_help_table + i);
 
-  return nullptr;
+  return {};
 }
 
 #define ENTRY_MAX 32384
@@ -853,7 +853,7 @@ int do_hedit(CharacterPtr ch, char *argument, cmd_t cmd)
     }
     else if (is_abbrev(field, "entry"))
     { // changing the actual help entry
-      ch->desc->backstr = nullptr;
+      ch->desc->backstr = {};
       send_to_char("        Write your help entry and stay within the line.  (/s saves /h for help)\n"
                    "   |--------------------------------------------------------------------------------|\n",
                    ch);

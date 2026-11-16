@@ -82,7 +82,7 @@ obj_emote_index obj_emote_head = {
 
 void free_emoting_obj_data(obj_emote_index *myobj)
 {
-  obj_emote_data *curr_data = nullptr;
+  obj_emote_data *curr_data = {};
 
   while (myobj->data)
   {
@@ -96,7 +96,7 @@ void free_emoting_obj_data(obj_emote_index *myobj)
 
 void DC::free_emoting_objects_from_memory(void)
 {
-  obj_emote_index *curr_index = nullptr;
+  obj_emote_index *curr_index = {};
 
   while (obj_emote_head.next)
   {
@@ -112,8 +112,8 @@ void DC::free_emoting_objects_from_memory(void)
 
 void load_emoting_objects()
 {
-  obj_emote_index *index_cursor = nullptr;
-  obj_emote_data *data_cursor = nullptr;
+  obj_emote_index *index_cursor = {};
+  obj_emote_data *data_cursor = {};
   FILEPtr fl;
   // short i;
   char fromfile;
@@ -130,8 +130,8 @@ void load_emoting_objects()
       dc_alloc(1, sizeof(obj_emote_index));
 #endif
   index_cursor = obj_emote_head.next;
-  index_cursor->next = nullptr;
-  index_cursor->data = nullptr;
+  index_cursor->next = {};
+  index_cursor->data = {};
   index_cursor->room_number = DC::NOWHERE;
   index_cursor->emote_index_length = -1;
   index_cursor->frequency = 0;
@@ -143,7 +143,7 @@ void load_emoting_objects()
       dc_alloc(1, sizeof(obj_emote_index));
 #endif
   index_cursor->data = data_cursor;
-  data_cursor->next = nullptr;
+  data_cursor->next = {};
   while (!done2)
   {
     index_cursor->room_number = fread_int(fl, 0, 1000000);
@@ -171,7 +171,7 @@ void load_emoting_objects()
             dc_alloc(1, sizeof(obj_emote_data));
 #endif
         data_cursor = data_cursor->next;
-        data_cursor->next = nullptr;
+        data_cursor->next = {};
         // Azrack -- dc_fseek had a -1 * offset * sizeof(char) which is going to send us to EOF immmediately
         // because dc_fseek takes an unsigned int.
         dc_fseek(fl, (-1 * offset * sizeof(char)), SEEK_CUR);
@@ -192,7 +192,7 @@ void load_emoting_objects()
           dc_alloc(1, sizeof(obj_emote_index));
 #endif
       index_cursor = index_cursor->next;
-      index_cursor->next = nullptr;
+      index_cursor->next = {};
 #ifdef LEAK_CHECK
       index_cursor->data = (obj_emote_data *)
           calloc(1, sizeof(obj_emote_data));
@@ -204,7 +204,7 @@ void load_emoting_objects()
       index_cursor->emote_index_length = -1;
       index_cursor->frequency = -1;
       data_cursor = index_cursor->data;
-      data_cursor->next = nullptr;
+      data_cursor->next = {};
     }
   }
 
@@ -214,8 +214,8 @@ void load_emoting_objects()
 int emoting_object(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                    CharacterPtr invoker)
 {
-  obj_emote_index *index_cursor = nullptr;
-  obj_emote_data *data_cursor = nullptr;
+  obj_emote_index *index_cursor = {};
+  obj_emote_data *data_cursor = {};
   short i = 0;
   if (cmd != cmd_t::UNDEFINED)
   {
@@ -601,7 +601,7 @@ int orrowand(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, Charact
   }
 
   ObjectPtr curr;
-  ObjectPtr firstP = nullptr, secondP = nullptr, vial = nullptr, diamond = nullptr;
+  ObjectPtr firstP = nullptr, secondP = nullptr, vial = nullptr, diamond = {};
 
   for (curr = ch->carrying; curr; curr = curr->next_content)
   {
@@ -1643,7 +1643,7 @@ int eliara_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr invoker)
 {
 
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -1799,7 +1799,7 @@ int restring_machine(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 {
   char name[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
-  ObjectPtr target_obj = nullptr;
+  ObjectPtr target_obj = {};
 
   if (cmd != cmd_t::RESTRING)
     return ReturnValue::eFAILURE;
@@ -1914,7 +1914,7 @@ int pagoda_balance(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
 
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   int found = 0;
 
   for (int i = 8695; i < 8699; i++)
@@ -1967,7 +1967,7 @@ int pagoda_shield_restorer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char
 int phish_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr invoker)
 {
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
@@ -2029,7 +2029,7 @@ int portal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2089,7 +2089,7 @@ int full_heal_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2226,7 +2226,7 @@ int teleport_word(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg,
 {
   char junk[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd == cmd_t::UNDEFINED && obj)
   { // This is where we recharge
@@ -2531,7 +2531,7 @@ int szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, Ch
       n = p->next;
       if (p->vnum_ == 30097)
       {
-        CharacterPtr v = nullptr;
+        CharacterPtr v = {};
 
         if (p->carried_by)
         {
@@ -2561,7 +2561,7 @@ int szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, Ch
               move_char(v, real_room(30000));
               do_look(v, "");
 
-              mprog_throw_type *throwitem = nullptr;
+              mprog_throw_type *throwitem = {};
               throwitem = (mprog_throw_type *)dc_alloc(1, sizeof(mprog_throw_type));
               throwitem->target_mob_num = 30033;
               strcpy(throwitem->target_mob_name, "");
@@ -2569,11 +2569,11 @@ int szrildor_pass(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, Ch
               throwitem->delay = 0;
               throwitem->mob = true; // This is, surprisingly, a mob
               throwitem->actor = v;
-              throwitem->obj = nullptr;
-              throwitem->vo = nullptr;
-              throwitem->rndm = nullptr;
+              throwitem->obj = {};
+              throwitem->vo = {};
+              throwitem->rndm = {};
               throwitem->opt = 0;
-              throwitem->var = nullptr;
+              throwitem->var = {};
               throwitem->next = g_mprog_throw_list;
               g_mprog_throw_list = throwitem;
             }
@@ -2782,7 +2782,7 @@ int boat_proc(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, Charac
     return ReturnValue::eFAILURE; // someone loaded me
 
   // figure out which boat I am
-  int *boat_list = nullptr;
+  int *boat_list = {};
   switch (obj->vnum_)
   {
   case 9531:
@@ -3026,7 +3026,7 @@ int hornoplenty(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, Char
   if (number(0, 100))
     return ReturnValue::eFAILURE;
 
-  ObjectPtr newobj = nullptr;
+  ObjectPtr newobj = {};
   int objnum = 3170; // chewy tuber
   if (objnum < 0)
   {
@@ -3194,7 +3194,7 @@ int generic_weapon_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, char *arg, 
 int TOHS_locator(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr invoker)
 {
-  ObjectPtr victim = nullptr;
+  ObjectPtr victim = {};
 
   if (cmd != cmd_t::PUSH) // push
     return ReturnValue::eFAILURE;
@@ -3575,7 +3575,7 @@ int eternitystaff(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 int talkingsword(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr invoker)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   int unequip = -1;
   static bool init_done = false;
   if (cmd != cmd_t::UNDEFINED)
@@ -3794,7 +3794,7 @@ int hot_potato(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 {
   auto &arena = DC::getInstance()->arena_;
   int dropped = 0;
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
 
   if (obj->equipped_by)
     vict = obj->equipped_by;
@@ -3969,8 +3969,8 @@ int exploding_mortar_shells(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const cha
 {
   int dam = 0;
   char buf[MAX_STRING_LENGTH];
-  CharacterPtr victim = nullptr;
-  CharacterPtr next_v = nullptr;
+  CharacterPtr victim = {};
+  CharacterPtr next_v = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;

@@ -1132,8 +1132,8 @@ int do_qedit(CharacterPtr ch, char *argument, cmd_t cmd)
   char value[MAX_STRING_LENGTH];
   int holdernum;
   int i, lownum, highnum;
-  quest_info *quest = nullptr;
-  CharacterPtr vict = nullptr;
+  quest_info *quest = {};
+  CharacterPtr vict = {};
 
   half_chop(argument, arg, argument);
   for (; *argument == ' '; argument++)

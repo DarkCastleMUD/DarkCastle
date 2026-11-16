@@ -285,7 +285,7 @@ social_messg *find_social(QString arg)
     if (!compare_social_search((void *)arg.toStdString().c_str(), (void *)&soc_mess_list[i]))
       return &soc_mess_list[i];
 
-  return nullptr;
+  return {};
   //    sprintf(buf + strlen(buf), "%18s", soc_mess_list[i].name);
 
   //  return (social_messg *) bsearch(arg, soc_mess_list, num_socials, sizeof( social_messg), compare_social_search);
@@ -319,7 +319,7 @@ void DC::clean_socials_from_memory()
   }
 
   dc_free(soc_mess_list);
-  soc_mess_list = nullptr;
+  soc_mess_list = {};
 }
 
 int do_social(CharacterPtr ch, char *argument, cmd_t cmd)

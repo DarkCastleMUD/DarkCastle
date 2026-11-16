@@ -1638,7 +1638,7 @@ CVoteData::CVoteData()
     : active(false), total_votes(0)
 {
   char buf[MAX_STRING_LENGTH];
-  FILEPtr the_file = nullptr;
+  FILEPtr the_file = {};
   ;
   int num = 0;
   int is_active = 0;

@@ -463,7 +463,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
   else if (arg1 == "crash")
   {
     // let's crash the mud!
-    CharacterPtr crashus = nullptr;
+    CharacterPtr crashus = {};
     if (crashus->in_room == DC::NOWHERE)
     {
       return ReturnValue::eFAILURE; // this should never be reached
@@ -480,7 +480,7 @@ command_return_t Character::do_shutdown(QStringList arguments, cmd_t cmd)
     try_to_hotboot_on_crash = 0;
 
     // let's crash the mud!
-    CharacterPtr crashus = nullptr;
+    CharacterPtr crashus = {};
     if (crashus->in_room == DC::NOWHERE)
     {
       return ReturnValue::eFAILURE; // this should never be reached

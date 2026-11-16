@@ -83,7 +83,7 @@ int number_or_name(char **name, int *num)
 int number_or_name(char **name, int *num)
 {
   unsigned i;
-  char *ppos = nullptr;
+  char *ppos = {};
   char number[MAX_INPUT_LENGTH];
 
   for (i = 0; i < strlen(*name); i++)
@@ -119,7 +119,7 @@ void do_mload(CharacterPtr ch, int rnum, int cnt)
 {
   if (!ch)
     return;
-  CharacterPtr mob = nullptr;
+  CharacterPtr mob = {};
   char buf[MAX_STRING_LENGTH];
   int i;
   if (cnt == 0)
@@ -137,7 +137,7 @@ void do_mload(CharacterPtr ch, int rnum, int cnt)
     ch->getDC()->mprog_load_trigger(mob);
     if (selfpurge)
     {
-      mob = nullptr;
+      mob = {};
     }
   }
 
@@ -185,7 +185,7 @@ void do_mload(CharacterPtr ch, int rnum, int cnt)
 
 obj_list_t oload(CharacterPtr ch, int rnum, int cnt, bool random)
 {
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   obj_list_t obj_list = {};
   std::string buf;
 
@@ -234,7 +234,7 @@ obj_list_t oload(CharacterPtr ch, int rnum, int cnt, bool random)
 
 void do_oload(CharacterPtr ch, int rnum, int cnt, bool random)
 {
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   char buf[MAX_STRING_LENGTH];
   int i;
 
@@ -1683,8 +1683,8 @@ public:
   QString mobname;
 };
 
-hunt_data *hunt_list = nullptr;
-hunt_items *hunt_items_list = nullptr;
+hunt_data *hunt_list = {};
+hunt_items *hunt_items_list = {};
 
 void check_end_of_hunt(hunt_data *h, bool forced = false)
 {
@@ -1746,7 +1746,7 @@ void check_end_of_hunt(hunt_data *h, bool forced = false)
     }
     send_info(buf);
 
-    hunt_data *hl, *p = nullptr;
+    hunt_data *hl, *p = {};
     for (hl = hunt_list; hl; hl = hl->next)
     {
       if (hl == h)
@@ -1790,7 +1790,7 @@ int do_huntclear(CharacterPtr ch, char *arg, cmd_t cmd)
 
 void huntclear_item(ObjectPtr obj)
 {
-  hunt_items *hi, *hin, *hip = nullptr;
+  hunt_items *hi, *hin, *hip = {};
   for (hi = hunt_items_list; hi; hi = hin)
   {
     hin = hi->next;
@@ -1856,7 +1856,7 @@ void init_random_hunt_items(hunt_data *h)
 
 char *last_hunt_time(char *last_hunt)
 {
-  static char *time_of_last_hunt = nullptr;
+  static char *time_of_last_hunt = {};
   char buf[MAX_STRING_LENGTH];
 
   if (!time_of_last_hunt)
@@ -1875,7 +1875,7 @@ void begin_hunt(int item, int duration, int amount, char *huntname)
 { // time, itme, item
   hunt_data *n;
   char *tmp;
-  tm *pTime = nullptr;
+  tm *pTime = {};
   time_t ct;
 
 #ifdef LEAK_CHECK

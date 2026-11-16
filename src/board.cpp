@@ -47,7 +47,6 @@ board.c version 1.2 - Jun 1991 by Twilight.
 #include <stdlib.h>
 #include <time.h>
 #include <map>
-#include <vector>
 
 #include "DC/dcstdio.h" // FILEPtr
 #include "DC/DC.h"
@@ -931,7 +930,7 @@ void board_load_board()
   for (map_it = board_db.begin(); map_it != board_db.end(); map_it++)
   {
     map_it->second.lock = 0;
-    map_it->second.locked_for = nullptr;
+    map_it->second.locked_for = {};
 
     the_file = dc_fopen((*map_it).second.save_file, "r");
     if (!the_file)

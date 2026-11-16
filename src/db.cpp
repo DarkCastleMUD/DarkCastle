@@ -57,19 +57,13 @@ int load_debug = 0;
 #include <ctime>
 #include <cstdlib>
 #include <sstream>
-#include <typeinfo>
 #include <QDebug>
 #include <QRegularExpression>
 #include <algorithm>
-#include <compare>
 #include <expected>
 #include <fstream>
-#include <iterator>
-#include <map>
 #include <string>
-#include <type_traits>
 #include <unordered_set>
-#include <utility>
 #include <vector>
 #include <cmath>
 
@@ -189,8 +183,8 @@ void Room::FreeTracks()
     // trackee is a str_hsh, don't free it
     dc_free(curr);
   }
-  tracks = nullptr;
-  last_track = nullptr;
+  tracks = {};
+  last_track = {};
   nTracks = 0;
 }
 
@@ -319,7 +313,7 @@ room_track_data *Room::TrackItem(int nIndex)
 
 void Character::add_to_bard_list(void)
 {
-  pulse_data *curr = nullptr;
+  pulse_data *curr = {};
 
   if (GET_CLASS(this) != CLASS_BARD)
     return;
@@ -339,8 +333,8 @@ void Character::add_to_bard_list(void)
 
 void Character::remove_from_bard_list(void)
 {
-  pulse_data *curr = nullptr;
-  pulse_data *last = nullptr;
+  pulse_data *curr = {};
+  pulse_data *last = {};
 
   if (!DC::getInstance()->bard_list)
     return;
@@ -498,7 +492,7 @@ int do_write_skillquest(CharacterPtr ch, char *argument, cmd_t cmd)
 void load_skillquests()
 {
   skill_quest *newsq, *last = 0;
-  skill_list = nullptr;
+  skill_list = {};
   int i;
   FILEPtr fl;
 
@@ -1178,7 +1172,7 @@ void DC::remove_all_mobs_from_world(void)
 
 void DC::remove_all_objs_from_world()
 {
-  ObjectPtr curr = nullptr;
+  ObjectPtr curr = {};
 
   while ((curr = DC::getInstance()->object_list))
     extract_obj(curr);
@@ -1738,7 +1732,7 @@ void Room::setup_dir(QTextStream &fl, int dir)
   tmp = fread_int<int>(fl);
 
   dir_option[dir]->exit_info = tmp;
-  dir_option[dir]->bracee = nullptr;
+  dir_option[dir]->bracee = {};
   int16_t key = fread_int<int16_t>(fl);
   dir_option[dir]->key = key;
 
@@ -2003,7 +1997,7 @@ zone_t DC::read_one_zone(FILEPtr fl, QString zone_filename)
   zone_commands_t reset_tab;
   char *check, buf[161], ch;
   int reset_top, i, tmp;
-  char *skipper = nullptr;
+  char *skipper = {};
   int version = 1;
   bool modified = false;
 
@@ -3023,7 +3017,7 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   }
   else
   {
-    mob_index[vnum].non_combat_func = nullptr;
+    mob_index[vnum].non_combat_func = {};
   }
 
   if (mob_combat_functions.contains(vnum))
@@ -3032,7 +3026,7 @@ auto DC::create_blank_mobile(vnum_t vnum) -> std::expected<vnum_t, create_error>
   }
   else
   {
-    mob_index[vnum].combat_func = nullptr;
+    mob_index[vnum].combat_func = {};
   }
 
   mob_index[vnum].mob = mob;
@@ -3172,7 +3166,7 @@ ObjectPtr DC::read_object(int nr, QTextStream &fl, bool ignore)
   obj->obj_flags.timer = 0;
 
   obj->ex_descriptions = {};
-  obj->affected = nullptr;
+  obj->affected = {};
   obj->num_affects = 0;
   /* *** other flags *** */
 
@@ -3330,7 +3324,7 @@ ObjectPtr DC::read_object(int nr, FILEPtr fl, bool ignore)
   obj->obj_flags.timer = 0;
 
   obj->ex_descriptions = {};
-  obj->affected = nullptr;
+  obj->affected = {};
   obj->num_affects = 0;
   /* *** other flags *** */
 
@@ -3466,7 +3460,7 @@ std::ifstream &operator>>(std::ifstream &in, ObjectPtr obj)
   obj->obj_flags.timer = 0;
 
   obj->ex_descriptions = {};
-  obj->affected = nullptr;
+  obj->affected = {};
   obj->num_affects = 0;
   // other flags
 
@@ -3762,7 +3756,7 @@ ObjectPtr clone_object(int nr)
   {
     qWarning("%s", qUtf8Printable(QStringLiteral("clone_object(%1): Obj not found in DC::getInstance()->obj_index.\n").arg(nr)));
     dc_free(obj);
-    return nullptr;
+    return {};
   }
 
   /* *** extra descriptions *** */
@@ -4025,7 +4019,7 @@ void Zone::reset(ResetType reset_type)
 
   int reset_cmd_index, last_cmd, last_percent;
   vnum_t last_mob{}, last_obj{};
-  CharacterPtr mob = nullptr;
+  CharacterPtr mob = {};
   ObjectPtr obj, obj_to;
   last_cmd = last_percent = -1;
 
@@ -4090,7 +4084,7 @@ void Zone::reset(ResetType reset_type)
           dc_->mprog_load_trigger(mob);
           if (selfpurge)
           {
-            mob = nullptr;
+            mob = {};
             last_mob = 0;
             last_cmd = 0;
           }
@@ -4555,7 +4549,7 @@ char *fread_string(std::ifstream &in, int hasher)
 
 QString fread_qstring(FILEPtr stream, bool *ok)
 {
-  char *lineptr = nullptr;
+  char *lineptr = {};
   size_t n = 0;
 
   ssize_t bytes_read = dc_getdelim(&lineptr, &n, '~', stream);
@@ -5353,26 +5347,26 @@ void clear_object(ObjectPtr obj)
   obj->vroom = 0;
   obj->obj_flags = obj_flag_data();
   obj->num_affects = 0;
-  obj->affected = nullptr;
+  obj->affected = {};
 
   obj->Name(QStringLiteral(""));
-  obj->long_description = nullptr;
-  obj->short_description = nullptr;
+  obj->long_description = {};
+  obj->short_description = {};
   obj->ActionDescription(QString());
   obj->ex_descriptions = {};
-  obj->carried_by = nullptr;
-  obj->equipped_by = nullptr;
+  obj->carried_by = {};
+  obj->equipped_by = {};
 
-  obj->in_obj = nullptr;
-  obj->contains = nullptr;
+  obj->in_obj = {};
+  obj->contains = {};
 
-  obj->next_content = nullptr;
-  obj->next = nullptr;
-  obj->next_skill = nullptr;
+  obj->next_content = {};
+  obj->next = {};
+  obj->next_skill = {};
   ;
-  obj->table = nullptr;
-  obj->slot = nullptr;
-  obj->wheel = nullptr;
+  obj->table = {};
+  obj->slot = {};
+  obj->wheel = {};
   obj->save_expiration = 0;
   obj->no_sell_expiration = 0;
 }
@@ -5452,7 +5446,7 @@ void init_char(CharacterPtr ch)
     break;
   }
 
-  ch->altar = nullptr;
+  ch->altar = {};
   ch->spec = 0;
   ch->setPrompt({});
   ch->setLastPrompt({});
@@ -6061,7 +6055,7 @@ FILEPtr LegacyFile::openFile(void)
   if ((file_handle_ = dc_fopen(qPrintable(filepath_), "w")) == nullptr)
   {
     qCritical() << error_message_.arg(filepath_);
-    return nullptr;
+    return {};
   }
 
   return file_handle_;

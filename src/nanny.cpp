@@ -354,7 +354,7 @@ ObjectPtr Character::clan_altar(void)
           }
         }
       }
-  return nullptr;
+  return {};
 }
 
 void update_max_who(void)
@@ -386,7 +386,7 @@ void Character::do_on_login_stuff(void)
   do_inate_race_abilities();
   check_hw();
   /* Add a character's skill item's to the list. */
-  this->player->skillchange = nullptr;
+  this->player->skillchange = {};
   this->spellcraftglyph = 0;
   for (int i = 0; i < MAX_WEAR; i++)
   {
@@ -398,7 +398,7 @@ void Character::do_on_login_stuff(void)
       {
         this->equipment[i]->next_skill = this->player->skillchange;
         this->player->skillchange = this->equipment[i];
-        this->equipment[i]->next_skill = nullptr;
+        this->equipment[i]->next_skill = {};
       }
     }
   }
@@ -1143,7 +1143,7 @@ void DC::nanny(class Connection *d, QString arg)
       // TODO - double check this to make sure we're free'ing properly
       ch->setName("");
       delete d->character;
-      d->character = nullptr;
+      d->character = {};
       STATE(d) = Connection::states::GET_NAME;
       break;
 
@@ -1392,7 +1392,7 @@ void DC::nanny(class Connection *d, QString arg)
       GET_RAW_DEX(ch) = ch->desc->stats->dex[selection - 1];
       GET_RAW_CON(ch) = ch->desc->stats->con[selection - 1];
       delete ch->desc->stats;
-      ch->desc->stats = nullptr;
+      ch->desc->stats = {};
       SEND_TO_Q("\nChoose a race(races you can select are marked with a *).\n", d);
       buf = u"  %11: Human\n  %22: Elf\n  %33: Dwarf\n"
             "  %44: Hobbit\n  %55: Pixie\n  %66: Ogre\n"
@@ -1723,7 +1723,7 @@ void DC::nanny(class Connection *d, QString arg)
     {
     case '0':
       close_socket(d);
-      d = nullptr;
+      d = {};
       break;
 
     case '1':
@@ -1743,7 +1743,7 @@ void DC::nanny(class Connection *d, QString arg)
       {
         write_to_descriptor(d->descriptor, "It seems your character has been deleted during logon, or you just experienced some obscure bug.");
         close_socket(d);
-        d = nullptr;
+        d = {};
         break;
       }
 
@@ -1882,7 +1882,7 @@ void DC::nanny(class Connection *d, QString arg)
       d->character->setLevel(1);
       DC::getInstance()->update_wizlist(d->character);
       close_socket(d);
-      d = nullptr;
+      d = {};
     }
     else
     {
@@ -1995,7 +1995,7 @@ bool is_valid_name(QString name)
 // Check for denial of service.
 bool check_deny(class Connection *d, const char *name)
 {
-  FILEPtr fpdeny = nullptr;
+  FILEPtr fpdeny = {};
   char strdeny[MAX_INPUT_LENGTH];
   char bufdeny[MAX_STRING_LENGTH];
 
@@ -3155,7 +3155,7 @@ bool stat_data::increase(quint64 number)
     return false;
   }
 
-  int *attribute_to_change = nullptr;
+  int *attribute_to_change = {};
   switch (selection)
   {
   case attribute_t::STRENGTH:
@@ -3219,7 +3219,7 @@ bool stat_data::increase(quint64 number)
 
 bool stat_data::decrease(quint64 number)
 {
-  int *attribute_to_change = nullptr;
+  int *attribute_to_change = {};
   switch (selection)
   {
   case attribute_t::STRENGTH:

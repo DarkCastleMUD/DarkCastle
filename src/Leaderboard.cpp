@@ -537,74 +537,74 @@ void Leaderboard::check(void)
   for (i = 0; i < 5; i++)
   {
     dc_free(hpactivename[i]);
-    hpactivename[i] = nullptr;
+    hpactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mnactivename[i]);
-    mnactivename[i] = nullptr;
+    mnactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(kiactivename[i]);
-    kiactivename[i] = nullptr;
+    kiactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pkactivename[i]);
-    pkactivename[i] = nullptr;
+    pkactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pdactivename[i]);
-    pdactivename[i] = nullptr;
+    pdactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(rdactivename[i]);
-    rdactivename[i] = nullptr;
+    rdactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mvactivename[i]);
-    mvactivename[i] = nullptr;
+    mvactivename[i] = {};
   }
   for (j = 0; j < CLASS_MAX - 2; j++)
   {
     for (i = 0; i < 5; i++)
     {
       dc_free(hpactiveclassname[j][i]);
-      hpactiveclassname[j][i] = nullptr;
+      hpactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(mnactiveclassname[j][i]);
-      mnactiveclassname[j][i] = nullptr;
+      mnactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(kiactiveclassname[j][i]);
-      kiactiveclassname[j][i] = nullptr;
+      kiactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(pkactiveclassname[j][i]);
-      pkactiveclassname[j][i] = nullptr;
+      pkactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(pdactiveclassname[j][i]);
-      pdactiveclassname[j][i] = nullptr;
+      pdactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(rdactiveclassname[j][i]);
-      rdactiveclassname[j][i] = nullptr;
+      rdactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(mvactiveclassname[j][i]);
-      mvactiveclassname[j][i] = nullptr;
+      mvactiveclassname[j][i] = {};
     }
   }
 }
@@ -1070,74 +1070,74 @@ void Leaderboard::check_offline(void)
   for (i = 0; i < 5; i++)
   {
     dc_free(hpactivename[i]);
-    hpactivename[i] = nullptr;
+    hpactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mnactivename[i]);
-    mnactivename[i] = nullptr;
+    mnactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(kiactivename[i]);
-    kiactivename[i] = nullptr;
+    kiactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pkactivename[i]);
-    pkactivename[i] = nullptr;
+    pkactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pdactivename[i]);
-    pdactivename[i] = nullptr;
+    pdactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(rdactivename[i]);
-    rdactivename[i] = nullptr;
+    rdactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mvactivename[i]);
-    mvactivename[i] = nullptr;
+    mvactivename[i] = {};
   }
   for (j = 0; j < CLASS_MAX - 2; j++)
   {
     for (i = 0; i < 5; i++)
     {
       dc_free(hpactiveclassname[j][i]);
-      hpactiveclassname[j][i] = nullptr;
+      hpactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(mnactiveclassname[j][i]);
-      mnactiveclassname[j][i] = nullptr;
+      mnactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(kiactiveclassname[j][i]);
-      kiactiveclassname[j][i] = nullptr;
+      kiactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(pkactiveclassname[j][i]);
-      pkactiveclassname[j][i] = nullptr;
+      pkactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(pdactiveclassname[j][i]);
-      pdactiveclassname[j][i] = nullptr;
+      pdactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(rdactiveclassname[j][i]);
-      rdactiveclassname[j][i] = nullptr;
+      rdactiveclassname[j][i] = {};
     }
     for (i = 0; i < 5; i++)
     {
       dc_free(mvactiveclassname[j][i]);
-      mvactiveclassname[j][i] = nullptr;
+      mvactiveclassname[j][i] = {};
     }
   }
 }
@@ -1510,37 +1510,37 @@ int do_leaderboard(CharacterPtr ch, char *argument, cmd_t cmd)
       for (i = 0; i < 5; i++)
       {
         dc_free(hpactivename[i]);
-        hpactivename[i] = nullptr;
+        hpactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
         dc_free(mnactivename[i]);
-        mnactivename[i] = nullptr;
+        mnactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
         dc_free(kiactivename[i]);
-        kiactivename[i] = nullptr;
+        kiactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
         dc_free(pkactivename[i]);
-        pkactivename[i] = nullptr;
+        pkactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
         dc_free(pdactivename[i]);
-        pdactivename[i] = nullptr;
+        pdactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
         dc_free(rdactivename[i]);
-        rdactivename[i] = nullptr;
+        rdactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
         dc_free(mvactivename[i]);
-        mvactivename[i] = nullptr;
+        mvactivename[i] = {};
       }
       for (i = 0; i < 5; i++)
       {
@@ -1942,72 +1942,72 @@ int do_leaderboard(CharacterPtr ch, char *argument, cmd_t cmd)
   for (i = 0; i < 5; i++)
   {
     dc_free(hponlinename[i]);
-    hponlinename[i] = nullptr;
+    hponlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mnonlinename[i]);
-    mnonlinename[i] = nullptr;
+    mnonlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(kionlinename[i]);
-    kionlinename[i] = nullptr;
+    kionlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pkonlinename[i]);
-    pkonlinename[i] = nullptr;
+    pkonlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pdonlinename[i]);
-    pdonlinename[i] = nullptr;
+    pdonlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(rdonlinename[i]);
-    rdonlinename[i] = nullptr;
+    rdonlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mvonlinename[i]);
-    mvonlinename[i] = nullptr;
+    mvonlinename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(hpactivename[i]);
-    hpactivename[i] = nullptr;
+    hpactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mnactivename[i]);
-    mnactivename[i] = nullptr;
+    mnactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(kiactivename[i]);
-    kiactivename[i] = nullptr;
+    kiactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pkactivename[i]);
-    pkactivename[i] = nullptr;
+    pkactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(pdactivename[i]);
-    pdactivename[i] = nullptr;
+    pdactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(rdactivename[i]);
-    rdactivename[i] = nullptr;
+    rdactivename[i] = {};
   }
   for (i = 0; i < 5; i++)
   {
     dc_free(mvactivename[i]);
-    mvactivename[i] = nullptr;
+    mvactivename[i] = {};
   }
 
   return ReturnValue::eSUCCESS;

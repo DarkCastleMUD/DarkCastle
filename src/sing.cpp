@@ -43,7 +43,7 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 
-CharacterPtr origsing = nullptr;
+CharacterPtr origsing = {};
 
 void check_eq(CharacterPtr ch);
 
@@ -229,8 +229,8 @@ int getTotalRating(CharacterPtr ch)
 
 void stop_grouped_bards(CharacterPtr ch, int bardsing)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (IS_SINGING(ch))
   { // kill everybody elses love
@@ -241,7 +241,7 @@ void stop_grouped_bards(CharacterPtr ch, int bardsing)
       if (bardsing)
         origsing = master;
       do_sing(ch, "stop");
-      origsing = nullptr;
+      origsing = {};
     }
     for (fvictim = master->followers; fvictim; fvictim = fvictim->next)
     {
@@ -250,7 +250,7 @@ void stop_grouped_bards(CharacterPtr ch, int bardsing)
       else
         origsing = fvictim->follower;
       do_sing(ch, "stop");
-      origsing = nullptr;
+      origsing = {};
     }
   }
   else
@@ -272,7 +272,7 @@ void stop_grouped_bards(CharacterPtr ch, int bardsing)
     {
       do_sing(master, "stop");
     }
-    origsing = nullptr;
+    origsing = {};
   }
 }
 
@@ -296,7 +296,7 @@ int do_sing(CharacterPtr ch, char *arg, cmd_t cmd)
   ObjectPtr tar_obj = 0;
   char name[MAX_STRING_LENGTH];
   char spellarg[MAX_STRING_LENGTH];
-  char *argument = nullptr;
+  char *argument = {};
   int qend, spl = -1;
   bool target_ok;
   int learned;
@@ -1311,9 +1311,9 @@ int song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, CharacterP
 
 int execute_song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  ObjectPtr obj = nullptr;
-  CharacterPtr vict = nullptr;
-  ObjectPtr corpse = nullptr;
+  ObjectPtr obj = {};
+  CharacterPtr vict = {};
+  ObjectPtr corpse = {};
   char buf[MAX_STRING_LENGTH];
   std::vector<songInfo>::iterator i;
 
@@ -1327,7 +1327,7 @@ int execute_song_note_of_knowledge(uint8_t level, CharacterPtr ch, char *arg, Ch
   vict = ch->get_char_room_vis((*i).song_data);
   corpse = get_obj_in_list_vis(ch, (*i).song_data, DC::getInstance()->world[ch->in_room].contents);
   if (corpse && (GET_ITEM_TYPE(corpse) != ITEM_CONTAINER || corpse->obj_flags.value[3] != 1))
-    corpse = nullptr;
+    corpse = {};
 
   dc_free((*i).song_data);
   (*i).song_data = 0;
@@ -1953,8 +1953,8 @@ int song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg, Charact
 
 int execute_song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  ObjectPtr obj = nullptr;
-  ObjectPtr tobj = nullptr;
+  ObjectPtr obj = {};
+  ObjectPtr tobj = {};
   std::vector<songInfo>::iterator i;
 
   for (i = ch->songs.begin(); i != ch->songs.end(); ++i)
@@ -1988,8 +1988,8 @@ int execute_song_shattering_resonance(uint8_t level, CharacterPtr ch, char *arg,
       ch->sendln("The magic is shattered by your will!");
       act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
       obj->equipped_by->sendln("Your magic beacon is shattered!");
-      obj->equipped_by->beacon = nullptr;
-      obj->equipped_by = nullptr;
+      obj->equipped_by->beacon = {};
+      obj->equipped_by = {};
     }
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
@@ -2160,7 +2160,7 @@ int song_searching_song(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr 
 
 int execute_song_searching_song(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr target = nullptr;
+  CharacterPtr target = {};
   char buf[200];
   std::vector<songInfo>::iterator i;
 
@@ -2275,7 +2275,7 @@ int song_summon_song(uint8_t level, CharacterPtr ch, char *Aag, CharacterPtr vic
 int execute_song_summon_song(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
   bool summoned = false;
-  follow_type *fvictim = nullptr;
+  follow_type *fvictim = {};
 
   if (ch->followers)
     for (fvictim = ch->followers; fvictim; fvictim = fvictim->next)
@@ -2539,8 +2539,8 @@ int pulse_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPt
 
 int intrp_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2569,8 +2569,8 @@ int intrp_jig_of_alacrity(uint8_t level, CharacterPtr ch, char *arg, CharacterPt
 
 int intrp_song_fanatical_fanfare(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2606,8 +2606,8 @@ int intrp_song_fanatical_fanfare(uint8_t level, CharacterPtr ch, char *arg, Char
 }
 int intrp_mking_charge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2730,8 +2730,8 @@ int song_bountiful_sonnet(uint8_t level, CharacterPtr ch, char *arg, CharacterPt
 
 int execute_song_bountiful_sonnet(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ch->master->in_room == ch->in_room && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -2770,7 +2770,7 @@ int execute_song_bountiful_sonnet(uint8_t level, CharacterPtr ch, char *arg, Cha
 
 int execute_song_dischordant_dirge(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr target = nullptr;
+  CharacterPtr target = {};
   // char buf[400];
   std::vector<songInfo>::iterator i;
 
@@ -2917,7 +2917,7 @@ int song_synchronous_chord(uint8_t level, CharacterPtr ch, char *arg, CharacterP
 
 int execute_song_synchronous_chord(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr target = nullptr;
+  CharacterPtr target = {};
   char buf[400];
   std::vector<songInfo>::iterator i;
 
@@ -3157,8 +3157,8 @@ int pulse_vigilant_siren(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr
 
 int intrp_vigilant_siren(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
 
   if (ch->master && ISSET(ch->affected_by, AFF_GROUP))
     master = ch->master;
@@ -3419,8 +3419,8 @@ int song_submariners_anthem(uint8_t level, CharacterPtr ch, char *arg, Character
 
 int execute_song_submariners_anthem(uint8_t level, CharacterPtr ch, char *arg, CharacterPtr victim, int skill)
 {
-  CharacterPtr master = nullptr;
-  follow_type *fvictim = nullptr;
+  CharacterPtr master = {};
+  follow_type *fvictim = {};
   affected_type af;
   af.type = SKILL_SONG_SUBMARINERS_ANTHEM;
   af.duration = 1 + (skill / 10);

@@ -197,7 +197,7 @@ void DC::mobile_activity(void)
         dc_free(tmp_act);
       }
       ch->mobdata->mpactnum = 0;
-      ch->mobdata->mpact = nullptr;
+      ch->mobdata->mpact = {};
     }
 
     PerfTimers["scavenge"].start();

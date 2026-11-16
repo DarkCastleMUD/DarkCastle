@@ -383,8 +383,8 @@ private slots:
     conn->output = {};
 
     QCOMPARE(dc.character_list.erase(ch), 1);
-    ch->desc = nullptr;
-    ch->player = nullptr;
+    ch->desc = {};
+    ch->player = {};
   }
 
   void test_do_vault_get()
@@ -655,8 +655,8 @@ private slots:
     remove_vault(ch->getNameC());
 
     QCOMPARE(dc.character_list.erase(ch), 1);
-    ch->desc = nullptr;
-    ch->player = nullptr;
+    ch->desc = {};
+    ch->player = {};
   }
 
   void test_fread()
@@ -1009,10 +1009,10 @@ private slots:
     QCOMPARE(dc.character_list.count(ch), 0);
     QCOMPARE(dc.character_list.erase(ch2), 1);
     QCOMPARE(dc.character_list.count(ch2), 0);
-    ch->desc = nullptr;
-    ch->player = nullptr;
-    ch2->desc = nullptr;
-    ch2->player = nullptr;
+    ch->desc = {};
+    ch->player = {};
+    ch2->desc = {};
+    ch2->player = {};
   }
 
   void test_do_medit()

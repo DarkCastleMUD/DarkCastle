@@ -392,7 +392,7 @@ int main(int argc, char **argv)
 
   if (argc > 1 && (QString(argv[1]) == "all" || QString(argv[1]) == "leaderboard"))
   {
-    ObjectPtr obj = nullptr;
+    ObjectPtr obj = {};
     QString savepath = dclib + "../save/";
     for (const auto &entry : std::filesystem::directory_iterator(savepath.toStdString()))
     {

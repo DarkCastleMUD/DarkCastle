@@ -80,7 +80,7 @@ char *str_hsh(const char *arg)
   // if(*arg == '\0')
   //  return(nulltree.name);
   if (!arg)
-    return nullptr;
+    return {};
 
   for (; current; current = next)
   {
@@ -100,7 +100,7 @@ char *str_hsh(const char *arg)
   current = (hash_info *)dc_alloc(1, sizeof(hash_info));
 #endif
 
-  current->right = current->left = nullptr;
+  current->right = current->left = {};
   if (scratch < 0)
     temp->left = current;
   else

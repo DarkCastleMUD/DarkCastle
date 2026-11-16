@@ -515,7 +515,7 @@ skill_quest *find_sq(char *testa)
   for (curr = skill_list; curr; curr = curr->next)
     if (!str_nosp_cmp(get_skill_name(curr->num), testa))
       return curr;
-  return nullptr;
+  return {};
 }
 
 skill_quest *find_sq(int sq)
@@ -524,7 +524,7 @@ skill_quest *find_sq(int sq)
   for (curr = skill_list; curr; curr = curr->next)
     if (sq == curr->num)
       return curr;
-  return nullptr;
+  return {};
 }
 
 int do_sqedit(CharacterPtr ch, char *argument, cmd_t cmd)
@@ -578,7 +578,7 @@ int do_sqedit(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH * 2];
   bool done = false;
   argument = one_argument(argument, arg1);
-  skill_quest *skill = nullptr;
+  skill_quest *skill = {};
 
   if (argument && *argument)
   {
@@ -594,7 +594,7 @@ int do_sqedit(CharacterPtr ch, char *argument, cmd_t cmd)
     ch->sendln("Unknown skill.");
     return ReturnValue::eFAILURE;
   }
-  skill_quest *curren, *last = nullptr;
+  skill_quest *curren, *last = {};
   switch (i)
   {
   case 0:

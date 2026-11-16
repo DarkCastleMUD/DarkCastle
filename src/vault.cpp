@@ -109,7 +109,7 @@ vault_data *has_vault(QString name)
 
 void remove_from_object_list(ObjectPtr obj)
 {
-  ObjectPtr tObj, pObj = nullptr;
+  ObjectPtr tObj, pObj = {};
   for (tObj = DC::getInstance()->object_list; tObj; tObj = tObj->next)
   {
     if (tObj == obj)
@@ -118,7 +118,7 @@ void remove_from_object_list(ObjectPtr obj)
         pObj->next = tObj->next;
       else
         DC::getInstance()->object_list = tObj->next;
-      tObj->next = nullptr;
+      tObj->next = {};
       break;
     }
     pObj = tObj;
@@ -179,7 +179,7 @@ void save_vault(QString name)
 void Character::vault_access(QString who)
 {
   vault_access_data *access;
-  vault_data *vault = nullptr;
+  vault_data *vault = {};
 
   if (!vault && !(vault = has_vault(getName())))
   {
@@ -473,7 +473,7 @@ int do_vault(CharacterPtr ch, char *argument, cmd_t cmd)
 
 void Character::vault_stats(QString name)
 {
-  vault_data *vault = nullptr;
+  vault_data *vault = {};
   vault_items_data *item;
   vault_access_data *access;
   ObjectPtr obj;
@@ -555,7 +555,7 @@ void DC::reload_vaults(void)
       free(vault);
   }
 
-  vault_table = nullptr;
+  vault_table = {};
 
   load_vaults();
 }
@@ -699,7 +699,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
 
   remove_vault_accesses(qPrintable(name));
 
-  vault_data *vault, *next_vault, *prev_vault = nullptr;
+  vault_data *vault, *next_vault, *prev_vault = {};
   vault_items_data *items, *titems;
   vault_access_data *access, *taccess;
 
@@ -749,7 +749,7 @@ void remove_vault(QString name, BACKUP_TYPE backup)
       else
         prev_vault->next = vault->next;
       free(vault);
-      vault = nullptr;
+      vault = {};
       total_vaults--;
       return;
     }
@@ -762,7 +762,7 @@ void DC::testing_load_vaults(void)
   vault_data *vault;
   vault_access_data *access;
   vault_items_data *items;
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   struct stat statbuf = {};
   int vnum = 0, full = 0, count = 0;
   quint64 gold = 0;
@@ -818,9 +818,9 @@ void DC::testing_load_vaults(void)
     vault->size = VAULT_BASE_SIZE;
     vault->gold = 0;
     vault->weight = 0;
-    vault->access = nullptr;
-    vault->items = nullptr;
-    vault->next = nullptr;
+    vault->access = {};
+    vault->items = {};
+    vault->next = {};
 
     QString type;
     qDebugQTextStreamLine(vault_file_stream, "load_vaults() before reading type");
@@ -846,7 +846,7 @@ void DC::testing_load_vaults(void)
         if (!full)
         {
           obj = get_obj(vnum);
-          items->obj = nullptr;
+          items->obj = {};
         }
         else
         {
@@ -984,7 +984,7 @@ void DC::load_vaults(void)
   vault_data *vault;
   vault_access_data *access;
   vault_items_data *items;
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   struct stat statbuf = {};
   FILEPtr fl, index;
   int vnum = 0, full = 0, count = 0;
@@ -1042,9 +1042,9 @@ void DC::load_vaults(void)
     vault->size = VAULT_BASE_SIZE;
     vault->gold = 0;
     vault->weight = 0;
-    vault->access = nullptr;
-    vault->items = nullptr;
-    vault->next = nullptr;
+    vault->access = {};
+    vault->items = {};
+    vault->next = {};
 
     get_line(fl, type);
     while (*type != '$')
@@ -1104,7 +1104,7 @@ void DC::load_vaults(void)
         if (!full)
         {
           obj = get_obj(vnum);
-          items->obj = nullptr;
+          items->obj = {};
         }
         else
         {
@@ -1239,7 +1239,7 @@ void remove_vault_accesses(QString name)
 
 void access_remove(QString name, vault_data *vault)
 {
-  vault_access_data *access, *next_access, *prev_access = nullptr;
+  vault_access_data *access, *next_access, *prev_access = {};
 
   for (access = vault->access; access; access = next_access)
   {
@@ -1255,7 +1255,7 @@ void access_remove(QString name, vault_data *vault)
       }
 
       free(access);
-      access = nullptr;
+      access = {};
       break;
     }
     prev_access = access;
@@ -1676,7 +1676,7 @@ void item_add(ObjectPtr obj, vault_data *vault)
 
 void item_remove(ObjectPtr obj, vault_data *vault)
 {
-  vault_items_data *item, *next_item, *prev_item = nullptr;
+  vault_items_data *item, *next_item, *prev_item = {};
   int vnum = GET_OBJ_VNUM(obj);
 
   for (item = vault->items; item; item = next_item)
@@ -1699,7 +1699,7 @@ void item_remove(ObjectPtr obj, vault_data *vault)
       }
 
       free(item);
-      item = nullptr;
+      item = {};
       vault->weight -= GET_OBJ_WEIGHT(get_obj(vnum));
       return;
     }
@@ -2256,8 +2256,8 @@ void add_new_vault(const char *name, int indexonly)
   else
     vault->size = VAULT_BASE_SIZE;
   vault->weight = 0;
-  vault->access = nullptr;
-  vault->items = nullptr;
+  vault->access = {};
+  vault->items = {};
   vault->next = vault_table;
   vault_table = vault;
 
@@ -2284,7 +2284,7 @@ CharacterPtr find_owner(QString name)
     return *result;
   }
 
-  return nullptr;
+  return {};
 }
 
 void vault_log(CharacterPtr ch, QString owner)
@@ -2312,7 +2312,7 @@ void vault_log(CharacterPtr ch, QString owner)
 
 void logvault(QString message, QString name)
 {
-  tm *tm = nullptr;
+  tm *tm = {};
   time_t ct;
   FILEPtr ofile, nfile;
   char buf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];

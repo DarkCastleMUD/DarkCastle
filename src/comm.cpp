@@ -1484,7 +1484,7 @@ CharacterPtr get_charmie(CharacterPtr ch)
       if (IS_AFFECTED(k->follower, AFF_CHARM))
         return k->follower;
 
-  return nullptr;
+  return {};
 }
 
 void write_to_q(QByteArray txt, std::queue<QByteArray> &input_queue)
@@ -1518,7 +1518,7 @@ void flush_queues(class Connection *d)
 
 void DC::free_buff_pool_from_memory(void)
 {
-  txt_block *curr = nullptr;
+  txt_block *curr = {};
 
   while (bufpool)
   {
@@ -2062,7 +2062,7 @@ int process_input(class Connection *t)
   // see if there's another newline in the input buffer
 
     read_point = ptr = nl_pos;
-    for (nl_pos = nullptr; *ptr && !nl_pos; ptr++)
+    for (nl_pos = {}; *ptr && !nl_pos; ptr++)
       if (ISNEWL(*ptr) || (t->connected != Connection::states::WRITE_BOARD && t->connected != Connection::states::EDITING && t->connected != Connection::states::EDIT_MPROG && *ptr == '|'))
         nl_pos = ptr;
 
@@ -2152,12 +2152,12 @@ int close_socket(class Connection *d)
 
   /* Forget snooping */
   if (d->snooping)
-    d->snooping->snoop_by = nullptr;
+    d->snooping->snoop_by = {};
 
   if (d->snoop_by)
   {
     SEND_TO_Q("Your victim is no longer among us.\n", d->snoop_by);
-    d->snoop_by->snooping = nullptr;
+    d->snoop_by->snooping = {};
   }
 
   // Force descriptors to send tilde (~) or "/s" to finish in-progress edits
@@ -2195,7 +2195,7 @@ int close_socket(class Connection *d)
       {
         logsocket(QStringLiteral("%1@%2 has disconnected from room %3.").arg(d->character->getName()).arg(d->getPeerFullAddressString()).arg(DC::getInstance()->world[d->character->in_room].number));
       }
-      d->character->desc = nullptr;
+      d->character->desc = {};
     }
     else
     {
@@ -2273,7 +2273,7 @@ void report_debug_logging()
 
 void DC::crash_hotboot(void)
 {
-  class Connection *d = nullptr;
+  class Connection *d = {};
   extern int try_to_hotboot_on_crash;
   extern int died_from_sigsegv;
 
@@ -2354,7 +2354,7 @@ void unrestrict_game(int sig)
 
   logentry(QStringLiteral("Received SIGUSR2 - completely unrestricting game (emergent)"),
            ANGEL, DC::LogChannel::LOG_GOD);
-  ban_list = nullptr;
+  ban_list = {};
   restrict = 0;
   num_invalid = 0;
 }
@@ -2416,7 +2416,7 @@ void signal_handler(int signal, siginfo_t *si, void *)
   }
   if (signal == SIGHUP)
   {
-    char **new_argv = nullptr;
+    char **new_argv = {};
     extern int do_not_save_corpses;
     do_not_save_corpses = 1;
     send_to_all(QStringLiteral("Hot reboot by SIGHUP.\n"));
@@ -2455,7 +2455,7 @@ void signal_setup(void)
   sahup.sa_sigaction = signal_handler;
   sigemptyset(&sahup.sa_mask);
   sahup.sa_flags = SA_SIGINFO;
-  sahup.sa_restorer = nullptr;
+  sahup.sa_restorer = {};
   sigaction(SIGHUP, &sahup, nullptr);
 
   my_signal(SIGTERM, hupsig);
@@ -2664,7 +2664,7 @@ void send_to_outdoor(char *messg)
 
 void send_to_zone(char *messg, int zone)
 {
-  class Connection *i = nullptr;
+  class Connection *i = {};
   if (messg)
   {
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
@@ -2679,7 +2679,7 @@ void send_to_zone(char *messg, int zone)
 
 void send_to_room(QString messg, room_t room, bool awakeonly, CharacterPtr nta)
 {
-  CharacterPtr i = nullptr;
+  CharacterPtr i = {};
 
   // If a megaphone goes off when in someone's inventory this happens
   if (room == DC::NOWHERE)

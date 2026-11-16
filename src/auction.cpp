@@ -745,7 +745,7 @@ void AuctionHouse::Load()
     InTicket.state = (AuctionStates)state;
     dc_fscanf(the_file, "%u\n", &InTicket.end_time);
     dc_fscanf(the_file, "%u\n", &InTicket.price);
-    InTicket.obj = nullptr;
+    InTicket.obj = {};
 
     Items_For_Sale[ticket] = InTicket;
   } // LOOP
@@ -1097,7 +1097,7 @@ void AuctionHouse::BuyItem(CharacterPtr ch, unsigned int ticket)
     }
   }
 
-  Item_it->obj = nullptr;
+  Item_it->obj = {};
   ItemsSold += 1;
   ItemsActive -= 1;
   Revenue += Item_it->price;
@@ -1194,12 +1194,12 @@ ObjectPtr ticket_object_load(QMap<unsigned int, AuctionTicket>::iterator Item_it
         {
           logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): could not load obj file for ticket %d due to reasons unknown", ticket);
         }
-        Item_it->obj = nullptr;
+        Item_it->obj = {};
       }
       catch (...)
       {
         logf(IMMORTAL, DC::LogChannel::LOG_BUG, "ticket_object_load(): unknown error");
-        Item_it->obj = nullptr;
+        Item_it->obj = {};
       }
     }
   }
@@ -1641,7 +1641,7 @@ void AuctionHouse::AddItem(CharacterPtr ch, ObjectPtr obj, unsigned int price, Q
   }
   else
   {
-    NewTicket.obj = nullptr;
+    NewTicket.obj = {};
   }
 
   Items_For_Sale[cur_index] = NewTicket;

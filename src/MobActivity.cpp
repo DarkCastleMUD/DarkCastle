@@ -23,7 +23,7 @@
 // Externs
 
 // Locals
-class Path *mPathList = nullptr;
+class Path *mPathList = {};
 
 /* PATHFINDING */
 
@@ -71,7 +71,7 @@ char *Path::determineRoute(CharacterPtr ch, room_t from, room_t to)
   {
     if (ch)
       ch->sendln("Error::determineBestRoute:: Room 'to' or 'from' is not connected to the path.");
-    return nullptr;
+    return {};
   }
   i = 1000;
   resetPath();
@@ -430,7 +430,7 @@ int do_pathpath(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
   argument = one_argument(argument, arg1);
   argument = one_argument(argument, arg2);
-  class Path *pt = nullptr, *pt2 = nullptr;
+  class Path *pt = nullptr, *pt2 = {};
   for (pt = mPathList; pt; pt = pt->next)
     if (!str_cmp(pt->name, arg1))
       break;

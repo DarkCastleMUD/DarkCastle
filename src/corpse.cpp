@@ -239,7 +239,7 @@ void DC::load_corpses(void)
   int t[15], zwei = 0;
   int num_objs = 0;
   vnum_t nr{};
-  ObjectPtr temp = nullptr, obj = nullptr, next_obj = nullptr;
+  ObjectPtr temp = nullptr, obj = nullptr, next_obj = {};
   char buf1[256] = {0}, buf2[256] = {0}, buf3[256] = {0};
   bool end = false;
   ObjectPtr money;
@@ -260,7 +260,7 @@ void DC::load_corpses(void)
 
   while (!dc_feof(fp) && !end)
   {
-    temp = nullptr;
+    temp = {};
     /* first, we get the number. Not too hard. */
     if (*line == '|')
       break;
@@ -609,7 +609,7 @@ char *fread_string_new(FILEPtr fl, char *error)
     strcpy(rslt, buf);
   }
   else
-    rslt = nullptr;
+    rslt = {};
 
   return rslt;
 }

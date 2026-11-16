@@ -174,7 +174,7 @@ void fwrite_var_string(QString str, FILEPtr fpsave)
 char *fread_var_string(FILEPtr fpsave)
 {
   uint16_t tmp_size = 0;
-  char *tmp_str = nullptr;
+  char *tmp_str = {};
 
   size_t records_read = dc_fread(&tmp_size, sizeof(tmp_size), 1, fpsave);
   if (tmp_size > 0 && records_read > 0)
@@ -183,7 +183,7 @@ char *fread_var_string(FILEPtr fpsave)
     assert(tmp_str);
     if (tmp_str == nullptr)
     {
-      return nullptr;
+      return {};
     }
 
     records_read = dc_fread(tmp_str, sizeof(char), tmp_size, fpsave);
@@ -194,7 +194,7 @@ char *fread_var_string(FILEPtr fpsave)
     dc_free(tmp_str);
   }
 
-  return nullptr;
+  return {};
 }
 
 QString fread_var_qstring(FILEPtr fpsave)
@@ -644,13 +644,13 @@ bool read_pc_or_mob_data(CharacterPtr ch, FILEPtr fpsave, QString filename)
 {
   if (ch->isNonPlayer())
   {
-    ch->player = nullptr;
+    ch->player = {};
     ch->mobdata = MobilePtr::create();
     ch->mobdata->read(fpsave);
   }
   else
   {
-    ch->mobdata = nullptr;
+    ch->mobdata = {};
     ch->player = new Player;
     ch->setType(Character::Type::Player);
     if (!ch->player->read(fpsave, ch, filename))
@@ -818,7 +818,7 @@ bool Character::store_to_char_variable_data(FILEPtr fpsave)
   {
     int16_t aff_count; // do not change form int16_t
     dc_fread(&aff_count, sizeof(aff_count), 1, fpsave);
-    this->affected = nullptr;
+    this->affected = {};
     for (int16_t i = 0; i < aff_count; i++)
     {
       affected_type *af = new (std::nothrow) affected_type;
@@ -1038,7 +1038,7 @@ load_status_t DC::load_char_obj(class Connection *d, QString name)
   FILEPtr fpsave{};
   QString strsave;
   char_file_u4 uchar;
-  ObjectPtr last_cont = nullptr;
+  ObjectPtr last_cont = {};
 
   name[0] = name[0].toUpper();
 
@@ -1124,7 +1124,7 @@ ObjectPtr obj_store_to_char(CharacterPtr ch, FILEPtr fpsave, ObjectPtr last_cont
   dc_fread(&object, sizeof(object), 1, fpsave);
 
   if (dc_feof(fpsave))
-    return nullptr;
+    return {};
 
   // if it's a current object, clone it and continue
   // if it's not, then we need to remove it from the pfile so clone obj 1

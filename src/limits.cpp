@@ -730,7 +730,7 @@ void gain_condition(CharacterPtr ch, int condition, int value)
 
 void food_update(void)
 {
-  ObjectPtr food = nullptr;
+  ObjectPtr food = {};
 
   const auto &character_list = (dynamic_cast<DC *>(DC::instance()))->character_list;
   for (const auto &i : character_list)
@@ -794,7 +794,7 @@ void point_update(void)
     {
       int o;
       for (o = 0; o < MAX_HIDE; o++)
-        i->player->hiding_from[o] = nullptr;
+        i->player->hiding_from[o] = {};
       o = 0;
       for (temp = DC::getInstance()->world[i->in_room].people; temp; temp = temp->next_in_room)
       {

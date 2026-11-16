@@ -80,7 +80,7 @@ void remove_obj_affect_by_index(ObjectPtr obj, int index)
   else
   {
     dc_free(obj->affected);
-    obj->affected = nullptr;
+    obj->affected = {};
   }
 }
 
@@ -492,7 +492,7 @@ int do_recite(CharacterPtr ch, char *argument, cmd_t cmd)
 void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
 {
   char buf[200];
-  ObjectPtr trap_obj = nullptr;
+  ObjectPtr trap_obj = {};
 
   sprintf(buf, "You set up the %s to catch people moving around in the area.\n", qPrintable(obj->short_description));
   ch->send(buf);
@@ -513,7 +513,7 @@ void set_movement_trap(CharacterPtr ch, ObjectPtr obj)
 void set_exit_trap(CharacterPtr ch, ObjectPtr obj, char *arg)
 {
   char buf[200];
-  ObjectPtr trap_obj = nullptr;
+  ObjectPtr trap_obj = {};
 
   sprintf(buf, "You set up the %s to catch people trying to leave the area.\n", qPrintable(obj->short_description));
   ch->send(buf);
@@ -539,7 +539,7 @@ bool set_utility_mortar(CharacterPtr ch, ObjectPtr obj, char *arg)
 {
   char direct[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  ObjectPtr trap_obj = nullptr;
+  ObjectPtr trap_obj = {};
   int dir;
 
   one_argument(arg, direct);
@@ -678,7 +678,7 @@ void set_utility_item(CharacterPtr ch, ObjectPtr obj, char *argument)
 
 int do_mortal_set(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
 
@@ -2621,7 +2621,7 @@ int do_remove(CharacterPtr ch, char *argument, cmd_t cmd)
 int Character::recheck_height_wears(void)
 {
   int j;
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
   if (isNonPlayer())
     return ReturnValue::eFAILURE; // NPCs get to wear the stuff.
 

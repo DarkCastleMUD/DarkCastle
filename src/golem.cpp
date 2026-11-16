@@ -161,7 +161,7 @@ int verify_existing_components(CharacterPtr ch, int golemtype)
 void save_golem_data(CharacterPtr ch)
 {
   char file[200];
-  FILEPtr fpfile = nullptr;
+  FILEPtr fpfile = {};
   int golemtype = 0;
   if (ch->isNonPlayer() || GET_CLASS(ch) != CLASS_MAGIC_USER || !ch->player->golem)
     return;
@@ -184,7 +184,7 @@ void save_golem_data(CharacterPtr ch)
 void save_charmie_data(CharacterPtr ch)
 {
   char file[200];
-  FILEPtr fpfile = nullptr;
+  FILEPtr fpfile = {};
 
   if (ch->isNonPlayer() || ch->followers == nullptr)
   {
@@ -267,7 +267,7 @@ void set_golem(CharacterPtr golem, int golemtype)
 void Character::load_golem_data(int golemtype)
 {
   char file[200];
-  FILEPtr fpfile = nullptr;
+  FILEPtr fpfile = {};
   CharacterPtr golem;
   if (this->isNonPlayer() || (GET_CLASS(this) != CLASS_MAGIC_USER && this->getLevel() < OVERSEER) || this->player->golem)
     return;
@@ -295,7 +295,7 @@ void Character::load_golem_data(int golemtype)
   }
 
   dc_fread(&(golem->exp), sizeof(golem->exp), 1, fpfile);
-  ObjectPtr last_cont = nullptr; // Last container.
+  ObjectPtr last_cont = {}; // Last container.
   while (!dc_feof(fpfile))
   {
     last_cont = obj_store_to_char(golem, fpfile, last_cont);

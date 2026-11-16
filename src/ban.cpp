@@ -25,7 +25,7 @@
 #include "DC/common.h"
 #include "DC/levels.h"
 
-ban_list_element *ban_list = nullptr;
+ban_list_element *ban_list = {};
 
 const char *ban_types[] = {
     "no",
@@ -69,7 +69,7 @@ void load_banned(void)
 
 void DC::free_ban_list_from_memory(void)
 {
-  ban_list_element *next = nullptr;
+  ban_list_element *next = {};
 
   for (; ban_list; ban_list = next)
   {

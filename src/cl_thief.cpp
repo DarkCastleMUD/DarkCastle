@@ -15,8 +15,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
-#include <string>
-#include <utility>
 
 #include "DC/obj.h"
 #include "DC/character.h"
@@ -774,7 +772,7 @@ int do_hide(CharacterPtr ch, const char *argument, cmd_t cmd)
   if (ch->isPlayer() && (a = ch->has_skill(SKILL_HIDE)))
   {
     for (i = 0; i < MAX_HIDE; i++)
-      ch->player->hiding_from[i] = nullptr;
+      ch->player->hiding_from[i] = {};
     i = 0;
     for (temp = DC::getInstance()->world[ch->in_room].people; temp; temp = temp->next_in_room)
     {
@@ -821,7 +819,7 @@ int do_steal(CharacterPtr ch, char *argument, cmd_t cmd)
   int eq_pos;
   int _exp;
   int retval;
-  ObjectPtr has_item = nullptr;
+  ObjectPtr has_item = {};
   bool ohoh = false;
   int chance = GET_HITROLL(ch) + ch->has_skill(SKILL_STEAL) / 4;
 

@@ -1061,7 +1061,7 @@ int do_mpforce(CharacterPtr ch, char *argument, cmd_t cmd)
 // argument should be <mob> <catchnum> <delay>
 int do_mpthrow(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = {};
   int mob_num;
   int catch_num;
   int delay;
@@ -1122,12 +1122,12 @@ int do_mpthrow(CharacterPtr ch, char *argument, cmd_t cmd)
   throwitem->actor = activeActor;
   throwitem->obj = activeObj;
   throwitem->vo = activeVo;
-  throwitem->rndm = nullptr;
+  throwitem->rndm = {};
 
   if (fourth[0] != '\0')
     throwitem->var = str_dup(fourth);
   else
-    throwitem->var = nullptr;
+    throwitem->var = {};
   throwitem->opt = opt;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -1233,7 +1233,7 @@ QString Character::getTemp(QString name)
   for (eh = tempVariable; eh; eh = eh->next)
     if (eh->name == name)
       return eh->data;
-  return nullptr;
+  return {};
 }
 
 command_return_t Character::do_mpsettemp(QStringList arguments, cmd_t cmd)
@@ -1337,7 +1337,7 @@ public:
   int damage; // Damage #
 };
 
-damage_list *dmg_list = nullptr;
+damage_list *dmg_list = {};
 
 void free_dmg_list()
 {
@@ -1347,7 +1347,7 @@ void free_dmg_list()
     n = c->next;
     dc_free(c);
   }
-  dmg_list = nullptr;
+  dmg_list = {};
 }
 
 void add_dmg(CharacterPtr ch, int dmg)
@@ -1401,14 +1401,14 @@ int do_mpdamage(CharacterPtr ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE | ReturnValue::eINTERNAL_ERROR;
   }
 
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   // if it's 'all' leave victim nullptr and skip
   if (strcmp(arg, "all") && strcmp(arg, "allpc"))
   {
     victim = get_char_room(arg, ch->in_room);
     if (victim && (victim->getLevel() > MORTAL || victim->isNonPlayer())) // don't target immortals
-      victim = nullptr;
+      victim = {};
 
     if (!victim)
       return ReturnValue::eFAILURE; // not an error, just couldn't get valid vict
@@ -1465,7 +1465,7 @@ int do_mpdamage(CharacterPtr ch, char *argument, cmd_t cmd)
 
     if (victim)
     {
-      int *data = nullptr;
+      int *data = {};
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
         hitpoints = ch->getHP();
@@ -1540,7 +1540,7 @@ int do_mpdamage(CharacterPtr ch, char *argument, cmd_t cmd)
       {
         continue;
       }
-      int *data = nullptr;
+      int *data = {};
       if (!temp[0] || !str_cmp(temp, "hitpoints"))
       {
         hitpoints = ch->getHP();
@@ -1592,7 +1592,7 @@ int do_mpdamage(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int do_mpothrow(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = {};
   int mob_num;
   int catch_num;
   int delay;
@@ -1649,7 +1649,7 @@ int do_mpothrow(CharacterPtr ch, char *argument, cmd_t cmd)
   if (fourth[0] != '\0')
     throwitem->var = str_dup(fourth);
   else
-    throwitem->var = nullptr;
+    throwitem->var = {};
 
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -1679,7 +1679,7 @@ int do_mpbestow(CharacterPtr ch, char *argument, cmd_t cmd)
   char arg[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH],
       arg3[MAX_INPUT_LENGTH];
   CharacterPtr victim;
-  CharacterPtr owner = nullptr;
+  CharacterPtr owner = {};
   if (ch->isPlayer())
   {
     ch->sendln("Huh?");
@@ -1774,7 +1774,7 @@ int do_mppause(CharacterPtr ch, char *argument, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  mprog_throw_type *throwitem = nullptr;
+  mprog_throw_type *throwitem = {};
   int delay;
 
   char first[MAX_INPUT_LENGTH];
@@ -1844,7 +1844,7 @@ int do_mppause(CharacterPtr ch, char *argument, cmd_t cmd)
 
   throwitem->startPos = activePos - activeProgTmpBuf;
 
-  throwitem->var = nullptr;
+  throwitem->var = {};
   throwitem->opt = 0;
   // add to delay list
   throwitem->next = g_mprog_throw_list;
@@ -1945,7 +1945,7 @@ int do_mppeace(CharacterPtr ch, char *argument, cmd_t cmd)
   argument = one_argument(argument, arg);
 
   CharacterPtr rch;
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
 
   if (arg[0])
   {
@@ -2118,20 +2118,20 @@ char *expand_data(CharacterPtr ch, char *orig)
     if (c != '\0')
       *(ptr + r) = '~';
 
-    int16_t *lvali = nullptr;
-    uint32_t *lvalui = nullptr;
+    int16_t *lvali = {};
+    uint32_t *lvalui = {};
     QString *lvalstr = new QString;
     QString lvalqstr;
-    int64_t *lvali64 = nullptr;
-    quint64 *lvalui64 = nullptr;
-    int8_t *lvalb = nullptr;
+    int64_t *lvali64 = {};
+    quint64 *lvalui64 = {};
+    int8_t *lvalb = {};
     ch->getDC()->translate_value(left, right, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
     if (!lvali && !lvalui && !lvalb)
     {
       ch->prog_error(QStringLiteral("Mpsetmath - Expand_data - Accessing unknown data."));
       delete lvalstr;
-      return nullptr;
+      return {};
     }
 
     for (o = z;; o++)
@@ -2183,7 +2183,7 @@ int do_mpsetmath(CharacterPtr ch, char *arg, cmd_t cmd)
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   arg = one_argument(arg, arg1);
-  char *r = nullptr;
+  char *r = {};
 
   if ((r = strchr(arg1, '.')) != nullptr)
   {
@@ -2198,13 +2198,13 @@ int do_mpsetmath(CharacterPtr ch, char *arg, cmd_t cmd)
   }
   bool allowed = false;
 
-  int16_t *lvali = nullptr;
-  uint32_t *lvalui = nullptr;
+  int16_t *lvali = {};
+  uint32_t *lvalui = {};
   QString *lvalstr = new QString;
   QString lvalqstr;
-  int64_t *lvali64 = nullptr;
-  quint64 *lvalui64 = nullptr;
-  int8_t *lvalb = nullptr;
+  int64_t *lvali64 = {};
+  quint64 *lvalui64 = {};
+  int8_t *lvalb = {};
   ch->getDC()->translate_value(arg1, r, &lvali, &lvalui, &lvalstr, &lvali64, &lvalui64, &lvalb, ch, activeActor, activeObj, activeVo, activeRndm, lvalqstr);
 
   vict = activeTarget;

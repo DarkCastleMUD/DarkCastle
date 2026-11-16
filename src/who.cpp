@@ -42,7 +42,7 @@ clan_data *get_clan(CharacterPtr);
 // we're not repeatedly allocing it, and it grows as needed to fit all the data (like a CString)
 // That way we never have to worry about having a bunch of players on, and overflowing it.
 // -pir 2/20/01
-char *gWhoBuffer = nullptr;
+char *gWhoBuffer = {};
 int32_t gWhoBufferCurSize = 0;
 int32_t gWhoBufferMaxSize = 0;
 

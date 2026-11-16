@@ -241,7 +241,7 @@ int search_skills(const char *arg, class_skill_defines *list_skills)
 
 class_skill_defines *Character::get_skill_list(void)
 {
-  class_skill_defines *skilllist = nullptr;
+  class_skill_defines *skilllist = {};
 
   switch (GET_CLASS(this))
   {

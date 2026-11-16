@@ -334,7 +334,7 @@ ObjectPtr DC::getObject(vnum_t vnum)
 
   if (rnum == -1)
   {
-    return nullptr;
+    return {};
   }
 
   return static_cast<ObjectPtr>(DC::getInstance()->obj_index[rnum].item);

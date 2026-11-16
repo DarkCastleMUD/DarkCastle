@@ -2569,7 +2569,7 @@ int DC::damage(CharacterPtr ch, CharacterPtr victim, int dam, int weapon_type, i
 
   int pre_stoneshield_dam = 0;
   std::stringstream string1;
-  affected_type *pspell = nullptr;
+  affected_type *pspell = {};
   if (!victim->isImmortalPlayer() && dam > 0 && typeofdamage == DAMAGE_TYPE_PHYSICAL &&
       ((pspell = victim->affected_by_spell(SPELL_STONE_SHIELD)) ||
        (pspell = victim->affected_by_spell(SPELL_GREATER_STONE_SHIELD))))
@@ -4564,7 +4564,7 @@ void make_corpse(CharacterPtr ch)
 
     if (ch->isNonPlayer() && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
     {
-      ObjectPtr recipeitem = nullptr;
+      ObjectPtr recipeitem = {};
       int rarity = number(1, 100);
       auto itemtype = number(0, 1);
       if (rarity > 95) // 96-100 5%
@@ -5993,7 +5993,7 @@ CharacterPtr loop_followers(follow_type **f)
     *f = (*f)->next;
   }
   else
-    tmp_ch = nullptr;
+    tmp_ch = {};
 
   return (tmp_ch);
 }
@@ -6766,7 +6766,7 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, int type, bool vict_is_attac
   if (IS_AFFECTED(victim, AFF_CHAMPION) && ch && ch != victim)
   {
     REMBIT(victim->affected_by, AFF_CHAMPION);
-    ObjectPtr obj = nullptr;
+    ObjectPtr obj = {};
     if (!(obj = get_obj_in_list_num(CHAMPION_ITEM, victim->carrying)))
     {
       logentry(QStringLiteral("Champion without the flag, no bueno amigo!"), IMMORTAL, DC::LogChannel::LOG_BUG);
@@ -6803,8 +6803,8 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, int type)
 
   char killer_message[MAX_STRING_LENGTH];
   //  CharacterPtr i;
-  clan_data *ch_clan = nullptr;
-  clan_data *victim_clan = nullptr;
+  clan_data *ch_clan = {};
+  clan_data *victim_clan = {};
   int eliminated = 1;
   void move_player_home(CharacterPtr victim);
 

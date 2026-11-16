@@ -661,10 +661,10 @@ public:
   static bool validateName(QString name);
 
   MobilePtr mobdata = {};
-  class Player *player = nullptr;
-  ObjectPtr objdata = nullptr;
+  class Player *player = {};
+  ObjectPtr objdata = {};
 
-  class Connection *desc = nullptr; // nullptr normally for mobs
+  class Connection *desc = {}; // nullptr normally for mobs
 
   const char *getNameC(void) const;
 
@@ -939,7 +939,7 @@ public:
 
   int16_t glow_factor = {}; // Amount that the character glows
 
-  ObjectPtr beacon = nullptr; /* pointer to my beacon */
+  ObjectPtr beacon = {}; /* pointer to my beacon */
 
   std::vector<songInfo> songs = {}; // Song list
                                     //     int16_t song_timer = {};       /* status for songs being sung */
@@ -948,9 +948,9 @@ public:
 
   ObjectPtr equipment[MAX_WEAR] = {}; // Equipment List
 
-  skill_list_t skills = {};           // Skills List
-  affected_type *affected = nullptr;  // Affected by list
-  ObjectPtr carrying = nullptr; // Inventory List
+  skill_list_t skills = {};     // Skills List
+  affected_type *affected = {}; // Affected by list
+  ObjectPtr carrying = {};      // Inventory List
 
   int16_t poison_amount = {}; // How much poison damage I'm taking every few seconds
 

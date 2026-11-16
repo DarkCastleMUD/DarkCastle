@@ -142,8 +142,8 @@ command_return_t Character::do_split(QStringList arguments, cmd_t cmd)
 {
   quint64 share = 0, extra = 0;
   quint64 no_members = 0;
-  CharacterPtr k = nullptr;
-  follow_type *f = nullptr;
+  CharacterPtr k = {};
+  follow_type *f = {};
 
   if (arguments.isEmpty())
   {
@@ -517,7 +517,7 @@ int do_promote(CharacterPtr ch, char *argument, cmd_t cmd)
   if (ch->group_name)
   {
     new_new_leader->group_name = ch->group_name;
-    ch->group_name = nullptr;
+    ch->group_name = {};
   }
   else
     new_new_leader->group_name = str_dup("I am a dork");
@@ -779,7 +779,7 @@ std::vector<CharacterPtr> Character::getFollowers(void)
 {
   std::vector<CharacterPtr> followers = {};
   follow_type *f = {};
-  CharacterPtr leader = nullptr;
+  CharacterPtr leader = {};
 
   if (!IS_AFFECTED(this, AFF_GROUP))
   {

@@ -148,7 +148,7 @@ int send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   QString buf1;
   QString buf;
   QString typestr;
-  Connection *i = nullptr;
+  Connection *i = {};
 
   if (message.isEmpty())
   {

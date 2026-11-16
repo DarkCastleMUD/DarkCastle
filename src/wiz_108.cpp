@@ -223,7 +223,7 @@ int do_purloin(CharacterPtr ch, char *argument, cmd_t cmd)
 
     if (j == nIndex)
     {
-      CharacterPtr vict = nullptr;
+      CharacterPtr vict = {};
       if (k->carried_by)
       {
         vict = k->carried_by;

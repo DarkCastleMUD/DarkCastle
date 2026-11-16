@@ -1912,8 +1912,8 @@ command_return_t Character::do_give(QStringList arguments, cmd_t cmd)
 // and try to put it in his inv.  If sucessful, return pointer to the item.
 ObjectPtr bring_type_to_front(CharacterPtr ch, int item_type)
 {
-  ObjectPtr item_carried = nullptr;
-  ObjectPtr container_item = nullptr;
+  ObjectPtr item_carried = {};
+  ObjectPtr container_item = {};
 
   std::queue<ObjectPtr> container_queue;
 
@@ -1941,14 +1941,14 @@ ObjectPtr bring_type_to_front(CharacterPtr ch, int item_type)
       }
     }
   }
-  return nullptr;
+  return {};
 }
 
 // Find an item on a character
 ObjectPtr search_char_for_item(CharacterPtr ch, vnum_t vnum, bool wearonly)
 {
-  ObjectPtr i = nullptr;
-  ObjectPtr j = nullptr;
+  ObjectPtr i = {};
+  ObjectPtr j = {};
   int k;
 
   for (k = 0; k < MAX_WEAR; k++)
@@ -1983,14 +1983,14 @@ ObjectPtr search_char_for_item(CharacterPtr ch, vnum_t vnum, bool wearonly)
         }
       }
     }
-  return nullptr;
+  return {};
 }
 
 // Find out how many of an item exists on character
 int search_char_for_item_count(CharacterPtr ch, vnum_t vnum, bool wearonly)
 {
-  ObjectPtr i = nullptr;
-  ObjectPtr j = nullptr;
+  ObjectPtr i = {};
+  ObjectPtr j = {};
   int k;
   int count = 0;
 

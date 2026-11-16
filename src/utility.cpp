@@ -107,7 +107,7 @@ extern std::map<int, std::map<uint8_t, std::string>> professions;
 // extern funcs
 clan_data *get_clan(CharacterPtr);
 void release_message(CharacterPtr ch);
-timer_data *timer_list = nullptr;
+timer_data *timer_list = {};
 
 // tested in TestUtility::test_nocolor_strlen_qstring
 std::size_t nocolor_strlen(const QStringView str)
@@ -2296,7 +2296,7 @@ void parse_bitstrings_into_int(const char *bits[], const char *remainder_args, C
 void check_timer()
 { // Called once/sec
   timer_data *curr, *nex, *las;
-  las = nullptr;
+  las = {};
   for (curr = timer_list; curr; curr = nex)
   {
     nex = curr->next;
@@ -2737,8 +2737,8 @@ void unique_scan(CharacterPtr victim)
   if (!victim)
     return;
 
-  ObjectPtr i = nullptr;
-  ObjectPtr j = nullptr;
+  ObjectPtr i = {};
+  ObjectPtr j = {};
   int k;
   std::map<int, int> virtnums;
   std::queue<ObjectPtr> found_items;

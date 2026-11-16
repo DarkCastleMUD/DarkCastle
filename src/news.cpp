@@ -36,14 +36,14 @@
 #include "DC/common.h"
 #include "DC/dcstdio.h"
 
-news_data *thenews = nullptr;
+news_data *thenews = {};
 void addnews(news_data *newnews)
 {
   if (!thenews)
     thenews = newnews;
   else
   {
-    news_data *tmpnews, *tmpnews2 = nullptr;
+    news_data *tmpnews, *tmpnews2 = {};
     for (tmpnews = thenews; tmpnews; tmpnews = tmpnews->next)
     {
       if (tmpnews->time < newnews->time)
@@ -64,7 +64,7 @@ void addnews(news_data *newnews)
       tmpnews2 = tmpnews;
     }
     tmpnews2->next = newnews;
-    newnews->next = nullptr;
+    newnews->next = {};
   }
 }
 
@@ -257,7 +257,7 @@ int do_addnews(CharacterPtr ch, char *argument, cmd_t cmd)
     nnews->addedby = str_dup(GET_NAME(ch));
     nnews->time = thetime;
     addnews(nnews);
-    nnews->news = nullptr;
+    nnews->news = {};
   }
   ch->sendln("        Enter news item.  (/s saves /h for help)");
   if (!nnews->news.isEmpty())

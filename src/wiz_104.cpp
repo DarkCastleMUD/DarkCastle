@@ -385,7 +385,7 @@ int do_purge(CharacterPtr ch, char *argument, cmd_t cmd)
       if (vict->desc)
       {
         close_socket(vict->desc);
-        vict->desc = nullptr;
+        vict->desc = {};
       }
 
       extract_char(vict, true);
@@ -1812,9 +1812,9 @@ command_return_t do_transfer(CharacterPtr ch, std::string arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
   room_t source_room = {};
-  Connection *i = nullptr;
+  Connection *i = {};
   if (arg1 == "all")
   {
     for (i = DC::getInstance()->descriptor_list; i; i = i->next)
@@ -2179,7 +2179,7 @@ int do_opedit(CharacterPtr ch, char *argument, cmd_t cmd)
     prog->type = ALL_GREET_PROG;
     prog->arglist = strdup("80");
     prog->comlist = strdup("say This is my new obj prog!\n");
-    prog->next = nullptr;
+    prog->next = {};
 
     if ((currprog = DC::getInstance()->obj_index[num].mobprogs))
     {
@@ -2205,7 +2205,7 @@ int do_opedit(CharacterPtr ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
     a = atoi(arg);
-    prog = nullptr;
+    prog = {};
     for (i = 1, currprog = DC::getInstance()->obj_index[num].mobprogs;
          currprog && i != a;
          i++, prog = currprog, currprog = currprog->next)
@@ -2345,7 +2345,7 @@ int do_opedit(CharacterPtr ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    ch->desc->backstr = nullptr;
+    ch->desc->backstr = {};
     ch->desc->strnew = &(currprog->comlist);
 
     if (isSet(ch->player->toggles, Player::PLR_EDITOR_WEB))
@@ -2448,7 +2448,7 @@ int do_oclone(CharacterPtr ch, char *argument, cmd_t cmd)
   DC::getInstance()->obj_index[r2].non_combat_func = 0;
   DC::getInstance()->obj_index[r2].qty = 0;
   DC::getInstance()->obj_index[r2].vnum(v2);
-  DC::getInstance()->obj_index[r2].mobprogs = nullptr;
+  DC::getInstance()->obj_index[r2].mobprogs = {};
   DC::getInstance()->obj_index[r2].combat_func = 0;
   DC::getInstance()->obj_index[r2].mobspec = 0;
   // extract_obj(otmp);
@@ -2537,7 +2537,7 @@ int do_mclone(CharacterPtr ch, char *argument, cmd_t cmd)
   DC::getInstance()->mob_index[dst].qty = 0;
   DC::getInstance()->mob_index[dst].non_combat_func = 0;
   DC::getInstance()->mob_index[dst].combat_func = 0;
-  DC::getInstance()->mob_index[dst].mobprogs = nullptr;
+  DC::getInstance()->mob_index[dst].mobprogs = {};
   DC::getInstance()->mob_index[dst].mobspec = 0;
   DC::getInstance()->mob_index[dst].progtypes = 0;
   DC::getInstance()->mob_index[dst].vnum(vdst);

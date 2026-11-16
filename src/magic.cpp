@@ -1515,7 +1515,7 @@ int spell_dispel_evil(uint8_t level, CharacterPtr ch, CharacterPtr victim, Objec
 {
   if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_DESECRATE)
   { // desecrate object
-    CharacterPtr pal = nullptr;
+    CharacterPtr pal = {};
     if ((pal = obj->obj_flags.origin) && charExists(pal))
     {
       pal->cRooms--;
@@ -1564,7 +1564,7 @@ int spell_dispel_good(uint8_t level, CharacterPtr ch, CharacterPtr victim, Objec
 {
   if (obj && obj->in_room && obj->obj_flags.value[0] == SPELL_CONSECRATE)
   { // consecrate object
-    CharacterPtr pal = nullptr;
+    CharacterPtr pal = {};
     if ((pal = obj->obj_flags.origin) && charExists(pal))
     {
       pal->cRooms--;
@@ -5504,8 +5504,8 @@ int spell_dispel_minor(uint8_t level, CharacterPtr ch, CharacterPtr victim, Obje
       ch->sendln("The magic is shattered by your will!");
       act("$p blinks out of existence with a bang!", ch, obj, 0, TO_ROOM, INVIS_NULL);
       obj->equipped_by->sendln("Your magic beacon is shattered!");
-      obj->equipped_by->beacon = nullptr;
-      obj->equipped_by = nullptr;
+      obj->equipped_by->beacon = {};
+      obj->equipped_by = {};
     }
     extract_obj(obj);
     return ReturnValue::eSUCCESS;
@@ -6784,7 +6784,7 @@ int cast_burning_hands(uint8_t level, CharacterPtr ch, char *arg, int type,
     if (arg1[0] && spellcraft(ch, SPELL_BURNING_HANDS))
       vict = ch->get_char_room_vis(arg1);
     else
-      vict = nullptr;
+      vict = {};
     if (!vict || vict == victim)
       return retval;
     return spell_burning_hands(level, ch, vict, 0, skill);
@@ -11762,7 +11762,7 @@ int cast_call_follower(uint8_t level, CharacterPtr ch, char *arg, int type, Char
     return ReturnValue::eFAILURE;
   }
 
-  victim = nullptr;
+  victim = {};
 
   for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && k->follower->affected_by_spell(SPELL_CHARM_PERSON) &&
@@ -12207,7 +12207,7 @@ int check_components(CharacterPtr ch, int destroy, int item_one = 0,
   int all_ok = 0;
   ObjectPtr ptr_one, ptr_two, ptr_three, ptr_four;
 
-  ptr_one = ptr_two = ptr_three = ptr_four = nullptr;
+  ptr_one = ptr_two = ptr_three = ptr_four = {};
 
   if (!ch)
   {
@@ -12575,9 +12575,9 @@ int spell_beacon(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterP
   if (others_clan_room(ch, &DC::getInstance()->world[ch->beacon->in_room]) == true)
   {
     ch->sendln("You cannot beacon into another clan's hall.");
-    ch->beacon->equipped_by = nullptr;
+    ch->beacon->equipped_by = {};
     extract_obj(ch->beacon);
-    ch->beacon = nullptr;
+    ch->beacon = {};
     return ReturnValue::eFAILURE;
   }
 
@@ -12585,9 +12585,9 @@ int spell_beacon(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterP
   {
     ch->sendln("In the heat of combat, you forget your beacon's location!");
     act("$n's eyes widen for a moment, $s concentration broken.", ch, 0, 0, TO_ROOM, 0);
-    ch->beacon->equipped_by = nullptr;
+    ch->beacon->equipped_by = {};
     extract_obj(ch->beacon);
-    ch->beacon = nullptr;
+    ch->beacon = {};
     return ReturnValue::eFAILURE;
   }
 
@@ -12607,7 +12607,7 @@ int spell_beacon(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterP
 
 int do_beacon(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  ObjectPtr new_obj = nullptr;
+  ObjectPtr new_obj = {};
   if (ch->isNonPlayer())
     return ReturnValue::eFAILURE;
   if (GET_CLASS(ch) != CLASS_ANTI_PAL && ch->getLevel() < ARCHANGEL)
@@ -12787,10 +12787,10 @@ void familiar_creation_message(CharacterPtr ch, int fam_type)
 
 int spell_summon_familiar(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterPtr victim, ObjectPtr tar_obj, int skill)
 {
-  CharacterPtr mob = nullptr;
+  CharacterPtr mob = {};
   int r_num;
   affected_type af;
-  follow_type *k = nullptr;
+  follow_type *k = {};
   int fam_type;
 
   fam_type = choose_familiar(ch, arg);
@@ -14106,7 +14106,7 @@ int cast_holy_aura(uint8_t level, CharacterPtr ch, char *arg, int type, Characte
 
 int spell_dismiss_familiar(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
-  victim = nullptr;
+  victim = {};
 
   for (follow_type *k = ch->followers; k; k = k->next)
     if (k->follower->isNonPlayer() && IS_AFFECTED(k->follower, AFF_FAMILIAR))
@@ -14165,7 +14165,7 @@ int cast_dismiss_familiar(uint8_t level, CharacterPtr ch, char *arg, int type, C
 
 int spell_dismiss_corpse(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
-  victim = nullptr;
+  victim = {};
   // ch->sendln("Disabled.");
   // return ReturnValue::eFAILURE;
 
@@ -14222,7 +14222,7 @@ int cast_dismiss_corpse(uint8_t level, CharacterPtr ch, char *arg, int type, Cha
 
 int spell_release_elemental(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
-  victim = nullptr;
+  victim = {};
   // ch->sendln("Disabled.");
   // return ReturnValue::eFAILURE;
 
@@ -14514,7 +14514,7 @@ int spell_conjure_elemental(uint8_t level, CharacterPtr ch, char *arg, Character
     ch->sendln("How do you plan on controlling so many followers?");
     return ReturnValue::eFAILURE;
   }
-  //  ObjectPtr container  = nullptr;
+  //  ObjectPtr container  = {};
   if (!str_cmp(arg, "fire"))
   {
     virt = FIRE_ELEMENTAL;
@@ -14804,7 +14804,7 @@ int cast_atonement(uint8_t level, CharacterPtr ch, char *arg, int type, Characte
 
 int spell_silence(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
-  ObjectPtr silence_obj = nullptr;
+  ObjectPtr silence_obj = {};
 
   if (isSet(DC::getInstance()->world[ch->in_room].room_flags, SAFE))
   {
@@ -14986,7 +14986,7 @@ int cast_channel(uint8_t level, CharacterPtr ch, char *arg, int type, CharacterP
 SPELL_POINTER get_wild_magic_offensive(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
   const int MAX_OFFENSIVE = 25;
-  SPELL_POINTER spell_to_cast = nullptr;
+  SPELL_POINTER spell_to_cast = {};
   switch (number(1, MAX_OFFENSIVE + 1)) //+1 causes a chance of defensive
   {
   case 1:
@@ -15231,7 +15231,7 @@ int spell_frostshield(uint8_t level, CharacterPtr ch, CharacterPtr victim, Objec
 SPELL_POINTER get_wild_magic_defensive(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
   const int MAX_DEFENSIVE = 50;
-  SPELL_POINTER spell_to_cast = nullptr;
+  SPELL_POINTER spell_to_cast = {};
 
   switch (number(1, MAX_DEFENSIVE + 1)) //+1 to allow for a random chance
   {
@@ -15400,7 +15400,7 @@ int cast_wild_magic(uint8_t level, CharacterPtr ch, char *arg,
                     ObjectPtr tar_obj, int skill)
 {
   char off_def[MAX_INPUT_LENGTH + 1];
-  SPELL_POINTER spell_to_cast = nullptr;
+  SPELL_POINTER spell_to_cast = {};
 
   arg = one_argument(arg, off_def);
 
@@ -15425,7 +15425,7 @@ int cast_wild_magic(uint8_t level, CharacterPtr ch, char *arg,
 
 int spell_spirit_shield(uint8_t level, CharacterPtr ch, CharacterPtr victim, ObjectPtr obj, int skill)
 {
-  ObjectPtr ssobj = nullptr;
+  ObjectPtr ssobj = {};
 
   if (ch->equipment[WEAR_SHIELD])
   {
@@ -15589,7 +15589,7 @@ int spell_consecrate(uint8_t level, CharacterPtr ch, CharacterPtr victim,
 {
   int spl = SPELL_CONSECRATE;
   int compNum = CONSECRATE_COMP_OBJ_NUMBER;
-  ObjectPtr component = nullptr;
+  ObjectPtr component = {};
 
   if (IS_MORTAL(ch))
   {
@@ -15643,7 +15643,7 @@ int spell_consecrate(uint8_t level, CharacterPtr ch, CharacterPtr victim,
     }
   }
 
-  ObjectPtr cItem = nullptr;
+  ObjectPtr cItem = {};
 
   if ((cItem = get_obj_in_list("consecrateitem", DC::getInstance()->world[ch->in_room].contents)))
   {
@@ -15746,7 +15746,7 @@ int spell_desecrate(uint8_t level, CharacterPtr ch, CharacterPtr victim,
   int spl = SPELL_DESECRATE;
   int compNum = DESECRATE_COMP_OBJ_NUMBER;
   char buf[MAX_STRING_LENGTH];
-  ObjectPtr component = nullptr;
+  ObjectPtr component = {};
 
   if (IS_MORTAL(ch))
   {
@@ -15808,7 +15808,7 @@ int spell_desecrate(uint8_t level, CharacterPtr ch, CharacterPtr victim,
     return ReturnValue::eSUCCESS;
   }
 
-  ObjectPtr cItem = nullptr;
+  ObjectPtr cItem = {};
   if ((cItem = get_obj_in_list("consecrateitem", DC::getInstance()->world[ch->in_room].contents)))
   {
     if (ch == ((CharacterPtr)(cItem->obj_flags.origin)))

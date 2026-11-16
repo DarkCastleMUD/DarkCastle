@@ -73,8 +73,8 @@ void move_player_home(CharacterPtr victim)
 {
   int was_in = victim->in_room;
   int found = 0;
-  clan_data *clan = nullptr;
-  clan_room_data *room = nullptr;
+  clan_data *clan = {};
+  clan_room_data *room = {};
 
   // check for homes that don't exist
   if (real_room(GET_HOME(victim) < 1))
@@ -148,8 +148,8 @@ void record_track_data(CharacterPtr ch, cmd_t cmd)
   newScent->race = (int)ch->race;
   newScent->sex = (int)ch->sex;
   newScent->condition = ((ch->getHP() * 100) / (GET_MAX_HIT(ch) == 0 ? 100 : GET_MAX_HIT(ch)));
-  newScent->next = nullptr;     // just in case
-  newScent->previous = nullptr; // just in case
+  newScent->next = {};     // just in case
+  newScent->previous = {}; // just in case
 
   newScent->trackee = ch->getName();
 
@@ -1101,7 +1101,7 @@ int do_enter(CharacterPtr ch, char *argument, cmd_t cmd)
   int retval;
 
   CharacterPtr sesame;
-  ObjectPtr portal = nullptr;
+  ObjectPtr portal = {};
 
   if ((ch->in_room != DC::NOWHERE) || (ch->in_room))
   {
@@ -1290,7 +1290,7 @@ int move_char(CharacterPtr ch, int dest, bool stop_all_fighting)
 int do_climb(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf[MAX_INPUT_LENGTH];
-  ObjectPtr obj = nullptr;
+  ObjectPtr obj = {};
 
   one_argument(argument, buf);
 

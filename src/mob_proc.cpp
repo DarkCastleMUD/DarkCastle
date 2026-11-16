@@ -64,7 +64,7 @@ bool many_charms(CharacterPtr ch);
 // Marauder proc uses this
 int call_for_help_in_room(CharacterPtr ch, int iFriendId)
 {
-  CharacterPtr ally = nullptr;
+  CharacterPtr ally = {};
   int friends = 0;
 
   if (!ch)
@@ -108,8 +108,8 @@ int call_for_help_in_room(CharacterPtr ch, int iFriendId)
 // Several procs use this
 int protect(CharacterPtr ch, int iFriendId)
 {
-  CharacterPtr ally = nullptr;
-  CharacterPtr tmp_ch = nullptr;
+  CharacterPtr ally = {};
+  CharacterPtr tmp_ch = {};
   int retval;
 
   if (!ch)
@@ -164,7 +164,7 @@ int protect(CharacterPtr ch, int iFriendId)
 // Pagoda place uses this
 CharacterPtr find_random_player_in_room(CharacterPtr ch)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   int count = 0;
 
   // Count the number of players in room
@@ -173,7 +173,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
       count++;
 
   if (!count) // no players
-    return nullptr;
+    return {};
 
   // Pick a random one
   count = number(1, count);
@@ -188,7 +188,7 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
         return vict;
     }
   // we should never get here
-  return nullptr;
+  return {};
 }
 
 // Call this for any "area effect" damage you want to do to all the
@@ -197,8 +197,8 @@ CharacterPtr find_random_player_in_room(CharacterPtr ch)
 // and the call this function to deal the damage you want to do
 void damage_all_players_in_room(CharacterPtr ch, int damage)
 {
-  CharacterPtr vict = nullptr;
-  CharacterPtr next_vict = nullptr;
+  CharacterPtr vict = {};
+  CharacterPtr next_vict = {};
   void inform_victim(CharacterPtr ch, CharacterPtr vict, int dam);
 
   for (vict = DC::getInstance()->world[ch->in_room].people; vict; vict = next_vict)
@@ -247,13 +247,13 @@ void summon_all_of_mob_to_room(CharacterPtr ch, int iFriendId)
 // Call this function with the finder, and the vnum of the mob you
 // want to find, and it will return his pointer if he's in the room.
 // If we find him, return his pointer
-// If it doesn't, return nullptr
+// If it doesn't, return {}
 CharacterPtr find_mob_in_room(CharacterPtr ch, int iFriendId)
 {
-  CharacterPtr ally = nullptr;
+  CharacterPtr ally = {};
 
   if (!ch)
-    return nullptr;
+    return {};
 
   // Is my friend in the room?
   for (ally = DC::getInstance()->world[ch->in_room].people; ally; ally = ally->next_in_room)
@@ -263,7 +263,7 @@ CharacterPtr find_mob_in_room(CharacterPtr ch, int iFriendId)
     if (iFriendId == ally->mobdata->vnum_)
       return ally;
   }
-  return nullptr;
+  return {};
 }
 
 // Spellcraft golem stuff.
@@ -2386,7 +2386,7 @@ int hellstreamer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 int firestormer(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                 CharacterPtr owner)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   // int percent;
 
   act("$n utters the words 'Fry bitch!'.", ch, 0, 0,
@@ -2652,7 +2652,7 @@ int panicprisoner(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
   // int x;
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2819,7 +2819,7 @@ int foggy_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 {
   if (!ch)
     return ReturnValue::eFAILURE;
-  CharacterPtr mob = nullptr;
+  CharacterPtr mob = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2875,7 +2875,7 @@ int foggy_non(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 int iasenko_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                    CharacterPtr owner)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   int dam = 0;
   int retval;
   // char buf[200];
@@ -2939,8 +2939,8 @@ int iasenko_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *ar
 int koban_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                  CharacterPtr owner)
 {
-  CharacterPtr iasenko = nullptr;
-  CharacterPtr temp_chr = nullptr;
+  CharacterPtr iasenko = {};
+  CharacterPtr temp_chr = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -2975,7 +2975,7 @@ int koban_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 int koban_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                      CharacterPtr owner)
 {
-  CharacterPtr iasenko = nullptr;
+  CharacterPtr iasenko = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;
@@ -3023,7 +3023,7 @@ int koban_non_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 int kogiro_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                   CharacterPtr owner)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   int dam = 0;
   int retval;
 
@@ -3168,7 +3168,7 @@ int surimoto_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
 int hiryushi_combat(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
                     CharacterPtr owner)
 {
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   if (cmd != cmd_t::UNDEFINED)
     return ReturnValue::eFAILURE;

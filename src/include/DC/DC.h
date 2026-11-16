@@ -532,7 +532,7 @@ public:
   static const QList<bestowable_god_commands_type> bestowable_god_commands;
   static const QMap<QString, mprog_ifs> ifcheck;
 
-  Connection *descriptor_list = nullptr; /* master desc list */
+  Connection *descriptor_list = {}; /* master desc list */
   server_descriptor_list_t server_descriptor_list;
   client_descriptor_list_t client_descriptor_list;
   character_list_t character_list;
@@ -746,8 +746,8 @@ public:
             index[vnum].qty = 0;
             index[vnum].non_combat_func = 0;
             index[vnum].combat_func = 0;
-            index[vnum].mobprogs = nullptr;
-            index[vnum].mobspec = nullptr;
+            index[vnum].mobprogs = {};
+            index[vnum].mobspec = {};
             index[vnum].progtypes = 0;
             index[vnum].source = pItem;
             pItem->enableVNUM(vnum);
@@ -967,7 +967,7 @@ auto get_bestow_command(QString command_name) -> std::expected<bestowable_god_co
 auto &operator>>(auto &in, Room &room)
 {
   room_t room_nr = {};
-  char *temp = nullptr;
+  char *temp = {};
   char ch = 0;
   int dir = 0;
   zone_t zone_nr = {};

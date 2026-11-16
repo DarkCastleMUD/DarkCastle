@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <cstring>
 #include <expected>
-#include <string>
 #include <unordered_set>
 
 #include "DC/obj.h"
@@ -87,7 +86,7 @@ int charm_levels(CharacterPtr ch)
 
 int do_free_animal(CharacterPtr ch, char *arg, cmd_t cmd)
 {
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
   char buf[MAX_INPUT_LENGTH];
 
   if (!ch->has_skill(SKILL_FREE_ANIMAL))
@@ -190,7 +189,7 @@ int do_tame(CharacterPtr ch, char *arg, cmd_t cmd)
   {
     ch->sendln("How you plan on controlling so many followers?");
     return ReturnValue::eFAILURE;
-    /*   CharacterPtr  vict = nullptr;
+    /*   CharacterPtr  vict = {};
        for(follow_type *k = ch->followers; k; k = k->next)
          if(k->follower->isNonPlayer() &&k->follower->affected_by_spell( SPELL_CHARM_PERSON))
          {
@@ -266,7 +265,7 @@ command_return_t Character::do_track(QStringList arguments, cmd_t cmd)
   char weight[40];
 
   CharacterPtr quarry;
-  CharacterPtr tmp_ch = nullptr; // For checking room stuff
+  CharacterPtr tmp_ch = {}; // For checking room stuff
   room_track_data *pScent = 0;
 
   QString victim = arguments.value(0);
@@ -848,7 +847,7 @@ int parse_arrow(CharacterPtr ch, char *arrow)
 }
 
 /* go through and find an arrow */
-/* return nullptr if failure
+/* return {} if failure
  *  return pointer if success */
 ObjectPtr find_arrow(ObjectPtr quiver)
 {
@@ -859,10 +858,10 @@ ObjectPtr find_arrow(ObjectPtr quiver)
   target = get_obj_in_list("arrow", quiver->contains);
 
   if (!target)
-    return nullptr;
+    return {};
 
   if (!(target->obj_flags.type_flag == ITEM_MISSILE))
-    target = nullptr;
+    target = {};
 
   return target;
 }
@@ -1142,7 +1141,7 @@ int do_fire(CharacterPtr ch, char *arg, cmd_t cmd)
       victhshr[MAX_STRING_LENGTH];
   bool enchantmentused = false;
 
-  victim = nullptr;
+  victim = {};
   *direct = '\0';
   *arrow = '\0';
 
@@ -1412,7 +1411,7 @@ int do_fire(CharacterPtr ch, char *arg, cmd_t cmd)
 
   /* check for arrows here */
 
-  found = nullptr;
+  found = {};
   int where = 0;
   for (; where < MAX_WEAR; where++)
   {
@@ -1747,7 +1746,7 @@ int do_fire(CharacterPtr ch, char *arg, cmd_t cmd)
 int do_mind_delve(CharacterPtr ch, char *arg, cmd_t cmd)
 {
   char buf[1000];
-  CharacterPtr target = nullptr;
+  CharacterPtr target = {};
   //  int learned, specialization;
 
   if (!*arg)

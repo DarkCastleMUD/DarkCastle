@@ -206,8 +206,8 @@ public:
 
   int (*funct)(CharacterPtr, cmd_t, const char *) = {}; // special procedure
 
-  ObjectPtr contents = {};       // List of items in room
-  CharacterPtr people = nullptr; // List of NPC / PC in room
+  ObjectPtr contents = {};  // List of items in room
+  CharacterPtr people = {}; // List of NPC / PC in room
 
   int nTracks = {};                 // number of tracks in the room
   room_track_data *tracks = {};     // beginning of the list of scents

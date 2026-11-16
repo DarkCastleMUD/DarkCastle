@@ -1320,7 +1320,7 @@ bool Character::can_use_command(cmd_t cmd)
 
 void pulse_command_lag()
 {
-  command_lag *cmdl{}, *cmdlp = nullptr, *cmdlnext = nullptr;
+  command_lag *cmdl{}, *cmdlp = nullptr, *cmdlnext = {};
 
   for (cmdl = DC::getInstance()->getCommandLag(); cmdl; cmdl = cmdlnext)
   {

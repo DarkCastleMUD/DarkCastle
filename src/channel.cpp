@@ -22,7 +22,6 @@
 #include <queue>
 #include <tuple>
 #include <QQueue>
-#include <utility>
 
 #include "DC/structs.h"
 #include "DC/room.h"
@@ -120,7 +119,7 @@ command_return_t Character::do_say(QStringList arguments, cmd_t cmd)
 command_return_t do_psay(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   std::string vict = {}, message = {}, buf = {};
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
   extern bool MOBtrigger;
 
   if (ch->isPlayer() && isSet(ch->player->punish, PUNISH_STUPID))
@@ -135,7 +134,7 @@ command_return_t do_psay(CharacterPtr ch, std::string argument, cmd_t cmd)
     return ReturnValue::eSUCCESS;
   }
 
-  ObjectPtr tmp_obj = nullptr;
+  ObjectPtr tmp_obj = {};
   for (tmp_obj = DC::getInstance()->world[ch->in_room].contents; tmp_obj; tmp_obj = tmp_obj->next_content)
     if (tmp_obj && tmp_obj->vnum_ >= 0 && DC::getInstance()->obj_index[tmp_obj->vnum_].vnum() == SILENCE_OBJ_NUMBER)
     {
@@ -632,7 +631,7 @@ int do_dream(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char buf1[MAX_STRING_LENGTH] = {0};
   char buf2[MAX_STRING_LENGTH] = {0};
-  class Connection *i = nullptr;
+  class Connection *i = {};
   int ctr = 0;
 
   if ((GET_POS(ch) != position_t::SLEEPING) && (ch->getLevel() < MIN_GOD))
@@ -740,9 +739,9 @@ command_return_t do_tellhistory(CharacterPtr ch, std::string argument, cmd_t cmd
 
 command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   QString name = {}, message = {}, buf = {}, log_buf = {};
-  ObjectPtr tmp_obj = nullptr;
+  ObjectPtr tmp_obj = {};
 
   if (!this->isNonPlayer() && isSet(this->player->punish, PUNISH_NOTELL))
   {
@@ -964,7 +963,7 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
 command_return_t do_reply(CharacterPtr ch, std::string argument, cmd_t cmd)
 {
   std::string buf = {};
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
 
   if (ch->isNonPlayer() || ch->player->last_tell.isEmpty())
   {

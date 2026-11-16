@@ -24,7 +24,7 @@ void *dc_alloc(size_t nmemb, size_t size)
 // void * dc_realloc(void * oldptr, size_t size)
 void *dc_realloc(void *oldptr, size_t size)
 {
-  void *new_mem = nullptr;
+  void *new_mem = {};
 
   // if no old pointer, use dc_alloc to calloc new memory instead of
   // realloc's default, which is to use malloc() (that way memory is 0'd)
@@ -35,7 +35,7 @@ void *dc_realloc(void *oldptr, size_t size)
   if (0 == size)
   {
     dc_free(oldptr);
-    return nullptr;
+    return {};
   }
 
   if (size < 0)
@@ -58,5 +58,5 @@ void *dc_free(void *ptr)
   {
     free(ptr);
   }
-  return nullptr;
+  return {};
 }

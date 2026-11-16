@@ -13,7 +13,6 @@
 #include <stdio.h>
 #include <expected>
 #include <string>
-#include <utility>
 
 #include "DC/structs.h"
 #include "DC/player.h"
@@ -261,11 +260,11 @@ int do_brace(CharacterPtr ch, char *argument, cmd_t cmd)
         csendf(ch, "You stop holding the %s shut.\n", fname(ch->brace_at->keyword).toStdString().c_str());
         act("$n stops holding the $F shut.", ch, 0, ch->brace_at->keyword, TO_ROOM, 0);
       }
-      ch->brace_at->bracee = nullptr;
-      ch->brace_at = nullptr;
+      ch->brace_at->bracee = {};
+      ch->brace_at = {};
       if (ch->brace_exit != nullptr) // incase it's a weird exit area
-        ch->brace_exit->bracee = nullptr;
-      ch->brace_exit = nullptr;
+        ch->brace_exit->bracee = {};
+      ch->brace_exit = {};
       return ReturnValue::eSUCCESS;
     }
     ch->sendln("Brace what??");

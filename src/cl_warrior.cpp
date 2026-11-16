@@ -972,7 +972,7 @@ int handle_any_guard(CharacterPtr ch)
   if (!ch->guarded_by)
     return false;
 
-  CharacterPtr guard = nullptr;
+  CharacterPtr guard = {};
 
   // search the room for my guard
   for (follow_type *curr = ch->guarded_by; curr;)
@@ -980,7 +980,7 @@ int handle_any_guard(CharacterPtr ch)
     for (CharacterPtr vict = DC::getInstance()->world[ch->in_room].people; vict; vict = vict->next_in_room)
       if (vict == curr->follower)
       {
-        curr = nullptr;
+        curr = {};
         guard = vict;
         break;
       }
@@ -1013,7 +1013,7 @@ CharacterPtr is_guarding_me(CharacterPtr ch, CharacterPtr guard)
     curr = curr->next;
   }
 
-  return nullptr;
+  return {};
 }
 
 void stop_guarding(CharacterPtr guard)
@@ -1023,7 +1023,7 @@ void stop_guarding(CharacterPtr guard)
 
   CharacterPtr victim = guard->guarding;
   follow_type *curr = victim->guarded_by;
-  follow_type *last = nullptr;
+  follow_type *last = {};
 
   while (curr)
   {
@@ -1041,7 +1041,7 @@ void stop_guarding(CharacterPtr guard)
       victim->guarded_by = curr->next;
   }
   // if we didn't find guard, return, since we wanted to remove um anyway:)
-  guard->guarding = nullptr;
+  guard->guarding = {};
 }
 
 void start_guarding(CharacterPtr guard, CharacterPtr victim)
@@ -1065,13 +1065,13 @@ void stop_guarding_me(CharacterPtr victim)
   {
     sprintf(buf, "You stop trying to guard %s.\n", GET_SHORT(victim));
     curr->follower->send(buf);
-    curr->follower->guarding = nullptr;
+    curr->follower->guarding = {};
     last = curr;
     curr = curr->next;
     dc_free(last);
   }
 
-  victim->guarded_by = nullptr;
+  victim->guarded_by = {};
 }
 
 /* END UTILITY FUNCTIONS FOR "Guard" */
@@ -1079,7 +1079,7 @@ void stop_guarding_me(CharacterPtr victim)
 int do_guard(CharacterPtr ch, char *argument, cmd_t cmd)
 {
   char name[MAX_INPUT_LENGTH];
-  CharacterPtr victim = nullptr;
+  CharacterPtr victim = {};
 
   if (!ch->isNonPlayer() && (!ch->has_skill(SKILL_GUARD) || !ch->has_skill(SKILL_RESCUE)))
   {
@@ -1408,7 +1408,7 @@ int do_battlesense(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int do_smite(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   char name[MAX_STRING_LENGTH];
   int learned = ch->has_skill(SKILL_SMITE);
   affected_type af;
@@ -1593,7 +1593,7 @@ int do_perseverance(CharacterPtr ch, char *argument, cmd_t cmd)
 
 int do_defenders_stance(CharacterPtr ch, char *argument, cmd_t cmd)
 {
-  CharacterPtr vict = nullptr;
+  CharacterPtr vict = {};
   int learned = ch->has_skill(SKILL_DEFENDERS_STANCE);
   affected_type af;
 
