@@ -891,11 +891,11 @@ int guild_guard(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg,
     align = 3;
     break;
   case 1942:
-    dir_cmd = cmd_t::EAST;
+    dir_cmd = cmd_t::SOUTH;
     clas = CLASS_WARRIOR;
     break;
   case 1988:
-    dir_cmd = cmd_t::EAST;
+    dir_cmd = cmd_t::SOUTH;
     clas = CLASS_DRUID;
     break;
   case 1900:
