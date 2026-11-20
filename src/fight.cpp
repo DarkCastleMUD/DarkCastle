@@ -2736,7 +2736,7 @@ int DC::damage(CharacterPtr ch, CharacterPtr victim, int dam, int weapon_type, i
     dam = victim->affected_by_spell(SPELL_DIVINE_INTER)->modifier;
 
   // Check for parry, mob disarm, and trip. Print a suitable damage message.
-  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (ch->isNonPlayer() && ch->mobdata->vnum_ > 87 && ch->mobdata->vnum_ < 92) || attacktype == SKILL_FLAMESLASH)
+  if ((attacktype >= TYPE_HIT && attacktype < TYPE_SUFFERING) || (attacktype >= TYPE_HIT && ch->isNonPlayer() && ch->mobdata->vnum_ > 87 && ch->mobdata->vnum_ < 92) || attacktype == SKILL_FLAMESLASH)
   {
     if (ch->equipment[weapon] == nullptr)
     {
