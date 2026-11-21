@@ -180,6 +180,36 @@ private slots:
     QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
   }
 
+  void test_create_money_piles_data()
+  {
+    QTest::addColumn<quint64>("amount");
+    QTest::addColumn<qsizetype>("expected_piles");
+    QTest::newRow("small") << quint64(1000) << qsizetype(1);
+    QTest::newRow("int32 max") << quint64(2147483647) << qsizetype(1);
+    QTest::newRow("3 billion") << quint64(3000000000) << qsizetype(2);
+    QTest::newRow("5 billion") << quint64(5000000000) << qsizetype(3);
+  }
+
+  void test_create_money_piles()
+  {
+    QFETCH(quint64, amount);
+    QFETCH(qsizetype, expected_piles);
+    DC::config cf;
+    cf.sql = false;
+    DC dc(cf);
+
+    auto piles = create_money_piles(amount);
+    QCOMPARE(piles.size(), expected_piles);
+    quint64 total = 0;
+    for (auto pile : piles)
+    {
+      QVERIFY(pile != nullptr);
+      QVERIFY(pile->obj_flags.value[0] > 0);
+      total += pile->obj_flags.value[0];
+    }
+    QCOMPARE(total, amount);
+  }
+
   void test_str_dup0()
   {
     std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup0(STRING_LITERAL1), std::free};

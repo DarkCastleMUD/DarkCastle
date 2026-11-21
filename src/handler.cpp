@@ -3396,7 +3396,7 @@ int obj_to_room(ObjectPtr object, room_t room)
   if (GET_ITEM_TYPE(object) == ITEM_MONEY)
   {
     for (obj = DC::getInstance()->world[room].contents; obj; obj = obj->next_content)
-      if (GET_ITEM_TYPE(obj) == ITEM_MONEY)
+      if (GET_ITEM_TYPE(obj) == ITEM_MONEY && obj->obj_flags.value[0] <= std::numeric_limits<object_value_t>::max() - object->obj_flags.value[0])
       {
         object->obj_flags.value[0] += obj->obj_flags.value[0];
         object->long_description = str_hsh("A pile of $B$5gold$R coins.");
@@ -4756,6 +4756,19 @@ ObjectPtr create_money(int amount)
   DC::getInstance()->object_list = obj;
 
   return (obj);
+}
+
+QList<ObjectPtr> create_money_piles(quint64 amount)
+{
+  constexpr quint64 max_pile = std::numeric_limits<object_value_t>::max();
+  QList<ObjectPtr> piles;
+  while (amount > 0)
+  {
+    auto pile = std::min(amount, max_pile);
+    piles.append(create_money(pile));
+    amount -= pile;
+  }
+  return piles;
 }
 
 /* Generic Find, designed to find any object/character                    */

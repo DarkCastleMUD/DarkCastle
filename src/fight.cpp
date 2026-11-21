@@ -4429,7 +4429,7 @@ static constexpr quint64 MAX_PC_CORPSE_TIME = 30;
 void make_corpse(CharacterPtr ch)
 {
   ObjectPtr corpse{}, o{}, o_in_container{}, next_o_in_container{};
-  ObjectPtr money{}, next_obj{};
+  ObjectPtr next_obj{};
 
   char buf[MAX_STRING_LENGTH]{};
   int i{};
@@ -4557,9 +4557,9 @@ void make_corpse(CharacterPtr ch)
 
     if (ch->getGold() > 0)
     {
-      money = create_money(ch->getGold());
+      for (auto pile : create_money_piles(ch->getGold()))
+        obj_to_obj(pile, corpse);
       ch->setGold(0);
-      obj_to_obj(money, corpse);
     }
 
     if (ch->isNonPlayer() && ch->getLevel() > 60 && number(1, 100) > 90) // 10%
@@ -4678,7 +4678,7 @@ void make_corpse(CharacterPtr ch)
 void make_dust(CharacterPtr ch)
 {
   ObjectPtr o, tmp_o, blah;
-  ObjectPtr money, next_obj;
+  ObjectPtr next_obj;
   int i;
 
   for (i = 0; i < MAX_WEAR; i++)
@@ -4687,9 +4687,9 @@ void make_dust(CharacterPtr ch)
 
   if (ch->getGold() > 0)
   {
-    money = create_money(ch->getGold());
+    for (auto pile : create_money_piles(ch->getGold()))
+      obj_to_room(pile, ch->in_room);
     ch->setGold(0);
-    obj_to_room(money, ch->in_room);
   }
 
   for (o = ch->carrying; o; o = next_obj)
@@ -5505,7 +5505,8 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
     if (victim->getGold() > 0)
     {
       act("$n drops $s stolen booty!", victim, 0, 0, TO_ROOM, 0);
-      obj_to_room(create_money(victim->getGold()), victim->in_room);
+      for (auto pile : create_money_piles(victim->getGold()))
+        obj_to_room(pile, victim->in_room);
       victim->setGold(0);
       victim->save_char_obj();
     }
@@ -6475,7 +6476,8 @@ void do_pkill(CharacterPtr ch, CharacterPtr victim, int type, bool vict_is_attac
     if (victim->getGold() > 0)
     {
       act("$N drops $S stolen booty!", ch, 0, victim, TO_ROOM, NOTVICT);
-      obj_to_room(create_money(victim->getGold()), victim->in_room);
+      for (auto pile : create_money_piles(victim->getGold()))
+        obj_to_room(pile, victim->in_room);
       victim->setGold(0);
       victim->save_char_obj();
     }
