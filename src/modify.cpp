@@ -500,7 +500,6 @@ help_index_element *build_help_index(FILEPtr fl, int *num)
 const char *next_page(const char *str)
 {
   int col = 1, line = 1, spec_code = false;
-  int chars = 0;
   for (;; str++)
   {
     // If end of string, return nullptr.
@@ -519,7 +518,6 @@ const char *next_page(const char *str)
       }
       str++; // skip the $
              // This causes the next char to get skipped in the loop iteration
-      chars += 7;
     }
     // Check for the begining of an ANSI color code block.
     else if (*str == '\x1B' && !spec_code)
@@ -534,16 +532,15 @@ const char *next_page(const char *str)
     // beep color into the pager menu (hopefully)
     else if (line > PAGE_LENGTH)
       return str;
-    else if (chars > 2048)
-      return str;
     // Check for everything else.
     else if (!spec_code)
     {
-      chars += 1;
-
       // Newline puts us on the next line.
       if (*str == '\n')
+      {
         line++;
+        col = 1;
+      }
 
       // We need to check here and see if we are over the page width,
       // and if so, compensate by going to the begining of the next line.
@@ -650,9 +647,7 @@ void page_string_dep(class Connection *d, const char *str, int keep_internal)
 /* The call that displays the next page. */
 void show_string(class Connection *d, const char *input)
 {
-  char buffer[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  int diff;
 
   one_argument(input, buf);
 
@@ -702,9 +697,7 @@ void show_string(class Connection *d, const char *input)
   /* Or if we have more to show.... */
   else
   {
-    strncpy(buffer, d->showstr_vector[d->showstr_page], diff = (d->showstr_vector[d->showstr_page + 1]) - (d->showstr_vector[d->showstr_page]));
-    buffer[diff] = '\0';
-    d->character->send(buffer);
+    d->character->send(QString::fromUtf8(d->showstr_vector[d->showstr_page], d->showstr_vector[d->showstr_page + 1] - d->showstr_vector[d->showstr_page]));
     d->showstr_page++;
   }
 }

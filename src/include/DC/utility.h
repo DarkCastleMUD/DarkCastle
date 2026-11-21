@@ -895,6 +895,7 @@ QString handle_ansi(QString, CharacterPtr ch);
 std::string handle_ansi(std::string s, CharacterPtr ch);
 char *handle_ansi_(char *s, CharacterPtr ch);
 void show_string(class Connection *d, const char *input);
+const char *next_page(const char *str);
 void special_log(QString message);
 int graf(int age, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 int len_cmp(const char *s1, const char *s2);
