@@ -220,7 +220,7 @@ int send_to_gods(QString message, quint64 god_level, DC::LogChannel type)
   }
 
   buf = QStringLiteral("//(%1) %2\n").arg(typestr).arg(message);
-  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(message).arg(RED).arg(NTEXT).arg(GREY);
+  buf1 = QStringLiteral("%1%2//%3(%4)%5 %6%7 %8%9%10\n").arg(BOLD).arg(RED).arg(NTEXT).arg(typestr).arg(BOLD).arg(YELLOW).arg(restore_color_after_reset(message, QString(BOLD) + YELLOW)).arg(RED).arg(NTEXT).arg(GREY);
 
   for (i = DC::getInstance()->descriptor_list; i; i = i->next)
   {
