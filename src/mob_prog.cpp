@@ -27,6 +27,7 @@
  ***************************************************************************/
 
 #include <qcompare.h>
+#include <qcontainerfwd.h>
 #include <qsharedpointer.h>
 #include <qchar.h>
 #include <qlist.h>
@@ -39,12 +40,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <cctype>
-#include <map>
 #include <string>
 #include <algorithm>
 #include <QString>
-#include <utility>
-
 #include "DC/player.h"
 #include "DC/room.h"
 #include "DC/structs.h"
@@ -189,6 +187,15 @@ char *mprog_next_command(char *clist)
 
   mprog_line_num++;
   return (pointer);
+}
+QString mprog_next_command(QString clist)
+{
+  auto lf = clist.indexOf('\n');
+  if (lf != -1)
+  {
+    clist.slice(lf);
+  }
+  return clist;
 }
 
 /* These two functions do the basic evaluation of ifcheck operators.
@@ -1403,7 +1410,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   if (*ifchckpt == '\0')
   {
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: null ifchck: '%s'", mob->mobdata->vnum_, ifchck);
+    logworld(u"Mob: v%1: null ifchck: '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
     return DC::IfReturnType::ILLEGAL;
   }
   /* skip leading spaces */
@@ -1430,7 +1437,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     else if (*ifchckpt == '\0')
     {
       mob->prog_error(QStringLiteral("ifchck syntax error"));
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%d: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: ifchck syntax error: '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == ' ')
@@ -1452,7 +1459,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     }
     else if (*ifchckpt == '\0')
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck syntax error: '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: ifchck syntax error: '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     else if (*ifchckpt == ' ')
@@ -1478,7 +1485,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     while ((*ifchckpt != ' ') && (!isalnum(*ifchckpt)))
       if (*ifchckpt == '\0')
       {
-        logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: ifchck operator without value: '%s'", mob->mobdata->vnum_, ifchck);
+        logworld(u"Mob: v%1: ifchck operator without value: '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
         return DC::IfReturnType::ILLEGAL;
       }
       else
@@ -1598,8 +1605,9 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
   if (mob->mobdata->vnum_ == 23)
     qDebug() << "\"" << ifchck << "\"" << ifcheck.value(buf) << val[0] << val2[0];
 
-  if (ifcheck.value(buf) == eUNKNOWN)
+  switch (ifcheck[buf])
   {
+  case eUNKNOWN:
     if (val[0] != '\0' && val2[0] == '\0')
     {
       if (lvali)
@@ -1657,10 +1665,8 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
           return mprog_veval((int)*lvalb, opr, rval);
       }
     }
-  }
 
-  switch (ifcheck[buf])
-  {
+    break;
   case eRAND:
     return DC::IfReturnType(number(1, 100) <= atoi(arg));
     break;
@@ -1686,33 +1692,22 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
 
   case eNUMOFMOBSINWORLD:
   {
-    int target = atoi(arg);
-    int count = 0;
-
+    vnum_t target = atol(arg);
     const auto &character_list = DC::getInstance()->character_list;
-    count = std::count_if(character_list.begin(), character_list.end(),
-                          [&target](CharacterPtr vch)
-                          {
-                            if (vch->isNonPlayer() && vch->in_room != DC::NOWHERE && vch->mobdata->vnum_ == target)
-                            {
-                              return true;
-                            }
-                            else
-                            {
-                              return false;
-                            }
-                          });
-
+    auto count = std::count_if(character_list.begin(), character_list.end(),
+                               [&target](CharacterPtr vch)
+                               {
+                                 return vch->isNonPlayer() && vch->in_room != DC::NOWHERE && vch->mobdata->vnum_ == target;
+                               });
     return mprog_veval(count, opr, atoi(val));
   }
   break;
   case eNUMOFOBJSINWORLD:
   {
-    int target = atoi(arg);
+    vnum_t target = atol(arg);
     int count = 0;
 
-    ObjectPtr p;
-    for (p = DC::getInstance()->object_list; p; p = p->next)
+    for (auto p = DC::getInstance()->object_list; p; p = p->next)
     {
       if (p->vnum_ == target)
       {
@@ -1937,7 +1932,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::FALSE;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isnpc(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isnpc(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::FALSE;
     }
     break;
@@ -1973,7 +1968,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isgood(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     break;
@@ -2009,7 +2004,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isgood(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     break;
@@ -2045,7 +2040,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isgood(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isgood(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     break;
@@ -2086,7 +2081,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isword(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isword(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
   }
@@ -2123,7 +2118,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isfight(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isfight(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     break;
@@ -2159,7 +2154,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to istank(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to istank(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     break;
@@ -2195,7 +2190,7 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
       else
         return DC::IfReturnType::ILLEGAL;
     default:
-      logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: v%llu: bad argument to isimmort(): '%s'", mob->mobdata->vnum_, ifchck);
+      logworld(u"Mob: v%1: bad argument to isimmort(): '%2'"_s.arg(mob->mobdata->vnum_).arg(ifchck));
       return DC::IfReturnType::ILLEGAL;
     }
     break;
@@ -2901,10 +2896,12 @@ DC::IfReturnType DC::mprog_do_ifchck(char *ifchck, CharacterPtr mob, CharacterPt
     // Ok... all the ifchcks are done, so if we didnt find ours then something
     // odd happened.  So report the bug and abort the MOBprogram (return error)
     //
-    logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu unknown ifchck  \"%s\" value %d",
-         mob->mobdata->vnum_, buf, ifcheck[buf]);
+    auto metaEnum = QMetaEnum::fromType<DC::mprog_ifs>();
+    logworld(u"Mob: %1 unknown ifchck  \"%2\" value %3"_s.arg(mob->mobdata->vnum_).arg(buf).arg(metaEnum.valueToKey(ifcheck[buf])));
     return DC::IfReturnType::ILLEGAL;
   }
+
+  return {};
 }
 
 /* Quite a long and arduous function, this guy handles the control
@@ -2947,22 +2944,26 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
   {
     /* check for trueness of the ifcheck */
     cIfs[ifpos++] = legal = mprog_do_ifchck(ifchck, mob, actor, obj, vo, rndm);
-    if (legal != DC::IfReturnType::ILLEGAL)
-    {
-      if (legal == DC::IfReturnType::TRUE)
-        flag = true;
-      else
-        return null;
-    }
+
+    if (legal == DC::IfReturnType::ILLEGAL)
+      return {};
+
+    if (legal == DC::IfReturnType::FALSE)
+      return {};
+
+    flag = true;
   }
   else
   {
     legal = thrw->ifchecks[thrw->cPos++];
     cIfs[ifpos++] = legal;
-    if (legal == DC::IfReturnType::TRUE)
-      flag = true;
-    else if (legal == DC::IfReturnType::ILLEGAL)
+    if (legal == DC::IfReturnType::ILLEGAL)
       return {};
+
+    if (legal == DC::IfReturnType::FALSE)
+      return {};
+
+    flag = true;
   }
 
   while (loopdone == false) /*scan over any existing or statements */
