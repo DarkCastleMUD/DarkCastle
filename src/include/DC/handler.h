@@ -48,6 +48,7 @@ affected_type *affected_by_random(CharacterPtr ch);
 
 /* utility */
 ObjectPtr create_money(int amount);
+QList<ObjectPtr> create_money_piles(quint64 amount);
 QString fname(QString namelist);
 int isprefix(const char *str, const char *namel);
 int get_max_stat(CharacterPtr ch, attribute_t stat);
