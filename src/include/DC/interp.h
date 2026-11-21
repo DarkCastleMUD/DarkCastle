@@ -35,6 +35,7 @@ int old_search_block(const char *argument, int begin, int length, const QStringL
 int old_search_block(const char *argument, int begin, int length, const char **list, int mode);
 void argument_interpreter(const char *argument, char *first_arg, char *second_arg);
 char *one_argument(char *argument, char *first_arg);
+QString one_argument(QString argument, QString *first_arg);
 const char *one_argument(const char *argument, char *first_arg);
 char *one_argument_long(char *argument, char *first_arg);
 char *one_argumentnolow(char *argument, char *first_arg);

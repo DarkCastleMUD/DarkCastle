@@ -934,6 +934,17 @@ char *one_argument(char *argument, char *first_arg)
   return (argument + begin);
 }
 
+QString one_argument(QString argument, QString *first_arg)
+{
+  if (!first_arg)
+    return argument;
+
+  auto arguments = argument.trimmed().split(' ');
+  *first_arg = arguments.value(0);
+  arguments.removeFirst();
+  return arguments.join(' ');
+}
+
 const char *one_argument(const char *argument, char *first_arg)
 {
   return one_argument_long(argument, first_arg);
