@@ -180,6 +180,26 @@ private slots:
     QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
   }
 
+  void test_next_page_data()
+  {
+    QTest::addColumn<QByteArray>("suffix");
+    QTest::newRow("plain") << QByteArray();
+    QTest::newRow("colour heavy") << QByteArray("$B$4").repeated(100);
+  }
+
+  void test_next_page()
+  {
+    QFETCH(QByteArray, suffix);
+    QByteArray text;
+    for (int i = 1; i <= 30; i++)
+    {
+      text += "Short line of text number " + QByteArray::number(i) + suffix + "\n";
+    }
+    const char *page2 = next_page(text.constData());
+    QVERIFY(page2 != nullptr);
+    QCOMPARE(page2 - text.constData(), text.indexOf("Short line of text number 23"));
+  }
+
   void test_str_dup0()
   {
     std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup0(STRING_LITERAL1), std::free};
