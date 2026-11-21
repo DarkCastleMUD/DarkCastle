@@ -180,6 +180,15 @@ private slots:
     QCOMPARE(handle_ansi(QStringLiteral(STRING_LITERAL1), ch.get()), QStringLiteral(STRING_LITERAL1_NOCOLOR));
   }
 
+  void test_restore_color_after_reset()
+  {
+    QCOMPARE(restore_color_after_reset(u"a $B$4flaming$R chicken"_s, u"$2$B"_s), u"a $B$4flaming$R$2$B chicken"_s);
+    QCOMPARE(restore_color_after_reset(u"$$R stays escaped"_s, u"$2$B"_s), u"$$R stays escaped"_s);
+    QCOMPARE(restore_color_after_reset(u"$$$R"_s, u"$2$B"_s), u"$$$R$2$B"_s);
+    QCOMPARE(restore_color_after_reset(u"no codes"_s, u"$2$B"_s), u"no codes"_s);
+    QCOMPARE(restore_color_after_reset(u"trailing $"_s, u"$2$B"_s), u"trailing $"_s);
+  }
+
   void test_str_dup0()
   {
     std::unique_ptr<char, decltype(std::free) *> new_string = {str_dup0(STRING_LITERAL1), std::free};

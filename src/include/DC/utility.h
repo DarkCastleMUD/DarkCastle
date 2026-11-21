@@ -719,6 +719,7 @@ int get_stat(CharacterPtr ch, attribute_t stat);
 const char *pluralize(int qty, const char ending[] = "s");
 size_t nocolor_strlen(const char *s);
 size_t nocolor_strlen(const QStringView str);
+QString restore_color_after_reset(const QString &text, const QString &color);
 
 qsizetype find(QString haystack, auto needle, qsizetype pos)
 {

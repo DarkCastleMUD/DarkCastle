@@ -87,13 +87,13 @@ command_return_t Character::do_say(QStringList arguments, cmd_t cmd)
       arguments = remove_all_codes(arguments.join(' ')).split(' ');
     }
 
-    auto buf = u"$B$7$n says '%1$B$7'$R"_s.arg(arguments.join(' '));
+    auto buf = u"$B$7$n says '%1$B$7'$R"_s.arg(restore_color_after_reset(arguments.join(' '), u"$B$7"_s));
     act(buf, this, 0, 0, TO_ROOM, 0);
 
     if (isPlayer())
       MOBtrigger = false;
 
-    buf = u"$B$7You say '%1$B$7'$R"_s.arg(arguments.join(' '));
+    buf = u"$B$7You say '%1$B$7'$R"_s.arg(restore_color_after_reset(arguments.join(' '), u"$B$7"_s));
     act(buf, this, 0, 0, TO_CHAR, 0);
 
     if (isPlayer())
@@ -769,6 +769,9 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     arguments.pop_front();
   }
   message = arguments.join(' ');
+  auto shown_message = restore_color_after_reset(message, u"$2$B"_s).toStdString();
+  auto sender = [&]()
+  { return restore_color_after_reset(PERS(this, vict), u"$2$B"_s).toStdString(); };
 
   if (name.isEmpty() || message.isEmpty())
   {
@@ -816,13 +819,13 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       this->sendln("That person is busy right now.");
       this->sendln("Your message has been saved.");
 
-      buf = fmt::format("$2$B{} told you, '{}'$R\n", PERS(this, vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$B{} told you, '{}'$R\n", sender(), shown_message).c_str();
       record_msg(buf, vict);
 
-      buf = fmt::format("$2$B{} told you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$B{} told you, '{}'$R", sender(), shown_message).c_str();
       vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$BYou told {}, '{}'$R", GET_SHORT(vict), shown_message).c_str();
       this->tell_history(this, buf);
     }
     else
@@ -867,11 +870,11 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
     {
       if (vict->isNonPlayer())
       {
-        buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
+        buf = fmt::format("{} tells you, '{}'", sender(), shown_message).c_str();
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
+        buf = fmt::format("{} tells you, '{}'{}", sender(), shown_message, isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
         if (this->isPlayer() && vict->isPlayer())
         {
@@ -884,31 +887,31 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$B{} tells you, '{}'$R", sender(), shown_message).c_str();
 
       vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), shown_message).c_str();
       this->send(buf);
     }
     else if (!is_busy(vict) && GET_POS(vict) > position_t::SLEEPING)
     {
       if (vict->isNonPlayer())
       {
-        buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+        buf = fmt::format("$2$B{} tells you, '{}'$R", sender(), shown_message).c_str();
       }
       else
       {
-        buf = fmt::format("$2$B{} tells you, '{}'$R{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
+        buf = fmt::format("$2$B{} tells you, '{}'$R{}", sender(), shown_message, isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
         if (this->isPlayer() && vict->isPlayer())
           vict->player->last_tell = GET_NAME(this);
       }
       act(buf, vict, 0, 0, TO_CHAR, STAYHIDE);
 
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$B{} tells you, '{}'$R", sender(), shown_message).c_str();
       vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), shown_message).c_str();
       act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
       this->tell_history(this, ar.str);
 
@@ -924,11 +927,11 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       vict->sendln("A heavenly power intrudes on your subconcious dreaming...");
       if (vict->isNonPlayer())
       {
-        buf = fmt::format("{} tells you, '{}'", PERS(this, vict), message.toStdString()).c_str();
+        buf = fmt::format("{} tells you, '{}'", sender(), shown_message).c_str();
       }
       else
       {
-        buf = fmt::format("{} tells you, '{}'{}", PERS(this, vict), message.toStdString(), isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
+        buf = fmt::format("{} tells you, '{}'{}", sender(), shown_message, isSet(vict->player->toggles, Player::PLR_BEEP) ? '\a' : '\0').c_str();
 
         if (this->isPlayer() && vict->isPlayer())
           vict->player->last_tell = GET_NAME(this);
@@ -938,10 +941,10 @@ command_return_t Character::do_tell(QStringList arguments, cmd_t cmd)
       send_to_char_regardless(buf, vict);
       ansi_color(NTEXT, vict);
 
-      buf = fmt::format("$2$B{} tells you, '{}'$R", PERS(this, vict), message.toStdString()).c_str();
+      buf = fmt::format("$2$B{} tells you, '{}'$R", sender(), shown_message).c_str();
       vict->tell_history(this, buf);
 
-      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), message.toStdString()).c_str();
+      buf = fmt::format("$2$BYou tell {}, '{}'$R", PERS(vict, this), shown_message).c_str();
       act_return ar = act(buf, this, 0, 0, TO_CHAR, STAYHIDE);
       this->tell_history(this, ar.str);
 

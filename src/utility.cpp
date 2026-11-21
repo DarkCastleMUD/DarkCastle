@@ -207,6 +207,24 @@ size_t nocolor_strlen(const char *s)
   return len;
 }
 
+QString restore_color_after_reset(const QString &text, const QString &color)
+{
+  QString result;
+  for (qsizetype i = 0; i < text.size(); ++i)
+  {
+    result += text[i];
+    if (text[i] == '$' && i + 1 < text.size())
+    {
+      result += text[++i];
+      if (text[i] == 'R')
+      {
+        result += color;
+      }
+    }
+  }
+  return result;
+}
+
 // This function is like str_dup except it returns 0 if passed 0
 // tested in TestUtility::test_str_dup0
 char *str_dup0(const char *str)

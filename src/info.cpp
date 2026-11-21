@@ -488,7 +488,7 @@ void show_spells(CharacterPtr i, CharacterPtr ch)
   if (!strbuf.empty())
   {
     if (i->isNonPlayer())
-      strbuf = std::string("$B$7-$1") + GET_SHORT(i) + " has: " + strbuf + "$R\n";
+      strbuf = std::string("$B$7-$1") + restore_color_after_reset(GET_SHORT(i), u"$B$1"_s).toStdString() + " has: " + strbuf + "$R\n";
     else
       strbuf = std::string("$B$7-$1") + GET_NAME(i) + " has: " + strbuf + "$R\n";
 
