@@ -19,7 +19,7 @@
 class QString;
 
 char *mprog_next_command(char *clist);
-
+QString mprog_next_command(QString clist);
 bool charExists(CharacterPtr ch);
 
 #define BASE_STAT 0
