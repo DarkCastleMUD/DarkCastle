@@ -20,11 +20,8 @@
 #include <QStringList>
 #include <string>
 #include <tuple>
-#include <variant>
 
 #include "DC/common.h"
-#include "DC/character.h"
-#include "DC/returnvals.h"
 
 class Character;
 

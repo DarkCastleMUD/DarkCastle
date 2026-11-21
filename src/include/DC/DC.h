@@ -107,7 +107,6 @@
 #include <QtHttpServer/QHttpServer>
 #include <QtConcurrent/QtConcurrent>
 #include <sstream>
-#include <utility>
 #include <vector>
 
 #include "DC/DC_global.h"
