@@ -57,11 +57,9 @@
 #include <map>
 #include <algorithm>
 #include <QString>
-#include <compare>
 #include <queue>
 #include <string>
 #include <tuple>
-#include <utility>
 #include <vector>
 
 #include "DC/dcstdio.h"
@@ -278,6 +276,11 @@ int str_cmp(const char *arg1, const char *arg2)
   }
 
   return 0;
+}
+
+int str_cmp(QString arg1, QString arg2)
+{
+  return arg1.compare(arg2, Qt::CaseInsensitive);
 }
 
 // Tested in TestUtility::test_str_nospace

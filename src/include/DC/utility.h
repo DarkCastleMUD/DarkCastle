@@ -478,6 +478,7 @@ int move_char(CharacterPtr ch, int dest, bool stop_all_fighting = true);
 
 int dice(int number, int size, QRandomGenerator *rng = QRandomGenerator::global());
 int str_cmp(const char *arg1, const char *arg2);
+int str_cmp(QString arg1, QString arg2);
 int str_nosp_cmp(const char *arg1, const char *arg2);
 int str_nosp_cmp(QString arg1, QString arg2);
 int str_n_nosp_cmp(const char *arg1, const char *arg2, int size);
