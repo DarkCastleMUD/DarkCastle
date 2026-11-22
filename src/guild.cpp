@@ -241,9 +241,14 @@ int search_skills(const char *arg, class_skill_defines *list_skills)
 
 class_skill_defines *Character::get_skill_list(void)
 {
+  return ::get_skill_list(GET_CLASS(this));
+}
+
+class_skill_defines *get_skill_list(int c_class)
+{
   class_skill_defines *skilllist = nullptr;
 
-  switch (GET_CLASS(this))
+  switch (c_class)
   {
   case CLASS_THIEF:
     skilllist = t_skills;

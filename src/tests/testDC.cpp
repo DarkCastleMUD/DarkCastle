@@ -222,6 +222,30 @@ private slots:
     QCOMPARE(space_to_underscore(std::string("  this is a test  ")), "__this_is_a_test__");
   }
 
+  void test_last_argument_data()
+  {
+    QTest::addColumn<QString>("input");
+    QTest::addColumn<QString>("last");
+    QTest::addColumn<QString>("rest");
+
+    QTest::newRow("skill and amount") << u"second_attack 100"_s << u"100"_s << u"second_attack"_s;
+    QTest::newRow("multi-word skill") << u"free animal 100"_s << u"100"_s << u"free animal"_s;
+    QTest::newRow("single word") << u"tame"_s << u"tame"_s << QString();
+    QTest::newRow("padded") << u"  dual_wield   100  "_s << u"100"_s << u"dual_wield"_s;
+    QTest::newRow("empty") << QString() << QString() << QString();
+  }
+
+  void test_last_argument()
+  {
+    QFETCH(QString, input);
+    QFETCH(QString, last);
+    QFETCH(QString, rest);
+
+    auto [result_last, result_rest] = last_argument(input);
+    QCOMPARE(result_last, last);
+    QCOMPARE(result_rest, rest);
+  }
+
   void test_str_nospace()
   {
     std::unique_ptr<char, decltype(std::free) *> result = {str_nospace("  this is a test  "), std::free};

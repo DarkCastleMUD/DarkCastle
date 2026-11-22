@@ -12,4 +12,5 @@ enum class cmd_t;
 
 int search_skills(char *arg, class_skill_defines *list_skills);
 int search_skills2(int arg, class_skill_defines *list_skills);
+class_skill_defines *get_skill_list(int c_class);
 int guild(CharacterPtr ch, ObjectPtr obj, cmd_t cmd, const char *arg, CharacterPtr owner);
