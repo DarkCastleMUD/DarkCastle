@@ -2377,7 +2377,7 @@ int random_percent_change(int from, int to, int value)
   return round((number(from, to) / 100.0) * value) + value;
 }
 
-bool is_in_game(CharacterPtr ch)
+bool DC::is_in_game(CharacterPtr ch)
 {
   // Bug in code if this happens
   if (ch == 0)
