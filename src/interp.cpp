@@ -1153,11 +1153,8 @@ std::tuple<std::string, std::string> last_argument(std::string arguments)
 std::tuple<QString, QString> last_argument(QString argumentStr)
 {
   auto arguments = argumentStr.trimmed().split(' ');
-  auto arg1 = arguments.value(0);
-  if (!arguments.isEmpty())
-    arguments.removeFirst();
-  auto remaining = arguments.join(' ');
-  return {arg1, remaining};
+  auto last_arg = arguments.takeLast();
+  return {last_arg, arguments.join(' ').trimmed()};
 }
 
 /* return first 'word' plus trailing substring of input std::string */

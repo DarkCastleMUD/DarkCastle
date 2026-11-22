@@ -60,6 +60,7 @@
 #include "DC/vault.h"
 #include "DC/structs.h"
 #include "DC/const.h"
+#include "DC/guild.h"
 #include "DC/memory.h"
 #include "DC/punish.h"
 #include "DC/Index.h"
@@ -1350,7 +1351,8 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
       u"add"_s,
       u"remove"_s,
       u"set"_s,
-      u"list"_s};
+      u"list"_s,
+      u"addall"_s};
 
   if (!ch->has_skill(COMMAND_SEDIT))
   {
@@ -1391,9 +1393,18 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
     ch->sendln("That field not recognized.");
     return ReturnValue::eFAILURE;
   }
-  field--;
-
-  if (field == 2)
+  if (field == 0)
+  {
+    auto [last, rest] = last_argument(text);
+    bool numeric = false;
+    last.toInt(&numeric);
+    if (numeric)
+    {
+      value = last;
+      text = rest;
+    }
+  }
+  else if (field == 2)
   {
     std::tie(value, text) = last_argument(text);
   }
@@ -1410,7 +1421,7 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
 
     if (results.size() > 1)
     {
-      ch->send(u"Skill '{}' is too ambiguous. Please specify one of the following:\n"_s.arg(text));
+      ch->send(u"Skill '%1' is too ambiguous. Please specify one of the following:\n"_s.arg(text));
       for (const auto &[key, result] : results.asKeyValueRange())
       {
         ch->sendln(u"%1"_s.arg(key));
@@ -1430,8 +1441,8 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
   {
     if (text.isEmpty())
     {
-      ch->send("$3Usage$R: sedit <character> add <skillname>\n"
-               "This will give the skill to the character at learning 1.\n");
+      ch->send("$3Usage$R: sedit <character> add <skillname> [amount]\n"
+               "This will give the skill to the character at learning amount (default 1).\n");
 
       return ReturnValue::eFAILURE;
     }
@@ -1442,11 +1453,18 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    vict->learn_skill(skillnum, 1, 1);
+    i = 1;
+    if (!value.isEmpty() && !check_range_valid_and_convert(i, value, 1, 100))
+    {
+      ch->sendln("Invalid skill amount.  Must be 1 - 100.");
+      return ReturnValue::eFAILURE;
+    }
 
-    buf = u"'%1' has been given skill '%2' (%3) by %4."_s.arg(GET_NAME(vict)).arg(text).arg(skillnum).arg(GET_NAME(ch));
+    vict->learn_skill(skillnum, i, i);
+
+    buf = u"'%1' has been given skill '%2' (%3) at %4 by %5."_s.arg(GET_NAME(vict)).arg(text).arg(skillnum).arg(i).arg(GET_NAME(ch));
     logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
-    ch->sendln(u"'%1' has been given skill '%2' (%3) by %4."_s.arg(GET_NAME(vict)).arg(text).arg(skillnum).arg(GET_NAME(ch)));
+    ch->sendln(buf);
     break;
   }
   case 1: /* remove */
@@ -1458,9 +1476,9 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
       return ReturnValue::eFAILURE;
     }
 
-    if (ch->skills.contains(skillnum))
+    if (vict->skills.contains(skillnum))
     {
-      ch->skills.erase(skillnum);
+      vict->skills.erase(skillnum);
 
       buf = u"Skill '%1' (%2) removed from %3 by %4."_s.arg(text).arg(skillnum).arg(GET_NAME(vict)).arg(GET_NAME(ch));
       logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
@@ -1526,6 +1544,54 @@ int do_sedit(CharacterPtr ch, char *argument, cmd_t cmd)
       ch->send("  (none)\n");
     }
     return ReturnValue::eSUCCESS;
+    break;
+  }
+  case 4: /* addall */
+  {
+    int c_class = GET_CLASS(vict);
+    QString classname;
+    std::tie(classname, value) = half_chop(text);
+    bool numeric = false;
+    classname.toInt(&numeric);
+    if (numeric)
+    {
+      value = classname;
+    }
+    else if (!classname.isEmpty())
+    {
+      for (c_class = 0; *pc_clss_types2[c_class] != '\n'; c_class++)
+        if (!classname.compare(pc_clss_types2[c_class], Qt::CaseInsensitive))
+          break;
+    }
+
+    class_skill_defines *skilllist = get_skill_list(c_class);
+    int amount = 0;
+    if (!skilllist || (!value.isEmpty() && !check_range_valid_and_convert(amount, value, 1, 100)))
+    {
+      ch->send("$3Usage$R: sedit <character> addall [class] [amount]\n"
+               "This will give the character every skill of the class (default their own) up to their level,\n"
+               "at amount (default their maximum for their own class, or the class maximum for another class).\n");
+      return ReturnValue::eFAILURE;
+    }
+
+    bool own_class = c_class == GET_CLASS(vict);
+    int added = 0;
+    for (i = 0; *skilllist[i].skillname != '\n'; i++)
+    {
+      const auto &classskill = skilllist[i];
+      if (vict->getLevel() < classskill.levelavailable || vict->has_skill(classskill.skillnum))
+        continue;
+      if (own_class && classskill.group && vict->isPlayer() && classskill.group != vict->player->profession)
+        continue;
+
+      int skill_level = amount ? amount : (own_class ? std::max(1, vict->get_max(classskill.skillnum)) : classskill.maximum);
+      vict->learn_skill(classskill.skillnum, skill_level, skill_level);
+      added++;
+    }
+
+    buf = u"'%1' has been given %2 %3 skills by %4."_s.arg(GET_NAME(vict)).arg(added).arg(pc_clss_types2[c_class]).arg(GET_NAME(ch));
+    logentry(buf, ch->getLevel(), DC::LogChannel::LOG_GOD);
+    ch->sendln(buf);
     break;
   }
 
