@@ -823,6 +823,13 @@ bool is_number(QString str)
 // Multiline arguments, used for mobprogs
 char *one_argument_long(char *argument, char *first_arg)
 {
+  if (!argument)
+  {
+    if (first_arg)
+      *first_arg = {};
+    return {};
+  }
+
   int begin, look_at;
   bool end = false;
   begin = 0;

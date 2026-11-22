@@ -163,6 +163,9 @@ DC::IfReturnType mprog_veval(auto lhs, QString opr, auto rhs)
  */
 char *mprog_next_command(char *clist)
 {
+  if (!clist)
+    return {};
+
   bool open = false;
   char *pointer = clist;
 
@@ -2970,9 +2973,9 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
   {
     cmnd = com_list;
     activePos = com_list = mprog_next_command(com_list);
-    while (*cmnd == ' ')
+    while (cmnd && *cmnd == ' ')
       cmnd++;
-    if (*cmnd == '\0')
+    if (!cmnd || *cmnd == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu no commands after IF/OR", mob->mobdata->vnum_);
       return null;
@@ -3018,7 +3021,7 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
           return null;
         while (*cmnd == ' ')
           cmnd++;
-        if (*com_list == '\0')
+        if (com_list && *com_list == '\0')
           return null;
         cmnd = com_list;
         activePos = com_list = mprog_next_command(com_list);
@@ -3039,10 +3042,13 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
           if (!str_cmp(buf, "endif"))
             nest--;
           cmnd = com_list;
+          if (!cmnd)
+            return {};
+
           activePos = com_list = mprog_next_command(com_list);
-          while (*cmnd == ' ')
+          while (cmnd && *cmnd == ' ')
             cmnd++;
-          if (*cmnd == '\0')
+          if (!cmnd || *cmnd == '\0')
           {
             logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu missing endif after else",
                  mob->mobdata->vnum_);
@@ -3108,9 +3114,9 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
       }
       cmnd = com_list;
       activePos = com_list = mprog_next_command(com_list);
-      while (*cmnd == ' ')
+      while (cmnd && *cmnd == ' ')
         cmnd++;
-      if (*cmnd == '\0')
+      if (!cmnd || *cmnd == '\0')
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu missing else or endif", mob->mobdata->vnum_);
         return null;
@@ -3138,7 +3144,7 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
       activePos = com_list = mprog_next_command(com_list);
       while (*cmnd == ' ')
         cmnd++;
-      if (*cmnd == '\0')
+      if (!cmnd || *cmnd == '\0')
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu missing an else or endif", mob->mobdata->vnum_);
         return null;
@@ -3153,7 +3159,7 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
     activePos = com_list = mprog_next_command(com_list);
     while (*cmnd == ' ')
       cmnd++;
-    if (*cmnd == '\0')
+    if (!cmnd || *cmnd == '\0')
     {
       logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu missing endif", mob->mobdata->vnum_);
       return null;
@@ -3199,9 +3205,9 @@ char *DC::mprog_process_if(char *ifchck, char *com_list, CharacterPtr mob,
       }
       cmnd = com_list;
       activePos = com_list = mprog_next_command(com_list);
-      while (*cmnd == ' ')
+      while (cmnd && *cmnd == ' ')
         cmnd++;
-      if (*cmnd == '\0')
+      if (!cmnd || *cmnd == '\0')
       {
         logf(IMMORTAL, DC::LogChannel::LOG_WORLD, "Mob: %llu missing endif in else section", mob->mobdata->vnum_);
         return null;
@@ -3616,7 +3622,7 @@ int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Obj
 
   point = buf;
   str = cmnd;
-  while (*str == ' ')
+  while (str && *str == ' ')
     str++;
   /*
     while (*str != '\0')
@@ -3662,6 +3668,8 @@ int DC::mprog_process_cmnd(char *cmnd, CharacterPtr mob, CharacterPtr actor, Obj
            str++;
     }*/
   str = cmnd;
+  if (!str)
+    return {};
   while (*str != '\0')
   {
     if (*str != '$')
@@ -3858,7 +3866,7 @@ void DC::mprog_driver(char *com_list, CharacterPtr mob, CharacterPtr actor, Obje
   activePos = command_list = mprog_next_command(command_list);
 
   // if (thrw) thrw->orig = &tmpcmndlst[0];
-  while (*cmnd != '\0')
+  while (cmnd && *cmnd != '\0')
   {
     morebuf = one_argument(cmnd, buf);
 
