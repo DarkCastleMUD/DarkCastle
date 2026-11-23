@@ -405,7 +405,7 @@ void Character::list_obj_to_char(ObjectPtr list, int mode, bool show)
   for (i = list; i; i = i->next_content)
   {
     if ((can_see = CAN_SEE_OBJ(this, i)) && i->next_content &&
-        i->next_content->vnum_ == i->vnum_ && DC::getInstance()->obj_index.contains(i->vnum_) && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
+        i->next_content->vnum_ == i->vnum_ && i->next_content->short_description == i->short_description && DC::getInstance()->obj_index.contains(i->vnum_) && !isSet(i->obj_flags.more_flags, ITEM_NONOTICE))
     {
       number++;
       continue;
