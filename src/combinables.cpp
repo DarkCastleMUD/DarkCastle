@@ -638,41 +638,16 @@ int do_brew(CharacterPtr ch, char *argument, cmd_t cmd)
     snprintf(buffer, MAX_STRING_LENGTH, "As $e finishes, the liquid turns %s.", potion_color);
     act(buffer, ch, containerobj, 0, TO_ROOM, 0);
 
-    // Find container key (crude, plain, etc)
-    auto container_key = containerobj->Name().split(' ').value(2);
-
-    // Find liquid key (salty, milk, strong)
-    const char *liquid_key;
-    switch (liquidobj->obj_flags.value[2])
-    {
-    case LIQ_MILK:
-      liquid_key = "milky";
-      break;
-    case LIQ_WINE:
-      liquid_key = "strong";
-      break;
-    case LIQ_SALTWATER:
-      liquid_key = "salty";
-      break;
-    default:
-      liquid_key = "unknown";
-      break;
-    }
-
-    // Put it all together into the new name
-    std::stringstream potionname, potionshort, potionlong;
-    potionname << "potion " << container_key << " " << liquid_key;
-    potionshort << "a " << container_key << " " << liquid_key << " " << potion_color << " potion";
-    potionlong << "a " << container_key << " " << liquid_key << " " << potion_color << " potion lies here.";
+    auto spell_name = get_skill_name(spell);
 
     containerobj->obj_flags.type_flag = ITEM_POTION;
     containerobj->obj_flags.value[0] = (learned / 2 - 5) + GET_WIS(ch) / 2 + GET_INT(ch) / 2;
     containerobj->obj_flags.value[1] = spell;
     containerobj->obj_flags.value[2] = 0;
     containerobj->obj_flags.value[3] = 0;
-    containerobj->Name(potionname.str().c_str());
-    GET_OBJ_SHORT(containerobj) = str_dup(potionshort.str().c_str());
-    containerobj->long_description = str_dup(potionlong.str().c_str());
+    containerobj->Name(u"potion brewed %1"_s.arg(spell_name));
+    containerobj->short_description = u"a brewed potion of %1"_s.arg(spell_name);
+    containerobj->long_description = u"A brewed potion of %1 lies here."_s.arg(spell_name);
     // We set the item to custom so that it will save everytime uniquely
     SET_BIT(containerobj->obj_flags.more_flags, ITEM_CUSTOM);
 
