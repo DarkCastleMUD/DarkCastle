@@ -718,6 +718,7 @@ const char *skills[] =
         "spiritualist",
         "troubadour", // 140
         "ministrel",
+        "sustain",
         "\n"};
 
 const char *spells[] =

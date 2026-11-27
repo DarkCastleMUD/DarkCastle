@@ -429,8 +429,9 @@ int dam_percent(int learned, int damage);
 // bard
 #define SKILL_TROUBADOUR 440
 #define SKILL_MINISTREL 441
+#define SKILL_SUSTAIN 442
 
-#define SKILL_MAX 441
+#define SKILL_MAX 442
 
 // if you add a skill, make sure you update "skills[]" in spells.C
 // as well as SKILL_MAX
@@ -608,7 +609,8 @@ int dam_percent(int learned, int damage);
 #define OBJ_DAWNSWORD 4021
 #define OBJ_DURENDAL 4022
 #define SPELL_VAMPIRIC_AURA_TIMER 4023
-#define RESERVED_MAX 4023
+#define SKILL_SUSTAIN_TIMER 4024
+#define RESERVED_MAX 4024
 
 ///////////////////////////////////////////////////////////////////////
 

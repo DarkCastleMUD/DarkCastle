@@ -528,6 +528,7 @@ public:
   history_t gtell_history = {};
   joining_t joining = {};
   uint32_t quest_points = {};
+  uint8_t sustain_countdown = {};
   int16_t quest_current[QUEST_MAX] = {};
   uint32_t quest_current_ticksleft[QUEST_MAX] = {};
   int16_t quest_cancel[QUEST_MAX_CANCEL] = {};
@@ -1042,6 +1043,7 @@ public:
 
   command_return_t do_clanarea(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_config(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
+  command_return_t do_sustain(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_experience(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_split(QStringList arguments = {}, cmd_t cmd = cmd_t::DEFAULT);
   command_return_t do_force(QStringList arguments = {}, cmd_t cmd = cmd_t::FORCE);

@@ -73,6 +73,7 @@
 #include "DC/room.h"
 #include "DC/timeinfo.h"
 #include "DC/weather.h"
+#include "DC/sustain.h"
 
 /* extern variables */
 
@@ -2085,6 +2086,7 @@ int do_score(CharacterPtr ch, char *argument, cmd_t cmd)
 
   if ((aff = ch->affected))
   {
+    auto sustained = sustained_spells(ch);
 
     for (; aff; aff = aff->next)
     {
@@ -2217,8 +2219,16 @@ int do_score(CharacterPtr ch, char *argument, cmd_t cmd)
       {
         format = "|%1| Affected by %2 %3 Modifier %4 |%1|\n";
         format = format.arg(scratch);
-        format = format.arg(aff_name, -25);
-        format = format.arg(QString::fromStdString(fading), 8);
+        if (sustained.contains(aff->type))
+        {
+          format = format.arg(aff_name, -22);
+          format = format.arg(u"$3(sustained)$7"_s);
+        }
+        else
+        {
+          format = format.arg(aff_name, -25);
+          format = format.arg(QString::fromStdString(fading), 8);
+        }
         format = format.arg(QString::fromStdString(modified), -15);
       }
       ch->send(format.toStdString());

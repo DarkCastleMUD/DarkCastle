@@ -46,6 +46,7 @@
 #include "DC/obj.h"
 #include "DC/structs.h"
 #include "DC/timeinfo.h"
+#include "DC/sustain.h"
 
 int FOUNTAINisPresent(CharacterPtr ch);
 
@@ -82,6 +83,9 @@ int32_t mana_limit(CharacterPtr ch)
     max = (ch->max_mana);
   else
     max = (ch->max_mana);
+
+  if (auto reserve = sustain_reserve(ch))
+    max = MAX(0, max - reserve);
 
   return (max);
 }
