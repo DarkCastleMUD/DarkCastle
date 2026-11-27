@@ -3188,6 +3188,12 @@ void set_cantquit(CharacterPtr ch, CharacterPtr vict, bool forced)
   if (realvict == realch) // killing your own pet was giving you a CQ
     return;
 
+  if (is_pkill(realch, realvict))
+  {
+    sustain_delay(realch);
+    sustain_delay(realvict);
+  }
+
   if (!realch->fighting)
     SET_BIT(realch->combat, COMBAT_ATTACKER);
 
