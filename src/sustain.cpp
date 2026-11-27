@@ -143,8 +143,6 @@ static int sustain_cast(CharacterPtr ch, int spl)
     return ReturnValue::eFAILURE;
   }
 
-  ch->sendln(u"Your sustained %1 renews itself."_s.arg(spells[spl - 1]));
-
   char argument[] = "";
   uint8_t level = ch->getLevel();
   const auto &info = spell_info[spl];
@@ -195,6 +193,7 @@ static void sustain_check(CharacterPtr ch)
       continue;
     }
 
+    ch->sendln(u"Your sustained %1 renews itself."_s.arg(spells[spl - 1]));
     if (SOMEONE_DIED(sustain_cast(ch, spl)))
     {
       return;
@@ -314,6 +313,23 @@ command_return_t Character::do_sustain(QStringList arguments, cmd_t cmd)
   GET_MANA(this) = MIN(GET_MANA(this), mana_limit(this));
   player->sustain_countdown = 0;
   sendln(u"You begin sustaining %1, reserving %2 mana."_s.arg(spells[spl - 1]).arg(reserve));
+
+  if (!affected_by_spell(sustain_effect(spl)) && !sustain_blocked(this))
+  {
+    if (SOMEONE_DIED(sustain_cast(this, spl)))
+    {
+      return ReturnValue::eSUCCESS;
+    }
+
+    if (!affected_by_spell(sustain_effect(spl)))
+    {
+      spell_list.removeOne(spl);
+      set_sustained_spells(this, spell_list);
+      sendln(u"Your %1 fails to take hold and you stop sustaining it."_s.arg(spells[spl - 1]));
+      return ReturnValue::eFAILURE;
+    }
+  }
+
   save(cmd_t::SAVE_SILENTLY);
   return ReturnValue::eSUCCESS;
 }
