@@ -2219,10 +2219,10 @@ int do_score(CharacterPtr ch, char *argument, cmd_t cmd)
       {
         format = "|%1| Affected by %2 %3 Modifier %4 |%1|\n";
         format = format.arg(scratch);
-        if (fading.empty() && sustained.contains(aff->type))
+        if (sustained.contains(aff->type))
         {
-          format = format.arg(aff_name, -22);
-          format = format.arg(u"$3(sustained)$7"_s);
+          format = format.arg(aff_name, fading.empty() ? -22 : -24);
+          format = format.arg(fading.empty() ? u"$3(sustained)$7"_s : u"$3S$2(fading)$7"_s);
         }
         else
         {
