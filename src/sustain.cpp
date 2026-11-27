@@ -15,11 +15,15 @@
 #include "DC/utility.h"
 
 static const auto SUSTAIN_CONFIG_KEY = u"sustain"_s;
-static const QList<int> unsustainable_spells = {SPELL_GROUP_SANC, SPELL_GROUP_RECALL, SPELL_GROUP_FLY, SPELL_VAMPIRIC_AURA, SPELL_HOLY_AURA, SPELL_DIVINE_INTER};
 
 int sustain_interval(int skill)
 {
   return 30 - (std::clamp(skill, 1, 100) - 1) * 25 / 99;
+}
+
+static int sustain_effect(int spl)
+{
+  return spl == SPELL_EYES_OF_THE_OWL ? SPELL_INFRAVISION : spl;
 }
 
 QList<int> sustained_spells(CharacterPtr ch)
@@ -33,12 +37,22 @@ QList<int> sustained_spells(CharacterPtr ch)
   for (const auto &entry : ch->player->config->value(SUSTAIN_CONFIG_KEY).split(',', Qt::SkipEmptyParts))
   {
     auto spl = entry.toInt();
-    if (spl > 0 && spl <= MAX_SPL_LIST)
+    if (spl > 0 && spl <= MAX_SPL_LIST && spell_info[spl].sustainable())
     {
       spell_list.append(spl);
     }
   }
   return spell_list;
+}
+
+QList<int> sustained_effects(CharacterPtr ch)
+{
+  QList<int> effects;
+  for (auto spl : sustained_spells(ch))
+  {
+    effects.append(sustain_effect(spl));
+  }
+  return effects;
 }
 
 static void set_sustained_spells(CharacterPtr ch, const QList<int> &spell_list)
@@ -176,7 +190,7 @@ static void sustain_check(CharacterPtr ch)
 
   for (auto spl : sustained_spells(ch))
   {
-    if (ch->affected_by_spell(spl))
+    if (ch->affected_by_spell(sustain_effect(spl)))
     {
       continue;
     }
@@ -186,7 +200,7 @@ static void sustain_check(CharacterPtr ch)
       return;
     }
 
-    if (ch->affected_by_spell(spl))
+    if (ch->affected_by_spell(sustain_effect(spl)))
     {
       ch->skill_increase_check(SKILL_SUSTAIN, ch->has_skill(SKILL_SUSTAIN), SKILL_INCREASE_MEDIUM);
     }
@@ -246,7 +260,7 @@ command_return_t Character::do_sustain(QStringList arguments, cmd_t cmd)
     sendln("You are sustaining:");
     for (auto spl : spell_list)
     {
-      sendln(u"  %1 %2 mana reserved%3"_s.arg(spells[spl - 1], -25).arg(SUSTAIN_RESERVE_MULTIPLIER * use_mana(this, spl), 4).arg(affected_by_spell(spl) ? "" : " (inactive)"));
+      sendln(u"  %1 %2 mana reserved%3"_s.arg(spells[spl - 1], -25).arg(SUSTAIN_RESERVE_MULTIPLIER * use_mana(this, spl), 4).arg(affected_by_spell(sustain_effect(spl)) ? "" : " (inactive)"));
     }
     sendln(u"Total mana reserved: %1"_s.arg(sustain_reserve(this)));
     return ReturnValue::eSUCCESS;
@@ -270,7 +284,7 @@ command_return_t Character::do_sustain(QStringList arguments, cmd_t cmd)
   if (spell_list.removeOne(spl))
   {
     set_sustained_spells(this, spell_list);
-    affect_from_char(this, spl);
+    affect_from_char(this, sustain_effect(spl));
     sendln(u"You stop sustaining %1."_s.arg(spells[spl - 1]));
     save(cmd_t::SAVE_SILENTLY);
     return ReturnValue::eSUCCESS;
@@ -282,8 +296,7 @@ command_return_t Character::do_sustain(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  const auto &info = spell_info[spl];
-  if (unsustainable_spells.contains(spl) || isSet(info.targets(), TAR_FIGHT_VICT | TAR_SELF_NONO) || !isSet(info.targets(), TAR_CHAR_ROOM | TAR_SELF_ONLY | TAR_SELF_DEFAULT))
+  if (!spell_info[spl].sustainable())
   {
     sendln("That spell cannot be sustained.");
     return ReturnValue::eFAILURE;
@@ -296,20 +309,10 @@ command_return_t Character::do_sustain(QStringList arguments, cmd_t cmd)
     return ReturnValue::eFAILURE;
   }
 
-  if (!affected_by_spell(spl))
-  {
-    auto cast_argument = u"'%1' %2"_s.arg(spells[spl - 1], getName()).toLocal8Bit();
-    do_cast(this, cast_argument.data());
-    if (!affected_by_spell(spl))
-    {
-      sendln(u"You must have %1 active on yourself to sustain it."_s.arg(spells[spl - 1]));
-      return ReturnValue::eFAILURE;
-    }
-  }
-
   spell_list.append(spl);
   set_sustained_spells(this, spell_list);
   GET_MANA(this) = MIN(GET_MANA(this), mana_limit(this));
+  player->sustain_countdown = 0;
   sendln(u"You begin sustaining %1, reserving %2 mana."_s.arg(spells[spl - 1]).arg(reserve));
   save(cmd_t::SAVE_SILENTLY);
   return ReturnValue::eSUCCESS;

@@ -2086,7 +2086,7 @@ int do_score(CharacterPtr ch, char *argument, cmd_t cmd)
 
   if ((aff = ch->affected))
   {
-    auto sustained = sustained_spells(ch);
+    auto sustained = sustained_effects(ch);
 
     for (; aff; aff = aff->next)
     {

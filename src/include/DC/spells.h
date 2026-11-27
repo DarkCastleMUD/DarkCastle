@@ -653,6 +653,8 @@ typedef int SPELL_FUN2(uint8_t level, CharacterPtr ch,
 // NOTE:  If you change this structure, keep in mind how it is used in guild.C
 // The min_level_XXX stuff MUST be updated in guild.C if you change this.  It is
 // using an offset from min_level_magic depending on class *(min_level_magic+2bytes)
+constexpr bool SUSTAINABLE = true;
+
 class spell_info_type
 {
 public:
@@ -660,12 +662,12 @@ public:
       : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(nullptr), spell_pointer2_(nullptr), difficulty_(difficulty)
   {
   }
-  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN *spell_pointer, int16_t difficulty)
-      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(spell_pointer), difficulty_(difficulty)
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN *spell_pointer, int16_t difficulty, bool sustainable = false)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer_(spell_pointer), difficulty_(difficulty), sustainable_(sustainable)
   {
   }
-  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN2 *spell_pointer, int16_t difficulty)
-      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer2_(spell_pointer), difficulty_(difficulty)
+  spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, SPELL_FUN2 *spell_pointer, int16_t difficulty, bool sustainable = false)
+      : beats_(beats), minimum_position_(minimum_position), min_usesmana_(min_usesmana), targets_(targets), spell_pointer2_(spell_pointer), difficulty_(difficulty), sustainable_(sustainable)
   {
   }
   // spell_info_type(uint32_t beats, position_t minimum_position, uint8_t min_usesmana, int16_t targets, spell_gen2_t spell_pointer, int16_t difficulty)
@@ -679,6 +681,7 @@ public:
   SPELL_FUN *spell_pointer(void) const { return spell_pointer_; }
   int16_t difficulty(void) const { return difficulty_; }
   SPELL_FUN2 *spell_pointer2(void) const { return spell_pointer2_; }
+  bool sustainable(void) const { return sustainable_; }
 
 private:
   uint32_t beats_;              /* Waiting time after spell	*/
@@ -688,6 +691,7 @@ private:
   SPELL_FUN *spell_pointer_;    /* Function to call		*/
   int16_t difficulty_;          /* Spell difficulty */
   SPELL_FUN2 *spell_pointer2_;  /* Function to call		*/
+  bool sustainable_ = {};
 };
 extern const QList<spell_info_type> spell_info;
 
