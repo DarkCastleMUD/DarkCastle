@@ -26499,4 +26499,44 @@ to responses before any other thought can occur.  A mage's entire group gains
 this advantage while active.
 #
 ~
+SUSTAIN
+SUSTAIN SKILL
+SUSTAINED
+NONE
+NONE
+CAST, SPELLS, SCORE, MANA
+L: 1
+E:
+$B$3Name:$R Sustain
+$B$3Type:$R Skill
+$B$3Class:$R Mage, Cleric, Druid, Ranger, Paladin, Anti-Paladin
+$B$3Level:$R 10
+$B$3Cost:$R Reserves twice the spell's mana cost from your maximum mana
+
+A practiced caster can hold a protective spell in place, renewing it
+without effort whenever it fades.  Each sustained spell sets aside part
+of your maximum mana for as long as you keep sustaining it.
+
+Only lasting spells you know and cast upon yourself can be sustained.
+Sustaining a spell casts it at once if it is not already active.  When
+it later fades or is dispelled it renews itself at no cost in mana and
+without breaking your concentration.  The more skilled you are, the
+sooner a lost spell returns: within 30 seconds for a novice, down to
+5 seconds for a master.
+
+Spells will not renew while you are fighting, asleep, stunned or
+paralyzed, in a room where magic or speech is suppressed, or for a
+short time after fleeing or fighting another player.  They return once
+you are able again.
+
+Sustaining a spell a second time releases it, ending the spell and
+restoring the reserved mana.  If your maximum mana can no longer cover
+your sustained spells, the most costly ones are released until it can.
+
+Sustained spells are marked (sustained) in your score.
+
+$B$3Syntax:$R sustain
+        sustain '<spellname>'
+#
+~
 $~

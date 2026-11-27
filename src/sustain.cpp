@@ -173,6 +173,7 @@ static void sustain_check(CharacterPtr ch)
                                                { return use_mana(ch, spl); });
     spell_list.removeOne(costliest);
     set_sustained_spells(ch, spell_list);
+    affect_from_char(ch, sustain_effect(costliest));
     ch->sendln(u"You can no longer sustain %1."_s.arg(spells[costliest - 1]));
   }
 
