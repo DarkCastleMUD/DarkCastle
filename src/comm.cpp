@@ -97,6 +97,7 @@
 #include "DC/SSH.h"
 #include "DC/character.h"
 #include "DC/memory.h"
+#include "DC/sustain.h"
 
 class multiplayer
 {
@@ -1091,6 +1092,7 @@ void DC::heartbeat(void)
   {
     pulse_timer = DC::PULSE_TIMER;
     check_timer();
+    sustain_update();
 
     PerfTimers["affect"].start();
     affect_update(DC::PULSE_TIMER);

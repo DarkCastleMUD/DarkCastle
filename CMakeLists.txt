@@ -141,6 +141,7 @@ add_library(DC SHARED
     src/cl_thief.cpp
     src/cl_warrior.cpp
     src/combinables.cpp
+    src/sustain.cpp
     src/CommandStack.cpp
     src/Command.cpp
     src/comm.cpp

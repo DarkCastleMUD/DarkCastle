@@ -2141,6 +2141,12 @@ void affect_remove(CharacterPtr ch, affected_type *af, int flags)
       ch->sendln("You feel ready to scribe something again.");
     }
     break;
+  case SKILL_SUSTAIN_TIMER:
+    if (!(flags & SUPPRESS_MESSAGES))
+    {
+      ch->sendln("You feel able to sustain your magic again.");
+    }
+    break;
   case OBJ_LILITHRING:
     if (ch->isNonPlayer())
     {

@@ -375,6 +375,7 @@ void Player::save(FILEPtr fpsave, time_data tmpage)
           setting.key() == "mode" ||
           setting.key() == "timezone" ||
           setting.key() == "fighting.showdps" ||
+          setting.key() == "sustain" ||
           setting.key() == "dateformat")
       {
         dc_fwrite("OPT", sizeof(char), 3, fpsave);
@@ -592,7 +593,7 @@ bool Player::read(FILEPtr fpsave, CharacterPtr ch, QString filename)
 
     QString key = fread_var_string(fpsave);
     QString value = fread_var_string(fpsave);
-    if (QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone)$").match(key).hasMatch())
+    if (QRegularExpression("^(color.(good|bad)|(tell|gossip).history.timestamp|locale|mode|fighting.showdps|timezone|sustain)$").match(key).hasMatch())
     {
       config->insert(key, value);
     }

@@ -143,6 +143,7 @@ const QList<Command> Commands::commands_ =
         Command(QStringLiteral("wear"), do_wear, position_t::RESTING, 0, cmd_t::DEFAULT, true, 25, CommandType::all),
         Command(QStringLiteral("scribe"), do_scribe, position_t::RESTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::all),
         Command(QStringLiteral("brew"), do_brew, position_t::RESTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::all),
+        Command(QStringLiteral("sustain"), &Character::do_sustain, position_t::RESTING, 0, cmd_t::DEFAULT, 0, 0, CommandType::players_only),
         //  { "poisonmaking"), do_poisonmaking, nullptr,nullptr, position_t::RESTING, 0, 9,   0, 0  ,CommandType::all),
 
         // Combat commands

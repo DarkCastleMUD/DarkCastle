@@ -62,6 +62,7 @@
 #include "DC/room.h"
 #include "DC/shop.h"
 #include "DC/weather.h"
+#include "DC/sustain.h"
 
 using namespace std::literals;
 
@@ -1436,6 +1437,33 @@ private slots:
     check_timer();
     QCOMPARE(conn->output, "");
     conn->output = {};
+  }
+
+  void test_sustain()
+  {
+    QCOMPARE(sustain_interval(1), 30);
+    QCOMPARE(sustain_interval(50), 18);
+    QCOMPARE(sustain_interval(100), 5);
+
+    DC::config cf;
+    cf.sql = false;
+    DC dc(cf);
+    auto ch = new Character(&dc);
+    ch->player = new Player;
+    ch->setType(Character::Type::Player);
+    ch->max_mana = 1000;
+    QCOMPARE(mana_limit(ch), 1000);
+
+    ch->player->config = new PlayerConfig;
+    ch->player->config->insert("sustain", u"%1,%2"_s.arg(SPELL_ARMOR).arg(SPELL_FLY));
+    QCOMPARE(sustained_spells(ch), (QList<int>{SPELL_ARMOR, SPELL_FLY}));
+
+    auto reserve = SUSTAIN_RESERVE_MULTIPLIER * (use_mana(ch, SPELL_ARMOR) + use_mana(ch, SPELL_FLY));
+    QCOMPARE(sustain_reserve(ch), reserve);
+    QCOMPARE(mana_limit(ch), 1000 - reserve);
+
+    ch->max_mana = 1;
+    QCOMPARE(mana_limit(ch), 0);
   }
 
   void test_legacy_prompts()
