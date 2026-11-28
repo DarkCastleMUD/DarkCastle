@@ -2861,7 +2861,7 @@ Proxy::Proxy(QString h)
     else
     {
       inet_protocol_family = inet_protocol_family_t::UNRECOGNIZED;
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2).toStdString().c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Unrecognized PROXY inet protocol family in arg2 [%1]").arg(arg2));
     }
   }
 
@@ -2883,7 +2883,7 @@ Proxy::Proxy(QString h)
     source_port = arg5.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg5).toStdString().c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg5));
       return;
     }
   }
@@ -2896,7 +2896,7 @@ Proxy::Proxy(QString h)
     destination_port = arg6.toUInt(&ok);
     if (!ok)
     {
-      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg6).toStdString().c_str());
+      logf(IMMORTAL, DC::LogChannel::LOG_BUG, QStringLiteral("Invalid source port [%1]").arg(arg6));
       return;
     }
 
