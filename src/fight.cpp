@@ -5418,7 +5418,7 @@ void raw_kill(CharacterPtr ch, CharacterPtr victim)
   DC::getInstance()->incrementZoneDiedTick(DC::getInstance()->world[victim->in_room].zone);
 
   victim->setStanding();
-  int retval = ch->getDC()->mprog_death_trigger(victim, ch);
+  int retval = DC::getInstance()->mprog_death_trigger(victim, ch);
   if (SOMEONE_DIED(retval))
     return;
   victim->setDead();
@@ -6817,7 +6817,7 @@ void arena_kill(CharacterPtr ch, CharacterPtr victim, int type)
   // Kill mobs outright
   if (victim->isNonPlayer())
   {
-    ch->getDC()->mprog_death_trigger(victim, ch);
+    DC::getInstance()->mprog_death_trigger(victim, ch);
     remove_nosave(victim);
     extract_char(victim, true);
     return;
